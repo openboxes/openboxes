@@ -34,12 +34,12 @@ class GenericApiController {
 
     def create = {
         Object result
-        def json = request.JSON
-        if (json instanceof JSONArray) {
-            result = genericApiService.createObjects(params.resource, json)
+        def jsonObject = request.JSON
+        if (jsonObject instanceof JSONArray) {
+            result = genericApiService.createObjects(params.resource, jsonObject)
         }
         else {
-            result = genericApiService.createObject(params.resource, json)
+            result = genericApiService.createObject(params.resource, jsonObject)
         }
         response.status = 201
         render ([data:result] as JSON)

@@ -55,12 +55,18 @@ class GenericApiService {
         return domainObject
     }
 
-    Object createObject(String resourceName, JSONObject json) {
-        log.info "Create " + json.class + ": " + json
+    Object createObject(String resourceName, JSONObject jsonObject) {
+        log.info "Create object " + jsonObject.class + ": " + jsonObject
         def domainClass = getDomainClass(resourceName)
 
-        def domainObject = domainClass.newInstance()
-        domainObject.properties = json
+        def domainObject
+        if (jsonObject.id) {
+            domainObject = getObject(resourceName, jsonObject.id)
+        }
+        else {
+            domainObject = domainClass.newInstance()
+        }
+        domainObject.properties = jsonObject
         if (domainObject.hasErrors() || !domainObject.save()) {
             throw new ValidationException("Cannot create product due to validation errors", domainObject.errors)
         }
@@ -68,7 +74,7 @@ class GenericApiService {
     }
 
     Object createObjects(String resourceName, JSONArray jsonArray) {
-        log.info "Create " + jsonArray.class + ": " + jsonArray
+        log.info "Create objects " + jsonArray.class + ": " + jsonArray
         def domainObjects = []
         jsonArray.each { JSONObject jsonObject ->
             domainObjects << createObject(resourceName, jsonObject)
@@ -76,26 +82,15 @@ class GenericApiService {
         return domainObjects
     }
 
-
-    Object updateObject(String resourceName, String id, JSONObject json) {
-        log.info "Update " + json
+    Object updateObject(String resourceName, String id, JSONObject jsonObject) {
+        log.info "Update " + jsonObject
         def domainObject = getObject(resourceName, id)
-        domainObject.properties = json
+        domainObject.properties = jsonObject
         if (domainObject.hasErrors() || !domainObject.save()) {
             throw new ValidationException("Cannot create product due to validation errors", domainObject.errors)
         }
         return domainObject
     }
-
-    Object updateObjects(String resourceName, JSONArray jsonArray) {
-        log.info "Update " + jsonArray.class + ": " + jsonArray
-        def domainObjects = []
-        jsonArray.each { JSONObject jsonObject ->
-            domainObjects << updateObject(resourceName, jsonObject)
-        }
-        return domainObjects
-    }
-
 
     boolean deleteObject(String resourceName, String id) {
         def domainObject = getObject(resourceName, id)

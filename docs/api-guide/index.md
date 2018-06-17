@@ -211,15 +211,25 @@ Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Sun, 10 Jun 2018 22:13:27 GMT
-
-{data:[{"id":"cab2b4f35c33cdec015c53e129ce1dea","productCode":"HS45","name":"\tExtension Set, 7\" Smllbore, Microclave, Clamp, Rotating Luer","category":{"id":"752e945e67d511e5a90eaa0009a30cce","name":"MedEquip&Supplies_IV_Supplies"},"description":null,"dateCreated":"2017-05-29T16:04:44Z","lastUpdated":"2017-05-29T16:04:44Z"}]
+[{
+	"id": "ff80818155df9de40155df9e329b0009",
+	"productCode": "00003",
+	"name": "Aspirin 20mg",
+	"category": {
+		"id": "1",
+		"name": "Medicines"
+	},
+	"description": null,
+	"dateCreated": "2016-07-12T14:58:55Z",
+	"lastUpdated": "2016-07-12T14:58:55Z"
+}]
 ```
 
 ### Search products with Name starting with 'New product' (results paginged using offset and max)
 #### Request
 ```
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
--d '{ "name":"New product", "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
+-d '{ "name":"Aspirin", "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
 ```
 #### Response
 ```
@@ -229,7 +239,18 @@ Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Sun, 10 Jun 2018 22:15:08 GMT
 
-[{"id":"ff80818163e2de8d0163eba1b1e90002","productCode":"KX43","name":"New product","category":{"id":"ff80818163e2de8d0163eb93c5a00001","name":"New category"},"description":null,"dateCreated":"2018-06-10T21:37:13Z","lastUpdated":"2018-06-10T21:37:13Z"}]
+[{
+	"id": "ff80818163e2de8d0163eba1b1e90002",
+	"productCode": "KX43",
+	"name": "New product",
+	"category": {
+		"id": "ff80818163e2de8d0163eb93c5a00001",
+		"name": "New category"
+	},
+	"description": null,
+	"dateCreated": "2018-06-10T21:37:13Z",
+	"lastUpdated": "2018-06-10T21:37:13Z"
+}]
 ```
 
 ### Get an existing product 
@@ -246,8 +267,18 @@ Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Sun, 10 Jun 2018 21:38:27 GMT
 
-{"id":"ff80818163e2de8d0163eba1b1e90002","productCode":"KX43","name":"New product","category":{"id":"ff80818163e2de8d0163eb93c5a00001","name":"New category"},"description":null,"dateCreated":"2018-06-10T21:37:13Z","lastUpdated":"2018-06-10T21:37:13Z"}
-```
+{
+	"id": "ff80818163e2de8d0163eba1b1e90002",
+	"productCode": "KX43",
+	"name": "New product",
+	"category": {
+		"id": "ff80818163e2de8d0163eb93c5a00001",
+		"name": "New category"
+	},
+	"description": null,
+	"dateCreated": "2018-06-10T21:37:13Z",
+	"lastUpdated": "2018-06-10T21:37:13Z"
+}```
 
 ### Product not found
 
@@ -438,7 +469,7 @@ https://openboxes.ngrok.io/openboxes/api/generic/product/ff8081816407132d0164071
 
 
 ### Create multiple objects 
-The REST API also allows you to create multiple objects at once. 
+The REST API allows you to create multiple objects at once. 
 
 If there are no errors, both objects should be created and returned.
 #### Request
@@ -495,3 +526,41 @@ https://openboxes.ngrok.io/openboxes/api/generic/product
 	}
 }
 ```
+
+
+### Update multiple objects 
+The REST API also allows you to update multiple objects at once. You'll POST to same endpoint used to create new 
+objects, but you'll include the ID within each data object. 
+
+#### Request
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '[{"id":"ff8081816407132d0164071eec250001", "name":"product 1+","category.id":"ROOT"},\
+{"id":"ff8081816407132d0164071eec2d0002", "name":"product 2.1","category.id":"ROOT"}]' \
+https://openboxes.ngrok.io/openboxes/api/generic/product
+```
+
+#### Response
+```
+{
+	"data": [{
+		"id": "ff8081816407132d0164071eec250001",
+		"productCode": "BK71",
+		"name": "product 1+",
+		"description": "This is the penultimate product",
+		"category": {
+			"id": "ROOT",
+			"name": "ROOT"
+		}
+	}, {
+		"id": "ff8081816407132d0164071eec2d0002",
+		"productCode": "DD67",
+		"name": "product 2.1",
+		"description": null,
+		"category": {
+			"id": "ROOT",
+			"name": "ROOT"
+		}
+	}]
+}```
+
