@@ -23,21 +23,21 @@ class UrlMappings {
 		}
 
         // REST APIs with complex plural resource names
-        "/api/categories"(parseRequest: false) {
+        "/api/categories"(parseRequest: true) {
             controller = { "categoryApi" }
             action = [GET: "list", POST: "save"]
         }
-        "/api/categories/$id"(parseRequest: false) {
+        "/api/categories/$id"(parseRequest: true) {
             controller = {"categoryApi" }
             action = [GET:"read", POST:"save", PUT:"save", DELETE:"delete"]
         }
 
         // Standard REST APIs
-        "/api/${resource}s"(parseRequest: false) {
+        "/api/${resource}s"(parseRequest: true) {
             controller = { "${params.resource}Api" }
             action = [GET: "list", POST: "create"]
         }
-		"/api/${resource}s/$id"(parseRequest: false) {
+		"/api/${resource}s/$id"(parseRequest: true) {
             controller = {"${params.resource}Api" }
             action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
         }
