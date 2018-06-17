@@ -15,12 +15,15 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
-import org.pih.warehouse.product.Product
+import org.hibernate.SessionFactory
+import org.hibernate.criterion.Criterion
+import org.hibernate.criterion.Restrictions
 
 class GenericApiService {
 
     boolean transactional = true
 
+    SessionFactory sessionFactory
     GrailsApplication grailsApplication
 
     GrailsDomainClass getDomainClassByName(String className) {
@@ -97,5 +100,39 @@ class GenericApiService {
         return domainObject.delete()
     }
 
+    def searchObjects(String resourceName, JSONObject jsonObject, Map params) {
+        Class domainClass = getDomainClass(resourceName)
+        def session = sessionFactory.currentSession
+        def criteria = session.createCriteria(domainClass);
+        jsonObject.searchAttributes.each { attr ->
+            Criterion criterion = buildCriterion(attr.property, attr.operator, attr.value)
+            criteria.add(criterion)
+        }
+        return criteria.list()
+    }
+
+    Criterion buildCriterion(String propertyName, String operator, String value) {
+        if (!propertyName || !value) {
+            throw new IllegalArgumentException("Property and value are required in order to perform searches")
+        }
+
+        // Default operator should be eq
+        operator = operator ?: "eq"
+
+        switch(operator) {
+
+            case "eq":
+                Restrictions.eq(propertyName, value)
+                break;
+            case "like":
+                Restrictions.like(propertyName, value)
+                break;
+            case "ilike":
+                Restrictions.ilike(propertyName, value)
+                break;
+            default:
+                throw new UnsupportedOperationException("Operator ${operator} is not supported at this time")
+        }
+    }
 
 }

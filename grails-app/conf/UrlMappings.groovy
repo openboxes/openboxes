@@ -52,6 +52,11 @@ class UrlMappings {
             action = [GET: "list", POST:"create"]
         }
 
+        "/api/generic/${resource}/search"(parseRequest: false) {
+            controller = "genericApi"
+            action = [GET: "search", POST:"search"]
+        }
+
         "/api/generic/${resource}/$id"(parseRequest: false) {
             controller = "genericApi"
             action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
@@ -59,23 +64,13 @@ class UrlMappings {
 
 
 
-        //"/test/searchByFirstName.json?q=$q"(controller:"test") {
-		//	action = [GET:"searchByFirstName"]
-		//}
-			
-		//"/person/name/$q?"(controller:"test") {
-		//	action = [GET:"searchByFirstName"]
-		//}
-		"401"(controller:"errors", action:"handleUnauthorized")
+        "401"(controller:"errors", action:"handleUnauthorized")
 		"404"(controller:"errors", action:"handleNotFound")
         "405"(controller:"errors", action:"handleMethodNotAllowed")
 		"500"(controller:"errors", action:"handleException")
         "500"(controller:"errors", action:"handleNotFound", exception: ObjectNotFoundException)
         "500"(controller:"errors", action:"handleValidationErrors", exception: ValidationException)
         "500"(controller:"errors", action:"handleUnauthorized", exception: AuthenticationException)
-
-		//"500"(controller:"errors",action: "handleInvalidDataAccess", exception: MySQLSyntaxErrorException)
-		//"500"(controller:"errors", action:"handleInvalidDataAccess", exception: HibernateOptimisticLockingFailureException)
         "/"(controller:"home", action:"index")
 	}
 

@@ -27,6 +27,12 @@ class GenericApiController {
         render ([data:data] as JSON)
 	}
 
+    def search = {
+        def jsonObject = request.JSON
+        List data = genericApiService.searchObjects(params.resource, jsonObject, params)
+        render ([data:data] as JSON)
+    }
+
     def read = {
         Object domainObject = genericApiService.getObject(params.resource, params.id)
         render ([data:domainObject] as JSON)
