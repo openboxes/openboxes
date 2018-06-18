@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import PickPageFieldArrayComponent from './PickPageFieldArrayComponent';
 import TableRow from './TableRow';
+import LineItemsRowKeyFieldArrayComponent from './LineItemsRowKeyFieldArrayComponent';
 
 class FieldArrayComponent extends Component {
   shouldComponentUpdate(nextProps) {
@@ -29,6 +30,16 @@ class FieldArrayComponent extends Component {
     if (fieldsConfig.pickPage) {
       return (
         <PickPageFieldArrayComponent
+          fieldsConfig={fieldsConfig}
+          properties={properties}
+          fields={fields}
+        />
+      );
+    }
+
+    if (fieldsConfig.lineItemsRowKey) {
+      return (
+        <LineItemsRowKeyFieldArrayComponent
           fieldsConfig={fieldsConfig}
           properties={properties}
           fields={fields}
