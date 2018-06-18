@@ -1,5 +1,6 @@
-import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import grails.validation.ValidationException
+import org.apache.http.auth.AuthenticationException
+import org.hibernate.ObjectNotFoundException
 
 /**
 * Copyright (c) 2012 Partners In Health.  All rights reserved.
@@ -20,23 +21,56 @@ class UrlMappings {
 				 // apply constraints here
 			  }
 		}
-		
-		"/api/$action/$id"(controller:"api", parseRequest:true){
+
+        // REST APIs with complex plural resource names
+        "/api/categories"(parseRequest: true) {
+            controller = { "categoryApi" }
+            action = [GET: "list", POST: "save"]
+        }
+        "/api/categories/$id"(parseRequest: true) {
+            controller = {"categoryApi" }
+            action = [GET:"read", POST:"save", PUT:"save", DELETE:"delete"]
+        }
+
+        // Standard REST APIs
+        "/api/${resource}s"(parseRequest: true) {
+            controller = { "${params.resource}Api" }
+            action = [GET: "list", POST: "create"]
+        }
+		"/api/${resource}s/$id"(parseRequest: true) {
+            controller = {"${params.resource}Api" }
+            action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
+        }
+
+        // Anonymous REST APIs like Status, Login, Logout
+		"/api/$action/$id?"(controller:"api", parseRequest:false){
 			//action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
 		}
-		//"/test/searchByFirstName.json?q=$q"(controller:"test") { 
-		//	action = [GET:"searchByFirstName"]
-		//}
-			
-		//"/person/name/$q?"(controller:"test") {
-		//	action = [GET:"searchByFirstName"]
-		//}
-		"401"(controller:"errors", action:"handleUnauthorized")
+
+        "/api/generic/${resource}/"(parseRequest: false) {
+            controller = "genericApi"
+            action = [GET: "list", POST:"create"]
+        }
+
+        "/api/generic/${resource}/search"(parseRequest: false) {
+            controller = "genericApi"
+            action = [GET: "search", POST:"search"]
+        }
+
+        "/api/generic/${resource}/$id"(parseRequest: false) {
+            controller = "genericApi"
+            action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
+        }
+
+
+
+        "401"(controller:"errors", action:"handleUnauthorized")
 		"404"(controller:"errors", action:"handleNotFound")
         "405"(controller:"errors", action:"handleMethodNotAllowed")
-		//"500"(controller:"errors", action:"handleException")
-		//"500"(controller:"errors",action: "handleInvalidDataAccess", exception: MySQLSyntaxErrorException)
-		//"500"(controller:"errors", action:"handleInvalidDataAccess", exception: HibernateOptimisticLockingFailureException)
+		"500"(controller:"errors", action:"handleException")
+        "500"(controller:"errors", action:"handleNotFound", exception: ObjectNotFoundException)
+        "500"(controller:"errors", action:"handleValidationErrors", exception: ValidationException)
+        "500"(controller:"errors", action:"handleUnauthorized", exception: AuthenticationException)
         "/"(controller:"home", action:"index")
 	}
 

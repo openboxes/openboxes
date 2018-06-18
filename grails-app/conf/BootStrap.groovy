@@ -8,6 +8,7 @@
  * You must not remove this notice, or any other, from this software.
  **/
 
+import grails.converters.JSON
 import grails.util.Environment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -18,11 +19,22 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentType
+import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.ContainerType
+
 
 import javax.sql.DataSource
 
@@ -37,6 +49,143 @@ class BootStrap {
     DataSource dataSource;
 
     def init = { servletContext ->
+
+        // Static data
+        JSON.registerObjectMarshaller(ContainerType) { ContainerType containerType -> [
+                id: containerType.id,
+                name: containerType.name,
+                description: containerType.description
+        ]}
+
+        JSON.registerObjectMarshaller(LocationType) { LocationType locationType -> [
+                id: locationType.id,
+                name: locationType.name,
+                description: locationType.description,
+                locationTypeCode: locationType?.locationTypeCode?.name()
+        ]}
+
+        JSON.registerObjectMarshaller(ShipmentType) { ShipmentType shipmentType -> [
+                id: shipmentType.id,
+                name: shipmentType.name,
+                description: shipmentType.description
+        ]}
+
+
+        // Master data
+
+        JSON.registerObjectMarshaller(Category) { Category category -> [
+                id: category.id,
+                name: category.name,
+                parentCategory: category?.parentCategory
+        ]}
+
+        JSON.registerObjectMarshaller(Container) { Container container -> [
+                id: container.id,
+                name: container.name,
+                containerNumber: container.containerNumber,
+                containerType: container.containerType,
+                recipient: container.recipient,
+                sortOrder: container.sortOrder,
+                shipmentItems: container.shipmentItems
+        ]}
+
+        JSON.registerObjectMarshaller(InventoryItem) { InventoryItem inventoryItem -> [
+                id: inventoryItem.id,
+                product: [
+                        id: inventoryItem?.product?.id,
+                        name: inventoryItem?.product?.name,
+                        productCode: inventoryItem?.product?.productCode
+                ],
+                lotNumber: inventoryItem.lotNumber,
+                expirationDate: inventoryItem.expirationDate
+        ]}
+
+        JSON.registerObjectMarshaller(Location) { Location location -> [
+                id: location.id,
+                name: location.name,
+                description: location.description,
+                locationNumber: location.locationNumber,
+                locationGroup: location.locationGroup,
+                parentLocation: location.parentLocation,
+                locationType: location.locationType,
+                locationTypeCode: location?.locationType?.locationTypeCode?.name()
+        ]}
+
+        JSON.registerObjectMarshaller(Product) { Product product -> [
+                id: product.id,
+                productCode: product.productCode,
+                name: product.name,
+                description: product.description,
+                category: [id: product?.category?.id, name: product?.category?.name]
+        ]}
+
+        JSON.registerObjectMarshaller(Receipt) { Receipt receipt -> [
+                id: receipt.id,
+                expectedDeliveryDate: receipt.expectedDeliveryDate,
+                actualDeliveryDate: receipt.actualDeliveryDate,
+                recipient: receipt.recipient,
+                shipment: receipt.shipment,
+                recipientItems: receipt.receiptItems
+        ]}
+
+        JSON.registerObjectMarshaller(ReceiptItem) { ReceiptItem receiptItem -> [
+                id: receiptItem.id,
+                receipt: receiptItem.receipt,
+                product: receiptItem.inventoryItem.product,
+                inventoryItem: receiptItem.inventoryItem,
+                quantityReceived: receiptItem.quantityReceived,
+                quantityShipped: receiptItem.quantityShipped,
+                binLocation: receiptItem.binLocation,
+                recipient: receiptItem.recipient
+        ]}
+
+        JSON.registerObjectMarshaller(Shipment) { Shipment shipment ->
+            def containerList = []
+            def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
+            shipmentItemsByContainer.each { container, shipmentItems ->
+                containerList << [id: container?.id, name: container?.name, type: container?.containerType?.name, shipmentItems: shipmentItems]
+            }
+            return [
+                id: shipment.id,
+                name: shipment.name,
+                status: shipment?.status?.code?.name(),
+                origin: [
+                        id: shipment.origin?.id,
+                        name: shipment?.origin?.name,
+                        type: shipment?.origin?.locationType?.locationTypeCode?.name()
+                ],
+                destination: [
+                        id: shipment?.destination?.id,
+                        name: shipment?.destination?.name,
+                        type: shipment?.destination?.locationType?.locationTypeCode?.name()
+
+                ],
+                shipmentItems: shipment.shipmentItems,
+                containers: containerList
+        ]}
+
+        JSON.registerObjectMarshaller(ShipmentItem) { ShipmentItem shipmentItem ->
+            def container = shipmentItem?.container ? [
+                    id: shipmentItem?.container?.id,
+                    name: shipmentItem?.container?.name,
+                    type: shipmentItem?.container?.containerType?.name ] : null
+            [
+                id: shipmentItem.id,
+                inventoryItem: shipmentItem?.inventoryItem,
+                quantity: shipmentItem.quantity,
+                recipient: shipmentItem.recipient,
+                shipment: [id: shipmentItem?.shipment?.id, name: shipmentItem?.shipment?.name],
+                container: container
+        ]}
+
+        JSON.registerObjectMarshaller(User) { User user -> [
+                id: user.id,
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                displayName: user.name
+        ]}
+
 
         // ================================    Static Data    ============================================
         //
@@ -126,7 +275,6 @@ class BootStrap {
         else {
             log.info("Uploads directory already exists")
         }
-
     }
 
 

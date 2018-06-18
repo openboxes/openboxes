@@ -179,7 +179,7 @@ class ProductController {
         params.productCode = params.q
         params.unitOfMeasure = params.q
 
-        productInstanceList = productService.getProducts(params.q, category, tags, includeInactive, params)
+        productInstanceList = productService.getProducts(category, tags, includeInactive, params)
         flash.productIds = productInstanceList.collect { it.id }
 
 		[productInstanceList: productInstanceList, productInstanceTotal: productInstanceList.totalCount]

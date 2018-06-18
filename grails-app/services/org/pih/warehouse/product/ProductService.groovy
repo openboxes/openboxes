@@ -278,13 +278,12 @@ class ProductService {
     }
     */
 
-    List<Product> getProducts(String query, Category category, List<Tag> tags, params) {
-        return getProducts(category, tags, false, params)
-    }
-
+	/**
+	 * @deprecated
+	 * @return
+	 */
     List<Product> getProducts(String query, Category category, List<Tag> tags, boolean includeInactive, params) {
         return getProducts(category, tags, includeInactive, params)
-
     }
 
     /**
@@ -311,7 +310,7 @@ class ProductService {
      * @param params
      * @return
      */
-    List<Product> getProducts(Category category, List<Tag> tags, params) {
+    List<Product> getProducts(Category category, List<Tag> tags, Map params) {
         return getProducts(category, tags, false, params)
     }
 
@@ -325,7 +324,7 @@ class ProductService {
      * @return
      */
     def getProducts(Category category, List<Tag> tagsInput, boolean includeInactive, Map params) {
-        println "get products where category=" + category + ", tags=" + tagsInput + ", params=" + params
+        log.info "get products where category=" + category + ", tags=" + tagsInput + ", params=" + params
 
         def criteria = Product.createCriteria()
         def results = criteria.list(max:params.max?:10, offset:params.offset?:0, sort:params.sort?:"name", order:params.order?:"asc") {
