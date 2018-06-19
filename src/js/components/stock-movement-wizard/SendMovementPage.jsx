@@ -46,7 +46,7 @@ const SendMovementPage = (props) => {
   } = props;
 
   const tableItems =
-    pickPage.length ? _.filter(pickPage, pick => !!pick.lotWithBin && !pick.crossedOut) : lineItems;
+    pickPage.length ? _.filter(pickPage, pick => !!pick.lot && !pick.crossedOut) : lineItems;
 
   return (
     <div>
