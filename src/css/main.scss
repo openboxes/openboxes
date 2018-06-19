@@ -180,6 +180,8 @@ $blue-epsilon: #bce7f7;
   text-decoration: none;
   background-color: $blue-epsilon;
   border: 1px solid $blue-gamma;
+  border-left: none;
+  border-right: none;
 }
 
 .wizard-steps div:first-child a {
@@ -197,13 +199,13 @@ $blue-epsilon: #bce7f7;
 }
 
 .wizard-steps div a:before {
-  right: -11px;
+  right: -10px;
   z-index: 3;
   border-left: 11px solid $blue-epsilon;
 }
 
 .wizard-steps div a:after {
-  right: -12px;
+  right: -11px;
   z-index: 2;
   border-left: 11px solid $blue-beta
 }
