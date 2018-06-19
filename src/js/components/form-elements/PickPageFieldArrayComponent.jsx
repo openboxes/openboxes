@@ -46,7 +46,7 @@ class PickPageFieldArrayComponent extends Component {
             }
           }}
         />
-        <table className="table text-center">
+        <table className="table text-center border">
           <thead>
             <tr>
               { _.map(fieldsConfig.fields, (config, name) =>

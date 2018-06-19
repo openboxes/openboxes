@@ -49,7 +49,7 @@ class FieldArrayComponent extends Component {
 
     return (
       <div>
-        <table className="table table-striped text-center">
+        <table className="table table-striped text-center border">
           <thead>
             <tr>
               { _.map(fieldsConfig.fields, (config, name) =>

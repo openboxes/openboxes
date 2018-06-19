@@ -3,7 +3,7 @@
 exports[`ArrayField component is correctly rendering with Add button 1`] = `
 <div>
   <table
-    className="table table-striped text-center"
+    className="table table-striped text-center border"
   >
     <thead>
       <tr>
@@ -126,7 +126,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
 exports[`ArrayField component is correctly rendering with no Add button 1`] = `
 <div>
   <table
-    className="table table-striped text-center"
+    className="table table-striped text-center border"
   >
     <thead>
       <tr>

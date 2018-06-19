@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import { formValueSelector } from 'redux-form';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+
 import CreateStockMovement from './CreateStockMovement';
 import AddItemsPage from './AddItemsPage';
 import EditPage from './EditPage';
@@ -7,10 +11,6 @@ import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
 
 class StockMovements extends Component {
-  static getStepList() {
-    return ['Create', 'Add items', 'Edit', 'Pick', 'Send'];
-  }
-
   static showResults(values) {
     window.alert(`You submitted:\n\n${JSON.stringify(values, null, 2)}`);
   }
@@ -26,6 +26,10 @@ class StockMovements extends Component {
     this.nextPage = this.nextPage.bind(this);
     this.previousPage = this.previousPage.bind(this);
     this.goToPage = this.goToPage.bind(this);
+  }
+
+  static getStepList() {
+    return ['Create', 'Add items', 'Edit', 'Pick', 'Send'];
   }
 
   getFormList() {
@@ -76,6 +80,11 @@ class StockMovements extends Component {
           <WizardSteps steps={StockMovements.getStepList()} currentStep={this.state.page} />
         </div>
         <div>
+          { (this.props.movementNumber && this.props.description) &&
+            <span>{`${this.props.movementNumber} - ${this.props.description}`}</span>
+          }
+        </div>
+        <div>
           {formList[page - 1]}
         </div>
       </div>
@@ -83,4 +92,21 @@ class StockMovements extends Component {
   }
 }
 
-export default StockMovements;
+const selector = formValueSelector('stock-movement-wizard');
+
+const mapStateToProps = state => ({
+  description: selector(state, 'description'),
+  movementNumber: selector(state, 'movementNumber'),
+});
+
+export default connect(mapStateToProps, {})(StockMovements);
+
+StockMovements.propTypes = {
+  movementNumber: PropTypes.string,
+  description: PropTypes.string,
+};
+
+StockMovements.defaultProps = {
+  movementNumber: '',
+  description: '',
+};

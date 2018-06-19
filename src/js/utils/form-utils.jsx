@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { MOVEMENT_NUMBER } from '../mockedData';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
@@ -82,3 +83,7 @@ renderField.defaultProps = {
 
 export const generateKey = () =>
   Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+
+// TODO: Make API call here and get movement number from backend
+export const getMovementNumber = () => MOVEMENT_NUMBER;
