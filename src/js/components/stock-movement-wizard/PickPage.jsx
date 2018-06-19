@@ -137,6 +137,7 @@ class PickPage extends Component {
                 lotWithBin: `${lot.lot}-${lot.bin}`,
               }
             )),
+            quantity: line.revisedQuantity || line.quantity,
             parent: true,
             qtyPicked: _.reduce(lotsPicked, (sum, lot) => sum + parseInt(lot.qtyPicked, 10), 0),
             rowKey: generateKey(),
