@@ -5,16 +5,28 @@ import _ from 'lodash';
 
 import ArrayField from '../form-elements/ArrayField';
 import TextField from '../form-elements/TextField';
-import ButtonField from '../form-elements/ButtonField';
 import { renderFormField } from '../../utils/form-utils';
 import LabelField from '../form-elements/LabelField';
 import SelectField from '../form-elements/SelectField';
 import { REASON_CODE_MOCKS } from '../../mockedData';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
+import SubstitutionsModal from './modals/SubstitutionsModal';
+import TableRowWithSelector from '../form-elements/TableRowWithSelector';
 
 const FIELDS = {
   lineItems: {
     type: ArrayField,
+    lineItemsRowKey: true,
+    rowComponent: TableRowWithSelector,
+    rowAttributes: {
+      formName: 'stock-movement-wizard',
+      rowSelector: 'substituted',
+    },
+    getDynamicRowAttr: ({ selectedValue }) => (
+      {
+        className: selectedValue ? 'crossed-out' : '',
+      }
+    ),
     fields: {
       product: {
         type: LabelField,
@@ -35,17 +47,45 @@ const FIELDS = {
         type: LabelField,
         label: 'Monthly consumption',
       },
-      button: {
-        type: ButtonField,
+      substituteButton: {
         label: 'Substitute available',
-        buttonLabel: 'Yes',
+        type: ValueSelectorField,
         attributes: {
-          className: 'btn btn-outline-primary',
+          formName: 'stock-movement-wizard',
+        },
+        getDynamicAttr: ({ rowIndex }) => ({
+          field: `lineItems[${rowIndex}].product.code`,
+        }),
+        component: SubstitutionsModal,
+        componentConfig: {
+          attributes: {
+            btnOpenText: 'Yes',
+            title: 'Substitutes',
+          },
+          getDynamicAttr: ({ selectedValue, rowIndex }) => ({
+            productCode: selectedValue,
+            rowIndex,
+          }),
         },
       },
       revisedQuantity: {
-        type: TextField,
-        label: 'Revised qty',
+        label: 'Revised Qty',
+        type: ValueSelectorField,
+        attributes: {
+          formName: 'stock-movement-wizard',
+        },
+        getDynamicAttr: ({ rowIndex }) => ({
+          field: `lineItems[${rowIndex}].substituted`,
+        }),
+        component: TextField,
+        componentConfig: {
+          attributes: {
+            type: 'number',
+          },
+          getDynamicAttr: ({ selectedValue }) => ({
+            disabled: !!selectedValue,
+          }),
+        },
       },
       reasonCode: {
         type: ValueSelectorField,
@@ -99,7 +139,6 @@ function validate(values) {
   });
   return errors;
 }
-
 
 export default reduxForm({
   form: 'stock-movement-wizard',

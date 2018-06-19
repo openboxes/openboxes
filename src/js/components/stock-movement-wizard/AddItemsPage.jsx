@@ -147,12 +147,14 @@ class AddItemsPage extends Component {
     } else {
       lineItems = _.map(
         STOCK_LIST_ITEMS_MOCKS[this.props.stockList],
-        val => ({ ...val, quantity: val.maxQuantity, disabled: true }),
+        val => ({
+          ...val, quantity: val.maxQuantity, disabled: true, rowKey: _.uniqueId('lineItem_'),
+        }),
       );
     }
 
     this.props.initialize('stock-movement-wizard', {
-      lineItems, pickPage: [], adjustInventory: [], editPick: [],
+      lineItems, pickPage: [], adjustInventory: [], editPick: [], substitutions: [],
     }, true);
   }
 

@@ -39,6 +39,7 @@ class ModalWrapper extends Component {
           type="button"
           className={this.props.btnOpenClassName}
           style={this.props.btnOpenStyle}
+          disabled={this.props.btnOpenDisabled}
           onClick={() => this.openModal()}
         >
           {this.props.btnOpenText}
@@ -66,6 +67,7 @@ class ModalWrapper extends Component {
               type="button"
               className={this.props.btnSaveClassName}
               style={this.props.btnSaveStyle}
+              disabled={this.props.btnSaveDisabled}
               onClick={() => this.save()}
             >
               {this.props.btnSaveText}
@@ -92,6 +94,7 @@ ModalWrapper.propTypes = {
   btnOpenText: PropTypes.string,
   btnOpenClassName: PropTypes.string,
   btnOpenStyle: PropTypes.shape({}),
+  btnOpenDisabled: PropTypes.bool,
 
   /* Modal title property */
   title: PropTypes.string.isRequired,
@@ -109,6 +112,7 @@ ModalWrapper.propTypes = {
   btnSaveText: PropTypes.string,
   btnSaveClassName: PropTypes.string,
   btnSaveStyle: PropTypes.shape({}),
+  btnSaveDisabled: PropTypes.bool,
 
   /* Cancel button properties */
   btnCancelText: PropTypes.string,
@@ -125,6 +129,7 @@ ModalWrapper.defaultProps = {
   btnOpenText: 'Open',
   btnOpenClassName: 'btn btn-outline-primary',
   btnOpenStyle: {},
+  btnOpenDisabled: false,
 
   bodyContainerClassName: 'modal-body-container',
   bodyContainerStyle: {},
@@ -135,10 +140,12 @@ ModalWrapper.defaultProps = {
   btnSaveText: 'Save',
   btnSaveClassName: 'btn btn-outline-success',
   btnSaveStyle: {},
+  btnSaveDisabled: false,
 
   btnCancelText: 'Cancel',
   btnCancelClassName: 'btn btn-outline-secondary',
   btnCancelStyle: {},
+
 
   onOpen: () => null,
   onSave: () => null,

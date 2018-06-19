@@ -112,7 +112,7 @@ class PickPage extends Component {
     if (!_.some(this.props.pickPageData, 'availableLots')) {
       const { lineItems } = this.props;
       let pickPage = [];
-      _.forEach(lineItems, (line) => {
+      _.forEach(_.filter(lineItems, item => !item.substituted), (line) => {
         // Get available lots for every product
         const availableLots =
           _.filter(
