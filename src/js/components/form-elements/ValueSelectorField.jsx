@@ -8,7 +8,7 @@ const withValueSelector = ({
   fieldName,
   fieldConfig: {
     component: FieldComponent,
-    componentConfig,
+    componentConfig = {},
     label,
     getDynamicAttr,
     attributes = {},

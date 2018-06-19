@@ -26,7 +26,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
           >
             <input
               className="form-control"
-              id="[object Object].textField"
+              id="test-field[0].textField"
               onBlur={[Function]}
               onChange={[Function]}
               type="text"
@@ -42,7 +42,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
           >
             <input
               className="form-control"
-              id="[object Object].textField2"
+              id="test-field[0].textField2"
               onBlur={[Function]}
               onChange={[Function]}
               type="text"
@@ -71,7 +71,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
           >
             <input
               className="form-control"
-              id="[object Object].textField"
+              id="test-field[1].textField"
               onBlur={[Function]}
               onChange={[Function]}
               type="text"
@@ -87,7 +87,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
           >
             <input
               className="form-control"
-              id="[object Object].textField2"
+              id="test-field[1].textField2"
               onBlur={[Function]}
               onChange={[Function]}
               type="text"
@@ -149,7 +149,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
           >
             <input
               className="form-control"
-              id="[object Object].textField"
+              id="test-field[0].textField"
               onBlur={[Function]}
               onChange={[Function]}
               type="text"
@@ -165,7 +165,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
           >
             <input
               className="form-control"
-              id="[object Object].textField2"
+              id="test-field[0].textField2"
               onBlur={[Function]}
               onChange={[Function]}
               type="text"
@@ -194,7 +194,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
           >
             <input
               className="form-control"
-              id="[object Object].textField"
+              id="test-field[1].textField"
               onBlur={[Function]}
               onChange={[Function]}
               type="text"
@@ -210,7 +210,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
           >
             <input
               className="form-control"
-              id="[object Object].textField2"
+              id="test-field[1].textField2"
               onBlur={[Function]}
               onChange={[Function]}
               type="text"
