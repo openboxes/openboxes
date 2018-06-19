@@ -12,7 +12,7 @@ import ButtonField from '../form-elements/ButtonField';
 import LabelField from '../form-elements/LabelField';
 import DateField from '../form-elements/DateField';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
-import { renderFormField } from '../../utils/form-utils';
+import { renderFormField, getMovementNumber } from '../../utils/form-utils';
 import { PRODUCTS_MOCKS, STOCK_LIST_ITEMS_MOCKS, USERNAMES_MOCKS } from '../../mockedData';
 
 const DELETE_BUTTON_FIELD = {
@@ -153,8 +153,15 @@ class AddItemsPage extends Component {
       );
     }
 
+    const movementNumber = getMovementNumber();
+
     this.props.initialize('stock-movement-wizard', {
-      lineItems, pickPage: [], adjustInventory: [], editPick: [], substitutions: [],
+      lineItems,
+      pickPage: [],
+      adjustInventory: [],
+      editPick: [],
+      substitutions: [],
+      movementNumber,
     }, true);
   }
 

@@ -42,7 +42,7 @@ const FIELDS = {
 const SendMovementPage = (props) => {
   const {
     handleSubmit, pristine, previousPage, submitting, pickPage, lineItems,
-    description, origin, destination, stockList, requestedBy, dateRequested,
+    description, origin, destination, stockList, requestedBy, dateRequested, movementNumber,
   } = props;
 
   const tableItems =
@@ -50,6 +50,7 @@ const SendMovementPage = (props) => {
 
   return (
     <div>
+      <hr />
       <div className="print-buttons-container">
         <button type="button" className="py-1 mb-1 btn btn-outline-secondary d-print-none">
           <span><i className="fa fa-print pr-2" />Print Delivery Note</span>
@@ -113,11 +114,19 @@ const SendMovementPage = (props) => {
             {dateRequested}
           </span>
         </div>
+        <div className="row">
+          <span className="pb-2 col-md-2 col-form-label text-right">
+            Shipment name
+          </span>
+          <span className="col-md-4 align-self-center">
+            {`"${origin.name}.${destination.name}.${dateRequested}.${stockList}.${movementNumber}.${description}"`}
+          </span>
+        </div>
         <hr />
         <div>
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
 
-          <table className="table table-striped text-center">
+          <table className="table table-striped text-center border">
             <thead>
               <tr>
                 <th>Product</th>
@@ -175,6 +184,7 @@ const mapStateToProps = state => ({
   dateRequested: selector(state, 'dateRequested'),
   pickPage: selector(state, 'pickPage'),
   lineItems: selector(state, 'lineItems'),
+  movementNumber: selector(state, 'movementNumber'),
 });
 
 export default reduxForm({
@@ -195,6 +205,7 @@ SendMovementPage.propTypes = {
   stockList: PropTypes.string.isRequired,
   requestedBy: PropTypes.string.isRequired,
   dateRequested: PropTypes.string.isRequired,
+  movementNumber: PropTypes.string.isRequired,
   pickPage: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   lineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   handleSubmit: PropTypes.func.isRequired,
