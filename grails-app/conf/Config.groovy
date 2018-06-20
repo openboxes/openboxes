@@ -295,7 +295,8 @@ log4j = {
 
 
 	fatal	'com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter',
-            'org.grails.plugin.resource.ResourceMeta'
+            'org.grails.plugin.resource.ResourceMeta',
+			'org.codehaus.groovy.grails.web.converters.JSONParsingParameterCreationListener'
 
 	// We get some annoying stack trace when cleaning this class up after functional tests
 	error	'org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog',

@@ -27,8 +27,6 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
-import org.pih.warehouse.shipping.Container
-import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
@@ -111,6 +109,27 @@ class BootStrap {
                 locationTypeCode: location?.locationType?.locationTypeCode?.name()
         ]}
 
+        JSON.registerObjectMarshaller(Picklist) { Picklist picklist -> [
+                id: picklist.id,
+                name: picklist.name,
+                description: picklist.description,
+                picker: picklist.picker,
+                datePicked: picklist.datePicked,
+                picklistItems: picklist.picklistItems,
+                "requisition.id": picklist?.requisition?.id
+        ]}
+
+        JSON.registerObjectMarshaller(PicklistItem) { PicklistItem picklistItem -> [
+                id: picklistItem.id,
+                inventoryItem: picklistItem.inventoryItem,
+                status: picklistItem.status,
+                "picklist.id": picklistItem.picklist?.id,
+                "requisitionItem.id": picklistItem?.requisitionItem?.id,
+                reasonCode: picklistItem.reasonCode,
+                comment: picklistItem.comment
+        ]}
+
+
         JSON.registerObjectMarshaller(Product) { Product product -> [
                 id: product.id,
                 productCode: product.productCode,
@@ -138,6 +157,55 @@ class BootStrap {
                 binLocation: receiptItem.binLocation,
                 recipient: receiptItem.recipient
         ]}
+
+        JSON.registerObjectMarshaller(Requisition) { Requisition requisition -> [
+                id: requisition.id,
+                name: requisition.name,
+                requisitionNumber: requisition.requisitionNumber,
+                description: requisition.description,
+                isTemplate: requisition.isTemplate,
+                type: requisition?.type?.name(),
+                status: requisition?.status?.name(),
+                commodityClass: requisition?.commodityClass?.name(),
+                dateRequested: requisition.dateRequested,
+                dateReviewed: requisition.dateReviewed,
+                dateVerified: requisition.dateVerified,
+                dateChecked: requisition.dateChecked,
+                dateDelivered: requisition.dateDelivered,
+                dateIssued: requisition.dateIssued,
+                dateReceived: requisition.dateReceived,
+                origin: requisition.origin,
+                destination: requisition.destination,
+                requestedBy: requisition.requestedBy,
+                reviewedBy: requisition.reviewedBy,
+                verifiedBy: requisition.verifiedBy,
+                checkedBy: requisition.checkedBy,
+                deliveredBy: requisition.deliveredBy,
+                issuedBy: requisition.issuedBy,
+                receivedBy: requisition.receivedBy,
+                recipient: requisition.recipient,
+                requisitionItems: requisition.requisitionItems
+        ]}
+
+        JSON.registerObjectMarshaller(RequisitionItem) { RequisitionItem requisitionItem -> [
+                id: requisitionItem.id,
+                status: requisitionItem?.status?.name(),
+                "requisition.id": requisitionItem?.requisition.id,
+                product: requisitionItem?.inventoryItem?.product,
+                inventoryItem: requisitionItem?.inventoryItem,
+                quantity: requisitionItem?.quantity,
+                quantityApproved: requisitionItem.quantityApproved,
+                quantityCanceled: requisitionItem.quantityCanceled,
+                cancelReasonCode: requisitionItem.cancelReasonCode,
+                cancelComments: requisitionItem.cancelComments,
+                orderIndex: requisitionItem.orderIndex,
+                changes: requisitionItem.change?[requisitionItem.change]:[],
+                modification: requisitionItem.modificationItem,
+                substitution: requisitionItem.substitutionItem,
+                picklistItems: requisitionItem.picklistItems,
+        ]}
+
+
 
         JSON.registerObjectMarshaller(Shipment) { Shipment shipment ->
             def containerList = []
