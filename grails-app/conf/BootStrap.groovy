@@ -220,22 +220,26 @@ class BootStrap {
                 containerList << [id: container?.id, name: container?.name, type: container?.containerType?.name, shipmentItems: shipmentItems]
             }
             return [
-                id: shipment.id,
-                name: shipment.name,
-                status: shipment?.status?.code?.name(),
-                origin: [
-                        id: shipment.origin?.id,
-                        name: shipment?.origin?.name,
-                        type: shipment?.origin?.locationType?.locationTypeCode?.name()
-                ],
-                destination: [
-                        id: shipment?.destination?.id,
-                        name: shipment?.destination?.name,
-                        type: shipment?.destination?.locationType?.locationTypeCode?.name()
+                    id: shipment.id,
+                    name: shipment.name,
+                    status: shipment?.status?.code?.name(),
+                    origin: [
+                            id: shipment.origin?.id,
+                            name: shipment?.origin?.name,
+                            type: shipment?.origin?.locationType?.locationTypeCode?.name()
+                    ],
+                    destination: [
+                            id: shipment?.destination?.id,
+                            name: shipment?.destination?.name,
+                            type: shipment?.destination?.locationType?.locationTypeCode?.name()
 
-                ],
-                shipmentItems: shipment.shipmentItems,
-                containers: containerList
+                    ],
+                    expectedShippingDate: shipment.expectedShippingDate,
+                    actualShippingDate: shipment.actualShippingDate,
+                    expectedDeliveryDate: shipment.expectedDeliveryDate,
+                    actualDeliveryDate: shipment.actualDeliveryDate,
+                    shipmentItems: shipment.shipmentItems,
+                    containers: containerList
         ]}
 
         JSON.registerObjectMarshaller(ShipmentItem) { ShipmentItem shipmentItem ->
