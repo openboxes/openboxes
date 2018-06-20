@@ -26,9 +26,25 @@ class LocationService {
 	def grailsApplication
 	boolean transactional = true
 	
-	
+
 	def getAllLocations() {
-		return Location.findAllByActiveAndParentLocationIsNull(true);
+		return getAllLocations(null)
+	}
+
+	def getAllLocations(String [] fields) {
+
+		def locations = Location.createCriteria().list() {
+			if (fields) {
+				projections {
+					fields.each { field ->
+						property(field)
+					}
+				}
+			}
+			eq("active", Boolean.TRUE)
+			isNull("parentLocation")
+		}
+		return locations
 	}
 
 	def getLocations(LocationType locationType, LocationGroup locationGroup, String query, Integer max, Integer offset) {
