@@ -13,6 +13,7 @@ import grails.util.Environment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
@@ -85,6 +86,11 @@ class BootStrap {
                 recipient: container.recipient,
                 sortOrder: container.sortOrder,
                 shipmentItems: container.shipmentItems
+        ]}
+
+        JSON.registerObjectMarshaller(LocationGroup) { LocationGroup locationGroup -> [
+                id: locationGroup.id,
+                name: locationGroup.name
         ]}
 
         JSON.registerObjectMarshaller(InventoryItem) { InventoryItem inventoryItem -> [
@@ -161,7 +167,7 @@ class BootStrap {
         JSON.registerObjectMarshaller(Requisition) { Requisition requisition -> [
                 id: requisition.id,
                 name: requisition.name,
-                requisitionNumber: requisition.requisitionNumber,
+                requisitionNumber: requisition.requestNumber,
                 description: requisition.description,
                 isTemplate: requisition.isTemplate,
                 type: requisition?.type?.name(),

@@ -19,7 +19,8 @@ class LocationApiController {
     def locationService
 
     def list = {
-        def locations = locationService.getAllLocations()
+        def fields = params.fields ? params.fields.split(",") : null
+        def locations = locationService.getAllLocations(fields)
 		render ([data:locations] as JSON)
 	}
 
