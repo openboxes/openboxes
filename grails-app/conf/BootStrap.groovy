@@ -161,6 +161,7 @@ class BootStrap {
         JSON.registerObjectMarshaller(Requisition) { Requisition requisition -> [
                 id: requisition.id,
                 name: requisition.name,
+                requisitionNumber: requisition.requisitionNumber,
                 description: requisition.description,
                 isTemplate: requisition.isTemplate,
                 type: requisition?.type?.name(),
