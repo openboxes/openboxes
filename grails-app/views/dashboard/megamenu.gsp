@@ -228,6 +228,11 @@
                     <warehouse:message code="stockMovement.create.label"/>
                 </g:link>
             </div>
+            <div class="megaButton">
+                <g:link controller="partialReceiving">
+                    <warehouse:message code="partialReceiving.label"/>
+                </g:link>
+            </div>
         </div>
     </li>
 

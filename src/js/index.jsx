@@ -13,6 +13,7 @@ import '../css/main.scss';
 
 import rootReducer from './reducers';
 import StockMovement from './components/stock-movement-wizard/StockMovement';
+import ReceivingPage from './components/receiving/ReceivingPage';
 import MainLayoutRoute from './components/Layout/MainLayoutRoute';
 import en from './en';
 import fr from './fr';
@@ -34,6 +35,7 @@ ReactDOM.render(
     <BrowserRouter>
       <Switch>
         <MainLayoutRoute path="/**/stockMovement" component={StockMovement} />
+        <MainLayoutRoute path="/**/partialReceiving" component={ReceivingPage} />
       </Switch>
     </BrowserRouter>
   </Provider>
