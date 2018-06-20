@@ -88,6 +88,11 @@ class BootStrap {
                 shipmentItems: container.shipmentItems
         ]}
 
+        JSON.registerObjectMarshaller(LocationGroup) { LocationGroup locationGroup -> [
+                id: locationGroup.id,
+                name: locationGroup.name
+        ]}
+
         JSON.registerObjectMarshaller(InventoryItem) { InventoryItem inventoryItem -> [
                 id: inventoryItem.id,
                 product: [
