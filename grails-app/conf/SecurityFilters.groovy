@@ -105,7 +105,7 @@ class SecurityFilters {
                     }
 
                     if (RequestUtil.isAjax(request)) {
-                        throw new AuthenticationException("Request ${controllerName}:${actionName} requires authentication")
+                        throw new AuthenticationException("Request requires authentication [${controllerName}:${actionName}]")
                     }
 
                     redirect(controller: 'auth', action:'login')
@@ -117,7 +117,7 @@ class SecurityFilters {
 					session.user = null;
 
                     if (RequestUtil.isAjax(request)) {
-                        throw new AuthenticationException("Request ${controllerName}:${actionName} requires authentication")
+                        throw new AuthenticationException("Request requires authentication [${controllerName}:${actionName}]")
                     }
 
                     redirect(controller: 'auth', action:'login')
