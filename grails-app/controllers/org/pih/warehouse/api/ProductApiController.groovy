@@ -15,46 +15,14 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
-class ProductApiController {
+class ProductApiController extends BaseDomainApiController {
 
     def productService
 
     def list = {
         log.info "List products " + params
 		def products = productService.getProducts(null, null, params)
-        products = products.collect { it.toJson() }
-		render products as JSON
+		render ([data:products] as JSON)
 	}
-
-    def read = {
-        Product product = Product.findByIdOrProductCode(params.id, params.id)
-        if (!product) {
-            throw new ObjectNotFoundException(params.id, "Product")
-        }
-        render product.toJson() as JSON
-    }
-
-    def create = {
-        log.info "Save category " + params
-        Product product = Product.get(params.id)
-        if (!product) {
-            product = new Product(request.JSON)
-        }
-        else {
-            product.properties = request.JSON;
-        }
-
-        if (!product.hasErrors() && product.save()) {
-            render product.toJson() as JSON
-        }
-        else {
-            throw new ValidationException("Unable to save product due to errors", product.errors)
-        }
-    }
-
-
-    def delete = {
-
-    }
 
 }

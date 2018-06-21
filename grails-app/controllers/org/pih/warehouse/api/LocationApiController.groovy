@@ -14,7 +14,7 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 
-class LocationApiController {
+class LocationApiController extends BaseDomainApiController {
 
     def locationService
 
@@ -23,14 +23,5 @@ class LocationApiController {
         def locations = locationService.getAllLocations(fields)
 		render ([data:locations] as JSON)
 	}
-
-    def read = {
-        Location location = Location.get(params.id)
-        if (!location) {
-            throw new ObjectNotFoundException(params.id, Location.class.toString())
-        }
-        render ([data:location] as JSON)
-    }
-
 
 }
