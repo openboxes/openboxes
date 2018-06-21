@@ -13,7 +13,8 @@ import LabelField from '../form-elements/LabelField';
 import DateField from '../form-elements/DateField';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import { renderFormField, getMovementNumber } from '../../utils/form-utils';
-import { PRODUCTS_MOCKS, STOCK_LIST_ITEMS_MOCKS, USERNAMES_MOCKS } from '../../mockedData';
+import apiClient from '../../utils/apiClient';
+import { STOCK_LIST_ITEMS_MOCKS } from '../../mockedData';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -37,9 +38,11 @@ const NO_STOCKLIST_FIELDS = {
         label: 'Requisition items',
         attributes: {
           openOnClick: false,
-          options: PRODUCTS_MOCKS,
           objectValue: true,
         },
+        getDynamicAttr: ({ products }) => ({
+          options: products,
+        }),
       },
       quantity: {
         type: TextField,
@@ -68,11 +71,11 @@ const STOCKLIST_FIELDS = {
         componentConfig: {
           attributes: {
             openOnClick: false,
-            options: PRODUCTS_MOCKS,
             objectValue: true,
           },
-          getDynamicAttr: ({ selectedValue }) => ({
+          getDynamicAttr: ({ selectedValue, products }) => ({
             disabled: !!selectedValue,
+            options: products,
           }),
         },
       },
@@ -107,9 +110,11 @@ const VENDOR_FIELDS = {
         label: 'Item',
         attributes: {
           openOnClick: false,
-          options: PRODUCTS_MOCKS,
           objectValue: true,
         },
+        getDynamicAttr: ({ products }) => ({
+          options: products,
+        }),
       },
       lot: {
         type: TextField,
@@ -129,9 +134,9 @@ const VENDOR_FIELDS = {
       recipient: {
         type: SelectField,
         label: 'Recipient',
-        attributes: {
-          options: USERNAMES_MOCKS,
-        },
+        getDynamicAttr: ({ recipients }) => ({
+          options: recipients,
+        }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
     },
@@ -139,6 +144,15 @@ const VENDOR_FIELDS = {
 };
 
 class AddItemsPage extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      recipients: [],
+      products: [],
+    };
+  }
+
   componentDidMount() {
     let lineItems;
 
@@ -163,6 +177,9 @@ class AddItemsPage extends Component {
       substitutions: [],
       movementNumber,
     }, true);
+
+    this.fetchRecipients();
+    this.fetchProducts();
   }
 
   getFields() {
@@ -173,6 +190,30 @@ class AddItemsPage extends Component {
     }
 
     return NO_STOCKLIST_FIELDS;
+  }
+
+  fetchRecipients() {
+    const url = '/openboxes/api/generic/person';
+
+    return apiClient.get(url)
+      .then((response) => {
+        const recipients = _.map(response.data.data, recipient => (
+          { value: recipient.id, label: recipient.displayName }
+        ));
+        this.setState({ recipients });
+      });
+  }
+
+  fetchProducts() {
+    const url = '/openboxes/api/products';
+
+    return apiClient.get(url)
+      .then((response) => {
+        const products = _.map(response.data.data, product => (
+          { value: product, label: product.name }
+        ));
+        this.setState({ products });
+      });
   }
 
   nextPage(formValues) {
@@ -190,7 +231,11 @@ class AddItemsPage extends Component {
     return (
       <form onSubmit={handleSubmit(values => this.nextPage(values))}>
         {_.map(this.getFields(), (fieldConfig, fieldName) =>
-          renderFormField(fieldConfig, fieldName, { stockList: this.props.stockList }))}
+          renderFormField(fieldConfig, fieldName, {
+            stockList: this.props.stockList,
+            recipients: this.state.recipients,
+            products: this.state.products,
+          }))}
         <div>
           <button type="button" className="btn btn-outline-primary" onClick={previousPage}>
             Previous
