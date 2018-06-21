@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { reduxForm } from 'redux-form';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -7,8 +7,9 @@ import { validate } from './validate';
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import DateField from '../form-elements/DateField';
+import ValueSelectorField from '../form-elements/ValueSelectorField';
 import { renderFormField } from '../../utils/form-utils';
-import { LOCATION_MOCKS, USERNAMES_MOCKS, STOCK_LIST_MOCKS } from '../../mockedData';
+import apiClient from '../../utils/apiClient';
 
 const FIELDS = {
   description: {
@@ -18,38 +19,59 @@ const FIELDS = {
       required: true,
     },
   },
-  origin: {
+  destination: {
     type: SelectField,
     label: 'Origin',
     attributes: {
       required: true,
       objectValue: true,
-      options: LOCATION_MOCKS,
     },
+    getDynamicAttr: props => ({
+      options: props.locations,
+    }),
   },
-  destination: {
+  origin: {
     type: SelectField,
     label: 'Destination',
     attributes: {
       required: true,
       objectValue: true,
-      options: LOCATION_MOCKS,
     },
+    getDynamicAttr: props => ({
+      onChange: (value) => {
+        if (value) {
+          props.fetchStockLists(value);
+        }
+      },
+      options: props.locations,
+    }),
   },
   stockList: {
-    type: SelectField,
     label: 'Stock list',
-    attributes: {
-      options: STOCK_LIST_MOCKS,
+    type: ValueSelectorField,
+    component: SelectField,
+    componentConfig: {
+      getDynamicAttr: ({ selectedValue, stockLists }) => ({
+        disabled: !selectedValue,
+        options: stockLists,
+      }),
     },
+    attributes: {
+      formName: 'stock-movement-wizard',
+    },
+    getDynamicAttr: () => ({
+      field: 'origin',
+    }),
   },
   requestedBy: {
     type: SelectField,
     label: 'Requested-by',
     attributes: {
       required: true,
-      options: USERNAMES_MOCKS,
     },
+    getDynamicAttr: props => ({
+      options: props.users,
+    }),
   },
   dateRequested: {
     type: DateField,
@@ -61,19 +83,82 @@ const FIELDS = {
   },
 };
 
-const CreateStockMovement = (props) => {
-  const { handleSubmit } = props;
-  return (
-    <form onSubmit={handleSubmit}>
-      {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
-      <div className="row col-md-6">
-        <button type="submit" className="btn btn-outline-primary text-right">
+class CreateStockMovement extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      locations: [],
+      users: [],
+      stockLists: [],
+    };
+    this.fetchStockLists = this.fetchStockLists.bind(this);
+  }
+
+  componentDidMount() {
+    this.fetchUsers();
+    this.fetchLocations();
+  }
+
+  fetchUsers() {
+    const url = '/openboxes/api/generic/person';
+
+    return apiClient.get(url)
+      .then((response) => {
+        const users = _.map(response.data.data, user => (
+          { value: user.id, label: user.displayName }
+        ));
+        this.setState({ users });
+      });
+  }
+
+  fetchStockLists(origin) {
+    const url = `/openboxes/api/stocklists?origin.id=${origin.id}`;
+
+    return apiClient.get(url)
+      .then((response) => {
+        const stockLists = _.map(response.data.data, stockList => (
+          { value: stockList.id, label: stockList.name }
+        ));
+        this.setState({ stockLists });
+      });
+  }
+
+  fetchLocations() {
+    const url = '/openboxes/api/locations';
+
+    return apiClient.get(url)
+      .then((response) => {
+        const locations = _.map(response.data.data, location => (
+          {
+            value: { id: location.id, type: location.locationTypeCode, name: location.name },
+            label: `${location.name} [${location.locationTypeCode}]`,
+          }
+        ));
+        this.setState({ locations });
+      });
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.props.handleSubmit}>
+        {_.map(
+          FIELDS,
+          (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+            users: this.state.users,
+            locations: this.state.locations,
+            stockLists: this.state.stockLists,
+            fetchStockLists: this.fetchStockLists,
+          }),
+        )}
+        <div className="row col-md-6">
+          <button type="submit" className="btn btn-outline-primary text-right">
           Next
-        </button>
-      </div>
-    </form>
-  );
-};
+          </button>
+        </div>
+      </form>
+    );
+  }
+}
 
 export default reduxForm({
   form: 'stock-movement-wizard',
