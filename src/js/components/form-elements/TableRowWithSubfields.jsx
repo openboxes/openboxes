@@ -1,32 +1,17 @@
-import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FieldArray } from 'redux-form';
 
 import TableBody from './TableBody';
-import { renderFormField } from '../../utils/form-utils';
+import TableRow from './TableRow';
 
 const TableRowWithSubfields = (props) => {
   const {
-    fieldsConfig, index, field, addRow, properties, removeRow,
+    fieldsConfig, index, field, properties,
   } = props;
 
-  const dynamicAttr = fieldsConfig.getDynamicRowAttr ? fieldsConfig.getDynamicRowAttr(props) : {};
-
   return [
-    <tr key={field} {...dynamicAttr}>
-      { _.map(fieldsConfig.fields, (config, name) => (
-        <td key={`${field}.${name}`} className="align-middle">
-          { !config.subfield && renderFormField(config, `${field}.${name}`, {
-            ...properties,
-            arrayField: true,
-            addRow,
-            removeRow,
-            rowIndex: index,
-          })}
-        </td>
-      ))}
-    </tr>,
+    <TableRow key={field} {...props} />,
     <FieldArray
       key={`${field}.${fieldsConfig.subfieldKey}`}
       name={`${field}.${fieldsConfig.subfieldKey}`}
