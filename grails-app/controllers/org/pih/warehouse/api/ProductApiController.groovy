@@ -21,7 +21,7 @@ class ProductApiController extends BaseDomainApiController {
 
     def list = {
         log.info "List products " + params
-		def products = productService.getProducts(null, null, params)
+		def products = productService.getProducts(null, null, false, params)
 		render ([data:products] as JSON)
 	}
 
