@@ -2,22 +2,6 @@
 
 ## Overview 
 
-### Unauthorized Access
-If you try to access the API with no cookies (or an invalid/stale cookie) you'll receive the following error and will need to (re-)authenticate
-```
-$ curl -i -X POST -H "Content-Type: application/json" \
-https://openboxes.ngrok.io/openboxes/api/categories
-
-HTTP/1.1 401 Unauthorized
-Server: Apache-Coyote/1.1
-Set-Cookie: JSESSIONID=905D991AE2661B0FDD7F6FB140EB97D8; Path=/openboxes
-Content-Type: application/json;charset=UTF-8
-Transfer-Encoding: chunked
-Date: Thu, 21 Jun 2018 04:21:29 GMT
-
-{"errorCode":401,"errorMessage":"Unauthorized user: Request categoryApi:save requires authentication"}
-```
-
 ### Authentication
 In order to authenticate, you need a valid user account. In order to get the full benefits of the API your user should 
 probably be in role Superuser. Once you have created a Superuser <cough> user, you can attempt to authenticate 
@@ -42,20 +26,22 @@ subsequent requests. This saves a huge amount of headache when you're testing th
 Once you have authenticated, you have two options to 
 
 
-1. use the JSESSIONID in the "Cookie" request header to make further authenticated requests 
+#### Cookie Header 
+Copy the JSESSIONID Cookie from the response header to make subsequent authenticated requests 
 to the API
-    ```
-    $ curl -i -X POST -H "Content-Type: application/json" \
-    -H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
-    https://openboxes.ngrok.io/openboxes/api/categories
-    
-    ```
-1. Or use `-b` to read from a cookies file and start making requests against the API.
-    ```
-    $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
-    https://openboxes.ngrok.io/openboxes/api/categories
-    
-    ```
+```
+$ curl -i -X POST -H "Content-Type: application/json" \
+-H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
+https://openboxes.ngrok.io/openboxes/api/categories
+
+```
+#### Cookie File
+Or use `-b cookies.txt` to read from a cookies file and start making requests against the API. 
+NOTE: You'll need to use the `-c cookies.txt` on the login request in order to generate the proper cookies.
+```
+$ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
+https://openboxes.ngrok.io/openboxes/api/categories
+```
 
 ### Logout
 
@@ -65,6 +51,24 @@ $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/logout
 
 ```
+### Exceptions
+
+#### Unauthorized Access
+If you try to access the API with no cookies (or an invalid/stale cookie) you'll receive the following error and will need to (re-)authenticate
+```
+$ curl -i -X POST -H "Content-Type: application/json" \
+https://openboxes.ngrok.io/openboxes/api/categories
+
+HTTP/1.1 401 Unauthorized
+Server: Apache-Coyote/1.1
+Set-Cookie: JSESSIONID=905D991AE2661B0FDD7F6FB140EB97D8; Path=/openboxes
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Thu, 21 Jun 2018 04:21:29 GMT
+
+{"errorCode":401,"errorMessage":"Unauthorized user: Request categoryApi:save requires authentication"}
+```
+
 
 ### Pagination
 All API endpoints will return all objects if pagination parameters are not provided.
@@ -204,7 +208,7 @@ Date: Sun, 10 Jun 2018 22:15:08 GMT
 }]
 ```
 
-### Get an existing product 
+### Read
 ```
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/products/ff80818163e2de8d0163eba1b1e90002
@@ -246,7 +250,6 @@ Date: Sun, 10 Jun 2018 21:35:58 GMT
 
 {"errorCode":500,"errorMessage":"Unable to save category due to errors:\n- Field error in object 'org.pih.warehouse.product.Product' on field 'category': rejected value [null]; codes [org.pih.warehouse.product.Product.category.nullable.error.org.pih.warehouse.product.Product.category,org.pih.warehouse.product.Product.category.nullable.error.category,org.pih.warehouse.product.Product.category.nullable.error.org.pih.warehouse.product.Category,org.pih.warehouse.product.Product.category.nullable.error,product.category.nullable.error.org.pih.warehouse.product.Product.category,product.category.nullable.error.category,product.category.nullable.error.org.pih.warehouse.product.Category,product.category.nullable.error,org.pih.warehouse.product.Product.category.nullable.org.pih.warehouse.product.Product.category,org.pih.warehouse.product.Product.category.nullable.category,org.pih.warehouse.product.Product.category.nullable.org.pih.warehouse.product.Category,org.pih.warehouse.product.Product.category.nullable,product.category.nullable.org.pih.warehouse.product.Product.category,product.category.nullable.category,product.category.nullable.org.pih.warehouse.product.Category,product.category.nullable,nullable.org.pih.warehouse.product.Product.category,nullable.category,nullable.org.pih.warehouse.product.Category,nullable]; arguments [category,Product]; default message [Property [{0}] of class [{1}] cannot be null]\n"}
 ```
-
 
 ### Read - Product not found
 ```
@@ -300,6 +303,7 @@ Date: Sat, 09 Jun 2018 14:30:20 GMT
 
 ## Identifier API
 The identifier API only supports POST.
+
 ### Create 
 Create a new alphanumeric identifier for a given `identifierType` or `identifierFormat`.
 
@@ -313,9 +317,10 @@ Create your own identifier format using the following codes.
 * Any other character (i.e. dashes, periods) will be included as-is.
 
 ```
-[jmiranda@jmiranda-ThinkPad-W540 ~]$ curl -i -X POST -b cookies.txt \
+$ curl -i -X POST -b cookies.txt \
 -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/identifiers?identifierFormat=AAANNN
+
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
@@ -335,9 +340,10 @@ Allowed `identifierType` values:
 * `order`
 
 ```
-[jmiranda@jmiranda-ThinkPad-W540 ~]$ curl -i -X POST -b cookies.txt \
+$ curl -i -X POST -b cookies.txt \
 -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/identifiers?identifierType=product
+
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Content-Type: application/json;charset=UTF-8
@@ -356,7 +362,9 @@ openboxes.identifier.productSupplier.format = LLNN
 openboxes.identifier.requisition.format = NNNLLL
 openboxes.identifier.shipment.format = NNNLLL
 ```
-You can also edit the available characters and digits available for `identifierFormat` mask. This allows you to remove characters that may be confused with others (i.e. I, 1, l or 0 and O). By default we keep all numeric digits and remove the conflicting alphabetic characters.
+You can also edit the available characters and digits available for the `identifierFormat` 
+mask. This allows you to remove characters that may be confused with others (i.e. I, 1, l or 0 and O). 
+By default we keep all numeric digits and remove the conflicting alphabetic characters.
 ```
 openboxes.identifier.numeric = 0123456789
 openboxes.identifier.alphabetic = ABCDEFGHJKMNPQRSTUVXYZ
