@@ -18,14 +18,15 @@ pages:
     - 'Considerations': 'about/considerations.md'
     - 'Release Notes': 'about/release-notes.md'
 
-- API Guide: 'api-guide/index.md'
-    - 'Generic': api-guide/generic.md
-    - 'Category': api-guide/category.md
-    - 'Identifier': api-guide/identifier.md
-    - 'Location': api-guide/location.md
-    - 'Lookup': api-guide/lookup.md
-    - 'Product': api-guide/product.md
-    - 'Stock Movement': api-guide/stockMovement.md
+- API Guide:
+    - 'Overview': 'api-guide/index.md'
+    - 'Generic': 'api-guide/generic.md'
+    - 'Category': 'api-guide/category.md'
+    - 'Identifier': 'api-guide/identifier.md'
+    - 'Location': 'api-guide/location.md'
+    - 'Lookup': 'api-guide/lookup.md'
+    - 'Product': 'api-guide/product.md'
+    - 'Stock Movement': 'api-guide/stockMovement.md'
 
 - Deployment Guide:
     - 'Installation': 'installation/index.md'
