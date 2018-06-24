@@ -15,6 +15,9 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 
+/**
+ * Should not extend BaseDomainApiController since stocklist is not a valid domain.
+ */
 class StocklistApiController {
 
     def requisitionService
@@ -31,7 +34,7 @@ class StocklistApiController {
         if (!requisition) {
             throw new ObjectNotFoundException(params.id, Requisition.class.toString())
         }
-        render ([data: requisition] as JSON)
+        render ([data:requisition] as JSON)
     }
 
 

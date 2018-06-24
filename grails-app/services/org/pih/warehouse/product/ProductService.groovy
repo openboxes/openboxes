@@ -326,8 +326,23 @@ class ProductService {
     def getProducts(Category category, List<Tag> tagsInput, boolean includeInactive, Map params) {
         log.info "get products where category=" + category + ", tags=" + tagsInput + ", params=" + params
 
-        def criteria = Product.createCriteria()
-        def results = criteria.list(max:params.max?:10, offset:params.offset?:0, sort:params.sort?:"name", order:params.order?:"asc") {
+        int max = params.max ? params.int("max") : 10
+        int offset = params.offset ? params.int("offset") : 0
+        String sortColumn = params.sort?:"name"
+        String sortOrder = params.order?:"asc"
+
+        //max:params.max?:10, offset:params.offset?:0, sort:params.sort?:"name", order:params.order?:"asc"
+        def results = Product.createCriteria().list() {
+
+			def fields = params.fields ? params.fields.split(",") : null
+			log.info "Fields: " + fields
+			if (fields) {
+				projections {
+					fields.each { field ->
+						property(field)
+					}
+				}
+			}
             if (!includeInactive) {
                 eq("active", true)
             }
@@ -377,6 +392,9 @@ class ProductService {
                     if (params.vendorCodeIsNull) isNull("vendorCode")
                 }
             }
+            if (offset) firstResult(offset)
+            if (max) maxResults(max)
+            if (sortColumn) order(sortColumn, sortOrder)
         }
 
         return results
