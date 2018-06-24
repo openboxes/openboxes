@@ -10,6 +10,8 @@
 
 import grails.converters.JSON
 import grails.util.Environment
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -195,11 +197,11 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(RequisitionItem) { RequisitionItem requisitionItem -> [
                 id: requisitionItem.id,
-                status: requisitionItem?.status?.name(),
+                status: requisitionItem.status?.name(),
                 "requisition.id": requisitionItem?.requisition.id,
-                product: requisitionItem?.inventoryItem?.product,
-                inventoryItem: requisitionItem?.inventoryItem,
-                quantity: requisitionItem?.quantity,
+                product: requisitionItem.product,
+                inventoryItem: requisitionItem.inventoryItem,
+                quantity: requisitionItem.quantity,
                 quantityApproved: requisitionItem.quantityApproved,
                 quantityCanceled: requisitionItem.quantityCanceled,
                 cancelReasonCode: requisitionItem.cancelReasonCode,
@@ -256,6 +258,14 @@ class BootStrap {
                 container: container
         ]}
 
+        JSON.registerObjectMarshaller(StockMovement) { StockMovement stockMovement ->
+            return stockMovement.toJson()
+        }
+
+        JSON.registerObjectMarshaller(StockMovementItem) { StockMovementItem stockMovementItem ->
+            return stockMovementItem.toJson()
+        }
+
         JSON.registerObjectMarshaller(User) { User user -> [
                 id: user.id,
                 username: user.username,
@@ -263,6 +273,7 @@ class BootStrap {
                 lastName: user.lastName,
                 displayName: user.name
         ]}
+
 
 
         // ================================    Static Data    ============================================
