@@ -58,7 +58,7 @@ class GenericApiController {
 
     def delete = {
         genericApiService.deleteObject(params.resource, params.id)
-        response.status = 204
+        render status: 204
     }
 
 }
