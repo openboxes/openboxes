@@ -12,14 +12,20 @@ google_analytics: ['UA-37396941-2', 'OpenBoxes']
 pages:
 
 - Home: 'index.md'
+
 - About:
     - 'Benefits': 'about/benefits.md'
     - 'Considerations': 'about/considerations.md'
     - 'Release Notes': 'about/release-notes.md'
 
 - API Guide: 'api-guide/index.md'
-
-- User Guide: 'user-guide/index.md'
+    - 'Generic': api-guide/generic.md
+    - 'Category': api-guide/category.md
+    - 'Identifier': api-guide/identifier.md
+    - 'Location': api-guide/location.md
+    - 'Lookup': api-guide/lookup.md
+    - 'Product': api-guide/product.md
+    - 'Stock Movement': api-guide/stockMovement.md
 
 - Deployment Guide:
     - 'Installation': 'installation/index.md'
@@ -35,13 +41,14 @@ pages:
     - 'Application': 'configuration/application.md'
     - 'Example': 'configuration/example.md'
 
+- User Guide: 'user-guide/index.md'
+
 - Developer Guide:
     - 'Introduction': 'developer-guide/index.md'
     - 'Getting Started': 'developer-guide/getting-started.md'
     - 'Contributing': 'developer-guide/contributing.md'
     - 'Syncing a Fork': 'developer-guide/syncing-a-fork.md'
     - 'Tagging a Release': 'developer-guide/tagging.md'
-
 
 - Support: 'support/index.md'
 
