@@ -10,7 +10,7 @@
   },
   "scripts": {
     "watch": "webpack --watch --colors --progress",
-    "bundle": "webpack -p",
+    "bundle": "webpack",
     "test": "jest"
   },
   "jest": {
