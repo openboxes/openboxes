@@ -5,7 +5,7 @@ import { renderFormField } from '../../utils/form-utils';
 
 const TableRow = (props) => {
   const {
-    fieldsConfig, index, field, addRow, properties, removeRow,
+    fieldsConfig, index, field, addRow, properties, removeRow, rowValues = {},
   } = props;
 
   const dynamicAttr = fieldsConfig.getDynamicRowAttr ? fieldsConfig.getDynamicRowAttr(props) : {};
@@ -20,6 +20,7 @@ const TableRow = (props) => {
             addRow,
             removeRow,
             rowIndex: index,
+            fieldValue: _.get(rowValues, name),
           })}
         </td>
       ))}
@@ -37,4 +38,9 @@ TableRow.propTypes = {
   addRow: PropTypes.func.isRequired,
   removeRow: PropTypes.func.isRequired,
   properties: PropTypes.shape({}).isRequired,
+  rowValues: PropTypes.shape({}),
+};
+
+TableRow.defaultProps = {
+  rowValues: {},
 };
