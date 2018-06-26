@@ -48,22 +48,18 @@ class FieldArrayComponent extends Component {
 
     return (
       <div>
-        <table className="table table-striped text-center border">
-          <thead>
-            <tr>
-              { _.map(fieldsConfig.fields, (config, name) =>
-                <th key={name}>{config.label}</th>) }
-            </tr>
-          </thead>
-          <tbody>
-            <TableBody
-              fields={fields}
-              properties={properties}
-              addRow={addRow}
-              fieldsConfig={fieldsConfig}
-            />
-          </tbody>
-        </table>
+        <div className="text-center border">
+          <div className="d-flex flex-row border-bottom font-weight-bold py-2">
+            { _.map(fieldsConfig.fields, (config, name) =>
+              <div key={name} className="mx-1" style={{ flex: '1 1 0' }}>{config.label}</div>) }
+          </div>
+          <TableBody
+            fields={fields}
+            properties={properties}
+            addRow={addRow}
+            fieldsConfig={fieldsConfig}
+          />
+        </div>
         { AddButton &&
         <div className="text-center">
           {

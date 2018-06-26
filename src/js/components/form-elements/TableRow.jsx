@@ -9,11 +9,13 @@ const TableRow = (props) => {
   } = props;
 
   const dynamicAttr = fieldsConfig.getDynamicRowAttr ? fieldsConfig.getDynamicRowAttr(props) : {};
+  const rowIndex = properties.parentIndex || index;
+  const className = `table-row ${rowIndex % 2 === 0 ? 'even-row' : ''} ${dynamicAttr.className ? dynamicAttr.className : ''}`;
 
   return (
-    <tr {...dynamicAttr}>
+    <div {...dynamicAttr} className={`d-flex flex-row border-bottom ${className}`}>
       { _.map(fieldsConfig.fields, (config, name) => (
-        <td key={`${field}.${name}`} className="align-middle">
+        <div key={`${field}.${name}`} className="align-self-center mx-1" style={{ flex: '1 1 0', minWidth: 0 }}>
           { renderFormField(config, `${field}.${name}`, {
             ...properties,
             arrayField: true,
@@ -22,9 +24,9 @@ const TableRow = (props) => {
             rowIndex: index,
             fieldValue: _.get(rowValues, name),
           })}
-        </td>
+        </div>
       ))}
-    </tr>);
+    </div>);
 };
 
 export default TableRow;
