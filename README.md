@@ -36,7 +36,7 @@ Optional
 
 #### Basic setup instructions for developers
 
-These instructions are for developers only.  If you are a user/implementer, please check out our [Installation](https://github.com/openboxes/openboxes/wiki/Installation) page.
+These instructions are for developers only.  If you are a user/implementer, please check out our [Installation](http://docs.openboxes.com/en/latest/installation/) documentation.
 
 ##### 1. Install Dependencies
 Install dependencies above
