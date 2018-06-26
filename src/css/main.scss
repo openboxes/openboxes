@@ -347,3 +347,17 @@ tr.crossed-out td:before {
   flex-direction: column;
   right: 15px;
 }
+
+.spinner-container > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(255,255,255, 0.8);
+  z-index: 100;
+}
+
+.spinner-container > div > div {
+  top: 40%;
+}
