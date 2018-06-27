@@ -104,7 +104,7 @@ class StockMovementService {
                     else {
                         log.info "Item updated " + requisitionItem.id
                         if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
-                        if (stockMovementItem.inventoryItem) requisitionItem.product = stockMovementItem.inventoryItem
+                        if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                         if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
                         //if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
