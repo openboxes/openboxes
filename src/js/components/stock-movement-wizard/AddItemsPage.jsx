@@ -267,7 +267,9 @@ export default reduxForm({
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
   validate,
-})(connect(mapStateToProps, { initialize, change, showSpinner, hideSpinner })(AddItemsPage));
+})(connect(mapStateToProps, {
+  initialize, change, showSpinner, hideSpinner,
+})(AddItemsPage));
 
 AddItemsPage.propTypes = {
   initialize: PropTypes.func.isRequired,
