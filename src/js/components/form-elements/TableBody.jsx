@@ -36,6 +36,7 @@ class TableBody extends Component {
           addRow={addRow}
           fieldsConfig={fieldsConfig}
           removeRow={() => fields.remove(index)}
+          rowValues={fields.get(index)}
         />))
     );
   }
