@@ -68,6 +68,7 @@ class StockMovementApiController {
             stockMovementItem.id = lineItem.id
             stockMovementItem.deleted = lineItem.deleted ? Boolean.parseBoolean(lineItem.deleted):Boolean.FALSE
             stockMovementItem.product = lineItem["product.id"] ? Product.load(lineItem["product.id"]) : null
+            stockMovementItem.inventoryItem = lineItem["inventoryItem.id"] ? InventoryItem.load(lineItem["inventoryItem.id"]) : null
             //stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
             stockMovementItem.quantityRequested = lineItem.quantityRequested ? new BigDecimal(lineItem.quantityRequested) : null
             stockMovementItem.sortOrder = lineItem.sortOrder ? new Integer(lineItem.sortOrder) : null
