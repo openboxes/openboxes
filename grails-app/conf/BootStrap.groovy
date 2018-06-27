@@ -26,6 +26,7 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -156,6 +157,17 @@ class BootStrap {
                 description: product.description,
                 category: [id: product?.category?.id, name: product?.category?.name]
         ]}
+
+        JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation -> [
+                id: productAssociation.id,
+                type: productAssociation?.code?.name(),
+                product: productAssociation.product,
+                associatedProduct: productAssociation.associatedProduct,
+                quantity: productAssociation.quantity,
+                comments: productAssociation.comments
+        ]}
+
+
 
         JSON.registerObjectMarshaller(Receipt) { Receipt receipt -> [
                 id: receipt.id,
