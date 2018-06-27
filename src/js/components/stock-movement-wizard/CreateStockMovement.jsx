@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { reduxForm } from 'redux-form';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -10,6 +11,7 @@ import DateField from '../form-elements/DateField';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../actions';
 
 const FIELDS = {
   description: {
@@ -100,6 +102,7 @@ class CreateStockMovement extends Component {
   }
 
   fetchUsers() {
+    this.props.showSpinner();
     const url = '/openboxes/api/generic/person';
 
     return apiClient.get(url)
@@ -107,11 +110,13 @@ class CreateStockMovement extends Component {
         const users = _.map(response.data.data, user => (
           { value: user.id, label: user.displayName }
         ));
-        this.setState({ users });
-      });
+        this.setState({ users }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   fetchStockLists(origin) {
+    this.props.showSpinner();
     const url = `/openboxes/api/stocklists?origin.id=${origin.id}`;
 
     return apiClient.get(url)
@@ -119,11 +124,13 @@ class CreateStockMovement extends Component {
         const stockLists = _.map(response.data.data, stockList => (
           { value: stockList.id, label: stockList.name }
         ));
-        this.setState({ stockLists });
-      });
+        this.setState({ stockLists }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   fetchLocations() {
+    this.props.showSpinner();
     const url = '/openboxes/api/locations';
 
     return apiClient.get(url)
@@ -134,8 +141,9 @@ class CreateStockMovement extends Component {
             label: `${location.name} [${location.locationTypeCode}]`,
           }
         ));
-        this.setState({ locations });
-      });
+        this.setState({ locations }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   render() {
@@ -165,8 +173,10 @@ export default reduxForm({
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
   validate,
-})(CreateStockMovement);
+})(connect(null, { showSpinner, hideSpinner })(CreateStockMovement));
 
 CreateStockMovement.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
 };
