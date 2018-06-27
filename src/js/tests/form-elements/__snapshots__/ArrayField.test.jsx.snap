@@ -95,6 +95,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
       >
         <button
           className="btn btn-outline-danger"
+          disabled={false}
           onClick={[Function]}
           type="button"
         >
@@ -160,6 +161,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
       >
         <button
           className="btn btn-outline-danger"
+          disabled={false}
           onClick={[Function]}
           type="button"
         >
@@ -277,6 +279,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
       >
         <button
           className="btn btn-outline-danger"
+          disabled={false}
           onClick={[Function]}
           type="button"
         >
@@ -342,6 +345,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
       >
         <button
           className="btn btn-outline-danger"
+          disabled={false}
           onClick={[Function]}
           type="button"
         >

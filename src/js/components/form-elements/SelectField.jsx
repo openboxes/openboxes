@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import 'react-select/dist/react-select.css';
 
-import BaseReactField from './BaseReactField';
+import BaseField from './BaseField';
 
 const SelectField = (props) => {
   const renderInput = ({ objectValue, ...attributes }) => {
@@ -61,7 +61,7 @@ const SelectField = (props) => {
   };
 
   return (
-    <BaseReactField
+    <BaseField
       {...props}
       renderInput={renderInput}
     />

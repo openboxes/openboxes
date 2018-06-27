@@ -15,6 +15,7 @@ import ValueSelectorField from '../form-elements/ValueSelectorField';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import { renderFormField } from '../../utils/form-utils';
 import Select from '../../utils/Select';
+import Checkbox from '../../utils/Checkbox';
 import { USERNAMES_MOCKS, BIN_LOCATION_MOCKS, RECEIPT_MOCKS } from '../../mockedData';
 
 const isReceiving = (subfield, selectedValue) => {
@@ -82,17 +83,14 @@ const FIELDS = {
             fieldConfig={{
               // eslint-disable-next-line react/prop-types
               component: ({ selectedValue }) => (
-                <input
-                  type="checkbox"
+                <Checkbox
                   className={subfield ? 'ml-4' : ''}
-                  checked={isReceiving(subfield, selectedValue)}
-                  onChange={(event) => {
-                    const { checked } = event.target;
-
+                  value={isReceiving(subfield, selectedValue)}
+                  onChange={(value) => {
                     if (subfield) {
-                      autofillLines(!checked, parentIndex, rowIndex);
+                      autofillLines(!value, parentIndex, rowIndex);
                     } else {
-                      autofillLines(!checked, rowIndex);
+                      autofillLines(!value, rowIndex);
                     }
                   }}
                 />),

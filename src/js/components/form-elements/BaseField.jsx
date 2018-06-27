@@ -12,6 +12,8 @@ class BaseField extends Component {
     this.state = {
       touched: false,
     };
+
+    this.renderInput = this.renderInput.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -28,25 +30,54 @@ class BaseField extends Component {
     });
   }
 
+  renderInput(input, attr) {
+    const onChange = (value) => {
+      if (attr.onChange) {
+        attr.onChange(value);
+      }
+
+      input.onChange(value);
+    };
+    const attributes = {
+      ...attr,
+      value: input.value,
+      onChange,
+      onBlur: () => this.setState({ touched: true }),
+    };
+
+    return this.props.renderInput(attributes);
+  }
+
   render() {
     const {
       fieldName,
       fieldConfig: { label, getDynamicAttr, attributes = {} },
       renderInput,
       arrayField,
+      fieldValue,
+      fieldPreview,
       ...otherProps
     } = this.props;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(otherProps) : {};
+
+    if (fieldPreview) {
+      return (
+        <div className="form-group my-0 ">
+          {renderInput({
+            ...attributes, ...dynamicAttr, value: fieldValue, disabled: true,
+          })}
+        </div>
+      );
+    }
 
     return (
       <Field
         name={fieldName}
         component={renderField}
-        renderInput={renderInput}
+        renderInput={this.renderInput}
         attributes={{
           ...attributes,
           ...dynamicAttr,
-          onBlur: () => this.setState({ touched: true }),
         }}
         label={label}
         touched={this.state.touched}
@@ -65,8 +96,13 @@ BaseField.propTypes = {
   }).isRequired,
   renderInput: PropTypes.func.isRequired,
   arrayField: PropTypes.bool,
+  fieldPreview: PropTypes.bool,
+  fieldValue: PropTypes.oneOfType([PropTypes.string,
+    PropTypes.shape({}), PropTypes.any]),
 };
 
 BaseField.defaultProps = {
   arrayField: false,
+  fieldPreview: false,
+  fieldValue: undefined,
 };

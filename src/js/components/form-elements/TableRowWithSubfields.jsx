@@ -19,23 +19,42 @@ class TableRowWithSubfields extends Component {
 
   render() {
     const {
-      fieldsConfig, index, field, properties,
+      fieldsConfig, index, field, properties, rowValues = {},
     } = this.props;
+    const { subfieldKey } = fieldsConfig;
 
-    return [
-      <TableRow key={field} {...this.props} />,
-      <FieldArray
-        key={`${field}.${fieldsConfig.subfieldKey}`}
-        name={`${field}.${fieldsConfig.subfieldKey}`}
-        component={TableBody}
-        fieldsConfig={fieldsConfig}
-        properties={{
-          ...properties,
-          parentIndex: index,
-          subfield: true,
-        }}
-      />,
-    ];
+    return (
+      <div>
+        <TableRow {...this.props} />
+        { !properties.fieldPreview ?
+          <FieldArray
+            name={`${field}.${subfieldKey}`}
+            component={TableBody}
+            fieldsConfig={fieldsConfig}
+            properties={{
+              ...properties,
+              parentIndex: index,
+              subfield: true,
+            }}
+          /> :
+          _.map(_.get(rowValues, subfieldKey), (subfield, subfieldIndex) => (
+            <TableRow
+              // eslint-disable-next-line react/no-array-index-key
+              key={`${index}-${subfieldIndex}`}
+              field={`${field}.${subfieldKey}[${subfieldIndex}]`}
+              index={subfieldIndex}
+              properties={{
+                ...properties,
+                parentIndex: index,
+                subfield: true,
+              }}
+              addRow={() => {}}
+              fieldsConfig={fieldsConfig}
+              removeRow={() => {}}
+              rowValues={subfield}
+            />)) }
+      </div>
+    );
   }
 }
 
@@ -50,4 +69,11 @@ TableRowWithSubfields.propTypes = {
   addRow: PropTypes.func.isRequired,
   removeRow: PropTypes.func.isRequired,
   properties: PropTypes.shape({}).isRequired,
+  fieldPreview: PropTypes.bool,
+  rowValues: PropTypes.shape({}),
+};
+
+TableRowWithSubfields.defaultProps = {
+  fieldPreview: false,
+  rowValues: {},
 };
