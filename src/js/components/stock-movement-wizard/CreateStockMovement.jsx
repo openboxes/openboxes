@@ -62,7 +62,7 @@ const FIELDS = {
       formName: 'stock-movement-wizard',
     },
     getDynamicAttr: () => ({
-      field: 'origin',
+      field: 'destination',
     }),
   },
   requestedBy: {
