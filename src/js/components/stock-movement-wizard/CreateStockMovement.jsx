@@ -11,7 +11,7 @@ import DateField from '../form-elements/DateField';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
+import { showSpinner, hideSpinner, fetchLocations, fetchUsers } from '../../actions';
 
 const FIELDS = {
   description: {
@@ -62,7 +62,7 @@ const FIELDS = {
       formName: 'stock-movement-wizard',
     },
     getDynamicAttr: () => ({
-      field: 'origin',
+      field: 'destination',
     }),
   },
   requestedBy: {
@@ -89,29 +89,24 @@ class CreateStockMovement extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      locations: [],
-      users: [],
       stockLists: [],
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
   }
 
   componentDidMount() {
-    this.fetchUsers();
-    this.fetchLocations();
+    if (!this.props.usersFetched) {
+      this.fetchData(this.props.fetchUsers);
+    }
+    if (!this.props.locationsFetched) {
+      this.fetchData(this.props.fetchLocations);
+    }
   }
 
-  fetchUsers() {
+  fetchData(fetchFunction) {
     this.props.showSpinner();
-    const url = '/openboxes/api/generic/person';
-
-    return apiClient.get(url)
-      .then((response) => {
-        const users = _.map(response.data.data, user => (
-          { value: user.id, label: user.name }
-        ));
-        this.setState({ users }, () => this.props.hideSpinner());
-      })
+    fetchFunction()
+      .then(() => this.props.hideSpinner())
       .catch(() => this.props.hideSpinner());
   }
 
@@ -129,31 +124,14 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  fetchLocations() {
-    this.props.showSpinner();
-    const url = '/openboxes/api/locations';
-
-    return apiClient.get(url)
-      .then((response) => {
-        const locations = _.map(response.data.data, location => (
-          {
-            value: { id: location.id, type: location.locationTypeCode, name: location.name },
-            label: `${location.name} [${location.locationTypeCode}]`,
-          }
-        ));
-        this.setState({ locations }, () => this.props.hideSpinner());
-      })
-      .catch(() => this.props.hideSpinner());
-  }
-
   render() {
     return (
       <form onSubmit={this.props.handleSubmit}>
         {_.map(
           FIELDS,
           (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-            users: this.state.users,
-            locations: this.state.locations,
+            users: this.props.users,
+            locations: this.props.locations,
             stockLists: this.state.stockLists,
             fetchStockLists: this.fetchStockLists,
           }),
@@ -168,15 +146,30 @@ class CreateStockMovement extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  locationsFetched: state.locations.fetched,
+  locations: state.locations.data,
+  usersFetched: state.users.fetched,
+  users: state.users.data,
+});
+
 export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
   validate,
-})(connect(null, { showSpinner, hideSpinner })(CreateStockMovement));
+})(connect(mapStateToProps, {
+  showSpinner, hideSpinner, fetchLocations, fetchUsers,
+})(CreateStockMovement));
 
 CreateStockMovement.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
+  fetchLocations: PropTypes.func.isRequired,
+  locationsFetched: PropTypes.bool.isRequired,
+  locations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  fetchUsers: PropTypes.func.isRequired,
+  usersFetched: PropTypes.bool.isRequired,
+  users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
