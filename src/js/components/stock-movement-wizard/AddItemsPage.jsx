@@ -13,9 +13,8 @@ import LabelField from '../form-elements/LabelField';
 import DateField from '../form-elements/DateField';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import { renderFormField, getMovementNumber } from '../../utils/form-utils';
-import apiClient from '../../utils/apiClient';
 import { STOCK_LIST_ITEMS_MOCKS } from '../../mockedData';
-import { showSpinner, hideSpinner } from '../../actions';
+import { showSpinner, hideSpinner, fetchUsers, fetchProducts } from '../../actions';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -145,15 +144,6 @@ const VENDOR_FIELDS = {
 };
 
 class AddItemsPage extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      recipients: [],
-      products: [],
-    };
-  }
-
   componentDidMount() {
     this.props.showSpinner();
     let lineItems;
@@ -180,8 +170,13 @@ class AddItemsPage extends Component {
       movementNumber,
     }, true);
 
-    this.fetchRecipients();
-    this.fetchProducts();
+    if (!this.props.recipientsFetched) {
+      this.fetchData(this.props.fetchUsers);
+    }
+
+    if (!this.props.productsFetched) {
+      this.fetchData(this.props.fetchProducts);
+    }
 
     this.props.hideSpinner();
   }
@@ -196,31 +191,10 @@ class AddItemsPage extends Component {
     return NO_STOCKLIST_FIELDS;
   }
 
-  fetchRecipients() {
+  fetchData(fetchFunction) {
     this.props.showSpinner();
-    const url = '/openboxes/api/generic/person';
-
-    return apiClient.get(url)
-      .then((response) => {
-        const recipients = _.map(response.data.data, recipient => (
-          { value: recipient.id, label: recipient.displayName }
-        ));
-        this.setState({ recipients }, () => this.props.hideSpinner());
-      })
-      .catch(() => this.props.hideSpinner());
-  }
-
-  fetchProducts() {
-    this.props.showSpinner();
-    const url = '/openboxes/api/products';
-
-    return apiClient.get(url)
-      .then((response) => {
-        const products = _.map(response.data.data, product => (
-          { value: product, label: product.name }
-        ));
-        this.setState({ products }, () => this.props.hideSpinner());
-      })
+    fetchFunction()
+      .then(() => this.props.hideSpinner())
       .catch(() => this.props.hideSpinner());
   }
 
@@ -241,8 +215,8 @@ class AddItemsPage extends Component {
         {_.map(this.getFields(), (fieldConfig, fieldName) =>
           renderFormField(fieldConfig, fieldName, {
             stockList: this.props.stockList,
-            recipients: this.state.recipients,
-            products: this.state.products,
+            recipients: this.props.recipients,
+            products: this.props.products,
           }))}
         <div>
           <button type="button" className="btn btn-outline-primary" onClick={previousPage}>
@@ -260,6 +234,10 @@ const selector = formValueSelector('stock-movement-wizard');
 const mapStateToProps = state => ({
   stockList: selector(state, 'stockList'),
   origin: selector(state, 'origin'),
+  products: state.products.data,
+  productsFetched: state.products.fetched,
+  recipients: state.users.data,
+  recipientsFetched: state.users.fetched,
 });
 
 export default reduxForm({
@@ -268,7 +246,7 @@ export default reduxForm({
   forceUnregisterOnUnmount: true,
   validate,
 })(connect(mapStateToProps, {
-  initialize, change, showSpinner, hideSpinner,
+  initialize, change, showSpinner, hideSpinner, fetchUsers, fetchProducts,
 })(AddItemsPage));
 
 AddItemsPage.propTypes = {
@@ -284,6 +262,12 @@ AddItemsPage.propTypes = {
   stockList: PropTypes.string,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
+  fetchUsers: PropTypes.func.isRequired,
+  recipients: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  recipientsFetched: PropTypes.bool.isRequired,
+  fetchProducts: PropTypes.func.isRequired,
+  products: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  productsFetched: PropTypes.bool.isRequired,
 };
 
 AddItemsPage.defaultProps = {
