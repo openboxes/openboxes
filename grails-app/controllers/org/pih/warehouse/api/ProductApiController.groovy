@@ -28,6 +28,18 @@ class ProductApiController extends BaseDomainApiController {
 		render ([data:products] as JSON)
 	}
 
+    def availableItems = {
+        def productIds = params.list("product.id") + params.list("id")
+        Location location = Location.get(params.location.id)
+
+        if (!location || productIds.empty) {
+            throw new IllegalArgumentException("Must specify a location and at least one product")
+        }
+
+        def products = Product.findAllByIdInList(productIds)
+        def availableItems = getAvailableItems(location, products)
+        render ([data:availableItems] as JSON)
+    }
 
     def associatedProducts = {
         Product product = Product.get(params.id)
@@ -68,20 +80,21 @@ class ProductApiController extends BaseDomainApiController {
                 productAssociations: productAssociations]] as JSON)
     }
 
-
     def getAvailableItems(Location location, Product product) {
-        def availableItemsMap = inventoryService.getQuantityByInventoryItemMap(location, [product])
-        // Transform all inventory items into available items
-        def availableItems = product.inventoryItems.collect {
-            def inventoryItemMap = [
-                    id: it.id,
-                    lotNumber: it.lotNumber,
-                    expirationDate: it.expirationDate,
-                    "product.id": it.product.id,
-                    "product.name": it.product.name
+        return getAvailableItems(location, [product])
+    }
+
+
+    def getAvailableItems(Location location, List products) {
+        def availableItemsMap = inventoryService.getQuantityByInventoryItemMap(location, products)
+
+        def inventoryItems = products.collect { it.inventoryItems }.flatten()
+        log.info "inventory items: " + inventoryItems
+        def availableItems = inventoryItems.collect {
+            return [
+                    inventoryItem: it,
+                    quantity: availableItemsMap[it]
             ]
-            inventoryItemMap << [quantity: availableItemsMap[it]]
-            inventoryItemMap
         }
         availableItems = availableItems.findAll { it.quantity > 0 }
 

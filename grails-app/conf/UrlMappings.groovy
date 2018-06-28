@@ -37,6 +37,16 @@ class UrlMappings {
             action = [GET: "associatedProducts"]
         }
 
+        "/api/products/$id/availableItems" {
+            controller = { "productApi" }
+            action = [GET: "availableItems"]
+        }
+
+        "/api/products/availableItems" {
+            controller = { "productApi" }
+            action = [GET: "availableItems"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
