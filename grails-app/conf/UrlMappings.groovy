@@ -22,7 +22,8 @@ class UrlMappings {
 			  }
 		}
 
-        // REST APIs with complex plural resource names
+        // REST APIs with complex resource names or subresources
+
         "/api/categories"(parseRequest: true) {
             controller = { "categoryApi" }
             action = [GET: "list", POST: "save"]
@@ -31,8 +32,23 @@ class UrlMappings {
             controller = {"categoryApi" }
             action = [GET:"read", POST:"save", PUT:"save", DELETE:"delete"]
         }
+        "/api/products/$id/associatedProducts" {
+            controller = { "productApi" }
+            action = [GET: "associatedProducts"]
+        }
+
+        "/api/products/$id/availableItems" {
+            controller = { "productApi" }
+            action = [GET: "availableItems"]
+        }
+
+        "/api/products/availableItems" {
+            controller = { "productApi" }
+            action = [GET: "availableItems"]
+        }
 
         // Standard REST APIs
+
         "/api/${resource}s"(parseRequest: true) {
             controller = { "${params.resource}Api" }
             action = [GET: "list", POST: "create"]
@@ -43,9 +59,12 @@ class UrlMappings {
         }
 
         // Anonymous REST APIs like Status, Login, Logout
+
 		"/api/$action/$id?"(controller:"api", parseRequest:false){
 			//action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
 		}
+
+        // Generic API for all other resources
 
         "/api/generic/${resource}/"(parseRequest: false) {
             controller = "genericApi"
@@ -62,7 +81,7 @@ class UrlMappings {
             action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
         }
 
-
+        // Error handling
 
         "401"(controller:"errors", action:"handleUnauthorized")
 		"404"(controller:"errors", action:"handleNotFound")
