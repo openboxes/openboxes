@@ -56,13 +56,6 @@ const FIELDS = {
       dateFormat: 'DD/MMM/YYYY',
     },
   },
-  recipient: {
-    type: SelectField,
-    label: 'Recipient',
-    attributes: {
-      options: USERNAMES_MOCKS,
-    },
-  },
   buttons: {
     // eslint-disable-next-line react/prop-types
     type: ({ autofillLines }) => (
