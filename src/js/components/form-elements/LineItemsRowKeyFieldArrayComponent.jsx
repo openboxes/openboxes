@@ -28,6 +28,7 @@ const LineItemsRowKeyFieldArrayComponent = (props) => {
               fieldsConfig={fieldsConfig}
               addRow={() => true}
               removeRow={() => fields.remove(index)}
+              rowValues={fields.get(index)}
             />))
               }
         </tbody>
