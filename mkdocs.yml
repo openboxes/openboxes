@@ -27,7 +27,6 @@ pages:
     - 'Lookup': 'api-guide/lookup.md'
     - 'Product': 'api-guide/product.md'
     - 'Stock Movement': 'api-guide/stockMovement.md'
-    - 'Stock Movement Item': 'api-guide/stockMovementItem.md'
 
 - Deployment Guide:
     - 'Installation': 'installation/index.md'
