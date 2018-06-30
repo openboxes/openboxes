@@ -42,25 +42,34 @@ class ProductApiController extends BaseDomainApiController {
         render ([data:availableItems] as JSON)
     }
 
+    def substitutions = {
+        params.type = ProductAssociationTypeCode.SUBSTITUTE
+        params.resource = "substitutions"
+        forward(action: "associatedProducts")
+    }
+
     def associatedProducts = {
         Product product = Product.get(params.id)
-        ProductAssociationTypeCode [] types = params.list("type")
+        ProductAssociationTypeCode[] types = params.list("type")
         log.info "Types: " + types
         def productAssociations = ProductAssociation.createCriteria().list {
             eq("product", product)
             'in'("code", types)
         }
         def availableItems = []
+        boolean hasEarlierExpiringItems = false
         def location = (params?.location?.id) ? Location.get(params.location.id) : null
         if (location) {
             def products = productAssociations.collect { it.associatedProduct }
-            log.info ("Location " + location + " products = " + products)
+            log.info("Location " + location + " products = " + products)
 
             availableItems = getAvailableItems(location, product)
 
             productAssociations = productAssociations.collect { productAssociation ->
                 def availableProducts = getAvailableProducts(location, productAssociation.associatedProduct)
-                def expirationDate = availableProducts.findAll { it.expirationDate != null }.collect { it.expirationDate }.min()
+                def expirationDate = availableProducts.findAll { it.expirationDate != null }.collect {
+                    it.expirationDate
+                }.min()
                 def availableQuantity = availableProducts.collect { it.quantity }.sum()
                 return [
                         id               : productAssociation.id,
@@ -68,21 +77,31 @@ class ProductApiController extends BaseDomainApiController {
                         product          : productAssociation.associatedProduct,
                         conversionFactor : productAssociation.quantity,
                         comments         : productAssociation.comments,
-                        minExpirationDate   : expirationDate,
-                        availableQuantity   : availableQuantity
+                        minExpirationDate: expirationDate,
+                        availableQuantity: availableQuantity
                 ]
             }
+            Date productExpirationDate = availableItems?.collect { it.inventoryItem.expirationDate }?.min()
+            Date otherExpirationDate = productAssociations?.collect { it.minExpirationDate }?.min()
+            hasEarlierExpiringItems = productExpirationDate ? productExpirationDate.after(otherExpirationDate) : false
         }
 
+        // This just renames the collection in the JSON so we can match the API called
+        // (i.e. resource name is substitutions for /api/products/:id/substitutions)
+        params.resource = params.resource ?: "productAssociations"
 
-
-        render ([data:[
-                product: product,
-                availableItems: availableItems,
-                hasAssociations: !productAssociations?.empty,
-                hasEarlierExpiringItems: false,
-                productAssociations: productAssociations]] as JSON)
+        render([
+                data:
+                        [
+                                product                : product,
+                                availableItems         : availableItems,
+                                hasAssociations        : !productAssociations?.empty,
+                                hasEarlierExpiringItems: hasEarlierExpiringItems,
+                                "${params.resource}"   : productAssociations
+                        ]
+        ] as JSON)
     }
+
 
     def getAvailableItems(Location location, Product product) {
         return getAvailableItems(location, [product])
