@@ -28,6 +28,7 @@ class StockMovement {
     String id
     String name
     String description
+    String identifier
     Location origin
     Location destination
     Person requestedBy
@@ -94,8 +95,13 @@ class StockMovement {
         )
 
         requisition.requisitionItems.each { requisitionItem ->
-            StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
-            stockMovement.lineItems.add(stockMovementItem)
+
+            // Ignore requisition items that are substitutions or modifications because the
+            // original requisition item will represent these changes
+            if (!requisitionItem.parentRequisitionItem) {
+                StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+                stockMovement.lineItems.add(stockMovementItem)
+            }
         }
         return stockMovement
 

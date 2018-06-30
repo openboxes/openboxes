@@ -24,19 +24,26 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
+import java.text.SimpleDateFormat
+
 class StockMovementApiController {
 
     def stockMovementService
 
     def list = {
-        def stockMovements = stockMovementService.getStockMovements(10)
-//        if (params.fields) {
-//            String [] propertyNames = params.fields?.split(",")
-//            stockMovements = stockMovements.collect { StockMovement stockMovement ->
-//                return stockMovement.getPropertyMap(propertyNames)
-//            }
-//        }
-        render ([stockMovements.collect { StockMovement stockMovement -> stockMovement.toJson() }] as JSON)
+        int max = Math.min(params.max ? params.int('max') : 10, 1000)
+        int offset = params.offset? params.int("offset") : 0
+        def stockMovements = stockMovementService.getStockMovements(max, offset)
+        stockMovements = stockMovements.collect { StockMovement stockMovement ->
+            Map json = stockMovement.toJson()
+            def excludes = params.list("exclude")
+            if (excludes) {
+                excludes.each { exclude ->
+                    json.remove(exclude)
+                }
+            }
+            return json
+        }
         render ([data:stockMovements] as JSON)
     }
 
@@ -53,27 +60,18 @@ class StockMovementApiController {
 
     def update = { //StockMovement stockMovement ->
 
-        JSONObject json = request.JSON
-        log.info "json: " + json
+        Object jsonObject = request.JSON
+        log.info "json: " + jsonObject
 
+        // Remove attributes that cause issues in the default grails data binder
+        List lineItems = jsonObject.remove("lineItems")
+        String dateRequested = jsonObject.remove("dateRequested")
 
-        def lineItems = json.remove("lineItems")
+        // Bind all other properties to stock movement
         StockMovement stockMovement = new StockMovement()
-        bindData(stockMovement, json)
-        
-        log.info "line items: " + lineItems
-        lineItems.each { lineItem ->
-            log.info "product" + lineItem["product.id"]
-            StockMovementItem stockMovementItem = new StockMovementItem()
-            stockMovementItem.id = lineItem.id
-            stockMovementItem.deleted = lineItem.deleted ? Boolean.parseBoolean(lineItem.deleted):Boolean.FALSE
-            stockMovementItem.product = lineItem["product.id"] ? Product.load(lineItem["product.id"]) : null
-            stockMovementItem.inventoryItem = lineItem["inventoryItem.id"] ? InventoryItem.load(lineItem["inventoryItem.id"]) : null
-            //stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
-            stockMovementItem.quantityRequested = lineItem.quantityRequested ? new BigDecimal(lineItem.quantityRequested) : null
-            stockMovementItem.sortOrder = lineItem.sortOrder ? new Integer(lineItem.sortOrder) : null
-            stockMovement.lineItems.add(stockMovementItem)
-        }
+        stockMovement.dateRequested = new SimpleDateFormat("MM/dd/yyyy").parse(dateRequested)
+        bindData(stockMovement, jsonObject)
+        bindLineItems(stockMovement, lineItems)
 
         stockMovement = stockMovementService.updateStockMovement(stockMovement)
         render ([data:stockMovement] as JSON)
@@ -82,6 +80,43 @@ class StockMovementApiController {
     def delete = {
         stockMovementService.deleteStockMovement(params.id)
         render status: 204
+    }
+
+    /**
+     * Bind the given line items (JSONArray) to StockMovementItem objects and add them to the given
+     * StockMovement object.
+     *
+     * NOTE: THis method was necessary because the default data binder for Grails command objects
+     * does not see to handle nested objects very well.
+     *
+     * @param stockMovement
+     * @param lineItems
+     */
+    void bindLineItems(StockMovement stockMovement, List lineItems) {
+        log.info "line items: " + lineItems
+        lineItems.each { lineItem ->
+            StockMovementItem stockMovementItem = new StockMovementItem()
+            stockMovementItem.id = lineItem.id
+            stockMovementItem.product = lineItem["product.id"] ? Product.load(lineItem["product.id"]) : null
+            stockMovementItem.inventoryItem = lineItem["inventoryItem.id"] ? InventoryItem.load(lineItem["inventoryItem.id"]) : null
+            stockMovementItem.quantityRequested = lineItem.quantityRequested ? new BigDecimal(lineItem.quantityRequested) : null
+            stockMovementItem.sortOrder = lineItem.sortOrder && !lineItem.isNull("sortOrder") ? new Integer(lineItem.sortOrder) : null
+
+            // Actions
+            stockMovementItem.delete = lineItem.delete ? Boolean.parseBoolean(lineItem.delete):Boolean.FALSE
+            stockMovementItem.revert = lineItem.revert ? Boolean.parseBoolean(lineItem.revert):Boolean.FALSE
+            stockMovementItem.cancel = lineItem.cancel ? Boolean.parseBoolean(lineItem.cancel):Boolean.FALSE
+
+            // When revising quantity you need quantity revised and reason code
+            stockMovementItem.quantityRevised = lineItem.quantityRevised ? new BigDecimal(lineItem.quantityRevised) : null
+            stockMovementItem.reasonCode = lineItem.reasonCode
+            stockMovementItem.comments = lineItem.comments
+
+            // Not supported yet because recipient is a String on Requisition Item and a Person on Shipment Item.
+            //stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
+
+            stockMovement.lineItems.add(stockMovementItem)
+        }
     }
 
 }

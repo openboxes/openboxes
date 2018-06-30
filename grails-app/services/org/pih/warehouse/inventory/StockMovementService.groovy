@@ -64,7 +64,7 @@ class StockMovementService {
     }
 
     def updateStockMovement(StockMovement stockMovement) {
-        log.info "Update stock movement " + stockMovement.lineItems
+        log.info "Update stock movement " + stockMovement + " stockMovement.lineItems = " + stockMovement?.lineItems
 
         if (!stockMovement.validate()) {
             throw new ValidationException("Invalid stock movement", stockMovement.errors)
@@ -89,17 +89,27 @@ class StockMovementService {
                 // Try to find a matching stock movement item
                 if (stockMovementItem.id) {
                     requisitionItem = requisition.requisitionItems.find { it.id == stockMovementItem.id }
+                    // We should not just assume that if
+                    if (!requisitionItem) {
+                        throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
+                    }
                 }
-
 
                 // If requisition item is found, we update it
                 if (requisitionItem) {
                     log.info "Item found " + requisitionItem.id
 
-                    if (stockMovementItem.deleted) {
+                    if (stockMovementItem.delete) {
                         log.info "Item deleted " + requisitionItem.id
+                        requisitionItem.undoChanges()
                         requisition.removeFromRequisitionItems(requisitionItem)
-                        requisitionItem.delete()
+                        requisitionItem.delete(flush:true)
+                    }
+                    else if (stockMovementItem.revert) {
+                        requisitionItem.undoChanges()
+                    }
+                    else if (stockMovementItem.cancel) {
+                        requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
                     }
                     else {
                         log.info "Item updated " + requisitionItem.id
@@ -108,12 +118,18 @@ class StockMovementService {
                         if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
                         //if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
+                        if (stockMovementItem.quantityRevised) {
+                            requisitionItem.changeQuantity(stockMovementItem?.quantityRevised?.intValueExact(), stockMovementItem.reasonCode, stockMovementItem.comments)
+                        }
                     }
                     requisitionItem.save()
                 }
                 // Otherwise we create a new one
                 else {
                     log.info "Item not found"
+                    if (stockMovementItem.quantityRevised) {
+                        throw new IllegalArgumentException("Cannot specify quantityRevised when creating a new item")
+                    }
                     requisitionItem = new RequisitionItem()
                     requisitionItem.product = stockMovementItem.product
                     requisitionItem.inventoryItem = stockMovementItem.inventoryItem
@@ -143,8 +159,8 @@ class StockMovementService {
         }
     }
 
-    def getStockMovements(Integer maxResults) {
-        def requisitions = Requisition.listOrderByDateCreated([max: maxResults, sort: "desc"])
+    def getStockMovements(Integer maxResults, Integer offset) {
+        def requisitions = Requisition.listOrderByDateCreated([max: maxResults, offset: offset, sort: "desc"])
         def stockMovements = requisitions.collect { requisition ->
             return StockMovement.createFromRequisition(requisition)
         }

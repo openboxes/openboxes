@@ -12,12 +12,24 @@ class StockMovementItem {
     String productCode
     Product product
     InventoryItem inventoryItem
+
     BigDecimal quantityRequested
     BigDecimal quantityAllowed
     BigDecimal quantityAvailable
+    BigDecimal quantityRevised
+    BigDecimal quantityCanceled
     Person recipient
-    Boolean deleted = Boolean.FALSE
 
+    // Actions
+    Boolean cancel = Boolean.FALSE
+    Boolean delete = Boolean.FALSE
+    Boolean revert = Boolean.FALSE
+    Boolean substitute = Boolean.FALSE
+
+    String statusCode
+
+    String reasonCode
+    String comments
 
     String palletName
     String boxName
@@ -33,6 +45,11 @@ class StockMovementItem {
         quantityRequested(nullable:false)
         quantityAllowed(nullable:true)
         quantityAvailable(nullable:true)
+        quantityRevised(nullable:true)
+        quantityCanceled(nullable:true)
+        statusCode(nullable:true)
+        reasonCode(nullable:true)
+        comments(nullable:true)
         recipient(nullable:true)
         deleted(nullable:true)
         palletName(nullable:true)
@@ -47,9 +64,14 @@ class StockMovementItem {
                 product: product,
                 palletName: palletName,
                 boxName: boxName,
+                statusCode: statusCode,
                 quantityRequested: quantityRequested,
                 quantityAllowed: quantityAllowed,
                 quantityAvailable: quantityAvailable,
+                quantityCanceled: quantityCanceled,
+                quantityRevised: quantityRevised,
+                reasonCode: reasonCode,
+                comments: comments,
                 recipient: recipient,
                 sortOrder: sortOrder
         ]
@@ -69,9 +91,14 @@ class StockMovementItem {
                 productCode: shipmentItem?.product?.productCode,
                 product: shipmentItem?.inventoryItem?.product,
                 inventoryItem: shipmentItem?.inventoryItem,
+                statusCode: null,
                 quantityRequested: shipmentItem?.quantity,
                 quantityAllowed: null,
                 quantityAvailable: null,
+                quantityCanceled: null,
+                quantityRevised: null,
+                reasonCode: null,
+                comments: null,
                 palletName:palletName,
                 boxName:boxName,
                 recipient: shipmentItem.recipient,
@@ -81,16 +108,22 @@ class StockMovementItem {
     }
 
     static StockMovementItem createFromRequisitionItem(RequisitionItem requisitionItem) {
+
         return new StockMovementItem(id: requisitionItem.id,
                 productCode: requisitionItem?.product?.productCode,
                 product: requisitionItem?.product,
                 inventoryItem: requisitionItem?.inventoryItem,
+                statusCode: requisitionItem.status?.name(),
                 quantityRequested: requisitionItem.quantity,
                 quantityAllowed: null,
                 quantityAvailable: null,
+                quantityCanceled: requisitionItem?.quantityCanceled,
+                quantityRevised: requisitionItem?.modificationItem?.quantity,
+                reasonCode: requisitionItem.cancelReasonCode,
+                comments: requisitionItem.cancelComments,
+                recipient: requisitionItem.recipient,
                 palletName:null,
                 boxName:null,
-                recipient: requisitionItem.recipient,
                 sortOrder: requisitionItem.orderIndex
 
         )
