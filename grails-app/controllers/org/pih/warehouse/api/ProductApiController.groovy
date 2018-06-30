@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
@@ -58,14 +59,17 @@ class ProductApiController extends BaseDomainApiController {
             availableItems = getAvailableItems(location, product)
 
             productAssociations = productAssociations.collect { productAssociation ->
-                def associatedAvailableItems = getAvailableItems(location, productAssociation.associatedProduct)
-                [
+                def availableProducts = getAvailableProducts(location, productAssociation.associatedProduct)
+                def expirationDate = availableProducts.findAll { it.expirationDate != null }.collect { it.expirationDate }.min()
+                def availableQuantity = availableProducts.collect { it.quantity }.sum()
+                return [
                         id               : productAssociation.id,
                         type             : productAssociation?.code?.name(),
                         product          : productAssociation.associatedProduct,
-                        quantity         : productAssociation.quantity,
+                        conversionFactor : productAssociation.quantity,
                         comments         : productAssociation.comments,
-                        availableItems   : associatedAvailableItems
+                        minExpirationDate   : expirationDate,
+                        availableQuantity   : availableQuantity
                 ]
             }
         }
@@ -98,6 +102,27 @@ class ProductApiController extends BaseDomainApiController {
         }
         availableItems = availableItems.findAll { it.quantity > 0 }
 
+        return availableItems
+    }
+
+    def getAvailableProducts(Location location, Product product) {
+        return getAvailableProducts(location, [product])
+    }
+
+    def getAvailableProducts(Location location, List products) {
+        def availableItemsMap = inventoryService.getQuantityByInventoryItemMap(location, products)
+
+        def inventoryItems = products.collect { it.inventoryItems }.flatten()
+        log.info "inventory items: " + inventoryItems
+        def availableItems = inventoryItems.collect { InventoryItem inventoryItem ->
+            return [
+                    "inventoryItem.id": inventoryItem.id,
+                    lotNumber: inventoryItem.lotNumber,
+                    expirationDate: inventoryItem.expirationDate,
+                    quantity: availableItemsMap[inventoryItem]
+            ]
+        }
+        availableItems = availableItems.findAll { it.quantity > 0 }
         return availableItems
     }
 
