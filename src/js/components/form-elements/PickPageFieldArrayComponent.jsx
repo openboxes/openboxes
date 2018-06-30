@@ -67,9 +67,10 @@ class PickPageFieldArrayComponent extends Component {
                   { _.map(fieldsConfig.fields, (config, name) => (
                     <td key={`${field}.${name}`} className="align-middle">
                       { renderFormField(config, `${field}.${name}`, {
-                      ...properties,
-                      arrayField: true,
-                      rowIndex: index,
+                        ...properties,
+                        arrayField: true,
+                        rowIndex: index,
+                        fieldValue: _.get(fields.get(index), name),
                     })}
                     </td>
                 )) }
@@ -94,6 +95,7 @@ class PickPageFieldArrayComponent extends Component {
                       ...properties,
                       arrayField: true,
                       rowIndex: index,
+                      fieldValue: _.get(fields.get(index), name),
                     })}
                   </td>
                 ))}
