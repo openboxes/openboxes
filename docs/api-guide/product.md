@@ -1,5 +1,7 @@
 ## Product API
 
+[TOC]
+
 ### Create 
 Create a new product.
 ```
@@ -123,4 +125,103 @@ Transfer-Encoding: chunked
 Date: Sun, 10 Jun 2018 21:43:37 GMT
 
 {"errorCode":404,"errorMessage":"Resource not found"}
+```
+
+### Sub Resources
+
+#### Available Items 
+```
+$ curl  -b cookies.txt -X GET -H "Content-Type: application/json" \
+"https://openboxes.ngrok.io/openboxes/api/products/ff80818155df9de40155df9e3312000d/availableItems?location.id=1"|jsonlint
+{
+  "data": [
+    {
+      "inventoryItem": {
+        "id": "ff80818155df9de40155df9e3356000e",
+        "product": {
+          "id": "ff80818155df9de40155df9e3312000d",
+          "name": "General Pain Reliever",
+          "productCode": "00004"
+        },
+        "lotNumber": "lot57",
+        "expirationDate": "2017-01-28T15:58:54Z"
+      },
+      "quantity": 10000
+    }
+  ]
+}
+```
+#### Product Associations
+```
+$ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
+"https://openboxes.ngrok.io/openboxes/api/products/ff80818155df9de40155df9e31000001/associatedProducts?type=SUBSTITUTE&type=EQUIVALENT&location.id=1" \ |jsonlint
+{
+  "data": {
+    "product": {
+      "id": "ff80818155df9de40155df9e31000001",
+      "productCode": "00001",
+      "name": "Ibuprofen 200mg",
+      "description": null,
+      "category": {
+        "id": "1",
+        "name": "Medicines"
+      }
+    },
+    "availableItems": [
+      {
+        "inventoryItem": {
+          "id": "ff80818155df9de40155df9e31930002",
+          "product": {
+            "id": "ff80818155df9de40155df9e31000001",
+            "name": "Ibuprofen 200mg",
+            "productCode": "00001"
+          },
+          "lotNumber": "lot57",
+          "expirationDate": "2016-07-15T14:58:53Z"
+        },
+        "quantity": 9990
+      }
+    ],
+    "hasAssociations": true,
+    "hasEarlierExpiringItems": false,
+    "productAssociations": [
+      {
+        "id": "ff808181643c655f01643c6ed8870001",
+        "type": "SUBSTITUTE",
+        "product": {
+          "id": "ff80818155df9de40155df9e321c0005",
+          "productCode": "00002",
+          "name": "Tylenol 325mg",
+          "description": null,
+          "category": {
+            "id": "1",
+            "name": "Medicines"
+          }
+        },
+        "conversionFactor": 1,
+        "comments": null,
+        "minExpirationDate": "2016-08-01T14:58:54Z",
+        "availableQuantity": 10244
+      },
+      {
+        "id": "ff808181643f048401643f93b95b0005",
+        "type": "SUBSTITUTE",
+        "product": {
+          "id": "ff80818155df9de40155df9e3312000d",
+          "productCode": "00004",
+          "name": "General Pain Reliever",
+          "description": null,
+          "category": {
+            "id": "1",
+            "name": "Medicines"
+          }
+        },
+        "conversionFactor": 1,
+        "comments": null,
+        "minExpirationDate": "2017-01-28T15:58:54Z",
+        "availableQuantity": 10000
+      }
+    ]
+  }
+}
 ```

@@ -32,20 +32,23 @@ class UrlMappings {
             controller = {"categoryApi" }
             action = [GET:"read", POST:"save", PUT:"save", DELETE:"delete"]
         }
-        "/api/products/$id/associatedProducts" {
+//        "/api/products/$id/associatedProducts" {
+//            controller = { "productApi" }
+//            action = [GET: "associatedProducts"]
+//        }
+        "/api/products/$id/$action" {
             controller = { "productApi" }
-            action = [GET: "associatedProducts"]
         }
 
-        "/api/products/$id/availableItems" {
-            controller = { "productApi" }
-            action = [GET: "availableItems"]
-        }
-
-        "/api/products/availableItems" {
-            controller = { "productApi" }
-            action = [GET: "availableItems"]
-        }
+//        "/api/products/$id/availableItems" {
+//            controller = { "productApi" }
+//            action = [GET: "availableItems"]
+//        }
+//
+//        "/api/products/availableItems" {
+//            controller = { "productApi" }
+//            action = [GET: "availableItems"]
+//        }
 
         // Standard REST APIs
 
