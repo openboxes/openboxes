@@ -1,125 +1,822 @@
-## Stock Movement API
-
-### Create 
-```
-$ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
--d '{"name":"New product", "category.id":"ff80818163e2de8d0163eb93c5a00001"}' https://openboxes.ngrok.io/openboxes/api/products
-
-
-HTTP/1.1 200 OK
-Server: Apache-Coyote/1.1
-Content-Type: application/json;charset=UTF-8
-Transfer-Encoding: chunked
-Date: Sun, 10 Jun 2018 21:37:12 GMT
-
-{"id":"ff80818163e2de8d0163eba1b1e90002","productCode":null,"name":"New product","category":{"id":"ff80818163e2de8d0163eb93c5a00001","name":"New category"},"description":null,"dateCreated":"2018-06-10T21:37:12Z","lastUpdated":"2018-06-10T21:37:12Z"}
-```
+## Stock Movements
 
 ### List 
-Return all products (results paginated using offset and max)
+Return stock movements 
+
+Parameter | Description | Required
+--- | --- | ---
+**max** | Limits the number of records in response | Optional
+**offset** | Indicate the first record to return | Optional
+**exclude** | Indicate which fields you'd like to exclude from the response | Optional
+
 ```
-$ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
--d '{ "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
+$ curl -b cookies.txt -X GET \
+-H "Content-Type: application/json" \
+https://openboxes.ngrok.io/openboxes/api/stockMovements?max=1&offset=2&exclude=lineItems|jsonlint
+{
+  "data": [
+    {
+      "id": "ff808181644d5e5b01644e5007500001",
+      "name": "new stock movement",
+      "description": "new stock movement",
+      "identifier": "483ZSA",
+      "origin": {
+        "id": "1",
+        "name": "Boston Headquarters"
+      },
+      "destination": {
+        "id": "2",
+        "name": "Miami Warehouse"
+      },
+      "dateRequested": "06/23/2018",
+      "requestedBy": {
+        "id": "1",
+        "name": "Mr Administrator",
+        "firstName": "Mr",
+        "lastName": "Administrator",
+        "email": "admin@pih.org",
+        "username": "admin"
+      }
+    }
+  ]
+}
 
 
-HTTP/1.1 200 OK
-Server: Apache-Coyote/1.1
-Content-Type: application/json;charset=UTF-8
-Transfer-Encoding: chunked
-Date: Sun, 10 Jun 2018 22:13:27 GMT
-[{
-	"id": "ff80818155df9de40155df9e329b0009",
-	"productCode": "00003",
-	"name": "Aspirin 20mg",
-	"category": {
-		"id": "1",
-		"name": "Medicines"
-	},
-	"description": null,
-	"dateCreated": "2016-07-12T14:58:55Z",
-	"lastUpdated": "2016-07-12T14:58:55Z"
-}]
 ```
 
-### Search 
-Return products with Name starting with 'New product' (results paginged using offset and max)
-```
-$ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
--d '{ "name":"Aspirin", "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
 
-HTTP/1.1 200 OK
-Server: Apache-Coyote/1.1
-Content-Type: application/json;charset=UTF-8
-Transfer-Encoding: chunked
-Date: Sun, 10 Jun 2018 22:15:08 GMT
-
-[{
-	"id": "ff80818163e2de8d0163eba1b1e90002",
-	"productCode": "KX43",
-	"name": "New product",
-	"category": {
-		"id": "ff80818163e2de8d0163eb93c5a00001",
-		"name": "New category"
-	},
-	"description": null,
-	"dateCreated": "2018-06-10T21:37:13Z",
-	"lastUpdated": "2018-06-10T21:37:13Z"
-}]
-```
 
 ### Read
+Read an existing stock movement
 ```
-$ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
-https://openboxes.ngrok.io/openboxes/api/products/ff80818163e2de8d0163eba1b1e90002
-
-HTTP/1.1 200 OK
-Server: Apache-Coyote/1.1
-Content-Type: application/json;charset=UTF-8
-Transfer-Encoding: chunked
-Date: Sun, 10 Jun 2018 21:38:27 GMT
-
+$ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001"|jsonlint 
 {
-	"id": "ff80818163e2de8d0163eba1b1e90002",
-	"productCode": "KX43",
-	"name": "New product",
-	"category": {
-		"id": "ff80818163e2de8d0163eb93c5a00001",
-		"name": "New category"
-	},
-	"description": null,
-	"dateCreated": "2018-06-10T21:37:13Z",
-	"lastUpdated": "2018-06-10T21:37:13Z"
+  "data": {
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "new stock movement",
+    "description": "new stock movement",
+    "identifier": "483ZSA",
+    "origin": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "destination": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": []
+  }
+}
+
+```
+
+### Create 
+
+#### Create a new stock movement
+```
+curl -X POST -b cookies.txt -H "Content-Type: application/json" \
+-d '{"name":"my new stock movement", "description":"same as name", "origin.id":"1", "destination.id":"2","requestedBy.id":"1","dateRequested":"06/23/2018"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements" | jsonlint 
+{
+  "data": {
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "",
+    "identifier": null,
+    "origin": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "destination": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": []
+  }
+}
+
+```
+
+#### Create a new stock movement for inbound shipment
+```
+$ curl -X POST -b cookies.txt -H "Content-Type: application/json" \
+-d '{"name":"new stock movement", "description":"same as name", "origin.id":"ff80818155dd68010155dd6bb9c00001", "destination.id":"2","requestedBy.id":"1","dateRequested":"06/23/2018"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements" | jsonlint 
+{
+  "data": {
+    "id": "ff808181644e51a401644e5a916f0005",
+    "name": "new stock movement",
+    "description": "",
+    "identifier": null,
+    "origin": {
+      "id": "ff80818155dd68010155dd6bb9c00001",
+      "name": "Test Supplier"
+    },
+    "destination": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": []
+  }
+}
+
+```
+
+#### Create a new stock movement based on a stocklist
+```
+curl -X POST -b cookies.txt -H "Content-Type: application/json" \
+-d '{"name":"stock movement based on stocklist", "description":"same as name", "origin.id":"1", "destination.id":"2","requestedBy.id":"1","dateRequested":"06/23/2018","stocklist.id":"ff808181641b2fd501641b39f4ef0001"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements" | jsonlint 
+{
+  "data": {
+    "id": "ff808181644e51a401644e5838aa0001",
+    "name": "stock movement based on stocklist",
+    "description": "stock movement based on stocklist",
+    "identifier": null,
+    "origin": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "destination": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": [
+      {
+        "id": "ff808181644e51a401644e5838ad0002",
+        "productCode": "00005",
+        "product": {
+          "id": "ff80818155df9de40155df9e33930011",
+          "productCode": "00005",
+          "name": "Similac Advance low iron 400g",
+          "description": null,
+          "category": {
+            "id": "1",
+            "name": "Medicines"
+          }
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "PENDING",
+        "quantityRequested": 25,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": null,
+        "quantityRevised": null,
+        "reasonCode": null,
+        "comments": null,
+        "recipient": null,
+        "sortOrder": 2
+      },
+      {
+        "id": "ff808181644e51a401644e5838ad0003",
+        "productCode": "00001",
+        "product": {
+          "id": "ff80818155df9de40155df9e31000001",
+          "productCode": "00001",
+          "name": "Ibuprofen 200mg",
+          "description": null,
+          "category": {
+            "id": "1",
+            "name": "Medicines"
+          }
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "PENDING",
+        "quantityRequested": 100,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": null,
+        "quantityRevised": null,
+        "reasonCode": null,
+        "comments": null,
+        "recipient": null,
+        "sortOrder": 0
+      },
+      {
+        "id": "ff808181644e51a401644e5838ad0004",
+        "productCode": "00002",
+        "product": {
+          "id": "ff80818155df9de40155df9e321c0005",
+          "productCode": "00002",
+          "name": "Tylenol 325mg",
+          "description": null,
+          "category": {
+            "id": "1",
+            "name": "Medicines"
+          }
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "PENDING",
+        "quantityRequested": 50,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": null,
+        "quantityRevised": null,
+        "reasonCode": null,
+        "comments": null,
+        "recipient": null,
+        "sortOrder": 1
+      }
+    ]
+  }
+}
+
+```
+
+### Update
+
+#### Read Stock Movement
+##### Request
+```
+curl -b cookies.txt -X GET -H "Content-Type: application/json" \
+-d @addStockMovementItem.json \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181642fc9c101642fcccc420004" \
+| jsonlint
+```
+
+##### Response
+```
+$ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001"|jsonlint
+{
+  "data": {
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "new stock movement",
+    "description": "",
+    "identifier": "483ZSA",
+    "origin": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "destination": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": []
+  }
 }
 ```
 
-### Exceptions
+#### Update Stock Movement
 
-#### Create - Validation Errors 
-Returns validation error (Category is a required field of Product)
+#### Add Stock Movement Item
+
+##### Request
 ```
-$ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
--d '{"name":"New product", "category":{"id":"ff80818163e2de8d0163eb93c5a00001"}}' \
-https://openboxes.ngrok.io/openboxes/api/products
-
-HTTP/1.1 500 Internal Server Error
-Server: Apache-Coyote/1.1
-Content-Type: application/json;charset=UTF-8
-Transfer-Encoding: chunked
-Date: Sun, 10 Jun 2018 21:35:58 GMT
-
-{"errorCode":500,"errorMessage":"Unable to save category due to errors:\n- Field error in object 'org.pih.warehouse.product.Product' on field 'category': rejected value [null]; codes [org.pih.warehouse.product.Product.category.nullable.error.org.pih.warehouse.product.Product.category,org.pih.warehouse.product.Product.category.nullable.error.category,org.pih.warehouse.product.Product.category.nullable.error.org.pih.warehouse.product.Category,org.pih.warehouse.product.Product.category.nullable.error,product.category.nullable.error.org.pih.warehouse.product.Product.category,product.category.nullable.error.category,product.category.nullable.error.org.pih.warehouse.product.Category,product.category.nullable.error,org.pih.warehouse.product.Product.category.nullable.org.pih.warehouse.product.Product.category,org.pih.warehouse.product.Product.category.nullable.category,org.pih.warehouse.product.Product.category.nullable.org.pih.warehouse.product.Category,org.pih.warehouse.product.Product.category.nullable,product.category.nullable.org.pih.warehouse.product.Product.category,product.category.nullable.category,product.category.nullable.org.pih.warehouse.product.Category,product.category.nullable,nullable.org.pih.warehouse.product.Product.category,nullable.category,nullable.org.pih.warehouse.product.Category,nullable]; arguments [category,Product]; default message [Property [{0}] of class [{1}] cannot be null]\n"}
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d @addStockMovementItem.json \
+https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
+```
+##### Post Body (addStockMovementItem.json)
+```
+{
+	"id": "ff808181644d5e5b01644e5007500001",
+	"name": "my new stock movement",
+	"description": "",
+	"identifier": "483ZSA",
+	"origin.id": "2",
+	"destination.id": "1",
+	"dateRequested": "06/23/2018",
+	"requestedBy.id": "1",
+	"lineItems": [{
+		"product.id": "ff8081816407132d0164071eec250001",
+		"quantityRequested": "100",
+		"sortOrder": 0,
+		"recipient.id": "1"
+	}]
+}
+```
+##### Response
+```
+{
+  "data": {
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "",
+    "identifier": "483ZSA",
+    "origin": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "destination": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": [
+      {
+        "id": "ff808181644e51a401644e85891b0006",
+        "productCode": "BK71",
+        "product": {
+          "id": "ff8081816407132d0164071eec250001",
+          "productCode": "BK71",
+          "name": "product 1+",
+          "description": "This is the penultimate product",
+          "category": {
+            "id": "ROOT",
+            "name": "ROOT"
+          }
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "PENDING",
+        "quantityRequested": 100,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": null,
+        "quantityRevised": null,
+        "reasonCode": null,
+        "comments": null,
+        "recipient": null,
+        "sortOrder": null
+      }
+    ]
+  }
+}
 ```
 
-### Read - Product not found
-```
-$ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
-https://openboxes.ngrok.io/openboxes/api/products/invalididentifier
 
-HTTP/1.1 404 Not Found
-Server: Apache-Coyote/1.1
-Content-Type: application/json;charset=UTF-8
-Transfer-Encoding: chunked
-Date: Sun, 10 Jun 2018 21:43:37 GMT
+#### Update Stock Movement Item
+This is used to change the quantity or product associated with an item, as well as 
+other changes like sort order. This is a direct change to the requisition item. 
 
-{"errorCode":404,"errorMessage":"Resource not found"}
+If you're looking to record a new quantity and want to keep the originally requested 
+information, then you'll likely want to use the Revise Stock Movement Item example below
+This will allow you to keep the originally requested quantity and product information, 
+record the new quantity, as well as a reason for the revision 
+(see next section for more information)
+
 ```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d @updateStockMovementItem.json \
+https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
+```
+
+##### Request Body (updateStockMovementItem.json)
+```
+{
+	"id": "ff808181644d5e5b01644e5007500001",
+	"name": "my new stock movement",
+	"description": "",
+	"identifier": "483ZSA",
+	"origin.id": "2",
+	"destination.id": "1",
+	"dateRequested": "06/23/2018",
+	"requestedBy.id": "1",
+	"lineItems": [{
+		"id": "ff808181644e51a401644e85891b0006",
+		"product.id": "ff80818155df9de40155df9e31000001",
+		"quantityRequested": "500",
+		"sortOrder": 0
+	}]
+}
+```
+##### Response 
+```
+{
+  "data": {
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "my new stock movement",
+    "identifier": "483ZSA",
+    "origin": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "destination": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": [
+      {
+        "id": "ff808181644e51a401644e85891b0006",
+        "productCode": "00001",
+        "product": {
+          "id": "ff80818155df9de40155df9e31000001",
+          "productCode": "00001",
+          "name": "Ibuprofen 200mg",
+          "description": null,
+          "category": {
+            "id": "1",
+            "name": "Medicines"
+          }
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "PENDING",
+        "quantityRequested": 500,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": 0,
+        "quantityRevised": null,
+        "reasonCode": null,
+        "comments": null,
+        "recipient": null,
+        "sortOrder": null
+      }
+    ]
+  }
+}
+```
+
+#### Revise Stock Movement Item
+This is used to record a revision to the quantity requested. This requires the user to 
+choose a reason code (i.e. STOCKOUT) and optionally add comments that may help provide
+more context for the revision.
+
+##### Request
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d @reviseStockMovementItem.json \
+https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
+```
+
+##### Post Body (reviseStockMovementItem.json)
+```
+{
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "",
+    "identifier": "483ZSA",
+    "origin.id": "2",
+    "destination.id": "1",
+    "dateRequested": "06/23/2018",
+    "requestedBy.id": "1",
+    "lineItems": [
+      {
+        "id":"ff808181644e51a401644e85891b0006",
+        "quantityRevised":200,
+        "reasonCode":"BECAUSE",
+        "comments":"because i said so",
+        
+      }
+    ]
+  }
+```
+##### Response
+```
+{
+  "data": {
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "my new stock movement",
+    "identifier": "483ZSA",
+    "origin": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "destination": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": [
+      {
+        "id": "ff808181644e51a401644e85891b0006",
+        "productCode": "BK71",
+        "product": {
+          "id": "ff8081816407132d0164071eec250001",
+          "productCode": "BK71",
+          "name": "product 1+",
+          "description": "This is the penultimate product",
+          "category": {
+            "id": "ROOT",
+            "name": "ROOT"
+          }
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "CHANGED",
+        "quantityRequested": 100,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": 100,
+        "quantityRevised": 200,
+        "reasonCode": "BECAUSE",
+        "comments": "because i said so",
+        "recipient": null,
+        "sortOrder": null
+      }
+    ]
+  }
+}
+```
+#### Cancel Stock Movement Item
+Similar to a revision, this operation allows you to cancel the stock movement item.
+
+##### Request
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d @cancelStockMovementItem.json \
+https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
+```
+##### Post Body (cancelStockMovementItem.json)
+```
+{
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "",
+    "identifier": "483ZSA",
+    "origin.id": "2",
+    "destination.id": "1",
+    "dateRequested": "06/23/2018",
+    "requestedBy.id": "1",
+    "lineItems": [
+      {
+        "id":"ff808181644e51a401644e85891b0006",
+        "cancel":"true",
+        "reasonCode":"BECAUSE",
+        "comments":"more information since BECAUSE is not a good reason"
+      }
+    ]
+}
+```
+
+##### Response
+```
+{
+  "data": {
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "my new stock movement",
+    "identifier": "483ZSA",
+    "origin": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "destination": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": [
+      {
+        "id": "ff808181644e51a401644e85891b0006",
+        "productCode": "BK71",
+        "product": {
+          "id": "ff8081816407132d0164071eec250001",
+          "productCode": "BK71",
+          "name": "product 1+",
+          "description": "This is the penultimate product",
+          "category": {
+            "id": "ROOT",
+            "name": "ROOT"
+          }
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "CANCELED",
+        "quantityRequested": 100,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": 100,
+        "quantityRevised": null,
+        "reasonCode": "BECAUSE",
+        "comments": "more information since BECAUSE is not a good reason",
+        "recipient": null,
+        "sortOrder": null
+      }
+    ]
+  }
+}
+```
+
+#### Revert Stock Movement Item
+This allows you to revert any changes made to the stock movement item (including revisions, cancellations, 
+and substitutions). However it does not allow you to revert deletes and updates.
+
+##### Request
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d @revertStockMovementItem.json \
+https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
+```
+##### Post Body (revertStockMovementItem.json)
+```
+{
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "",
+    "identifier": "483ZSA",
+    "origin.id": "2",
+    "destination.id": "1",
+    "dateRequested": "06/23/2018",
+    "requestedBy.id": "1",
+    "lineItems": [
+      {
+        "id":"ff808181644e51a401644e85891b0006",
+        "revert":"true"        
+      }
+    ]
+}
+```
+##### Response
+```
+{
+  "data": {
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "my new stock movement",
+    "identifier": "483ZSA",
+    "origin": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "destination": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": [
+      {
+        "id": "ff808181644e51a401644e85891b0006",
+        "productCode": "BK71",
+        "product": {
+          "id": "ff8081816407132d0164071eec250001",
+          "productCode": "BK71",
+          "name": "product 1+",
+          "description": "This is the penultimate product",
+          "category": {
+            "id": "ROOT",
+            "name": "ROOT"
+          }
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "PENDING",
+        "quantityRequested": 100,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": 0,
+        "quantityRevised": null,
+        "reasonCode": null,
+        "comments": null,
+        "recipient": null,
+        "sortOrder": null
+      }
+    ]
+  }
+}
+```
+
+#### Delete Stock Movement Item
+This operation allows you to delete the stock movement item completely. 
+
+##### Request
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d @deleteStockMovementItem.json \
+https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
+```
+##### Post Body (deleteStockMovementItem.json)
+```
+{
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "",
+    "identifier": "483ZSA",
+    "origin.id": "2",
+    "destination.id": "1",
+    "dateRequested": "06/23/2018",
+    "requestedBy.id": "1",
+    "lineItems": [
+      {
+        "id":"ff808181644e51a401644e85891b0006",
+        "delete":"true",
+      }
+    ]
+}
+```
+
+##### Response
+```
+{
+  "data": {
+    "id": "ff808181644d5e5b01644e5007500001",
+    "name": "my new stock movement",
+    "description": "my new stock movement",
+    "identifier": "483ZSA",
+    "origin": {
+      "id": "2",
+      "name": "Miami Warehouse"
+    },
+    "destination": {
+      "id": "1",
+      "name": "Boston Headquarters"
+    },
+    "dateRequested": "06/23/2018",
+    "requestedBy": {
+      "id": "1",
+      "name": "Mr Administrator",
+      "firstName": "Mr",
+      "lastName": "Administrator",
+      "email": "admin@pih.org",
+      "username": "admin"
+    },
+    "lineItems": []
+  }
+}
+```
+
+##### Exceptions
+This operation 
+cannot be performed on a stock movement item that has been revised (due to a bug with 
+foreign key constraints). 
+```
+{
+  "errorCode": 500,
+  "errorMessage": "Cannot delete or update a parent row: a foreign key constraint fails (`openboxes_integration`.`requisition_item`, CONSTRAINT `FK5358E4D6405AC22D` FOREIGN KEY (`modification_item_id`) REFERENCES `requisition_item` (`id`))"
+}
+```
+Therefore you must revert all changes to the stock movement 
+item before deleting.
