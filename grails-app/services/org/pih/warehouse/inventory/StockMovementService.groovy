@@ -60,6 +60,8 @@ class StockMovementService {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
 
+        requisition = requisition.refresh()
+
         return StockMovement.createFromRequisition(requisition)
     }
 
@@ -106,10 +108,22 @@ class StockMovementService {
                         requisitionItem.delete(flush:true)
                     }
                     else if (stockMovementItem.revert) {
+                        log.info "Item reverted " + requisitionItem.id
                         requisitionItem.undoChanges()
                     }
                     else if (stockMovementItem.cancel) {
+                        log.info "Item canceled " + requisitionItem.id
                         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
+                    }
+                    else if (stockMovementItem.substitute) {
+                        log.info "Item substituted " + requisitionItem.id
+                        log.info "New product " + stockMovementItem.newProduct
+                        requisitionItem.chooseSubstitute(
+                                stockMovementItem.newProduct,
+                                null,
+                                stockMovementItem.newQuantity?.intValueExact(),
+                                stockMovementItem.reasonCode,
+                                stockMovementItem.comments)
                     }
                     else {
                         log.info "Item updated " + requisitionItem.id
@@ -119,7 +133,10 @@ class StockMovementService {
                         //if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
                         if (stockMovementItem.quantityRevised) {
-                            requisitionItem.changeQuantity(stockMovementItem?.quantityRevised?.intValueExact(), stockMovementItem.reasonCode, stockMovementItem.comments)
+                            requisitionItem.changeQuantity(
+                                    stockMovementItem?.quantityRevised?.intValueExact(),
+                                    stockMovementItem.reasonCode,
+                                    stockMovementItem.comments)
                         }
                     }
                     requisitionItem.save()
@@ -145,6 +162,8 @@ class StockMovementService {
         if (requisition.hasErrors() || !requisition.save(flush:true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
+
+        requisition = requisition.refresh()
 
         return StockMovement.createFromRequisition(requisition)
     }

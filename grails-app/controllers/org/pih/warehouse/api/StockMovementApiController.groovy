@@ -106,6 +106,10 @@ class StockMovementApiController {
             stockMovementItem.delete = lineItem.delete ? Boolean.parseBoolean(lineItem.delete):Boolean.FALSE
             stockMovementItem.revert = lineItem.revert ? Boolean.parseBoolean(lineItem.revert):Boolean.FALSE
             stockMovementItem.cancel = lineItem.cancel ? Boolean.parseBoolean(lineItem.cancel):Boolean.FALSE
+            stockMovementItem.substitute = lineItem.substitute ? Boolean.parseBoolean(lineItem.substitute):Boolean.FALSE
+
+            stockMovementItem.newProduct = lineItem["newProduct.id"] ? Product.load(lineItem["newProduct.id"]) : null
+            stockMovementItem.newQuantity = lineItem.newQuantity ? new BigDecimal(lineItem.newQuantity) : null
 
             // When revising quantity you need quantity revised and reason code
             stockMovementItem.quantityRevised = lineItem.quantityRevised ? new BigDecimal(lineItem.quantityRevised) : null

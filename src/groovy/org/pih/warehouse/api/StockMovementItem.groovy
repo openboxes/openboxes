@@ -4,6 +4,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.shipping.ShipmentItem
 
 class StockMovementItem {
@@ -25,6 +26,9 @@ class StockMovementItem {
     Boolean delete = Boolean.FALSE
     Boolean revert = Boolean.FALSE
     Boolean substitute = Boolean.FALSE
+
+    Product newProduct
+    BigDecimal newQuantity
 
     String statusCode
 
@@ -51,13 +55,25 @@ class StockMovementItem {
         reasonCode(nullable:true)
         comments(nullable:true)
         recipient(nullable:true)
-        deleted(nullable:true)
+        delete(nullable:true)
+        cancel(nullable:true)
+        revert(nullable:true)
+        substitute(nullable:true)
         palletName(nullable:true)
         boxName(nullable:true)
         sortOrder(nullable:true)
     }
 
     Map toJson() {
+
+        // Gather all substitutions
+        RequisitionItem requisitionItem = RequisitionItem.load(id)
+        def substitutions = requisitionItem.requisitionItems.findAll {
+            it.requisitionItemType = RequisitionItemType.SUBSTITUTION
+        }
+        substitutions = substitutions.collect { substitutionItem ->
+            StockMovementItem.createFromRequisitionItem(substitutionItem)
+        }
         return [
                 id: id,
                 productCode: productCode,
@@ -70,6 +86,7 @@ class StockMovementItem {
                 quantityAvailable: quantityAvailable,
                 quantityCanceled: quantityCanceled,
                 quantityRevised: quantityRevised,
+                substitutions: substitutions,
                 reasonCode: reasonCode,
                 comments: comments,
                 recipient: recipient,
@@ -108,7 +125,6 @@ class StockMovementItem {
     }
 
     static StockMovementItem createFromRequisitionItem(RequisitionItem requisitionItem) {
-
         return new StockMovementItem(id: requisitionItem.id,
                 productCode: requisitionItem?.product?.productCode,
                 product: requisitionItem?.product,
