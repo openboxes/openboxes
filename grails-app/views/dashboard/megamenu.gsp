@@ -233,6 +233,11 @@
                     <warehouse:message code="partialReceiving.label"/>
                 </g:link>
             </div>
+            <div class="megaButton">
+                <g:link controller="putAway">
+                    <warehouse:message code="putAway.label"/>
+                </g:link>
+            </div>
         </div>
     </li>
 

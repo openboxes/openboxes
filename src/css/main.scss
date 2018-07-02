@@ -361,3 +361,7 @@ tr.crossed-out td:before {
 .spinner-container > div > div {
   top: 40%;
 }
+
+.ReactTable .-pagination .-btn {
+  height: 5% !important;
+}
