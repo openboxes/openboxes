@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 
 import PickPageFieldArrayComponent from './PickPageFieldArrayComponent';
 import TableBody from './TableBody';
-import LineItemsRowKeyFieldArrayComponent from './LineItemsRowKeyFieldArrayComponent';
 
 const FieldArrayComponent = (props) => {
   const { fieldsConfig, properties, fields } = props;
@@ -14,16 +13,6 @@ const FieldArrayComponent = (props) => {
   if (fieldsConfig.pickPage) {
     return (
       <PickPageFieldArrayComponent
-        fieldsConfig={fieldsConfig}
-        properties={properties}
-        fields={fields}
-      />
-    );
-  }
-
-  if (fieldsConfig.lineItemsRowKey) {
-    return (
-      <LineItemsRowKeyFieldArrayComponent
         fieldsConfig={fieldsConfig}
         properties={properties}
         fields={fields}

@@ -16,7 +16,6 @@ import TableRowWithSelector from '../form-elements/TableRowWithSelector';
 const FIELDS = {
   lineItems: {
     type: ArrayField,
-    lineItemsRowKey: true,
     rowComponent: TableRowWithSelector,
     rowAttributes: {
       formName: 'stock-movement-wizard',
@@ -54,7 +53,7 @@ const FIELDS = {
           formName: 'stock-movement-wizard',
         },
         getDynamicAttr: ({ rowIndex }) => ({
-          field: `lineItems[${rowIndex}].product.code`,
+          field: `lineItems[${rowIndex}].product.productCode`,
         }),
         component: SubstitutionsModal,
         componentConfig: {
