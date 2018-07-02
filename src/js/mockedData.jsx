@@ -373,8 +373,6 @@ const SUBSTITUTIONS_MOCKS = {
   4: [],
 };
 
-const MOVEMENT_NUMBER = 'ABC123';
-
 const BIN_LOCATION_MOCKS = [
   { value: 'Receiving', label: 'Receiving' },
   { value: 'Bin 1', label: 'Bin 1' },
@@ -603,7 +601,6 @@ export {
   REASON_CODE_MOCKS,
   AVAILABLE_LOTS,
   SUBSTITUTIONS_MOCKS,
-  MOVEMENT_NUMBER,
   BIN_LOCATION_MOCKS,
   RECEIPT_MOCKS,
   PUT_AWAY_MOCKS,
