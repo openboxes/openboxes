@@ -14,6 +14,8 @@ import org.apache.commons.lang.NotImplementedException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.product.ProductAssociation
+import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -117,7 +119,12 @@ class StockMovementService {
                     }
                     else if (stockMovementItem.substitute) {
                         log.info "Item substituted " + requisitionItem.id
-                        log.info "New product " + stockMovementItem.newProduct
+                        log.info "Substitutions: " + requisitionItem.product.substitutions
+                        if (!requisitionItem.product.isValidSubstitution(stockMovementItem?.newProduct)) {
+                            throw new IllegalArgumentException("Product ${stockMovementItem?.newProduct?.productCode} " +
+                                    "${stockMovementItem?.newProduct?.name} is not a valid substitution of " +
+                                    "${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}")
+                        }
                         requisitionItem.chooseSubstitute(
                                 stockMovementItem.newProduct,
                                 null,

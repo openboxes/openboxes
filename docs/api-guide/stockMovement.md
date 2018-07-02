@@ -732,7 +732,23 @@ under the original requisition item.
     }]
 }
 ```
+##### Exceptions
+Cannot substitute a product that is not in the original product's list of available substitutions. 
+See the Substitutions API.
+```
+{
+  "errorCode": 500,
+  "errorMessage": "Product 00004 General Pain Reliever is not a valid substitution of BK71 product 1+"
+}
+```
+You also cannot substitute the product for itself.
+```
+{
+  "errorCode": 500,
+  "errorMessage": "Product BK71 product 1+ is not a valid substitution of BK71 product 1+"
+}
 
+```
 
 #### Cancel Stock Movement Item
 Similar to a revision, this operation allows you to cancel the stock movement item.
