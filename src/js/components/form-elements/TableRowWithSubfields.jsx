@@ -21,12 +21,14 @@ class TableRowWithSubfields extends Component {
     const {
       fieldsConfig, index, field, properties, rowValues = {},
     } = this.props;
+    const dynamicAttr = fieldsConfig.getDynamicRowAttr ?
+      fieldsConfig.getDynamicRowAttr({ ...properties, index, rowValues }) : {};
     const { subfieldKey } = fieldsConfig;
 
     return (
       <div>
         <TableRow {...this.props} />
-        { !properties.fieldPreview ?
+        { !dynamicAttr.hideSubfields && (!properties.fieldPreview ?
           <FieldArray
             name={`${field}.${subfieldKey}`}
             component={TableBody}
@@ -52,7 +54,7 @@ class TableRowWithSubfields extends Component {
               fieldsConfig={fieldsConfig}
               removeRow={() => {}}
               rowValues={subfield}
-            />)) }
+            />))) }
       </div>
     );
   }
