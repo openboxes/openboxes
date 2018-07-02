@@ -14,6 +14,8 @@ import org.apache.commons.lang.NotImplementedException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.product.ProductAssociation
+import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -59,6 +61,8 @@ class StockMovementService {
         if (requisition.hasErrors() || !requisition.save(flush:true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
+
+        requisition = requisition.refresh()
 
         return StockMovement.createFromRequisition(requisition)
     }
@@ -106,10 +110,27 @@ class StockMovementService {
                         requisitionItem.delete(flush:true)
                     }
                     else if (stockMovementItem.revert) {
+                        log.info "Item reverted " + requisitionItem.id
                         requisitionItem.undoChanges()
                     }
                     else if (stockMovementItem.cancel) {
+                        log.info "Item canceled " + requisitionItem.id
                         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
+                    }
+                    else if (stockMovementItem.substitute) {
+                        log.info "Item substituted " + requisitionItem.id
+                        log.info "Substitutions: " + requisitionItem.product.substitutions
+                        if (!requisitionItem.product.isValidSubstitution(stockMovementItem?.newProduct)) {
+                            throw new IllegalArgumentException("Product ${stockMovementItem?.newProduct?.productCode} " +
+                                    "${stockMovementItem?.newProduct?.name} is not a valid substitution of " +
+                                    "${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}")
+                        }
+                        requisitionItem.chooseSubstitute(
+                                stockMovementItem.newProduct,
+                                null,
+                                stockMovementItem.newQuantity?.intValueExact(),
+                                stockMovementItem.reasonCode,
+                                stockMovementItem.comments)
                     }
                     else {
                         log.info "Item updated " + requisitionItem.id
@@ -119,7 +140,10 @@ class StockMovementService {
                         //if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
                         if (stockMovementItem.quantityRevised) {
-                            requisitionItem.changeQuantity(stockMovementItem?.quantityRevised?.intValueExact(), stockMovementItem.reasonCode, stockMovementItem.comments)
+                            requisitionItem.changeQuantity(
+                                    stockMovementItem?.quantityRevised?.intValueExact(),
+                                    stockMovementItem.reasonCode,
+                                    stockMovementItem.comments)
                         }
                     }
                     requisitionItem.save()
@@ -145,6 +169,8 @@ class StockMovementService {
         if (requisition.hasErrors() || !requisition.save(flush:true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
+
+        requisition = requisition.refresh()
 
         return StockMovement.createFromRequisition(requisition)
     }

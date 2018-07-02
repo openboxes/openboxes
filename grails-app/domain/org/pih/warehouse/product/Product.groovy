@@ -212,7 +212,7 @@ class Product implements Comparable, Serializable {
     User updatedBy
 
     // "inventoryLevels"
-    static transients = ["rootCategory", "images", "genericProduct", "thumbnail", "binLocation"];
+    static transients = ["rootCategory", "images", "genericProduct", "thumbnail", "binLocation","substitutions"];
 
     static hasMany = [
         categories: Category,
@@ -343,6 +343,15 @@ class Product implements Comparable, Serializable {
     List<ProductAssociation> getSubstitutions() {
         return ProductAssociation.findAllByProductAndCode(this, ProductAssociationTypeCode.SUBSTITUTE)
     }
+
+    Boolean isValidSubstitution(Product product) {
+        return ProductAssociation.createCriteria().get {
+            eq("product", this)
+            eq("code", ProductAssociationTypeCode.SUBSTITUTE)
+            eq("associatedProduct", product)
+        }
+    }
+
 
     List<ProductCatalog> getProductCatalogs() {
         return ProductCatalog.includesProduct(this).listDistinct()
