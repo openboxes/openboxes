@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import Select from 'react-select';
+import Select, { Async } from 'react-select';
 import PropTypes from 'prop-types';
 
 import 'react-select/dist/react-select.css';
@@ -46,8 +46,10 @@ const SelectField = (props) => {
       objectValue: false,
     };
 
+    const SelectType = attributes.async ? Async : Select;
+
     return (
-      <Select
+      <SelectType
         name={attributes.id}
         {...attributes}
         options={options}

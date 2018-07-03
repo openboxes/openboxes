@@ -163,7 +163,10 @@ class CreateStockMovement extends Component {
             this.getIdentifier().then(() => this.props.hideSpinner());
           }
         })
-        .catch(() => this.props.hideSpinner());
+        .catch(() => {
+          this.props.hideSpinner();
+          return Promise.reject(new Error('Could not create stock movement'));
+        });
     }
 
     return new Promise(((resolve, reject) => {
@@ -180,7 +183,7 @@ class CreateStockMovement extends Component {
         this.props.dateRequested,
         this.props.description,
         this.props.stockList,
-      ).then(() => this.props.onSubmit());
+      ).then(() => { this.props.onSubmit(); }).catch(() => this.props.hideSpinner());
     } else {
       this.props.onSubmit();
     }
