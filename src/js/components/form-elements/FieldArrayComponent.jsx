@@ -3,12 +3,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import PickPageFieldArrayComponent from './PickPageFieldArrayComponent';
+import TableBody from './TableBody';
 import TableBodyVirtualized from './TableBodyVirtualized';
 
 const FieldArrayComponent = (props) => {
   const { fieldsConfig, properties, fields } = props;
   const AddButton = fieldsConfig.addButton;
   const addRow = (row = {}) => fields.push(row);
+  const TableBodyComponent = fieldsConfig.disableVirtualization ? TableBody : TableBodyVirtualized;
 
   if (fieldsConfig.pickPage) {
     return (
@@ -27,7 +29,7 @@ const FieldArrayComponent = (props) => {
           { _.map(fieldsConfig.fields, (config, name) =>
             <div key={name} className="mx-1" style={{ flex: '1 1 0' }}>{config.label}</div>) }
         </div>
-        <TableBodyVirtualized
+        <TableBodyComponent
           fields={fields}
           properties={properties}
           addRow={addRow}

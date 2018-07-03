@@ -14,6 +14,7 @@ import { renderFormField, generateKey } from '../../../utils/form-utils';
 const FIELDS = {
   editPick: {
     type: ArrayField,
+    disableVirtualization: true,
     fields: {
       lot: {
         type: LabelField,

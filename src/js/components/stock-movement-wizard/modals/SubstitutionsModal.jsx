@@ -14,6 +14,7 @@ import { SUBSTITUTIONS_MOCKS } from '../../../mockedData';
 const FIELDS = {
   substitutions: {
     type: ArrayField,
+    disableVirtualization: true,
     fields: {
       product: {
         type: LabelField,
