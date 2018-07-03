@@ -47,7 +47,7 @@ class StockMovement {
 
     static constraints = {
         id(nullable:true)
-        name(nullable:false)
+        name(nullable:true)
         description(nullable:true)
         origin(nullable:false)
         destination(nullable:false)
@@ -86,7 +86,8 @@ class StockMovement {
         StockMovement stockMovement = new StockMovement(
                 id: requisition.id,
                 name: requisition.name,
-                description: requisition.name,
+                identifier: requisition.requestNumber,
+                description: requisition.description,
                 origin: requisition.origin,
                 destination: requisition.destination,
                 dateRequested: requisition.dateRequested,
@@ -94,10 +95,9 @@ class StockMovement {
                 requisition: requisition
         )
 
+        // Include all requisition items except those that are substitutions or modifications because the
+        // original requisition item will represent these changes
         requisition.requisitionItems.each { requisitionItem ->
-
-            // Ignore requisition items that are substitutions or modifications because the
-            // original requisition item will represent these changes
             if (!requisitionItem.parentRequisitionItem) {
                 StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
                 stockMovement.lineItems.add(stockMovementItem)
