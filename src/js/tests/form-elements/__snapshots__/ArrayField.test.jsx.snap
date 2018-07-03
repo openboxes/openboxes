@@ -54,16 +54,27 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             }
           >
             <div
-              className="form-group my-0   "
+              className=""
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+              tabIndex={undefined}
+              title={undefined}
             >
-              <input
-                className="form-control"
-                id="test-field[0].textField"
-                onBlur={[Function]}
-                onChange={[Function]}
-                type="text"
-                value={undefined}
-              />
+              <div
+                className="form-group my-0   "
+              >
+                <input
+                  className="form-control"
+                  id="test-field[0].textField"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  type="text"
+                  value={undefined}
+                />
+              </div>
             </div>
           </div>
           <div
@@ -76,16 +87,27 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             }
           >
             <div
-              className="form-group my-0   "
+              className=""
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+              tabIndex={undefined}
+              title={undefined}
             >
-              <input
-                className="form-control"
-                id="test-field[0].textField2"
-                onBlur={[Function]}
-                onChange={[Function]}
-                type="text"
-                value={undefined}
-              />
+              <div
+                className="form-group my-0   "
+              >
+                <input
+                  className="form-control"
+                  id="test-field[0].textField2"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  type="text"
+                  value={undefined}
+                />
+              </div>
             </div>
           </div>
           <div
@@ -124,16 +146,27 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             }
           >
             <div
-              className="form-group my-0   "
+              className=""
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+              tabIndex={undefined}
+              title={undefined}
             >
-              <input
-                className="form-control"
-                id="test-field[1].textField"
-                onBlur={[Function]}
-                onChange={[Function]}
-                type="text"
-                value={undefined}
-              />
+              <div
+                className="form-group my-0   "
+              >
+                <input
+                  className="form-control"
+                  id="test-field[1].textField"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  type="text"
+                  value={undefined}
+                />
+              </div>
             </div>
           </div>
           <div
@@ -146,16 +179,27 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             }
           >
             <div
-              className="form-group my-0   "
+              className=""
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+              tabIndex={undefined}
+              title={undefined}
             >
-              <input
-                className="form-control"
-                id="test-field[1].textField2"
-                onBlur={[Function]}
-                onChange={[Function]}
-                type="text"
-                value={undefined}
-              />
+              <div
+                className="form-group my-0   "
+              >
+                <input
+                  className="form-control"
+                  id="test-field[1].textField2"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  type="text"
+                  value={undefined}
+                />
+              </div>
             </div>
           </div>
           <div
@@ -248,16 +292,27 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             }
           >
             <div
-              className="form-group my-0   "
+              className=""
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+              tabIndex={undefined}
+              title={undefined}
             >
-              <input
-                className="form-control"
-                id="test-field[0].textField"
-                onBlur={[Function]}
-                onChange={[Function]}
-                type="text"
-                value={undefined}
-              />
+              <div
+                className="form-group my-0   "
+              >
+                <input
+                  className="form-control"
+                  id="test-field[0].textField"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  type="text"
+                  value={undefined}
+                />
+              </div>
             </div>
           </div>
           <div
@@ -270,16 +325,27 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             }
           >
             <div
-              className="form-group my-0   "
+              className=""
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+              tabIndex={undefined}
+              title={undefined}
             >
-              <input
-                className="form-control"
-                id="test-field[0].textField2"
-                onBlur={[Function]}
-                onChange={[Function]}
-                type="text"
-                value={undefined}
-              />
+              <div
+                className="form-group my-0   "
+              >
+                <input
+                  className="form-control"
+                  id="test-field[0].textField2"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  type="text"
+                  value={undefined}
+                />
+              </div>
             </div>
           </div>
           <div
@@ -318,16 +384,27 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             }
           >
             <div
-              className="form-group my-0   "
+              className=""
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+              tabIndex={undefined}
+              title={undefined}
             >
-              <input
-                className="form-control"
-                id="test-field[1].textField"
-                onBlur={[Function]}
-                onChange={[Function]}
-                type="text"
-                value={undefined}
-              />
+              <div
+                className="form-group my-0   "
+              >
+                <input
+                  className="form-control"
+                  id="test-field[1].textField"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  type="text"
+                  value={undefined}
+                />
+              </div>
             </div>
           </div>
           <div
@@ -340,16 +417,27 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             }
           >
             <div
-              className="form-group my-0   "
+              className=""
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+              tabIndex={undefined}
+              title={undefined}
             >
-              <input
-                className="form-control"
-                id="test-field[1].textField2"
-                onBlur={[Function]}
-                onChange={[Function]}
-                type="text"
-                value={undefined}
-              />
+              <div
+                className="form-group my-0   "
+              >
+                <input
+                  className="form-control"
+                  id="test-field[1].textField2"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  type="text"
+                  value={undefined}
+                />
+              </div>
             </div>
           </div>
           <div

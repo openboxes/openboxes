@@ -53,6 +53,7 @@
     "react-select": "^1.2.1",
     "react-spinners": "^0.3.2",
     "react-table": "^6.8.6",
+    "react-tippy": "^1.2.2",
     "react-virtualized": "^9.19.1",
     "redux": "^4.0.0",
     "redux-form": "^7.3.0",
