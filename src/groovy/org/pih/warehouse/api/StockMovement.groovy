@@ -7,6 +7,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentType
 
 enum StockMovementType {
 
@@ -34,6 +35,13 @@ class StockMovement {
     Person requestedBy
     Date dateRequested
 
+    // Shipment information
+    Date dateShipped
+    ShipmentType shipmentType
+    String trackingNumber
+    String driverName
+    String comments
+
     StockMovementType stockMovementType
 
 
@@ -55,6 +63,12 @@ class StockMovement {
         requestedBy(nullable:false)
         dateRequested(nullable:false)
         stockMovementType(nullable:true)
+        shipment(nullable:true)
+        dateShipped(nullable:true)
+        shipmentType(nullable:true)
+        trackingNumber(nullable:true)
+        driverName(nullable:true)
+        comments(nullable:true)
     }
 
 
@@ -79,6 +93,19 @@ class StockMovement {
                 requestedBy: requestedBy,
                 lineItems: lineItems.collect { it.toJson() }
         ]
+    }
+
+    /**
+     * “FROM.TO.DATEREQUESTED.STOCKLIST.TRACKING#.DESCRIPTION”
+     *
+     * @return
+     */
+    String generateShipmentName() {
+        String name = "${origin?.name}.${destination?.name}.${dateRequested.format("dd/MMM/yyyy")}"
+        if (stocklist?.name) name += ".${stocklist.name}"
+        if (trackingNumber) name += ".${trackingNumber}"
+        if (description) name += ".${description}"
+        return name
     }
 
 
