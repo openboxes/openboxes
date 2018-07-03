@@ -37,7 +37,7 @@ const FieldArrayComponent = (props) => {
         />
       </div>
       { AddButton &&
-        <div className="text-center">
+        <div className="text-center mt-2">
           {
             typeof AddButton === 'string' ?
               <button type="button" className="btn btn-outline-success margin-bottom-lg" onClick={() => addRow()}>

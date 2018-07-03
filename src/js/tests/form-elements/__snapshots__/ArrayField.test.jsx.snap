@@ -225,7 +225,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
     </div>
   </div>
   <div
-    className="text-center"
+    className="text-center mt-2"
   >
     <button
       className="btn btn-outline-success margin-bottom-lg"
