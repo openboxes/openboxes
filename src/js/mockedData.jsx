@@ -328,7 +328,7 @@ const AVAILABLE_LOTS = [
 ];
 
 const SUBSTITUTIONS_MOCKS = {
-  1: [
+  '00001': [
     {
       product: { code: 5, name: 'Ibuprofenum #1 200mg' },
       maxQuantity: 8,
@@ -342,7 +342,7 @@ const SUBSTITUTIONS_MOCKS = {
       substitutionExpiryDate: '2018/09/31',
     },
   ],
-  2: [
+  '00002': [
     {
       product: { code: 7, name: 'Paracetamol #1 325mg' },
       maxQuantity: 2,
@@ -362,7 +362,7 @@ const SUBSTITUTIONS_MOCKS = {
       substitutionExpiryDate: '2018/09/31',
     },
   ],
-  3: [
+  '00003': [
     {
       product: { code: 10, name: 'Aspirin #1 20mg' },
       maxQuantity: 14,

@@ -3,7 +3,7 @@ import DateTime from 'react-datetime';
 
 import 'react-datetime/css/react-datetime.css';
 
-import BaseReactField from './BaseReactField';
+import BaseField from './BaseField';
 
 const DateField = (props) => {
   const renderInput = (attributes) => {
@@ -25,7 +25,7 @@ const DateField = (props) => {
   };
 
   return (
-    <BaseReactField
+    <BaseField
       {...props}
       renderInput={renderInput}
     />

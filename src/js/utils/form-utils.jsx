@@ -1,5 +1,8 @@
 import React from 'react';
+import { Tooltip } from 'react-tippy';
 import PropTypes from 'prop-types';
+
+import 'react-tippy/dist/tippy.css';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
@@ -28,14 +31,19 @@ export const renderField = ({
 
   if (arrayField) {
     return (
-      <div className={className}>
-        {renderInput(input, attr)}
-        { (touched || fieldTouched) && error &&
-          <div className="help-block mb-0" style={{ float: 'left' }}>
-            { error }
-          </div>
-        }
-      </div>
+      <Tooltip
+        title={error}
+        disabled={!error || !(touched || fieldTouched)}
+        theme="transparent"
+        arrow="true"
+        delay="150"
+        duration="250"
+        hideDelay="50"
+      >
+        <div className={className}>
+          {renderInput(input, attr)}
+        </div>
+      </Tooltip>
     );
   }
 

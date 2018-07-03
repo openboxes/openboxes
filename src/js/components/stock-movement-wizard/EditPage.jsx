@@ -11,20 +11,13 @@ import SelectField from '../form-elements/SelectField';
 import { REASON_CODE_MOCKS } from '../../mockedData';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import SubstitutionsModal from './modals/SubstitutionsModal';
-import TableRowWithSelector from '../form-elements/TableRowWithSelector';
 
 const FIELDS = {
   lineItems: {
     type: ArrayField,
-    lineItemsRowKey: true,
-    rowComponent: TableRowWithSelector,
-    rowAttributes: {
-      formName: 'stock-movement-wizard',
-      rowSelector: 'substituted',
-    },
-    getDynamicRowAttr: ({ selectedValue }) => (
+    getDynamicRowAttr: ({ rowValues }) => (
       {
-        className: selectedValue ? 'crossed-out' : '',
+        className: rowValues.substituted ? 'crossed-out' : '',
       }
     ),
     fields: {
@@ -54,7 +47,7 @@ const FIELDS = {
           formName: 'stock-movement-wizard',
         },
         getDynamicAttr: ({ rowIndex }) => ({
-          field: `lineItems[${rowIndex}].product.code`,
+          field: `lineItems[${rowIndex}].product.productCode`,
         }),
         component: SubstitutionsModal,
         componentConfig: {

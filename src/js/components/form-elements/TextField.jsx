@@ -1,18 +1,18 @@
 import React from 'react';
 
-import BaseHtmlField from './BaseHtmlField';
+import BaseField from './BaseField';
+import Input from '../../utils/Input';
 
 const TextField = (props) => {
   const renderInput = attributes => (
-    <input
-      type="text"
+    <Input
       className="form-control"
       {...attributes}
     />
   );
 
   return (
-    <BaseHtmlField
+    <BaseField
       {...props}
       renderInput={renderInput}
     />

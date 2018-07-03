@@ -287,26 +287,6 @@ $blue-epsilon: #bce7f7;
   max-height: 80vh;
 }
 
-/* DATE FIELD
-----------------------------*/
-
-.date-field tr {
-  background-color: initial !important;
-}
-
-.date-field thead th {
-  border-bottom: 1px solid #f9f9f9;
-  border-top: none;
-  padding: 0;
-  vertical-align: middle;
-}
-
-.date-field td {
-  border: none;
-  padding: 0;
-  vertical-align: middle;
-}
-
 /* PRINT STYLING
 ----------------------------*/
 
@@ -364,4 +344,27 @@ tr.crossed-out td:before {
 
 .ReactTable .-pagination .-btn {
   height: 5% !important;
+}
+
+.even-row {
+  background-color: $white-alpha;
+}
+
+.table-row {
+  height: 45px;
+}
+
+.table-inner-row {
+  position: relative;
+  height: 45px;
+}
+
+div.crossed-out .table-inner-row:before {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  border-bottom: 2px solid $red-beta;
+  width: 100%;
+  z-index: 999 !important;
 }

@@ -52,7 +52,7 @@ describe('BaseField component is correctly rendering', () => {
         getDynamicAttr: ({ dynamicProp }) => ({ hidden: true, dynamicAttr: dynamicProp }),
       },
       dynamicProp: 'dynamic property',
-      renderInput: (input, attr) => (<input {...attr} />),
+      renderInput: attr => (<input {...attr} />),
     };
 
     const rendered = renderer.create(<BaseField {...props} />);

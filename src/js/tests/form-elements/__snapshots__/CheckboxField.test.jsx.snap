@@ -17,12 +17,12 @@ exports[`CheckboxField component is correctly rendering renders correctly 1`] = 
       className="col-md-4"
     >
       <input
-        checked={undefined}
+        checked={null}
         id="test-field"
-        name="test-field"
         onBlur={[Function]}
         onChange={[Function]}
         type="checkbox"
+        value={null}
       />
     </div>
   </div>

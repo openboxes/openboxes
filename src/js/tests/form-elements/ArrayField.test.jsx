@@ -17,9 +17,25 @@ jest.mock('redux-form', () => ({
     const fields = {
       map: callback => [`${name}[0]`, `${name}[1]`].map(callback),
       get: () => {},
+      length: 2,
+      name: 'test-field',
     };
     return <Component fields={fields} {...others} />;
   },
+  formValueSelector: () => {},
+}));
+
+jest.mock('react-virtualized', () => ({
+  List: (props) => {
+    const { rowCount, rowRenderer } = props;
+
+    return (
+      [...new Array(rowCount)].map((e, index) => (rowRenderer({
+        key: index, index, style: {}, isScrolling: false, isVisible: true,
+      })))
+    );
+  },
+  AutoSizer: props => (props.children({ width: 600 })),
   formValueSelector: () => {},
 }));
 

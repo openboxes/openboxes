@@ -11,24 +11,24 @@ import ArrayField from '../form-elements/ArrayField';
 import ButtonField from '../form-elements/ButtonField';
 import LabelField from '../form-elements/LabelField';
 import DateField from '../form-elements/DateField';
-import ValueSelectorField from '../form-elements/ValueSelectorField';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import { renderFormField } from '../../utils/form-utils';
 import Select from '../../utils/Select';
+import Checkbox from '../../utils/Checkbox';
 import { USERNAMES_MOCKS, BIN_LOCATION_MOCKS, RECEIPT_MOCKS } from '../../mockedData';
 
-const isReceiving = (subfield, selectedValue) => {
+const isReceiving = (subfield, fieldValue) => {
   if (subfield) {
-    return !_.isNil(selectedValue);
+    return !_.isNil(_.get(fieldValue, 'receiveItem.quantity'));
   }
 
-  if (!selectedValue) {
+  if (!fieldValue.shipmentItems) {
     return false;
   }
   let selected = false;
 
-  selectedValue.forEach((item) => {
-    if (!_.isNil(item.receiveItem) && !_.isNil(item.receiveItem.quantity)) {
+  fieldValue.shipmentItems.forEach((item) => {
+    if (!_.isNil(_.get(item, 'receiveItem.quantity'))) {
       selected = true;
     }
   });
@@ -74,33 +74,21 @@ const FIELDS = {
     subfieldKey: 'shipmentItems',
     fields: {
       autofillLine: {
+        fieldKey: '',
         type: ({
           // eslint-disable-next-line react/prop-types
-          subfield, parentIndex, rowIndex, autofillLines,
+          subfield, parentIndex, rowIndex, autofillLines, fieldPreview, fieldValue,
         }) => (
-          <ValueSelectorField
-            fieldConfig={{
-              // eslint-disable-next-line react/prop-types
-              component: ({ selectedValue }) => (
-                <input
-                  type="checkbox"
-                  className={subfield ? 'ml-4' : ''}
-                  checked={isReceiving(subfield, selectedValue)}
-                  onChange={(event) => {
-                    const { checked } = event.target;
-
-                    if (subfield) {
-                      autofillLines(!checked, parentIndex, rowIndex);
-                    } else {
-                      autofillLines(!checked, rowIndex);
-                    }
-                  }}
-                />),
-              attributes: {
-                formName: 'partial-receiving-wizard',
-                field: !subfield ? `containers[${rowIndex}].shipmentItems` :
-                  `containers[${parentIndex}].shipmentItems[${rowIndex}].receiveItem.quantity`,
-              },
+          <Checkbox
+            disabled={fieldPreview}
+            className={subfield ? 'ml-4' : ''}
+            value={isReceiving(subfield, fieldValue)}
+            onChange={(value) => {
+              if (subfield) {
+                autofillLines(!value, parentIndex, rowIndex);
+              } else {
+                autofillLines(!value, rowIndex);
+              }
             }}
           />),
       },
@@ -147,6 +135,7 @@ const FIELDS = {
           params.subfield ?
             <SelectField {...params} /> :
             <Select
+              disabled={params.fieldPreview}
               options={BIN_LOCATION_MOCKS}
               onChange={value => params.setLocation(params.rowIndex, value)}
             />),
