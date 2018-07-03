@@ -1,11 +1,19 @@
 import _ from 'lodash';
 import React from 'react';
-import Select, { Async } from 'react-select';
+import Select, { Async } from 'react-select-plus';
+import { Overlay } from 'react-overlays';
 import PropTypes from 'prop-types';
 
-import 'react-select/dist/react-select.css';
+import 'react-select-plus/dist/react-select-plus.css';
 
 import BaseField from './BaseField';
+
+// eslint-disable-next-line react/prop-types
+const Dropdown = ({ children, style, width }) => (
+  <div style={{ ...style, position: 'absolute', width }}>
+    {children}
+  </div>
+);
 
 const SelectField = (props) => {
   const renderInput = ({ objectValue, ...attributes }) => {
@@ -48,15 +56,35 @@ const SelectField = (props) => {
 
     const SelectType = attributes.async ? Async : Select;
 
+    // eslint-disable-next-line react/prop-types
+    const dropdownComponent = ({ children }) => {
+      const target = document.getElementById(`${attributes.id}-container`);
+      return (
+        <Overlay
+          show
+          placement="bottom"
+          target={target}
+          container={document.getElementById('root')}
+        >
+          <Dropdown width={target.offsetWidth}>
+            {children}
+          </Dropdown>
+        </Overlay>
+      );
+    };
+
     return (
-      <SelectType
-        name={attributes.id}
-        {...attributes}
-        options={options}
-        delimiter={delimiter}
-        value={attributes.multi ? _.join(value, delimiter) : value}
-        onChange={onChange}
-      />
+      <div id={`${attributes.id}-container`}>
+        <SelectType
+          name={attributes.id}
+          {...attributes}
+          options={options}
+          delimiter={delimiter}
+          value={attributes.multi ? _.join(value, delimiter) : value}
+          onChange={onChange}
+          dropdownComponent={dropdownComponent}
+        />
+      </div>
     );
   };
 
