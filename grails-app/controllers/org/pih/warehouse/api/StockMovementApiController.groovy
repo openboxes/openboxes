@@ -108,6 +108,7 @@ class StockMovementApiController {
             stockMovementItem.cancel = lineItem.cancel ? Boolean.parseBoolean(lineItem.cancel):Boolean.FALSE
             stockMovementItem.substitute = lineItem.substitute ? Boolean.parseBoolean(lineItem.substitute):Boolean.FALSE
 
+            // When substituting a product, we need to include the new product, quantity and reason code
             stockMovementItem.newProduct = lineItem["newProduct.id"] ? Product.load(lineItem["newProduct.id"]) : null
             stockMovementItem.newQuantity = lineItem.newQuantity ? new BigDecimal(lineItem.newQuantity) : null
 
