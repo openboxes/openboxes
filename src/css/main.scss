@@ -353,3 +353,18 @@ tr.crossed-out td:before {
 .table-row {
   height: 45px;
 }
+
+.table-inner-row {
+  position: relative;
+  height: 45px;
+}
+
+div.crossed-out .table-inner-row:before {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  border-bottom: 2px solid $red-beta;
+  width: 100%;
+  z-index: 999 !important;
+}

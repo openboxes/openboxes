@@ -25,19 +25,21 @@ class TableRow extends Component {
     const className = `table-row ${rowIndex % 2 === 0 ? 'even-row' : ''} ${dynamicAttr.className ? dynamicAttr.className : ''}`;
 
     return (
-      <div {...dynamicAttr} className={`d-flex flex-row border-bottom ${className}`}>
-        {_.map(fieldsConfig.fields, (config, name) => (
-          <div key={`${field}.${name}`} className="align-self-center mx-1" style={{ flex: '1 1 0', minWidth: 0 }}>
-            {renderFormField(config, `${field}.${name}`, {
-              ...properties,
-              arrayField: true,
-              addRow,
-              removeRow,
-              rowIndex: index,
-              fieldValue: config.fieldKey === '' ? rowValues : _.get(rowValues, config.fieldKey || name),
-            })}
-          </div>
-        ))}
+      <div {...dynamicAttr} className={className}>
+        <div className="d-flex flex-row border-bottom table-inner-row">
+          {_.map(fieldsConfig.fields, (config, name) => (
+            <div key={`${field}.${name}`} className="align-self-center mx-1" style={{ flex: '1 1 0', minWidth: 0 }}>
+              {renderFormField(config, `${field}.${name}`, {
+                ...properties,
+                arrayField: true,
+                addRow,
+                removeRow,
+                rowIndex: index,
+                fieldValue: config.fieldKey === '' ? rowValues : _.get(rowValues, config.fieldKey || name),
+              })}
+            </div>
+          ))}
+        </div>
       </div>);
   }
 }
