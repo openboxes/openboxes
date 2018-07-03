@@ -53,7 +53,7 @@ const FIELDS = {
     type: DateField,
     label: 'Delivered On',
     attributes: {
-      dateFormat: 'DD/MMM/YYYY',
+      dateFormat: 'MM/DD/YYYY',
     },
   },
   buttons: {
