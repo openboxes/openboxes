@@ -12,9 +12,36 @@ import ButtonField from '../form-elements/ButtonField';
 import LabelField from '../form-elements/LabelField';
 import DateField from '../form-elements/DateField';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
-import { renderFormField, getMovementNumber } from '../../utils/form-utils';
+import { renderFormField } from '../../utils/form-utils';
 import { STOCK_LIST_ITEMS_MOCKS } from '../../mockedData';
-import { showSpinner, hideSpinner, fetchUsers, fetchProducts } from '../../actions';
+import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
+import apiClient from '../../utils/apiClient';
+
+const debouncedProductsFetch = _.debounce((searchTerm, callback) => {
+  if (searchTerm) {
+    apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}`)
+      .then(result => callback(
+        null,
+        {
+          complete: true,
+          options: _.map(result.data.data, obj => (
+            {
+              value: {
+                id: obj.id,
+                name: obj.name,
+                productCode: obj.productCode,
+                label: `${obj.productCode} - ${obj.name}`,
+              },
+              label: `${obj.productCode} - ${obj.name}`,
+            }
+          )),
+        },
+      ))
+      .catch(error => callback(error, { options: [] }));
+  } else {
+    callback(null, { options: [] });
+  }
+}, 500);
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -37,12 +64,12 @@ const NO_STOCKLIST_FIELDS = {
         type: SelectField,
         label: 'Requisition items',
         attributes: {
+          async: true,
           openOnClick: false,
-          objectValue: true,
+          autoload: false,
+          loadOptions: debouncedProductsFetch,
+          cache: false,
         },
-        getDynamicAttr: ({ products }) => ({
-          options: products,
-        }),
       },
       quantity: {
         type: TextField,
@@ -70,12 +97,14 @@ const STOCKLIST_FIELDS = {
         component: SelectField,
         componentConfig: {
           attributes: {
+            async: true,
             openOnClick: false,
-            objectValue: true,
+            autoload: false,
+            loadOptions: debouncedProductsFetch,
+            cache: false,
           },
-          getDynamicAttr: ({ selectedValue, products }) => ({
+          getDynamicAttr: ({ selectedValue }) => ({
             disabled: !!selectedValue,
-            options: products,
           }),
         },
       },
@@ -109,12 +138,12 @@ const VENDOR_FIELDS = {
         type: SelectField,
         label: 'Item',
         attributes: {
+          async: true,
           openOnClick: false,
-          objectValue: true,
+          autoload: false,
+          loadOptions: debouncedProductsFetch,
+          cache: false,
         },
-        getDynamicAttr: ({ products }) => ({
-          options: products,
-        }),
       },
       lot: {
         type: TextField,
@@ -159,23 +188,16 @@ class AddItemsPage extends Component {
       );
     }
 
-    const movementNumber = getMovementNumber();
-
     this.props.initialize('stock-movement-wizard', {
       lineItems,
       pickPage: [],
       adjustInventory: [],
       editPick: [],
       substitutions: [],
-      movementNumber,
     }, true);
 
     if (!this.props.recipientsFetched) {
       this.fetchData(this.props.fetchUsers);
-    }
-
-    if (!this.props.productsFetched) {
-      this.fetchData(this.props.fetchProducts);
     }
 
     this.props.hideSpinner();
@@ -216,7 +238,6 @@ class AddItemsPage extends Component {
           renderFormField(fieldConfig, fieldName, {
             stockList: this.props.stockList,
             recipients: this.props.recipients,
-            products: this.props.products,
           }))}
         <div>
           <button type="button" className="btn btn-outline-primary" onClick={previousPage}>
@@ -234,8 +255,6 @@ const selector = formValueSelector('stock-movement-wizard');
 const mapStateToProps = state => ({
   stockList: selector(state, 'stockList'),
   origin: selector(state, 'origin'),
-  products: state.products.data,
-  productsFetched: state.products.fetched,
   recipients: state.users.data,
   recipientsFetched: state.users.fetched,
 });
@@ -246,7 +265,7 @@ export default reduxForm({
   forceUnregisterOnUnmount: true,
   validate,
 })(connect(mapStateToProps, {
-  initialize, change, showSpinner, hideSpinner, fetchUsers, fetchProducts,
+  initialize, change, showSpinner, hideSpinner, fetchUsers,
 })(AddItemsPage));
 
 AddItemsPage.propTypes = {
@@ -265,9 +284,6 @@ AddItemsPage.propTypes = {
   fetchUsers: PropTypes.func.isRequired,
   recipients: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   recipientsFetched: PropTypes.bool.isRequired,
-  fetchProducts: PropTypes.func.isRequired,
-  products: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  productsFetched: PropTypes.bool.isRequired,
 };
 
 AddItemsPage.defaultProps = {

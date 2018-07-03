@@ -34,13 +34,3 @@ export function fetchUsers() {
     payload: request,
   };
 }
-
-export function fetchProducts() {
-  const url = '/openboxes/api/products';
-  const request = apiClient.get(url);
-
-  return {
-    type: FETCH_PRODUCTS,
-    payload: request,
-  };
-}

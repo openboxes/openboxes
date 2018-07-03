@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { reduxForm } from 'redux-form';
+import { reduxForm, change, formValueSelector } from 'redux-form';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
@@ -80,7 +80,7 @@ const FIELDS = {
     label: 'Date requested',
     attributes: {
       required: true,
-      dateFormat: 'DD/MMM/YYYY',
+      dateFormat: 'MM/DD/YYYY',
     },
   },
 };
@@ -101,6 +101,22 @@ class CreateStockMovement extends Component {
     if (!this.props.locationsFetched) {
       this.fetchData(this.props.fetchLocations);
     }
+  }
+
+  getIdentifier() {
+    const identifierUrl = '/openboxes/api/identifiers';
+
+    const payload = {
+      identifierType: 'requisition',
+    };
+
+    return apiClient.post(identifierUrl, payload)
+      .then((response) => {
+        if (response.data) {
+          const resp = response.data.data;
+          this.props.change('stock-movement-wizard', 'movementNumber', resp);
+        }
+      });
   }
 
   fetchData(fetchFunction) {
@@ -124,9 +140,58 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  createNewRequisition(origin, destination, requestedBy, dateRequested, description, stockList) {
+    if (origin && destination && requestedBy && dateRequested && description) {
+      this.props.showSpinner();
+      const requisitionUrl = '/openboxes/api/stockMovements';
+
+      const payload = {
+        name: description,
+        description,
+        dateRequested,
+        'origin.id': origin,
+        'destination.id': destination,
+        'requestedBy.id': requestedBy,
+        'stockList.id': stockList || null,
+      };
+
+      return apiClient.post(requisitionUrl, payload)
+        .then((response) => {
+          if (response.data) {
+            const resp = response.data.data;
+            this.props.change('stock-movement-wizard', 'requisitionId', resp.id);
+            this.getIdentifier().then(() => this.props.hideSpinner());
+          }
+        })
+        .catch(() => {
+          this.props.hideSpinner();
+          return Promise.reject(new Error('Could not create stock movement'));
+        });
+    }
+
+    return new Promise(((resolve, reject) => {
+      reject(new Error('Missing required parameters'));
+    }));
+  }
+
+  nextPage() {
+    if (!this.props.requisitionId) {
+      this.createNewRequisition(
+        this.props.origin.id,
+        this.props.destination.id,
+        this.props.requestedBy,
+        this.props.dateRequested,
+        this.props.description,
+        this.props.stockList,
+      ).then(() => { this.props.onSubmit(); }).catch(() => this.props.hideSpinner());
+    } else {
+      this.props.onSubmit();
+    }
+  }
+
   render() {
     return (
-      <form onSubmit={this.props.handleSubmit}>
+      <form onSubmit={this.props.handleSubmit(() => this.nextPage())}>
         {_.map(
           FIELDS,
           (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
@@ -146,11 +211,20 @@ class CreateStockMovement extends Component {
   }
 }
 
+const selector = formValueSelector('stock-movement-wizard');
+
 const mapStateToProps = state => ({
   locationsFetched: state.locations.fetched,
   locations: state.locations.data,
   usersFetched: state.users.fetched,
   users: state.users.data,
+  origin: selector(state, 'origin'),
+  destination: selector(state, 'destination'),
+  requestedBy: selector(state, 'requestedBy'),
+  description: selector(state, 'description'),
+  dateRequested: selector(state, 'dateRequested'),
+  stockList: selector(state, 'stockList'),
+  requisitionId: selector(state, 'requisitionId'),
 });
 
 export default reduxForm({
@@ -159,7 +233,7 @@ export default reduxForm({
   forceUnregisterOnUnmount: true,
   validate,
 })(connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchLocations, fetchUsers,
+  showSpinner, hideSpinner, fetchLocations, fetchUsers, change,
 })(CreateStockMovement));
 
 CreateStockMovement.propTypes = {
@@ -172,4 +246,27 @@ CreateStockMovement.propTypes = {
   fetchUsers: PropTypes.func.isRequired,
   usersFetched: PropTypes.bool.isRequired,
   users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  change: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  origin: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }),
+  destination: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }),
+  requestedBy: PropTypes.string,
+  requisitionId: PropTypes.string,
+  description: PropTypes.string,
+  dateRequested: PropTypes.string,
+  stockList: PropTypes.string,
+};
+
+CreateStockMovement.defaultProps = {
+  origin: { id: '' },
+  destination: { id: '' },
+  requestedBy: '',
+  requisitionId: '',
+  description: '',
+  dateRequested: '',
+  stockList: '',
 };
