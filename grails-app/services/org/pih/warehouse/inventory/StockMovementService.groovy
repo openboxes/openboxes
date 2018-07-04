@@ -23,6 +23,8 @@ import org.pih.warehouse.shipping.Shipment
 
 class StockMovementService {
 
+    def identifierService
+
     boolean transactional = true
 
     def createStockMovement(StockMovement stockMovement) {
@@ -36,14 +38,20 @@ class StockMovementService {
             requisition = new Requisition()
         }
 
-        // Origin and destination are backwards on purpose. The origin/destination of the requisition are from the
-        // perspective of the requisition, while the origin/destination of the stock movement related to the stock
-        // being transferred.
-        requisition.status = RequisitionStatus.CREATED
+        if (!requisition.status) {
+            requisition.status = RequisitionStatus.CREATED
+        }
+
+        // Generate identifier if one has not been provided
+        if (!stockMovement.identifier && !requisition.requestNumber) {
+            requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+        }
+
+        requisition.name = stockMovement.name;
+        requisition.description = stockMovement.description
         requisition.destination = stockMovement.destination
         requisition.origin = stockMovement.origin
         requisition.name = stockMovement.name
-        requisition.description = stockMovement.description
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
 
@@ -76,16 +84,16 @@ class StockMovementService {
 
         Requisition requisition = Requisition.get(stockMovement.id)
         if (!requisition) {
-            requisition = new Requisition()
+            throw new ObjectNotFoundException(id, StockMovement.class.toString())
         }
 
+        if (stockMovement.identifier) requisition.requestNumber = stockMovement.identifier
         if (stockMovement.destination) requisition.destination = stockMovement.destination
         if (stockMovement.origin) requisition.origin = stockMovement.origin
         if (stockMovement.name) requisition.name = stockMovement.name
         if (stockMovement.description) requisition.description = stockMovement.description
         if (stockMovement.requestedBy) requisition.requestedBy = stockMovement.requestedBy
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
-        //if (stockMovement.identifier) requisition.requestNumber = stockMovement.identifier
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->

@@ -153,7 +153,7 @@ const VENDOR_FIELDS = {
         type: DateField,
         label: 'Expiry',
         attributes: {
-          dateFormat: 'DD/MMM/YYYY',
+          dateFormat: 'MM/DD/YYYY',
         },
       },
       quantity: {

@@ -7,6 +7,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentType
 
 enum StockMovementType {
 
@@ -34,6 +35,13 @@ class StockMovement {
     Person requestedBy
     Date dateRequested
 
+    // Shipment information
+    Date dateShipped
+    ShipmentType shipmentType
+    String trackingNumber
+    String driverName
+    String comments
+
     StockMovementType stockMovementType
 
 
@@ -47,7 +55,7 @@ class StockMovement {
 
     static constraints = {
         id(nullable:true)
-        name(nullable:false)
+        name(nullable:true)
         description(nullable:true)
         origin(nullable:false)
         destination(nullable:false)
@@ -55,6 +63,12 @@ class StockMovement {
         requestedBy(nullable:false)
         dateRequested(nullable:false)
         stockMovementType(nullable:true)
+        shipment(nullable:true)
+        dateShipped(nullable:true)
+        shipmentType(nullable:true)
+        trackingNumber(nullable:true)
+        driverName(nullable:true)
+        comments(nullable:true)
     }
 
 
@@ -81,12 +95,26 @@ class StockMovement {
         ]
     }
 
+    /**
+     * “FROM.TO.DATEREQUESTED.STOCKLIST.TRACKING#.DESCRIPTION”
+     *
+     * @return
+     */
+    String generateShipmentName() {
+        String name = "${origin?.name}.${destination?.name}.${dateRequested.format("dd/MMM/yyyy")}"
+        if (stocklist?.name) name += ".${stocklist.name}"
+        if (trackingNumber) name += ".${trackingNumber}"
+        if (description) name += ".${description}"
+        return name
+    }
+
 
     static StockMovement createFromRequisition(Requisition requisition) {
         StockMovement stockMovement = new StockMovement(
                 id: requisition.id,
                 name: requisition.name,
-                description: requisition.name,
+                identifier: requisition.requestNumber,
+                description: requisition.description,
                 origin: requisition.origin,
                 destination: requisition.destination,
                 dateRequested: requisition.dateRequested,
@@ -94,10 +122,9 @@ class StockMovement {
                 requisition: requisition
         )
 
+        // Include all requisition items except those that are substitutions or modifications because the
+        // original requisition item will represent these changes
         requisition.requisitionItems.each { requisitionItem ->
-
-            // Ignore requisition items that are substitutions or modifications because the
-            // original requisition item will represent these changes
             if (!requisitionItem.parentRequisitionItem) {
                 StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
                 stockMovement.lineItems.add(stockMovementItem)
