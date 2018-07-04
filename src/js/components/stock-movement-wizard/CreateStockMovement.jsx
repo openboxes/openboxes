@@ -8,7 +8,6 @@ import { validate } from './validate';
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import DateField from '../form-elements/DateField';
-import ValueSelectorField from '../form-elements/ValueSelectorField';
 import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchLocations, fetchUsers } from '../../actions';
@@ -29,6 +28,11 @@ const FIELDS = {
       objectValue: true,
     },
     getDynamicAttr: props => ({
+      onChange: (value) => {
+        if (value && props.destination && props.destination.id) {
+          props.fetchStockLists(value, props.destination);
+        }
+      },
       options: props.locations,
     }),
   },
@@ -41,8 +45,8 @@ const FIELDS = {
     },
     getDynamicAttr: props => ({
       onChange: (value) => {
-        if (value) {
-          props.fetchStockLists(value);
+        if (value && props.origin && props.origin.id) {
+          props.fetchStockLists(props.origin, value);
         }
       },
       options: props.locations,
@@ -50,19 +54,10 @@ const FIELDS = {
   },
   stockList: {
     label: 'Stock list',
-    type: ValueSelectorField,
-    component: SelectField,
-    componentConfig: {
-      getDynamicAttr: ({ selectedValue, stockLists }) => ({
-        disabled: !selectedValue,
-        options: stockLists,
-      }),
-    },
-    attributes: {
-      formName: 'stock-movement-wizard',
-    },
-    getDynamicAttr: () => ({
-      field: 'destination',
+    type: SelectField,
+    getDynamicAttr: ({ origin, destination, stockLists }) => ({
+      disabled: !(origin && destination && origin.id && destination.id),
+      options: stockLists,
     }),
   },
   requestedBy: {
@@ -101,6 +96,10 @@ class CreateStockMovement extends Component {
     if (!this.props.locationsFetched) {
       this.fetchData(this.props.fetchLocations);
     }
+
+    if (this.props.origin && this.props.destination) {
+      this.fetchStockLists(this.props.origin, this.props.destination);
+    }
   }
 
   getIdentifier() {
@@ -126,9 +125,9 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  fetchStockLists(destination) {
+  fetchStockLists(origin, destination) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stocklists?destination.id=${destination.id}`;
+    const url = `/openboxes/api/stocklists?origin.id=${origin.id}&destination.id=${destination.id}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -199,6 +198,8 @@ class CreateStockMovement extends Component {
             locations: this.props.locations,
             stockLists: this.state.stockLists,
             fetchStockLists: this.fetchStockLists,
+            origin: this.props.origin,
+            destination: this.props.destination,
           }),
         )}
         <div className="row col-md-6">
