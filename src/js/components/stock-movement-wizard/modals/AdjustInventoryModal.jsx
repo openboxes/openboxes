@@ -92,7 +92,7 @@ class AdjustInventoryModal extends Component {
   onOpen() {
     const { pickPage } = this.props;
     const inventoryItem =
-      _.find(pickPage, item => item.product.code === this.state.attr.product.code);
+      _.find(pickPage, item => item.product.productCode === this.state.attr.product.productCode);
     this.props.change(
       'stock-movement-wizard',
       'adjustInventory',
@@ -104,12 +104,12 @@ class AdjustInventoryModal extends Component {
     // TODO: send new/changed availableLots to backend!
     const { pickPage } = this.props;
     const lotsToUpdate =
-      _.find(pickPage, item => item.product.code === this.state.attr.product.code);
+      _.find(pickPage, item => item.product.productCode === this.state.attr.product.productCode);
     lotsToUpdate.availableLots = _.map(this.props.adjustInventory, item => (
       {
         ...item,
         product: item.product ||
-          { code: this.state.attr.product.code, name: this.state.attr.product.name },
+          { code: this.state.attr.product.productCode, name: this.state.attr.product.name },
       }
     ));
     this.props.change('stock-movement-wizard', 'pickPage', pickPage);

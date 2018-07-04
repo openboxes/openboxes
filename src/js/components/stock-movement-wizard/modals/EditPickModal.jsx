@@ -82,12 +82,12 @@ class EditPickModal extends Component {
     // Find product that will be edited
     const editPick =
       _.find(pickPage, item =>
-        item.product.code === this.state.attr.productCode && item.availableLots.length >= 0);
+        item.product.productCode === this.state.attr.productCode && item.availableLots.length >= 0);
     // Update specfied field in redux form
     this.props.change('stock-movement-wizard', 'editPick', editPick.availableLots);
     this.setState({
       currentEdit: {
-        itemCode: editPick.product.code,
+        itemCode: editPick.product.productCode,
         itemName: editPick.product.name,
         qtyRequested: editPick.quantity,
       },
@@ -103,7 +103,7 @@ class EditPickModal extends Component {
     const newPicks = editPick;
     // Get lots that were picked before
     const currentPicks = _.filter(pickPage, line =>
-      line.product.code === this.state.currentEdit.itemCode && !!line.lot);
+      line.product.productCode === this.state.currentEdit.itemCode && !!line.lot);
     // Get difference between old and new lots, this lots are assumed to be saved
     let picksToSave = _.differenceBy(
       _.filter(newPicks, pick => pick.qtyPicked > 0),
@@ -135,11 +135,12 @@ class EditPickModal extends Component {
       }
     });
     // Remove old picks for specified product from current data in Pick Page
-    _.remove(pickPage, pick => pick.product.code === this.state.currentEdit.itemCode && pick.lot);
+    _.remove(pickPage, pick => pick.product.productCode === this.state.currentEdit.itemCode
+      && pick.lot);
     // Find index after witch we will add our new picks
     const itemIdx = _.findIndex(
       pickPage,
-      pick => pick.product.code === this.state.currentEdit.itemCode,
+      pick => pick.product.productCode === this.state.currentEdit.itemCode,
     );
     // Insert our new picked lots
     pickPage.splice(itemIdx + 1, 0, ...(_.sortBy(picksToSave, ['-class', 'lotWithBin'])));

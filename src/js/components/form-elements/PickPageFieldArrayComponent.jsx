@@ -61,7 +61,7 @@ class PickPageFieldArrayComponent extends Component {
                   key={this.props.pickPage[index].rowKey}
                   className="bg-light clickable-row"
                   data-toggle="collapse"
-                  data-target={`.collapse-${this.props.pickPage[index].product.code}`}
+                  data-target={`.collapse-${this.props.pickPage[index].product.productCode}`}
                   aria-expanded="false"
                 >
                   { _.map(fieldsConfig.fields, (config, name) => (
@@ -84,7 +84,7 @@ class PickPageFieldArrayComponent extends Component {
                   bg-white 
                   collapse 
                   collapse-all 
-                  collapse-${this.props.pickPage[index].product.code} 
+                  collapse-${this.props.pickPage[index].product.productCode}
                   ${this.props.pickPage[index].crossedOut ? 'crossed-out' : ''}
                 `}
               >
@@ -122,7 +122,7 @@ PickPageFieldArrayComponent.propTypes = {
   properties: PropTypes.shape({}),
   pickPage: PropTypes.arrayOf(PropTypes.shape({
     product: PropTypes.shape({
-      code: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      productCode: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     }),
     lot: PropTypes.string,
     crossedOut: PropTypes.bool,
