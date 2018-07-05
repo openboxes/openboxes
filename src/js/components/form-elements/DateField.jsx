@@ -1,9 +1,21 @@
 import React from 'react';
-import DateTime from 'react-datetime';
+import DatePicker from 'react-datepicker';
+import { Portal } from 'react-overlays';
 
-import 'react-datetime/css/react-datetime.css';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import BaseField from './BaseField';
+
+// eslint-disable-next-line react/prop-types
+const CalendarContainer = ({ children }) => {
+  const el = document.getElementById('root');
+
+  return (
+    <Portal container={el}>
+      {children}
+    </Portal>
+  );
+};
 
 const DateField = (props) => {
   const renderInput = (attributes) => {
@@ -12,13 +24,19 @@ const DateField = (props) => {
       attributes.onChange(val);
     };
 
+    const onChangeRaw = (e) => {
+      attributes.onChange(e.target.value);
+    };
+
     return (
       <div className="date-field">
-        <DateTime
-          timeFormat={false}
-          closeOnSelect
+        <DatePicker
+          className="form-control"
           {...attributes}
           onChange={date => onChange(date)}
+          onChangeRaw={onChangeRaw}
+          popperContainer={CalendarContainer}
+          popperClassName="force-on-top"
         />
       </div>
     );
