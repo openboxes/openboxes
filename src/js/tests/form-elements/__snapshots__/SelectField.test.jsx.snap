@@ -17,7 +17,7 @@ exports[`SelectField component is correctly rendering renders correctly 1`] = `
       className="col-md-4"
     >
       <div
-        id="test-field-container"
+        id="select-id_1-container"
       >
         <div
           className="Select is-clearable is-searchable Select--single"
