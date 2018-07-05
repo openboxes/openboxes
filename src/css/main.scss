@@ -368,3 +368,7 @@ div.crossed-out .table-inner-row:before {
   width: 100%;
   z-index: 999 !important;
 }
+
+.force-on-top {
+  z-index: 9999 !important;
+}
