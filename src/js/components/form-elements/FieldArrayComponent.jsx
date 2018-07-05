@@ -24,7 +24,7 @@ const FieldArrayComponent = (props) => {
 
   return (
     <div>
-      <div className="text-center border">
+      <div className="text-center border mb-2">
         <div className="d-flex flex-row border-bottom font-weight-bold py-2">
           { _.map(fieldsConfig.fields, (config, name) =>
             <div key={name} className="mx-1" style={{ flex: '1 1 0' }}>{config.label}</div>) }
@@ -37,7 +37,7 @@ const FieldArrayComponent = (props) => {
         />
       </div>
       { AddButton &&
-        <div className="text-center mt-2">
+        <div className="text-center">
           {
             typeof AddButton === 'string' ?
               <button type="button" className="btn btn-outline-success margin-bottom-lg" onClick={() => addRow()}>

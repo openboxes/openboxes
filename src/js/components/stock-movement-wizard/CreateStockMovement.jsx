@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { reduxForm, change, formValueSelector } from 'redux-form';
+import { reduxForm, change, formValueSelector, initialize } from 'redux-form';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
@@ -90,6 +90,14 @@ class CreateStockMovement extends Component {
   }
 
   componentDidMount() {
+    this.props.initialize('stock-movement-wizard', {
+      lineItems: [],
+      pickPage: [],
+      adjustInventory: [],
+      editPick: [],
+      substitutions: [],
+    }, true);
+
     if (!this.props.usersFetched) {
       this.fetchData(this.props.fetchUsers);
     }
@@ -100,22 +108,6 @@ class CreateStockMovement extends Component {
     if (this.props.origin && this.props.destination) {
       this.fetchStockLists(this.props.origin, this.props.destination);
     }
-  }
-
-  getIdentifier() {
-    const identifierUrl = '/openboxes/api/identifiers';
-
-    const payload = {
-      identifierType: 'requisition',
-    };
-
-    return apiClient.post(identifierUrl, payload)
-      .then((response) => {
-        if (response.data) {
-          const resp = response.data.data;
-          this.props.change('stock-movement-wizard', 'movementNumber', resp);
-        }
-      });
   }
 
   fetchData(fetchFunction) {
@@ -145,7 +137,7 @@ class CreateStockMovement extends Component {
       const requisitionUrl = '/openboxes/api/stockMovements';
 
       const payload = {
-        name: description,
+        name: '',
         description,
         dateRequested,
         'origin.id': origin,
@@ -159,7 +151,8 @@ class CreateStockMovement extends Component {
           if (response.data) {
             const resp = response.data.data;
             this.props.change('stock-movement-wizard', 'requisitionId', resp.id);
-            this.getIdentifier().then(() => this.props.hideSpinner());
+            this.props.change('stock-movement-wizard', 'lineItems', resp.lineItems);
+            this.props.change('stock-movement-wizard', 'movementNumber', resp.identifier);
           }
         })
         .catch(() => {
@@ -234,10 +227,11 @@ export default reduxForm({
   forceUnregisterOnUnmount: true,
   validate,
 })(connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchLocations, fetchUsers, change,
+  showSpinner, hideSpinner, fetchLocations, fetchUsers, change, initialize,
 })(CreateStockMovement));
 
 CreateStockMovement.propTypes = {
+  initialize: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
