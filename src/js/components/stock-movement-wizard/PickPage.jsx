@@ -67,7 +67,7 @@ const FIELDS = {
           formName: 'stock-movement-wizard',
         },
         getDynamicAttr: ({ rowIndex }) => ({
-          field: `pickPage[${rowIndex}].product.code`,
+          field: `pickPage[${rowIndex}].product.productCode`,
         }),
         component: EditPickModal,
         componentConfig: {
@@ -117,13 +117,13 @@ class PickPage extends Component {
         const availableLots =
           _.filter(
             AVAILABLE_LOTS,
-            data => data.product.code === line.product.code,
+            data => data.product.productCode === line.product.productCode,
           );
         // Get picked lots (out of all available lots)
         const lotsPicked =
           _.filter(
             availableLots,
-            data => data.product.code === line.product.code && data.qtyPicked > 0,
+            data => data.product.productCode === line.product.productCode && data.qtyPicked > 0,
           );
         // Create array for PickPage table: line items with lots picked for them
         // (rowKey = unique value, that will be used as row key inside rendered table)

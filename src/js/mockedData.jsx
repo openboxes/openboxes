@@ -69,44 +69,44 @@ const USERNAMES_MOCKS = ['Julian Benson',
 const STOCK_LIST_ITEMS_MOCKS = {
   1: [
     {
-      product: { code: 1, name: 'Advil 200mg' }, maxQuantity: 10, monthlyConsumption: 350,
+      product: { productCode: 1, name: 'Advil 200mg' }, maxQuantity: 10, monthlyConsumption: 350,
     },
     {
-      product: { code: 4, name: 'Similac Advance low iron 400g' }, maxQuantity: 10, monthlyConsumption: 250,
+      product: { productCode: 4, name: 'Similac Advance low iron 400g' }, maxQuantity: 10, monthlyConsumption: 250,
     },
     {
-      product: { code: 3, name: 'Aspirin 20mg' }, maxQuantity: 10, monthlyConsumption: 140,
+      product: { productCode: 3, name: 'Aspirin 20mg' }, maxQuantity: 10, monthlyConsumption: 140,
     },
   ],
   2: [
     {
-      product: { code: 2, name: 'Tylenol 325mg' }, maxQuantity: 10, monthlyConsumption: 120,
+      product: { productCode: 2, name: 'Tylenol 325mg' }, maxQuantity: 10, monthlyConsumption: 120,
     },
     {
-      product: { code: 1, name: 'Advil 200mg' }, maxQuantity: 10, monthlyConsumption: 400,
+      product: { productCode: 1, name: 'Advil 200mg' }, maxQuantity: 10, monthlyConsumption: 400,
     },
     {
-      product: { code: 4, name: 'Similac Advance low iron 400g' }, maxQuantity: 10, monthlyConsumption: 120,
+      product: { productCode: 4, name: 'Similac Advance low iron 400g' }, maxQuantity: 10, monthlyConsumption: 120,
     },
   ],
   3: [
     {
-      product: { code: 3, name: 'Aspirin 20mg' }, maxQuantity: 10, monthlyConsumption: 55,
+      product: { productCode: 3, name: 'Aspirin 20mg' }, maxQuantity: 10, monthlyConsumption: 55,
     },
     {
-      product: { code: 1, name: 'Advil 200mg' }, maxQuantity: 10, monthlyConsumption: 44,
+      product: { productCode: 1, name: 'Advil 200mg' }, maxQuantity: 10, monthlyConsumption: 44,
     },
     {
-      product: { code: 2, name: 'Tylenol 325mg' }, maxQuantity: 10, monthlyConsumption: 55,
+      product: { productCode: 2, name: 'Tylenol 325mg' }, maxQuantity: 10, monthlyConsumption: 55,
     },
   ],
   4: [
-    { product: { code: 4, name: 'Similac Advance low iron 400g' }, maxQuantity: 10 },
+    { product: { productCode: 4, name: 'Similac Advance low iron 400g' }, maxQuantity: 10 },
     {
-      product: { code: 3, name: 'Aspirin 20mg' }, maxQuantity: 10, monthlyConsumption: 100,
+      product: { productCode: 3, name: 'Aspirin 20mg' }, maxQuantity: 10, monthlyConsumption: 100,
     },
     {
-      product: { code: 2, name: 'Advil 200mg' }, maxQuantity: 10, monthlyConsumption: 140,
+      product: { productCode: 2, name: 'Advil 200mg' }, maxQuantity: 10, monthlyConsumption: 140,
     },
   ],
 };
@@ -119,7 +119,7 @@ const REASON_CODE_MOCKS = [
 
 const AVAILABLE_LOTS = [
   {
-    product: { code: 1, name: 'Advil 200mg' },
+    product: { productCode: '00001', name: 'Advil 200mg' },
     lot: '1111',
     bin: '1',
     qtyAvailable: 50,
@@ -128,7 +128,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 5,
   },
   {
-    product: { code: 1, name: 'Advil 200mg' },
+    product: { productCode: '00001', name: 'Advil 200mg' },
     lot: '1111',
     bin: '2',
     qtyAvailable: '20',
@@ -137,7 +137,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 1, name: 'Advil 200mg' },
+    product: { productCode: '00001', name: 'Advil 200mg' },
     lot: '2222',
     bin: '1',
     qtyAvailable: 50,
@@ -146,7 +146,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 5,
   },
   {
-    product: { code: 2, name: 'Tylenol 325mg' },
+    product: { productCode: '00002', name: 'Tylenol 325mg' },
     lot: '3131',
     bin: '1',
     qtyAvailable: 102,
@@ -155,7 +155,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 2, name: 'Tylenol 325mg' },
+    product: { productCode: '00002', name: 'Tylenol 325mg' },
     lot: '3333',
     bin: '1',
     qtyAvailable: 103,
@@ -164,7 +164,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 5,
   },
   {
-    product: { code: 2, name: 'Tylenol 325mg' },
+    product: { productCode: '00002', name: 'Tylenol 325mg' },
     lot: '3333',
     bin: '2',
     qtyAvailable: 101,
@@ -173,7 +173,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 5,
   },
   {
-    product: { code: 3, name: 'Aspirin 20mg' },
+    product: { productCode: '00003', name: 'Aspirin 20mg' },
     lot: '4444',
     bin: '1',
     qtyAvailable: 200,
@@ -182,7 +182,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 3, name: 'Aspirin 20mg' },
+    product: { productCode: '00003', name: 'Aspirin 20mg' },
     lot: '5555',
     bin: '1',
     qtyAvailable: 300,
@@ -191,7 +191,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 3, name: 'Aspirin 20mg' },
+    product: { productCode: '00003', name: 'Aspirin 20mg' },
     lot: '5555',
     bin: '2',
     qtyAvailable: 100,
@@ -200,7 +200,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 10,
   },
   {
-    product: { code: 4, name: 'Similac Advance low iron 400g' },
+    product: { productCode: '00005', name: 'Similac Advance low iron 400g' },
     lot: '6666',
     bin: '1',
     qtyAvailable: '123',
@@ -209,7 +209,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 10,
   },
   {
-    product: { code: 4, name: 'Similac Advance low iron 400g' },
+    product: { productCode: '00005', name: 'Similac Advance low iron 400g' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -218,7 +218,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 7, name: 'Paracetamol #1 325mg' },
+    product: { productCode: 7, name: 'Paracetamol #1 325mg' },
     lot: '8888',
     bin: '1',
     qtyAvailable: '111',
@@ -227,7 +227,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 4,
   },
   {
-    product: { code: 7, name: 'Paracetamol #1 325mg' },
+    product: { productCode: 7, name: 'Paracetamol #1 325mg' },
     lot: '9999',
     bin: '1',
     qtyAvailable: '111',
@@ -236,7 +236,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 8, name: 'Paracetamol #2 200mg' },
+    product: { productCode: 8, name: 'Paracetamol #2 200mg' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -245,7 +245,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 15,
   },
   {
-    product: { code: 8, name: 'Paracetamol #2 200mg' },
+    product: { productCode: 8, name: 'Paracetamol #2 200mg' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -254,7 +254,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 9, name: 'Paracetamol #3 400g' },
+    product: { productCode: 9, name: 'Paracetamol #3 400g' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -263,7 +263,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 50,
   },
   {
-    product: { code: 9, name: 'Paracetamol #3 400g' },
+    product: { productCode: 9, name: 'Paracetamol #3 400g' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -272,7 +272,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 5, name: 'Ibuprofenum #1 200mg' },
+    product: { productCode: 5, name: 'Ibuprofenum #1 200mg' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -281,7 +281,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 80,
   },
   {
-    product: { code: 5, name: 'Ibuprofenum #1 200mg' },
+    product: { productCode: 5, name: 'Ibuprofenum #1 200mg' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -290,7 +290,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 6, name: 'Ibuprofenum #2 200mg' },
+    product: { productCode: 6, name: 'Ibuprofenum #2 200mg' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -299,7 +299,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 4,
   },
   {
-    product: { code: 6, name: 'Ibuprofenum #2 200mg' },
+    product: { productCode: 6, name: 'Ibuprofenum #2 200mg' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -308,7 +308,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 0,
   },
   {
-    product: { code: 10, name: 'Aspirin #1 20mg' },
+    product: { productCode: 10, name: 'Aspirin #1 20mg' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -317,7 +317,7 @@ const AVAILABLE_LOTS = [
     qtyPicked: 55,
   },
   {
-    product: { code: 10, name: 'Aspirin #1 20mg' },
+    product: { productCode: 10, name: 'Aspirin #1 20mg' },
     lot: '7777',
     bin: '1',
     qtyAvailable: '111',
@@ -330,13 +330,13 @@ const AVAILABLE_LOTS = [
 const SUBSTITUTIONS_MOCKS = {
   '00001': [
     {
-      product: { code: 5, name: 'Ibuprofenum #1 200mg' },
+      product: { productCode: 5, name: 'Ibuprofenum #1 200mg' },
       maxQuantity: 8,
       monthlyConsumption: 350,
       substitutionExpiryDate: '2018/11/31',
     },
     {
-      product: { code: 6, name: 'Ibuprofenum #2 200mg' },
+      product: { productCode: 6, name: 'Ibuprofenum #2 200mg' },
       maxQuantity: 5,
       monthlyConsumption: 250,
       substitutionExpiryDate: '2018/09/31',
@@ -344,19 +344,19 @@ const SUBSTITUTIONS_MOCKS = {
   ],
   '00002': [
     {
-      product: { code: 7, name: 'Paracetamol #1 325mg' },
+      product: { productCode: 7, name: 'Paracetamol #1 325mg' },
       maxQuantity: 2,
       monthlyConsumption: 120,
       substitutionExpiryDate: '2018/06/31',
     },
     {
-      product: { code: 8, name: 'Paracetamol #2 200mg' },
+      product: { productCode: 8, name: 'Paracetamol #2 200mg' },
       maxQuantity: 12,
       monthlyConsumption: 400,
       substitutionExpiryDate: '2018/07/31',
     },
     {
-      product: { code: 9, name: 'Paracetamol #3 400g' },
+      product: { productCode: 9, name: 'Paracetamol #3 400g' },
       maxQuantity: 15,
       monthlyConsumption: 120,
       substitutionExpiryDate: '2018/09/31',
@@ -364,7 +364,7 @@ const SUBSTITUTIONS_MOCKS = {
   ],
   '00003': [
     {
-      product: { code: 10, name: 'Aspirin #1 20mg' },
+      product: { productCode: 10, name: 'Aspirin #1 20mg' },
       maxQuantity: 14,
       monthlyConsumption: 55,
       substitutionExpiryDate: '2018/12/31',
