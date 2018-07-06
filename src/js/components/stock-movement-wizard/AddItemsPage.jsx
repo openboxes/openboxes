@@ -281,7 +281,7 @@ class AddItemsPage extends Component {
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
-      const oldItem = _.find(this.state.oldLineItems, old => old.product.id === item.product.id);
+      const oldItem = _.find(this.state.oldLineItems, old => old.id === item.id);
       if (parseInt(item.quantityRequested, 10) !== parseInt(oldItem.quantityRequested, 10)) {
         lineItemsToBeUpdated.push(item);
       }
