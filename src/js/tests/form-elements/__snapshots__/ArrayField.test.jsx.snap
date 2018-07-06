@@ -3,7 +3,7 @@
 exports[`ArrayField component is correctly rendering with Add button 1`] = `
 <div>
   <div
-    className="text-center border"
+    className="text-center border mb-2"
   >
     <div
       className="d-flex flex-row border-bottom font-weight-bold py-2"
@@ -233,7 +233,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
     </div>
   </div>
   <div
-    className="text-center mt-2"
+    className="text-center"
   >
     <button
       className="btn btn-outline-success margin-bottom-lg"
@@ -249,7 +249,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
 exports[`ArrayField component is correctly rendering with no Add button 1`] = `
 <div>
   <div
-    className="text-center border"
+    className="text-center border mb-2"
   >
     <div
       className="d-flex flex-row border-bottom font-weight-bold py-2"
