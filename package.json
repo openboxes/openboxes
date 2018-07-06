@@ -51,7 +51,6 @@
     "react-overlays": "^0.8.3",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",
-    "react-select": "^1.2.1",
     "react-select-plus": "^1.2.0",
     "react-spinners": "^0.3.2",
     "react-table": "^6.8.6",
