@@ -80,7 +80,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     User updatedBy
 
 
-    static transients = [ "type" ]
+    static transients = [ "type", "substitutionItems" ]
 	
 	static belongsTo = [ requisition: Requisition ]	
 	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
@@ -568,7 +568,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return new RequisitionItem()
     }
 
-    List<RequisitionItem> getSubstitutionItems() {
+    Set<RequisitionItem> getSubstitutionItems() {
         return requisitionItems.findAll { it.requisitionItemType = RequisitionItemType.SUBSTITUTION }
     }
 

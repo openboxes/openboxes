@@ -27,7 +27,7 @@ class StockMovementItem {
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
 
-    List substitutionItems = []
+    List<StockMovementItem> substitutionItems = []
 
     // Actions
     Boolean cancel = Boolean.FALSE
@@ -131,6 +131,12 @@ class StockMovementItem {
 
 
     static StockMovementItem createFromRequisitionItem(RequisitionItem requisitionItem) {
+
+        List<StockMovementItem> substitutionItems = requisitionItem?.substitutionItems ?
+                requisitionItem.substitutionItems.collect {
+            return StockMovementItem.createFromRequisitionItem(it)
+        } : []
+
         return new StockMovementItem(id: requisitionItem.id,
                 productCode: requisitionItem?.product?.productCode,
                 product: requisitionItem?.product,
@@ -142,6 +148,7 @@ class StockMovementItem {
                 quantityCanceled: requisitionItem?.quantityCanceled,
                 quantityRevised: requisitionItem?.modificationItem?.quantity,
                 quantityPicked: requisitionItem?.totalQuantityPicked(),
+                substitutionItems: substitutionItems,
                 reasonCode: requisitionItem.cancelReasonCode,
                 comments: requisitionItem.cancelComments,
                 recipient: requisitionItem.recipient,

@@ -166,7 +166,8 @@ class BootStrap {
                 productCode: product.productCode,
                 name: product.name,
                 description: product.description,
-                category: [id: product?.category?.id, name: product?.category?.name]
+                "category.id": product?.category?.id,
+                "category.name": product?.category?.name
         ]}
 
         JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation -> [

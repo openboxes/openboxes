@@ -228,7 +228,7 @@ class StockMovementService {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 List availableItems =
                         inventoryService.getAvailableItems(stockMovement.origin, stockMovementItem.product)
-                stockMovementItem.availableItems = availableItems
+                //stockMovementItem.availableItems = availableItems
             }
         }
         else if (stepNumber.equals("4")) {
@@ -397,7 +397,7 @@ class StockMovementService {
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         if (requisitionItem.isSubstituted()) {
             pickPageItems << requisitionItem.substitutionItems.collect {
-                return buildPickPageItem(requisitionItem)
+                return buildPickPageItem(it)
             }
         }
         else {
