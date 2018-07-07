@@ -470,4 +470,10 @@ class StockMovementService {
 
     }
 
+
+    void sendStockMovement(String id) {
+        StockMovement stockMovement = getStockMovement(id)
+        throw new NotImplementedException("Cannot send stock movement ${stockMovement.identifier} - method has not been implemented yet")
+    }
+
 }

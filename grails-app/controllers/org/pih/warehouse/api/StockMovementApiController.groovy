@@ -113,6 +113,10 @@ class StockMovementApiController {
             case "5":
                 stockMovementService.updateStatus(params.id, RequisitionStatus.PICKED)
                 break;
+            case "6":
+                stockMovementService.sendStockMovement(params.id)
+                stockMovementService.updateStatus(params.id, RequisitionStatus.ISSUED)
+                break;
             default:
                 throw new IllegalArgumentException("Cannot update status - invalid step number ${params.stepNumber}")
                 break;
