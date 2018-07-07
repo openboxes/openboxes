@@ -60,6 +60,12 @@ class UrlMappings {
             controller = {"${params.resource}Api" }
             action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
         }
+        "/api/${resource}s/$id/status"(parseRequest: true) {
+            controller = {"${params.resource}Api" }
+            action = [POST:"updateStatus"]
+        }
+
+
 
         // Anonymous REST APIs like Status, Login, Logout
 

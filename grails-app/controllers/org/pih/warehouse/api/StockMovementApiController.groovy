@@ -83,6 +83,14 @@ class StockMovementApiController {
     }
 
     /**
+     * Peforms a status update on the stock movement and forwards to the read action.
+     *
+     */
+    def updateStatus = {
+        forward(action: "read")
+    }
+
+    /**
      * Bind the given line items (JSONArray) to StockMovementItem objects and add them to the given
      * StockMovement object.
      *
