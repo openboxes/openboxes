@@ -35,6 +35,9 @@ class StockMovement {
     Person requestedBy
     Date dateRequested
 
+    // Status
+    String stepNumber
+
     // Shipment information
     Date dateShipped
     ShipmentType shipmentType
@@ -44,6 +47,7 @@ class StockMovement {
 
     StockMovementType stockMovementType
 
+    PickPage pickPage
 
     List<StockMovementItem> lineItems =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class));
@@ -91,7 +95,8 @@ class StockMovement {
                 destination: [id: destination?.id, name: destination?.name],
                 dateRequested: dateRequested?.format("MM/dd/yyyy"),
                 requestedBy: requestedBy,
-                lineItems: lineItems.collect { it.toJson() }
+                pickPage: pickPage,
+                lineItems: lineItems
         ]
     }
 
@@ -100,11 +105,12 @@ class StockMovement {
      *
      * @return
      */
-    String generateShipmentName() {
+    String generateName() {
         String name = "${origin?.name}.${destination?.name}.${dateRequested.format("dd/MMM/yyyy")}"
         if (stocklist?.name) name += ".${stocklist.name}"
         if (trackingNumber) name += ".${trackingNumber}"
         if (description) name += ".${description}"
+        name = name.toUpperCase()
         return name
     }
 
@@ -152,4 +158,19 @@ class StockMovement {
         }
         return stockMovement
     }
+}
+
+class PickPage {
+    List<PickPageItem> pickPageItems = []
+
+    static constraints = {
+        pickPageItems(nullable:true)
+    }
+
+    Map toJson() {
+        return [
+                pickPageItems: pickPageItems
+        ]
+    }
+
 }

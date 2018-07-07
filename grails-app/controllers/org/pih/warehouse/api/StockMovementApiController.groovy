@@ -48,7 +48,7 @@ class StockMovementApiController {
     }
 
     def read = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, params.stepNumber)
         render ([data:stockMovement] as JSON)
     }
 
@@ -95,7 +95,7 @@ class StockMovementApiController {
      * StockMovement object.
      *
      * NOTE: THis method was necessary because the default data binder for Grails command objects
-     * does not see to handle nested objects very well.
+     * does not seem to handle nested objects very well.
      *
      * @param stockMovement
      * @param lineItems

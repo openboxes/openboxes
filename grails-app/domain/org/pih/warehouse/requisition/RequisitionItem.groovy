@@ -568,6 +568,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return new RequisitionItem()
     }
 
+    List<RequisitionItem> getSubstitutionItems() {
+        return requisitionItems.findAll { it.requisitionItemType = RequisitionItemType.SUBSTITUTION }
+    }
+
+
     /**
      * Sort by sort order, name
      *

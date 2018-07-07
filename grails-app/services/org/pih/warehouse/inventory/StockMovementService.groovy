@@ -12,18 +12,28 @@ package org.pih.warehouse.inventory
 import grails.validation.ValidationException
 import org.apache.commons.lang.NotImplementedException
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.PickPage
+import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 
 class StockMovementService {
 
+    def productService
     def identifierService
+    def inventoryService
 
     boolean transactional = true
 
@@ -183,7 +193,7 @@ class StockMovementService {
         return StockMovement.createFromRequisition(requisition)
     }
 
-    def deleteStockMovement(String id) {
+    void deleteStockMovement(String id) {
         StockMovement stockMovement = getStockMovement(id)
         if (stockMovement?.requisition) {
             stockMovement.requisition.delete()
@@ -193,7 +203,7 @@ class StockMovementService {
         }
     }
 
-    def getStockMovements(Integer maxResults, Integer offset) {
+    List<StockMovementItem> getStockMovements(Integer maxResults, Integer offset) {
         def requisitions = Requisition.listOrderByDateCreated([max: maxResults, offset: offset, sort: "desc"])
         def stockMovements = requisitions.collect { requisition ->
             return StockMovement.createFromRequisition(requisition)
@@ -201,11 +211,214 @@ class StockMovementService {
         return stockMovements
     }
 
-    def getStockMovement(String id) {
+    StockMovement getStockMovement(String id) {
+        return getStockMovement(id, null)
+    }
+
+    StockMovement getStockMovement(String id, String stepNumber) {
         Requisition requisition = Requisition.read(id)
         if (!requisition) {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
         }
-        return StockMovement.createFromRequisition(requisition)
+
+        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+
+        if (stepNumber.equals("3")) {
+            // Hack way to include suggested and available items needed for step 3
+            stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
+                List availableItems =
+                        inventoryService.getAvailableItems(stockMovement.origin, stockMovementItem.product)
+                stockMovementItem.availableItems = availableItems
+            }
+        }
+        else if (stepNumber.equals("4")) {
+            stockMovement.pickPage = getPickPage(id)
+        }
+
+        return stockMovement
     }
+
+
+    StockMovementItem getStockMovementItem(String id) {
+        RequisitionItem requisitionItem = RequisitionItem.get(id)
+        StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+        Location location = requisitionItem?.requisition?.origin
+        List availableItems = inventoryService.getAvailableBinLocations(location, stockMovementItem.product)
+//        availableItems = availableItems.collect {
+//            return new AvailableItem(inventoryItem: it.inventoryItem,
+//                    binLocation: it.binLocation, quantityAvailable: it.quantity)
+//        }
+
+
+        stockMovementItem.availableItems = availableItems
+
+        log.info "Bin locations " + stockMovementItem.availableItems
+        stockMovementItem.suggestedItems = getSuggestedItems(stockMovementItem)
+
+        return stockMovementItem
+    }
+
+    void autoCreatePicklist(StockMovement stockMovement) {
+        for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
+            autoCreatePicklist(stockMovementItem)
+        }
+    }
+
+
+    void autoCreatePicklist(StockMovementItem stockMovementItem) {
+        List<SuggestedItem> suggestedItems = getSuggestedItems(stockMovementItem)
+        if (suggestedItems) {
+            clearPicklist(stockMovementItem)
+            for (SuggestedItem suggestedItem : suggestedItems) {
+                createOrUpdatePicklistItem(stockMovementItem,
+                        suggestedItem.inventoryItem,
+                        suggestedItem.binLocation,
+                        suggestedItem.quantityPicked.intValueExact(),
+                        null,
+                        null)
+            }
+        }
+    }
+
+
+    void clearPicklist(StockMovementItem stockMovementItem) {
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        Picklist picklist = requisitionItem?.requisition?.picklist
+        log.info "Clear picklist"
+        if (picklist) {
+            picklist.picklistItems.toArray().each {
+                picklist.removeFromPicklistItems(it)
+            }
+            picklist.save()
+        }
+    }
+
+    void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, InventoryItem inventoryItem, Location binLocation,
+                         Integer quantity, String reasonCode, String comment) {
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        def picklist = requisitionItem.requisition.picklist
+        if (!picklist) {
+            picklist = new Picklist()
+            picklist.requisition = requisitionItem.requisition
+        }
+
+        // Locate picklist item by inventory item and bin location (unique)
+        PicklistItem picklistItem = picklist.picklistItems.find {
+            it.inventoryItem == inventoryItem && it.binLocation == binLocation
+        }
+
+        // If one does not exist create it and add it to the list
+        if (!picklistItem) {
+            picklistItem = new PicklistItem()
+            picklist.addToPicklistItems(picklistItem)
+        }
+
+        // Remove from picklist
+        if (quantity <= 0) {
+            picklist.removeFromPicklistItems(picklistItem)
+        }
+        // Update picklist item
+        else {
+            picklistItem.requisitionItem = requisitionItem
+            picklistItem.inventoryItem = inventoryItem
+            picklistItem.binLocation = binLocation
+            picklistItem.quantity = quantity
+            picklistItem.reasonCode = reasonCode
+            picklistItem.comment = comment
+        }
+        picklist.save()
+    }
+
+    /**
+     * Get a list of suggested items for the given stock movement item.
+     *
+     * @param stockMovementItem
+     * @return
+     */
+    List getSuggestedItems(StockMovementItem stockMovementItem) {
+
+        List suggestedItems = []
+
+        // If there are no available items then we cannot reasonably suggest any
+        if (!stockMovementItem.availableItems) {
+            return suggestedItems
+        }
+
+        // As long as quantity requested is less than the total available we can iterate through available items
+        // and pick until quantity requested is 0. Otherwise, we don't suggest anything because the user must
+        // choose anyway. This might be improved in the future.
+        Integer quantityRequested = stockMovementItem?.quantityRequested
+        Integer quantityAvailable = stockMovementItem?.availableItems?.sum { it.quantityAvailable }
+        if (quantityRequested < quantityAvailable) {
+
+            for (def availableItem : stockMovementItem.availableItems) {
+
+                if (quantityRequested == 0)
+                    break
+
+                // The quantity to pick is either the quantity available (if less than requested) or
+                // the quantity requested (if less than available).
+                int quantityPicked = (quantityRequested > availableItem.quantityAvailable) ?
+                        availableItem.quantityAvailable : quantityRequested
+
+                log.info "Quantity picked ${quantityPicked}"
+                suggestedItems << new SuggestedItem(inventoryItem: availableItem?.inventoryItem,
+                        binLocation: availableItem?.binLocation,
+                        quantityAvailable: availableItem?.quantityAvailable,
+                        quantityRequested: stockMovementItem.quantityRequested,
+                        quantityPicked: quantityPicked)
+                quantityRequested -= quantityPicked
+            }
+        }
+        return suggestedItems
+    }
+
+    /**
+     * Get a list of substitution items for the given stock movement item.
+     *
+     * @param stockMovementItem
+     * @return
+     */
+    List getSubstitutionItems(StockMovementItem stockMovementItem) {
+
+        // Gather all substitutions
+        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
+
+        List substitutionItems = requisitionItem?.substitutionItems?.collect { substitutionItem ->
+            StockMovementItem.createFromRequisitionItem(substitutionItem)
+        }
+        return substitutionItems
+    }
+
+
+    PickPage getPickPage(String id) {
+        PickPage pickPage = new PickPage()
+
+        StockMovement stockMovement = getStockMovement(id)
+        stockMovement.lineItems.each { stockMovementItem ->
+            List pickPageItems = getPickPageItems(stockMovementItem)
+            pickPage.pickPageItems.addAll(pickPageItems)
+        }
+        return pickPage
+    }
+
+    /**
+     * Get a list of pick page items for the given stock movement item.
+     *
+     * @param stockMovementItem
+     * @return
+     */
+    List getPickPageItems(StockMovementItem stockMovementItem) {
+        List pickPageItems = []
+        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
+        if (requisitionItem.isSubstituted()) {
+            pickPageItems << requisitionItem.substitutionItems.collect {
+                new PickPageItem(requisitionItem: it, it.picklistItems)
+            }
+        }
+        else {
+            pickPageItems << new PickPageItem(requisitionItem: requisitionItem, picklistItems: requisitionItem.picklistItems)
+        }
+    }
+
 }

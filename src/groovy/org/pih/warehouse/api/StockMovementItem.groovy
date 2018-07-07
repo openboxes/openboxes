@@ -1,7 +1,11 @@
 package org.pih.warehouse.api
 
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemType
@@ -13,13 +17,20 @@ class StockMovementItem {
     String productCode
     Product product
     InventoryItem inventoryItem
+    Location binLocation
+    Person recipient
 
     BigDecimal quantityRequested
     BigDecimal quantityAllowed
     BigDecimal quantityAvailable
     BigDecimal quantityRevised
     BigDecimal quantityCanceled
-    Person recipient
+    BigDecimal quantityPicked
+
+    Set picklistItems = []
+    Set suggestedItems = []
+    List availableItems = []
+    List substitutionItems = []
 
     // Actions
     Boolean cancel = Boolean.FALSE
@@ -46,11 +57,17 @@ class StockMovementItem {
         productCode(nullable:true)
         product(nullable:true)
         inventoryItem(nullable:true)
+        binLocation(nullable:true)
         quantityRequested(nullable:false)
         quantityAllowed(nullable:true)
         quantityAvailable(nullable:true)
         quantityRevised(nullable:true)
         quantityCanceled(nullable:true)
+        quantityPicked(nullable:true)
+
+        picklistItems(nullable:true)
+        availableItems(nullable:true)
+        picklistItems(nullable:true)
         statusCode(nullable:true)
         reasonCode(nullable:true)
         comments(nullable:true)
@@ -66,14 +83,6 @@ class StockMovementItem {
 
     Map toJson() {
 
-        // Gather all substitutions
-        RequisitionItem requisitionItem = RequisitionItem.load(id)
-        def substitutions = requisitionItem.requisitionItems.findAll {
-            it.requisitionItemType = RequisitionItemType.SUBSTITUTION
-        }
-        substitutions = substitutions.collect { substitutionItem ->
-            StockMovementItem.createFromRequisitionItem(substitutionItem)
-        }
         return [
                 id: id,
                 productCode: productCode,
@@ -86,13 +95,19 @@ class StockMovementItem {
                 quantityAvailable: quantityAvailable,
                 quantityCanceled: quantityCanceled,
                 quantityRevised: quantityRevised,
-                substitutions: substitutions,
+                quantityPicked: quantityPicked,
                 reasonCode: reasonCode,
                 comments: comments,
                 recipient: recipient,
+                substitutionItems: substitutionItems,
+                suggestedItems: suggestedItems,
+                availableItems: availableItems,
+                picklistItems: picklistItems,
                 sortOrder: sortOrder
         ]
     }
+
+
 
     static StockMovementItem createFromShipmentItem(ShipmentItem shipmentItem) {
 
@@ -124,6 +139,7 @@ class StockMovementItem {
         )
     }
 
+
     static StockMovementItem createFromRequisitionItem(RequisitionItem requisitionItem) {
         return new StockMovementItem(id: requisitionItem.id,
                 productCode: requisitionItem?.product?.productCode,
@@ -135,14 +151,115 @@ class StockMovementItem {
                 quantityAvailable: null,
                 quantityCanceled: requisitionItem?.quantityCanceled,
                 quantityRevised: requisitionItem?.modificationItem?.quantity,
+                quantityPicked: requisitionItem?.totalQuantityPicked(),
                 reasonCode: requisitionItem.cancelReasonCode,
                 comments: requisitionItem.cancelComments,
                 recipient: requisitionItem.recipient,
+                picklistItems: requisitionItem.picklistItems,
+                availableItems: [],
+                suggestedItems: [],
                 palletName:null,
                 boxName:null,
                 sortOrder: requisitionItem.orderIndex
 
         )
+    }
+
+}
+
+class AvailableItem {
+
+    InventoryItem inventoryItem
+    Location binLocation
+    BigDecimal quantityAvailable
+
+    static constraints = {
+        inventoryItem(nullable:true)
+        binLocation(nullable:true)
+        quantityAvailable(nullable:true)
+    }
+
+    Map toJson() {
+        return [
+                "inventoryItem.id": inventoryItem?.id,
+                "product.name"    : inventoryItem?.product?.name,
+                "productCode"     : inventoryItem?.product?.productCode,
+                lotNumber         : inventoryItem?.lotNumber,
+                expirationDate    : inventoryItem?.expirationDate,
+                "binLocation.id"  : binLocation?.id,
+                "binLocation.name": binLocation?.name,
+                quantityAvailable : quantityAvailable,
+        ]
+    }
+
+}
+
+
+class SuggestedItem extends AvailableItem {
+
+    BigDecimal quantityRequested
+    BigDecimal quantityPicked
+
+    static constraints = {
+        quantityRequested(nullable:true)
+        quantityPicked(nullable:true)
+    }
+
+    Map toJson() {
+        Map json = super.toJson()
+        json << [quantityRequested: quantityRequested, quantityPicked:quantityPicked]
+        return json
+    }
+}
+
+
+class PickPageItem {
+
+    RequisitionItem requisitionItem
+    InventoryItem inventoryItem
+    Location binLocation
+
+    Set<PicklistItem> picklistItems
+    List<AvailableItem> availableItems
+
+    Map toJson() {
+        return [
+                "requisitionItem.id": requisitionItem?.id,
+                "product.name"      : requisitionItem?.product?.name,
+                productCode         : requisitionItem?.product?.productCode,
+                quantityRequested   : requisitionItem.quantity,
+                quantityPicked      : quantityPicked,
+                statusCode          : statusCode
+        ]
+    }
+
+    Integer getQuantityRequested() {
+        requisitionItem?.quantity?:0
+    }
+
+    Integer getQuantityPicked() {
+        return picklistItems ? picklistItems?.sum { it.quantity } : 0
+    }
+
+    Integer getQuantityAvailable() {
+        return availableItems ? availableItems?.sum { it.quantityAvailable } : 0
+    }
+
+
+    String getStatusCode() {
+        if (quantityRequested == quantityPicked) {
+            return "PICKED"
+        }
+        else if (quantityPicked > 0) {
+            return "PARTIALLY_PICKED"
+        }
+        else {
+            return "NOT_PICKED"
+        }
+    }
+
+    static PickPageItem createFromRequisitionItem(RequisitionItem requisitionItem) {
+        return new PickPageItem(requisitionItem: requisitionItem)
     }
 
 }
