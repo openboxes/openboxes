@@ -14,9 +14,11 @@ import groovy.xml.Namespace
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
@@ -332,7 +334,7 @@ class ProductService {
         String sortOrder = params.order?:"asc"
 
         //max:params.max?:10, offset:params.offset?:0, sort:params.sort?:"name", order:params.order?:"asc"
-        def results = Product.createCriteria().list() {
+        def results = Product.createCriteria().list(max: max, offset: offset) {
 
 			def fields = params.fields ? params.fields.split(",") : null
 			log.info "Fields: " + fields
