@@ -17,10 +17,12 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -28,7 +30,7 @@ import java.text.SimpleDateFormat
 
 class StockMovementApiController {
 
-    def stockMovementService
+    StockMovementService stockMovementService
 
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
@@ -60,7 +62,7 @@ class StockMovementApiController {
 
     def update = { //StockMovement stockMovement ->
 
-        Object jsonObject = request.JSON
+        JSONObject jsonObject = request.JSON
         log.info "json: " + jsonObject
 
         // Remove attributes that cause issues in the default grails data binder
@@ -87,6 +89,36 @@ class StockMovementApiController {
      *
      */
     def updateStatus = {
+        JSONObject jsonObject = request.JSON
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        switch (params.stepNumber) {
+            case "1":
+                stockMovementService.updateStatus(params.id, RequisitionStatus.CREATED)
+                break;
+            case "2":
+                stockMovementService.updateStatus(params.id, RequisitionStatus.EDITING)
+                break;
+            case "3":
+                stockMovementService.updateStatus(params.id, RequisitionStatus.REVIEWING)
+                break;
+            case "4":
+                stockMovementService.updateStatus(params.id, RequisitionStatus.PICKING)
+                Boolean clearPicklist = jsonObject.containsKey("clearPicklist") ?
+                        jsonObject.getBoolean("clearPicklist") : false
+                if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
+                Boolean createPicklist = jsonObject.containsKey("createPicklist") ?
+                        jsonObject.getBoolean("createPicklist") : false
+                if (createPicklist) stockMovementService.createPicklist(stockMovement)
+                break;
+            case "5":
+                stockMovementService.updateStatus(params.id, RequisitionStatus.PICKED)
+                break;
+            default:
+                throw new IllegalArgumentException("Cannot update status - invalid step number ${params.stepNumber}")
+                break;
+
+        }
+
         forward(action: "read")
     }
 

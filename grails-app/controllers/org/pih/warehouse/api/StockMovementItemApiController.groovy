@@ -41,15 +41,15 @@ class StockMovementItemApiController {
         log.info "JSON " + jsonObject
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
-        Boolean autoSuggest = jsonObject.autoSuggest ?
-                Boolean.parseBoolean(jsonObject.autoSuggest):Boolean.FALSE
+        Boolean createPicklist = jsonObject.createPicklist ?
+                Boolean.parseBoolean(jsonObject.createPicklist):Boolean.FALSE
 
         Boolean clearPicklist = jsonObject.clearPicklist ?
                 Boolean.parseBoolean(jsonObject.clearPicklist):Boolean.FALSE
 
-        if (autoSuggest) {
+        if (createPicklist) {
             log.info "Auto creating picklist for stock movement item ${stockMovementItem}"
-            stockMovementService.autoCreatePicklist(stockMovementItem)
+            stockMovementService.createPicklist(stockMovementItem)
         }
         else if (clearPicklist) {
             stockMovementService.clearPicklist(stockMovementItem)

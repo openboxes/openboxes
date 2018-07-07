@@ -86,6 +86,13 @@ class StockMovementService {
         return StockMovement.createFromRequisition(requisition)
     }
 
+    def updateStatus(String id, RequisitionStatus status) {
+        Requisition requisition = Requisition.get(id)
+        requisition.status = status
+        requisition.save(flush:true)
+    }
+
+
     def updateStockMovement(StockMovement stockMovement) {
         log.info "Update stock movement " + stockMovement + " stockMovement.lineItems = " + stockMovement?.lineItems
 
@@ -184,7 +191,6 @@ class StockMovementService {
             }
         }
 
-
         if (requisition.hasErrors() || !requisition.save(flush:true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
@@ -239,20 +245,48 @@ class StockMovementService {
         return stockMovement
     }
 
-
     StockMovementItem getStockMovementItem(String id) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
         return StockMovementItem.createFromRequisitionItem(requisitionItem)
     }
 
-    void autoCreatePicklist(StockMovement stockMovement) {
+
+    void clearPicklist(String id) {
+        StockMovement stockMovement = getStockMovement(id)
+        clearPicklist(stockMovement)
+    }
+
+    void clearPicklist(StockMovement stockMovement) {
         for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
-            autoCreatePicklist(stockMovementItem)
+            clearPicklist(stockMovementItem)
+        }
+    }
+
+    void clearPicklist(StockMovementItem stockMovementItem) {
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        Picklist picklist = requisitionItem?.requisition?.picklist
+        log.info "Clear picklist"
+        if (picklist) {
+            picklist.picklistItems.toArray().each {
+                picklist.removeFromPicklistItems(it)
+            }
+            picklist.save()
+        }
+    }
+
+    void createPicklist(String id) {
+        StockMovement stockMovement = getStockMovement(id)
+        createPicklist(stockMovement)
+    }
+
+    void createPicklist(StockMovement stockMovement) {
+        for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
+            createPicklist(stockMovementItem)
         }
     }
 
 
-    void autoCreatePicklist(StockMovementItem stockMovementItem) {
+    void createPicklist(StockMovementItem stockMovementItem) {
 
         // This is kind of a hack, but it's the only way I could figure out how to get the origin field
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
@@ -276,43 +310,29 @@ class StockMovementService {
         }
     }
 
-    void clearPicklist(StockMovement stockMovement) {
-        for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
-            clearPicklist(stockMovementItem)
-        }
-    }
-
-    void clearPicklist(StockMovementItem stockMovementItem) {
-        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        Picklist picklist = requisitionItem?.requisition?.picklist
-        log.info "Clear picklist"
-        if (picklist) {
-            picklist.picklistItems.toArray().each {
-                picklist.removeFromPicklistItems(it)
-            }
-            picklist.save()
-        }
-    }
 
     void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, InventoryItem inventoryItem, Location binLocation,
                          Integer quantity, String reasonCode, String comment) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+
+        // Validate quantity
+        // Cannot validate because this code cause the following exception:
+        // PropertyValueException: not-null property references a null or transient value: org.pih.warehouse.picklist.PicklistItem.picklist
+//        Location location = binLocation.parentLocation
+//        List binLocations = inventoryService.getQuantityByBinLocation(location, binLocation)
+//        binLocations = binLocations.findAll { it.inventoryItem == inventoryItem}
+//        Integer quantityAvailable = binLocations.sum { it.quantity }
+//
+//        log.info ("Validation quantity available ${quantityAvailable} vs quantity requested ${quantity}")
+//        if (quantityAvailable < quantity) {
+//            throw new IllegalArgumentException("Bin location ${binLocation} does not have enough quantity " +
+//                    "available ${quantityAvailable} to fulfill requested quantity ${quantity}.")
+//        }
+
         def picklist = requisitionItem.requisition.picklist
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisitionItem.requisition
-        }
-
-        // Validate quantity
-        Location location = binLocation.parentLocation
-        List binLocations = inventoryService.getQuantityByBinLocation(location, binLocation)
-        binLocations = binLocations.findAll { it.inventoryItem == inventoryItem}
-        Integer quantityAvailable = binLocations.sum { it.quantity }
-
-        log.info ("Validation quantity available ${quantityAvailable} vs quantity requested ${quantity}")
-        if (quantityAvailable < quantity) {
-            throw new IllegalArgumentException("Bin location ${binLocation} does not have enough quantity " +
-                    "available ${quantityAvailable} to fulfill requested quantity ${quantity}.")
         }
 
         // Locate picklist item by inventory item and bin location (unique)
@@ -339,7 +359,7 @@ class StockMovementService {
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
         }
-        picklist.save()
+        picklist.save(flush:true)
     }
 
     /**
