@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.picklist
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.requisition.RequisitionItem
 
@@ -17,6 +18,8 @@ class PicklistItem implements Serializable {
 	String id	
 	RequisitionItem requisitionItem
 	InventoryItem inventoryItem
+	Location binLocation
+
 	Integer quantity
 	
 	String status
@@ -36,6 +39,7 @@ class PicklistItem implements Serializable {
 		
     static constraints = {    	
 		inventoryItem(nullable:true)
+		binLocation(nullable:true)
         requisitionItem(nullable:true)
 		quantity(nullable:false)
 		status(nullable:true)
@@ -44,13 +48,16 @@ class PicklistItem implements Serializable {
 		
 	}
 
-    Map toJson(){
-        [
+    Map toJson() { [
             id: id,
+			version: version,
+            status:status,
             requisitionItemId: requisitionItem?.id,
+			binLocationId: binLocation?.id,
             inventoryItemId: inventoryItem?.id,
-            version: version,
-            quantity:quantity
+            quantity: quantity,
+            reasonCode: reasonCode,
+            comment: comment
         ]
     }
 		
