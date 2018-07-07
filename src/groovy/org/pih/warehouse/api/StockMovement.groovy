@@ -95,8 +95,8 @@ class StockMovement {
                 destination: [id: destination?.id, name: destination?.name],
                 dateRequested: dateRequested?.format("MM/dd/yyyy"),
                 requestedBy: requestedBy,
+                lineItems: lineItems,
                 pickPage: pickPage,
-                lineItems: lineItems
         ]
     }
 

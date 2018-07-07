@@ -27,9 +27,6 @@ class StockMovementItem {
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
 
-    Set picklistItems = []
-    Set suggestedItems = []
-    List availableItems = []
     List substitutionItems = []
 
     // Actions
@@ -64,10 +61,6 @@ class StockMovementItem {
         quantityRevised(nullable:true)
         quantityCanceled(nullable:true)
         quantityPicked(nullable:true)
-
-        picklistItems(nullable:true)
-        availableItems(nullable:true)
-        picklistItems(nullable:true)
         statusCode(nullable:true)
         reasonCode(nullable:true)
         comments(nullable:true)
@@ -100,9 +93,6 @@ class StockMovementItem {
                 comments: comments,
                 recipient: recipient,
                 substitutionItems: substitutionItems,
-                suggestedItems: suggestedItems,
-                availableItems: availableItems,
-                picklistItems: picklistItems,
                 sortOrder: sortOrder
         ]
     }
@@ -155,9 +145,6 @@ class StockMovementItem {
                 reasonCode: requisitionItem.cancelReasonCode,
                 comments: requisitionItem.cancelComments,
                 recipient: requisitionItem.recipient,
-                picklistItems: requisitionItem.picklistItems,
-                availableItems: [],
-                suggestedItems: [],
                 palletName:null,
                 boxName:null,
                 sortOrder: requisitionItem.orderIndex
@@ -219,18 +206,33 @@ class PickPageItem {
     InventoryItem inventoryItem
     Location binLocation
 
-    Set<PicklistItem> picklistItems
-    List<AvailableItem> availableItems
+    Set<PicklistItem> picklistItems = []
+    Set<AvailableItem> availableItems = []
+    Set<SuggestedItem> suggestedItems = []
+
 
     Map toJson() {
         return [
+                pickStatusCode      : statusCode,
+                requestStatusCode   : requisitionItem?.status?.name(),
                 "requisitionItem.id": requisitionItem?.id,
                 "product.name"      : requisitionItem?.product?.name,
                 productCode         : requisitionItem?.product?.productCode,
                 quantityRequested   : requisitionItem.quantity,
                 quantityPicked      : quantityPicked,
-                statusCode          : statusCode
+                quantityAvailable   : quantityAvailable,
+                quantityRemaining   : requisitionItem.totalQuantityRemaining(),
+                picklistItems       : picklistItems,
+                availableItems      : availableItems,
+                suggestedItems      : suggestedItems,
+
         ]
+    }
+
+
+    Integer getQuantityRemaining() {
+        Integer quantityRemaining = quantityRequested - quantityPicked
+        return quantityRemaining > 0 ? quantityRemaining : 0
     }
 
     Integer getQuantityRequested() {
@@ -247,10 +249,10 @@ class PickPageItem {
 
 
     String getStatusCode() {
-        if (quantityRequested == quantityPicked) {
+        if (quantityRequested == quantityPicked && quantityRemaining == 0) {
             return "PICKED"
         }
-        else if (quantityPicked > 0) {
+        else if (quantityPicked > 0 && quantityRemaining > 0) {
             return "PARTIALLY_PICKED"
         }
         else {

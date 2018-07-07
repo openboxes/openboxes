@@ -241,21 +241,7 @@ class StockMovementService {
 
     StockMovementItem getStockMovementItem(String id) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
-        StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
-        Location location = requisitionItem?.requisition?.origin
-        List availableItems = inventoryService.getAvailableBinLocations(location, stockMovementItem.product)
-//        availableItems = availableItems.collect {
-//            return new AvailableItem(inventoryItem: it.inventoryItem,
-//                    binLocation: it.binLocation, quantityAvailable: it.quantity)
-//        }
-
-
-        stockMovementItem.availableItems = availableItems
-
-        log.info "Bin locations " + stockMovementItem.availableItems
-        stockMovementItem.suggestedItems = getSuggestedItems(stockMovementItem)
-
-        return stockMovementItem
+        return StockMovementItem.createFromRequisitionItem(requisitionItem)
     }
 
     void autoCreatePicklist(StockMovement stockMovement) {
@@ -335,24 +321,22 @@ class StockMovementService {
      * @param stockMovementItem
      * @return
      */
-    List getSuggestedItems(StockMovementItem stockMovementItem) {
+    List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested) {
 
         List suggestedItems = []
 
         // If there are no available items then we cannot reasonably suggest any
-        if (!stockMovementItem.availableItems) {
+        if (!availableItems) {
             return suggestedItems
         }
 
         // As long as quantity requested is less than the total available we can iterate through available items
         // and pick until quantity requested is 0. Otherwise, we don't suggest anything because the user must
         // choose anyway. This might be improved in the future.
-        Integer quantityRequested = stockMovementItem?.quantityRequested
-        Integer quantityAvailable = stockMovementItem?.availableItems?.sum { it.quantityAvailable }
+        Integer quantityAvailable = availableItems?.sum { it.quantityAvailable }
         if (quantityRequested < quantityAvailable) {
 
-            for (def availableItem : stockMovementItem.availableItems) {
-
+            for (AvailableItem availableItem : availableItems) {
                 if (quantityRequested == 0)
                     break
 
@@ -365,7 +349,7 @@ class StockMovementService {
                 suggestedItems << new SuggestedItem(inventoryItem: availableItem?.inventoryItem,
                         binLocation: availableItem?.binLocation,
                         quantityAvailable: availableItem?.quantityAvailable,
-                        quantityRequested: stockMovementItem.quantityRequested,
+                        quantityRequested: quantityRequested,
                         quantityPicked: quantityPicked)
                 quantityRequested -= quantityPicked
             }
@@ -413,12 +397,29 @@ class StockMovementService {
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         if (requisitionItem.isSubstituted()) {
             pickPageItems << requisitionItem.substitutionItems.collect {
-                new PickPageItem(requisitionItem: it, it.picklistItems)
+                return buildPickPageItem(requisitionItem)
             }
         }
         else {
-            pickPageItems << new PickPageItem(requisitionItem: requisitionItem, picklistItems: requisitionItem.picklistItems)
+            pickPageItems << buildPickPageItem(requisitionItem)
         }
+    }
+
+    /**
+     *
+     * @param requisitionItem
+     * @return
+     */
+    PickPageItem buildPickPageItem(RequisitionItem requisitionItem) {
+
+        PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem, picklistItems: requisitionItem.picklistItems)
+        Location location = requisitionItem?.requisition?.origin
+        List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
+        pickPageItem.availableItems = availableItems
+        pickPageItem.suggestedItems = getSuggestedItems(availableItems, requisitionItem.quantity)
+
+        return pickPageItem
+
     }
 
 }
