@@ -30,6 +30,8 @@ class StockMovement {
     String name
     String description
     String identifier
+    String statusCode
+
     Location origin
     Location destination
     Person requestedBy
@@ -61,6 +63,7 @@ class StockMovement {
         id(nullable:true)
         name(nullable:true)
         description(nullable:true)
+        statusCode(nullable:true)
         origin(nullable:false)
         destination(nullable:false)
         stocklist(nullable:true)
@@ -90,6 +93,7 @@ class StockMovement {
                 id: id,
                 name: name,
                 description: description,
+                statusCode: statusCode,
                 identifier: requisition?.requestNumber,
                 origin: [id: origin?.id, name: origin?.name],
                 destination: [id: destination?.id, name: destination?.name],
@@ -121,6 +125,7 @@ class StockMovement {
                 name: requisition.name,
                 identifier: requisition.requestNumber,
                 description: requisition.description,
+                statusCode: requisition?.status?.name(),
                 origin: requisition.origin,
                 destination: requisition.destination,
                 dateRequested: requisition.dateRequested,
@@ -145,6 +150,7 @@ class StockMovement {
                 id: shipment.id,
                 name: shipment.name,
                 description: shipment.name,
+                statusCode: shipment.status?.name(),
                 origin: shipment.origin,
                 destination: shipment.destination,
                 dateRequested: shipment?.dateCreated,

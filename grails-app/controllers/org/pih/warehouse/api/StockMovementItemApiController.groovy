@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
@@ -35,11 +36,10 @@ class StockMovementItemApiController {
 
 
     def update = {
-        Object jsonObject = request.JSON
+        JSONObject jsonObject = request.JSON
 
         log.info "JSON " + jsonObject
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
-
 
         Boolean autoSuggest = jsonObject.autoSuggest ?
                 Boolean.parseBoolean(jsonObject.autoSuggest):Boolean.FALSE

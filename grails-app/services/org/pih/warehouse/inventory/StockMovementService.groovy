@@ -21,6 +21,7 @@ import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
@@ -252,7 +253,16 @@ class StockMovementService {
 
 
     void autoCreatePicklist(StockMovementItem stockMovementItem) {
-        List<SuggestedItem> suggestedItems = getSuggestedItems(stockMovementItem)
+
+        // This is kind of a hack, but it's the only way I could figure out how to get the origin field
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        Product product = requisitionItem.product
+        Location location = requisitionItem?.requisition?.origin
+        Integer quantityRequested = requisitionItem.quantity
+
+        // Retrieve all available items and then calculate suggested
+        List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, product)
+        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequested)
         if (suggestedItems) {
             clearPicklist(stockMovementItem)
             for (SuggestedItem suggestedItem : suggestedItems) {
@@ -266,6 +276,11 @@ class StockMovementService {
         }
     }
 
+    void clearPicklist(StockMovement stockMovement) {
+        for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
+            clearPicklist(stockMovementItem)
+        }
+    }
 
     void clearPicklist(StockMovementItem stockMovementItem) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
@@ -286,6 +301,18 @@ class StockMovementService {
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisitionItem.requisition
+        }
+
+        // Validate quantity
+        Location location = binLocation.parentLocation
+        List binLocations = inventoryService.getQuantityByBinLocation(location, binLocation)
+        binLocations = binLocations.findAll { it.inventoryItem == inventoryItem}
+        Integer quantityAvailable = binLocations.sum { it.quantity }
+
+        log.info ("Validation quantity available ${quantityAvailable} vs quantity requested ${quantity}")
+        if (quantityAvailable < quantity) {
+            throw new IllegalArgumentException("Bin location ${binLocation} does not have enough quantity " +
+                    "available ${quantityAvailable} to fulfill requested quantity ${quantity}.")
         }
 
         // Locate picklist item by inventory item and bin location (unique)
@@ -334,7 +361,7 @@ class StockMovementService {
         // and pick until quantity requested is 0. Otherwise, we don't suggest anything because the user must
         // choose anyway. This might be improved in the future.
         Integer quantityAvailable = availableItems?.sum { it.quantityAvailable }
-        if (quantityRequested < quantityAvailable) {
+        if (quantityRequested <= quantityAvailable) {
 
             for (AvailableItem availableItem : availableItems) {
                 if (quantityRequested == 0)
@@ -342,7 +369,7 @@ class StockMovementService {
 
                 // The quantity to pick is either the quantity available (if less than requested) or
                 // the quantity requested (if less than available).
-                int quantityPicked = (quantityRequested > availableItem.quantityAvailable) ?
+                int quantityPicked = (quantityRequested >= availableItem.quantityAvailable) ?
                         availableItem.quantityAvailable : quantityRequested
 
                 log.info "Quantity picked ${quantityPicked}"
@@ -415,8 +442,9 @@ class StockMovementService {
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem, picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
+        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, requisitionItem.quantity)
         pickPageItem.availableItems = availableItems
-        pickPageItem.suggestedItems = getSuggestedItems(availableItems, requisitionItem.quantity)
+        pickPageItem.suggestedItems = suggestedItems
 
         return pickPageItem
 
