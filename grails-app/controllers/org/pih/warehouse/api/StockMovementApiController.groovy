@@ -91,38 +91,46 @@ class StockMovementApiController {
     def updateStatus = {
         JSONObject jsonObject = request.JSON
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        switch (params.stepNumber) {
-            case "1":
-                stockMovementService.updateStatus(params.id, RequisitionStatus.CREATED)
-                break;
-            case "2":
-                stockMovementService.updateStatus(params.id, RequisitionStatus.EDITING)
-                break;
-            case "3":
-                stockMovementService.updateStatus(params.id, RequisitionStatus.REVIEWING)
-                break;
-            case "4":
-                stockMovementService.updateStatus(params.id, RequisitionStatus.PICKING)
-                Boolean clearPicklist = jsonObject.containsKey("clearPicklist") ?
-                        jsonObject.getBoolean("clearPicklist") : false
-                if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
-                Boolean createPicklist = jsonObject.containsKey("createPicklist") ?
-                        jsonObject.getBoolean("createPicklist") : false
-                if (createPicklist) stockMovementService.createPicklist(stockMovement)
-                break;
-            case "5":
-                stockMovementService.updateStatus(params.id, RequisitionStatus.PICKED)
-                break;
-            case "6":
-                stockMovementService.sendStockMovement(params.id)
-                stockMovementService.updateStatus(params.id, RequisitionStatus.ISSUED)
-                break;
-            default:
-                throw new IllegalArgumentException("Cannot update status - invalid step number ${params.stepNumber}")
-                break;
 
+        Boolean rollback = jsonObject.rollback ? jsonObject.getBoolean("rollback") : false
+        if (rollback) {
+            stockMovementService.rollbackStockMovement(params.id)
         }
 
+        RequisitionStatus status = jsonObject.status ? jsonObject.status as RequisitionStatus : null
+        if (status) {
+            switch (status) {
+                case RequisitionStatus.CREATED:
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                case RequisitionStatus.EDITING:
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                case RequisitionStatus.VERIFYING:
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                case RequisitionStatus.PICKING:
+                    stockMovementService.updateStatus(params.id, status)
+                    Boolean clearPicklist = jsonObject.containsKey("clearPicklist") ?
+                            jsonObject.getBoolean("clearPicklist") : false
+                    if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
+                    Boolean createPicklist = jsonObject.containsKey("createPicklist") ?
+                            jsonObject.getBoolean("createPicklist") : false
+                    if (createPicklist) stockMovementService.createPicklist(stockMovement)
+                    break;
+                case RequisitionStatus.PICKED:
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                case RequisitionStatus.ISSUED:
+                    stockMovementService.sendStockMovement(params.id)
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot update status with invalid status ${jsonObject.status}")
+                    break;
+
+            }
+        }
         forward(action: "read")
     }
 

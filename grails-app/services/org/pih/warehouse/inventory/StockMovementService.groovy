@@ -34,6 +34,7 @@ class StockMovementService {
 
     def productService
     def identifierService
+    def requisitionService
     def inventoryService
 
     boolean transactional = true
@@ -223,7 +224,7 @@ class StockMovementService {
     }
 
     StockMovement getStockMovement(String id, String stepNumber) {
-        Requisition requisition = Requisition.read(id)
+        Requisition requisition = Requisition.get(id)
         if (!requisition) {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
         }
@@ -470,10 +471,13 @@ class StockMovementService {
 
     }
 
-
     void sendStockMovement(String id) {
         StockMovement stockMovement = getStockMovement(id)
         throw new NotImplementedException("Cannot send stock movement ${stockMovement.identifier} - method has not been implemented yet")
     }
 
+    void rollbackStockMovement(String id) {
+        StockMovement stockMovement = getStockMovement(id)
+        requisitionService.rollbackRequisition(stockMovement.requisition)
+    }
 }
