@@ -101,6 +101,11 @@ class StockMovement {
                 requestedBy: requestedBy,
                 lineItems: lineItems,
                 pickPage: pickPage,
+                associations: [
+                    requisition: [id: requisition.id, requestNumber: requisition.requestNumber],
+                    shipments: requisition?.shipments?.collect { [id: it.id, shipmentNumber: it.shipmentNumber] },
+                    documents: []
+                ],
         ]
     }
 
@@ -110,11 +115,11 @@ class StockMovement {
      * @return
      */
     String generateName() {
-        String name = "${origin?.name}.${destination?.name}.${dateRequested.format("dd/MMM/yyyy")}"
+        String name = "${origin?.name}.${destination?.name}.${dateRequested.format("dd-MMM-yyyy")}"
         if (stocklist?.name) name += ".${stocklist.name}"
         if (trackingNumber) name += ".${trackingNumber}"
         if (description) name += ".${description}"
-        name = name.toUpperCase()
+        name = name.toUpperCase().replace(" ", "")
         return name
     }
 

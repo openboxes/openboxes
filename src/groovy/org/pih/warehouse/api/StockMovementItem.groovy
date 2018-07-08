@@ -229,10 +229,9 @@ class PickPageItem {
                 quantityPicked      : quantityPicked,
                 quantityAvailable   : quantityAvailable,
                 quantityRemaining   : requisitionItem.totalQuantityRemaining(),
-                picklistItems       : picklistItems,
                 availableItems      : availableItems,
                 suggestedItems      : suggestedItems,
-
+                picklistItems       : picklistItems,
         ]
     }
 

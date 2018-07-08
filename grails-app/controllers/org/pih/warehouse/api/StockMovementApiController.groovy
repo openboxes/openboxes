@@ -26,6 +26,7 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 class StockMovementApiController {
@@ -65,18 +66,32 @@ class StockMovementApiController {
         JSONObject jsonObject = request.JSON
         log.info "json: " + jsonObject
 
+        // Bind all other properties to stock movement
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovement = new StockMovement()
+        }
+
         // Remove attributes that cause issues in the default grails data binder
         List lineItems = jsonObject.remove("lineItems")
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         String dateRequested = jsonObject.remove("dateRequested")
+        String dateShipped = jsonObject.remove("dateShipped")
 
-        // Bind all other properties to stock movement
-        StockMovement stockMovement = new StockMovement()
-        stockMovement.dateRequested = new SimpleDateFormat("MM/dd/yyyy").parse(dateRequested)
+        // Dates aren't bound properly using default JSON binding
+        if (dateShipped) stockMovement.dateShipped = dateFormat.parse(dateShipped)
+        if (dateRequested) stockMovement.dateRequested = dateFormat.parse(dateRequested)
+
+        // Bind the rest of the JSON attributes to the stock movement object
         bindData(stockMovement, jsonObject)
+
+        // Bind all line items
         bindLineItems(stockMovement, lineItems)
 
-        stockMovement = stockMovementService.updateStockMovement(stockMovement)
-        render ([data:stockMovement] as JSON)
+        // Create or update stock movement
+        stockMovementService.updateStockMovement(stockMovement)
+
+        forward(action: "read")
     }
 
     def delete = {

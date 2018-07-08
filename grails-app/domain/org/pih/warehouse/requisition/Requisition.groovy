@@ -20,7 +20,8 @@ import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.picklist.Picklist;
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.shipping.Shipment;
 
 class Requisition implements Comparable<Requisition>, Serializable {
 
@@ -193,6 +194,12 @@ class Requisition implements Comparable<Requisition>, Serializable {
     //def getTransactions() {
     //    return Transaction.findAllByRequisition(this)
     //}
+
+
+    List<Shipment> getShipments() {
+        return Shipment.findAllByRequisition(this)
+    }
+
 
     def getRequisitionItemCount() {
         return getOriginalRequisitionItems()?.size()
