@@ -1,8 +1,8 @@
-[TOC]
+
 
 # Stock Movement Items
 
-## Add Stock Movement Item
+## Create
 
 ### Request
 ```
@@ -87,7 +87,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 ```
 
 
-## Update Stock Movement Item
+## Update 
 This is used to change the quantity or product associated with an item, as well as 
 other changes like sort order. This is a direct change to the requisition item. 
 
@@ -179,7 +179,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-## Revise Stock Movement Item
+## Revise 
 This is used to record a revision to the quantity requested. This requires the user to 
 choose a reason code (i.e. STOCKOUT) and optionally add comments that may help provide
 more context for the revision.
@@ -268,7 +268,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
   }
 }
 ```
-## Substitute Stock Movement Item
+## Substitute
 This is used to record a substitution for an stock movement item. This requires the user to 
 enter a new product and quantity, as well as choose a reason code (i.e. STOCKOUT) and optionally add a comment that may 
 help provide more context for the substitution.
@@ -444,7 +444,7 @@ You also cannot substitute the product for itself.
 
 ```
 
-## Cancel Stock Movement Item
+## Cancel 
 Similar to a revision, this operation allows you to cancel the stock movement item.
 
 ### Request
@@ -532,7 +532,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-## Revert Stock Movement Item
+## Revert 
 This allows you to revert any changes made to the stock movement item (including revisions, cancellations, 
 and substitutions). However it does not allow you to revert deletes and updates.
 
@@ -618,7 +618,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-## Delete Stock Movement Item
+## Delete 
 This operation allows you to delete the stock movement item completely. 
 
 ### Request

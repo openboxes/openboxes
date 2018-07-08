@@ -1,5 +1,3 @@
-[TOC]
-
 # Stock Movements
 
 ## List 
@@ -265,9 +263,7 @@ curl -X POST -b cookies.txt -H "Content-Type: application/json" \
 
 ```
 
-## Update
-
-### Update Stock Movement
+## Update 
 
 ```
 curl -b cookies.txt -X POST -H "Content-Type: application/json" \
@@ -302,7 +298,7 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 }
 ```
 
-### Update Status
+## Update Status
 For stock movements, the Status API provides a way to transition the stock movement between states. 
 The API is currently only configured to change the stock movement status and return the JSON required for the 
 page associated with the next status. For example, moving from `REVIEWING` to `PICKING` would return the
@@ -317,7 +313,7 @@ Therefore, you can use the `stepNumber` parameter if you want to transform the r
 specific step. At, the moment only `?stepNumber=4` transforms the data, but that might change in
 a later version.
 
-#### Created
+### Created
 The first state in the stock movement lifecycle is the `CREATED` state. You can also transition to `PENDING`
 `OPEN` if that's more clear to your users. 
 ```
@@ -432,7 +428,7 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
   }
 
 ```
-#### Editing
+### Editing
 After creating the stock movement you are brought to the `EDITING` state (step 2) of the workflow which allows you
 to edit the line items. Honestly, there's no requirement to move into this state from the current UI
 so this state can probably be ignored. 
@@ -441,7 +437,7 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"status":"EDITING"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=2"|jsonlint
 ```
-#### Verifying
+### Verifying
 Once items have been added to the stock movement you'll move into the `VERIFYING` state (step 3) which 
 allows you to revise quantity, substitute items, cancel items, and generally 
 ```
@@ -449,7 +445,7 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"status":"VERIFYING"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=3"|jsonlint
 ```
-#### Picking
+### Picking
 The `PICKING` state (step 4) is the one state that currently has custom business logic associated with it. 
 To trigger this business logic, you can choose to include optional attributes `"clearPicklist":"true"` or 
 `"createPicklist":"true"` to your JSON body in order to, respectively: clear the current picklist of all 
@@ -463,14 +459,14 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"status":"PICKING", "createPicklist":"true"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=4"|jsonlint
 ```
-#### Picked
+### Picked
 Once you have finished picking items for the stock movement, you'll move to the `PICKED` state (step 5). 
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"status":"PICKED"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
 ```
-#### Issued
+### Issued
 In the `PICKED` state you will be prompoted to enter information about the shipment used to send
 stock to the destination. Once this information has been filled out and saved to the database, 
 you can transitition to the `ISSUED` state which will attempt to send the stock movement to the 
@@ -485,7 +481,7 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
   "errorMessage": "Cannot send stock movement 916SUB - method has not been implemented yet"
 }
 ```
-#### Canceled
+### Canceled
 If at any point you'd like to cancel the stock movement you can transition to the `CANCELED` state.
 If the stock movement is canceled after it has been moved to the `ISSUED` state then any transaction 
 created as part of the stock movement will be reverted and the stock movement will be transitioned
@@ -495,7 +491,7 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"status":"CANCELED"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
 ```
-### Rollback Status
+## Rollback Status
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"rollback":"true"}' \
