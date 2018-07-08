@@ -1,14 +1,16 @@
-## Stock Movement Items
+[TOC]
 
-### Add Stock Movement Item
+# Stock Movement Items
 
-#### Request
+## Add Stock Movement Item
+
+### Request
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @addStockMovementItem.json \
 https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
 ```
-#### Post Body (addStockMovementItem.json)
+### Post Body (addStockMovementItem.json)
 ```
 {
 	"id": "ff808181644d5e5b01644e5007500001",
@@ -27,7 +29,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 	}]
 }
 ```
-#### Response
+### Response
 ```
 {
   "data": {
@@ -85,7 +87,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 ```
 
 
-### Update Stock Movement Item
+## Update Stock Movement Item
 This is used to change the quantity or product associated with an item, as well as 
 other changes like sort order. This is a direct change to the requisition item. 
 
@@ -101,7 +103,7 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
 ```
 
-#### Request Body (updateStockMovementItem.json)
+### Request Body (updateStockMovementItem.json)
 ```
 {
 	"id": "ff808181644d5e5b01644e5007500001",
@@ -120,7 +122,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 	}]
 }
 ```
-#### Response 
+### Response 
 ```
 {
   "data": {
@@ -177,18 +179,18 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-### Revise Stock Movement Item
+## Revise Stock Movement Item
 This is used to record a revision to the quantity requested. This requires the user to 
 choose a reason code (i.e. STOCKOUT) and optionally add comments that may help provide
 more context for the revision.
 
-#### Request
+### Request
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @reviseStockMovementItem.json \
 https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
 ```
-#### Post Body (reviseStockMovementItem.json)
+### Post Body (reviseStockMovementItem.json)
 ```
 {
     "id": "ff808181644d5e5b01644e5007500001",
@@ -210,7 +212,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
     ]
   }
 ```
-#### Response
+### Response
 ```
 {
   "data": {
@@ -266,18 +268,18 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
   }
 }
 ```
-### Substitute Stock Movement Item
+## Substitute Stock Movement Item
 This is used to record a substitution for an stock movement item. This requires the user to 
 enter a new product and quantity, as well as choose a reason code (i.e. STOCKOUT) and optionally add a comment that may 
 help provide more context for the substitution.
 
-#### Request
+### Request
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @substituteStockMovementItem.json \
 https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
 ```
-#### Post Body (substituteStockMovementItem.json)
+### Post Body (substituteStockMovementItem.json)
 ```
 {
 	"id": "ff808181644d5e5b01644e5007500001",
@@ -301,7 +303,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 NOTE: You can add multiple substitutions by adding another line item with the same ID along with 
 the `substitute` instruction.
 
-#### Response
+### Response
 ```
 {
   "data": {
@@ -424,7 +426,7 @@ under the original requisition item.
     }]
 }
 ```
-#### Exceptions
+### Exceptions
 Cannot substitute a product that is not in the original product's list of available substitutions. 
 See the Substitutions API.
 ```
@@ -442,16 +444,16 @@ You also cannot substitute the product for itself.
 
 ```
 
-### Cancel Stock Movement Item
+## Cancel Stock Movement Item
 Similar to a revision, this operation allows you to cancel the stock movement item.
 
-#### Request
+### Request
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @cancelStockMovementItem.json \
 https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
 ```
-#### Post Body (cancelStockMovementItem.json)
+### Post Body (cancelStockMovementItem.json)
 ```
 {
     "id": "ff808181644d5e5b01644e5007500001",
@@ -473,7 +475,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-#### Response
+### Response
 ```
 {
   "data": {
@@ -530,17 +532,17 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-### Revert Stock Movement Item
+## Revert Stock Movement Item
 This allows you to revert any changes made to the stock movement item (including revisions, cancellations, 
 and substitutions). However it does not allow you to revert deletes and updates.
 
-#### Request
+### Request
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @revertStockMovementItem.json \
 https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
 ```
-#### Post Body (revertStockMovementItem.json)
+### Post Body (revertStockMovementItem.json)
 ```
 {
     "id": "ff808181644d5e5b01644e5007500001",
@@ -559,7 +561,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
     ]
 }
 ```
-#### Response
+### Response
 ```
 {
   "data": {
@@ -616,16 +618,16 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-### Delete Stock Movement Item
+## Delete Stock Movement Item
 This operation allows you to delete the stock movement item completely. 
 
-#### Request
+### Request
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @deleteStockMovementItem.json \
 https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
 ```
-#### Post Body (deleteStockMovementItem.json)
+### Post Body (deleteStockMovementItem.json)
 ```
 {
     "id": "ff808181644d5e5b01644e5007500001",
@@ -645,7 +647,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-#### Response
+### Response
 ```
 {
   "data": {
@@ -675,7 +677,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-#### Exceptions
+### Exceptions
 This operation 
 cannot be performed on a stock movement item that has been revised (due to a bug with 
 foreign key constraints). 

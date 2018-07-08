@@ -1,8 +1,8 @@
 [TOC]
 
-## Stock Movements
+# Stock Movements
 
-### List 
+## List 
 Return stock movements 
 
 Parameter | Description | Required
@@ -48,7 +48,7 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements?max=1&offset=2&exclude=l
 
 
 
-### Read
+## Read
 Read an existing stock movement
 ```
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
@@ -82,9 +82,9 @@ $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 
 ```
 
-### Create 
+## Create 
 
-#### Create a new stock movement
+### Create a new stock movement
 ```
 curl -X POST -b cookies.txt -H "Content-Type: application/json" \
 -d '{"name":"my new stock movement", "description":"same as name", "origin.id":"1", "destination.id":"2","requestedBy.id":"1","dateRequested":"06/23/2018"}' \
@@ -118,7 +118,7 @@ curl -X POST -b cookies.txt -H "Content-Type: application/json" \
 
 ```
 
-#### Create a new stock movement for inbound shipment
+### Create a new stock movement for inbound shipment
 ```
 $ curl -X POST -b cookies.txt -H "Content-Type: application/json" \
 -d '{"name":"new stock movement", "description":"same as name", "origin.id":"ff80818155dd68010155dd6bb9c00001", "destination.id":"2","requestedBy.id":"1","dateRequested":"06/23/2018"}' \
@@ -152,7 +152,7 @@ $ curl -X POST -b cookies.txt -H "Content-Type: application/json" \
 
 ```
 
-#### Create a new stock movement based on a stocklist
+### Create a new stock movement based on a stocklist
 ```
 curl -X POST -b cookies.txt -H "Content-Type: application/json" \
 -d '{"name":"stock movement based on stocklist", "description":"same as name", "origin.id":"1", "destination.id":"2","requestedBy.id":"1","dateRequested":"06/23/2018","stocklist.id":"ff808181641b2fd501641b39f4ef0001"}' \
@@ -265,41 +265,9 @@ curl -X POST -b cookies.txt -H "Content-Type: application/json" \
 
 ```
 
-### Update
+## Update
 
-#### Read Stock Movement
-```
-$ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
-"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001"|jsonlint
-{
-  "data": {
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "new stock movement",
-    "description": "",
-    "identifier": "483ZSA",
-    "origin": {
-      "id": "1",
-      "name": "Boston Headquarters"
-    },
-    "destination": {
-      "id": "2",
-      "name": "Miami Warehouse"
-    },
-    "dateRequested": "06/23/2018",
-    "requestedBy": {
-      "id": "1",
-      "name": "Mr Administrator",
-      "firstName": "Mr",
-      "lastName": "Administrator",
-      "email": "admin@pih.org",
-      "username": "admin"
-    },
-    "lineItems": []
-  }
-}
-```
-
-#### Update Stock Movement
+### Update Stock Movement
 
 ```
 curl -b cookies.txt -X POST -H "Content-Type: application/json" \
@@ -334,7 +302,7 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 }
 ```
 
-#### Update Status
+### Update Status
 For stock movements, the Status API provides a way to transition the stock movement between states. 
 The API is currently only configured to change the stock movement status and return the JSON required for the 
 page associated with the next status. For example, moving from `REVIEWING` to `PICKING` would return the
@@ -349,7 +317,7 @@ Therefore, you can use the `stepNumber` parameter if you want to transform the r
 specific step. At, the moment only `?stepNumber=4` transforms the data, but that might change in
 a later version.
 
-##### Created
+#### Created
 The first state in the stock movement lifecycle is the `CREATED` state. You can also transition to `PENDING`
 `OPEN` if that's more clear to your users. 
 ```
@@ -464,7 +432,7 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
   }
 
 ```
-##### Editing
+#### Editing
 After creating the stock movement you are brought to the `EDITING` state (step 2) of the workflow which allows you
 to edit the line items. Honestly, there's no requirement to move into this state from the current UI
 so this state can probably be ignored. 
@@ -473,15 +441,15 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"status":"EDITING"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=2"|jsonlint
 ```
-##### Reviewing
-Once items have been added to the stock movement you'll move into the `REVIEWING` state (step 3) which 
+#### Verifying
+Once items have been added to the stock movement you'll move into the `VERIFYING` state (step 3) which 
 allows you to revise quantity, substitute items, cancel items, and generally 
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d '{"status":"REVIEWING"}' \
+-d '{"status":"VERIFYING"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=3"|jsonlint
 ```
-##### Picking
+#### Picking
 The `PICKING` state (step 4) is the one state that currently has custom business logic associated with it. 
 To trigger this business logic, you can choose to include optional attributes `"clearPicklist":"true"` or 
 `"createPicklist":"true"` to your JSON body in order to, respectively: clear the current picklist of all 
@@ -495,14 +463,14 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"status":"PICKING", "createPicklist":"true"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=4"|jsonlint
 ```
-##### Picked
+#### Picked
 Once you have finished picking items for the stock movement, you'll move to the `PICKED` state (step 5). 
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"status":"PICKED"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
 ```
-##### Issued
+#### Issued
 In the `PICKED` state you will be prompoted to enter information about the shipment used to send
 stock to the destination. Once this information has been filled out and saved to the database, 
 you can transitition to the `ISSUED` state which will attempt to send the stock movement to the 
@@ -517,7 +485,7 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
   "errorMessage": "Cannot send stock movement 916SUB - method has not been implemented yet"
 }
 ```
-##### Canceled
+#### Canceled
 If at any point you'd like to cancel the stock movement you can transition to the `CANCELED` state.
 If the stock movement is canceled after it has been moved to the `ISSUED` state then any transaction 
 created as part of the stock movement will be reverted and the stock movement will be transitioned
@@ -527,18 +495,7 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"status":"CANCELED"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
 ```
-
-##### Canceled
-If at any point you'd like to cancel the stock movement you can transition to the `CANCELED` state.
-If the stock movement is canceled after it has been moved to the `ISSUED` state then any transaction 
-created as part of the stock movement will be reverted and the stock movement will be transitioned
-to the `CANCELED` state.
-```
-$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d '{"status":"CANCELED"}' \
-"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
-```
-#### Rollback Status
+### Rollback Status
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"rollback":"true"}' \
