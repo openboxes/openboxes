@@ -101,11 +101,16 @@ class StockMovementApiController {
 
     /**
      * Peforms a status update on the stock movement and forwards to the read action.
-     *
      */
     def updateStatus = {
         JSONObject jsonObject = request.JSON
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        Boolean clearPicklist =
+                jsonObject.containsKey("clearPicklist") ? jsonObject.getBoolean("clearPicklist") : false
+        Boolean createPicklist =
+                jsonObject.containsKey("createPicklist") ? jsonObject.getBoolean("createPicklist") : false
+
 
         Boolean rollback = jsonObject.rollback ? jsonObject.getBoolean("rollback") : false
         if (rollback) {
@@ -126,11 +131,7 @@ class StockMovementApiController {
                     break;
                 case RequisitionStatus.PICKING:
                     stockMovementService.updateStatus(params.id, status)
-                    Boolean clearPicklist = jsonObject.containsKey("clearPicklist") ?
-                            jsonObject.getBoolean("clearPicklist") : false
                     if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
-                    Boolean createPicklist = jsonObject.containsKey("createPicklist") ?
-                            jsonObject.getBoolean("createPicklist") : false
                     if (createPicklist) stockMovementService.createPicklist(stockMovement)
                     break;
                 case RequisitionStatus.PICKED:

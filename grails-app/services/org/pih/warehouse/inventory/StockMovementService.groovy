@@ -18,8 +18,10 @@ import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
@@ -33,6 +35,7 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
 class StockMovementService {
@@ -535,12 +538,40 @@ class StockMovementService {
 
 
     void sendStockMovement(String id) {
+
+        User user = AuthService.currentUser.get()
         StockMovement stockMovement = getStockMovement(id)
-        throw new NotImplementedException("Cannot send stock movement ${stockMovement.identifier} - method has not been implemented yet")
+        Requisition requisition = stockMovement.requisition
+        def shipments = requisition.shipments
+
+        if(!shipments) {
+            throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
+        }
+
+        if (shipments.size() > 1) {
+            throw new IllegalStateException("There are too many shipments associated with stock movement ${requisition.requestNumber}")
+        }
+
+        shipmentService.sendShipment(shipments[0], null, user, requisition.origin, new Date())
     }
 
     void rollbackStockMovement(String id) {
         StockMovement stockMovement = getStockMovement(id)
-        requisitionService.rollbackRequisition(stockMovement.requisition)
+        Requisition requisition = stockMovement?.requisition
+        if (requisition) requisitionService.rollbackRequisition(requisition)
+
+        // If the shipment has been shipped we can roll it back
+        Shipment shipment = stockMovement?.requisition?.shipments[0]
+        if (shipment) {
+            if (shipment.currentStatus == ShipmentStatusCode.SHIPPED) {
+                shipmentService.rollbackLastEvent(shipment)
+            }
+            // If shipment status is any other status except pending then we should throw an error since rolling it
+            // back would cause issues
+            else if (shipment.currentStatus != ShipmentStatusCode.PENDING) {
+                throw new IllegalStateException("Cannot rollback status for shipment ${shipment.shipmentNumber} from ${shipment.currentStatus}")
+            }
+
+        }
     }
 }
