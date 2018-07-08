@@ -38,7 +38,7 @@ class ProductApiController extends BaseDomainApiController {
         }
 
         def products = Product.findAllByIdInListAndActive(productIds, true)
-        def availableItems = getAvailableItems(location, products)
+        def availableItems = inventoryService.getAvailableItems(location, products)
         render ([data:availableItems] as JSON)
     }
 
@@ -63,10 +63,10 @@ class ProductApiController extends BaseDomainApiController {
             def products = productAssociations.collect { it.associatedProduct }
             log.info("Location " + location + " products = " + products)
 
-            availableItems = getAvailableItems(location, product)
+            availableItems = inventoryService.getAvailableItems(location, product)
 
             productAssociations = productAssociations.collect { productAssociation ->
-                def availableProducts = getAvailableProducts(location, productAssociation.associatedProduct)
+                def availableProducts = inventoryService.getAvailableProducts(location, productAssociation.associatedProduct)
                 def expirationDate = availableProducts.findAll { it.expirationDate != null }.collect {
                     it.expirationDate
                 }.min()
@@ -103,46 +103,6 @@ class ProductApiController extends BaseDomainApiController {
     }
 
 
-    def getAvailableItems(Location location, Product product) {
-        return getAvailableItems(location, [product])
-    }
 
-
-    def getAvailableItems(Location location, List products) {
-        def availableItemsMap = inventoryService.getQuantityByInventoryItemMap(location, products)
-
-        def inventoryItems = products.collect { it.inventoryItems }.flatten()
-        log.info "inventory items: " + inventoryItems
-        def availableItems = inventoryItems.collect {
-            return [
-                    inventoryItem: it,
-                    quantity: availableItemsMap[it]
-            ]
-        }
-        availableItems = availableItems.findAll { it.quantity > 0 }
-
-        return availableItems
-    }
-
-    def getAvailableProducts(Location location, Product product) {
-        return getAvailableProducts(location, [product])
-    }
-
-    def getAvailableProducts(Location location, List products) {
-        def availableItemsMap = inventoryService.getQuantityByInventoryItemMap(location, products)
-
-        def inventoryItems = products.collect { it.inventoryItems }.flatten()
-        log.info "inventory items: " + inventoryItems
-        def availableItems = inventoryItems.collect { InventoryItem inventoryItem ->
-            return [
-                    "inventoryItem.id": inventoryItem.id,
-                    lotNumber: inventoryItem.lotNumber,
-                    expirationDate: inventoryItem.expirationDate,
-                    quantity: availableItemsMap[inventoryItem]
-            ]
-        }
-        availableItems = availableItems.findAll { it.quantity > 0 }
-        return availableItems
-    }
 
 }

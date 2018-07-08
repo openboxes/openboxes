@@ -24,6 +24,7 @@ import org.grails.plugins.csv.CSVWriter
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.id.UUIDHexGenerator
 import org.joda.time.LocalDate
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -4666,6 +4667,76 @@ class InventoryService implements ApplicationContextAware {
         return transactionEntries;
     }
 
+
+	def getAvailableBinLocations(Location location, Product product) {
+		return getAvailableBinLocations(location, [product])
+	}
+
+	def getAvailableBinLocations(Location location, List products) {
+		def availableBinLocations = getProductQuantityByBinLocation(location, products)
+
+		availableBinLocations = availableBinLocations.collect {
+            return new AvailableItem(
+					inventoryItem: it?.inventoryItem,
+					binLocation: it?.binLocation,
+					quantityAvailable: it.quantity
+            )
+		}
+		availableBinLocations = availableBinLocations.findAll { it.quantityAvailable > 0 }
+
+		// Sort empty expiration dates last
+		availableBinLocations = availableBinLocations.sort { a, b ->
+			!a?.inventoryItem?.expirationDate ?
+					!b?.inventoryItem?.expirationDate ? 0 : 1 :
+					!b?.inventoryItem?.expirationDate ? -1 :
+							a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
+		}
+
+
+		return availableBinLocations
+	}
+
+
+	def getAvailableItems(Location location, Product product) {
+		return getAvailableItems(location, [product])
+	}
+
+	def getAvailableItems(Location location, List products) {
+		def availableItemsMap = getQuantityByInventoryItemMap(location, products)
+
+		def inventoryItems = products.collect { it.inventoryItems }.flatten()
+		log.info "inventory items: " + inventoryItems
+		def availableItems = inventoryItems.collect {
+			return [
+					inventoryItem: it,
+					quantity: availableItemsMap[it]
+			]
+		}
+		availableItems = availableItems.findAll { it.quantity > 0 }
+
+		return availableItems
+	}
+
+	def getAvailableProducts(Location location, Product product) {
+		return getAvailableProducts(location, [product])
+	}
+
+	def getAvailableProducts(Location location, List products) {
+		def availableItemsMap = getQuantityByInventoryItemMap(location, products)
+
+		def inventoryItems = products.collect { it.inventoryItems }.flatten()
+		log.info "inventory items: " + inventoryItems
+		def availableItems = inventoryItems.collect { InventoryItem inventoryItem ->
+			return [
+					"inventoryItem.id": inventoryItem.id,
+					lotNumber: inventoryItem.lotNumber,
+					expirationDate: inventoryItem.expirationDate,
+					quantity: availableItemsMap[inventoryItem]
+			]
+		}
+		availableItems = availableItems.findAll { it.quantity > 0 }
+		return availableItems
+	}
 
 }
 

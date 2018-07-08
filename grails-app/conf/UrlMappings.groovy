@@ -40,15 +40,17 @@ class UrlMappings {
             controller = { "productApi" }
         }
 
-//        "/api/products/$id/availableItems" {
-//            controller = { "productApi" }
-//            action = [GET: "availableItems"]
-//        }
-//
-//        "/api/products/availableItems" {
-//            controller = { "productApi" }
-//            action = [GET: "availableItems"]
-//        }
+        // Stock Movement Item API
+
+        "/api/stockMovementItems"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [GET:"list", POST: "update"]
+        }
+
+        "/api/stockMovementItems/$id"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [GET:"read", POST: "update"]
+        }
 
         // Standard REST APIs
 
@@ -60,6 +62,12 @@ class UrlMappings {
             controller = {"${params.resource}Api" }
             action = [GET:"read", POST:"update", PUT:"update", DELETE:"delete"]
         }
+        "/api/${resource}s/$id/status"(parseRequest: true) {
+            controller = {"${params.resource}Api" }
+            action = [POST:"updateStatus"]
+        }
+
+
 
         // Anonymous REST APIs like Status, Login, Logout
 

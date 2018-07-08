@@ -40,7 +40,10 @@ class ErrorsController {
         if (RequestUtil.isAjax(request)) {
             response.status = 404
             def errorMessage = "Resource not found"
-            if (params.resource) {
+            if (request?.exception?.message) {
+                errorMessage = request.exception.message
+            }
+            else if (params.resource) {
                 errorMessage = "${params.resource.capitalize()} with identifier ${params.id} not found"
             }
             render([errorCode: 404, errorMessage: errorMessage] as JSON)

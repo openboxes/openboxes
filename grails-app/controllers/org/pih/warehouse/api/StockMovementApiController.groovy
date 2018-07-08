@@ -17,18 +17,21 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 class StockMovementApiController {
 
-    def stockMovementService
+    StockMovementService stockMovementService
 
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
@@ -48,7 +51,7 @@ class StockMovementApiController {
     }
 
     def read = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, params.stepNumber)
         render ([data:stockMovement] as JSON)
     }
 
@@ -60,21 +63,35 @@ class StockMovementApiController {
 
     def update = { //StockMovement stockMovement ->
 
-        Object jsonObject = request.JSON
+        JSONObject jsonObject = request.JSON
         log.info "json: " + jsonObject
+
+        // Bind all other properties to stock movement
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovement = new StockMovement()
+        }
 
         // Remove attributes that cause issues in the default grails data binder
         List lineItems = jsonObject.remove("lineItems")
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         String dateRequested = jsonObject.remove("dateRequested")
+        String dateShipped = jsonObject.remove("dateShipped")
 
-        // Bind all other properties to stock movement
-        StockMovement stockMovement = new StockMovement()
-        stockMovement.dateRequested = new SimpleDateFormat("MM/dd/yyyy").parse(dateRequested)
+        // Dates aren't bound properly using default JSON binding
+        if (dateShipped) stockMovement.dateShipped = dateFormat.parse(dateShipped)
+        if (dateRequested) stockMovement.dateRequested = dateFormat.parse(dateRequested)
+
+        // Bind the rest of the JSON attributes to the stock movement object
         bindData(stockMovement, jsonObject)
+
+        // Bind all line items
         bindLineItems(stockMovement, lineItems)
 
-        stockMovement = stockMovementService.updateStockMovement(stockMovement)
-        render ([data:stockMovement] as JSON)
+        // Create or update stock movement
+        stockMovementService.updateStockMovement(stockMovement)
+
+        forward(action: "read")
     }
 
     def delete = {
@@ -83,11 +100,62 @@ class StockMovementApiController {
     }
 
     /**
+     * Peforms a status update on the stock movement and forwards to the read action.
+     */
+    def updateStatus = {
+        JSONObject jsonObject = request.JSON
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        Boolean clearPicklist =
+                jsonObject.containsKey("clearPicklist") ? jsonObject.getBoolean("clearPicklist") : false
+        Boolean createPicklist =
+                jsonObject.containsKey("createPicklist") ? jsonObject.getBoolean("createPicklist") : false
+
+
+        Boolean rollback = jsonObject.rollback ? jsonObject.getBoolean("rollback") : false
+        if (rollback) {
+            stockMovementService.rollbackStockMovement(params.id)
+        }
+
+        RequisitionStatus status = jsonObject.status ? jsonObject.status as RequisitionStatus : null
+        if (status) {
+            switch (status) {
+                case RequisitionStatus.CREATED:
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                case RequisitionStatus.EDITING:
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                case RequisitionStatus.VERIFYING:
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                case RequisitionStatus.PICKING:
+                    stockMovementService.updateStatus(params.id, status)
+                    if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
+                    if (createPicklist) stockMovementService.createPicklist(stockMovement)
+                    break;
+                case RequisitionStatus.PICKED:
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                case RequisitionStatus.ISSUED:
+                    stockMovementService.sendStockMovement(params.id)
+                    stockMovementService.updateStatus(params.id, status)
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot update status with invalid status ${jsonObject.status}")
+                    break;
+
+            }
+        }
+        forward(action: "read")
+    }
+
+    /**
      * Bind the given line items (JSONArray) to StockMovementItem objects and add them to the given
      * StockMovement object.
      *
      * NOTE: THis method was necessary because the default data binder for Grails command objects
-     * does not see to handle nested objects very well.
+     * does not seem to handle nested objects very well.
      *
      * @param stockMovement
      * @param lineItems

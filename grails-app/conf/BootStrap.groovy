@@ -10,8 +10,12 @@
 
 import grails.converters.JSON
 import grails.util.Environment
+import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.PickPage
+import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -141,10 +145,17 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(PicklistItem) { PicklistItem picklistItem -> [
                 id: picklistItem.id,
-                inventoryItem: picklistItem.inventoryItem,
                 status: picklistItem.status,
-                "picklist.id": picklistItem.picklist?.id,
+                "picklist.id": picklistItem?.picklist?.id,
                 "requisitionItem.id": picklistItem?.requisitionItem?.id,
+                "inventoryItem.id": picklistItem.inventoryItem?.id,
+                "product.name": picklistItem?.inventoryItem?.product?.name,
+                "productCode": picklistItem?.inventoryItem?.product?.productCode,
+                lotNumber: picklistItem?.inventoryItem?.lotNumber,
+                expirationDate: picklistItem?.inventoryItem?.expirationDate,
+                "binLocation.id": picklistItem?.binLocation?.id,
+                "binLocation.name": picklistItem?.binLocation?.name,
+                quantity: picklistItem.quantity,
                 reasonCode: picklistItem.reasonCode,
                 comment: picklistItem.comment
         ]}
@@ -155,7 +166,8 @@ class BootStrap {
                 productCode: product.productCode,
                 name: product.name,
                 description: product.description,
-                category: [id: product?.category?.id, name: product?.category?.name]
+                "category.id": product?.category?.id,
+                "category.name": product?.category?.name
         ]}
 
         JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation -> [
@@ -281,13 +293,6 @@ class BootStrap {
                 container: container
         ]}
 
-        JSON.registerObjectMarshaller(StockMovement) { StockMovement stockMovement ->
-            return stockMovement.toJson()
-        }
-
-        JSON.registerObjectMarshaller(StockMovementItem) { StockMovementItem stockMovementItem ->
-            return stockMovementItem.toJson()
-        }
 
         JSON.registerObjectMarshaller(User) { User user -> [
                 id: user.id,
@@ -297,6 +302,32 @@ class BootStrap {
                 email: user.email,
                 username: user.username
         ]}
+
+        // Command objects
+
+        JSON.registerObjectMarshaller(AvailableItem) { AvailableItem availableItem ->
+            return availableItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PickPage) { PickPage pickPage ->
+            return pickPage.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PickPageItem) { PickPageItem pickPageItem ->
+            return pickPageItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(StockMovement) { StockMovement stockMovement ->
+            return stockMovement.toJson()
+        }
+
+        JSON.registerObjectMarshaller(StockMovementItem) { StockMovementItem stockMovementItem ->
+            return stockMovementItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(SuggestedItem) { SuggestedItem suggestedItem ->
+            return suggestedItem.toJson()
+        }
 
 
 

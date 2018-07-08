@@ -12,18 +12,39 @@ package org.pih.warehouse.inventory
 import grails.validation.ValidationException
 import org.apache.commons.lang.NotImplementedException
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.PickPage
+import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
+import org.pih.warehouse.donation.Donor
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.pih.warehouse.shipping.ShipmentType
 
 class StockMovementService {
 
+    def productService
     def identifierService
+    def requisitionService
+    def shipmentService
+    def inventoryService
 
     boolean transactional = true
 
@@ -75,12 +96,15 @@ class StockMovementService {
         return StockMovement.createFromRequisition(requisition)
     }
 
+    def updateStatus(String id, RequisitionStatus status) {
+        Requisition requisition = Requisition.get(id)
+        requisition.status = status
+        requisition.save(flush:true)
+    }
+
+
     def updateStockMovement(StockMovement stockMovement) {
         log.info "Update stock movement " + stockMovement + " stockMovement.lineItems = " + stockMovement?.lineItems
-
-        if (!stockMovement.validate()) {
-            throw new ValidationException("Invalid stock movement", stockMovement.errors)
-        }
 
         Requisition requisition = Requisition.get(stockMovement.id)
         if (!requisition) {
@@ -94,6 +118,12 @@ class StockMovementService {
         if (stockMovement.description) requisition.description = stockMovement.description
         if (stockMovement.requestedBy) requisition.requestedBy = stockMovement.requestedBy
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
+
+        if (stockMovement.dateShipped && stockMovement.shipmentType) {
+            log.info "Creating shipment for stock movement ${stockMovement}"
+            createOrUpdateShipment(stockMovement)
+        }
+
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
@@ -173,7 +203,6 @@ class StockMovementService {
             }
         }
 
-
         if (requisition.hasErrors() || !requisition.save(flush:true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
@@ -183,7 +212,7 @@ class StockMovementService {
         return StockMovement.createFromRequisition(requisition)
     }
 
-    def deleteStockMovement(String id) {
+    void deleteStockMovement(String id) {
         StockMovement stockMovement = getStockMovement(id)
         if (stockMovement?.requisition) {
             stockMovement.requisition.delete()
@@ -193,7 +222,7 @@ class StockMovementService {
         }
     }
 
-    def getStockMovements(Integer maxResults, Integer offset) {
+    List<StockMovementItem> getStockMovements(Integer maxResults, Integer offset) {
         def requisitions = Requisition.listOrderByDateCreated([max: maxResults, offset: offset, sort: "desc"])
         def stockMovements = requisitions.collect { requisition ->
             return StockMovement.createFromRequisition(requisition)
@@ -201,11 +230,348 @@ class StockMovementService {
         return stockMovements
     }
 
-    def getStockMovement(String id) {
-        Requisition requisition = Requisition.read(id)
+    StockMovement getStockMovement(String id) {
+        return getStockMovement(id, null)
+    }
+
+    StockMovement getStockMovement(String id, String stepNumber) {
+        Requisition requisition = Requisition.get(id)
         if (!requisition) {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
         }
-        return StockMovement.createFromRequisition(requisition)
+
+        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+
+        if (stepNumber.equals("3")) {
+            // Hack way to include suggested and available items needed for step 3
+            stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
+                List availableItems =
+                        inventoryService.getAvailableItems(stockMovement.origin, stockMovementItem.product)
+                //stockMovementItem.availableItems = availableItems
+            }
+        }
+        else if (stepNumber.equals("4")) {
+            stockMovement.pickPage = getPickPage(id)
+        }
+
+        return stockMovement
+    }
+
+    StockMovementItem getStockMovementItem(String id) {
+        RequisitionItem requisitionItem = RequisitionItem.get(id)
+        return StockMovementItem.createFromRequisitionItem(requisitionItem)
+    }
+
+
+    void clearPicklist(String id) {
+        StockMovement stockMovement = getStockMovement(id)
+        clearPicklist(stockMovement)
+    }
+
+    void clearPicklist(StockMovement stockMovement) {
+        for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
+            clearPicklist(stockMovementItem)
+        }
+    }
+
+    void clearPicklist(StockMovementItem stockMovementItem) {
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        Picklist picklist = requisitionItem?.requisition?.picklist
+        log.info "Clear picklist"
+        if (picklist) {
+            picklist.picklistItems.findAll { it.requisitionItem == requisitionItem }.toArray().each {
+                picklist.removeFromPicklistItems(it)
+            }
+            picklist.save()
+        }
+    }
+
+    /**
+     * Create an automated picklist for the stock movenent associated with the given id.
+     *
+     * @param id
+     */
+    void createPicklist(String id) {
+        StockMovement stockMovement = getStockMovement(id)
+        createPicklist(stockMovement)
+    }
+
+    /**
+     * Create an automated picklist for the given stock movement.
+     *
+     * @param stockMovement
+     */
+    void createPicklist(StockMovement stockMovement) {
+        log.info "Create picklist"
+        for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
+            createPicklist(stockMovementItem)
+        }
+    }
+
+
+    /**
+     * Create an automated picklist for the given stock movement item.
+     *
+     * @param id
+     */
+    void createPicklist(StockMovementItem stockMovementItem) {
+
+        log.info "Create picklist for stock movement item ${stockMovementItem}"
+
+        // This is kind of a hack, but it's the only way I could figure out how to get the origin field
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        Product product = requisitionItem.product
+        Location location = requisitionItem?.requisition?.origin
+        Integer quantityRequested = requisitionItem.quantity
+
+        // Retrieve all available items and then calculate suggested
+        List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, product)
+        log.info "Available items: ${availableItems}"
+        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequested)
+        log.info "Suggested items " + suggestedItems
+        if (suggestedItems) {
+            clearPicklist(stockMovementItem)
+            for (SuggestedItem suggestedItem : suggestedItems) {
+                createOrUpdatePicklistItem(stockMovementItem,
+                        suggestedItem.inventoryItem,
+                        suggestedItem.binLocation,
+                        suggestedItem.quantityPicked.intValueExact(),
+                        null,
+                        null)
+            }
+        }
+    }
+
+
+    void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, InventoryItem inventoryItem, Location binLocation,
+                         Integer quantity, String reasonCode, String comment) {
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+
+        // Validate quantity
+        // Cannot validate because this code cause the following exception:
+        // PropertyValueException: not-null property references a null or transient value: org.pih.warehouse.picklist.PicklistItem.picklist
+//        Location location = binLocation.parentLocation
+//        List binLocations = inventoryService.getQuantityByBinLocation(location, binLocation)
+//        binLocations = binLocations.findAll { it.inventoryItem == inventoryItem}
+//        Integer quantityAvailable = binLocations.sum { it.quantity }
+//
+//        log.info ("Validation quantity available ${quantityAvailable} vs quantity requested ${quantity}")
+//        if (quantityAvailable < quantity) {
+//            throw new IllegalArgumentException("Bin location ${binLocation} does not have enough quantity " +
+//                    "available ${quantityAvailable} to fulfill requested quantity ${quantity}.")
+//        }
+
+        def picklist = requisitionItem.requisition.picklist
+        if (!picklist) {
+            picklist = new Picklist()
+            picklist.requisition = requisitionItem.requisition
+        }
+
+        // Locate picklist item by inventory item and bin location (unique)
+        PicklistItem picklistItem = picklist.picklistItems.find {
+            it.inventoryItem == inventoryItem && it.binLocation == binLocation
+        }
+
+        // If one does not exist create it and add it to the list
+        if (!picklistItem) {
+            picklistItem = new PicklistItem()
+            picklist.addToPicklistItems(picklistItem)
+        }
+
+        // Remove from picklist
+        if (quantity <= 0) {
+            picklist.removeFromPicklistItems(picklistItem)
+        }
+        // Update picklist item
+        else {
+            picklistItem.requisitionItem = requisitionItem
+            picklistItem.inventoryItem = inventoryItem
+            picklistItem.binLocation = binLocation
+            picklistItem.quantity = quantity
+            picklistItem.reasonCode = reasonCode
+            picklistItem.comment = comment
+        }
+        picklist.save(flush:true)
+    }
+
+    /**
+     * Get a list of suggested items for the given stock movement item.
+     *
+     * @param stockMovementItem
+     * @return
+     */
+    List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested) {
+
+        List suggestedItems = []
+
+        // As long as quantity requested is less than the total available we can iterate through available items
+        // and pick until quantity requested is 0. Otherwise, we don't suggest anything because the user must
+        // choose anyway. This might be improved in the future.
+        Integer quantityAvailable = availableItems ? availableItems?.sum { it.quantityAvailable } : 0
+        if (quantityRequested <= quantityAvailable) {
+
+            for (AvailableItem availableItem : availableItems) {
+                if (quantityRequested == 0)
+                    break
+
+                // The quantity to pick is either the quantity available (if less than requested) or
+                // the quantity requested (if less than available).
+                int quantityPicked = (quantityRequested >= availableItem.quantityAvailable) ?
+                        availableItem.quantityAvailable : quantityRequested
+
+                log.info "Quantity picked ${quantityPicked}"
+                suggestedItems << new SuggestedItem(inventoryItem: availableItem?.inventoryItem,
+                        binLocation: availableItem?.binLocation,
+                        quantityAvailable: availableItem?.quantityAvailable,
+                        quantityRequested: quantityRequested,
+                        quantityPicked: quantityPicked)
+                quantityRequested -= quantityPicked
+            }
+        }
+        return suggestedItems
+    }
+
+    /**
+     * Get a list of substitution items for the given stock movement item.
+     *
+     * @param stockMovementItem
+     * @return
+     */
+    List getSubstitutionItems(StockMovementItem stockMovementItem) {
+
+        // Gather all substitutions
+        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
+
+        List substitutionItems = requisitionItem?.substitutionItems?.collect { substitutionItem ->
+            StockMovementItem.createFromRequisitionItem(substitutionItem)
+        }
+        return substitutionItems
+    }
+
+
+    PickPage getPickPage(String id) {
+        PickPage pickPage = new PickPage()
+
+        StockMovement stockMovement = getStockMovement(id)
+        stockMovement.lineItems.each { stockMovementItem ->
+            List pickPageItems = getPickPageItems(stockMovementItem)
+            pickPage.pickPageItems.addAll(pickPageItems)
+        }
+        return pickPage
+    }
+
+    /**
+     * Get a list of pick page items for the given stock movement item.
+     *
+     * @param stockMovementItem
+     * @return
+     */
+    List getPickPageItems(StockMovementItem stockMovementItem) {
+        List pickPageItems = []
+        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
+        if (requisitionItem.isSubstituted()) {
+            pickPageItems << requisitionItem.substitutionItems.collect {
+                return buildPickPageItem(it)
+            }
+        }
+        else {
+            pickPageItems << buildPickPageItem(requisitionItem)
+        }
+    }
+
+    /**
+     *
+     * @param requisitionItem
+     * @return
+     */
+    PickPageItem buildPickPageItem(RequisitionItem requisitionItem) {
+
+        PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem, picklistItems: requisitionItem.picklistItems)
+        Location location = requisitionItem?.requisition?.origin
+        List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
+        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, requisitionItem.quantity)
+        pickPageItem.availableItems = availableItems
+        pickPageItem.suggestedItems = suggestedItems
+
+        return pickPageItem
+
+    }
+
+    Shipment createOrUpdateShipment(StockMovement stockMovement) {
+        Shipment shipment = Shipment.findByRequisition(stockMovement.requisition)
+        if (!shipment) shipment = new Shipment()
+        shipment.name = stockMovement.generateName()
+        shipment.origin = stockMovement.origin
+        shipment.destination = stockMovement.destination
+        shipment.requisition = stockMovement.requisition
+        shipment.expectedShippingDate = stockMovement.dateShipped
+        shipment.shipmentType = stockMovement.shipmentType
+
+        // FIXME Associated tracking number and driver name with reference number and carrier (respectively)
+        String additionalInformation = ""
+        if (stockMovement.comments) additionalInformation += "Comments: ${stockMovement.comments}\n"
+        if (stockMovement.trackingNumber) additionalInformation += "Tracking Number: ${stockMovement.trackingNumber}\n"
+        if (stockMovement.driverName) additionalInformation += "Driver Name: ${stockMovement.driverName}\n"
+        shipment.additionalInformation = additionalInformation
+
+        stockMovement.requisition.picklist.picklistItems.collect { PicklistItem picklistItem ->
+            ShipmentItem shipmentItem = createOrUpdateShipmentItem(picklistItem)
+            shipment.addToShipmentItems(shipmentItem)
+        }
+        return shipment.save()
+    }
+
+    ShipmentItem createOrUpdateShipmentItem(PicklistItem picklistItem) {
+        ShipmentItem shipmentItem = ShipmentItem.findByRequisitionItem(picklistItem?.requisitionItem)
+        if (!shipmentItem) shipmentItem = new ShipmentItem()
+        shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
+        shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
+        shipmentItem.product = picklistItem?.inventoryItem?.product
+        shipmentItem.quantity = picklistItem?.quantity
+        shipmentItem.requisitionItem = picklistItem.requisitionItem
+        shipmentItem.recipient = picklistItem?.requisitionItem?.recipient
+        shipmentItem.inventoryItem = picklistItem?.inventoryItem
+        //shipmentItem.container = picklistItem?.requisitionItem?.palletName
+        shipmentItem.binLocation = picklistItem?.binLocation
+        return shipmentItem
+    }
+
+
+    void sendStockMovement(String id) {
+
+        User user = AuthService.currentUser.get()
+        StockMovement stockMovement = getStockMovement(id)
+        Requisition requisition = stockMovement.requisition
+        def shipments = requisition.shipments
+
+        if(!shipments) {
+            throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
+        }
+
+        if (shipments.size() > 1) {
+            throw new IllegalStateException("There are too many shipments associated with stock movement ${requisition.requestNumber}")
+        }
+
+        shipmentService.sendShipment(shipments[0], null, user, requisition.origin, new Date())
+    }
+
+    void rollbackStockMovement(String id) {
+        StockMovement stockMovement = getStockMovement(id)
+        Requisition requisition = stockMovement?.requisition
+        if (requisition) requisitionService.rollbackRequisition(requisition)
+
+        // If the shipment has been shipped we can roll it back
+        Shipment shipment = stockMovement?.requisition?.shipments[0]
+        if (shipment) {
+            if (shipment.currentStatus == ShipmentStatusCode.SHIPPED) {
+                shipmentService.rollbackLastEvent(shipment)
+            }
+            // If shipment status is any other status except pending then we should throw an error since rolling it
+            // back would cause issues
+            else if (shipment.currentStatus != ShipmentStatusCode.PENDING) {
+                throw new IllegalStateException("Cannot rollback status for shipment ${shipment.shipmentNumber} from ${shipment.currentStatus}")
+            }
+
+        }
     }
 }

@@ -30,10 +30,15 @@ class StockMovement {
     String name
     String description
     String identifier
+    String statusCode
+
     Location origin
     Location destination
     Person requestedBy
     Date dateRequested
+
+    // Status
+    String stepNumber
 
     // Shipment information
     Date dateShipped
@@ -44,6 +49,7 @@ class StockMovement {
 
     StockMovementType stockMovementType
 
+    PickPage pickPage
 
     List<StockMovementItem> lineItems =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class));
@@ -57,6 +63,7 @@ class StockMovement {
         id(nullable:true)
         name(nullable:true)
         description(nullable:true)
+        statusCode(nullable:true)
         origin(nullable:false)
         destination(nullable:false)
         stocklist(nullable:true)
@@ -86,12 +93,19 @@ class StockMovement {
                 id: id,
                 name: name,
                 description: description,
+                statusCode: statusCode,
                 identifier: requisition?.requestNumber,
                 origin: [id: origin?.id, name: origin?.name],
                 destination: [id: destination?.id, name: destination?.name],
                 dateRequested: dateRequested?.format("MM/dd/yyyy"),
                 requestedBy: requestedBy,
-                lineItems: lineItems.collect { it.toJson() }
+                lineItems: lineItems,
+                pickPage: pickPage,
+                associations: [
+                    requisition: [id: requisition.id, requestNumber: requisition.requestNumber],
+                    shipments: requisition?.shipments?.collect { [id: it.id, shipmentNumber: it.shipmentNumber] },
+                    documents: []
+                ],
         ]
     }
 
@@ -100,11 +114,12 @@ class StockMovement {
      *
      * @return
      */
-    String generateShipmentName() {
-        String name = "${origin?.name}.${destination?.name}.${dateRequested.format("dd/MMM/yyyy")}"
+    String generateName() {
+        String name = "${origin?.name}.${destination?.name}.${dateRequested.format("dd-MMM-yyyy")}"
         if (stocklist?.name) name += ".${stocklist.name}"
         if (trackingNumber) name += ".${trackingNumber}"
         if (description) name += ".${description}"
+        name = name.toUpperCase().replace(" ", "")
         return name
     }
 
@@ -115,6 +130,7 @@ class StockMovement {
                 name: requisition.name,
                 identifier: requisition.requestNumber,
                 description: requisition.description,
+                statusCode: requisition?.status?.name(),
                 origin: requisition.origin,
                 destination: requisition.destination,
                 dateRequested: requisition.dateRequested,
@@ -139,6 +155,7 @@ class StockMovement {
                 id: shipment.id,
                 name: shipment.name,
                 description: shipment.name,
+                statusCode: shipment.status?.name(),
                 origin: shipment.origin,
                 destination: shipment.destination,
                 dateRequested: shipment?.dateCreated,
@@ -152,4 +169,19 @@ class StockMovement {
         }
         return stockMovement
     }
+}
+
+class PickPage {
+    List<PickPageItem> pickPageItems = []
+
+    static constraints = {
+        pickPageItems(nullable:true)
+    }
+
+    Map toJson() {
+        return [
+                pickPageItems: pickPageItems
+        ]
+    }
+
 }

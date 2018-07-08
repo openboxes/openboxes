@@ -1,3 +1,5 @@
+[TOC]
+
 ## Stock Movements
 
 ### List 
@@ -266,15 +268,6 @@ curl -X POST -b cookies.txt -H "Content-Type: application/json" \
 ### Update
 
 #### Read Stock Movement
-##### Request
-```
-curl -b cookies.txt -X GET -H "Content-Type: application/json" \
--d @addStockMovementItem.json \
-"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181642fc9c101642fcccc420004" \
-| jsonlint
-```
-
-##### Response
 ```
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001"|jsonlint
@@ -308,666 +301,24 @@ $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 
 #### Update Stock Movement
 
-#### Add Stock Movement Item
-
-##### Request
 ```
-$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d @addStockMovementItem.json \
-https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
-```
-##### Post Body (addStockMovementItem.json)
-```
-{
-	"id": "ff808181644d5e5b01644e5007500001",
-	"name": "my new stock movement",
-	"description": "",
-	"identifier": "483ZSA",
-	"origin.id": "2",
-	"destination.id": "1",
-	"dateRequested": "06/23/2018",
-	"requestedBy.id": "1",
-	"lineItems": [{
-		"product.id": "ff8081816407132d0164071eec250001",
-		"quantityRequested": "100",
-		"sortOrder": 0,
-		"recipient.id": "1"
-	}]
-}
-```
-##### Response
-```
+curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"name":"new stock movement", "description":"new stock movement", "origin.id":"1", "destination.id":"2","requestedBy.id":"1","dateRequested":"06/23/2018"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181642fc9c101642fcccc420004" \
+| jsonlint
 {
   "data": {
     "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "",
+    "name": "new stock movement",
+    "description": "new stock movement",
     "identifier": "483ZSA",
     "origin": {
-      "id": "2",
-      "name": "Miami Warehouse"
-    },
-    "destination": {
       "id": "1",
       "name": "Boston Headquarters"
     },
-    "dateRequested": "06/23/2018",
-    "requestedBy": {
-      "id": "1",
-      "name": "Mr Administrator",
-      "firstName": "Mr",
-      "lastName": "Administrator",
-      "email": "admin@pih.org",
-      "username": "admin"
-    },
-    "lineItems": [
-      {
-        "id": "ff808181644e51a401644e85891b0006",
-        "productCode": "BK71",
-        "product": {
-          "id": "ff8081816407132d0164071eec250001",
-          "productCode": "BK71",
-          "name": "product 1+",
-          "description": "This is the penultimate product",
-          "category": {
-            "id": "ROOT",
-            "name": "ROOT"
-          }
-        },
-        "palletName": null,
-        "boxName": null,
-        "statusCode": "PENDING",
-        "quantityRequested": 100,
-        "quantityAllowed": null,
-        "quantityAvailable": null,
-        "quantityCanceled": null,
-        "quantityRevised": null,
-        "reasonCode": null,
-        "comments": null,
-        "recipient": null,
-        "sortOrder": null
-      }
-    ]
-  }
-}
-```
-
-
-#### Update Stock Movement Item
-This is used to change the quantity or product associated with an item, as well as 
-other changes like sort order. This is a direct change to the requisition item. 
-
-If you're looking to record a new quantity and want to keep the originally requested 
-information, then you'll likely want to use the Revise Stock Movement Item example below
-This will allow you to keep the originally requested quantity and product information, 
-record the new quantity, as well as a reason for the revision 
-(see next section for more information)
-
-```
-$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d @updateStockMovementItem.json \
-https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
-```
-
-##### Request Body (updateStockMovementItem.json)
-```
-{
-	"id": "ff808181644d5e5b01644e5007500001",
-	"name": "my new stock movement",
-	"description": "",
-	"identifier": "483ZSA",
-	"origin.id": "2",
-	"destination.id": "1",
-	"dateRequested": "06/23/2018",
-	"requestedBy.id": "1",
-	"lineItems": [{
-		"id": "ff808181644e51a401644e85891b0006",
-		"product.id": "ff80818155df9de40155df9e31000001",
-		"quantityRequested": "500",
-		"sortOrder": 0
-	}]
-}
-```
-##### Response 
-```
-{
-  "data": {
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "my new stock movement",
-    "identifier": "483ZSA",
-    "origin": {
+    "destination": {
       "id": "2",
       "name": "Miami Warehouse"
-    },
-    "destination": {
-      "id": "1",
-      "name": "Boston Headquarters"
-    },
-    "dateRequested": "06/23/2018",
-    "requestedBy": {
-      "id": "1",
-      "name": "Mr Administrator",
-      "firstName": "Mr",
-      "lastName": "Administrator",
-      "email": "admin@pih.org",
-      "username": "admin"
-    },
-    "lineItems": [
-      {
-        "id": "ff808181644e51a401644e85891b0006",
-        "productCode": "00001",
-        "product": {
-          "id": "ff80818155df9de40155df9e31000001",
-          "productCode": "00001",
-          "name": "Ibuprofen 200mg",
-          "description": null,
-          "category": {
-            "id": "1",
-            "name": "Medicines"
-          }
-        },
-        "palletName": null,
-        "boxName": null,
-        "statusCode": "PENDING",
-        "quantityRequested": 500,
-        "quantityAllowed": null,
-        "quantityAvailable": null,
-        "quantityCanceled": 0,
-        "quantityRevised": null,
-        "reasonCode": null,
-        "comments": null,
-        "recipient": null,
-        "sortOrder": null
-      }
-    ]
-  }
-}
-```
-
-#### Revise Stock Movement Item
-This is used to record a revision to the quantity requested. This requires the user to 
-choose a reason code (i.e. STOCKOUT) and optionally add comments that may help provide
-more context for the revision.
-
-##### Request
-```
-$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d @reviseStockMovementItem.json \
-https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
-```
-##### Post Body (reviseStockMovementItem.json)
-```
-{
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "",
-    "identifier": "483ZSA",
-    "origin.id": "2",
-    "destination.id": "1",
-    "dateRequested": "06/23/2018",
-    "requestedBy.id": "1",
-    "lineItems": [
-      {
-        "id":"ff808181644e51a401644e85891b0006",
-        "quantityRevised":200,
-        "reasonCode":"BECAUSE",
-        "comments":"because i said so",
-        
-      }
-    ]
-  }
-```
-##### Response
-```
-{
-  "data": {
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "my new stock movement",
-    "identifier": "483ZSA",
-    "origin": {
-      "id": "2",
-      "name": "Miami Warehouse"
-    },
-    "destination": {
-      "id": "1",
-      "name": "Boston Headquarters"
-    },
-    "dateRequested": "06/23/2018",
-    "requestedBy": {
-      "id": "1",
-      "name": "Mr Administrator",
-      "firstName": "Mr",
-      "lastName": "Administrator",
-      "email": "admin@pih.org",
-      "username": "admin"
-    },
-    "lineItems": [
-      {
-        "id": "ff808181644e51a401644e85891b0006",
-        "productCode": "BK71",
-        "product": {
-          "id": "ff8081816407132d0164071eec250001",
-          "productCode": "BK71",
-          "name": "product 1+",
-          "description": "This is the penultimate product",
-          "category": {
-            "id": "ROOT",
-            "name": "ROOT"
-          }
-        },
-        "palletName": null,
-        "boxName": null,
-        "statusCode": "CHANGED",
-        "quantityRequested": 100,
-        "quantityAllowed": null,
-        "quantityAvailable": null,
-        "quantityCanceled": 100,
-        "quantityRevised": 200,
-        "reasonCode": "BECAUSE",
-        "comments": "because i said so",
-        "recipient": null,
-        "sortOrder": null
-      }
-    ]
-  }
-}
-```
-#### Substitute Stock Movement Item
-This is used to record a substitution for an stock movement item. This requires the user to 
-enter a new product and quantity, as well as choose a reason code (i.e. STOCKOUT) and optionally add a comment that may 
-help provide more context for the substitution.
-
-##### Request
-```
-$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d @substituteStockMovementItem.json \
-https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
-```
-##### Post Body (substituteStockMovementItem.json)
-```
-{
-	"id": "ff808181644d5e5b01644e5007500001",
-	"name": "my new stock movement",
-	"description": "",
-	"identifier": "483ZSA",
-	"origin.id": "2",
-	"destination.id": "1",
-	"dateRequested": "06/23/2018",
-	"requestedBy.id": "1",
-	"lineItems": [{
-		"id": "ff808181644e51a401644e85891b0006",
-		"substitute": "true",
-		"newProduct.id":"ff80818155df9de40155df9e3312000d",
-		"newQuantity":100,
-		"reasonCode":"CLINICAL",
-		"comments":"A clinical decision that is none of your business",
-	}]
-}  
-```
-NOTE: You can add multiple substitutions by adding another line item with the same ID along with 
-the `substitute` instruction.
-
-##### Response
-```
-{
-  "data": {
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "my new stock movement",
-    "identifier": "483ZSA",
-    "origin": {
-      "id": "2",
-      "name": "Miami Warehouse"
-    },
-    "destination": {
-      "id": "1",
-      "name": "Boston Headquarters"
-    },
-    "dateRequested": "06/23/2018",
-    "requestedBy": {
-      "id": "1",
-      "name": "Mr Administrator",
-      "firstName": "Mr",
-      "lastName": "Administrator",
-      "email": "admin@pih.org",
-      "username": "admin"
-    },
-    "lineItems": [
-      {
-        "id": "ff808181644e51a401644e85891b0006",
-        "productCode": "BK71",
-        "product": {
-          "id": "ff8081816407132d0164071eec250001",
-          "productCode": "BK71",
-          "name": "product 1+",
-          "description": "This is the penultimate product",
-          "category": {
-            "id": "ROOT",
-            "name": "ROOT"
-          }
-        },
-        "palletName": null,
-        "boxName": null,
-        "statusCode": "SUBSTITUTED",
-        "quantityRequested": 100,
-        "quantityAllowed": null,
-        "quantityAvailable": null,
-        "quantityCanceled": 100,
-        "quantityRevised": null,
-        "substitutions": [
-          {
-            "id": "ff8081816458c881016458d22b5f0002",
-            "productCode": "00005",
-            "product": {
-              "id": "ff80818155df9de40155df9e33930011",
-              "productCode": "00005",
-              "name": "Similac Advance low iron 400g",
-              "description": null,
-              "category": {
-                "id": "1",
-                "name": "Medicines"
-              }
-            },
-            "palletName": null,
-            "boxName": null,
-            "statusCode": "APPROVED",
-            "quantityRequested": 100,
-            "quantityAllowed": null,
-            "quantityAvailable": null,
-            "quantityCanceled": null,
-            "quantityRevised": null,
-            "substitutions": [],
-            "reasonCode": null,
-            "comments": null,
-            "recipient": null,
-            "sortOrder": null
-          }
-        ],
-        "reasonCode": "CLINICAL",
-        "comments": "A clinical decision that is none of your business",
-        "recipient": null,
-        "sortOrder": null
-      }
-    ]
-  }
-}
-
-```
-**IMPORTANT**: If you want to make changes to an existing substitution item, the request body should include 
-an instruction to revert the changes along with the modified substitution items. You can also modify 
-ANY stock movement item by editing it's corresponding requisition item through the Requisition Item API endpoint
-(currently `/api/generic/requisitionItem/:id`). Substitutions and modifications are just children requisition items
-under the original requisition item.
-```
-{
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "",
-    "identifier": "483ZSA",
-    "origin.id": "2",
-    "destination.id": "1",
-    "dateRequested": "06/23/2018",
-    "requestedBy.id": "1",
-    "lineItems": [{
-        "id": "ff8081816458c881016458ca819e0001",
-        "revert": "true"
-    },	
-    {
-        "id": "ff8081816458c881016458ca819e0001",
-        "substitute": "true",
-        "newProduct.id":"ff80818155df9de40155df9e33930011",
-        "newQuantity":1000,
-        "reasonCode":"CLINICAL",
-        "comments":"A clinical decision that is none of your business", 
-    },
-    {
-        "id": "ff8081816458c881016458ca819e0001",
-        "substitute": "true",
-        "newProduct.id":"ff80818155df9de40155df9e3312000d",
-        "newQuantity":500,
-        "reasonCode":"CLINICAL",
-        "comments":"A clinical decision that is none of your business",	
-    }]
-}
-```
-##### Exceptions
-Cannot substitute a product that is not in the original product's list of available substitutions. 
-See the Substitutions API.
-```
-{
-  "errorCode": 500,
-  "errorMessage": "Product 00004 General Pain Reliever is not a valid substitution of BK71 product 1+"
-}
-```
-You also cannot substitute the product for itself.
-```
-{
-  "errorCode": 500,
-  "errorMessage": "Product BK71 product 1+ is not a valid substitution of BK71 product 1+"
-}
-
-```
-
-#### Cancel Stock Movement Item
-Similar to a revision, this operation allows you to cancel the stock movement item.
-
-##### Request
-```
-$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d @cancelStockMovementItem.json \
-https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
-```
-##### Post Body (cancelStockMovementItem.json)
-```
-{
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "",
-    "identifier": "483ZSA",
-    "origin.id": "2",
-    "destination.id": "1",
-    "dateRequested": "06/23/2018",
-    "requestedBy.id": "1",
-    "lineItems": [
-      {
-        "id":"ff808181644e51a401644e85891b0006",
-        "cancel":"true",
-        "reasonCode":"BECAUSE",
-        "comments":"more information since BECAUSE is not a good reason"
-      }
-    ]
-}
-```
-
-##### Response
-```
-{
-  "data": {
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "my new stock movement",
-    "identifier": "483ZSA",
-    "origin": {
-      "id": "2",
-      "name": "Miami Warehouse"
-    },
-    "destination": {
-      "id": "1",
-      "name": "Boston Headquarters"
-    },
-    "dateRequested": "06/23/2018",
-    "requestedBy": {
-      "id": "1",
-      "name": "Mr Administrator",
-      "firstName": "Mr",
-      "lastName": "Administrator",
-      "email": "admin@pih.org",
-      "username": "admin"
-    },
-    "lineItems": [
-      {
-        "id": "ff808181644e51a401644e85891b0006",
-        "productCode": "BK71",
-        "product": {
-          "id": "ff8081816407132d0164071eec250001",
-          "productCode": "BK71",
-          "name": "product 1+",
-          "description": "This is the penultimate product",
-          "category": {
-            "id": "ROOT",
-            "name": "ROOT"
-          }
-        },
-        "palletName": null,
-        "boxName": null,
-        "statusCode": "CANCELED",
-        "quantityRequested": 100,
-        "quantityAllowed": null,
-        "quantityAvailable": null,
-        "quantityCanceled": 100,
-        "quantityRevised": null,
-        "reasonCode": "BECAUSE",
-        "comments": "more information since BECAUSE is not a good reason",
-        "recipient": null,
-        "sortOrder": null
-      }
-    ]
-  }
-}
-```
-
-#### Revert Stock Movement Item
-This allows you to revert any changes made to the stock movement item (including revisions, cancellations, 
-and substitutions). However it does not allow you to revert deletes and updates.
-
-##### Request
-```
-$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d @revertStockMovementItem.json \
-https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
-```
-##### Post Body (revertStockMovementItem.json)
-```
-{
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "",
-    "identifier": "483ZSA",
-    "origin.id": "2",
-    "destination.id": "1",
-    "dateRequested": "06/23/2018",
-    "requestedBy.id": "1",
-    "lineItems": [
-      {
-        "id":"ff808181644e51a401644e85891b0006",
-        "revert":"true"        
-      }
-    ]
-}
-```
-##### Response
-```
-{
-  "data": {
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "my new stock movement",
-    "identifier": "483ZSA",
-    "origin": {
-      "id": "2",
-      "name": "Miami Warehouse"
-    },
-    "destination": {
-      "id": "1",
-      "name": "Boston Headquarters"
-    },
-    "dateRequested": "06/23/2018",
-    "requestedBy": {
-      "id": "1",
-      "name": "Mr Administrator",
-      "firstName": "Mr",
-      "lastName": "Administrator",
-      "email": "admin@pih.org",
-      "username": "admin"
-    },
-    "lineItems": [
-      {
-        "id": "ff808181644e51a401644e85891b0006",
-        "productCode": "BK71",
-        "product": {
-          "id": "ff8081816407132d0164071eec250001",
-          "productCode": "BK71",
-          "name": "product 1+",
-          "description": "This is the penultimate product",
-          "category": {
-            "id": "ROOT",
-            "name": "ROOT"
-          }
-        },
-        "palletName": null,
-        "boxName": null,
-        "statusCode": "PENDING",
-        "quantityRequested": 100,
-        "quantityAllowed": null,
-        "quantityAvailable": null,
-        "quantityCanceled": 0,
-        "quantityRevised": null,
-        "reasonCode": null,
-        "comments": null,
-        "recipient": null,
-        "sortOrder": null
-      }
-    ]
-  }
-}
-```
-
-#### Delete Stock Movement Item
-This operation allows you to delete the stock movement item completely. 
-
-##### Request
-```
-$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d @deleteStockMovementItem.json \
-https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e5007500001|jsonlint
-```
-##### Post Body (deleteStockMovementItem.json)
-```
-{
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "",
-    "identifier": "483ZSA",
-    "origin.id": "2",
-    "destination.id": "1",
-    "dateRequested": "06/23/2018",
-    "requestedBy.id": "1",
-    "lineItems": [
-      {
-        "id":"ff808181644e51a401644e85891b0006",
-        "delete":"true",
-      }
-    ]
-}
-```
-
-##### Response
-```
-{
-  "data": {
-    "id": "ff808181644d5e5b01644e5007500001",
-    "name": "my new stock movement",
-    "description": "my new stock movement",
-    "identifier": "483ZSA",
-    "origin": {
-      "id": "2",
-      "name": "Miami Warehouse"
-    },
-    "destination": {
-      "id": "1",
-      "name": "Boston Headquarters"
     },
     "dateRequested": "06/23/2018",
     "requestedBy": {
@@ -983,15 +334,213 @@ https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181644d5e5b01644e50
 }
 ```
 
-##### Exceptions
-This operation 
-cannot be performed on a stock movement item that has been revised (due to a bug with 
-foreign key constraints). 
+#### Update Status
+For stock movements, the Status API provides a way to transition the stock movement between states. 
+The API is currently only configured to change the stock movement status and return the JSON required for the 
+page associated with the next status. For example, moving from `REVIEWING` to `PICKING` would return the
+customized JSON response required for the Picking stage of the stock movement workflow.
+
+In future versions we'll add the ability to validate the stock movement between transitions as well as 
+custom business logic related to the transition. For example in the transition to the `ISSUED` state, 
+we'll want that to trigger a shipment to be sent if the stock movement has been fully picked.
+
+The data returned by Status API is the same data returned by a GET request on the Stock Movement API.
+Therefore, you can use the `stepNumber` parameter if you want to transform the response data for a 
+specific step. At, the moment only `?stepNumber=4` transforms the data, but that might change in
+a later version.
+
+##### Created
+The first state in the stock movement lifecycle is the `CREATED` state. You can also transition to `PENDING`
+`OPEN` if that's more clear to your users. 
 ```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"status":"CREATED"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
+{
+  "data": {
+    "id": "ff808181646b260401646b5bf4ca002a",
+    "name": "Stock - Store 1 - Mixed - Jul 05 2018",
+    "description": null,
+    "statusCode": "CREATED",
+    "identifier": "916SUB",
+    "origin": {
+      "id": "ff808181646b260401646b3f2ced0002",
+      "name": "Store 1"
+    },
+    "destination": {
+      "id": "ff8081816430012d0164301b8eda0008",
+      "name": "Depot 1"
+    },
+    "dateRequested": "07/05/2018",
+    "requestedBy": {
+      "id": "3",
+      "name": "Justin Miranda",
+      "firstName": "Justin",
+      "lastName": "Miranda",
+      "email": "jmiranda@pih.org",
+      "username": "jmiranda"
+    },
+    "lineItems": [
+      {
+        "id": "ff808181646b260401646b5bf4cb002b",
+        "productCode": "AB12",
+        "product": {
+          "id": "ff80818155df9de40155df9e31000001",
+          "productCode": "AB12",
+          "name": "Ibuprofen 200mg",
+          "description": null,
+          "category.id": "1",
+          "category.name": "Medicines"
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "APPROVED",
+        "quantityRequested": 25,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": null,
+        "quantityRevised": null,
+        "quantityPicked": 0,
+        "reasonCode": null,
+        "comments": null,
+        "recipient": null,
+        "substitutionItems": [],
+        "sortOrder": 0
+      },
+      {
+        "id": "ff808181646b260401646b5bf4cb002c",
+        "productCode": "00002",
+        "product": {
+          "id": "ff80818155df9de40155df9e321c0005",
+          "productCode": "00002",
+          "name": "Tylenol 325mg",
+          "description": null,
+          "category.id": "1",
+          "category.name": "Medicines"
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "CANCELED",
+        "quantityRequested": 50,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": 50,
+        "quantityRevised": null,
+        "quantityPicked": 0,
+        "reasonCode": "STOCKOUT",
+        "comments": "temporary stock out",
+        "recipient": null,
+        "substitutionItems": [],
+        "sortOrder": 1
+      },
+      {
+        "id": "ff8081816472adba016472cc9b460001",
+        "productCode": "00005",
+        "product": {
+          "id": "ff80818155df9de40155df9e33930011",
+          "productCode": "00005",
+          "name": "Similac Advance low iron 400g",
+          "description": null,
+          "category.id": "1",
+          "category.name": "Medicines"
+        },
+        "palletName": null,
+        "boxName": null,
+        "statusCode": "PENDING",
+        "quantityRequested": 20,
+        "quantityAllowed": null,
+        "quantityAvailable": null,
+        "quantityCanceled": null,
+        "quantityRevised": null,
+        "quantityPicked": 0,
+        "reasonCode": null,
+        "comments": null,
+        "recipient": null,
+        "substitutionItems": [],
+        "sortOrder": 2
+      }
+    ],
+    "pickPage": null
+  }
+
+```
+##### Editing
+After creating the stock movement you are brought to the `EDITING` state (step 2) of the workflow which allows you
+to edit the line items. Honestly, there's no requirement to move into this state from the current UI
+so this state can probably be ignored. 
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"status":"EDITING"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=2"|jsonlint
+```
+##### Reviewing
+Once items have been added to the stock movement you'll move into the `REVIEWING` state (step 3) which 
+allows you to revise quantity, substitute items, cancel items, and generally 
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"status":"REVIEWING"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=3"|jsonlint
+```
+##### Picking
+The `PICKING` state (step 4) is the one state that currently has custom business logic associated with it. 
+To trigger this business logic, you can choose to include optional attributes `"clearPicklist":"true"` or 
+`"createPicklist":"true"` to your JSON body in order to, respectively: clear the current picklist of all 
+items or automatically created a picklist and fill it with suggested items. 
+
+NOTE: We use a first-expiry-first-out (FEFO) algorithm for stock picking. In the future, this might be 
+configurable by product.
+
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"status":"PICKING", "createPicklist":"true"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=4"|jsonlint
+```
+##### Picked
+Once you have finished picking items for the stock movement, you'll move to the `PICKED` state (step 5). 
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"status":"PICKED"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
+```
+##### Issued
+In the `PICKED` state you will be prompoted to enter information about the shipment used to send
+stock to the destination. Once this information has been filled out and saved to the database, 
+you can transitition to the `ISSUED` state which will attempt to send the stock movement to the 
+`destination` as a shipment. As you can see in the response below, this state transition has not
+been implemented yet.
+```
+curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"status":"ISSUED"}' 
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=6"
 {
   "errorCode": 500,
-  "errorMessage": "Cannot delete or update a parent row: a foreign key constraint fails (`openboxes_integration`.`requisition_item`, CONSTRAINT `FK5358E4D6405AC22D` FOREIGN KEY (`modification_item_id`) REFERENCES `requisition_item` (`id`))"
+  "errorMessage": "Cannot send stock movement 916SUB - method has not been implemented yet"
 }
 ```
-Therefore you must revert all changes to the stock movement 
-item before deleting.
+##### Canceled
+If at any point you'd like to cancel the stock movement you can transition to the `CANCELED` state.
+If the stock movement is canceled after it has been moved to the `ISSUED` state then any transaction 
+created as part of the stock movement will be reverted and the stock movement will be transitioned
+to the `CANCELED` state.
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"status":"CANCELED"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
+```
+
+##### Canceled
+If at any point you'd like to cancel the stock movement you can transition to the `CANCELED` state.
+If the stock movement is canceled after it has been moved to the `ISSUED` state then any transaction 
+created as part of the stock movement will be reverted and the stock movement will be transitioned
+to the `CANCELED` state.
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"status":"CANCELED"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
+```
+#### Rollback Status
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"rollback":"true"}' \
+"https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status"|jsonlint
+```
