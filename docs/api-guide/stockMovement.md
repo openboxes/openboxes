@@ -484,15 +484,15 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 ##### Picking
 The `PICKING` state (step 4) is the one state that currently has custom business logic associated with it. 
 To trigger this business logic, you can choose to include optional attributes `"clearPicklist":"true"` or 
-`"suggestPicklist":"true"` to your JSON body in order to, respectively: clear the current picklist of all 
-items and automatically suggest items for the picklist. 
+`"createPicklist":"true"` to your JSON body in order to, respectively: clear the current picklist of all 
+items or automatically created a picklist and fill it with suggested items. 
 
 NOTE: We use a first-expiry-first-out (FEFO) algorithm for stock picking. In the future, this might be 
 configurable by product.
 
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
--d '{"status":"PICKING"}' \
+-d '{"status":"PICKING", "createPicklist":"true"}' \
 "https://openboxes.ngrok.io/openboxes/api/stockMovements/ff808181646b260401646b5bf4ca002a/status?stepNumber=4"|jsonlint
 ```
 ##### Picked
