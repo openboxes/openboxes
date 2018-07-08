@@ -16,6 +16,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderShipment
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.requisition.RequisitionItem
 
 // import java.util.Date
 
@@ -43,7 +44,9 @@ class ShipmentItem implements Comparable, Serializable {
 									// (which might be a pallet or shipping container), in  
 									// that this will likely be a box that the item is 
 									// actually contained within.
-	
+
+	RequisitionItem requisitionItem
+
 	static belongsTo = [ shipment : Shipment ]
 	
 	static hasMany = [ orderShipments : OrderShipment, receiptItems: ReceiptItem]
@@ -68,6 +71,7 @@ class ShipmentItem implements Comparable, Serializable {
         recipient(nullable:true)
 		inventoryItem(nullable:true)
 		donor(nullable:true)
+        requisitionItem(nullable:true)
 	}
     
 	/**

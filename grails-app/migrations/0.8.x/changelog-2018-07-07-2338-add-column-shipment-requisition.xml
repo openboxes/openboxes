@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1531024770642-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment" columnName="requisition_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="shipment">
+            <column name="requisition_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1531024770642-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKE139719A5DE9E374"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requisition_id" baseTableName="shipment"
+                                 constraintName="FKE139719A5DE9E374" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1531024770642-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment_item" columnName="requisition_item_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="shipment_item">
+            <column name="requisition_item_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1531024770642-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKDA3BB2981CD3412D"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requisition_item_id" baseTableName="shipment_item"
+                                 constraintName="FKDA3BB2981CD3412D" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="requisition_item"/>
+    </changeSet>
+
+</databaseChangeLog>

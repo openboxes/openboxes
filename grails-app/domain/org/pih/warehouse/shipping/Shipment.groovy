@@ -17,6 +17,7 @@ import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.requisition.Requisition
 
 // import java.io.Serializable;
 
@@ -73,6 +74,8 @@ class Shipment implements Comparable, Serializable {
 
 	// One-to-many associations
 	SortedSet events;
+
+	Requisition requisition
 
     Event currentEvent
     ShipmentStatusCode currentStatus
@@ -172,7 +175,7 @@ class Shipment implements Comparable, Serializable {
 		events ( validator: { events ->
         	events?.collect( {it.eventType?.eventCode} )?.unique( { a, b -> a <=> b } )?.size() == events?.size()        
 		} )
-
+		requisition(nullable:true)
 		shipmentItemCount(nullable:true)
         currentStatus(nullable:true)
         currentEvent(nullable:true)
