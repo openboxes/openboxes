@@ -13,5 +13,6 @@
     <include file="0.8.x/changelog-2018-03-22-2137-add-column-unit-cost.xml"/>
     <include file="0.8.x/changelog-2018-03-22-2341-create-product-catalog.xml"/>
     <include file="0.8.x/changelog-2018-07-05-1522-add-column-bin-location.xml"/>
+    <include file="0.8.x/changelog-2018-07-07-2338-add-column-shipment-requisition.xml"/>
 
 </databaseChangeLog>
