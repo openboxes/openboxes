@@ -110,8 +110,34 @@ class LocationService {
         return locationMap;
         //return getLoginLocations(currentLocation).sort { it?.locationGroup }.reverse().groupBy { it?.locationGroup }
 	}
-	
-	List getDepots() {
+
+	List getInternalLocations(ActivityCode[] activityCodes) {
+		List<Location> internalLocations = Location.createCriteria().list() {
+			eq("active", Boolean.TRUE)
+			locationType {
+				eq("locationTypeCode", LocationTypeCode.INTERNAL)
+			}
+            if (activityCodes) {
+                'in'("supportedActivities", activityCodes)
+            }
+		}
+		return internalLocations
+	}
+
+	List getPutawayLocations() {
+        return getInternalLocations([ActivityCode.PUTAWAY_STOCK])
+	}
+
+    List getPickingLocations() {
+        return getInternalLocations([ActivityCode.PICK_STOCK])
+    }
+
+    List getReceivingLocations() {
+        return getInternalLocations([ActivityCode.RECEIVE_STOCK])
+    }
+
+
+    List getDepots() {
 		return getAllLocations()?.findAll { it.supports(ActivityCode.MANAGE_INVENTORY) }
 	}
 
