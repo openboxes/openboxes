@@ -100,8 +100,8 @@ class ErrorsController {
 
         if (RequestUtil.isAjax(request)) {
             response.status = 400
-            def errors = request?.exception?.cause?.errors
-            render([errorCode: 400, errorMessage: "Validation errors", data:errors] as JSON)
+            BeanPropertyBindingResult errors = request?.exception?.cause?.errors
+            render([errorCode: 400, errorMessage: "Validation errors", data:errors?.getAllErrors()] as JSON)
             return
         }
         render(view:"/error")
