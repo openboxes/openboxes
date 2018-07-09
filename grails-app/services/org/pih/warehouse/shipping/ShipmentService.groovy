@@ -1267,11 +1267,10 @@ class ShipmentService {
 
 		}
 
-		// Shipment has errors or it has already shipped or ship date is
+		// Shipment has validation errors (i.e. ship date is invalid) or the shipment has already shipped
 		else {
-			log.warn("Failed to send shipment due to errors: " + shipmentInstance?.errors)
-			// TODO: make this a better error message
-			throw new ShipmentException(message: "Failed to send shipment", shipment: shipmentInstance)
+			//log.warn("Failed to send shipment due to errors: " + shipmentInstance?.errors)
+			throw new ValidationException("Failed to send shipment", shipmentInstance?.errors)
 		}
 	}
 	

@@ -96,14 +96,21 @@ class StockMovementService {
         return StockMovement.createFromRequisition(requisition)
     }
 
-    def updateStatus(String id, RequisitionStatus status) {
+    void updateStatus(String id, RequisitionStatus status) {
         Requisition requisition = Requisition.get(id)
+        if (!status in RequisitionStatus.list()) {
+            throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
+        }
+        else if (status < requisition.status) {
+            throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
+        }
+
         requisition.status = status
-        requisition.save(flush:true)
+        requisition.save(flush: true)
     }
 
 
-    def updateStockMovement(StockMovement stockMovement) {
+    StockMovement updateStockMovement(StockMovement stockMovement) {
         log.info "Update stock movement " + stockMovement + " stockMovement.lineItems = " + stockMovement?.lineItems
 
         Requisition requisition = Requisition.get(stockMovement.id)
