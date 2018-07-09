@@ -143,7 +143,7 @@ class CreateStockMovement extends Component {
         'origin.id': origin,
         'destination.id': destination,
         'requestedBy.id': requestedBy,
-        'stockList.id': stockList || null,
+        'stocklist.id': stockList || '',
       };
 
       return apiClient.post(requisitionUrl, payload)
