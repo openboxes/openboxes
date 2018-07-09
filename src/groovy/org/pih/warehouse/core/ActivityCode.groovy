@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.core;
 
-public enum ActivityCode {
+enum ActivityCode {
 	
 	MANAGE_INVENTORY('MANAGE_INVENTORY'),
 	ADJUST_INVENTORY('ADJUST_INVENTORY'),
@@ -19,6 +19,12 @@ public enum ActivityCode {
 	FULFILL_REQUEST('FULFILL_REQUEST'),
 	SEND_STOCK('SEND_STOCK'),
 	RECEIVE_STOCK('RECEIVE_STOCK'),
+
+	// Activities for INTERNAL_LOCATION
+	CROSS_DOCKING('CROSS_DOCKING'),
+	PUTAWAY_STOCK('PUTAWAY_STOCK'),
+	PICK_STOCK('PICK_STOCK'),
+
 	EXTERNAL('EXTERNAL')
 	
 	final String id
@@ -26,6 +32,19 @@ public enum ActivityCode {
 	ActivityCode(String id) { this.id = id }
 	
 	static list() {
-		[MANAGE_INVENTORY, ADJUST_INVENTORY, PLACE_ORDER, PLACE_REQUEST, FULFILL_ORDER, FULFILL_REQUEST, SEND_STOCK, RECEIVE_STOCK, EXTERNAL]
+		[
+                MANAGE_INVENTORY,
+                ADJUST_INVENTORY,
+                PLACE_ORDER,
+                PLACE_REQUEST,
+                FULFILL_ORDER,
+                FULFILL_REQUEST,
+                SEND_STOCK,
+                RECEIVE_STOCK,
+                CROSS_DOCKING,
+                PUTAWAY_STOCK,
+                PICK_STOCK,
+                EXTERNAL
+        ]
 	}
 }
