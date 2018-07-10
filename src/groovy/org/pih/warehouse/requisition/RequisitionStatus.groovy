@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.requisition
 
-public enum RequisitionStatus {
+enum RequisitionStatus {
 	CREATED(1),
     EDITING(2),
     VERIFYING(3),
