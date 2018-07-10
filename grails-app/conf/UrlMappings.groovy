@@ -61,7 +61,7 @@ class UrlMappings {
 
         "/api/${resource}s/$id/status"(parseRequest: true) {
             controller = {"${params.resource}Api" }
-            action = [POST:"updateStatus"]
+            action = [GET: "status", DELETE: "deleteStatus", POST:"updateStatus"]
         }
 
         "/api/${resource}s/$id"(parseRequest: true) {

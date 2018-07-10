@@ -102,12 +102,22 @@ class StockMovement {
                 lineItems: lineItems,
                 pickPage: pickPage,
                 associations: [
-                    requisition: [id: requisition.id, requestNumber: requisition.requestNumber],
-                    shipments: requisition?.shipments?.collect { [id: it.id, shipmentNumber: it.shipmentNumber] },
+                    requisition: [id: requisition.id, requestNumber: requisition.requestNumber, status: requisition?.status?.name()],
+                    shipments: requisition?.shipments?.collect { [id: it.id, shipmentNumber: it.shipmentNumber, status: it?.currentStatus?.name()] },
                     documents: []
                 ],
         ]
     }
+
+    /**
+     * Return the status of the associated requisition.
+     *
+     * @return
+     */
+    String getStatus() {
+        return requisition?.status
+    }
+
 
     /**
      * “FROM.TO.DATEREQUESTED.STOCKLIST.TRACKING#.DESCRIPTION”
@@ -115,7 +125,7 @@ class StockMovement {
      * @return
      */
     String generateName() {
-        String name = "${origin?.name}.${destination?.name}.${dateRequested.format("dd-MMM-yyyy")}"
+        String name = "${origin?.name}.${destination?.name}.${dateRequested.format("ddMMMyyyy")}"
         if (stocklist?.name) name += ".${stocklist.name}"
         if (trackingNumber) name += ".${trackingNumber}"
         if (description) name += ".${description}"

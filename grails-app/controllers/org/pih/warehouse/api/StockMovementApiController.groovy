@@ -99,6 +99,17 @@ class StockMovementApiController {
         render status: 204
     }
 
+
+    def status = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render ([data:stockMovement?.status] as JSON)
+    }
+
+    def deleteStatus = {
+        stockMovementService.rollbackStockMovement(params.id)
+        forward(action: "read")
+    }
+
     /**
      * Peforms a status update on the stock movement and forwards to the read action.
      */
@@ -106,45 +117,48 @@ class StockMovementApiController {
         JSONObject jsonObject = request.JSON
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
+        Boolean statusOnly =
+                jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
         Boolean clearPicklist =
                 jsonObject.containsKey("clearPicklist") ? jsonObject.getBoolean("clearPicklist") : false
         Boolean createPicklist =
                 jsonObject.containsKey("createPicklist") ? jsonObject.getBoolean("createPicklist") : false
 
+        RequisitionStatus status = jsonObject.containsKey("status") ? jsonObject.status as RequisitionStatus : null
+        Boolean rollback = jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
 
-        Boolean rollback = jsonObject.rollback ? jsonObject.getBoolean("rollback") : false
-        if (rollback) {
-            stockMovementService.rollbackStockMovement(params.id)
+        if (status && statusOnly) {
+            stockMovementService.updateStatus(params.id, status)
         }
+        else {
+            if (rollback) {
+                stockMovementService.rollbackStockMovement(params.id)
+            }
 
-        RequisitionStatus status = jsonObject.status ? jsonObject.status as RequisitionStatus : null
-        if (status) {
-            switch (status) {
-                case RequisitionStatus.CREATED:
-                    stockMovementService.updateStatus(params.id, status)
-                    break;
-                case RequisitionStatus.EDITING:
-                    stockMovementService.updateStatus(params.id, status)
-                    break;
-                case RequisitionStatus.VERIFYING:
-                    stockMovementService.updateStatus(params.id, status)
-                    break;
-                case RequisitionStatus.PICKING:
-                    stockMovementService.updateStatus(params.id, status)
-                    if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
-                    if (createPicklist) stockMovementService.createPicklist(stockMovement)
-                    break;
-                case RequisitionStatus.PICKED:
-                    stockMovementService.updateStatus(params.id, status)
-                    break;
-                case RequisitionStatus.ISSUED:
-                    stockMovementService.sendStockMovement(params.id)
-                    stockMovementService.updateStatus(params.id, status)
-                    break;
-                default:
-                    throw new IllegalArgumentException("Cannot update status with invalid status ${jsonObject.status}")
-                    break;
+            if (status) {
+                switch (status) {
+                    case RequisitionStatus.CREATED:
+                        break;
+                    case RequisitionStatus.EDITING:
+                        break;
+                    case RequisitionStatus.VERIFYING:
+                        break;
+                    case RequisitionStatus.PICKING:
+                        if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
+                        if (createPicklist) stockMovementService.createPicklist(stockMovement)
+                        break;
+                    case RequisitionStatus.PICKED:
+                        break;
+                    case RequisitionStatus.ISSUED:
+                        stockMovementService.sendStockMovement(params.id)
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Cannot update status with invalid status ${jsonObject.status}")
+                        break;
 
+                }
+                // If the dependent actions were updated properly then we can update the
+                stockMovementService.updateStatus(params.id, status)
             }
         }
         forward(action: "read")
