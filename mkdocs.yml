@@ -28,6 +28,7 @@ pages:
     - 'Product': 'api-guide/product.md'
     - 'Stock Movement': 'api-guide/stockMovement.md'
     - 'Stock Movement Item': 'api-guide/stockMovementItem.md'
+    - 'Stock Movement Status': 'api-guide/stockMovementStatus.md'
 
 - Deployment Guide:
     - 'Installation': 'installation/index.md'
