@@ -111,29 +111,41 @@ class LocationService {
         //return getLoginLocations(currentLocation).sort { it?.locationGroup }.reverse().groupBy { it?.locationGroup }
 	}
 
-	List getInternalLocations(ActivityCode[] activityCodes) {
+	List getInternalLocations(Location parentLocation) {
+		return getInternalLocations(parentLocation, null)
+	}
+
+	List getInternalLocations(Location parentLocation, ActivityCode[] activityCodes) {
+		List<Location> internalLocationsSupportingActivityCodes = []
+		log.info "Get internal locations for parent ${parentLocation} with activity codes ${activityCodes}"
 		List<Location> internalLocations = Location.createCriteria().list() {
 			eq("active", Boolean.TRUE)
+			eq("parentLocation", parentLocation)
 			locationType {
-				eq("locationTypeCode", LocationTypeCode.INTERNAL)
+				'in'("locationTypeCode", [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION])
 			}
-            if (activityCodes) {
-                'in'("supportedActivities", activityCodes)
-            }
 		}
-		return internalLocations
+
+		// Filter by activity code
+		activityCodes.each { activityCode ->
+			internalLocationsSupportingActivityCodes << internalLocations.findAll { internalLocation ->
+				internalLocation.supports(activityCode)
+			}
+		}
+
+		return internalLocationsSupportingActivityCodes.unique()
 	}
 
-	List getPutawayLocations() {
-        return getInternalLocations([ActivityCode.PUTAWAY_STOCK])
+	List getPutawayLocations(Location parentLocation) {
+        return getInternalLocations(parentLocation, [ActivityCode.PUTAWAY_STOCK])
 	}
 
-    List getPickingLocations() {
-        return getInternalLocations([ActivityCode.PICK_STOCK])
+    List getPickingLocations(Location parentLocation) {
+        return getInternalLocations(parentLocation, [ActivityCode.PICK_STOCK])
     }
 
-    List getReceivingLocations() {
-        return getInternalLocations([ActivityCode.RECEIVE_STOCK])
+    List getReceivingLocations(Location parentLocation) {
+        return getInternalLocations(parentLocation, [ActivityCode.RECEIVE_STOCK])
     }
 
 

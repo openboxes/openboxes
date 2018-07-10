@@ -10,25 +10,24 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationTypeCode
 
-class LocationApiController extends BaseDomainApiController {
+class InternalLocationApiController {
 
     def locationService
 
     def list = {
-        def fields = params.fields ? params.fields.split(",") : null
-        def locations
-
-        if (params.type=="INTERNAL")
-            locations = locationService.getInternalLocations()
-        else
-            locations = locationService.getAllLocations(fields)
-
+        ActivityCode [] activityCodes = params.activityCode ? params.list("activityCode") : null
+        Location parentLocation = params?.parentLocation?.id ? Location.get(params.parentLocation?.id) : null
+        List<Location> locations = locationService.getInternalLocations(parentLocation, activityCodes)
         render ([data:locations] as JSON)
 	}
 
+
+    def read = {
+        Location location = Location.get(params.id)
+        render ([data:location] as JSON)
+    }
 
 }
