@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import PutAwayPage from './PutAwayPage';
 import PutAwaySecondPage from './PutAwaySecondPage';
+import PutAwayCheckPage from './PutAwayCheckPage';
 
 class PutAwayMainPage extends Component {
   static showResults(values) {
@@ -28,6 +29,11 @@ class PutAwayMainPage extends Component {
       <PutAwaySecondPage
         {...this.state.props}
         nextPage={this.nextPage}
+      />,
+      <PutAwayCheckPage
+        {...this.state.props}
+        prevPage={this.prevPage}
+        nextPage={PutAwayMainPage.showResults}
       />,
     ];
   }
