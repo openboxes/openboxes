@@ -7,14 +7,13 @@ import { ClimbingBoxLoader } from 'react-spinners';
 import StockMovement from './stock-movement-wizard/StockMovement';
 import ReceivingPage from './receiving/ReceivingPage';
 import MainLayoutRoute from './Layout/MainLayoutRoute';
-import PutAwayPage from './put-away/PutAwayPage';
-
+import PutAwayMainPage from './put-away/PutAwayMainPage';
 
 const Router = props => (
   <div>
     <BrowserRouter>
       <Switch>
-        <MainLayoutRoute path="/**/putAway" component={PutAwayPage} />
+        <MainLayoutRoute path="/**/putAway" component={PutAwayMainPage} />
         <MainLayoutRoute path="/**/stockMovement" component={StockMovement} />
         <MainLayoutRoute path="/**/partialReceiving" component={ReceivingPage} />
       </Switch>

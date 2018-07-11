@@ -2,6 +2,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
+import PropTypes from 'prop-types';
 
 import 'react-table/react-table.css';
 
@@ -277,10 +278,23 @@ class PutAwayPage extends Component {
             />
             : null
         }
+        <button
+          type="button"
+          onClick={() => this.props.nextPage({
+            data: _.filter(data, item => _.includes([...this.state.selection], item.id)),
+            pivotBy,
+          })}
+          className="btn btn-outline-primary float-right my-2"
+        >Start Put-Away
+        </button>
       </div>
     );
   }
 }
 
 export default PutAwayPage;
+
+PutAwayPage.propTypes = {
+  nextPage: PropTypes.func.isRequired,
+};
 
