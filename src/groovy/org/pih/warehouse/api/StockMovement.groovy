@@ -50,6 +50,7 @@ class StockMovement {
     StockMovementType stockMovementType
 
     PickPage pickPage
+    EditPage editPage
 
     List<StockMovementItem> lineItems =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class));
@@ -101,6 +102,7 @@ class StockMovement {
                 requestedBy: requestedBy,
                 lineItems: lineItems,
                 pickPage: pickPage,
+                editPage: editPage,
                 associations: [
                     requisition: [id: requisition.id, requestNumber: requisition.requestNumber, status: requisition?.status?.name()],
                     shipments: requisition?.shipments?.collect { [id: it.id, shipmentNumber: it.shipmentNumber, status: it?.currentStatus?.name()] },
@@ -193,5 +195,18 @@ class PickPage {
                 pickPageItems: pickPageItems
         ]
     }
+}
 
+class EditPage {
+    List<EditPageItem> editPageItems = []
+
+    static constraints = {
+        editPageItems(nullable:true)
+    }
+
+    Map toJson() {
+        return [
+                editPageItems: editPageItems
+        ]
+    }
 }

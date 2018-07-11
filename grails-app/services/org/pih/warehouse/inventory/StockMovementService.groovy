@@ -13,10 +13,13 @@ import grails.validation.ValidationException
 import org.apache.commons.lang.NotImplementedException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.EditPage
+import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PickPage
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
@@ -250,12 +253,7 @@ class StockMovementService {
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
 
         if (stepNumber.equals("3")) {
-            // Hack way to include suggested and available items needed for step 3
-            stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
-                List availableItems =
-                        inventoryService.getAvailableItems(stockMovement.origin, stockMovementItem.product)
-                //stockMovementItem.availableItems = availableItems
-            }
+            stockMovement.editPage = getEditPage(id)
         }
         else if (stepNumber.equals("4")) {
             stockMovement.pickPage = getPickPage(id)
@@ -456,6 +454,56 @@ class StockMovementService {
     }
 
 
+    List<SubstitutionItem> getAvailableSubstitutions(Location location, Product product) {
+
+        List<SubstitutionItem> availableSubstitutions
+        if (location) {
+            def productAssociations =
+                    productService.getProductAssociations(product, [ProductAssociationTypeCode.SUBSTITUTE])
+
+            availableSubstitutions = productAssociations.collect { productAssociation ->
+
+                def associatedProduct = productAssociation.associatedProduct
+                def availableItems = inventoryService.getAvailableBinLocations(location, associatedProduct)
+
+                log.info "Available items for substitution ${associatedProduct}: ${availableItems}"
+                SubstitutionItem substitutionItem = new SubstitutionItem()
+                substitutionItem.productId = associatedProduct.id
+                substitutionItem.productName = associatedProduct.name
+                substitutionItem.productCode = associatedProduct.productCode
+                substitutionItem.availableItems = availableItems
+                return substitutionItem
+            }
+        }
+        return availableSubstitutions
+    }
+
+
+
+    // These two methods do very different things
+//    List<SubstitutionItem> getSubstitutionItems(StockMovementItem stockMovementItem) {
+//        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
+//        List substitutionItems = requisitionItem?.substitutionItems?.collect { substitutionItem ->
+//            List availableItems = getAvailableItems()
+//            return SubstitutionItem.createFromRequisitionItem(requisitionItem)
+//        }
+//        return substitutionItems
+//    }
+
+
+
+
+    EditPage getEditPage(String id) {
+        EditPage editPage = new EditPage()
+        StockMovement stockMovement = getStockMovement(id)
+        stockMovement.lineItems.each { stockMovementItem ->
+            EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
+            editPage.editPageItems.addAll(editPageItem)
+        }
+        return editPage
+    }
+
+
     PickPage getPickPage(String id) {
         PickPage pickPage = new PickPage()
 
@@ -486,6 +534,25 @@ class StockMovementService {
         }
     }
 
+
+    EditPageItem buildEditPageItem(StockMovementItem stockMovementItem)  {
+        EditPageItem editPageItem = new EditPageItem()
+        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
+        Location location = requisitionItem?.requisition?.origin
+        List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
+        List<SubstitutionItem> substitutionItems = getAvailableSubstitutions(location, requisitionItem.product)
+        editPageItem.requisitionItem = requisitionItem
+        editPageItem.productId = requisitionItem.product.id
+        editPageItem.productCode = requisitionItem.product.productCode
+        editPageItem.productName = requisitionItem.product.name
+        editPageItem.quantityRequested = requisitionItem.quantity
+        editPageItem.quantityConsumed = 0
+        editPageItem.substitutionItems = substitutionItems
+        editPageItem.availableItems = availableItems
+        return editPageItem
+    }
+
+
     /**
      *
      * @param requisitionItem
@@ -493,7 +560,8 @@ class StockMovementService {
      */
     PickPageItem buildPickPageItem(RequisitionItem requisitionItem) {
 
-        PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem, picklistItems: requisitionItem.picklistItems)
+        PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
+                picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, requisitionItem.quantity)

@@ -1204,4 +1204,14 @@ class ProductService {
 		Product.findAll("from Product as p where productCode is null or productCode = ''")
 	}
 
+	List<ProductAssociation> getProductAssociations(Product product, List<ProductAssociationTypeCode> types) {
+		return ProductAssociation.createCriteria().list {
+			eq("product", product)
+			if (types) {
+				'in'("code", types)
+			}
+		}
+	}
+
+
 }
