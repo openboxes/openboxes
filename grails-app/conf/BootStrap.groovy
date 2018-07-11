@@ -11,10 +11,13 @@
 import grails.converters.JSON
 import grails.util.Environment
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.EditPage
+import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PickPage
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -309,6 +312,14 @@ class BootStrap {
             return availableItem.toJson()
         }
 
+        JSON.registerObjectMarshaller(EditPage) { EditPage editPage ->
+            return editPage.toJson()
+        }
+
+        JSON.registerObjectMarshaller(EditPageItem) { EditPageItem editPageItem ->
+            return editPageItem.toJson()
+        }
+
         JSON.registerObjectMarshaller(PickPage) { PickPage pickPage ->
             return pickPage.toJson()
         }
@@ -323,6 +334,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(StockMovementItem) { StockMovementItem stockMovementItem ->
             return stockMovementItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(SubstitutionItem) { SubstitutionItem substitutionItem ->
+            return substitutionItem.toJson()
         }
 
         JSON.registerObjectMarshaller(SuggestedItem) { SuggestedItem suggestedItem ->

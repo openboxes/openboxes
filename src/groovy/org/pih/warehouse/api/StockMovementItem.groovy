@@ -1,14 +1,11 @@
 package org.pih.warehouse.api
 
-import org.apache.commons.collections.FactoryUtils
-import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.shipping.ShipmentItem
 
 class StockMovementItem {
@@ -206,6 +203,127 @@ class SuggestedItem extends AvailableItem {
     }
 }
 
+class SubstitutionItem {
+
+    String productId
+    String productCode
+    String productName
+    //Date minExpirationDate
+    //Integer quantityAvailable
+    Integer quantitySelected
+
+    List availableItems
+
+    Date getMinExpirationDate() {
+        return availableItems ?
+                availableItems.findAll { it.inventoryItem.expirationDate != null }.collect {
+                    it.inventoryItem?.expirationDate }.min() :
+                null
+    }
+
+    Integer getQuantityAvailable() {
+        availableItems ? availableItems.sum { it.quantityAvailable } : 0
+    }
+
+    Map toJson() {
+        return [
+                productId       : productId,
+                productCode      : productCode,
+                productName      : productName,
+                minExpirationDate: minExpirationDate,
+                quantityAvailable: quantityAvailable,
+                quantitySelected : quantitySelected
+        ]
+    }
+
+}
+
+enum SubstitutionStatusCode {
+
+    EARLIER(0),
+    YES(1),
+    NO(2)
+
+    int sortOrder
+
+    SubstitutionStatusCode(int sortOrder) { [ this.sortOrder = sortOrder ] }
+
+    static int compare(SubstitutionStatusCode a, SubstitutionStatusCode b) {
+        return a.sortOrder <=> b.sortOrder
+    }
+
+    static list() {
+        [ EARLIER, YES, NO ]
+    }
+
+    String getName() { return name() }
+
+    String toString() { return name() }
+
+
+}
+
+class EditPageItem {
+
+    String productId
+    String productCode
+    String productName
+
+    RequisitionItem requisitionItem
+
+    Integer quantityRequested
+    //Integer quantityAvailable
+    Integer quantityConsumed
+
+    List<AvailableItem> availableItems
+    List<SubstitutionItem> substitutionItems
+
+    Integer getQuantityAvailable() {
+        availableItems ? availableItems.sum { it.quantityAvailable } : 0
+    }
+
+    Date getMinExpirationDate() {
+        return availableItems ?
+                availableItems.findAll { it.inventoryItem.expirationDate != null }.collect {
+                    it.inventoryItem?.expirationDate }.min() :
+                null
+    }
+
+    Date getMinExpirationDateForSubstitutionItems() {
+        return substitutionItems ? substitutionItems?.collect { it.minExpirationDate }?.min() : null
+    }
+
+    Boolean hasEarlierExpirationDate() {
+        Date productExpirationDate = getMinExpirationDate()
+        Date substitutionExpirationDate = getMinExpirationDateForSubstitutionItems()
+        return productExpirationDate && substitutionExpirationDate ?
+                productExpirationDate.after(substitutionExpirationDate) :
+                false
+    }
+
+    String getSubstitutionStatusCode() {
+        if (hasEarlierExpirationDate()) {
+            return SubstitutionStatusCode.EARLIER
+        }
+        else {
+            return (!substitutionItems?.empty) ? SubstitutionStatusCode.YES : SubstitutionStatusCode.NO
+        }
+    }
+
+    Map toJson() {
+        return [
+                requisitionItemId : requisitionItem.id,
+                productId         : productId,
+                productCode       : productCode,
+                productName       : productName,
+                quantityRequested : quantityRequested,
+                quantityConsumed  : quantityConsumed,
+                quantityAvailable : quantityAvailable,
+                substitutionStatus: substitutionStatusCode,
+                substitutionItems : substitutionItems
+        ]
+    }
+}
 
 class PickPageItem {
 
