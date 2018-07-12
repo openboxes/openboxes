@@ -16,7 +16,7 @@ class Select extends Component {
     super(props);
 
     this.state = {
-      value: null,
+      value: props.initialValue === undefined ? null : props.initialValue,
       id: _.uniqueId('select-id_'),
     };
 
@@ -109,6 +109,8 @@ Select.propTypes = {
   multi: PropTypes.bool,
   async: PropTypes.bool,
   delimiter: PropTypes.string,
+  initialValue: PropTypes.oneOfType([PropTypes.string,
+    PropTypes.shape({}), PropTypes.any]),
 };
 
 Select.defaultProps = {
@@ -118,4 +120,5 @@ Select.defaultProps = {
   multi: false,
   async: false,
   delimiter: ';',
+  initialValue: null,
 };

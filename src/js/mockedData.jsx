@@ -521,6 +521,7 @@ const PUT_AWAY_MOCKS = [
     expiryDate: '2018/01/01',
     recipient: { id: 6, name: 'Marc Julmisse' },
     quantity: '15000',
+    currentBin: 'container 1',
   },
   {
     id: 2,
@@ -531,6 +532,8 @@ const PUT_AWAY_MOCKS = [
     expiryDate: '2018/02/01',
     recipient: { id: 6, name: 'Youdy Gaston' },
     quantity: '100',
+    currentBin: 'container 1',
+    status: 'PENDING',
   },
   {
     id: 3,
@@ -541,6 +544,7 @@ const PUT_AWAY_MOCKS = [
     expiryDate: '2018/01/01',
     recipient: {},
     quantity: '5000',
+    currentBin: 'container 1',
   },
   {
     id: 4,
@@ -551,6 +555,7 @@ const PUT_AWAY_MOCKS = [
     expiryDate: '2020/03/31',
     recipient: {},
     quantity: '1000',
+    currentBin: 'container 2',
   },
   {
     id: 5,
@@ -561,6 +566,8 @@ const PUT_AWAY_MOCKS = [
     expiryDate: '2020/04/31',
     recipient: {},
     quantity: '1000',
+    currentBin: 'container 2',
+    status: 'PENDING',
   },
   {
     id: 6,
@@ -571,6 +578,7 @@ const PUT_AWAY_MOCKS = [
     expiryDate: '2020/04/31',
     recipient: { id: 6, name: 'Jonas Eddy' },
     quantity: '5',
+    currentBin: 'container 2',
   },
   {
     id: 7,
@@ -581,6 +589,7 @@ const PUT_AWAY_MOCKS = [
     expiryDate: '2018/01/31',
     recipient: {},
     quantity: '10000',
+    currentBin: 'container 1',
   },
   {
     id: 8,
@@ -591,6 +600,7 @@ const PUT_AWAY_MOCKS = [
     expiryDate: '2018/01/31',
     recipient: {},
     quantity: '20000',
+    currentBin: 'container 1',
   },
 ];
 
