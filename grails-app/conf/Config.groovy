@@ -344,7 +344,7 @@ log4j = {
             'org.quartz',
 			'com.gargoylesoftware.htmlunit'
 
-   debug 	'org.apache.cxf',
+	debug 	'org.apache.cxf',
             'grails.plugin.rendering',
 		   	'org.apache.commons.mail',
             'grails.plugins.raven',
@@ -357,7 +357,7 @@ log4j = {
 		   	//'com.gargoylesoftware.htmlunit',
             'org.apache.http.wire'        // shows traffic between htmlunit and server
 
-   //trace    'org.hibernate.type.descriptor.sql.BasicBinder',
+	//trace    'org.hibernate.type.descriptor.sql.BasicBinder',
    //         'org.hibernate.type'
 
 
