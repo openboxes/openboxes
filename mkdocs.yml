@@ -23,7 +23,7 @@ pages:
     - 'Generic': 'api-guide/generic.md'
     - 'Category': 'api-guide/category.md'
     - 'Identifier': 'api-guide/identifier.md'
-    - 'Internal Location': 'api-guide/internalLlocation.md'
+    - 'Internal Location': 'api-guide/internalLocation.md'
     - 'Location': 'api-guide/location.md'
     - 'Lookup': 'api-guide/lookup.md'
     - 'Product': 'api-guide/product.md'
