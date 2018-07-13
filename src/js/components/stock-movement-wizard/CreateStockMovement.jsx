@@ -92,6 +92,7 @@ class CreateStockMovement extends Component {
   componentDidMount() {
     this.props.initialize('stock-movement-wizard', {
       lineItems: [],
+      editPageItems: [],
       pickPage: [],
       adjustInventory: [],
       editPick: [],
