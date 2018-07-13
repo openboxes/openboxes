@@ -7,9 +7,9 @@ $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 {
   "data": [
     {
-      "putawayStatus": null,
-      "currentFacility.id": null,
-      "currentFacility.name": null,
+      "putawayStatus": TODO,
+      "currentFacility.id": "ff808181646b260401646b3f2ced0002",
+      "currentFacility.name": "Store 1",
       "currentLocation.id": "ff808181648c6e2401648c95140f0001",
       "currentLocation.name": "Receiving",
       "container": null,

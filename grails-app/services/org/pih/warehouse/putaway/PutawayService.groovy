@@ -14,6 +14,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
+import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -45,9 +46,11 @@ class PutawayService {
                             inventoryService.getAvailableBinLocations(location, it.product)
 
                     PutawayItem putawayItem = new PutawayItem()
+                    // FIXME Should be PENDING if there are existing putaways that are in-progress
+                    putawayItem.putawayStatus = PutawayStatus.TODO
                     putawayItem.product = it.product
                     putawayItem.inventoryItem = it.inventoryItem
-                    putawayItem.currentFacility = it.location
+                    putawayItem.currentFacility = location
                     putawayItem.currentLocation = it.binLocation
                     putawayItem.putawayFacility = null
                     putawayItem.putawayLocation = null
