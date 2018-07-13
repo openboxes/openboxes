@@ -127,13 +127,17 @@ class LocationService {
 		}
 
 		// Filter by activity code
-		activityCodes.each { activityCode ->
-			internalLocations = internalLocations.findAll { internalLocation ->
-				internalLocation.supports(activityCode)
+		if (activityCodes) {
+			activityCodes.each { activityCode ->
+				internalLocations = internalLocations.findAll { internalLocation ->
+					internalLocation.supports(activityCode)
+				}
+				internalLocationsSupportingActivityCodes.addAll(internalLocations)
 			}
+		}
+		else {
 			internalLocationsSupportingActivityCodes.addAll(internalLocations)
 		}
-
 		return internalLocationsSupportingActivityCodes.unique()
 	}
 

@@ -18,12 +18,15 @@ class InternalLocationApiController {
     def locationService
 
     def list = {
+        Location parentLocation = params?.location?.id ? Location.get(params.location?.id) : null
+        if (!parentLocation) {
+            throw new IllegalArgumentException("Must provide location.id as a request parameter")
+        }
+
         ActivityCode [] activityCodes = params.activityCode ? params.list("activityCode") : null
-        Location parentLocation = params?.parentLocation?.id ? Location.get(params.parentLocation?.id) : null
         List<Location> locations = locationService.getInternalLocations(parentLocation, activityCodes)
         render ([data:locations] as JSON)
 	}
-
 
     def read = {
         Location location = Location.get(params.id)
