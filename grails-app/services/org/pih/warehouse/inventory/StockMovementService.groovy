@@ -233,7 +233,7 @@ class StockMovementService {
     }
 
     List<StockMovementItem> getStockMovements(Integer maxResults, Integer offset) {
-        def requisitions = Requisition.listOrderByDateCreated([max: maxResults, offset: offset, sort: "desc"])
+        def requisitions = Requisition.findAllByIsTemplate(Boolean.FALSE, [max: maxResults, offset: offset, sort: "dateCreated", order: "desc"])
         def stockMovements = requisitions.collect { requisition ->
             return StockMovement.createFromRequisition(requisition)
         }
