@@ -10,6 +10,8 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 
@@ -23,11 +25,30 @@ class ApiController {
         def password = request.JSON.password
         if (userService.authenticate(username, password)) {
             session.user = User.findByUsernameOrEmail(username, username)
+            if (request.JSON.location) {
+                session.warehouse = Location.get(request.JSON.location)
+            }
             render ([status: 200, text: "Authentication was successful"])
             return
         }
         render([status: 401, text: "Authentication failed"])
     }
+
+    def chooseLocation = {
+        Location location = Location.get(params.id)
+        if (!location) {
+            throw new ObjectNotFoundException(params.id, Location.class.toString())
+        }
+        session.warehouse = location
+        render ([status: 200, text: "User ${session.user} is now logged into ${location.name}"])
+    }
+
+    def getSession = {
+        User user = User.get(session?.user?.id)
+        Location location = Location.get(session.warehouse?.id)
+        render ([data:[user:user, location:location]] as JSON)
+    }
+
 
     def logout = {
         session.user = null

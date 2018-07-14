@@ -9,21 +9,14 @@
 **/ 
 package org.pih.warehouse.putaway
 
-import org.codehaus.groovy.grails.web.json.JSONArray
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.inventory.TransferStockCommand
-import org.pih.warehouse.product.Product
 
 class PutawayService {
 
@@ -62,6 +55,37 @@ class PutawayService {
             }
         }
         return putawayItems
+    }
+
+    void processSplitItems(Putaway putaway) {
+
+        putaway.putawayItems.toArray().each { PutawayItem oldPutawayItem ->
+
+            if (oldPutawayItem.splitItems) {
+
+                Integer totalSplitQuantity = oldPutawayItem.splitItems.sum { it.quantity }
+                // Validate quantity
+                if (totalSplitQuantity != oldPutawayItem?.quantity) {
+                    throw new IllegalArgumentException("Sum of split quantities " +
+                            "must equal original quantity [${totalSplitQuantity} != ${oldPutawayItem?.quantity}]")
+                }
+
+                // Iterate over split items and create new putaway items for them
+                // NOTE: The only fields we change from the original are the putaway bin and quantity.
+                oldPutawayItem.splitItems.each { PutawayItem splitPutawayItem ->
+                    PutawayItem newPutawayItem = new PutawayItem()
+                    BeanUtils.copyProperties(newPutawayItem, oldPutawayItem)
+                    newPutawayItem.quantity = splitPutawayItem.quantity
+                    newPutawayItem.putawayFacility = splitPutawayItem.putawayFacility
+                    newPutawayItem.putawayLocation = splitPutawayItem.putawayLocation
+                    putaway.putawayItems.add(newPutawayItem)
+                }
+
+                // Remove the original putaway item since it was replaced with the above
+                putaway.putawayItems.remove(oldPutawayItem)
+            }
+
+        }
     }
 
 
