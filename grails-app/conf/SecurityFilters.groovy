@@ -19,8 +19,9 @@ class SecurityFilters {
 	
 	static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
 	static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo']
+
+	static ArrayList controllersWithLocationNotRequired = ['categoryApi','productApi','genericApi', 'api']
 	static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
-	static ArrayList controllersWithLocationNotRequired = ['categoryApi','productApi','genericApi']
 
 	def authService 
 	def filters = {
@@ -130,7 +131,7 @@ class SecurityFilters {
                         controllersWithLocationNotRequired.contains(controllerName) || controllerName.endsWith("Api"))) {
 
 					session.warehouseStillNotSelected = true;
-					log.info "Location has not been selected, redirecting to chooseLocation ..."
+					log.info "Request ${controllerName}:${actionName} requires location, redirecting to chooseLocation ..."
 					redirect(controller: 'dashboard', action: 'chooseLocation')
 					return false;
 				}
