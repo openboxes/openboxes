@@ -37,9 +37,6 @@ class StockMovement {
     Person requestedBy
     Date dateRequested
 
-    // Status
-    String stepNumber
-
     // Shipment information
     Date dateShipped
     ShipmentType shipmentType

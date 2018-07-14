@@ -85,6 +85,9 @@ enum ReasonCode {
                 OTHER]
     }
 
+    static listInventoryAdjustmentReasonCodes() {
+        return [EXPIRED, DAMAGED, COULD_NOT_LOCATE, OTHER]
+    }
 
     static listRequisitionQuantityChangeReasonCodes() {
 		[
