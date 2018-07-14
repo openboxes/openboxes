@@ -230,10 +230,20 @@ class SubstitutionItem {
                 productId       : productId,
                 productCode      : productCode,
                 productName      : productName,
-                minExpirationDate: minExpirationDate,
+                minExpirationDate: minExpirationDate?.format("MM/dd/yyyy"),
                 quantityAvailable: quantityAvailable,
                 quantitySelected : quantitySelected
         ]
+    }
+
+
+    static SubstitutionItem createFromRequisitionItem(RequisitionItem requisitionItem) {
+        SubstitutionItem substitutionItem = new SubstitutionItem()
+        substitutionItem.productId = requisitionItem?.product?.id
+        substitutionItem.productName = requisitionItem?.product?.name
+        substitutionItem.productCode = requisitionItem?.product?.productCode
+        substitutionItem.quantitySelected = requisitionItem?.quantity
+        return substitutionItem
     }
 
 }
@@ -276,10 +286,14 @@ class EditPageItem {
     Integer quantityConsumed
 
     List<AvailableItem> availableItems
-    List<SubstitutionItem> substitutionItems
+    List<SubstitutionItem> availableSubstitutions
 
     Integer getQuantityAvailable() {
         availableItems ? availableItems.sum { it.quantityAvailable } : 0
+    }
+
+    Integer getQuantityRevised() {
+        requisitionItem?.modificationItem ? requisitionItem?.modificationItem?.quantity : 0
     }
 
     Date getMinExpirationDate() {
@@ -290,7 +304,14 @@ class EditPageItem {
     }
 
     Date getMinExpirationDateForSubstitutionItems() {
-        return substitutionItems ? substitutionItems?.collect { it.minExpirationDate }?.min() : null
+        return availableSubstitutions ? availableSubstitutions?.collect { it.minExpirationDate }?.min() : null
+    }
+
+    List<SubstitutionItem> getSubstitutionItems() {
+        return requisitionItem?.substitutionItems ?
+                requisitionItem?.substitutionItems?.collect { RequisitionItem requsitionItem ->
+                    SubstitutionItem.createFromRequisitionItem(requsitionItem) } :
+                null
     }
 
     Boolean hasEarlierExpirationDate() {
@@ -306,21 +327,25 @@ class EditPageItem {
             return SubstitutionStatusCode.EARLIER
         }
         else {
-            return (!substitutionItems?.empty) ? SubstitutionStatusCode.YES : SubstitutionStatusCode.NO
+            return (!availableSubstitutions?.empty) ? SubstitutionStatusCode.YES : SubstitutionStatusCode.NO
         }
     }
 
     Map toJson() {
         return [
-                requisitionItemId : requisitionItem.id,
-                productId         : productId,
-                productCode       : productCode,
-                productName       : productName,
-                quantityRequested : quantityRequested,
-                quantityConsumed  : quantityConsumed,
-                quantityAvailable : quantityAvailable,
-                substitutionStatus: substitutionStatusCode,
-                substitutionItems : substitutionItems
+                statusCode            : requisitionItem.status.name(),
+                requisitionItemId     : requisitionItem.id,
+                productId             : productId,
+                productCode           : productCode,
+                productName           : productName,
+                minExpirationDate     : minExpirationDate?.format("MM/dd/yyyy"),
+                quantityRequested     : quantityRequested,
+                quantityRevised       : quantityRevised,
+                quantityConsumed      : quantityConsumed,
+                quantityAvailable     : quantityAvailable,
+                substitutionStatus    : substitutionStatusCode,
+                availableSubstitutions: availableSubstitutions,
+                substitutionItems     : substitutionItems
         ]
     }
 }

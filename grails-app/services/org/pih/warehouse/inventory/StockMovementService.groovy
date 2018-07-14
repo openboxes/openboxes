@@ -253,9 +253,11 @@ class StockMovementService {
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
 
         if (stepNumber.equals("3")) {
+            stockMovement.lineItems = null
             stockMovement.editPage = getEditPage(id)
         }
         else if (stepNumber.equals("4")) {
+            stockMovement.lineItems = null
             stockMovement.pickPage = getPickPage(id)
         }
 
@@ -540,14 +542,14 @@ class StockMovementService {
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         Location location = requisitionItem?.requisition?.origin
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
-        List<SubstitutionItem> substitutionItems = getAvailableSubstitutions(location, requisitionItem.product)
+        List<SubstitutionItem> availableSubstitutions = getAvailableSubstitutions(location, requisitionItem.product)
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
         editPageItem.quantityRequested = requisitionItem.quantity
         editPageItem.quantityConsumed = 0
-        editPageItem.substitutionItems = substitutionItems
+        editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         return editPageItem
     }
