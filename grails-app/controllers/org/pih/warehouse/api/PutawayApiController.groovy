@@ -32,7 +32,7 @@ class PutawayApiController {
     def identifierService
 
     def list = {
-        Location location = Location.get(params?.location?.id)
+        Location location = Location.get(params?.location?.id?:session?.warehouse?.id)
         if (!location) {
             throw new IllegalArgumentException("Must provide location.id as request parameter")
         }
