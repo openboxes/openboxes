@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.grails.validation.Validateable
 import org.codehaus.groovy.grails.web.binding.DataBindingUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -72,6 +73,7 @@ enum PutawayStatus {
 @Validateable
 class Putaway {
 
+    String id
     String putawayNumber
     Person putawayAssignee
     Date putawayDate
@@ -90,6 +92,7 @@ class Putaway {
 
     Map toJson() {
         return [
+                id: id,
                 putawayNumber: putawayNumber,
                 putawayStatus: putawayStatus?.name(),
                 putawayDate: putawayDate,
@@ -103,6 +106,7 @@ class Putaway {
 @Validateable
 class PutawayItem {
 
+    String id
     Product product
     InventoryItem inventoryItem
     Container container
@@ -116,9 +120,25 @@ class PutawayItem {
     PutawayStatus putawayStatus
     Transaction transaction
 
+    String getCurrentBins() {
+        String currentBins = ""
+        if (availableItems) {
+            currentBins = availableItems?.collect { it?.binLocation?.name }.sort().join(",")
+        }
+        return currentBins
+    }
+
+    String getCurrentBinsAbbreviated() {
+        String currentBins = getCurrentBins()
+        return StringUtils.abbreviate(currentBins, 25)
+    }
+
 
     Map toJson() {
         return [
+                id: id,
+                "stockMovement.id": currentLocation.name,
+                "stockMovement.name": currentLocation.name,
                 putawayStatus: transaction ? PutawayStatus.COMPLETE.name() : putawayStatus?.name(),
                 transactionNumber: transaction?.transactionNumber,
                 "currentFacility.id": currentFacility?.id,
@@ -127,14 +147,15 @@ class PutawayItem {
                 "currentLocation.name": currentLocation?.name,
                 container: container,
                 "product.id": product?.id,
-                productCode: product?.productCode,
+                "product.productCode": product?.productCode,
                 "product.name": product?.name,
                 "inventoryItem.id": inventoryItem?.id,
-                lotNumber: inventoryItem?.lotNumber,
-                expirationDate: inventoryItem?.expirationDate,
+                "inventoryItem.lotNumber": inventoryItem?.lotNumber,
+                "inventoryItem.expirationDate": inventoryItem?.expirationDate,
                 "recipient.id": recipient?.id,
                 "recipient.name": recipient?.name,
-                availableBins: availableItems?.collect { it?.binLocation?.name },
+                currentBins: currentBins,
+                currentBinsAbbreviated: currentBinsAbbreviated,
                 "putawayFacility.id": putawayFacility?.id,
                 "putawayFacility.name": putawayFacility?.name,
                 "putawayLocation.id": putawayLocation?.id,
