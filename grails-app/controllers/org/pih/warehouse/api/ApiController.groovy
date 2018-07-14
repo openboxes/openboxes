@@ -40,9 +40,15 @@ class ApiController {
             throw new ObjectNotFoundException(params.id, Location.class.toString())
         }
         session.warehouse = location
-
         render ([status: 200, text: "User ${session.user} is now logged into ${location.name}"])
     }
+
+    def getSession = {
+        User user = User.get(session?.user?.id)
+        Location location = Location.get(session.warehouse?.id)
+        render ([data:[user:user, location:location]] as JSON)
+    }
+
 
     def logout = {
         session.user = null
