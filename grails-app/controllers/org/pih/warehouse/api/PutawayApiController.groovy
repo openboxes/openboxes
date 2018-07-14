@@ -43,10 +43,21 @@ class PutawayApiController {
 
     def create = { Putaway putaway ->
         JSONObject jsonObject = request.JSON
+
+        // Bind the putaway
         bindData(putaway, jsonObject)
+
+        // Bind the putaway items
         jsonObject.putawayItems.each { putawayItemMap ->
             PutawayItem putawayItem = new PutawayItem()
             bindData(putawayItem, putawayItemMap)
+
+            // Bind the split items
+            putawayItemMap.splitItems.each { splitItemMap ->
+                PutawayItem splitItem = new PutawayItem()
+                bindData(splitItem, splitItemMap)
+                putawayItem.splitItems.add(splitItem)
+            }
 
             if (!putaway.putawayNumber) {
                 putaway.putawayNumber = identifierService.generateOrderIdentifier()
@@ -58,6 +69,10 @@ class PutawayApiController {
             putaway.putawayItems.add(putawayItem)
         }
 
+        // Need to process the split items
+        putawayService.processSplitItems(putaway)
+
+        // Putaway stock
         if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETE)) {
             putawayService.putawayStock(putaway)
         }
@@ -119,6 +134,8 @@ class PutawayItem {
     List<AvailableItem> availableItems
     PutawayStatus putawayStatus
     Transaction transaction
+
+    List<PutawayItem> splitItems = []
 
     String getCurrentBins() {
         String currentBins = ""
