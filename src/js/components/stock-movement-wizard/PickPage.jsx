@@ -11,6 +11,7 @@ import ValueSelectorField from '../form-elements/ValueSelectorField';
 import AdjustInventoryModal from './modals/AdjustInventoryModal';
 import EditPickModal from './modals/EditPickModal';
 import { AVAILABLE_LOTS } from '../../mockedData';
+import { showSpinner, hideSpinner } from '../../actions';
 
 const FIELDS = {
   pickPage: {
@@ -107,6 +108,11 @@ const FIELDS = {
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["print"] }] */
 /* eslint no-param-reassign: "error" */
 class PickPage extends Component {
+  constructor(props) {
+    super(props);
+    this.props.showSpinner();
+  }
+
   componentDidMount() {
     // TODO: once API will be ready, rewrite this to get data from backend
     if (!_.some(this.props.pickPageData, 'availableLots')) {
@@ -156,6 +162,7 @@ class PickPage extends Component {
       // Update specfied field in redux form
       this.props.change('stock-movement-wizard', 'pickPage', pickPage);
     }
+    this.props.hideSpinner();
   }
 
   print() {
@@ -192,7 +199,7 @@ export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
-})(connect(mapStateToProps, { change })(PickPage));
+})(connect(mapStateToProps, { change, showSpinner, hideSpinner })(PickPage));
 
 PickPage.propTypes = {
   pickPageData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
@@ -200,4 +207,6 @@ PickPage.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   lineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
 };

@@ -20,6 +20,7 @@ const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
   NO: 'disabled btn btn-outline-secondary',
   EARLIER: 'btn btn-outline-warning',
+  HIDDEN: 'btn invisible',
 };
 
 const FIELDS = {
@@ -35,6 +36,9 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
+        getDynamicAttr: ({ subfield }) => ({
+          className: subfield ? 'text-center' : 'text-left ml-4',
+        }),
         label: 'Code',
       },
       productName: {
@@ -60,16 +64,20 @@ const FIELDS = {
         attributes: {
           title: 'Substitutes',
         },
-        getDynamicAttr: ({ fieldValue, rowIndex }) => ({
+        getDynamicAttr: ({
+          fieldValue, rowIndex, stockMovementId, rewriteTable,
+        }) => ({
           productCode: fieldValue.productCode,
           btnOpenText: fieldValue.substitutionStatus,
           btnOpenDisabled: fieldValue.substitutionStatus === 'NO',
-          btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus],
+          btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus || 'HIDDEN'],
           rowIndex,
           lineItem: fieldValue,
+          stockMovementId,
+          rewriteTable,
         }),
       },
-      revisedQuantity: {
+      quantityRevised: {
         label: 'Revised Qty',
         type: TextField,
         fieldKey: 'statusCode',
@@ -96,7 +104,7 @@ const FIELDS = {
           formName: 'stock-movement-wizard',
         },
         getDynamicAttr: ({ rowIndex }) => ({
-          field: `editPageItems[${rowIndex}].revisedQuantity`,
+          field: `editPageItems[${rowIndex}].quantityRevised`,
         }),
       },
     },
@@ -109,6 +117,7 @@ class EditItemsPage extends Component {
 
     this.state = { statusCode: '' };
 
+    this.rewriteTable = this.rewriteTable.bind(this);
     this.props.showSpinner();
   }
 
@@ -138,19 +147,27 @@ class EditItemsPage extends Component {
     });
   }
 
-  // TODO
-  // updateRequisitionItems() {
-  // TODO const itemsToUpdate = filter items with revised qty
-  // TODO const url = ``;
-  // TODO payload = { itemsToUpdate }
-  // TODO apiClient.post(url, payload)
-  // }
+  reviseRequisitionItems(values) {
+    const itemsToRevise = _.filter(
+      values.editPageItems,
+      item => item.quantityRevised && item.reasonCode,
+    );
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
+    const payload = {
+      lineItems: _.map(itemsToRevise, item => ({
+        id: item.requisitionItemId,
+        quantityRevised: item.quantityRevised,
+        reasonCode: item.reasonCode,
+      })),
+    };
+    return apiClient.post(url, payload);
+  }
 
   transitionToStep4() {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
     const payload = { status: 'PICKING' };
 
-    apiClient.post(url, payload);
+    return apiClient.post(url, payload);
   }
 
   fetchLineItems() {
@@ -161,21 +178,33 @@ class EditItemsPage extends Component {
       .catch(err => err);
   }
 
-  // TODO
   nextPage(formValues) {
-    // TODO check which items have filled revisedqty and reason
-    // TODO make 'changes' field for those items
-    // TODO this.updateRequisitionItems request
-    // TODO then this.props.onSubmit();
-    // TODO catch this.props.hideSpinner();
-    // TODO if (statusCode === 'VERIFYING') { this.transitionToStep4(); }
-    this.props.onSubmit();
+    this.props.showSpinner();
+    this.reviseRequisitionItems(formValues)
+      .then(() => {
+        if (this.state.statusCode === 'VERIFYING') {
+          this.transitionToStep4()
+            .then(() => this.props.onSubmit())
+            .catch(() => this.props.hideSpinner());
+        } else {
+          this.props.onSubmit();
+        }
+      }).catch(() => this.props.hideSpinner());
+  }
+
+  rewriteTable() {
+    const items = this.props.editPageItems;
+    this.props.change('stock-movement-wizard', 'editPageItems', []);
+    this.props.change('stock-movement-wizard', 'editPageItems', items);
   }
 
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(values => this.nextPage(values))}>
-        {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
+        {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+          stockMovementId: this.props.stockMovementId,
+          rewriteTable: this.rewriteTable,
+        }))}
         <div>
           <button type="button" className="btn btn-outline-primary" onClick={this.props.previousPage}>
             Previous
@@ -193,10 +222,10 @@ function validate(values) {
   errors.editPageItems = [];
 
   _.forEach(values.editPageItems, (item, key) => {
-    if (!_.isEmpty(item.revisedQuantity) && _.isEmpty(item.reasonCode)) {
+    if (!_.isEmpty(item.quantityRevised) && _.isEmpty(item.reasonCode)) {
       errors.editPageItems[key] = { reasonCode: 'Reason code required' };
-    } else if (_.isEmpty(item.revisedQuantity) && !_.isEmpty(item.reasonCode)) {
-      errors.editPageItems[key] = { revisedQuantity: 'Revised quantity required' };
+    } else if (_.isEmpty(item.quantityRevised) && !_.isEmpty(item.reasonCode)) {
+      errors.editPageItems[key] = { quantityRevised: 'Revised quantity required' };
     }
   });
   return errors;
@@ -205,6 +234,7 @@ const selector = formValueSelector('stock-movement-wizard');
 
 const mapStateToProps = state => ({
   stockMovementId: selector(state, 'requisitionId'),
+  editPageItems: selector(state, 'editPageItems'),
 });
 
 export default reduxForm({
@@ -222,4 +252,5 @@ EditItemsPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   stockMovementId: PropTypes.string.isRequired,
+  editPageItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

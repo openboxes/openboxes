@@ -296,12 +296,10 @@ class AddItemsPage extends Component {
           if (this.state.statusCode === 'CREATED' || this.state.statusCode === 'EDITING') {
             this.transitionToStep3()
               .then(() => {
-                // this.props.hideSpinner();
                 this.props.onSubmit();
               })
               .catch(() => this.props.hideSpinner());
           } else {
-            // this.props.hideSpinner();
             this.props.onSubmit();
           }
         })
