@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
@@ -56,6 +57,7 @@ class StockMovement {
     Requisition requisition
     Order order
     Shipment shipment
+    List documents
 
     static constraints = {
         id(nullable:true)
@@ -77,15 +79,6 @@ class StockMovement {
     }
 
 
-    Map getPropertyMap(String [] propertyNames) {
-        Map propertyMap = [:]
-
-        propertyNames.each { propertyName ->
-            propertyMap << ["${propertyName}": this."${propertyName}"]
-        }
-        return propertyMap;
-    }
-
     Map toJson() {
         return [
                 id: id,
@@ -103,7 +96,7 @@ class StockMovement {
                 associations: [
                     requisition: [id: requisition.id, requestNumber: requisition.requestNumber, status: requisition?.status?.name()],
                     shipments: requisition?.shipments?.collect { [id: it.id, shipmentNumber: it.shipmentNumber, status: it?.currentStatus?.name()] },
-                    documents: []
+                    documents: documents
                 ],
         ]
     }
@@ -147,6 +140,8 @@ class StockMovement {
                 requisition: requisition
         )
 
+        stockMovement.shipment = Shipment.findByRequisition(requisition)
+
         // Include all requisition items except those that are substitutions or modifications because the
         // original requisition item will represent these changes
         requisition.requisitionItems.each { requisitionItem ->
@@ -178,6 +173,26 @@ class StockMovement {
         }
         return stockMovement
     }
+}
+
+enum DocumentGroupCode {
+    INVOICE('Invoice'),
+    PICKLIST('Pick list'),
+    PACKING_LIST('Packing List'),
+    CERTIFICATE_OF_DONATION('Certificate of Donation'),
+    DELIVERY_NOTE('Delivery Note'),
+    GOODS_RECEIPT_NOTE('Goods Receipt Note')
+
+    final String description
+
+    DocumentGroupCode(String description) {
+        this.description = description
+    }
+
+    static list() {
+        return [INVOICE, PICKLIST, PACKING_LIST, CERTIFICATE_OF_DONATION, DELIVERY_NOTE, GOODS_RECEIPT_NOTE]
+    }
+
 }
 
 class PickPage {
