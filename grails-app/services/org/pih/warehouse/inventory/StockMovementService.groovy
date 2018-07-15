@@ -10,9 +10,9 @@
 package org.pih.warehouse.inventory
 
 import grails.validation.ValidationException
-import org.apache.commons.lang.NotImplementedException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PickPage
@@ -23,23 +23,17 @@ import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
-import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.shipping.ShipmentType
 
 class StockMovementService {
 
@@ -50,6 +44,8 @@ class StockMovementService {
     def inventoryService
 
     boolean transactional = true
+
+    def grailsApplication
 
     def createStockMovement(StockMovement stockMovement) {
 
@@ -90,7 +86,7 @@ class StockMovementService {
                 requisition.addToRequisitionItems(requisitionItem)
             }
         }
-        if (requisition.hasErrors() || !requisition.save(flush:true)) {
+        if (requisition.hasErrors() || !requisition.save(flush: true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
 
@@ -103,8 +99,7 @@ class StockMovementService {
         Requisition requisition = Requisition.get(id)
         if (!status in RequisitionStatus.list()) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
-        }
-        else if (status < requisition.status) {
+        } else if (status < requisition.status) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
         }
 
@@ -155,17 +150,14 @@ class StockMovementService {
                         log.info "Item deleted " + requisitionItem.id
                         requisitionItem.undoChanges()
                         requisition.removeFromRequisitionItems(requisitionItem)
-                        requisitionItem.delete(flush:true)
-                    }
-                    else if (stockMovementItem.revert) {
+                        requisitionItem.delete(flush: true)
+                    } else if (stockMovementItem.revert) {
                         log.info "Item reverted " + requisitionItem.id
                         requisitionItem.undoChanges()
-                    }
-                    else if (stockMovementItem.cancel) {
+                    } else if (stockMovementItem.cancel) {
                         log.info "Item canceled " + requisitionItem.id
                         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
-                    }
-                    else if (stockMovementItem.substitute) {
+                    } else if (stockMovementItem.substitute) {
                         log.info "Item substituted " + requisitionItem.id
                         log.info "Substitutions: " + requisitionItem.product.substitutions
                         if (!requisitionItem.product.isValidSubstitution(stockMovementItem?.newProduct)) {
@@ -179,8 +171,7 @@ class StockMovementService {
                                 stockMovementItem.newQuantity?.intValueExact(),
                                 stockMovementItem.reasonCode,
                                 stockMovementItem.comments)
-                    }
-                    else {
+                    } else {
                         log.info "Item updated " + requisitionItem.id
                         if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
                         if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
@@ -213,7 +204,7 @@ class StockMovementService {
             }
         }
 
-        if (requisition.hasErrors() || !requisition.save(flush:true)) {
+        if (requisition.hasErrors() || !requisition.save(flush: true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
 
@@ -251,12 +242,11 @@ class StockMovementService {
         }
 
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-
+        stockMovement.documents = getDocuments(stockMovement)
         if (stepNumber.equals("3")) {
             stockMovement.lineItems = null
             stockMovement.editPage = getEditPage(id)
-        }
-        else if (stepNumber.equals("4")) {
+        } else if (stepNumber.equals("4")) {
             stockMovement.lineItems = null
             stockMovement.pickPage = getPickPage(id)
         }
@@ -315,7 +305,6 @@ class StockMovementService {
         }
     }
 
-
     /**
      * Create an automated picklist for the given stock movement item.
      *
@@ -351,7 +340,7 @@ class StockMovementService {
 
 
     void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, InventoryItem inventoryItem, Location binLocation,
-                         Integer quantity, String reasonCode, String comment) {
+                                    Integer quantity, String reasonCode, String comment) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
 
         // Validate quantity
@@ -398,7 +387,7 @@ class StockMovementService {
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
         }
-        picklist.save(flush:true)
+        picklist.save(flush: true)
     }
 
     /**
@@ -480,8 +469,6 @@ class StockMovementService {
         return availableSubstitutions
     }
 
-
-
     // These two methods do very different things
 //    List<SubstitutionItem> getSubstitutionItems(StockMovementItem stockMovementItem) {
 //        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
@@ -491,8 +478,6 @@ class StockMovementService {
 //        }
 //        return substitutionItems
 //    }
-
-
 
 
     EditPage getEditPage(String id) {
@@ -530,14 +515,13 @@ class StockMovementService {
             pickPageItems << requisitionItem.substitutionItems.collect {
                 return buildPickPageItem(it)
             }
-        }
-        else {
+        } else {
             pickPageItems << buildPickPageItem(requisitionItem)
         }
     }
 
 
-    EditPageItem buildEditPageItem(StockMovementItem stockMovementItem)  {
+    EditPageItem buildEditPageItem(StockMovementItem stockMovementItem) {
         EditPageItem editPageItem = new EditPageItem()
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         Location location = requisitionItem?.requisition?.origin
@@ -553,7 +537,6 @@ class StockMovementService {
         editPageItem.availableItems = availableItems
         return editPageItem
     }
-
 
     /**
      *
@@ -621,7 +604,7 @@ class StockMovementService {
         Requisition requisition = stockMovement.requisition
         def shipments = requisition.shipments
 
-        if(!shipments) {
+        if (!shipments) {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
@@ -651,4 +634,69 @@ class StockMovementService {
 
         }
     }
+
+
+    List<Map> getDocuments(StockMovement stockMovement) {
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def documentList = [
+                [
+                        name        : g.message(code: "picklist.button.print.label"),
+                        documentType: DocumentGroupCode.PICKLIST.name(),
+                        contentType : "text/html",
+                        stepNumber  : 4,
+                        uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                ],
+                [
+                        name        : g.message(code: "picklist.button.download.label"),
+                        documentType: DocumentGroupCode.PICKLIST.name(),
+                        contentType : "application/pdf",
+                        stepNumber  : 4,
+                        uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true)
+                ],
+                [
+                        name        : g.message(code: "shipping.printPickList.label"),
+                        documentType: DocumentGroupCode.PICKLIST.name(),
+                        contentType : "text/html",
+                        stepNumber  : 5,
+                        uri         : g.createLink(controller: 'report', action: "printPickListReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
+                ],
+                [
+                        name        : g.message(code: "shipping.printShippingReport.label"),
+                        documentType: DocumentGroupCode.PACKING_LIST.name(),
+                        contentType : "text/html",
+                        stepNumber  : 5,
+                        uri         : g.createLink(controller: 'report', action: "printShippingReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
+                ],
+                [
+                        name        : g.message(code: "shipping.printPaginatedPackingListReport.label"),
+                        documentType: DocumentGroupCode.PACKING_LIST.name(),
+                        contentType : "text/html",
+                        stepNumber  : 5,
+                        uri         : g.createLink(controller: 'report', action: "printPaginatedPackingListReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
+                ],
+                [
+                        name        : g.message(code: "shipping.downloadPackingList.label"),
+                        documentType: DocumentGroupCode.PACKING_LIST.name(),
+                        contentType : "application/vnd.ms-excel",
+                        stepNumber  : 5,
+                        uri         : g.createLink(controller: 'doc4j', action: "downloadPackingList", id: stockMovement?.shipment?.id, absolute: true)
+                ],
+                [
+                        name        : g.message(code: "shipping.downloadLetter.label"),
+                        documentType: DocumentGroupCode.CERTIFICATE_OF_DONATION.name(),
+                        contentType : "text/html",
+                        stepNumber  : 5,
+                        uri         : g.createLink(controller: 'doc4j', action: "downloadLetter", id: stockMovement?.shipment?.id, absolute: true)
+                ],
+                [
+                        name        : g.message(code: "deliveryNote.button.print.label"),
+                        documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
+                        contentType : "text/html",
+                        stepNumber  : 5,
+                        uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                ]
+        ]
+        return documentList
+    }
 }
+
