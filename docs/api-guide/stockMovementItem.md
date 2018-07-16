@@ -689,3 +689,34 @@ foreign key constraints).
 ```
 Therefore you must revert all changes to the stock movement 
 item before deleting.
+
+
+## Picking
+
+### Request
+```
+curl  -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d @pickStockMovementItems.json \
+https://openboxes.ngrok.io/openboxes/api/stockMovementItems/ff808181646b260401646b5bf4cb002b
+```
+### Post Body (pickStockMovementItem.json)
+```
+{
+	"picklistItems":[{
+        "id": "ff80818164787ed10164788a0f190022",
+	    "inventoryItem.id": "ff8081816473166d0164731d419f000c",
+	    "binLocation.id": "ff808181646d3ec101646d5e8e3e0003",
+	    "quantityPicked":"10"
+	}]
+}
+
+```
+
+NOTE: To create a pick list item, remove the ID field from the post body (value can also be empty string).
+To edit an existing picklist item, specify the ID from the `picklistItems` array. To delete the picklist item
+assign a value of 0 to the `quantityPicked` field.
+
+
+### Exceptions
+This operation might fail if the quantity picked of the selected item is greater than
+the quantity on hand of that item in stock.
