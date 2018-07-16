@@ -15,5 +15,6 @@
     <include file="0.8.x/changelog-2018-07-05-1522-add-column-bin-location.xml"/>
     <include file="0.8.x/changelog-2018-07-07-2338-add-column-shipment-requisition.xml"/>
     <include file="0.8.x/changelog-2018-07-09-2222-insert-internal-receiving-location-type.xml"/>
+    <include file="0.8.x/changelog-2018-07-15-2301-insert-internal-cross-docking-location-type.xml"/>
 
 </databaseChangeLog>

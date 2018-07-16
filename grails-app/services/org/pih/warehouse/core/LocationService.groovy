@@ -158,6 +158,9 @@ class LocationService {
         return getInternalLocations(parentLocation, [ActivityCode.RECEIVE_STOCK])
     }
 
+    List getCrossDockingLocations(Location parentLocation) {
+        return getInternalLocations(parentLocation, [ActivityCode.CROSS_DOCKING])
+    }
 
     List getDepots() {
 		return getAllLocations()?.findAll { it.supports(ActivityCode.MANAGE_INVENTORY) }
