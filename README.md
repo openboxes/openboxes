@@ -84,12 +84,15 @@ Edit `$HOME/.grails/openboxes-config.properties`
 # If you want to run $ grails test-app you should comment out the dataSource.url below and create a new 
 # openboxes_test database.  Eventually, we will move to an in-memory H2 database for testing, but we're 
 # currently stuck with MySQL because I'm using some MySQL-specific stuff in the Liquibase changesets.  My bad.
+# 
+# MySQL 5.5 required a few extra parameters but these are no longer needed if using MySQL 5.7
+# ?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
 
-dataSource.url=jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
+dataSource.url=jdbc:mysql://localhost:3306/openboxes
 dataSource.username=openboxes
 dataSource.password=openboxes
 
-# OpenBoxes mail settings - disabled by default
+# OpenBoxes mail settings (disabled by default)
 grails.mail.enabled=false
 
 # OpenBoxes > Inventory Browser > Quick categories
