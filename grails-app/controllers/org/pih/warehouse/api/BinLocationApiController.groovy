@@ -26,11 +26,7 @@ class BinLocationApiController {
             throw new UnresolvableObjectException("No bin locations for location ${params?.parentLocation?.id}", params?.parentLocation?.id, Location.class.toString())
         }
 
-        // FIXME This should be moved to the Location domain
-        Set binLocations =
-                location?.locations?.findAll { it.locationType?.locationTypeCode == LocationTypeCode.BIN_LOCATION }
-
-		render ([data:binLocations] as JSON)
+		render ([data:location?.binLocations] as JSON)
 	}
 
     def read = {

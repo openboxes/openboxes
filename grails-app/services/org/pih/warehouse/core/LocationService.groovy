@@ -138,6 +138,11 @@ class LocationService {
 		else {
 			internalLocationsSupportingActivityCodes.addAll(internalLocations)
 		}
+
+		// Sort locations by sort order, then name
+		internalLocationsSupportingActivityCodes =
+				internalLocationsSupportingActivityCodes.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
+
 		return internalLocationsSupportingActivityCodes.unique()
 	}
 
@@ -153,6 +158,9 @@ class LocationService {
         return getInternalLocations(parentLocation, [ActivityCode.RECEIVE_STOCK])
     }
 
+    List getCrossDockingLocations(Location parentLocation) {
+        return getInternalLocations(parentLocation, [ActivityCode.CROSS_DOCKING])
+    }
 
     List getDepots() {
 		return getAllLocations()?.findAll { it.supports(ActivityCode.MANAGE_INVENTORY) }
