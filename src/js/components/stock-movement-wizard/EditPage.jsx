@@ -32,7 +32,7 @@ const FIELDS = {
         className: rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out' : '',
       }
     ),
-    subfieldKey: 'substitutions',
+    subfieldKey: 'substitutionItems',
     fields: {
       productCode: {
         type: LabelField,
@@ -65,16 +65,15 @@ const FIELDS = {
           title: 'Substitutes',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, stockMovementId, rewriteTable,
+          fieldValue, rowIndex, stockMovementId,
         }) => ({
           productCode: fieldValue.productCode,
           btnOpenText: fieldValue.substitutionStatus,
-          btnOpenDisabled: fieldValue.substitutionStatus === 'NO',
+          btnOpenDisabled: fieldValue.substitutionStatus === 'NO' || fieldValue.statusCode === 'SUBSTITUTED',
           btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus || 'HIDDEN'],
           rowIndex,
           lineItem: fieldValue,
           stockMovementId,
-          rewriteTable,
         }),
       },
       quantityRevised: {
@@ -84,8 +83,8 @@ const FIELDS = {
         attributes: {
           type: 'number',
         },
-        getDynamicAttr: ({ fieldValue }) => ({
-          disabled: fieldValue === 'SUBSTITUTED',
+        getDynamicAttr: ({ fieldValue, subfield }) => ({
+          disabled: fieldValue === 'SUBSTITUTED' || subfield,
         }),
       },
       reasonCode: {
@@ -96,8 +95,8 @@ const FIELDS = {
           attributes: {
             options: REASON_CODE_MOCKS,
           },
-          getDynamicAttr: ({ selectedValue }) => ({
-            disabled: !selectedValue,
+          getDynamicAttr: ({ selectedValue, subfield }) => ({
+            disabled: !selectedValue || subfield,
           }),
         },
         attributes: {
@@ -117,7 +116,6 @@ class EditItemsPage extends Component {
 
     this.state = { statusCode: '' };
 
-    this.rewriteTable = this.rewriteTable.bind(this);
     this.props.showSpinner();
   }
 
@@ -192,18 +190,11 @@ class EditItemsPage extends Component {
       }).catch(() => this.props.hideSpinner());
   }
 
-  rewriteTable() {
-    const items = this.props.editPageItems;
-    this.props.change('stock-movement-wizard', 'editPageItems', []);
-    this.props.change('stock-movement-wizard', 'editPageItems', items);
-  }
-
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(values => this.nextPage(values))}>
         {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
           stockMovementId: this.props.stockMovementId,
-          rewriteTable: this.rewriteTable,
         }))}
         <div>
           <button type="button" className="btn btn-outline-primary" onClick={this.props.previousPage}>

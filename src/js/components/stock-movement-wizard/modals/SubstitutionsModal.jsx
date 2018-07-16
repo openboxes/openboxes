@@ -8,11 +8,21 @@ import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
 import ArrayField from '../../form-elements/ArrayField';
 import TextField from '../../form-elements/TextField';
+import SelectField from '../../form-elements/SelectField';
+import { REASON_CODE_MOCKS } from '../../../mockedData';
 import { renderFormField } from '../../../utils/form-utils';
 import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../../actions';
 
 const FIELDS = {
+  reasonCode: {
+    type: SelectField,
+    label: 'Reason code',
+    attributes: {
+      required: true,
+      options: REASON_CODE_MOCKS,
+    },
+  },
   substitutions: {
     type: ArrayField,
     disableVirtualization: true,
@@ -66,44 +76,35 @@ class SubstitutionsModal extends Component {
     this.props.change(
       'substitution-form',
       'substitutions',
-      this.state.attr.lineItem.substitutionItems,
+      this.state.attr.lineItem.availableSubstitutions,
     );
   }
 
-  onSave() {
+  onSave(values) {
     this.props.showSpinner();
-    const substitutions = _.filter(this.props.substitutions, sub => sub.quantitySelected > 0);
-    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
+    const substitutions = _.filter(values.substitutions, sub => sub.quantitySelected > 0);
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=3`;
     const payload = {
       lineItems: _.map(substitutions, sub => ({
         id: this.state.attr.lineItem.requisitionItemId,
         substitute: 'true',
         'newProduct.id': sub.productId,
         newQuantity: sub.quantitySelected,
-        // TODO: reasonCode field on modal
-        reasonCode: 'SUB',
+        reasonCode: values.reasonCode,
       })),
     };
 
     return apiClient.post(url, payload).then((resp) => {
-      const substitutedItem = _.find(
-        resp.data.data.lineItems,
-        item => item.id === this.state.attr.lineItem.requisitionItemId,
-      );
-      const newEditPageItem = {
-        ...substitutedItem,
-        // hide reason code for crossed out
-        reasonCode: '',
-        productName: substitutedItem.product.name,
-        substitutions: _.map(substitutedItem.substitutionItems, sub => ({
-          ...sub,
-          productName: sub.product.name,
-        })),
-      };
+      const { editPageItems } = resp.data.data.editPage;
 
-      this.props.arrayRemove('stock-movement-wizard', 'editPageItems', this.props.rowIndex);
-      this.props.arrayInsert('stock-movement-wizard', 'editPageItems', this.props.rowIndex, newEditPageItem);
-      this.props.rewriteTable();
+      this.props.change('stock-movement-wizard', 'editPageItems', []);
+      this.props.change('stock-movement-wizard', 'editPageItems', _.map(editPageItems, item => ({
+        ...item,
+        substitutionItems: _.map(item.substitutionItems, sub => ({
+          ...sub,
+          quantityRequested: sub.quantitySelected,
+        })),
+      })));
 
       this.props.hideSpinner();
     }).catch(() => { this.props.hideSpinner(); });
@@ -119,7 +120,7 @@ class SubstitutionsModal extends Component {
       <ModalWrapper
         {...this.state.attr}
         onOpen={this.onOpen}
-        onSave={this.onSave}
+        onSave={this.props.handleSubmit(values => this.onSave(values))}
         btnSaveDisabled={this.props.invalid}
       >
         <form value={this.state.attr.productCode}>
@@ -127,6 +128,7 @@ class SubstitutionsModal extends Component {
           <div className="font-weight-bold">Product Name: {this.state.attr.lineItem.productName}</div>
           <div className="font-weight-bold">Quantity Requested: {this.state.attr.lineItem.quantityRequested}</div>
           <div className="font-weight-bold pb-2">Quantity Remaining: {this.calculateRemaining()}</div>
+          <hr />
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
         </form>
       </ModalWrapper>
@@ -143,6 +145,10 @@ function validate(values) {
       errors.substitutions[key] = { quantitySelected: 'Selected quantity is higher than available' };
     }
   });
+
+  if (!values.reasonCode) {
+    errors.reasonCode = 'This field is required';
+  }
   return errors;
 }
 
@@ -173,8 +179,8 @@ SubstitutionsModal.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   arrayRemove: PropTypes.func.isRequired,
   arrayInsert: PropTypes.func.isRequired,
-  rewriteTable: PropTypes.func.isRequired,
   rowIndex: PropTypes.number.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
 };
 
 SubstitutionsModal.defaultProps = {
