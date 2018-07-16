@@ -108,7 +108,9 @@ grails.project.dependency.resolution = {
         runtime(':quartz2:2.1.6.2')
         runtime(":resources:1.1.6")
         runtime(":zipped-resources:1.0") { excludes 'resources' }
-        runtime(":cached-resources:1.0") { excludes 'resources' }
+        runtime(":cached-resources:1.0") {
+            excludes 'resources', 'cache-headers'
+        }
         runtime(":cache-headers:1.1.5")
         runtime(":jquery:1.7.2")
         runtime(":jquery-ui:1.8.7") { excludes 'jquery' }
