@@ -55,7 +55,7 @@ class PicklistItem implements Serializable {
             requisitionItemId: requisitionItem?.id,
 			binLocationId: binLocation?.id,
             inventoryItemId: inventoryItem?.id,
-            quantityPicked: quantity,
+            quantity: quantity,
             reasonCode: reasonCode,
             comment: comment
         ]

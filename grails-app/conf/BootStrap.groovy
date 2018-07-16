@@ -158,7 +158,7 @@ class BootStrap {
                 expirationDate: picklistItem?.inventoryItem?.expirationDate,
                 "binLocation.id": picklistItem?.binLocation?.id,
                 "binLocation.name": picklistItem?.binLocation?.name,
-                quantity: picklistItem.quantity,
+                quantityPicked: picklistItem.quantity,
                 reasonCode: picklistItem.reasonCode,
                 comment: picklistItem.comment
         ]}
