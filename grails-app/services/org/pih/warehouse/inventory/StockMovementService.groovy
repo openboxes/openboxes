@@ -339,7 +339,8 @@ class StockMovementService {
     }
 
 
-    void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, InventoryItem inventoryItem, Location binLocation,
+    void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, PicklistItem picklistItem,
+                                    InventoryItem inventoryItem, Location binLocation,
                                     Integer quantity, String reasonCode, String comment) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
 
@@ -361,11 +362,6 @@ class StockMovementService {
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisitionItem.requisition
-        }
-
-        // Locate picklist item by inventory item and bin location (unique)
-        PicklistItem picklistItem = picklist.picklistItems.find {
-            it.inventoryItem == inventoryItem && it.binLocation == binLocation
         }
 
         // If one does not exist create it and add it to the list

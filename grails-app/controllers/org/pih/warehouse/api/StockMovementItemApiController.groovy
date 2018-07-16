@@ -14,6 +14,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.picklist.PicklistItem
 
 class StockMovementItemApiController {
 
@@ -61,20 +62,24 @@ class StockMovementItemApiController {
             if (!picklistItems) {
                 throw new IllegalArgumentException("Must specifiy picklistItems if autoSuggest is not enabled")
             }
-            picklistItems.each { picklistItem ->
+            picklistItems.each { picklistItemMap ->
 
-                InventoryItem inventoryItem = picklistItem["inventoryItem.id"] ?
-                        InventoryItem.get(picklistItem["inventoryItem.id"]) : null
+                PicklistItem picklistItem = picklistItemMap["id"] ?
+                        PicklistItem.get(picklistItemMap["id"]) : null
 
-                Location binLocation = picklistItem["binLocation.id"] ?
-                        Location.get(picklistItem["binLocation.id"]) : null
+                InventoryItem inventoryItem = picklistItemMap["inventoryItem.id"] ?
+                        InventoryItem.get(picklistItemMap["inventoryItem.id"]) : null
 
-                BigDecimal quantity = picklistItem.quantityPicked ? new BigDecimal(picklistItem.quantityPicked) : null
+                Location binLocation = picklistItemMap["binLocation.id"] ?
+                        Location.get(picklistItemMap["binLocation.id"]) : null
 
-                String reasonCode = picklistItem.reasonCode
-                String comment = picklistItem.comment
+                BigDecimal quantity = (picklistItemMap.quantityPicked != null) ?
+                        new BigDecimal(picklistItemMap.quantityPicked) : null
 
-                stockMovementService.createOrUpdatePicklistItem(stockMovementItem, inventoryItem, binLocation,
+                String reasonCode = picklistItemMap.reasonCode
+                String comment = picklistItemMap.comment
+
+                stockMovementService.createOrUpdatePicklistItem(stockMovementItem, picklistItem, inventoryItem, binLocation,
                         quantity.intValueExact(), reasonCode, comment)
             }
         }
