@@ -69,19 +69,4 @@
         </insert>
     </changeSet>
 
-    <changeSet author="jmiranda" id="1531713286656-4">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT count(*)
-                FROM location_type_supported_activities
-                WHERE location_type_id = 'cab2b48e649c71940164a13750f40001'
-                AND supported_activities_string = 'PICK_STOCK';
-            </sqlCheck>
-        </preConditions>
-        <insert tableName="location_type_supported_activities">
-            <column name="location_type_id" value="cab2b48e649c71940164a13750f40001"/>
-            <column name="supported_activities_string" value="PICK_STOCK"/>
-        </insert>
-    </changeSet>
-
 </databaseChangeLog>
