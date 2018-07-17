@@ -509,12 +509,13 @@ class StockMovementService {
         List pickPageItems = []
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         if (requisitionItem.isSubstituted()) {
-            pickPageItems << requisitionItem.substitutionItems.collect {
+            pickPageItems = requisitionItem.substitutionItems.collect {
                 return buildPickPageItem(it)
             }
         } else {
             pickPageItems << buildPickPageItem(requisitionItem)
         }
+        return pickPageItems
     }
 
 
