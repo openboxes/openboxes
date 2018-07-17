@@ -329,6 +329,7 @@ class StockMovementService {
             clearPicklist(stockMovementItem)
             for (SuggestedItem suggestedItem : suggestedItems) {
                 createOrUpdatePicklistItem(stockMovementItem,
+                        null,
                         suggestedItem.inventoryItem,
                         suggestedItem.binLocation,
                         suggestedItem.quantityPicked.intValueExact(),
