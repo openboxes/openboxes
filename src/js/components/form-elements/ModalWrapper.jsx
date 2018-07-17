@@ -33,6 +33,8 @@ class ModalWrapper extends Component {
   }
 
   render() {
+    const Title = this.props.title;
+
     return (
       <div>
         <button
@@ -50,7 +52,11 @@ class ModalWrapper extends Component {
           className="modal-content-custom"
           shouldCloseOnOverlayClick={false}
         >
-          <h5 className="text-center">{this.props.title}</h5>
+          {
+            typeof Title === 'string' ?
+              <h5 className="text-center">{Title}</h5> :
+              <Title />
+          }
           <hr />
 
           <div className={this.props.bodyContainerClassName} style={this.props.bodyContainerStyle}>
@@ -97,7 +103,10 @@ ModalWrapper.propTypes = {
   btnOpenDisabled: PropTypes.bool,
 
   /* Modal title property */
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func,
+  ]).isRequired,
 
   /* Modal body container properties */
   children: PropTypes.element.isRequired,

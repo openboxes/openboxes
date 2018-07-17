@@ -8,6 +8,8 @@ import 'react-table/react-table.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
 import Select from '../../utils/Select';
+import SplitLineModal from './SplitLineModal';
+import { BIN_LOCATION_MOCKS } from '../../mockedData';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -59,18 +61,6 @@ class PutAwaySecondPage extends Component {
       accessor: 'currentBin',
       style: { whiteSpace: 'normal' },
     }, {
-      Header: 'Put Away Bin',
-      accessor: 'putAwayBin',
-      Cell: cellInfo => (
-        <Select
-          value={_.get(this.state.data, `[${cellInfo.index}].${cellInfo.column.id}`) || ''}
-          onChange={value => this.setState({
-            data: update(this.state.data, {
-              [cellInfo.index]: { [cellInfo.column.id]: { $set: value } },
-            }),
-          })}
-        />),
-    }, {
       Header: 'Stock Movement',
       accessor: 'stockMovement.name',
       style: { whiteSpace: 'normal' },
@@ -81,15 +71,38 @@ class PutAwaySecondPage extends Component {
       ),
       filterable: true,
     }, {
+      Header: 'Put Away Bin',
+      accessor: 'putAwayBin',
+      Cell: (cellInfo) => {
+        const splitItems = _.get(this.state.data, `[${cellInfo.index}].splitItems`);
+
+        if (splitItems && splitItems.length > 0) {
+          return 'Split line';
+        }
+
+        return (<Select
+          options={BIN_LOCATION_MOCKS}
+          value={_.get(this.state.data, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
+          onChange={value => this.setState({
+            data: update(this.state.data, {
+              [cellInfo.index]: { [cellInfo.column.id]: { $set: value } },
+            }),
+          })}
+        />);
+      },
+    }, {
       Header: '',
-      accessor: 'splitLine',
-      Cell: () => (
-        <button
-          type="button"
-          className="btn btn-outline-success"
-        >
-          Split line
-        </button>),
+      accessor: 'splitItems',
+      Cell: cellInfo => (
+        <SplitLineModal
+          putawayItem={this.state.data[cellInfo.index]}
+          splitItems={_.get(this.state.data, `[${cellInfo.index}].${cellInfo.column.id}`)}
+          saveSplitItems={splitItems => this.setState({
+            data: update(this.state.data, {
+              [cellInfo.index]: { [cellInfo.column.id]: { $set: splitItems } },
+            }),
+          })}
+        />),
       filterable: false,
     },
   ];
