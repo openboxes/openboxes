@@ -42,6 +42,21 @@ class ProductApiController extends BaseDomainApiController {
         render ([data:availableItems] as JSON)
     }
 
+
+    def availableBins = {
+        def productIds = params.list("product.id") + params.list("id")
+        Location location = Location.get(params.location.id)
+
+        if (!location || productIds.empty) {
+            throw new IllegalArgumentException("Must specify a location and at least one product")
+        }
+
+        def products = Product.findAllByIdInListAndActive(productIds, true)
+        def availableBins = inventoryService.getAvailableBinLocations(location, products)
+        render ([data:availableBins] as JSON)
+    }
+
+
     def substitutions = {
         params.type = ProductAssociationTypeCode.SUBSTITUTE
         params.resource = "substitutions"

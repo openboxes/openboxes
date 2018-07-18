@@ -130,27 +130,71 @@ Date: Sun, 10 Jun 2018 21:43:37 GMT
 ### Sub Resources
 
 #### Available Items 
+
+NOTE: I'm realizing it could be dangerous to use this endpoint because it leaves the bin location empty. 
+This is misleading since you should not be able to make any changes to the quantity associated with the inventory item
+without specifying a valid bin location. 
 ```
 $ curl  -b cookies.txt -X GET -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/products/ff80818155df9de40155df9e3312000d/availableItems?location.id=1"|jsonlint
 {
   "data": [
     {
-      "inventoryItem": {
-        "id": "ff80818155df9de40155df9e3356000e",
-        "product": {
-          "id": "ff80818155df9de40155df9e3312000d",
-          "name": "General Pain Reliever",
-          "productCode": "00004"
-        },
-        "lotNumber": "lot57",
-        "expirationDate": "2017-01-28T15:58:54Z"
-      },
-      "quantity": 10000
+      "inventoryItem.id": "ff80818155df9de40155df9e3356000e",
+      "product.name": "General Pain Reliever",
+      "productCode": "00004",
+      "lotNumber": "lot57",
+      "expirationDate": "2017-01-28T15:58:54Z",
+      "binLocation.id": null,
+      "binLocation.name": null,
+      "quantityAvailable": 10000
+    }
+  ]
+}
+
+```
+
+#### Available Bin Locations 
+```
+$ curl  -b cookies.txt -X GET -H "Content-Type: application/json" \
+"https://openboxes.ngrok.io/openboxes/api/products/ff80818155df9de40155df9e3312000d/availableItems?location.id=1"|jsonlint
+{
+  "data": [
+    {
+      "inventoryItem.id": "ff8081816473166d0164731813990001",
+      "product.name": "General Pain Reliever",
+      "productCode": "00004",
+      "lotNumber": "252151251",
+      "expirationDate": "2025-01-01T06:00:00Z",
+      "binLocation.id": null,
+      "binLocation.name": null,
+      "quantityAvailable": 0
+    },
+    {
+      "inventoryItem.id": "ff80818155df9de40155df9e3356000e",
+      "product.name": "General Pain Reliever",
+      "productCode": "00004",
+      "lotNumber": "lot57",
+      "expirationDate": "2017-01-28T15:58:54Z",
+      "binLocation.id": null,
+      "binLocation.name": null,
+      "quantityAvailable": 10000
+    },
+    {
+      "inventoryItem.id": "ff8081816473166d0164731814310002",
+      "product.name": "General Pain Reliever",
+      "productCode": "00004",
+      "lotNumber": "214214212",
+      "expirationDate": "2020-01-01T06:00:00Z",
+      "binLocation.id": null,
+      "binLocation.name": null,
+      "quantityAvailable": 0
     }
   ]
 }
 ```
+
+
 #### Product Associations
 ```
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
