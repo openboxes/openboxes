@@ -78,7 +78,7 @@ class Select extends Component {
           target={target}
           container={document.getElementById('root')}
         >
-          <Dropdown width={target.offsetWidth} style={{ zIndex: 9999 }}>
+          <Dropdown width={target.offsetWidth}>
             {children}
           </Dropdown>
         </Overlay>

@@ -9,22 +9,34 @@ import ValueSelectorField from '../../form-elements/ValueSelectorField';
 import LabelField from '../../form-elements/LabelField';
 import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
-import { renderFormField, generateKey } from '../../../utils/form-utils';
+import { renderFormField } from '../../../utils/form-utils';
+import SelectField from '../../form-elements/SelectField';
+import { REASON_CODE_MOCKS } from '../../../mockedData';
+import apiClient from '../../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../../actions';
 
 const FIELDS = {
-  editPick: {
+  reasonCode: {
+    type: SelectField,
+    label: 'Reason code',
+    attributes: {
+      required: true,
+      options: REASON_CODE_MOCKS,
+    },
+  },
+  availableItems: {
     type: ArrayField,
     disableVirtualization: true,
     fields: {
-      lot: {
+      lotNumber: {
         type: LabelField,
         label: 'Lot #',
       },
-      expiryDate: {
+      expirationDate: {
         type: LabelField,
         label: 'Expiry Date',
       },
-      bin: {
+      'binLocation.name': {
         type: LabelField,
         label: 'Bin',
       },
@@ -35,7 +47,7 @@ const FIELDS = {
           formName: 'stock-movement-wizard',
         },
         getDynamicAttr: ({ rowIndex }) => ({
-          field: `editPick[${rowIndex}].recipient`,
+          field: `availableItems[${rowIndex}].recipient`,
         }),
         component: LabelField,
         componentConfig: {
@@ -44,11 +56,11 @@ const FIELDS = {
           }),
         },
       },
-      qtyAvailable: {
+      quantityAvailable: {
         type: LabelField,
         label: 'Qty available',
       },
-      qtyPicked: {
+      quantityPicked: {
         type: TextField,
         label: 'Qty picked',
         attributes: {
@@ -70,100 +82,79 @@ class EditPickModal extends Component {
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
     const attr = { ...attributes, ...dynamicAttr };
 
-    this.state = { attr, currentEdit: {} };
+    this.state = { attr };
 
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
   }
 
   onOpen() {
-    // Get Pick Page data
-    const { pickPage } = this.props;
-    // Find product that will be edited
-    const editPick =
-      _.find(pickPage, item =>
-        item.product.productCode === this.state.attr.productCode && item.availableLots.length >= 0);
-    // Update specfied field in redux form
-    this.props.change('stock-movement-wizard', 'editPick', editPick.availableLots);
-    this.setState({
-      currentEdit: {
-        itemCode: editPick.product.productCode,
-        itemName: editPick.product.name,
-        qtyRequested: editPick.quantity,
-      },
-    });
+    this.props.change(
+      'stock-movement-wizard', 'availableItems',
+      this.state.attr.fieldValue.availableItems,
+    );
   }
 
-  onSave() {
-    const elements = document.getElementsByClassName('collapse-all');
-    _.forEach(elements, element => element.classList.remove('show'));
+  onSave(values) {
+    this.props.showSpinner();
 
-    const { pickPage, editPick } = this.props;
-    // Get all new lot picks
-    const newPicks = editPick;
-    // Get lots that were picked before
-    const currentPicks = _.filter(pickPage, line =>
-      line.product.productCode === this.state.currentEdit.itemCode && !!line.lot);
-    // Get difference between old and new lots, this lots are assumed to be saved
-    let picksToSave = _.differenceBy(
-      _.filter(newPicks, pick => pick.qtyPicked > 0),
-      currentPicks,
-      'lotWithBin',
-    );
-    // For new picks add rowKey (if it does not exist)
-    picksToSave = _.map(picksToSave, pick => (
-      {
-        ...pick,
-        rowKey: pick.rowKey || generateKey(),
-      }
-    ));
-    // Get intersections of old and new lots, for this picks we have to check direct differences
-    const inters = _.intersectionBy(newPicks, currentPicks, 'lotWithBin');
-    _.forEach(inters, (obj) => {
-      const { lotWithBin } = obj;
-      // Get old pick to be potentially crossed out
-      const pickToCrossOut = _.find(currentPicks, pick => pick.lotWithBin === lotWithBin);
-      // Get new pick to be potentially added
-      const pickToAdd = _.find(newPicks, pick => pick.lotWithBin === lotWithBin);
-      picksToSave.push({
-        ...pickToCrossOut,
-        crossedOut: pickToAdd.qtyPicked !== pickToCrossOut.qtyPicked,
-        rowKey: pickToCrossOut.rowKey || generateKey(),
-      });
-      if (pickToAdd.qtyPicked > 0 && pickToAdd.qtyPicked !== pickToCrossOut.qtyPicked) {
-        picksToSave.push({ ...pickToAdd, rowKey: pickToAdd.rowKey || generateKey() });
-      }
-    });
-    // Remove old picks for specified product from current data in Pick Page
-    _.remove(pickPage, pick => pick.product.productCode === this.state.currentEdit.itemCode
-      && pick.lot);
-    // Find index after witch we will add our new picks
-    const itemIdx = _.findIndex(
-      pickPage,
-      pick => pick.product.productCode === this.state.currentEdit.itemCode,
-    );
-    // Insert our new picked lots
-    pickPage.splice(itemIdx + 1, 0, ...(_.sortBy(picksToSave, ['-class', 'lotWithBin'])));
-    const filteredPicks = _.filter(picksToSave, pick => !pick.crossedOut);
-    // Calculate summarised quantity picked (for specified item)
-    pickPage[itemIdx].qtyPicked =
-      _.reduce(filteredPicks, (sum, lot) => sum + parseInt(lot.qtyPicked, 10), 0);
-    // Update available lots quantities picked for specified item
-    _.forEach(pickPage[itemIdx].availableLots, (lot) => {
-      const newAvailableLot = _.find(filteredPicks, pick => pick.lotWithBin === lot.lotWithBin);
-      lot.qtyPicked = newAvailableLot ? newAvailableLot.qtyPicked : 0;
-    });
-    // Update specfied field in redux form
-    this.props.change('stock-movement-wizard', 'pickPage', pickPage);
+    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}`;
+    const payload = {
+      picklistItems: _.map(values.availableItems, (avItem) => {
+        // check if this picklist item already exists
+        const picklistItem = _.find(
+          this.state.attr.fieldValue.picklistItems,
+          item => item['inventoryItem.id'] === avItem['inventoryItem.id'],
+        );
+        if (picklistItem) {
+          return {
+            id: picklistItem.id,
+            'inventoryItem.id': avItem['inventoryItem.id'],
+            'binLocation.id': avItem['binLocation.id'],
+            quantityPicked: avItem.quantityPicked,
+          };
+        }
+        return {
+          'inventoryItem.id': avItem['inventoryItem.id'],
+          'binLocation.id': avItem['binLocation.id'],
+          quantityPicked: avItem.quantityPicked,
+        };
+      }),
+    };
+
+    return apiClient.post(url, payload).then((resp) => {
+      const { pickPageItems } = resp.data.data.pickPage;
+
+      this.props.change('stock-movement-wizard', 'pickPageItems', []);
+      this.props.change('stock-movement-wizard', 'pickPageItems', pickPageItems);
+
+      this.props.hideSpinner();
+    }).catch(() => { this.props.hideSpinner(); });
+  }
+
+  calculatePicked() {
+    return _.reduce(this.props.availableItems, (sum, val) =>
+      (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0);
   }
 
   render() {
+    if (this.state.attr.subfield) {
+      return null;
+    }
+
     return (
-      <ModalWrapper {...this.state.attr} onOpen={this.onOpen} onSave={this.onSave}>
+      <ModalWrapper
+        {...this.state.attr}
+        onOpen={this.onOpen}
+        onSave={this.props.handleSubmit(values => this.onSave(values))}
+        btnSaveDisabled={this.props.invalid}
+      >
         <form className="print-mt">
-          <div className="font-weight-bold">Product Code: {this.state.currentEdit.itemCode}</div>
-          <div className="font-weight-bold">Product Name: {this.state.currentEdit.itemName}</div>
-          <div className="font-weight-bold pb-2">Quantity Requested: {this.state.currentEdit.qtyRequested}</div>
+          <div className="font-weight-bold">Product Code: {this.state.attr.fieldValue.productCode}</div>
+          <div className="font-weight-bold">Product Name: {this.state.attr.fieldValue['product.name']}</div>
+          <div className="font-weight-bold">Quantity Requested: {this.state.attr.fieldValue.quantityRequested}</div>
+          <div className="font-weight-bold pb-2">Quantity Picked: {this.calculatePicked()}</div>
+          <hr />
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
         </form>
       </ModalWrapper>
@@ -171,15 +162,35 @@ class EditPickModal extends Component {
   }
 }
 
+function validate(values) {
+  const errors = {};
+  errors.availableItems = [];
+
+  _.forEach(values.availableItems, (item, key) => {
+    if (item.quantityPicked > item.quantityAvailable) {
+      errors.availableItems[key] = { quantityPicked: 'Picked quantity is higher than available' };
+    }
+  });
+
+  if (!values.reasonCode) {
+    errors.reasonCode = 'This field is required';
+  }
+
+  return errors;
+}
+
 const selector = formValueSelector('stock-movement-wizard');
 
-const mapStateToProps = state => ({ pickPage: selector(state, 'pickPage'), editPick: selector(state, 'editPick') });
+const mapStateToProps = state => ({
+  availableItems: selector(state, 'availableItems'),
+});
 
 export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
-})(connect(mapStateToProps, { change })(EditPickModal));
+  validate,
+})(connect(mapStateToProps, { change, showSpinner, hideSpinner })(EditPickModal));
 
 EditPickModal.propTypes = {
   change: PropTypes.func.isRequired,
@@ -187,7 +198,14 @@ EditPickModal.propTypes = {
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
-  pickPage: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  editPick: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  availableItems: PropTypes.arrayOf(PropTypes.shape({})),
   rowIndex: PropTypes.number.isRequired,
+  invalid: PropTypes.bool.isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+};
+
+EditPickModal.defaultProps = {
+  availableItems: [],
 };

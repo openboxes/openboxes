@@ -137,6 +137,7 @@ class EditItemsPage extends Component {
       );
 
       this.setState({ statusCode });
+      this.setState({ statusCode });
 
       this.props.change('stock-movement-wizard', 'editPageItems', editPageItems);
       this.props.hideSpinner();
@@ -163,7 +164,7 @@ class EditItemsPage extends Component {
 
   transitionToStep4() {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
-    const payload = { status: 'PICKING' };
+    const payload = { status: 'PICKING', createPicklist: 'true' };
 
     return apiClient.post(url, payload);
   }
@@ -218,6 +219,11 @@ function validate(values) {
     } else if (_.isEmpty(item.quantityRevised) && !_.isEmpty(item.reasonCode)) {
       errors.editPageItems[key] = { quantityRevised: 'Revised quantity required' };
     }
+    if (parseInt(item.quantityRevised, 10) === item.quantityRequested) {
+      errors.editPageItems[key] = {
+        quantityRevised: 'Revised quantity can\'t be the same as requested quantity',
+      };
+    }
   });
   return errors;
 }
@@ -225,7 +231,6 @@ const selector = formValueSelector('stock-movement-wizard');
 
 const mapStateToProps = state => ({
   stockMovementId: selector(state, 'requisitionId'),
-  editPageItems: selector(state, 'editPageItems'),
 });
 
 export default reduxForm({
@@ -243,5 +248,4 @@ EditItemsPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   stockMovementId: PropTypes.string.isRequired,
-  editPageItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
