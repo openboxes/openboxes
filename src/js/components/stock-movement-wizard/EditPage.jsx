@@ -37,7 +37,7 @@ const FIELDS = {
       productCode: {
         type: LabelField,
         getDynamicAttr: ({ subfield }) => ({
-          className: subfield ? 'text-center' : 'text-left ml-4',
+          className: subfield ? 'text-center' : 'text-left',
         }),
         label: 'Code',
       },
@@ -231,6 +231,12 @@ function validate(values) {
       errors.editPageItems[key] = {
         quantityRevised: 'Revised quantity can\'t be the same as requested quantity',
       };
+    }
+    if (_.isEmpty(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable)) {
+      errors.editPageItems[key] = { quantityRevised: 'Revise quantity! Quantity available is lower than requested' };
+    }
+    if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised > item.quantityAvailable)) {
+      errors.editPageItems[key] = { quantityRevised: 'Revised quantity exceeds quantity available' };
     }
   });
   return errors;
