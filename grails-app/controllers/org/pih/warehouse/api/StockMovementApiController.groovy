@@ -119,13 +119,18 @@ class StockMovementApiController {
 
         Boolean statusOnly =
                 jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
+
         Boolean clearPicklist =
                 jsonObject.containsKey("clearPicklist") ? jsonObject.getBoolean("clearPicklist") : false
+
         Boolean createPicklist =
                 jsonObject.containsKey("createPicklist") ? jsonObject.getBoolean("createPicklist") : false
 
-        RequisitionStatus status = jsonObject.containsKey("status") ? jsonObject.status as RequisitionStatus : null
-        Boolean rollback = jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
+        RequisitionStatus status =
+                jsonObject.containsKey("status") ? jsonObject.status as RequisitionStatus : null
+
+        Boolean rollback =
+                jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
 
         if (status && statusOnly) {
             stockMovementService.updateStatus(params.id, status)

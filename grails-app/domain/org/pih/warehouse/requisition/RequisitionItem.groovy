@@ -584,6 +584,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 id <=> requisitionItem?.id
     }
 
+    String toString() {
+        return "${product.productCode}:${status}:${requisitionItemType}:${quantity}"
+    }
+
 
     Map toJson(){
         [
