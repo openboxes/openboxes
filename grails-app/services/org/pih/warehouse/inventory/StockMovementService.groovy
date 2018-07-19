@@ -208,6 +208,8 @@ class StockMovementService {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
 
+        requisition = requisition.refresh()
+
         return StockMovement.createFromRequisition(requisition)
     }
 
@@ -297,7 +299,6 @@ class StockMovementService {
      * @param stockMovement
      */
     void createPicklist(StockMovement stockMovement) {
-        log.info "Create picklist"
         for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
             createPicklist(stockMovementItem)
         }
@@ -398,7 +399,7 @@ class StockMovementService {
                 int quantityPicked = (quantityRequested >= availableItem.quantityAvailable) ?
                         availableItem.quantityAvailable : quantityRequested
 
-                log.info "Quantity picked ${quantityPicked}"
+                log.info "Suggested quantity ${quantityPicked}"
                 suggestedItems << new SuggestedItem(inventoryItem: availableItem?.inventoryItem,
                         binLocation: availableItem?.binLocation,
                         quantityAvailable: availableItem?.quantityAvailable,
