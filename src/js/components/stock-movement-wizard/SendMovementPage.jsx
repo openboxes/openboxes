@@ -73,12 +73,14 @@ class SendMovementPage extends Component {
 
   render() {
     const {
-      handleSubmit, pristine, previousPage, submitting, pickPage, lineItems,
+      handleSubmit, pristine, previousPage, submitting, pickPageItems, lineItems,
       description, origin, destination, stockList, requestedBy, dateRequested, movementNumber,
     } = this.props;
 
-    const tableItems =
-      pickPage.length ? _.filter(pickPage, pick => !!pick.lot && !pick.crossedOut) : lineItems;
+    let tableItems;
+    if (pickPageItems.length) {
+      tableItems = _.filter(pickPageItems, pick => !!pick.lot && !pick.crossedOut);
+    } else { tableItems = lineItems; }
 
     return (
       <div>
@@ -216,7 +218,7 @@ const mapStateToProps = state => ({
   stockList: selector(state, 'stockList'),
   requestedBy: selector(state, 'requestedBy'),
   dateRequested: selector(state, 'dateRequested'),
-  pickPage: selector(state, 'pickPage'),
+  pickPageItems: selector(state, 'pickPageItems'),
   lineItems: selector(state, 'lineItems'),
   movementNumber: selector(state, 'movementNumber'),
 });
@@ -240,7 +242,7 @@ SendMovementPage.propTypes = {
   requestedBy: PropTypes.string.isRequired,
   dateRequested: PropTypes.string.isRequired,
   movementNumber: PropTypes.string.isRequired,
-  pickPage: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  pickPageItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   lineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   handleSubmit: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,

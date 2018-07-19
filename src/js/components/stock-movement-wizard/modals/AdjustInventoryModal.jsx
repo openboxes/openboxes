@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { change, reduxForm, formValueSelector } from 'redux-form';
+import { change, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
@@ -9,7 +9,6 @@ import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
 import { renderFormField } from '../../../utils/form-utils';
 import DateField from '../../form-elements/DateField';
-import ValueSelectorField from '../../form-elements/ValueSelectorField';
 
 const FIELDS = {
   adjustInventory: {
@@ -17,56 +16,32 @@ const FIELDS = {
     type: ArrayField,
     disableVirtualization: true,
     fields: {
-      lot: {
-        type: ValueSelectorField,
+      lotNumber: {
+        type: TextField,
         label: 'Lot #',
-        attributes: {
-          formName: 'stock-movement-wizard',
-        },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `adjustInventory[${rowIndex}].disabled`,
+        fieldKey: 'inventoryItem.id',
+        getDynamicAttr: ({ fieldValue }) => ({
+          disabled: !!fieldValue,
         }),
-        component: TextField,
-        componentConfig: {
-          getDynamicAttr: ({ selectedValue }) => ({
-            disabled: !!selectedValue,
-          }),
-        },
       },
-      bin: {
-        type: ValueSelectorField,
+      'binLocation.name': {
+        type: TextField,
         label: 'Bin',
-        attributes: {
-          formName: 'stock-movement-wizard',
-        },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `adjustInventory[${rowIndex}].disabled`,
+        fieldKey: 'inventoryItem.id',
+        getDynamicAttr: ({ fieldValue }) => ({
+          disabled: !!fieldValue,
         }),
-        component: TextField,
-        componentConfig: {
-          getDynamicAttr: ({ selectedValue }) => ({
-            disabled: !!selectedValue,
-          }),
-        },
       },
-      expiryDate: {
-        type: ValueSelectorField,
+      expirationDate: {
+        type: DateField,
         label: 'Expiry Date',
-        attributes: {
-          formName: 'stock-movement-wizard',
-        },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `adjustInventory[${rowIndex}].disabled`,
+        fieldKey: 'inventoryItem.id',
+        getDynamicAttr: ({ fieldValue }) => ({
+          dateFormat: 'YYYY/MM/DD',
+          disabled: !!fieldValue,
         }),
-        component: DateField,
-        componentConfig: {
-          getDynamicAttr: ({ selectedValue }) => ({
-            dateFormat: 'YYYY/MM/DD',
-            inputProps: { disabled: !!selectedValue },
-          }),
-        },
       },
-      qtyAvailable: {
+      quantityAvailable: {
         type: TextField,
         label: 'Qty Available',
       },
@@ -90,34 +65,31 @@ class AdjustInventoryModal extends Component {
   }
 
   onOpen() {
-    const { pickPage } = this.props;
-    const inventoryItem =
-      _.find(pickPage, item => item.product.productCode === this.state.attr.product.productCode);
     this.props.change(
       'stock-movement-wizard',
       'adjustInventory',
-      inventoryItem ? _.map(inventoryItem.availableLots, lot => ({ ...lot, disabled: true })) : [],
+      this.state.attr.fieldValue.availableItems,
     );
   }
 
-  onSave() {
-    // TODO: send new/changed availableLots to backend!
-    const { pickPage } = this.props;
-    const lotsToUpdate =
-      _.find(pickPage, item => item.product.productCode === this.state.attr.product.productCode);
-    lotsToUpdate.availableLots = _.map(this.props.adjustInventory, item => (
-      {
-        ...item,
-        product: item.product ||
-          { code: this.state.attr.product.productCode, name: this.state.attr.product.name },
-      }
-    ));
-    this.props.change('stock-movement-wizard', 'pickPage', pickPage);
+  // temporary disablers
+  /* eslint-disable class-methods-use-this */
+  /* eslint-disable no-unused-vars */
+  onSave(values) {
+    // TODO Save adjusted invenetory
   }
 
   render() {
+    if (this.state.attr.subfield) {
+      return null;
+    }
+
     return (
-      <ModalWrapper {...this.state.attr} onOpen={this.onOpen} onSave={this.onSave}>
+      <ModalWrapper
+        {...this.state.attr}
+        onOpen={this.onOpen}
+        onSave={this.props.handleSubmit(values => this.onSave(values))}
+      >
         <form className="print-mt">
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
         </form>
@@ -126,25 +98,17 @@ class AdjustInventoryModal extends Component {
   }
 }
 
-const selector = formValueSelector('stock-movement-wizard');
-
-const mapStateToProps = state => ({
-  pickPage: selector(state, 'pickPage'),
-  adjustInventory: selector(state, 'adjustInventory'),
-});
-
 export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
-})(connect(mapStateToProps, { change })(AdjustInventoryModal));
+})(connect(null, { change })(AdjustInventoryModal));
 
 AdjustInventoryModal.propTypes = {
-  pickPage: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  adjustInventory: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   change: PropTypes.func.isRequired,
   fieldName: PropTypes.string.isRequired,
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
+  handleSubmit: PropTypes.func.isRequired,
 };

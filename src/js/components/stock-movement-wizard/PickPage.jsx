@@ -6,41 +6,48 @@ import _ from 'lodash';
 
 import ArrayField from '../form-elements/ArrayField';
 import LabelField from '../form-elements/LabelField';
-import { renderFormField, generateKey } from '../../utils/form-utils';
+import { renderFormField } from '../../utils/form-utils';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import AdjustInventoryModal from './modals/AdjustInventoryModal';
 import EditPickModal from './modals/EditPickModal';
-import { AVAILABLE_LOTS } from '../../mockedData';
+import { showSpinner, hideSpinner } from '../../actions';
+import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
+import apiClient from '../../utils/apiClient';
 
 const FIELDS = {
-  pickPage: {
+  pickPageItems: {
     type: ArrayField,
-    pickPage: true,
+    rowComponent: TableRowWithSubfields,
+    subfieldKey: 'picklistItems',
     fields: {
-      product: {
+      productCode: {
+        type: LabelField,
+        label: 'Code',
+        getDynamicAttr: ({ subfield }) => ({
+          className: subfield ? 'text-center' : 'text-left ml-4',
+        }),
+      },
+      'product.name': {
         type: LabelField,
         label: 'Product Name',
-        attributes: {
-          formatValue: value => (`${value.productCode} - ${value.name}`),
-        },
       },
-      lot: {
+      lotNumber: {
         type: LabelField,
         label: 'Lot #',
       },
-      expiryDate: {
+      expirationDate: {
         type: LabelField,
         label: 'Expiry Date',
       },
-      bin: {
+      'binLocation.name': {
         type: LabelField,
         label: 'Bin',
       },
-      quantity: {
+      quantityRequested: {
         type: LabelField,
         label: 'Qty required',
       },
-      qtyPicked: {
+      quantityPicked: {
         type: LabelField,
         label: 'Qty picked',
       },
@@ -62,116 +69,102 @@ const FIELDS = {
       },
       buttonEditPick: {
         label: 'Edit Pick',
-        type: ValueSelectorField,
+        type: EditPickModal,
+        fieldKey: '',
         attributes: {
-          formName: 'stock-movement-wizard',
+          btnOpenText: 'Edit',
+          title: 'Edit Pick',
         },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `pickPage[${rowIndex}].product.productCode`,
+        getDynamicAttr: ({
+          fieldValue, selectedValue, subfield, stockMovementId,
+        }) => ({
+          productCode: selectedValue,
+          fieldValue,
+          subfield,
+          stockMovementId,
         }),
-        component: EditPickModal,
-        componentConfig: {
-          attributes: {
-            btnOpenText: 'Edit',
-            title: 'Edit Pick',
-          },
-          getDynamicAttr: ({ selectedValue }) => ({
-            productCode: selectedValue,
-          }),
-        },
       },
       buttonAdjustInventory: {
         label: 'Adjust Inventory',
-        type: ValueSelectorField,
+        type: AdjustInventoryModal,
+        fieldKey: '',
         attributes: {
-          formName: 'stock-movement-wizard',
+          btnOpenText: 'Adjust',
+          title: 'Adjust Inventory',
         },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `pickPage[${rowIndex}].product`,
+        getDynamicAttr: ({ fieldValue, selectedValue, subfield }) => ({
+          product: selectedValue,
+          fieldValue,
+          subfield,
         }),
-        component: AdjustInventoryModal,
-        componentConfig: {
-          attributes: {
-            btnOpenText: 'Adjust',
-            title: 'Adjust Inventory',
-          },
-          getDynamicAttr: ({ selectedValue }) => ({
-            product: selectedValue,
-          }),
-        },
       },
     },
   },
 };
 
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["print"] }] */
-/* eslint no-param-reassign: "error" */
 class PickPage extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { statusCode: '' };
+
+    this.props.showSpinner();
+  }
+
   componentDidMount() {
-    // TODO: once API will be ready, rewrite this to get data from backend
-    if (!_.some(this.props.pickPageData, 'availableLots')) {
-      const { lineItems } = this.props;
-      let pickPage = [];
-      _.forEach(_.filter(lineItems, item => !item.substituted), (line) => {
-        // Get available lots for every product
-        const availableLots =
-          _.filter(
-            AVAILABLE_LOTS,
-            data => data.product.productCode === line.product.productCode,
-          );
-        // Get picked lots (out of all available lots)
-        const lotsPicked =
-          _.filter(
-            availableLots,
-            data => data.product.productCode === line.product.productCode && data.qtyPicked > 0,
-          );
-        // Create array for PickPage table: line items with lots picked for them
-        // (rowKey = unique value, that will be used as row key inside rendered table)
-        pickPage = _.concat(
-          pickPage,
-          {
-            ...line,
-            availableLots: _.map(availableLots, lot => (
-              {
-                ...lot,
-                lotWithBin: `${lot.lot}-${lot.bin}`,
-              }
-            )),
-            quantity: line.revisedQuantity || line.quantity,
-            parent: true,
-            qtyPicked: _.reduce(lotsPicked, (sum, lot) => sum + parseInt(lot.qtyPicked, 10), 0),
-            rowKey: generateKey(),
-          },
-          // Add fields to picked lots:
-          // - initialPick (Bool),
-          // - lotWithBin (String made from lot and bin fields, assumed to be unique),
-          _.map(lotsPicked, lot => ({
-            ...lot,
-            initialPick: true,
-            lotWithBin: `${lot.lot}-${lot.bin}`,
-            rowKey: generateKey(),
-          })),
-        );
-      });
-      // Update specfied field in redux form
-      this.props.change('stock-movement-wizard', 'pickPage', pickPage);
-    }
+    this.fetchLineItems()
+      .then((resp) => {
+        const { statusCode, pickPageItems } = resp.data.data.pickPage;
+        this.props.change('stock-movement-wizard', 'pickPageItems', pickPageItems);
+        this.setState({ statusCode });
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   print() {
     window.print();
   }
 
+  fetchLineItems() {
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=4`;
+
+    return apiClient.get(url)
+      .then(resp => resp)
+      .catch(err => err);
+  }
+
+  transitionToStep5() {
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
+    const payload = { status: 'PICKED' };
+
+    return apiClient.post(url, payload);
+  }
+
+  nextPage() {
+    this.props.showSpinner();
+    if (this.state.statusCode === 'PICKING') {
+      this.transitionToStep5()
+        .then(() => this.props.onSubmit())
+        .catch(() => this.props.hideSpinner());
+    } else {
+      this.props.onSubmit();
+    }
+  }
+
   render() {
     return (
-      <div>
+      <div className="d-flex flex-column">
         <button
           type="button"
-          className="fa fa-print float-right p-2 mb-1 btn btn-secondary d-print-none"
+          className="fa fa-print float-right p-2 mb-1 btn btn-secondary d-print-none align-self-end"
           onClick={this.print}
         />
-        <form onSubmit={this.props.onSubmit} className="print-mt">
-          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
+        <form onSubmit={this.props.handleSubmit(() => this.nextPage())} className="print-mt">
+          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+            stockMovementId: this.props.stockMovementId,
+          }))}
           <div className="d-print-none">
             <button type="button" className="btn btn-outline-primary" onClick={this.props.previousPage}>
               Previous
@@ -186,18 +179,22 @@ class PickPage extends Component {
 
 const selector = formValueSelector('stock-movement-wizard');
 
-const mapStateToProps = state => ({ pickPageData: selector(state, 'pickPage'), lineItems: selector(state, 'lineItems') });
+const mapStateToProps = state => ({
+  stockMovementId: selector(state, 'requisitionId'),
+});
 
 export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
-})(connect(mapStateToProps, { change })(PickPage));
+})(connect(mapStateToProps, { change, showSpinner, hideSpinner })(PickPage));
 
 PickPage.propTypes = {
-  pickPageData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   change: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
-  lineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
+  stockMovementId: PropTypes.string.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
 };

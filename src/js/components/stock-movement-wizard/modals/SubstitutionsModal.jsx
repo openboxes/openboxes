@@ -1,37 +1,49 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { reduxForm, formValueSelector, change } from 'redux-form';
+import { reduxForm, formValueSelector, change, arrayRemove, arrayInsert } from 'redux-form';
 import { connect } from 'react-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
 import ArrayField from '../../form-elements/ArrayField';
 import TextField from '../../form-elements/TextField';
+import SelectField from '../../form-elements/SelectField';
+import { REASON_CODE_MOCKS } from '../../../mockedData';
 import { renderFormField } from '../../../utils/form-utils';
-import { SUBSTITUTIONS_MOCKS } from '../../../mockedData';
+import apiClient from '../../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../../actions';
 
 const FIELDS = {
+  reasonCode: {
+    type: SelectField,
+    label: 'Reason code',
+    attributes: {
+      required: true,
+      options: REASON_CODE_MOCKS,
+    },
+  },
   substitutions: {
     type: ArrayField,
     disableVirtualization: true,
     fields: {
-      product: {
+      productCode: {
         type: LabelField,
-        label: 'Description',
-        attributes: {
-          formatValue: value => (value.name),
-        },
+        label: 'Code',
       },
-      substitutionExpiryDate: {
+      productName: {
+        type: LabelField,
+        label: 'Product',
+      },
+      minExpirationDate: {
         type: LabelField,
         label: 'Expiry Date',
       },
-      maxQuantity: {
+      quantityAvailable: {
         type: LabelField,
         label: 'Qty Available',
       },
-      quantity: {
+      quantitySelected: {
         type: TextField,
         label: 'Qty Selected',
         attributes: {
@@ -51,78 +63,72 @@ class SubstitutionsModal extends Component {
     } = props;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
     const attr = { ...attributes, ...dynamicAttr };
-    let substituteAvailable;
-    if (_.isEmpty(SUBSTITUTIONS_MOCKS[attr.productCode])) {
-      substituteAvailable = false;
-    } else {
-      substituteAvailable = true;
-    }
 
     this.state = {
-      attr, substituteAvailable,
+      attr,
     };
+
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
   }
 
   onOpen() {
-    const substitutions = SUBSTITUTIONS_MOCKS[this.state.attr.productCode];
-    this.props.change('substitution-form', 'substitutions', substitutions);
+    this.props.change(
+      'substitution-form',
+      'substitutions',
+      this.state.attr.lineItem.availableSubstitutions,
+    );
   }
 
-  onSave() {
-    const newLineItems = _.cloneDeep(this.props.lineItems);
+  onSave(values) {
+    this.props.showSpinner();
+    const substitutions = _.filter(values.substitutions, sub => sub.quantitySelected > 0);
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=3`;
+    const payload = {
+      lineItems: _.map(substitutions, sub => ({
+        id: this.state.attr.lineItem.requisitionItemId,
+        substitute: 'true',
+        'newProduct.id': sub.productId,
+        newQuantity: sub.quantitySelected,
+        reasonCode: values.reasonCode,
+      })),
+    };
 
-    newLineItems[this.state.attr.rowIndex].substituted = true;
+    return apiClient.post(url, payload).then((resp) => {
+      const { editPageItems } = resp.data.data.editPage;
 
-    _.forEach(
-      _.filter(this.props.substitutions, sub => !_.isEmpty(sub.quantity)),
-      (sub) => {
-        const subCopy = _.cloneDeep(sub);
-        subCopy.revisedQuantity = sub.quantity;
-        subCopy.rowKey = _.uniqueId('lineItem_');
+      this.props.change('stock-movement-wizard', 'editPageItems', []);
+      this.props.change('stock-movement-wizard', 'editPageItems', _.map(editPageItems, item => ({
+        ...item,
+        substitutionItems: _.map(item.substitutionItems, sub => ({
+          ...sub,
+          quantityRequested: sub.quantitySelected,
+        })),
+      })));
 
-        newLineItems.splice(
-          this.state.attr.rowIndex + 1,
-          0, subCopy,
-        );
-      },
-    );
-    this.props.change('stock-movement-wizard', 'lineItems', newLineItems);
+      this.props.hideSpinner();
+    }).catch(() => { this.props.hideSpinner(); });
   }
 
   calculateRemaining() {
     return _.reduce(this.props.substitutions, (sum, val) =>
-      (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0);
+      (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0);
   }
 
   render() {
-    if (this.state.substituteAvailable === false) {
-      return (
-        <button
-          type="button"
-          className="disabled btn btn-outline-secondary"
-        >
-          No
-        </button>
-      );
-    }
-
     return (
-
       <ModalWrapper
         {...this.state.attr}
-        btnOpenClassName="btn btn-outline-success"
         onOpen={this.onOpen}
-        onSave={this.onSave}
-        btnOpenDisabled={this.props.lineItems[this.state.attr.rowIndex].substituted}
+        onSave={this.props.handleSubmit(values => this.onSave(values))}
         btnSaveDisabled={this.props.invalid}
       >
         <form value={this.state.attr.productCode}>
-          <div className="font-weight-bold">Product Code: {this.props.lineItems[this.state.attr.rowIndex].product.productCode}</div>
-          <div className="font-weight-bold">Product Name: {this.props.lineItems[this.state.attr.rowIndex].product.name}</div>
-          <div className="font-weight-bold">Quantity Requested: {this.props.lineItems[this.state.attr.rowIndex].quantity}</div>
+          <div className="font-weight-bold">Product Code: {this.state.attr.lineItem.productCode}</div>
+          <div className="font-weight-bold">Product Name: {this.state.attr.lineItem.productName}</div>
+          <div className="font-weight-bold">Quantity Requested: {this.state.attr.lineItem.quantityRequested}</div>
           <div className="font-weight-bold pb-2">Quantity Remaining: {this.calculateRemaining()}</div>
+          <hr />
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
         </form>
       </ModalWrapper>
@@ -135,36 +141,46 @@ function validate(values) {
   errors.substitutions = [];
 
   _.forEach(values.substitutions, (item, key) => {
-    if (item.quantity > item.maxQuantity) {
-      errors.substitutions[key] = { quantity: 'Selected quantity is higher than available' };
+    if (item.quantitySelected > item.quantityAvailable) {
+      errors.substitutions[key] = { quantitySelected: 'Selected quantity is higher than available' };
     }
   });
+
+  if (!values.reasonCode) {
+    errors.reasonCode = 'This field is required';
+  }
   return errors;
 }
 
-const stockMovementSelector = formValueSelector('stock-movement-wizard');
 const substitutionSelector = formValueSelector('substitution-form');
 
 const mapStateToProps = state => ({
-  lineItems: stockMovementSelector(state, 'lineItems'),
   substitutions: substitutionSelector(state, 'substitutions'),
 });
 
 export default reduxForm({
   form: 'substitution-form',
   validate,
-})(connect(mapStateToProps, { change })(SubstitutionsModal));
+})(connect(mapStateToProps, {
+  change, showSpinner, hideSpinner, arrayRemove, arrayInsert,
+})(SubstitutionsModal));
 
 SubstitutionsModal.propTypes = {
   initialize: PropTypes.func.isRequired,
   invalid: PropTypes.bool.isRequired,
   change: PropTypes.func.isRequired,
-  lineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   substitutions: PropTypes.arrayOf(PropTypes.shape({})),
   fieldName: PropTypes.string.isRequired,
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
+  stockMovementId: PropTypes.string.isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
+  arrayRemove: PropTypes.func.isRequired,
+  arrayInsert: PropTypes.func.isRequired,
+  rowIndex: PropTypes.number.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
 };
 
 SubstitutionsModal.defaultProps = {

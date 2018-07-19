@@ -1,5 +1,6 @@
-import React from 'react';
-import { reduxForm } from 'redux-form';
+import React, { Component } from 'react';
+import { reduxForm, formValueSelector, change } from 'redux-form';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
@@ -11,28 +12,44 @@ import SelectField from '../form-elements/SelectField';
 import { REASON_CODE_MOCKS } from '../../mockedData';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import SubstitutionsModal from './modals/SubstitutionsModal';
+import apiClient from '../../utils/apiClient';
+import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
+import { showSpinner, hideSpinner } from '../../actions';
+
+const BTN_CLASS_MAPPER = {
+  YES: 'btn btn-outline-success',
+  NO: 'disabled btn btn-outline-secondary',
+  EARLIER: 'btn btn-outline-warning',
+  HIDDEN: 'btn invisible',
+};
 
 const FIELDS = {
-  lineItems: {
+  editPageItems: {
     type: ArrayField,
+    rowComponent: TableRowWithSubfields,
     getDynamicRowAttr: ({ rowValues }) => (
       {
-        className: rowValues.substituted ? 'crossed-out' : '',
+        className: rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out' : '',
       }
     ),
+    subfieldKey: 'substitutionItems',
     fields: {
-      product: {
+      productCode: {
         type: LabelField,
-        label: 'Requisition items',
-        attributes: {
-          formatValue: value => (value.name),
-        },
+        getDynamicAttr: ({ subfield }) => ({
+          className: subfield ? 'text-center' : 'text-left ml-4',
+        }),
+        label: 'Code',
+      },
+      productName: {
+        type: LabelField,
+        label: 'Product',
       },
       quantityRequested: {
         type: LabelField,
         label: 'Qty requested',
       },
-      maxQuantity: {
+      quantityAvailable: {
         type: LabelField,
         label: 'Qty available',
       },
@@ -42,43 +59,33 @@ const FIELDS = {
       },
       substituteButton: {
         label: 'Substitute available',
-        type: ValueSelectorField,
+        type: SubstitutionsModal,
+        fieldKey: '',
         attributes: {
-          formName: 'stock-movement-wizard',
+          title: 'Substitutes',
         },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `lineItems[${rowIndex}].product.productCode`,
+        getDynamicAttr: ({
+          fieldValue, rowIndex, stockMovementId,
+        }) => ({
+          productCode: fieldValue.productCode,
+          btnOpenText: fieldValue.substitutionStatus,
+          btnOpenDisabled: fieldValue.substitutionStatus === 'NO' || fieldValue.statusCode === 'SUBSTITUTED',
+          btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus || 'HIDDEN'],
+          rowIndex,
+          lineItem: fieldValue,
+          stockMovementId,
         }),
-        component: SubstitutionsModal,
-        componentConfig: {
-          attributes: {
-            btnOpenText: 'Yes',
-            title: 'Substitutes',
-          },
-          getDynamicAttr: ({ selectedValue, rowIndex }) => ({
-            productCode: selectedValue,
-            rowIndex,
-          }),
-        },
       },
-      revisedQuantity: {
+      quantityRevised: {
         label: 'Revised Qty',
-        type: ValueSelectorField,
+        type: TextField,
+        fieldKey: 'statusCode',
         attributes: {
-          formName: 'stock-movement-wizard',
+          type: 'number',
         },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `lineItems[${rowIndex}].substituted`,
+        getDynamicAttr: ({ fieldValue, subfield }) => ({
+          disabled: fieldValue === 'SUBSTITUTED' || subfield,
         }),
-        component: TextField,
-        componentConfig: {
-          attributes: {
-            type: 'number',
-          },
-          getDynamicAttr: ({ selectedValue }) => ({
-            disabled: !!selectedValue,
-          }),
-        },
       },
       reasonCode: {
         type: ValueSelectorField,
@@ -88,59 +95,165 @@ const FIELDS = {
           attributes: {
             options: REASON_CODE_MOCKS,
           },
-          getDynamicAttr: ({ selectedValue }) => ({
-            disabled: !selectedValue,
+          getDynamicAttr: ({ selectedValue, subfield }) => ({
+            disabled: !selectedValue || subfield,
           }),
         },
         attributes: {
           formName: 'stock-movement-wizard',
         },
         getDynamicAttr: ({ rowIndex }) => ({
-          field: `lineItems[${rowIndex}].revisedQuantity`,
+          field: `editPageItems[${rowIndex}].quantityRevised`,
         }),
       },
     },
   },
 };
 
-const EditItemsPage = (props) => {
-  const { handleSubmit, previousPage } = props;
-  return (
-    <form onSubmit={handleSubmit}>
-      {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
-      <div>
-        <button type="button" className="btn btn-outline-primary" onClick={previousPage}>
-            Previous
-        </button>
-        <button type="submit" className="btn btn-outline-primary float-right">Next</button>
-      </div>
+class EditItemsPage extends Component {
+  constructor(props) {
+    super(props);
 
-    </form>
-  );
-};
+    this.state = {
+      statusCode: '',
+      redoAutopick: false,
+    };
+
+    this.props.showSpinner();
+  }
+
+  componentDidMount() {
+    this.props.change('stock-movement-wizard', 'editPageItems', []);
+    this.fetchLineItems().then((resp) => {
+      const { statusCode, editPage } = resp.data.data;
+      const editPageItems = _.map(
+        editPage.editPageItems,
+        val => ({
+          ...val,
+          disabled: true,
+          rowKey: _.uniqueId('lineItem_'),
+          product: {
+            ...val.product,
+            label: `${val.productCode} ${val.productName}`,
+          },
+        }),
+      );
+
+      this.setState({ statusCode });
+      this.setState({ statusCode });
+
+      this.props.change('stock-movement-wizard', 'editPageItems', editPageItems);
+      this.props.hideSpinner();
+    }).catch(() => {
+      this.props.hideSpinner();
+    });
+  }
+
+  reviseRequisitionItems(values) {
+    const itemsToRevise = _.filter(
+      values.editPageItems,
+      item => item.quantityRevised && item.reasonCode,
+    );
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
+    const payload = {
+      lineItems: _.map(itemsToRevise, item => ({
+        id: item.requisitionItemId,
+        quantityRevised: item.quantityRevised,
+        reasonCode: item.reasonCode,
+      })),
+    };
+
+    if (payload.lineItems.length) {
+      this.setState({ redoAutopick: true });
+    }
+
+    return apiClient.post(url, payload);
+  }
+
+  transitionToStep4() {
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
+    const payload = { status: 'PICKING', createPicklist: 'true' };
+
+    return apiClient.post(url, payload);
+  }
+
+  fetchLineItems() {
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=3`;
+
+    return apiClient.get(url)
+      .then(resp => resp)
+      .catch(err => err);
+  }
+
+  nextPage(formValues) {
+    this.props.showSpinner();
+    this.reviseRequisitionItems(formValues)
+      .then(() => {
+        if (this.state.statusCode === 'VERIFYING' || this.state.redoAutopick) {
+          this.transitionToStep4()
+            .then(() => this.props.onSubmit())
+            .catch(() => this.props.hideSpinner());
+        } else {
+          this.props.onSubmit();
+        }
+      }).catch(() => this.props.hideSpinner());
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.props.handleSubmit(values => this.nextPage(values))}>
+        {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+          stockMovementId: this.props.stockMovementId,
+        }))}
+        <div>
+          <button type="button" className="btn btn-outline-primary" onClick={this.props.previousPage}>
+            Previous
+          </button>
+          <button type="submit" className="btn btn-outline-primary float-right">Next</button>
+        </div>
+
+      </form>
+    );
+  }
+}
 
 function validate(values) {
   const errors = {};
-  errors.lineItems = [];
+  errors.editPageItems = [];
 
-  _.forEach(values.lineItems, (item, key) => {
-    if (!_.isEmpty(item.revisedQuantity) && _.isEmpty(item.reasonCode)) {
-      errors.lineItems[key] = { reasonCode: 'Reason code required' };
-    } else if (_.isEmpty(item.revisedQuantity) && !_.isEmpty(item.reasonCode)) {
-      errors.lineItems[key] = { revisedQuantity: 'Revised quantity required' };
+  _.forEach(values.editPageItems, (item, key) => {
+    if (!_.isEmpty(item.quantityRevised) && _.isEmpty(item.reasonCode)) {
+      errors.editPageItems[key] = { reasonCode: 'Reason code required' };
+    } else if (_.isEmpty(item.quantityRevised) && !_.isEmpty(item.reasonCode)) {
+      errors.editPageItems[key] = { quantityRevised: 'Revised quantity required' };
+    }
+    if (parseInt(item.quantityRevised, 10) === item.quantityRequested) {
+      errors.editPageItems[key] = {
+        quantityRevised: 'Revised quantity can\'t be the same as requested quantity',
+      };
     }
   });
   return errors;
 }
+const selector = formValueSelector('stock-movement-wizard');
+
+const mapStateToProps = state => ({
+  stockMovementId: selector(state, 'requisitionId'),
+});
 
 export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
   validate,
-})(EditItemsPage);
+})(connect(mapStateToProps, { change, showSpinner, hideSpinner })(EditItemsPage));
 
 EditItemsPage.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  change: PropTypes.func.isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
+  stockMovementId: PropTypes.string.isRequired,
 };

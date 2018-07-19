@@ -70,6 +70,7 @@ const NO_STOCKLIST_FIELDS = {
           autoload: false,
           loadOptions: debouncedProductsFetch,
           cache: false,
+          options: [],
         },
         getDynamicAttr: ({ fieldValue }) => ({
           disabled: !!fieldValue,
@@ -106,6 +107,7 @@ const STOCKLIST_FIELDS = {
             autoload: false,
             loadOptions: debouncedProductsFetch,
             cache: false,
+            options: [],
           },
           getDynamicAttr: ({ selectedValue }) => ({
             disabled: !!selectedValue,
@@ -147,6 +149,7 @@ const VENDOR_FIELDS = {
           autoload: false,
           loadOptions: debouncedProductsFetch,
           cache: false,
+          options: [],
         },
       },
       lot: {
@@ -180,42 +183,55 @@ class AddItemsPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      oldLineItems: this.props.lineItems,
+      currentLineItems: [],
+      statusCode: '',
     };
 
+    this.props.showSpinner();
     this.removeItem = this.removeItem.bind(this);
   }
 
   componentDidMount() {
-    this.props.showSpinner();
-
-    let lineItems;
-
-    if (!this.props.lineItems.length && (this.props.origin.type === 'SUPPLIER' || !this.props.stockList)) {
-      lineItems = new Array(5).fill({});
-    } else {
-      lineItems = _.map(
-        this.props.lineItems,
-        val => ({
-          ...val,
-          quantityAllowed: val.quantityAllowed,
-          disabled: true,
-          rowKey: _.uniqueId('lineItem_'),
-          product: {
-            ...val.product,
-            label: `${val.productCode} ${val.product.name}`,
-          },
-        }),
-      );
-    }
-
-    this.props.change('stock-movement-wizard', 'lineItems', lineItems);
-
     if (!this.props.recipientsFetched) {
       this.fetchData(this.props.fetchUsers);
     }
 
-    this.props.hideSpinner();
+    if (this.props.origin.type === 'SUPPLIER') {
+      const lineItems = this.props.lineItems.length ? this.props.lineItems : new Array(5).fill({});
+      this.props.change('stock-movement-wizard', 'lineItems', lineItems);
+      this.props.hideSpinner();
+    } else {
+      this.fetchLineItems().then((resp) => {
+        const { statusCode, lineItems } = resp.data.data;
+        let lineItemsData;
+        if (!lineItems.length) {
+          lineItemsData = new Array(5).fill({});
+        } else {
+          lineItemsData = _.map(
+            lineItems,
+            val => ({
+              ...val,
+              quantityAllowed: val.quantityAllowed,
+              disabled: true,
+              rowKey: _.uniqueId('lineItem_'),
+              product: {
+                ...val.product,
+                label: `${val.productCode} ${val.product.name}`,
+              },
+            }),
+          );
+        }
+
+        this.props.change('stock-movement-wizard', 'lineItems', lineItemsData);
+
+        this.setState({
+          currentLineItems: lineItems,
+          statusCode,
+        });
+
+        this.props.hideSpinner();
+      }).catch(() => this.props.hideSpinner());
+    }
   }
 
   getFields() {
@@ -226,6 +242,39 @@ class AddItemsPage extends Component {
     }
 
     return NO_STOCKLIST_FIELDS;
+  }
+
+  getLineItemsToBeSaved(lineItems) {
+    const lineItemsToBeAdded = _.filter(lineItems, item => !item.statusCode);
+
+    const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
+    const lineItemsToBeUpdated = [];
+    _.forEach(lineItemsWithStatus, (item) => {
+      const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
+      if (parseInt(item.quantityRequested, 10) !== parseInt(oldItem.quantityRequested, 10)) {
+        lineItemsToBeUpdated.push(item);
+      }
+    });
+
+    return [].concat(
+      _.map(lineItemsToBeAdded, item => ({
+        'product.id': item.product.id,
+        quantityRequested: item.quantityRequested,
+      })),
+      _.map(lineItemsToBeUpdated, item => ({
+        id: item.id,
+        'product.id': item.product.id,
+        quantityRequested: item.quantityRequested,
+      })),
+    );
+  }
+
+  fetchLineItems() {
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=2`;
+
+    return apiClient.get(url)
+      .then(resp => resp)
+      .catch(err => err);
   }
 
   fetchData(fetchFunction) {
@@ -242,50 +291,24 @@ class AddItemsPage extends Component {
       this.props.goToPage(5);
     } else {
       this.props.showSpinner();
-      this.createRequisitionItems(lineItems)
+      this.saveRequisitionItems(lineItems)
         .then(() => {
-          this.updateRequisitionItems(lineItems)
-            .then(() => { this.props.hideSpinner(); this.props.onSubmit(); })
-            .catch(() => this.props.hideSpinner());
+          if (this.state.statusCode === 'CREATED' || this.state.statusCode === 'EDITING') {
+            this.transitionToStep3()
+              .then(() => {
+                this.props.onSubmit();
+              })
+              .catch(() => this.props.hideSpinner());
+          } else {
+            this.props.onSubmit();
+          }
         })
         .catch(() => this.props.hideSpinner());
     }
   }
 
-  createRequisitionItems(lineItems) {
-    const lineItemsToBeAdded = _.filter(lineItems, item => !item.statusCode);
-    const addItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
-    const payload = {
-      id: this.props.stockMovementId,
-      name: '',
-      description: this.props.description,
-      identifier: this.props.movementNumber,
-      'origin.id': this.props.origin.id,
-      'destination.id': this.props.destination.id,
-      dateRequested: this.props.dateRequested,
-      'requestedBy.id': this.props.requestedBy,
-      lineItems: _.map(lineItemsToBeAdded, item => ({
-        'product.id': item.product.id,
-        quantityRequested: item.quantityRequested,
-      })),
-    };
-
-    return apiClient.post(addItemsUrl, payload)
-      .catch(() => {
-        this.props.hideSpinner();
-        return Promise.reject(new Error('Could not add requisition items'));
-      });
-  }
-
-  updateRequisitionItems(lineItems) {
-    const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
-    const lineItemsToBeUpdated = [];
-    _.forEach(lineItemsWithStatus, (item) => {
-      const oldItem = _.find(this.state.oldLineItems, old => old.id === item.id);
-      if (parseInt(item.quantityRequested, 10) !== parseInt(oldItem.quantityRequested, 10)) {
-        lineItemsToBeUpdated.push(item);
-      }
-    });
+  saveRequisitionItems(lineItems) {
+    const itemsToSave = this.getLineItemsToBeSaved(lineItems);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
     const payload = {
       id: this.props.stockMovementId,
@@ -296,17 +319,18 @@ class AddItemsPage extends Component {
       'destination.id': this.props.destination.id,
       dateRequested: this.props.dateRequested,
       'requestedBy.id': this.props.requestedBy,
-      lineItems: _.map(lineItemsToBeUpdated, item => ({
-        id: item.id,
-        'product.id': item.product.id,
-        quantityRequested: item.quantityRequested,
-      })),
+      lineItems: itemsToSave,
     };
-    return apiClient.post(updateItemsUrl, payload)
-      .then((resp) => {
-        this.props.change('stock-movement-wizard', 'lineItems', resp.data.data.lineItems);
-      })
-      .catch(() => Promise.reject(new Error('Could not update requisition items')));
+
+    if (payload.lineItems.length) {
+      return apiClient.post(updateItemsUrl, payload)
+        .then((resp) => {
+          this.props.change('stock-movement-wizard', 'lineItems', resp.data.data.lineItems);
+        })
+        .catch(() => Promise.reject(new Error('Could not save requisition items')));
+    }
+
+    return Promise.resolve();
   }
 
   removeItem(itemId) {
@@ -331,6 +355,13 @@ class AddItemsPage extends Component {
         this.props.hideSpinner();
         return Promise.reject(new Error('Could not delete requisition items'));
       });
+  }
+
+  transitionToStep3() {
+    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
+    const payload = { status: 'VERIFYING' };
+
+    return apiClient.post(url, payload);
   }
 
   render() {

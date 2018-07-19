@@ -92,10 +92,8 @@ class CreateStockMovement extends Component {
   componentDidMount() {
     this.props.initialize('stock-movement-wizard', {
       lineItems: [],
-      pickPage: [],
-      adjustInventory: [],
-      editPick: [],
-      substitutions: [],
+      editPageItems: [],
+      pickPageItems: [],
     }, true);
 
     if (!this.props.usersFetched) {
@@ -143,7 +141,7 @@ class CreateStockMovement extends Component {
         'origin.id': origin,
         'destination.id': destination,
         'requestedBy.id': requestedBy,
-        'stockList.id': stockList || null,
+        'stocklist.id': stockList || '',
       };
 
       return apiClient.post(requisitionUrl, payload)
