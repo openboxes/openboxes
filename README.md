@@ -187,6 +187,25 @@ npm test
 ```
 
 ### Troubleshooting
+
+#### How to Debug 
+* Run Grails in debug mode
+    ```
+    grails-debug run-app
+    ```
+* In Intellij navigate to Run > Edit Configurations
+* Create a new Remote Debug Configuration
+    * Name: openboxes-debug
+    * Transport: Socket
+    * Debugger mode: Attach
+    * Host: localhost
+    * Port: 5005
+* Command line arguments should look something like this: 
+    ```
+    -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+    ```
+
+
 #### Problem
 ```
 Caused by: java.io.FileNotFoundException: Could not open ServletContext resource [/WEB-INF/applicationContext.xml]

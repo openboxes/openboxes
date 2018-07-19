@@ -86,7 +86,11 @@ class StockMovementApiController {
         bindData(stockMovement, jsonObject)
 
         // Bind all line items
-        bindLineItems(stockMovement, lineItems)
+        if (lineItems) {
+            // Need to clear the existing line items so we only process the modified ones
+            stockMovement.lineItems.clear()
+            bindLineItems(stockMovement, lineItems)
+        }
 
         // Create or update stock movement
         stockMovementService.updateStockMovement(stockMovement)
@@ -119,13 +123,18 @@ class StockMovementApiController {
 
         Boolean statusOnly =
                 jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
+
         Boolean clearPicklist =
                 jsonObject.containsKey("clearPicklist") ? jsonObject.getBoolean("clearPicklist") : false
+
         Boolean createPicklist =
                 jsonObject.containsKey("createPicklist") ? jsonObject.getBoolean("createPicklist") : false
 
-        RequisitionStatus status = jsonObject.containsKey("status") ? jsonObject.status as RequisitionStatus : null
-        Boolean rollback = jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
+        RequisitionStatus status =
+                jsonObject.containsKey("status") ? jsonObject.status as RequisitionStatus : null
+
+        Boolean rollback =
+                jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
 
         if (status && statusOnly) {
             stockMovementService.updateStatus(params.id, status)
@@ -170,6 +179,8 @@ class StockMovementApiController {
      *
      * NOTE: THis method was necessary because the default data binder for Grails command objects
      * does not seem to handle nested objects very well.
+     *
+     * FIXME Refactor data binding
      *
      * @param stockMovement
      * @param lineItems

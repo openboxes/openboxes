@@ -299,7 +299,6 @@ class StockMovementService {
      * @param stockMovement
      */
     void createPicklist(StockMovement stockMovement) {
-        log.info "Create picklist"
         for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
             createPicklist(stockMovementItem)
         }
@@ -343,26 +342,14 @@ class StockMovementService {
     void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
                                     Integer quantity, String reasonCode, String comment) {
+
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        Requisition requisition = requisitionItem.requisition
 
-        // Validate quantity
-        // Cannot validate because this code cause the following exception:
-        // PropertyValueException: not-null property references a null or transient value: org.pih.warehouse.picklist.PicklistItem.picklist
-//        Location location = binLocation.parentLocation
-//        List binLocations = inventoryService.getQuantityByBinLocation(location, binLocation)
-//        binLocations = binLocations.findAll { it.inventoryItem == inventoryItem}
-//        Integer quantityAvailable = binLocations.sum { it.quantity }
-//
-//        log.info ("Validation quantity available ${quantityAvailable} vs quantity requested ${quantity}")
-//        if (quantityAvailable < quantity) {
-//            throw new IllegalArgumentException("Bin location ${binLocation} does not have enough quantity " +
-//                    "available ${quantityAvailable} to fulfill requested quantity ${quantity}.")
-//        }
-
-        def picklist = requisitionItem.requisition.picklist
+        Picklist picklist = Picklist.findByRequisition(requisition)
         if (!picklist) {
             picklist = new Picklist()
-            picklist.requisition = requisitionItem.requisition
+            picklist.requisition = requisition
         }
 
         // If one does not exist create it and add it to the list
@@ -412,7 +399,7 @@ class StockMovementService {
                 int quantityPicked = (quantityRequested >= availableItem.quantityAvailable) ?
                         availableItem.quantityAvailable : quantityRequested
 
-                log.info "Quantity picked ${quantityPicked}"
+                log.info "Suggested quantity ${quantityPicked}"
                 suggestedItems << new SuggestedItem(inventoryItem: availableItem?.inventoryItem,
                         binLocation: availableItem?.binLocation,
                         quantityAvailable: availableItem?.quantityAvailable,

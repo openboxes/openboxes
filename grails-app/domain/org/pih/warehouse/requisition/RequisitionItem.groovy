@@ -569,7 +569,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     Set<RequisitionItem> getSubstitutionItems() {
-        return requisitionItems.findAll { it.requisitionItemType = RequisitionItemType.SUBSTITUTION }
+        return requisitionItems.findAll { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
     }
 
 
@@ -582,6 +582,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return orderIndex <=> requisitionItem.orderIndex ?:
             requisitionItemType <=> requisitionItem?.requisitionItemType ?:
                 id <=> requisitionItem?.id
+    }
+
+    String toString() {
+        return "${product.productCode}:${status}:${requisitionItemType}:${quantity}"
     }
 
 

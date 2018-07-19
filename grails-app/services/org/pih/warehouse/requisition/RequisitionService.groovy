@@ -433,8 +433,8 @@ class RequisitionService {
                 requisition.save()
             }
             // FIXME We actually need status history so we can rollback to the correct status here
-            else if (requisition.status == RequisitionStatus.CANCELED) {
-                requisition.status = RequisitionStatus.PENDING
+            else if (requisition.status == RequisitionStatus.CHECKING) {
+                requisition.status = RequisitionStatus.PICKED
             }
             else if (requisition.status == RequisitionStatus.PICKED) {
                 requisition.status = RequisitionStatus.PICKING
@@ -447,6 +447,9 @@ class RequisitionService {
             }
             else if (requisition.status == RequisitionStatus.EDITING) {
                 requisition.status = RequisitionStatus.CREATED
+            }
+            else if (requisition.status == RequisitionStatus.CANCELED) {
+                requisition.status = RequisitionStatus.PENDING
             }
             requisition.save(flush:true)
 

@@ -71,6 +71,10 @@ class StockMovementItem {
         sortOrder(nullable:true)
     }
 
+    String toString() {
+        return "${id}:${productCode}:${statusCode}:${quantityRequested}:${quantityRevised}:${reasonCode}:${!substitutionItems?.empty}"
+    }
+
     Map toJson() {
 
         return [
@@ -135,10 +139,10 @@ class StockMovementItem {
         } : []
 
         return new StockMovementItem(id: requisitionItem.id,
+                statusCode: requisitionItem.status?.name(),
                 productCode: requisitionItem?.product?.productCode,
                 product: requisitionItem?.product,
                 inventoryItem: requisitionItem?.inventoryItem,
-                statusCode: requisitionItem.status?.name(),
                 quantityRequested: requisitionItem.quantity,
                 quantityAllowed: null,
                 quantityAvailable: null,
