@@ -317,7 +317,7 @@ class StockMovementService {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
         Product product = requisitionItem.product
         Location location = requisitionItem?.requisition?.origin
-        Integer quantityRequested = requisitionItem.quantity
+        Integer quantityRequested = stockMovementItem?.quantityRevised?:stockMovementItem?.quantityRequested
 
         // Retrieve all available items and then calculate suggested
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, product)
