@@ -208,8 +208,6 @@ class StockMovementService {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
 
-        requisition = requisition.refresh()
-
         return StockMovement.createFromRequisition(requisition)
     }
 

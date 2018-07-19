@@ -86,7 +86,11 @@ class StockMovementApiController {
         bindData(stockMovement, jsonObject)
 
         // Bind all line items
-        bindLineItems(stockMovement, lineItems)
+        if (lineItems) {
+            // Need to clear the existing line items so we only process the modified ones
+            stockMovement.lineItems.clear()
+            bindLineItems(stockMovement, lineItems)
+        }
 
         // Create or update stock movement
         stockMovementService.updateStockMovement(stockMovement)
@@ -175,6 +179,8 @@ class StockMovementApiController {
      *
      * NOTE: THis method was necessary because the default data binder for Grails command objects
      * does not seem to handle nested objects very well.
+     *
+     * FIXME Refactor data binding
      *
      * @param stockMovement
      * @param lineItems

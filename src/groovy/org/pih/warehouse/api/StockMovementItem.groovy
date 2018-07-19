@@ -71,6 +71,10 @@ class StockMovementItem {
         sortOrder(nullable:true)
     }
 
+    String toString() {
+        return "${id}:${productCode}:${statusCode}:${quantityRequested}:${quantityRevised}:${reasonCode}:${!substitutionItems?.empty}"
+    }
+
     Map toJson() {
 
         return [
@@ -129,17 +133,10 @@ class StockMovementItem {
 
     static StockMovementItem createFromRequisitionItem(RequisitionItem requisitionItem) {
 
-        println "item: " + requisitionItem
-        println "all items: " + requisitionItem?.requisitionItems
-        println "subs: " + requisitionItem?.substitutionItems
-        println "mods: " + requisitionItem?.modificationItem
-
         List<StockMovementItem> substitutionItems = requisitionItem?.substitutionItems ?
                 requisitionItem.substitutionItems.collect {
             return StockMovementItem.createFromRequisitionItem(it)
         } : []
-
-        println "Substitution stock movement items: " + substitutionItems
 
         return new StockMovementItem(id: requisitionItem.id,
                 statusCode: requisitionItem.status?.name(),
