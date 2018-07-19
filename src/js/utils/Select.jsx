@@ -6,7 +6,11 @@ import PropTypes from 'prop-types';
 
 // eslint-disable-next-line react/prop-types
 const Dropdown = ({ children, style, width }) => (
-  <div style={{ ...style, position: 'absolute', width }}>
+  <div
+    style={{
+      ...style, position: 'absolute', zIndex: 9999, width,
+    }}
+  >
     {children}
   </div>
 );
