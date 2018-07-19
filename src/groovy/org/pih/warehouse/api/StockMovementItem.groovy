@@ -129,16 +129,23 @@ class StockMovementItem {
 
     static StockMovementItem createFromRequisitionItem(RequisitionItem requisitionItem) {
 
+        println "item: " + requisitionItem
+        println "all items: " + requisitionItem?.requisitionItems
+        println "subs: " + requisitionItem?.substitutionItems
+        println "mods: " + requisitionItem?.modificationItem
+
         List<StockMovementItem> substitutionItems = requisitionItem?.substitutionItems ?
                 requisitionItem.substitutionItems.collect {
             return StockMovementItem.createFromRequisitionItem(it)
         } : []
 
+        println "Substitution stock movement items: " + substitutionItems
+
         return new StockMovementItem(id: requisitionItem.id,
+                statusCode: requisitionItem.status?.name(),
                 productCode: requisitionItem?.product?.productCode,
                 product: requisitionItem?.product,
                 inventoryItem: requisitionItem?.inventoryItem,
-                statusCode: requisitionItem.status?.name(),
                 quantityRequested: requisitionItem.quantity,
                 quantityAllowed: null,
                 quantityAvailable: null,
