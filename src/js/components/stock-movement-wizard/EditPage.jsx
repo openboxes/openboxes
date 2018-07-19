@@ -114,7 +114,10 @@ class EditItemsPage extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { statusCode: '' };
+    this.state = {
+      statusCode: '',
+      redoAutopick: false,
+    };
 
     this.props.showSpinner();
   }
@@ -159,6 +162,11 @@ class EditItemsPage extends Component {
         reasonCode: item.reasonCode,
       })),
     };
+
+    if (payload.lineItems.length) {
+      this.setState({ redoAutopick: true });
+    }
+
     return apiClient.post(url, payload);
   }
 
@@ -181,7 +189,7 @@ class EditItemsPage extends Component {
     this.props.showSpinner();
     this.reviseRequisitionItems(formValues)
       .then(() => {
-        if (this.state.statusCode === 'VERIFYING') {
+        if (this.state.statusCode === 'VERIFYING' || this.state.redoAutopick) {
           this.transitionToStep4()
             .then(() => this.props.onSubmit())
             .catch(() => this.props.hideSpinner());

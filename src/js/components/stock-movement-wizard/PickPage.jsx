@@ -155,14 +155,16 @@ class PickPage extends Component {
 
   render() {
     return (
-      <div>
+      <div className="d-flex flex-column">
         <button
           type="button"
-          className="fa fa-print float-right p-2 mb-1 btn btn-secondary d-print-none"
+          className="fa fa-print float-right p-2 mb-1 btn btn-secondary d-print-none align-self-end"
           onClick={this.print}
         />
         <form onSubmit={this.props.handleSubmit(() => this.nextPage())} className="print-mt">
-          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
+          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+            stockMovementId: this.props.stockMovementId,
+          }))}
           <div className="d-print-none">
             <button type="button" className="btn btn-outline-primary" onClick={this.props.previousPage}>
               Previous

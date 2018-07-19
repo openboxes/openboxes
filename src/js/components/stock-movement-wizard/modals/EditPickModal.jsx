@@ -122,13 +122,17 @@ class EditPickModal extends Component {
       }),
     };
 
-    return apiClient.post(url, payload).then((resp) => {
-      const { pickPageItems } = resp.data.data.pickPage;
+    return apiClient.post(url, payload).then(() => {
+      apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
+        .then((resp) => {
+          const { pickPageItems } = resp.data.data.pickPage;
 
-      this.props.change('stock-movement-wizard', 'pickPageItems', []);
-      this.props.change('stock-movement-wizard', 'pickPageItems', pickPageItems);
+          this.props.change('stock-movement-wizard', 'pickPageItems', []);
+          this.props.change('stock-movement-wizard', 'pickPageItems', pickPageItems);
 
-      this.props.hideSpinner();
+          this.props.hideSpinner();
+        })
+        .catch(() => { this.props.hideSpinner(); });
     }).catch(() => { this.props.hideSpinner(); });
   }
 
