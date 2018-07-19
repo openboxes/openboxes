@@ -45,6 +45,10 @@ class StockMovementItem {
 
     Integer sortOrder = 0
 
+    BigDecimal getQuantityRequired() {
+        return quantityRevised?:quantityRequested
+    }
+
 
     static constraints = {
         id(nullable:true)
@@ -90,6 +94,7 @@ class StockMovementItem {
                 quantityCanceled: quantityCanceled,
                 quantityRevised: quantityRevised,
                 quantityPicked: quantityPicked,
+                quantityRequired: quantityRequired,
                 reasonCode: reasonCode,
                 comments: comments,
                 recipient: recipient,
@@ -373,9 +378,10 @@ class PickPageItem {
                 "product.name"      : requisitionItem?.product?.name,
                 productCode         : requisitionItem?.product?.productCode,
                 quantityRequested   : requisitionItem.quantity,
+                quantityRequired    : quantityRequired,
                 quantityPicked      : quantityPicked,
                 quantityAvailable   : quantityAvailable,
-                quantityRemaining   : requisitionItem.totalQuantityRemaining(),
+                quantityRemaining   : quantityRemaining,
                 availableItems      : availableItems,
                 suggestedItems      : suggestedItems,
                 picklistItems       : picklistItems,
@@ -384,9 +390,16 @@ class PickPageItem {
 
 
     Integer getQuantityRemaining() {
-        Integer quantityRemaining = quantityRequested - quantityPicked
+        Integer quantityRemaining = quantityRequired - quantityPicked
         return quantityRemaining > 0 ? quantityRemaining : 0
     }
+
+    // FIXME Don't love this logic in multiple places (see StockMovementItem). Refactor method to use
+    // StockMovementItem instead of RequisitionItem
+    Integer getQuantityRequired() {
+        return requisitionItem?.modificationItem?.quantity?:requisitionItem?.quantity?:0
+    }
+
 
     Integer getQuantityRequested() {
         requisitionItem?.quantity?:0
@@ -402,7 +415,8 @@ class PickPageItem {
 
 
     String getStatusCode() {
-        if (quantityRequested == quantityPicked && quantityRemaining == 0) {
+
+        if (quantityRequired == quantityPicked && quantityRemaining == 0) {
             return "PICKED"
         }
         else if (quantityPicked > 0 && quantityRemaining > 0) {

@@ -317,12 +317,12 @@ class StockMovementService {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
         Product product = requisitionItem.product
         Location location = requisitionItem?.requisition?.origin
-        Integer quantityRequested = stockMovementItem?.quantityRevised?:stockMovementItem?.quantityRequested
+        Integer quantityRequired = stockMovementItem?.quantityRequired
 
         // Retrieve all available items and then calculate suggested
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, product)
         log.info "Available items: ${availableItems}"
-        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequested)
+        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         log.info "Suggested items " + suggestedItems
         if (suggestedItems) {
             clearPicklist(stockMovementItem)
@@ -534,7 +534,12 @@ class StockMovementService {
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
-        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, requisitionItem.quantity)
+
+        // FIXME Don't love this logic in multiple places (see StockMovementItem). Refactor method to use
+        // StockMovementItem instead of RequisitionItem
+        Integer quantityRequired = requisitionItem?.modificationItem?.quantity?:requisitionItem?.quantity
+
+        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         pickPageItem.availableItems = availableItems
         pickPageItem.suggestedItems = suggestedItems
 
