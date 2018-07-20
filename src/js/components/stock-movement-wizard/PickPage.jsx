@@ -108,13 +108,15 @@ const FIELDS = {
   },
 };
 
-/* eslint class-methods-use-this: ["error",{ "exceptMethods":
-  ["print", "checkForInitialPicksChanges"] }] */
+/* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 class PickPage extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { statusCode: '' };
+    this.state = {
+      statusCode: '',
+      printPicksUrl: '',
+    };
 
     this.props.showSpinner();
   }
@@ -122,10 +124,17 @@ class PickPage extends Component {
   componentDidMount() {
     this.fetchLineItems()
       .then((resp) => {
+        const { associations } = resp.data.data;
         const { statusCode, pickPageItems } = resp.data.data.pickPage;
         this.props.change('stock-movement-wizard', 'pickPageItems', []);
         this.props.change('stock-movement-wizard', 'pickPageItems', this.checkForInitialPicksChanges(pickPageItems));
-        this.setState({ statusCode });
+
+        const printPicks = _.find(associations.documents, doc => doc.name === 'Print Picklist');
+        this.setState({
+          printPicksUrl: printPicks.uri,
+          statusCode,
+        });
+
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
@@ -153,10 +162,6 @@ class PickPage extends Component {
       pickPageItem.picklistItems = _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['inventoryItem.id', 'initial']);
     });
     return pickPageItems;
-  }
-
-  print() {
-    window.print();
   }
 
   fetchLineItems() {
@@ -188,11 +193,14 @@ class PickPage extends Component {
   render() {
     return (
       <div className="d-flex flex-column">
-        <button
-          type="button"
-          className="fa fa-print float-right p-2 mb-1 btn btn-secondary d-print-none align-self-end"
-          onClick={this.print}
-        />
+        <a
+          href={this.state.printPicksUrl}
+          className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span><i className="fa fa-print pr-2" />Print Picklist</span>
+        </a>
         <form onSubmit={this.props.handleSubmit(() => this.nextPage())} className="print-mt">
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
             checkForInitialPicksChanges: this.checkForInitialPicksChanges,
