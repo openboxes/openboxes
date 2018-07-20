@@ -103,7 +103,7 @@ class EditPickModal extends Component {
       picklistItems: _.map(values.availableItems, (avItem) => {
         // check if this picklist item already exists
         const picklistItem = _.find(
-          this.state.attr.fieldValue.picklistItems,
+          _.filter(this.state.attr.fieldValue.picklistItems, listItem => !listItem.initial),
           item => item['inventoryItem.id'] === avItem['inventoryItem.id'],
         );
         if (picklistItem) {

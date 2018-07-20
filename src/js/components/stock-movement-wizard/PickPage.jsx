@@ -142,7 +142,7 @@ class PickPage extends Component {
 
   checkForInitialPicksChanges(pickPageItems) {
     _.forEach(pickPageItems, (pickPageItem) => {
-      if (pickPageItem.picklistItems.lenght) {
+      if (pickPageItem.picklistItems.length) {
         const initialPicks = [];
         _.forEach(pickPageItem.suggestedItems, (suggestion) => {
           // search if suggested picks are inside picklist

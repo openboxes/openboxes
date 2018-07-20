@@ -53,7 +53,7 @@ const FIELDS = {
         type: LabelField,
         label: 'Qty available',
       },
-      qualityConsumed: {
+      quantityConsumed: {
         type: LabelField,
         label: 'Monthly consumption',
       },
