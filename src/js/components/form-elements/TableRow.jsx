@@ -21,7 +21,7 @@ class TableRow extends Component {
 
     const dynamicAttr = fieldsConfig.getDynamicRowAttr ?
       fieldsConfig.getDynamicRowAttr({ ...properties, index, rowValues }) : {};
-    const rowIndex = properties.parentIndex || index;
+    const rowIndex = !_.isNil(properties.parentIndex) ? properties.parentIndex : index;
     const className = `table-row ${rowIndex % 2 === 0 ? 'even-row' : ''} ${dynamicAttr.className ? dynamicAttr.className : ''}`;
 
     return (

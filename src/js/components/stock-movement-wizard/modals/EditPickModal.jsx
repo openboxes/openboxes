@@ -126,9 +126,8 @@ class EditPickModal extends Component {
       apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
         .then((resp) => {
           const { pickPageItems } = resp.data.data.pickPage;
-
           this.props.change('stock-movement-wizard', 'pickPageItems', []);
-          this.props.change('stock-movement-wizard', 'pickPageItems', pickPageItems);
+          this.props.change('stock-movement-wizard', 'pickPageItems', this.state.attr.checkForInitialPicksChanges(pickPageItems));
 
           this.props.hideSpinner();
         })

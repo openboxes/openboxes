@@ -19,6 +19,11 @@ const FIELDS = {
     type: ArrayField,
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'picklistItems',
+    getDynamicRowAttr: ({ rowValues }) => (
+      {
+        className: rowValues.initial ? 'crossed-out' : '',
+      }
+    ),
     fields: {
       productCode: {
         type: LabelField,
@@ -76,12 +81,13 @@ const FIELDS = {
           title: 'Edit Pick',
         },
         getDynamicAttr: ({
-          fieldValue, selectedValue, subfield, stockMovementId,
+          fieldValue, selectedValue, subfield, stockMovementId, checkForInitialPicksChanges,
         }) => ({
           productCode: selectedValue,
           fieldValue,
           subfield,
           stockMovementId,
+          checkForInitialPicksChanges,
         }),
       },
       buttonAdjustInventory: {
@@ -102,7 +108,8 @@ const FIELDS = {
   },
 };
 
-/* eslint class-methods-use-this: ["error",{ "exceptMethods": ["print"] }] */
+/* eslint class-methods-use-this: ["error",{ "exceptMethods":
+  ["print", "checkForInitialPicksChanges"] }] */
 class PickPage extends Component {
   constructor(props) {
     super(props);
@@ -116,11 +123,36 @@ class PickPage extends Component {
     this.fetchLineItems()
       .then((resp) => {
         const { statusCode, pickPageItems } = resp.data.data.pickPage;
-        this.props.change('stock-movement-wizard', 'pickPageItems', pickPageItems);
+        this.props.change('stock-movement-wizard', 'pickPageItems', []);
+        this.props.change('stock-movement-wizard', 'pickPageItems', this.checkForInitialPicksChanges(pickPageItems));
         this.setState({ statusCode });
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  checkForInitialPicksChanges(pickPageItems) {
+    _.forEach(pickPageItems, (pickPageItem) => {
+      const initialPicks = [];
+      _.forEach(pickPageItem.suggestedItems, (suggestion) => {
+        // search if suggested picks are inside picklist
+        // if no -> add suggested pick as initial pick (to be crossed out)
+        // if yes -> compare quantityPicked of item in picklist with sugestion
+        const pick = _.find(
+          pickPageItem.picklistItems,
+          item => suggestion['inventoryItem.id'] === item['inventoryItem.id'],
+        );
+        if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
+          initialPicks.push({
+            ...suggestion,
+            initial: true,
+          });
+        }
+      });
+      /* eslint-disable-next-line no-param-reassign */
+      pickPageItem.picklistItems = _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['inventoryItem.id', 'initial']);
+    });
+    return pickPageItems;
   }
 
   print() {
@@ -163,6 +195,7 @@ class PickPage extends Component {
         />
         <form onSubmit={this.props.handleSubmit(() => this.nextPage())} className="print-mt">
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+            checkForInitialPicksChanges: this.checkForInitialPicksChanges,
             stockMovementId: this.props.stockMovementId,
           }))}
           <div className="d-print-none">
