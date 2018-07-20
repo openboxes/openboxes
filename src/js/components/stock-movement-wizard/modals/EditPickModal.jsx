@@ -103,7 +103,7 @@ class EditPickModal extends Component {
       picklistItems: _.map(values.availableItems, (avItem) => {
         // check if this picklist item already exists
         const picklistItem = _.find(
-          this.state.attr.fieldValue.picklistItems,
+          _.filter(this.state.attr.fieldValue.picklistItems, listItem => !listItem.initial),
           item => item['inventoryItem.id'] === avItem['inventoryItem.id'],
         );
         if (picklistItem) {
@@ -126,9 +126,8 @@ class EditPickModal extends Component {
       apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
         .then((resp) => {
           const { pickPageItems } = resp.data.data.pickPage;
-
           this.props.change('stock-movement-wizard', 'pickPageItems', []);
-          this.props.change('stock-movement-wizard', 'pickPageItems', pickPageItems);
+          this.props.change('stock-movement-wizard', 'pickPageItems', this.state.attr.checkForInitialPicksChanges(pickPageItems));
 
           this.props.hideSpinner();
         })
@@ -156,7 +155,7 @@ class EditPickModal extends Component {
         <form className="print-mt">
           <div className="font-weight-bold">Product Code: {this.state.attr.fieldValue.productCode}</div>
           <div className="font-weight-bold">Product Name: {this.state.attr.fieldValue['product.name']}</div>
-          <div className="font-weight-bold">Quantity Requested: {this.state.attr.fieldValue.quantityRequested}</div>
+          <div className="font-weight-bold">Quantity Required: {this.state.attr.fieldValue.quantityRequired}</div>
           <div className="font-weight-bold pb-2">Quantity Picked: {this.calculatePicked()}</div>
           <hr />
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}

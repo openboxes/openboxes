@@ -2,7 +2,6 @@ import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import PickPageFieldArrayComponent from './PickPageFieldArrayComponent';
 import TableBody from './TableBody';
 import TableBodyVirtualized from './TableBodyVirtualized';
 
@@ -11,16 +10,6 @@ const FieldArrayComponent = (props) => {
   const AddButton = fieldsConfig.addButton;
   const addRow = (row = {}) => fields.push(row);
   const TableBodyComponent = fieldsConfig.disableVirtualization ? TableBody : TableBodyVirtualized;
-
-  if (fieldsConfig.pickPage) {
-    return (
-      <PickPageFieldArrayComponent
-        fieldsConfig={fieldsConfig}
-        properties={properties}
-        fields={fields}
-      />
-    );
-  }
 
   return (
     <div>

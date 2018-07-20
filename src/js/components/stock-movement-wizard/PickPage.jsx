@@ -19,6 +19,11 @@ const FIELDS = {
     type: ArrayField,
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'picklistItems',
+    getDynamicRowAttr: ({ rowValues }) => (
+      {
+        className: rowValues.initial ? 'crossed-out' : '',
+      }
+    ),
     fields: {
       productCode: {
         type: LabelField,
@@ -43,7 +48,7 @@ const FIELDS = {
         type: LabelField,
         label: 'Bin',
       },
-      quantityRequested: {
+      quantityRequired: {
         type: LabelField,
         label: 'Qty required',
       },
@@ -76,12 +81,13 @@ const FIELDS = {
           title: 'Edit Pick',
         },
         getDynamicAttr: ({
-          fieldValue, selectedValue, subfield, stockMovementId,
+          fieldValue, selectedValue, subfield, stockMovementId, checkForInitialPicksChanges,
         }) => ({
           productCode: selectedValue,
           fieldValue,
           subfield,
           stockMovementId,
+          checkForInitialPicksChanges,
         }),
       },
       buttonAdjustInventory: {
@@ -102,12 +108,15 @@ const FIELDS = {
   },
 };
 
-/* eslint class-methods-use-this: ["error",{ "exceptMethods": ["print"] }] */
+/* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 class PickPage extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { statusCode: '' };
+    this.state = {
+      statusCode: '',
+      printPicksUrl: '',
+    };
 
     this.props.showSpinner();
   }
@@ -115,16 +124,46 @@ class PickPage extends Component {
   componentDidMount() {
     this.fetchLineItems()
       .then((resp) => {
+        const { associations } = resp.data.data;
         const { statusCode, pickPageItems } = resp.data.data.pickPage;
-        this.props.change('stock-movement-wizard', 'pickPageItems', pickPageItems);
-        this.setState({ statusCode });
+        this.props.change('stock-movement-wizard', 'pickPageItems', []);
+        this.props.change('stock-movement-wizard', 'pickPageItems', this.checkForInitialPicksChanges(pickPageItems));
+
+        const printPicks = _.find(associations.documents, doc => doc.name === 'Print Picklist');
+        this.setState({
+          printPicksUrl: printPicks.uri,
+          statusCode,
+        });
+
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
   }
 
-  print() {
-    window.print();
+  checkForInitialPicksChanges(pickPageItems) {
+    _.forEach(pickPageItems, (pickPageItem) => {
+      if (pickPageItem.picklistItems.length) {
+        const initialPicks = [];
+        _.forEach(pickPageItem.suggestedItems, (suggestion) => {
+          // search if suggested picks are inside picklist
+          // if no -> add suggested pick as initial pick (to be crossed out)
+          // if yes -> compare quantityPicked of item in picklist with sugestion
+          const pick = _.find(
+            pickPageItem.picklistItems,
+            item => suggestion['inventoryItem.id'] === item['inventoryItem.id'],
+          );
+          if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
+            initialPicks.push({
+              ...suggestion,
+              initial: true,
+            });
+          }
+        });
+        /* eslint-disable-next-line no-param-reassign */
+        pickPageItem.picklistItems = _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['inventoryItem.id', 'initial']);
+      }
+    });
+    return pickPageItems;
   }
 
   fetchLineItems() {
@@ -156,13 +195,17 @@ class PickPage extends Component {
   render() {
     return (
       <div className="d-flex flex-column">
-        <button
-          type="button"
-          className="fa fa-print float-right p-2 mb-1 btn btn-secondary d-print-none align-self-end"
-          onClick={this.print}
-        />
+        <a
+          href={this.state.printPicksUrl}
+          className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span><i className="fa fa-print pr-2" />Print Picklist</span>
+        </a>
         <form onSubmit={this.props.handleSubmit(() => this.nextPage())} className="print-mt">
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+            checkForInitialPicksChanges: this.checkForInitialPicksChanges,
             stockMovementId: this.props.stockMovementId,
           }))}
           <div className="d-print-none">
