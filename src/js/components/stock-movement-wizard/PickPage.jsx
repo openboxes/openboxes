@@ -142,24 +142,26 @@ class PickPage extends Component {
 
   checkForInitialPicksChanges(pickPageItems) {
     _.forEach(pickPageItems, (pickPageItem) => {
-      const initialPicks = [];
-      _.forEach(pickPageItem.suggestedItems, (suggestion) => {
-        // search if suggested picks are inside picklist
-        // if no -> add suggested pick as initial pick (to be crossed out)
-        // if yes -> compare quantityPicked of item in picklist with sugestion
-        const pick = _.find(
-          pickPageItem.picklistItems,
-          item => suggestion['inventoryItem.id'] === item['inventoryItem.id'],
-        );
-        if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
-          initialPicks.push({
-            ...suggestion,
-            initial: true,
-          });
-        }
-      });
-      /* eslint-disable-next-line no-param-reassign */
-      pickPageItem.picklistItems = _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['inventoryItem.id', 'initial']);
+      if (pickPageItem.picklistItems.lenght) {
+        const initialPicks = [];
+        _.forEach(pickPageItem.suggestedItems, (suggestion) => {
+          // search if suggested picks are inside picklist
+          // if no -> add suggested pick as initial pick (to be crossed out)
+          // if yes -> compare quantityPicked of item in picklist with sugestion
+          const pick = _.find(
+            pickPageItem.picklistItems,
+            item => suggestion['inventoryItem.id'] === item['inventoryItem.id'],
+          );
+          if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
+            initialPicks.push({
+              ...suggestion,
+              initial: true,
+            });
+          }
+        });
+        /* eslint-disable-next-line no-param-reassign */
+        pickPageItem.picklistItems = _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['inventoryItem.id', 'initial']);
+      }
     });
     return pickPageItems;
   }
