@@ -43,7 +43,7 @@ const FIELDS = {
         type: LabelField,
         label: 'Bin',
       },
-      quantityRequested: {
+      quantityRequired: {
         type: LabelField,
         label: 'Qty required',
       },

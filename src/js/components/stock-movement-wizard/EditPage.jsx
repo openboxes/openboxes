@@ -117,6 +117,7 @@ class EditItemsPage extends Component {
     this.state = {
       statusCode: '',
       redoAutopick: false,
+      revisedItems: [],
     };
 
     this.props.showSpinner();
@@ -139,8 +140,10 @@ class EditItemsPage extends Component {
         }),
       );
 
-      this.setState({ statusCode });
-      this.setState({ statusCode });
+      this.setState({
+        statusCode,
+        revisedItems: _.filter(editPageItems, item => item.statusCode === 'CHANGED'),
+      });
 
       this.props.change('stock-movement-wizard', 'editPageItems', editPageItems);
       this.props.hideSpinner();
@@ -152,7 +155,17 @@ class EditItemsPage extends Component {
   reviseRequisitionItems(values) {
     const itemsToRevise = _.filter(
       values.editPageItems,
-      item => item.quantityRevised && item.reasonCode,
+      (item) => {
+        if (item.quantityRevised && item.reasonCode) {
+          const oldRevision = _.find(
+            this.state.revisedItems,
+            revision => revision.requisitionItemId === item.requisitionItemId,
+          );
+          return _.isEmpty(oldRevision) ? true :
+            (oldRevision.quantityRevised !== item.quantityRevised);
+        }
+        return false;
+      },
     );
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
     const payload = {
@@ -165,9 +178,10 @@ class EditItemsPage extends Component {
 
     if (payload.lineItems.length) {
       this.setState({ redoAutopick: true });
+      return apiClient.post(url, payload);
     }
 
-    return apiClient.post(url, payload);
+    return Promise.resolve();
   }
 
   transitionToStep4() {
@@ -224,7 +238,7 @@ function validate(values) {
   _.forEach(values.editPageItems, (item, key) => {
     if (!_.isEmpty(item.quantityRevised) && _.isEmpty(item.reasonCode)) {
       errors.editPageItems[key] = { reasonCode: 'Reason code required' };
-    } else if (_.isEmpty(item.quantityRevised) && !_.isEmpty(item.reasonCode)) {
+    } else if (!item.quantityRevised && !_.isEmpty(item.reasonCode)) {
       errors.editPageItems[key] = { quantityRevised: 'Revised quantity required' };
     }
     if (parseInt(item.quantityRevised, 10) === item.quantityRequested) {

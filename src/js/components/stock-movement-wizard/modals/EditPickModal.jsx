@@ -156,7 +156,7 @@ class EditPickModal extends Component {
         <form className="print-mt">
           <div className="font-weight-bold">Product Code: {this.state.attr.fieldValue.productCode}</div>
           <div className="font-weight-bold">Product Name: {this.state.attr.fieldValue['product.name']}</div>
-          <div className="font-weight-bold">Quantity Requested: {this.state.attr.fieldValue.quantityRequested}</div>
+          <div className="font-weight-bold">Quantity Required: {this.state.attr.fieldValue.quantityRequired}</div>
           <div className="font-weight-bold pb-2">Quantity Picked: {this.calculatePicked()}</div>
           <hr />
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
