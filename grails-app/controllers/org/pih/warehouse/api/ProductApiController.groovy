@@ -31,8 +31,8 @@ class ProductApiController extends BaseDomainApiController {
 
     def availableItems = {
         def productIds = params.list("product.id") + params.list("id")
-        Location location = Location.get(params.location.id)
-
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
         if (!location || productIds.empty) {
             throw new IllegalArgumentException("Must specify a location and at least one product")
         }
@@ -58,7 +58,8 @@ class ProductApiController extends BaseDomainApiController {
         }
         def availableItems = []
         boolean hasEarlierExpiringItems = false
-        def location = (params?.location?.id) ? Location.get(params.location.id) : null
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        def location = (locationId) ? Location.get(locationId) : null
         if (location) {
             def products = productAssociations.collect { it.associatedProduct }
             log.info("Location " + location + " products = " + products)

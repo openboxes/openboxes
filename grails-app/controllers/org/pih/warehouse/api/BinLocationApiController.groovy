@@ -21,7 +21,8 @@ class BinLocationApiController {
     def locationService
 
     def list = {
-        Location location = Location.get(params?.parentLocation?.id)
+        String locationId = params?.parentLocation?.id?:session?.warehouse?.id
+        Location location = Location.get(locationId)
         if (!location) {
             throw new UnresolvableObjectException("No bin locations for location ${params?.parentLocation?.id}", params?.parentLocation?.id, Location.class.toString())
         }

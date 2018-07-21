@@ -51,12 +51,7 @@ class ApiController {
 
 
     def logout = {
-        session.user = null
-        session.targetUri = null
-        session.user = null;
-        session.userName = null
-        session.locale = null;
-        session.warehouse = null;
+        session.invalidate()
         render ([status: 200, text: "Logout was successful"])
     }
 

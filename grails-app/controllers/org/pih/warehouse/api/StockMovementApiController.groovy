@@ -10,21 +10,11 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.apache.commons.collections.FactoryUtils
-import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
-import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
