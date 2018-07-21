@@ -18,7 +18,8 @@ class InternalLocationApiController {
     def locationService
 
     def list = {
-        Location parentLocation = params?.location?.id ? Location.get(params.location?.id) : null
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location parentLocation =  locationId ? Location.get(locationId) : null
         if (!parentLocation) {
             throw new IllegalArgumentException("Must provide location.id as a request parameter")
         }
