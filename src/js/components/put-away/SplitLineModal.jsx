@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 import ModalWrapper from '../form-elements/ModalWrapper';
 import Input from '../../utils/Input';
 import Select from '../../utils/Select';
-import { BIN_LOCATION_MOCKS } from '../../mockedData';
 
 class SplitLineModal extends Component {
   constructor(props) {
@@ -63,8 +62,8 @@ class SplitLineModal extends Component {
         btnSaveDisabled={!this.isValid()}
         title={() => (
           <div>
-            <h3 className="font-weight-bold">{this.props.putawayItem.name}</h3>
-            <div className="font-weight-bold">Expiry: {this.props.putawayItem.expiryDate}</div>
+            <h3 className="font-weight-bold">{`${this.props.putawayItem.product.productCode} ${this.props.putawayItem.product.name}`}</h3>
+            <div className="font-weight-bold">Expiry: {this.props.putawayItem.inventoryItem.expirationDate}</div>
             <div className="font-weight-bold">Total QTY: {this.props.putawayItem.quantity}</div>
           </div>)}
       >
@@ -84,12 +83,11 @@ class SplitLineModal extends Component {
                 >
                   <td className="align-middle">
                     <Select
-                      options={BIN_LOCATION_MOCKS}
+                      options={this.props.bins}
                       value={item.putawayLocation ? item.putawayLocation.id : null}
                       onChange={value => this.setState({
                         splitItems: update(this.state.splitItems, {
                           [index]: {
-                            putawayFacility: { id: { $set: value } },
                             putawayLocation: { id: { $set: value } },
                           },
                         }),
@@ -130,7 +128,12 @@ class SplitLineModal extends Component {
             onClick={() => this.setState({
               splitItems: update(this.state.splitItems, {
                 $push: [{
-                  quantity: 0, putawayFacility: { id: null }, putawayLocation: { id: null },
+                  quantity: 0,
+                  putawayFacility: {
+                    id: this.props.putawayItem.putawayFacility
+                      ? this.props.putawayItem.putawayFacility.id : null,
+                  },
+                  putawayLocation: { id: null },
                 }],
               }),
             })}
@@ -147,8 +150,13 @@ export default SplitLineModal;
 SplitLineModal.propTypes = {
   saveSplitItems: PropTypes.func.isRequired,
   putawayItem: PropTypes.shape({
-    name: PropTypes.string,
-    expiryDate: PropTypes.string,
+    product: PropTypes.shape({
+      productCode: PropTypes.string,
+      name: PropTypes.string,
+    }),
+    inventoryItem: PropTypes.shape({
+      expirationDate: PropTypes.string,
+    }),
     quantity: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -161,9 +169,11 @@ SplitLineModal.propTypes = {
     }),
   }),
   splitItems: PropTypes.arrayOf(PropTypes.shape({})),
+  bins: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
 SplitLineModal.defaultProps = {
   putawayItem: {},
   splitItems: [],
+  bins: [],
 };

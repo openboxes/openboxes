@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 import PropTypes from 'prop-types';
@@ -7,31 +8,15 @@ import PropTypes from 'prop-types';
 import 'react-table/react-table.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
-import { PUT_AWAY_MOCKS } from '../../mockedData';
 import Select from '../../utils/Select';
+import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../actions';
 
 const SelectTreeTable = selectTableHOC(customTreeTableHOC(ReactTable));
 
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-
-function getData(includePending) {
-  const data = PUT_AWAY_MOCKS.map((item) => {
-    // this _id is used internally in TreeTable
-    const _id = _.uniqueId();
-    return {
-      _id,
-      ...item,
-    };
-  });
-
-  if (includePending) {
-    return data;
-  }
-
-  return _.filter(data, val => val.status !== 'PENDING');
-}
 
 function getNodes(data, node = []) {
   data.forEach((item) => {
@@ -47,10 +32,10 @@ function getNodes(data, node = []) {
 class PutAwayPage extends Component {
   constructor(props) {
     super(props);
-    const data = getData(false);
     const columns = this.getColumns();
     this.state = {
-      data,
+      pendingPutAways: [],
+      putawayItems: [],
       columns,
       selection: new Set(),
       selectAll: false,
@@ -60,6 +45,10 @@ class PutAwayPage extends Component {
     };
   }
 
+  componentDidMount() {
+    this.fetchPutAwayCandidates();
+  }
+
   onExpandedChange = (expanded) => {
     this.setState({ expanded });
   };
@@ -67,19 +56,19 @@ class PutAwayPage extends Component {
   getColumns = () => [
     {
       Header: 'Code',
-      accessor: 'code',
+      accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
     }, {
       Header: 'Name',
-      accessor: 'name',
+      accessor: 'product.name',
       style: { whiteSpace: 'normal' },
     }, {
       Header: 'Lot',
-      accessor: 'lot',
+      accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
     }, {
       Header: 'Expiry',
-      accessor: 'expiryDate',
+      accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
     }, {
       Header: 'Recipient',
@@ -96,9 +85,9 @@ class PutAwayPage extends Component {
       Expander: ({ row, isExpanded }) => (
         <span className="ml-2">
           <input
-            id={`stockMovement_${row._subRows[0]._original.stockMovement.id}`}
             type="checkbox"
             name="aggregationCheckbox"
+            checked={this.checkSelected(row)}
             value={row._subRows[0]._original.stockMovement.id}
             ref={elem => elem && (elem.indeterminate = this.checkIndetermediate(row))}
             onChange={this.toggleSelectionsByStockMovement}
@@ -110,18 +99,90 @@ class PutAwayPage extends Component {
     },
   ];
 
+  fetchPutAwayCandidates() {
+    this.props.showSpinner();
+    const url = '/openboxes/api/putaways';
+
+    return apiClient.get(url)
+      .then((response) => {
+        const putawayItems = [];
+        const pendingPutAways = [];
+        const putAwayCandidates = parseResponse(response.data.data);
+
+        putAwayCandidates.forEach((item) => {
+          // this _id is used internally in TreeTable
+          const _id = _.uniqueId('item_');
+          if (item.putawayStatus === 'PENDING') {
+            pendingPutAways.push({ _id, ...item });
+          } else {
+            putawayItems.push({
+              _id,
+              ...item,
+              putawayFacility: { id: item.currentFacility ? item.currentFacility.id : null },
+            });
+          }
+        });
+
+        this.setState({ putawayItems, pendingPutAways }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  savePutAways() {
+    this.props.showSpinner();
+    const url = '/openboxes/api/putaways';
+    const payload = {
+      putawayNumber: '',
+      'putawayAssignee.id': '',
+      putawayStatus: '',
+      putawayDate: '',
+      putawayItems: _.filter(this.state.putawayItems, item =>
+        _.includes([...this.state.selection], item._id)),
+    };
+
+    return apiClient.post(url, flattenRequest(payload))
+      .then((response) => {
+        const putAway = parseResponse(response.data.data);
+        putAway.putawayItems = _.map(putAway.putawayItems, item => ({ _id: _.uniqueId('item_'), ...item }));
+
+        this.props.hideSpinner();
+
+        this.props.nextPage({
+          putAway,
+          pivotBy: this.state.pivotBy,
+        });
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  filterPutAways(includePending) {
+    let putawayItems = [];
+    if (includePending) {
+      putawayItems = [...this.state.putawayItems, ...this.state.pendingPutAways];
+    } else {
+      putawayItems = _.filter(this.state.putawayItems, val => val.putawayStatus !== 'PENDING');
+    }
+
+    this.setState({ putawayItems });
+  }
+
   checkIndetermediate(row) {
     return _.some(row._subRows, subRow =>
-      !_.includes([...this.state.selection], subRow._original.id))
+      !_.includes([...this.state.selection], subRow._original._id))
     && _.some(row._subRows, subRow =>
-      _.includes([...this.state.selection], subRow._original.id));
+      _.includes([...this.state.selection], subRow._original._id));
+  }
+
+  checkSelected(row) {
+    return _.every(row._subRows, subRow =>
+      _.includes([...this.state.selection], subRow._original._id));
   }
 
   toggleSelectionsByStockMovement = (event) => {
     const { target } = event;
     const { checked, value } = target;
-    const itemsToToggle = _.map(_.filter(this.state.data, product =>
-      product.stockMovement.id === parseInt(value, 10) && product.status !== 'PENDING'), item => item.id);
+    const itemsToToggle = _.map(_.filter(this.state.putawayItems, product =>
+      product.stockMovement.id === value && product.putawayStatus !== 'PENDING'), item => item._id);
     this.toggleSelection(itemsToToggle, checked);
   };
 
@@ -140,12 +201,8 @@ class PutAwayPage extends Component {
     const nodes = getNodes(currentRecords);
     // we just push all the IDs onto the selection array
     nodes.forEach((item) => {
-      if (item.status !== 'PENDING') {
-        selection.push(item.id);
-      }
-      const parentCheckbox = document.querySelector(`input[id="stockMovement_${item.stockMovement.id}"]`);
-      if (parentCheckbox) {
-        parentCheckbox.checked = selectAll;
+      if (item.putawayStatus !== 'PENDING') {
+        selection.push(item._id);
       }
     });
     this.toggleSelection(selection, selectAll);
@@ -161,7 +218,7 @@ class PutAwayPage extends Component {
   };
 
   isSelected = key =>
-    _.includes([...this.state.selection], parseInt(key, 10));
+    _.includes([...this.state.selection], key);
 
   toggleSelection = (keys, checked) => {
     const selection = new Set(this.state.selection);
@@ -175,10 +232,10 @@ class PutAwayPage extends Component {
           selection.delete(item);
         });
       }
-    } else if (selection.has(parseInt(keys, 10))) {
-      selection.delete(parseInt(keys, 10));
-    } else if (!selection.has(parseInt(keys, 10))) {
-      selection.add(parseInt(keys, 10));
+    } else if (selection.has(keys)) {
+      selection.delete(keys);
+    } else if (!selection.has(keys)) {
+      selection.add(keys);
     }
     this.setState({ selection });
   };
@@ -193,7 +250,7 @@ class PutAwayPage extends Component {
       onExpandedChange, toggleTree,
     } = this;
     const {
-      data, columns, selectAll, selectType, pivotBy, expanded,
+      putawayItems, columns, selectAll, selectType, pivotBy, expanded,
     } = this.state;
     const extraProps =
       {
@@ -226,7 +283,7 @@ class PutAwayPage extends Component {
           <div style={{ width: '150px' }}>
             <Select
               options={[{ value: false, label: 'Exclude' }, { value: true, label: 'Include' }]}
-              onChange={val => this.setState({ data: getData(val) })}
+              onChange={val => this.filterPutAways(val)}
               objectValue
               initialValue={false}
               clearable={false}
@@ -234,9 +291,9 @@ class PutAwayPage extends Component {
           </div>
         </div>
         {
-          data ?
+          putawayItems ?
             <SelectTreeTable
-              data={data}
+              data={putawayItems}
               columns={columns}
               ref={r => this.selectTable = r}
               className="-striped -highlight"
@@ -258,7 +315,7 @@ class PutAwayPage extends Component {
                     e.stopPropagation();
                     onClick(id, shiftKey, row);
                   }}
-                  disabled={row.status === 'PENDING'}
+                  disabled={row.putawayStatus === 'PENDING'}
                 />)}
               defaultSorted={[{
                   id: 'name',
@@ -266,7 +323,7 @@ class PutAwayPage extends Component {
                   id: 'stockMovement.name',
               }]}
               getTdProps={(state, rowInfo) => ({
-                  style: { color: _.get(rowInfo, 'original.status') === 'PENDING' ? 'gray' : 'black' },
+                  style: { color: _.get(rowInfo, 'original.putawayStatus') === 'PENDING' ? 'gray' : 'black' },
                   onClick: (event, handleOriginal) => {
                     const { target } = event;
                     // Fire the original onClick handler, if the other part of row is clicked on
@@ -280,10 +337,7 @@ class PutAwayPage extends Component {
         }
         <button
           type="button"
-          onClick={() => this.props.nextPage({
-            data: _.filter(data, item => _.includes([...this.state.selection], item.id)),
-            pivotBy,
-          })}
+          onClick={() => this.savePutAways()}
           className="btn btn-outline-primary float-right my-2"
         >Start Put-Away
         </button>
@@ -292,9 +346,11 @@ class PutAwayPage extends Component {
   }
 }
 
-export default PutAwayPage;
+export default connect(null, { showSpinner, hideSpinner })(PutAwayPage);
 
 PutAwayPage.propTypes = {
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
   nextPage: PropTypes.func.isRequired,
 };
 
