@@ -35,6 +35,9 @@ const FIELDS = {
       'product.name': {
         type: LabelField,
         label: 'Product Name',
+        attributes: {
+          className: 'text-left ml-1',
+        },
       },
       lotNumber: {
         type: LabelField,

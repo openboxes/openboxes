@@ -43,7 +43,10 @@ const FIELDS = {
       },
       productName: {
         type: LabelField,
-        label: 'Product',
+        label: 'Product Name',
+        attributes: {
+          className: 'text-left ml-1',
+        },
       },
       quantityRequested: {
         type: LabelField,
