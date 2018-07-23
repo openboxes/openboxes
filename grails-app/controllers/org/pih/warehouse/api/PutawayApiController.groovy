@@ -74,18 +74,5 @@ class PutawayApiController {
         render ([data:putaway?.toJson()] as JSON)
     }
 
-    def generatePdf = {
-        String locationId = params?.location?.id?:session?.warehouse?.id
-        Location location = Location.get(locationId)
-        Requisition requisition = Requisition.get(params.id)
 
-        Picklist picklist = requisition.picklist
-
-        pdfRenderingService.render(
-                template: "/picklist/print",
-                //locale:locale,
-                model: [requisition:requisition, picklist: picklist, location:location],
-                filename: "Picklist - ${requisition.requestNumber}"
-        )
-    }
 }
