@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import PropTypes from 'prop-types';
+import Alert from 'react-s-alert';
 
 import 'react-table/react-table.css';
 
@@ -136,7 +137,7 @@ class PutAwayCheckPage extends Component {
         </button>
         <button
           type="button"
-          onClick={() => this.props.nextPage(this.state.data)}
+          onClick={() => Alert.success('Put-Away was successfully completed!')}
           className="btn btn-outline-primary float-right my-2"
         >Complete Put Away
         </button>
