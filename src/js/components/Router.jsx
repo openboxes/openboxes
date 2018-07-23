@@ -3,6 +3,10 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { BrowserRouter, Switch } from 'react-router-dom';
 import { ClimbingBoxLoader } from 'react-spinners';
+import Alert from 'react-s-alert';
+
+import 'react-s-alert/dist/s-alert-default.css';
+import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
 
 import StockMovement from './stock-movement-wizard/StockMovement';
 import ReceivingPage from './receiving/ReceivingPage';
@@ -25,6 +29,14 @@ const Router = props => (
         style={{ top: '40%', lefft: '50%' }}
       />
     </div>
+    <Alert
+      timeout={5000}
+      stack={{ limit: 3 }}
+      offset={20}
+      html
+      position="top-right"
+      effect="bouncyflip"
+    />
   </div>
 );
 

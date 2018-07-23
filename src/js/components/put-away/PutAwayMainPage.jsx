@@ -5,10 +5,6 @@ import PutAwaySecondPage from './PutAwaySecondPage';
 import PutAwayCheckPage from './PutAwayCheckPage';
 
 class PutAwayMainPage extends Component {
-  static showResults(values) {
-    window.alert(`You submitted:\n\n${JSON.stringify(values, null, 2)}`);
-  }
-
   constructor(props) {
     super(props);
 
@@ -19,6 +15,7 @@ class PutAwayMainPage extends Component {
 
     this.nextPage = this.nextPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
+    this.firstPage = this.firstPage.bind(this);
   }
 
   getFormList() {
@@ -33,7 +30,7 @@ class PutAwayMainPage extends Component {
       <PutAwayCheckPage
         {...this.state.props}
         prevPage={this.prevPage}
-        nextPage={PutAwayMainPage.showResults}
+        firstPage={this.firstPage}
       />,
     ];
   }
@@ -44,6 +41,10 @@ class PutAwayMainPage extends Component {
 
   prevPage(props) {
     this.setState({ page: this.state.page - 1, props });
+  }
+
+  firstPage() {
+    this.setState({ page: 0, props: null });
   }
 
   render() {
