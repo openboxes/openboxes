@@ -106,6 +106,23 @@
             </tr>
         </table>
 
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Putaway Location</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <g:each var="putawayItem" in="${jsonObject.putawayItems}">
+                <tr>
+                    <td>${putawayItem?.product?.name}</td>
+                    <td>${putawayItem?.putawayLocation?.name}</td>
+                    <td>${putawayItem?.quantity}</td>
+                </tr>
+            </g:each>
+        </table>
+
 
 
 </div>
