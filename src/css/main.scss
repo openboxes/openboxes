@@ -44,7 +44,7 @@ $blue-epsilon: #bce7f7;
 .dropdown:hover {
   background-color: white;
   .nav-link {
-  color: black !important;
+    color: black !important;
   }
 }
 
@@ -106,12 +106,43 @@ $blue-epsilon: #bce7f7;
 
 .form-group {
   &.required {
-  .col-form-label:after {
-    content: "*";
-    color: red;
-  }
+    .col-form-label:after {
+      content: "*";
+      color: red;
+    }
   }
 }
+
+.create-form {
+  border-radius: 5px;
+  border: 1px solid $gray-alpha;
+  padding-top: 50px;
+  padding-bottom: 30px;
+  box-shadow: 3px 3px whitesmoke;
+
+  .form-group {
+    margin-left: 30%;
+  }
+  .btn {
+    margin-top: 40px;
+  }
+}
+
+.btn {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.movement-number {
+  height: auto;
+  line-height: 36px;
+  list-style: none;
+  font-size: 25px;
+  color: $blue-alpha;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
 
 .help-block {
   display: block;
@@ -140,6 +171,11 @@ $blue-epsilon: #bce7f7;
 
 /* = WIZARD STEPS CONTAINER
 ----------------------------*/
+
+.wizard-box {
+  border: 1px solid $gray-alpha;
+}
+
 .wizard-steps {
   height: 36px;
   padding: 0;
@@ -171,17 +207,19 @@ $blue-epsilon: #bce7f7;
 }
 
 .wizard-steps div:first-child a {
-  padding: 0 10px
+  padding: 0 10px;
 }
 
 .wizard-steps div a {
   position: relative;
-  color: white;
   text-decoration: none;
   background-color: $blue-epsilon;
-  border: 1px solid $blue-gamma;
+  color: $blue-alpha;
   border-left: none;
   border-right: none;
+  width : 8vw;
+  text-align: center;
+  font-size: 1.2em;
 }
 
 .wizard-steps div:first-child a {
@@ -240,7 +278,8 @@ $blue-epsilon: #bce7f7;
 
 .wizard-steps .active-step a {
   background-color: $blue-alpha;
-  border: 1px solid $blue-alpha
+  border: 1px solid $blue-alpha;
+  color: white;
 }
 
 .wizard-steps .active-step a:before {

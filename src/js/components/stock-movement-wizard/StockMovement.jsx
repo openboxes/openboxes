@@ -75,17 +75,19 @@ class StockMovements extends Component {
     const formList = this.getFormList();
 
     return (
-      <div className="container-fluid pt-2">
-        <div className="pb-3">
+      <div>
+        <div>
           <WizardSteps steps={StockMovements.getStepList()} currentStep={this.state.page} />
         </div>
-        <div>
-          { (this.props.movementNumber && this.props.description) &&
+        <div className="panel panel-primary">
+          <div className="panel-heading movement-number">
+            { (this.props.movementNumber && this.props.description) &&
             <span>{`${this.props.movementNumber} - ${this.props.description}`}</span>
-          }
-        </div>
-        <div>
-          {formList[page - 1]}
+            }
+          </div>
+          <div className="panelBody">
+            {formList[page - 1]}
+          </div>
         </div>
       </div>
     );
