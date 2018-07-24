@@ -194,7 +194,7 @@ class CreateStockMovement extends Component {
           }),
         )}
         <div className="row col-md-6">
-          <button type="submit" className="btn btn-outline-primary text-right">
+          <button type="submit" className="btn btn-outline-primary float-right">
           Next
           </button>
         </div>
