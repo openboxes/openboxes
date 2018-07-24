@@ -12,6 +12,8 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.requisition.Requisition
 
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
@@ -21,6 +23,7 @@ class PutawayApiController {
     def putawayService
     def inventoryService
     def identifierService
+    def pdfRenderingService
 
     def list = {
         String locationId = params?.location?.id ?: session?.warehouse?.id
@@ -70,4 +73,6 @@ class PutawayApiController {
 
         render ([data:putaway?.toJson()] as JSON)
     }
+
+
 }
