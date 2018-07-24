@@ -246,8 +246,12 @@ class StockMovementService {
         if (stepNumber.equals("3")) {
             stockMovement.lineItems = null
             stockMovement.editPage = getEditPage(id)
-        } else if (stepNumber.equals("4")) {
+        }
+        else if (stepNumber.equals("4")) {
             stockMovement.lineItems = null
+            stockMovement.pickPage = getPickPage(id)
+        }
+        else if (stepNumber.equals("5")) {
             stockMovement.pickPage = getPickPage(id)
         }
 
