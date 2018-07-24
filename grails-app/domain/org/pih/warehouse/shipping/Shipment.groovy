@@ -86,7 +86,7 @@ class Shipment implements Comparable, Serializable {
 	List comments;
 	List referenceNumbers;
 	
-	static transients = [ 
+	static transients = [
 			"allShipmentItems",
 			"unpackedShipmentItems",
 			"containersByType",
@@ -99,18 +99,22 @@ class Shipment implements Comparable, Serializable {
 			"consigneeAddress"
     ]
 	
-	static mappedBy = [outgoingTransactions: 'outgoingShipment',
-		incomingTransactions: 'incomingShipment']
+	static mappedBy = [
+            outgoingTransactions: 'outgoingShipment',
+            incomingTransactions: 'incomingShipment'
+    ]
 	
 	// Core association mappings
-	static hasMany = [events : Event,
-	                  comments : Comment,
-	                  containers : Container,
-	                  documents : Document, 	                  
-					  shipmentItems : ShipmentItem,
-	                  referenceNumbers : ReferenceNumber,
-					  outgoingTransactions : Transaction,
-					  incomingTransactions : Transaction ]
+	static hasMany = [
+			events : Event,
+			comments : Comment,
+			containers : Container,
+			documents : Document,
+			shipmentItems : ShipmentItem,
+			referenceNumbers : ReferenceNumber,
+			outgoingTransactions : Transaction,
+			incomingTransactions : Transaction
+	]
 	
 
 	

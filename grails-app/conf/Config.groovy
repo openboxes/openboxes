@@ -308,7 +308,7 @@ log4j = {
 	warn	'org.mortbay.log',
             'org.codehaus.groovy.grails.web.servlet',		// controllers
             'org.codehaus.groovy.grails.web.sitemesh',		// layouts
-            'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
+			'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
 			'org.codehaus.groovy.grails.web.mapping', 		// URL mapping
             'org.codehaus.groovy.grails.orm.hibernate',
 			'org.codehaus.groovy.grails.commons', 			// core / classloading

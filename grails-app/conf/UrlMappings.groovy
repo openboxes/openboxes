@@ -52,6 +52,18 @@ class UrlMappings {
             action = [GET:"read", POST: "update"]
         }
 
+        // Partial Receiving API
+
+        "/api/partialReceiving"(parseRequest: true) {
+            controller = "partialReceivingApi"
+            action = [GET:"list", POST: "create"]
+        }
+
+        "/api/partialReceiving/$id"(parseRequest: true) {
+            controller = "partialReceivingApi"
+            action = [GET:"read", POST: "update"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
