@@ -110,7 +110,7 @@ class SubstitutionsModal extends Component {
     }).catch(() => { this.props.hideSpinner(); });
   }
 
-  calculateRemaining() {
+  calculateSelected() {
     return _.reduce(this.props.substitutions, (sum, val) =>
       (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0);
   }
@@ -127,7 +127,7 @@ class SubstitutionsModal extends Component {
           <div className="font-weight-bold">Product Code: {this.state.attr.lineItem.productCode}</div>
           <div className="font-weight-bold">Product Name: {this.state.attr.lineItem.productName}</div>
           <div className="font-weight-bold">Quantity Requested: {this.state.attr.lineItem.quantityRequested}</div>
-          <div className="font-weight-bold pb-2">Quantity Remaining: {this.calculateRemaining()}</div>
+          <div className="font-weight-bold pb-2">Quantity Selected: {this.calculateSelected()}</div>
           <hr />
           {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
         </form>
