@@ -12,7 +12,11 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentCommand
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.shipping.Shipment
 
 
 class StockMovementController {
@@ -24,6 +28,24 @@ class StockMovementController {
 		render(template: "/stockMovement/create")
 	}
 
+
+    def uploadDocument = { DocumentCommand command ->
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        //Shipment shipment = stockMovement.shipment
+        Document document = new Document()
+        document.fileContents = command.fileContents.bytes
+        document.contentType = command.fileContents.fileItem.contentType
+        document.name = command.fileContents.fileItem.name
+        document.filename = command.fileContents.fileItem.name
+        document.documentType = DocumentType.get(9)
+        document.save(flush:true)
+
+        //shipment.addToDocuments(document)
+        //shipment.save(flush:true)
+
+        render ([data: "Document was uploaded successfully"] as JSON)
+    }
 
 	def exportCsv = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
