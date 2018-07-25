@@ -114,11 +114,9 @@ $blue-epsilon: #bce7f7;
 }
 
 .create-form {
-  border-radius: 5px;
   border: 1px solid $gray-alpha;
   padding-top: 50px;
   padding-bottom: 30px;
-  box-shadow: 3px 3px whitesmoke;
 
   .form-group {
     margin-left: 30%;
@@ -135,6 +133,7 @@ $blue-epsilon: #bce7f7;
 
 .movement-number {
   height: auto;
+  margin-bottom: 15px;
   line-height: 36px;
   list-style: none;
   font-size: 25px;
@@ -173,11 +172,13 @@ $blue-epsilon: #bce7f7;
 ----------------------------*/
 
 .wizard-box {
-  border: 1px solid $gray-alpha;
+  border-bottom: 1px solid $gray-alpha;
+  border-radius: 4px;
+  z-index: 3;
 }
 
 .wizard-steps {
-  height: 36px;
+  height: 35px;
   padding: 0;
   line-height: 36px;
   list-style: none;
@@ -201,7 +202,7 @@ $blue-epsilon: #bce7f7;
 }
 
 .wizard-steps div a, .wizard-steps div:not(:first-child) span {
-  height: 36px;
+  height: 35px;
   padding: 0 10px 0 25px;
   line-height: 36px
 }
@@ -217,7 +218,7 @@ $blue-epsilon: #bce7f7;
   color: $blue-alpha;
   border-left: none;
   border-right: none;
-  width : 8vw;
+  width : 140px;
   text-align: center;
   font-size: 1.2em;
 }
@@ -232,8 +233,8 @@ $blue-epsilon: #bce7f7;
   width: 0;
   height: 0;
   content: '';
-  border-top: 18px solid transparent;
-  border-bottom: 18px solid transparent
+  border-top: 17px solid transparent;
+  border-bottom: 20px solid transparent
 }
 
 .wizard-steps div a:before {
@@ -262,7 +263,7 @@ $blue-epsilon: #bce7f7;
 
 .wizard-steps .completed-step a {
   background-color: $blue-gamma;
-  border: 1px solid $blue-gamma;
+  //border: 1px solid $blue-gamma;
 }
 
 .wizard-steps .completed-step a:before {
