@@ -14,6 +14,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
 import org.pih.warehouse.api.PickPage
 import org.pih.warehouse.api.PickPageItem
@@ -328,6 +329,10 @@ class BootStrap {
         }
         JSON.registerObjectMarshaller(PartialReceiptItem) { PartialReceiptItem partialReceiptItem ->
             return partialReceiptItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PartialReceiptContainer) { PartialReceiptContainer partialReceiptContainer ->
+            return partialReceiptContainer.toJson()
         }
 
         JSON.registerObjectMarshaller(PickPage) { PickPage pickPage ->

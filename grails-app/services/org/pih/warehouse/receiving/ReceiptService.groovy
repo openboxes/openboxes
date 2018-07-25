@@ -11,8 +11,10 @@ package org.pih.warehouse.receiving
 
 import grails.validation.ValidationException
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -32,15 +34,24 @@ class ReceiptService {
         partialReceipt.dateShipped = shipment.actualShippingDate
         partialReceipt.dateDelivered = shipment.actualDeliveryDate
 
-        shipment.shipmentItems.collect { ShipmentItem shipmentItem ->
-            PartialReceiptItem partialReceiptItem = new PartialReceiptItem()
-            partialReceiptItem.shipmentItem = shipmentItem
-            partialReceipt.partialReceiptItems.add(partialReceiptItem)
+        shipment.containers.collect { Container container ->
+
+            PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer()
+            partialReceiptContainer.container = container
+            partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
+
+            container.shipmentItems.collect { ShipmentItem shipmentItem ->
+                PartialReceiptItem partialReceiptItem = new PartialReceiptItem()
+                partialReceiptItem.shipmentItem = shipmentItem
+                partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
+            }
         }
         return partialReceipt
     }
 
-    void createPartialReceipt(PartialReceipt partialReceipt) {
+    void savePartialReceipt(PartialReceipt partialReceipt) {
+
+        log.info "Saving partial receipt " + partialReceipt
 
         Shipment shipment = partialReceipt?.shipment
         Receipt receipt = shipment?.receipt
@@ -54,8 +65,11 @@ class ReceiptService {
         receipt.expectedDeliveryDate = partialReceipt.dateDelivered
         receipt.actualDeliveryDate = partialReceipt.dateDelivered
 
+
         // Update receipt items
         partialReceipt.partialReceiptItems.each { partialReceiptItem ->
+
+            log.info "Saving partial receipt item " + partialReceiptItem
 
             ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
             if (!shipmentItem) {
@@ -83,9 +97,14 @@ class ReceiptService {
         }
         shipment.receipt = receipt
         shipment.save()
+    }
 
-        rollbackInboundTransactions(shipment)
-        shipmentService.createInboundTransaction(shipment)
+    void saveInboundTransaction(PartialReceipt partialReceipt) {
+        Shipment shipment = partialReceipt.shipment
+        if (shipment) {
+            rollbackInboundTransactions(shipment)
+            shipmentService.createInboundTransaction(shipment)
+        }
     }
 
     void rollbackInboundTransactions(Shipment shipment) {

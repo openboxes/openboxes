@@ -4,9 +4,6 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 
-enum PartialReceiptStatus {
-    PENDING, COMPLETE, ROLLBACK
-}
 
 class PartialReceipt {
 
@@ -20,7 +17,15 @@ class PartialReceipt {
 
     Person recipient
 
-    List<PartialReceiptItem> partialReceiptItems = []
+    List<PartialReceiptContainer> partialReceiptContainers = []
+
+    List<PartialReceiptItem> getPartialReceiptItems() {
+        List<PartialReceiptItem> partialReceiptItems = []
+        partialReceiptContainers.each {
+            partialReceiptItems.addAll(it.partialReceiptItems)
+        }
+        return partialReceiptItems
+    }
 
     Map toJson() {
         return [
@@ -37,7 +42,7 @@ class PartialReceipt {
                 "destination.name": shipment?.destination?.name,
                 dateShipped: shipment.actualShippingDate,
                 dateDelivered: dateDelivered,
-                partialReceiptItems: partialReceiptItems
+                containers: partialReceiptContainers
         ]
     }
 
