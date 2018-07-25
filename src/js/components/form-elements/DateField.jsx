@@ -29,7 +29,7 @@ const DateField = (props) => {
     };
 
     return (
-      <div className="date-field">
+      <div className="col-md-12 col-5 date-field">
         <DatePicker
           className="form-control"
           {...attributes}
