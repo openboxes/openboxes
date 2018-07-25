@@ -2,7 +2,7 @@
 
 exports[`WizardSteps renders correctly 1`] = `
 <div
-  className="container-fluid d-print-none"
+  className="wizard-box container-fluid d-print-none"
 >
   <div
     className="row"
