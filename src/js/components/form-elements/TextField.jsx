@@ -6,7 +6,7 @@ import Input from '../../utils/Input';
 const TextField = (props) => {
   const renderInput = attributes => (
     <Input
-      className="col-md-12 col-5 form-control"
+      className="form-control"
       {...attributes}
     />
   );

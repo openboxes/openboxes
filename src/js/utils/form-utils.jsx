@@ -52,10 +52,10 @@ export const renderField = ({
       <div className="row">
         {
           typeof FieldLabel === 'string' ?
-            <label htmlFor={attr.id} className="col-md-2 col-5 col-form-label text-center text-md-right">{ FieldLabel }</label> :
+            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label text-center text-md-right">{ FieldLabel }</label> :
             <FieldLabel />
         }
-        <div className="col-md-4">
+        <div className="col-md-4 col-7">
           {renderInput(input, attr)}
         </div>
       </div>

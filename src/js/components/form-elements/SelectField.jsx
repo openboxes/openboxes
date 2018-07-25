@@ -8,7 +8,6 @@ import Select from '../../utils/Select';
 const SelectField = (props) => {
   const renderInput = attributes => (
     <Select
-      className="col-md-12 col-5"
       name={attributes.id}
       {...attributes}
     />

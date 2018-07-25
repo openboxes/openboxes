@@ -85,7 +85,7 @@ class StockMovements extends Component {
             <span>{`${this.props.movementNumber} - ${this.props.description}`}</span>
             }
           </div>
-          <div className="panelBody">
+          <div className="panelBody px-1">
             {formList[page - 1]}
           </div>
         </div>

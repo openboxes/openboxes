@@ -9,6 +9,7 @@ import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
 import { renderFormField } from '../../../utils/form-utils';
 import DateField from '../../form-elements/DateField';
+import { showSpinner, hideSpinner } from '../../../actions';
 
 const FIELDS = {
   adjustInventory: {
@@ -76,7 +77,7 @@ class AdjustInventoryModal extends Component {
   /* eslint-disable class-methods-use-this */
   /* eslint-disable no-unused-vars */
   onSave(values) {
-    // TODO Save adjusted invenetory
+    this.props.showSpinner();
   }
 
   render() {
@@ -102,10 +103,12 @@ export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
-})(connect(null, { change })(AdjustInventoryModal));
+})(connect(null, { change, showSpinner, hideSpinner })(AdjustInventoryModal));
 
 AdjustInventoryModal.propTypes = {
   change: PropTypes.func.isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
   fieldName: PropTypes.string.isRequired,
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
