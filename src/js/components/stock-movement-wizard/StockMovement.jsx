@@ -11,10 +11,6 @@ import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
 
 class StockMovements extends Component {
-  static showResults(values) {
-    window.alert(`You submitted:\n\n${JSON.stringify(values, null, 2)}`);
-  }
-
   constructor(props) {
     super(props);
 
@@ -52,7 +48,6 @@ class StockMovements extends Component {
       />,
       <SendMovementPage
         previousPage={this.previousPage}
-        onSubmit={StockMovements.showResults}
       />,
     ];
   }
