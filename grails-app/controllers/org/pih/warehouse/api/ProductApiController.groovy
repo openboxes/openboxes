@@ -38,7 +38,7 @@ class ProductApiController extends BaseDomainApiController {
         }
 
         def products = Product.findAllByIdInListAndActive(productIds, true)
-        def availableItems = inventoryService.getAvailableItems(location, products)
+        def availableItems = inventoryService.getAvailableBinLocations(location, products)
         render ([data:availableItems] as JSON)
     }
 
