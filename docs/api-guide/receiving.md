@@ -1,6 +1,13 @@
 # Receiving API
 
 ## Get Partial Receipt Candidates
+
+### Request
+```
+curl -b cookies.txt -X GET -H "Content-Type: application/json" \
+"https://openboxes.ngrok.io/openboxes/api/partialReceiving/ff808181646b260401646b61df3f0034"|jsonlint
+```
+### Response
 ```
 {
   "data": {
@@ -16,30 +23,38 @@
     "destination.name": "Store 1",
     "dateShipped": "2018-07-05T17:03:00Z",
     "dateDelivered": null,
-    "partialReceiptItems": [
+    "containers": [
       {
-        "shipmentItem.id": "ff808181646b260401646b6256ed0036",
         "container.id": "ff808181646b260401646b62d1c10037",
         "container.name": "Box 1\r",
-        "product.id": "ff80818155df9de40155df9e31000001",
-        "product.productCode": "AB12",
-        "product.name": "Ibuprofen 200mg",
-        "inventoryItem.id": "ff80818163f7308a0163f73d5bda0002",
-        "inventoryItem.lotNumber": "ABC123",
-        "inventoryItem.expirationDate": "01/01/2021",
-        "binLocation.id": null,
-        "binLocation.name": null,
-        "recipient.id": null,
-        "recipient.name": null,
-        "quantityShipped": 150,
-        "quantityReceived": 0,
-        "quantityReceiving": 0,
-        "quantityRemaining": 150,
-        "cancelRemaining": false
+        "container.type": "Box|fr:Boite",
+        "shipmentItems": [
+          {
+            "shipmentItem.id": "ff808181646b260401646b6256ed0036",
+            "container.id": "ff808181646b260401646b62d1c10037",
+            "container.name": "Box 1\r",
+            "product.id": "ff80818155df9de40155df9e31000001",
+            "product.productCode": "AB12",
+            "product.name": "Ibuprofen 200mg",
+            "inventoryItem.id": "ff80818163f7308a0163f73d5bda0002",
+            "inventoryItem.lotNumber": "ABC123",
+            "inventoryItem.expirationDate": "01/01/2021",
+            "binLocation.id": null,
+            "binLocation.name": null,
+            "recipient.id": null,
+            "recipient.name": null,
+            "quantityShipped": 150,
+            "quantityReceived": 0,
+            "quantityReceiving": 0,
+            "quantityRemaining": 150,
+            "cancelRemaining": false
+          }
+        ]
       }
     ]
   }
 }
+
 ```
 
 ## Create Partial Receipt 
@@ -58,13 +73,20 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
     "receiptStatus":"PENDING",
     "dateShipped": "07/22/2018",
     "dateDelivered": "07/24/2018",
-    "partialReceiptItems":[{
-        "shipmentItem.id": "ff808181646b260401646b6256ed0036",
-        "quantityReceiving": 50,
-        "binLocation.id": "ff808181646d3ec101646d5e7d480001",
-        "recipient.id": "1"
-    }]
+    "containers":[{
+        "container.id": "ff808181646b260401646b62d1c10037",
+        "container.name": "Box 1\r",
+        "container.type": "Box|fr:Boite",
+        "shipmentItems":[{
+            "shipmentItem.id": "ff808181646b260401646b6256ed0036",
+            "quantityReceiving": 50,
+            "binLocation.id": "ff808181646d3ec101646d5e7d480001",
+            "recipient.id": "1",
+            "cancelRemaining":false
+        }]
+    }]  
 }
+
 
 ```
 ### Response
@@ -83,30 +105,38 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
     "destination.name": "Store 1",
     "dateShipped": "2018-07-05T17:03:00Z",
     "dateDelivered": "2018-07-24T05:00:00Z",
-    "partialReceiptItems": [
+    "containers": [
       {
-        "shipmentItem.id": "ff808181646b260401646b6256ed0036",
         "container.id": "ff808181646b260401646b62d1c10037",
         "container.name": "Box 1\r",
-        "product.id": "ff80818155df9de40155df9e31000001",
-        "product.productCode": "AB12",
-        "product.name": "Ibuprofen 200mg",
-        "inventoryItem.id": "ff80818163f7308a0163f73d5bda0002",
-        "inventoryItem.lotNumber": "ABC123",
-        "inventoryItem.expirationDate": "01/01/2021",
-        "binLocation.id": "ff808181646d3ec101646d5e7d480001",
-        "binLocation.name": "Bin 1",
-        "recipient.id": "1",
-        "recipient.name": "Mr Administrator",
-        "quantityShipped": 150,
-        "quantityReceived": 0,
-        "quantityReceiving": 50,
-        "quantityRemaining": 100,
-        "cancelRemaining": false
+        "container.type": "Box|fr:Boite",
+        "shipmentItems": [
+          {
+            "shipmentItem.id": "ff808181646b260401646b6256ed0036",
+            "container.id": "ff808181646b260401646b62d1c10037",
+            "container.name": "Box 1\r",
+            "product.id": "ff80818155df9de40155df9e31000001",
+            "product.productCode": "AB12",
+            "product.name": "Ibuprofen 200mg",
+            "inventoryItem.id": "ff80818163f7308a0163f73d5bda0002",
+            "inventoryItem.lotNumber": "ABC123",
+            "inventoryItem.expirationDate": "01/01/2021",
+            "binLocation.id": "ff808181646d3ec101646d5e7d480001",
+            "binLocation.name": "Bin 1",
+            "recipient.id": "1",
+            "recipient.name": "Mr Administrator",
+            "quantityShipped": 150,
+            "quantityReceived": 0,
+            "quantityReceiving": 50,
+            "quantityRemaining": 100,
+            "cancelRemaining": false
+          }
+        ]
       }
     ]
   }
 }
+
 
 ```
 
@@ -128,13 +158,20 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
     "receiptStatus":"COMPLETE",
     "dateShipped": "07/22/2018",
     "dateDelivered": "07/24/2018",
-    "partialReceiptItems":[{
-        "shipmentItem.id": "ff808181646b260401646b6256ed0036",
-        "quantityReceiving": 50,
-        "binLocation.id": "ff808181646d3ec101646d5e7d480001",
-        "recipient.id": "1"
-    }]
+    "containers":[{
+        "container.id": "ff808181646b260401646b62d1c10037",
+        "container.name": "Box 1\r",
+        "container.type": "Box|fr:Boite",
+        "shipmentItems":[{
+            "shipmentItem.id": "ff808181646b260401646b6256ed0036",
+            "quantityReceiving": 50,
+            "binLocation.id": "ff808181646d3ec101646d5e7d480001",
+            "recipient.id": "1",
+            "cancelRemaining":false
+        }]
+    }]  
 }
+
 ```
 
 ### Response
@@ -153,26 +190,33 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
     "destination.name": "Store 1",
     "dateShipped": "2018-07-05T17:03:00Z",
     "dateDelivered": null,
-    "partialReceiptItems": [
+    "containers": [
       {
-        "shipmentItem.id": "ff808181646b260401646b6256ed0036",
         "container.id": "ff808181646b260401646b62d1c10037",
         "container.name": "Box 1\r",
-        "product.id": "ff80818155df9de40155df9e31000001",
-        "product.productCode": "AB12",
-        "product.name": "Ibuprofen 200mg",
-        "inventoryItem.id": "ff80818163f7308a0163f73d5bda0002",
-        "inventoryItem.lotNumber": "ABC123",
-        "inventoryItem.expirationDate": "01/01/2021",
-        "binLocation.id": null,
-        "binLocation.name": null,
-        "recipient.id": null,
-        "recipient.name": null,
-        "quantityShipped": 150,
-        "quantityReceived": 50,
-        "quantityReceiving": 0,
-        "quantityRemaining": 100,
-        "cancelRemaining": false
+        "container.type": "Box|fr:Boite",
+        "shipmentItems": [
+          {
+            "shipmentItem.id": "ff808181646b260401646b6256ed0036",
+            "container.id": "ff808181646b260401646b62d1c10037",
+            "container.name": "Box 1\r",
+            "product.id": "ff80818155df9de40155df9e31000001",
+            "product.productCode": "AB12",
+            "product.name": "Ibuprofen 200mg",
+            "inventoryItem.id": "ff80818163f7308a0163f73d5bda0002",
+            "inventoryItem.lotNumber": "ABC123",
+            "inventoryItem.expirationDate": "01/01/2021",
+            "binLocation.id": null,
+            "binLocation.name": null,
+            "recipient.id": null,
+            "recipient.name": null,
+            "quantityShipped": 150,
+            "quantityReceived": 50,
+            "quantityReceiving": 0,
+            "quantityRemaining": 100,
+            "cancelRemaining": false
+          }
+        ]
       }
     ]
   }
@@ -191,7 +235,6 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
 ### Data (partialReceivingRollback.json)
 ```
 {
-    "shipment.id":"ff808181646b260401646b61df3f0034",
     "receiptStatus":"ROLLBACK"
 }
 ```
@@ -213,29 +256,37 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
     "destination.name": "Store 1",
     "dateShipped": "2018-07-05T17:03:00Z",
     "dateDelivered": null,
-    "partialReceiptItems": [
+    "containers": [
       {
-        "shipmentItem.id": "ff808181646b260401646b6256ed0036",
         "container.id": "ff808181646b260401646b62d1c10037",
         "container.name": "Box 1\r",
-        "product.id": "ff80818155df9de40155df9e31000001",
-        "product.productCode": "AB12",
-        "product.name": "Ibuprofen 200mg",
-        "inventoryItem.id": "ff80818163f7308a0163f73d5bda0002",
-        "inventoryItem.lotNumber": "ABC123",
-        "inventoryItem.expirationDate": "01/01/2021",
-        "binLocation.id": null,
-        "binLocation.name": null,
-        "recipient.id": null,
-        "recipient.name": null,
-        "quantityShipped": 150,
-        "quantityReceived": 0,
-        "quantityReceiving": 0,
-        "quantityRemaining": 150,
-        "cancelRemaining": false
+        "container.type": "Box|fr:Boite",
+        "shipmentItems": [
+          {
+            "shipmentItem.id": "ff808181646b260401646b6256ed0036",
+            "container.id": "ff808181646b260401646b62d1c10037",
+            "container.name": "Box 1\r",
+            "product.id": "ff80818155df9de40155df9e31000001",
+            "product.productCode": "AB12",
+            "product.name": "Ibuprofen 200mg",
+            "inventoryItem.id": "ff80818163f7308a0163f73d5bda0002",
+            "inventoryItem.lotNumber": "ABC123",
+            "inventoryItem.expirationDate": "01/01/2021",
+            "binLocation.id": null,
+            "binLocation.name": null,
+            "recipient.id": null,
+            "recipient.name": null,
+            "quantityShipped": 150,
+            "quantityReceived": 0,
+            "quantityReceiving": 0,
+            "quantityRemaining": 150,
+            "cancelRemaining": false
+          }
+        ]
       }
     ]
   }
 }
+
 ```
 
