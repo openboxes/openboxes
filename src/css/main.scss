@@ -44,7 +44,7 @@ $blue-epsilon: #bce7f7;
 .dropdown:hover {
   background-color: white;
   .nav-link {
-  color: black !important;
+    color: black !important;
   }
 }
 
@@ -106,12 +106,53 @@ $blue-epsilon: #bce7f7;
 
 .form-group {
   &.required {
-  .col-form-label:after {
-    content: "*";
-    color: red;
-  }
+    .col-form-label:after {
+      content: "*";
+      color: red;
+    }
   }
 }
+
+.create-form {
+  border: 1px solid $gray-alpha;
+  padding-top: 50px;
+  padding-bottom: 30px;
+
+  .form-group {
+    margin-left: 30%;
+    overflow-x: hidden;
+  }
+  .btn {
+    margin: 40px 0px 20px 0px;
+  }
+}
+
+.create-form {
+  border: 1px solid $gray-alpha;
+  padding-top: 50px;
+  padding-bottom: 30px;
+
+  .btn {
+    margin: 40px 0px 20px 0px;
+  }
+}
+
+.btn {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.movement-number {
+  height: auto;
+  margin-bottom: 15px;
+  line-height: 36px;
+  list-style: none;
+  font-size: 25px;
+  color: $blue-alpha;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
 
 .help-block {
   display: block;
@@ -140,8 +181,15 @@ $blue-epsilon: #bce7f7;
 
 /* = WIZARD STEPS CONTAINER
 ----------------------------*/
+
+.wizard-box {
+  border-bottom: 1px solid $gray-alpha;
+  width: 100%;
+  overflow: hidden;
+}
+
 .wizard-steps {
-  height: 36px;
+  height: 35px;
   padding: 0;
   line-height: 36px;
   list-style: none;
@@ -153,35 +201,32 @@ $blue-epsilon: #bce7f7;
   padding-bottom: 2px;
 }
 
-.wizard-steps div:first-child a {
-  border-radius: 4px 0 0 4px;
-  -webkit-border-radius: 4px 0 0 4px;
-  -moz-border-radius: 4px 0 0 4px
-}
-
 .wizard-steps div, .wizard-steps div a, .wizard-steps div span {
   display: inline-block;
   vertical-align: top
 }
 
 .wizard-steps div a, .wizard-steps div:not(:first-child) span {
-  height: 36px;
+  height: 35px;
   padding: 0 10px 0 25px;
   line-height: 36px
 }
 
 .wizard-steps div:first-child a {
-  padding: 0 10px
+  padding: 0 10px;
 }
 
 .wizard-steps div a {
   position: relative;
-  color: white;
   text-decoration: none;
   background-color: $blue-epsilon;
-  border: 1px solid $blue-gamma;
+  color: $blue-alpha;
   border-left: none;
   border-right: none;
+  font-size: 1.2em;
+  width: 10vw;
+  text-align: center;
+  overflow-wrap: break-word;
 }
 
 .wizard-steps div:first-child a {
@@ -194,8 +239,8 @@ $blue-epsilon: #bce7f7;
   width: 0;
   height: 0;
   content: '';
-  border-top: 18px solid transparent;
-  border-bottom: 18px solid transparent
+  border-top: 17px solid transparent;
+  border-bottom: 20px solid transparent
 }
 
 .wizard-steps div a:before {
@@ -224,7 +269,6 @@ $blue-epsilon: #bce7f7;
 
 .wizard-steps .completed-step a {
   background-color: $blue-gamma;
-  border: 1px solid $blue-gamma;
 }
 
 .wizard-steps .completed-step a:before {
@@ -240,7 +284,7 @@ $blue-epsilon: #bce7f7;
 
 .wizard-steps .active-step a {
   background-color: $blue-alpha;
-  border: 1px solid $blue-alpha
+  color: white;
 }
 
 .wizard-steps .active-step a:before {

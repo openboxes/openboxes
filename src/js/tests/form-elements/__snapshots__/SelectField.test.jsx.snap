@@ -8,13 +8,13 @@ exports[`SelectField component is correctly rendering renders correctly 1`] = `
     className="row"
   >
     <label
-      className="col-md-2 col-form-label text-right"
+      className="col-md-2 col-7 col-form-label text-center text-md-right"
       htmlFor="test-field"
     >
       test label
     </label>
     <div
-      className="col-md-4"
+      className="col-md-4 col-7"
     >
       <div
         id="select-id_1-container"
