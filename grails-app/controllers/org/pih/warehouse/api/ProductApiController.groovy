@@ -45,7 +45,8 @@ class ProductApiController extends BaseDomainApiController {
 
     def availableBins = {
         def productIds = params.list("product.id") + params.list("id")
-        Location location = Location.get(params.location.id)
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
 
         if (!location || productIds.empty) {
             throw new IllegalArgumentException("Must specify a location and at least one product")
