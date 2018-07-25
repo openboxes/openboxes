@@ -4,7 +4,6 @@ import { reduxForm, initialize, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { validate } from './validate';
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import ArrayField from '../form-elements/ArrayField';
@@ -80,9 +79,12 @@ const NO_STOCKLIST_FIELDS = {
       quantityRequested: {
         type: TextField,
         label: 'Quantity',
-        fieldKey: 'statusCode',
+        attributes: {
+          type: 'number',
+        },
+        fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => ({
-          disabled: fieldValue === 'SUBSTITUTED',
+          disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -122,10 +124,16 @@ const STOCKLIST_FIELDS = {
       quantityAllowed: {
         type: LabelField,
         label: 'Max QTY',
+        attributes: {
+          type: 'number',
+        },
       },
       quantityRequested: {
         type: TextField,
         label: 'Needed QTY',
+        attributes: {
+          type: 'number',
+        },
       },
       deleteButton: DELETE_BUTTON_FIELD,
     },
@@ -168,9 +176,12 @@ const VENDOR_FIELDS = {
           dateFormat: 'MM/DD/YYYY',
         },
       },
-      quantity: {
+      quantityRequested: {
         type: TextField,
         label: 'QTY',
+        attributes: {
+          type: 'number',
+        },
       },
       recipient: {
         type: SelectField,
@@ -202,7 +213,7 @@ class AddItemsPage extends Component {
     }
 
     if (this.props.origin.type === 'SUPPLIER') {
-      const lineItems = this.props.lineItems.length ? this.props.lineItems : new Array(5).fill({});
+      const lineItems = this.props.lineItems.length ? this.props.lineItems : new Array(10).fill({});
       this.props.change('stock-movement-wizard', 'lineItems', lineItems);
       this.props.hideSpinner();
     } else {
@@ -210,7 +221,7 @@ class AddItemsPage extends Component {
         const { statusCode, lineItems } = resp.data.data;
         let lineItemsData;
         if (!lineItems.length) {
-          lineItemsData = new Array(5).fill({});
+          lineItemsData = new Array(10).fill({});
         } else {
           lineItemsData = _.map(
             lineItems,
@@ -383,13 +394,31 @@ class AddItemsPage extends Component {
           <button type="button" className="btn btn-outline-primary" onClick={previousPage}>
             Previous
           </button>
-          <button type="submit" className="btn btn-outline-primary float-right">Next</button>
+          <button
+            type="submit"
+            className="btn btn-outline-primary float-right"
+            disabled={!_.some(this.props.lineItems, item => !_.isEmpty(item))}
+          >Next
+          </button>
         </div>
       </form>
     );
   }
 }
 
+function validate(values) {
+  const errors = {};
+  errors.lineItems = [];
+
+  _.forEach(values.lineItems, (item, key) => {
+
+    if (!_.isNil(item.product) && (item.quantityRequested <= 0
+    || _.isNil(item.quantityRequested))) {
+      errors.lineItems[key] = { quantityRequested: 'Enter proper quantity' };
+    }
+  });
+  return errors;
+}
 const selector = formValueSelector('stock-movement-wizard');
 
 const mapStateToProps = state => ({
