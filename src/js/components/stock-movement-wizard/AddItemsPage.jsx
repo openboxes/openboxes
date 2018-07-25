@@ -165,11 +165,11 @@ const VENDOR_FIELDS = {
           options: [],
         },
       },
-      lot: {
+      lotNumber: {
         type: TextField,
         label: 'Lot',
       },
-      expiry: {
+      expirationDate: {
         type: DateField,
         label: 'Expiry',
         attributes: {

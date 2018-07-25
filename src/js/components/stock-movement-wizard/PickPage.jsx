@@ -127,8 +127,8 @@ class PickPage extends Component {
   componentDidMount() {
     this.fetchLineItems()
       .then((resp) => {
-        const { associations } = resp.data.data;
-        const { statusCode, pickPageItems } = resp.data.data.pickPage;
+        const { associations, statusCode } = resp.data.data;
+        const { pickPageItems } = resp.data.data.pickPage;
         this.props.change('stock-movement-wizard', 'pickPageItems', []);
         this.props.change('stock-movement-wizard', 'pickPageItems', this.checkForInitialPicksChanges(pickPageItems));
 

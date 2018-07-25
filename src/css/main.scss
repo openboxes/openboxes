@@ -367,9 +367,11 @@ tr.crossed-out td:before {
 
 .print-buttons-container {
   display: flex;
-  position: absolute;
   flex-direction: column;
-  right: 15px;
+}
+
+.print-buttons-container a span {
+  white-space: normal;
 }
 
 .spinner-container > div {
@@ -420,3 +422,26 @@ div.crossed-out .table-inner-row:before {
 .Select-loading-zone {
   display: none !important;
 }
+
+.dropzone {
+  border-width: 2px;
+  border-color: rgb(102, 102, 102);
+  border-style: dashed;
+  border-radius: 5px;
+}
+
+.dropzone div {
+  border: none !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+.chosen-file {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+#stockMovementInfo {
+  flex-grow: 2;
+}
+

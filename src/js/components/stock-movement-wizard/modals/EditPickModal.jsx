@@ -110,13 +110,13 @@ class EditPickModal extends Component {
           return {
             id: picklistItem.id,
             'inventoryItem.id': avItem['inventoryItem.id'],
-            'binLocation.id': avItem['binLocation.id'],
+            'binLocation.id': avItem['binLocation.id'] || '',
             quantityPicked: avItem.quantityPicked,
           };
         }
         return {
           'inventoryItem.id': avItem['inventoryItem.id'],
-          'binLocation.id': avItem['binLocation.id'],
+          'binLocation.id': avItem['binLocation.id'] || '',
           quantityPicked: avItem.quantityPicked,
         };
       }),
