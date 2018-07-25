@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import PropTypes from 'prop-types';
 import update from 'immutability-helper';
+import fileDownload from 'js-file-download';
 
 import 'react-table/react-table.css';
 
@@ -160,6 +161,19 @@ class PutAwaySecondPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  generatePutAwayList() {
+    this.props.showSpinner();
+    const url = '/openboxes/putAway/generatePdf/ff80818164ae89800164affcfe6e0001';
+    const { putawayNumber } = this.state.putAway;
+
+    return apiClient.post(url, flattenRequest(this.state.putAway), { responseType: 'blob' })
+      .then((response) => {
+        fileDownload(response.data, `PutawayReport${putawayNumber ? `-${putawayNumber}` : ''}.pdf`, 'application/pdf');
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
   render() {
     const {
       onExpandedChange, toggleTree,
@@ -186,6 +200,12 @@ class PutAwaySecondPage extends Component {
             onClick={toggleTree}
           >
             {pivotBy && pivotBy.length ? 'Stock Movement' : 'Product'}
+          </button>
+          <button
+            className="float-right btn btn-outline-secondary align-self-end"
+            onClick={() => this.generatePutAwayList()}
+          >
+            <span><i className="fa fa-print pr-2" />Generate Put-Away list</span>
           </button>
         </div>
         {
