@@ -25,15 +25,21 @@ const isReceiving = (subfield, fieldValue) => {
   if (!fieldValue.shipmentItems) {
     return false;
   }
-  let selected = false;
 
-  fieldValue.shipmentItems.forEach((item) => {
-    if (!_.isNil(_.get(item, 'receiveItem.quantity'))) {
-      selected = true;
-    }
-  });
+  return _.every(fieldValue.shipmentItems, item => !_.isNil(_.get(item, 'receiveItem.quantity')));
+};
 
-  return selected;
+const isIndeterminate = (subfield, fieldValue) => {
+  if (subfield) {
+    return false;
+  }
+
+  if (!fieldValue.shipmentItems) {
+    return false;
+  }
+
+  return _.some(fieldValue.shipmentItems, item => !_.isNil(_.get(item, 'receiveItem.quantity')))
+    && _.some(fieldValue.shipmentItems, item => _.isNil(_.get(item, 'receiveItem.quantity')));
 };
 
 const FIELDS = {
@@ -69,7 +75,6 @@ const FIELDS = {
   },
   containers: {
     type: ArrayField,
-    addButton: 'Add Line',
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
     fields: {
@@ -83,6 +88,7 @@ const FIELDS = {
             disabled={fieldPreview}
             className={subfield ? 'ml-4' : ''}
             value={isReceiving(subfield, fieldValue)}
+            indeterminate={isIndeterminate(subfield, fieldValue)}
             onChange={(value) => {
               if (subfield) {
                 autofillLines(!value, parentIndex, rowIndex);
@@ -244,10 +250,19 @@ class PartialReceivingPage extends Component {
     }
   }
 
+  nextPage(formValues) {
+    const containers = _.map(formValues.containers, container => ({
+      ...container,
+      shipmentItems: _.filter(container.shipmentItems, item => !_.isNil(_.get(item, 'receiveItem.quantity'))),
+    }));
+    this.props.change('partial-receiving-wizard', 'containers', _.filter(containers, container => container.shipmentItems.length));
+    this.props.onSubmit();
+  }
+
   render() {
     const { handleSubmit } = this.props;
     return (
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(values => this.nextPage(values))}>
         {_.map(FIELDS, (fieldConfig, fieldName) =>
           renderFormField(fieldConfig, fieldName, {
             autofillLines: this.autofillLines,
@@ -274,6 +289,7 @@ PartialReceivingPage.propTypes = {
   initialize: PropTypes.func.isRequired,
   change: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
   containers: PropTypes.arrayOf(PropTypes.shape({})),
 };
 

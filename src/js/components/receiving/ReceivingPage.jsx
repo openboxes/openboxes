@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import PartialReceivingPage from './PartialReceivingPage';
+import ReceivingCheckScreen from './ReceivingCheckScreen';
 
 class ReceivingPage extends Component {
   static showResults(values) {
@@ -15,12 +16,17 @@ class ReceivingPage extends Component {
     };
 
     this.nextPage = this.nextPage.bind(this);
+    this.prevPage = this.prevPage.bind(this);
   }
 
-  static getFormList() {
+  getFormList() {
     return [
       <PartialReceivingPage
+        onSubmit={this.nextPage}
+      />,
+      <ReceivingCheckScreen
         onSubmit={ReceivingPage.showResults}
+        prevPage={this.prevPage}
       />,
     ];
   }
@@ -29,9 +35,13 @@ class ReceivingPage extends Component {
     this.setState({ page: this.state.page + 1 });
   }
 
+  prevPage() {
+    this.setState({ page: this.state.page - 1 });
+  }
+
   render() {
     const { page } = this.state;
-    const formList = ReceivingPage.getFormList();
+    const formList = this.getFormList();
 
     return (
       <div>

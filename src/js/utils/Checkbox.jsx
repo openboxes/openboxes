@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Checkbox = (props) => {
+const Checkbox = ({ value, indeterminate, ...props }) => {
   const onChange = (event) => {
     const { checked } = event.target;
 
@@ -13,7 +13,9 @@ const Checkbox = (props) => {
   return (
     <input
       type="checkbox"
-      checked={props.value}
+      // eslint-disable-next-line no-param-reassign,no-return-assign
+      ref={elem => elem && (elem.indeterminate = indeterminate)}
+      checked={value}
       {...props}
       onChange={onChange}
     />);
@@ -24,9 +26,11 @@ export default Checkbox;
 Checkbox.propTypes = {
   onChange: PropTypes.func,
   value: PropTypes.bool,
+  indeterminate: PropTypes.bool,
 };
 
 Checkbox.defaultProps = {
   onChange: null,
   value: null,
+  indeterminate: false,
 };
