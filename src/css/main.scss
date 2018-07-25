@@ -44,7 +44,7 @@ $blue-epsilon: #bce7f7;
 .dropdown:hover {
   background-color: white;
   .nav-link {
-    color: black !important;
+  color: black !important;
   }
 }
 
@@ -106,10 +106,10 @@ $blue-epsilon: #bce7f7;
 
 .form-group {
   &.required {
-    .col-form-label:after {
-      content: "*";
-      color: red;
-    }
+  .col-form-label:after {
+    content: "*";
+    color: red;
+  }
   }
 }
 
@@ -122,7 +122,7 @@ $blue-epsilon: #bce7f7;
     margin-left: 30%;
   }
   .btn {
-    margin-top: 40px;
+    margin: 40px 0px 20px 0px;
   }
 }
 
@@ -173,8 +173,9 @@ $blue-epsilon: #bce7f7;
 
 .wizard-box {
   border-bottom: 1px solid $gray-alpha;
-  border-radius: 4px;
-  z-index: 3;
+  border-bottom-left-radius: 4px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .wizard-steps {
@@ -218,9 +219,9 @@ $blue-epsilon: #bce7f7;
   color: $blue-alpha;
   border-left: none;
   border-right: none;
-  width : 140px;
-  text-align: center;
   font-size: 1.2em;
+  width: 10vw;
+  word-wrap: break-word;
 }
 
 .wizard-steps div:first-child a {
@@ -263,7 +264,6 @@ $blue-epsilon: #bce7f7;
 
 .wizard-steps .completed-step a {
   background-color: $blue-gamma;
-  //border: 1px solid $blue-gamma;
 }
 
 .wizard-steps .completed-step a:before {
@@ -279,7 +279,6 @@ $blue-epsilon: #bce7f7;
 
 .wizard-steps .active-step a {
   background-color: $blue-alpha;
-  border: 1px solid $blue-alpha;
   color: white;
 }
 
