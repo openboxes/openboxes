@@ -8,7 +8,7 @@ exports[`TextField component is correctly rendering renders correctly 1`] = `
     className="row"
   >
     <label
-      className="col-md-2 col-form-label text-right"
+      className="col-md-2 col-5 col-form-label text-center text-md-right"
       htmlFor="test-field"
     >
       test label
@@ -17,7 +17,7 @@ exports[`TextField component is correctly rendering renders correctly 1`] = `
       className="col-md-4"
     >
       <input
-        className="form-control"
+        className="col-md-12 col-5 form-control"
         id="test-field"
         onBlur={[Function]}
         onChange={[Function]}

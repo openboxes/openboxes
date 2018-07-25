@@ -8,7 +8,7 @@ exports[`SelectField component is correctly rendering renders correctly 1`] = `
     className="row"
   >
     <label
-      className="col-md-2 col-form-label text-right"
+      className="col-md-2 col-5 col-form-label text-center text-md-right"
       htmlFor="test-field"
     >
       test label
@@ -20,7 +20,7 @@ exports[`SelectField component is correctly rendering renders correctly 1`] = `
         id="select-id_1-container"
       >
         <div
-          className="Select is-clearable is-searchable Select--single"
+          className="Select col-md-12 col-5 is-clearable is-searchable Select--single"
           style={undefined}
         >
           <div
