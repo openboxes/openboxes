@@ -177,6 +177,8 @@ class StockMovement {
 }
 
 enum DocumentGroupCode {
+
+    EXPORT('Export'),
     INVOICE('Invoice'),
     PICKLIST('Pick list'),
     PACKING_LIST('Packing List'),
@@ -191,7 +193,7 @@ enum DocumentGroupCode {
     }
 
     static list() {
-        return [INVOICE, PICKLIST, PACKING_LIST, CERTIFICATE_OF_DONATION, DELIVERY_NOTE, GOODS_RECEIPT_NOTE]
+        return [EXPORT, INVOICE, PICKLIST, PACKING_LIST, CERTIFICATE_OF_DONATION, DELIVERY_NOTE, GOODS_RECEIPT_NOTE]
     }
 
 }

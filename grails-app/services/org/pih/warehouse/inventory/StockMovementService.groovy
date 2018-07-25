@@ -634,6 +634,13 @@ class StockMovementService {
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         def documentList = [
                 [
+                        name        : g.message(code: "export.items.label", default: "Export Items"),
+                        documentType: DocumentGroupCode.EXPORT.name(),
+                        contentType : "text/csv",
+                        stepNumber  : 2,
+                        uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true)
+                ],
+                [
                         name        : g.message(code: "picklist.button.print.label"),
                         documentType: DocumentGroupCode.PICKLIST.name(),
                         contentType : "text/html",
