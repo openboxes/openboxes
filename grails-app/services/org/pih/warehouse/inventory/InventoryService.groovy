@@ -4668,6 +4668,10 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
+	def getAvailableBinLocations(Location location, Product product) {
+		return getAvailableBinLocations(location, [product], false)
+	}
+
 	def getAvailableBinLocations(Location location, Product product, boolean excludeOutOfStock) {
 		return getAvailableBinLocations(location, [product], excludeOutOfStock)
 	}
