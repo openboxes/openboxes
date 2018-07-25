@@ -1,6 +1,6 @@
 package org.pih.warehouse.api
 
-import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
