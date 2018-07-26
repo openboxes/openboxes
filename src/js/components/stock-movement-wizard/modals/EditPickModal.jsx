@@ -93,6 +93,9 @@ class EditPickModal extends Component {
       'stock-movement-wizard', 'availableItems',
       this.state.attr.fieldValue.availableItems,
     );
+    this.props.change('stock-movement-wizard', 'reasonCode', '');
+    // for validation purposes
+    this.props.change('stock-movement-wizard', 'quantityRequired', this.state.attr.fieldValue.quantityRequired);
   }
 
   onSave(values) {
@@ -112,12 +115,14 @@ class EditPickModal extends Component {
             'inventoryItem.id': avItem['inventoryItem.id'],
             'binLocation.id': avItem['binLocation.id'] || '',
             quantityPicked: avItem.quantityPicked,
+            resonCode: values.reasonCode || '',
           };
         }
         return {
           'inventoryItem.id': avItem['inventoryItem.id'],
           'binLocation.id': avItem['binLocation.id'] || '',
           quantityPicked: avItem.quantityPicked,
+          resonCode: values.reasonCode || '',
         };
       }),
     };
@@ -168,15 +173,22 @@ class EditPickModal extends Component {
 function validate(values) {
   const errors = {};
   errors.availableItems = [];
-
   _.forEach(values.availableItems, (item, key) => {
     if (item.quantityPicked > item.quantityAvailable) {
       errors.availableItems[key] = { quantityPicked: 'Picked quantity is higher than available' };
     }
   });
 
-  if (!values.reasonCode) {
-    errors.reasonCode = 'This field is required';
+  const pickedSum = _.reduce(
+    values.availableItems, (sum, val) =>
+      (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)),
+    0,
+  );
+
+
+  if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
+    !values.reasonCode && pickedSum !== values.quantityRequired) {
+    errors.reasonCode = 'Total quantity picked is different than required! Add reason code!';
   }
 
   return errors;
