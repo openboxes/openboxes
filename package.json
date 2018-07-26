@@ -44,6 +44,7 @@
     "popper.js": "^1.14.3",
     "prop-types": "^15.6.1",
     "react": "^16.3.2",
+    "react-confirm-alert": "^2.0.5",
     "react-custom-scrollbars": "^4.2.1",
     "react-datepicker": "^1.5.0",
     "react-dom": "^16.3.2",
