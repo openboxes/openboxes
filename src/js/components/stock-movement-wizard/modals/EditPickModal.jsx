@@ -188,7 +188,7 @@ function validate(values) {
 
   if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
     !values.reasonCode && pickedSum !== values.quantityRequired) {
-    errors.reasonCode = 'Total quantity picked is different than requiered! Add reason code!';
+    errors.reasonCode = 'Total quantity picked is different than required! Add reason code!';
   }
 
   return errors;
