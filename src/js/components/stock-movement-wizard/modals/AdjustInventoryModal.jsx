@@ -7,9 +7,13 @@ import { connect } from 'react-redux';
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
+import LabelField from '../../form-elements/LabelField';
+import SelectField from '../../form-elements/SelectField';
 import { renderFormField } from '../../../utils/form-utils';
 import DateField from '../../form-elements/DateField';
 import { showSpinner, hideSpinner } from '../../../actions';
+import apiClient from '../../../utils/apiClient';
+import { BIN_LOCATION_MOCKS } from '../../../mockedData';
 
 const FIELDS = {
   adjustInventory: {
@@ -17,17 +21,20 @@ const FIELDS = {
     type: ArrayField,
     disableVirtualization: true,
     fields: {
-      lotNumber: {
-        type: TextField,
-        label: 'Lot #',
+      'binLocation.name': {
+        type: SelectField,
+        label: 'Bin',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue }) => ({
           disabled: !!fieldValue,
         }),
+        attributes: {
+          options: BIN_LOCATION_MOCKS,
+        },
       },
-      'binLocation.name': {
+      lotNumber: {
         type: TextField,
-        label: 'Bin',
+        label: 'Lot #',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue }) => ({
           disabled: !!fieldValue,
@@ -43,8 +50,19 @@ const FIELDS = {
         }),
       },
       quantityAvailable: {
+        type: LabelField,
+        label: 'Previous Qty',
+      },
+      quantityAdjusted: {
         type: TextField,
-        label: 'Qty Available',
+        label: 'Current Qty',
+        attributes: {
+          type: 'number',
+        },
+      },
+      comments: {
+        type: TextField,
+        label: 'Comments',
       },
     },
   },
@@ -73,11 +91,31 @@ class AdjustInventoryModal extends Component {
     );
   }
 
-  // temporary disablers
-  /* eslint-disable class-methods-use-this */
-  /* eslint-disable no-unused-vars */
   onSave(values) {
     this.props.showSpinner();
+
+    const url = '/openboxes/api/stockAdjustments';
+    const payload = _.map(values.adjustInventory, (adItem) => {
+      return {
+        'inventoryItem.id': adItem['inventoryItem.id'] || '' ,
+        'binLocation.id': adItem['binLocation.id'] || '',
+        quantityAvailable: adItem.quantityAvailable,
+        quantityAdjusted: adItem.quantityAdjusted,
+        comments: adItem.comments,
+      };
+    });
+
+    return apiClient.post(url, payload).then(() => {
+      apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
+        .then((resp) => {
+          const { pickPageItems } = resp.data.data.pickPage;
+          this.props.change('stock-movement-wizard', 'pickPageItems', []);
+          this.props.change('stock-movement-wizard', 'pickPageItems', this.state.attr.checkForInitialPicksChanges(pickPageItems));
+
+          this.props.hideSpinner();
+        })
+        .catch(() => { this.props.hideSpinner(); });
+    }).catch(() => { this.props.hideSpinner(); });
   }
 
   render() {
@@ -107,11 +145,16 @@ export default reduxForm({
 
 AdjustInventoryModal.propTypes = {
   change: PropTypes.func.isRequired,
-  showSpinner: PropTypes.func.isRequired,
-  hideSpinner: PropTypes.func.isRequired,
+  adjustInventory: PropTypes.arrayOf(PropTypes.shape({})),
   fieldName: PropTypes.string.isRequired,
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
+};
+
+AdjustInventoryModal.defaultProps = {
+  adjustInventory: [],
 };
