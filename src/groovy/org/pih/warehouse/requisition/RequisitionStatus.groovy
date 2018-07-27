@@ -37,7 +37,7 @@ enum RequisitionStatus {
 	}
 	/* remove OPEN, FULFILLED */
 	static list() {
-		[ CREATED, EDITING, VERIFYING, PICKING, CHECKING, ISSUED, CANCELED ]
+		[ CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED ]
 	}
 
     static listAll() {
