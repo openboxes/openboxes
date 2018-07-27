@@ -4,7 +4,7 @@ import { reduxForm, change, formValueSelector, initialize } from 'redux-form';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import { validate } from './validate';
+import validate from './validate';
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import DateField from '../form-elements/DateField';

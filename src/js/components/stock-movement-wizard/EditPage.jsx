@@ -223,10 +223,10 @@ class EditItemsPage extends Component {
           stockMovementId: this.props.stockMovementId,
         }))}
         <div>
-          <button type="button" className="btn btn-outline-primary" onClick={this.props.previousPage}>
+          <button type="button" className="btn btn-outline-primary btn-form" onClick={this.props.previousPage}>
             Previous
           </button>
-          <button type="submit" className="btn btn-outline-primary float-right">Next</button>
+          <button type="submit" className="btn btn-outline-primary btn-form float-right">Next</button>
         </div>
 
       </form>
@@ -241,7 +241,7 @@ function validate(values) {
   _.forEach(values.editPageItems, (item, key) => {
     if (!_.isEmpty(item.quantityRevised) && _.isEmpty(item.reasonCode)) {
       errors.editPageItems[key] = { reasonCode: 'Reason code required' };
-    } else if (_.isNil(item.quantityRevised) && !_.isEmpty(item.reasonCode)) {
+    } else if (_.isNil(item.quantityRevised) && !_.isEmpty(item.reasonCode) && item.statusCode !== 'SUBSTITUTED') {
       errors.editPageItems[key] = { quantityRevised: 'Revised quantity required' };
     }
     if (parseInt(item.quantityRevised, 10) === item.quantityRequested) {

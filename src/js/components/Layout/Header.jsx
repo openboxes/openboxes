@@ -12,12 +12,7 @@ const Header = () => (
     >
       Openboxes
     </a>
-    <div className="d-flex align-items-center justify-content-center">
-      <form className="form-inline my-2 my-lg-1 align-self-end">
-        <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
-      </form>
-      <LanguageSelector />
-    </div>
+    <LanguageSelector />
   </div>
 );
 

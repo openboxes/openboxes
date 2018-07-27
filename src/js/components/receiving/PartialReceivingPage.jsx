@@ -196,7 +196,6 @@ class PartialReceivingPage extends Component {
     if (!this.props.usersFetched) {
       this.fetchData(this.props.fetchUsers);
     }
-    this.fetchPartialReceiptCandidates();
   }
 
   onSave() {
@@ -299,18 +298,6 @@ class PartialReceivingPage extends Component {
           { value: bin.id, label: bin.name }
         ));
         this.setState({ bins }, () => this.props.hideSpinner());
-      })
-      .catch(() => this.props.hideSpinner());
-  }
-
-  fetchPartialReceiptCandidates() {
-    this.props.showSpinner();
-    const url = `/openboxes/api/partialReceiving/${this.props.shipmentId}`;
-
-    return apiClient.get(url)
-      .then((response) => {
-        this.props.initialize('partial-receiving-wizard', parseResponse(response.data.data), false);
-        this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
   }
