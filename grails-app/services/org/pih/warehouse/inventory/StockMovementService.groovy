@@ -521,7 +521,7 @@ class StockMovementService {
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
         editPageItem.quantityRequested = requisitionItem.quantity
-        editPageItem.quantityConsumed = 0
+        editPageItem.quantityConsumed = null
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         return editPageItem
