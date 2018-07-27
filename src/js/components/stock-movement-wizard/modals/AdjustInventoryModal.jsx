@@ -90,12 +90,8 @@ class AdjustInventoryModal extends Component {
     this.props.showSpinner();
 
     const url = '/openboxes/api/stockAdjustments';
-
-    return apiClient.post(url, _.map(values.adjustInventory, (adItem) => {
-      const adjustItem = _.find(
-        _.filter(this.state.attr.fieldValue.adItem, listItem => !listItem.initial),
-        item => item['inventoryItem.id'] === adItem['inventoryItem.id'],
-      );
+    const payload = _.map(values.adjustInventory, (adItem) => {
+      const adjustItem = _.find(item => item['inventoryItem.id'] === adItem['inventoryItem.id']);
       if (adjustItem) {
         return {
           id: adjustItem.id,
@@ -113,7 +109,9 @@ class AdjustInventoryModal extends Component {
         quantityAdjusted: adItem.quantityAdjusted,
         comments: adItem.comments,
       };
-    })).then(() => {
+    });
+
+    return apiClient.post(url, payload).then(() => {
       apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
         .then((resp) => {
           const { pickPageItems } = resp.data.data.pickPage;
@@ -125,7 +123,6 @@ class AdjustInventoryModal extends Component {
         .catch(() => { this.props.hideSpinner(); });
     }).catch(() => { this.props.hideSpinner(); });
   }
-
 
   render() {
     if (this.state.attr.subfield) {
@@ -146,17 +143,12 @@ class AdjustInventoryModal extends Component {
   }
 }
 
-const selector = formValueSelector('stock-movement-wizard');
-
-const mapStateToProps = state => ({
-  adjustInventory: selector(state, 'adjustInventory'),
-});
 
 export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
-})(connect(mapStateToProps, { change, showSpinner, hideSpinner })(AdjustInventoryModal));
+})(connect(null, { change, showSpinner, hideSpinner })(AdjustInventoryModal));
 
 AdjustInventoryModal.propTypes = {
   change: PropTypes.func.isRequired,

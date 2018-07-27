@@ -194,7 +194,7 @@ class CreateStockMovement extends Component {
           }),
         )}
         <div>
-          <button type="submit" className="btn btn-outline-primary btnForm float-right">Next</button>
+          <button type="submit" className="btn btn-outline-primary float-right">Next</button>
         </div>
       </form>
     );
