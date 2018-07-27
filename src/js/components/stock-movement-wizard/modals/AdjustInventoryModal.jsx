@@ -91,7 +91,7 @@ class AdjustInventoryModal extends Component {
 
     const url = '/openboxes/api/stockAdjustments';
     const payload = _.map(values.adjustInventory, (adItem) => {
-      const adjustItem = _.find(item => item['inventoryItem.id'] === adItem['inventoryItem.id']);
+      const adjustItem = _.find(this.state.attr.fieldValue.availableItems, item => item['inventoryItem.id'] === adItem['inventoryItem.id']);
       if (adjustItem) {
         return {
           id: adjustItem.id,
