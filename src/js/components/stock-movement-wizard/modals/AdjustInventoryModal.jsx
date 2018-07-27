@@ -95,15 +95,13 @@ class AdjustInventoryModal extends Component {
     this.props.showSpinner();
 
     const url = '/openboxes/api/stockAdjustments';
-    const payload = _.map(values.adjustInventory, (adItem) => {
-      return {
-        'inventoryItem.id': adItem['inventoryItem.id'] || '' ,
-        'binLocation.id': adItem['binLocation.id'] || '',
-        quantityAvailable: adItem.quantityAvailable,
-        quantityAdjusted: adItem.quantityAdjusted,
-        comments: adItem.comments,
-      };
-    });
+    const payload = _.map(values.adjustInventory, adItem => ({
+      'inventoryItem.id': adItem['inventoryItem.id'] || '',
+      'binLocation.id': adItem['binLocation.id'] || '',
+      quantityAvailable: adItem.quantityAvailable,
+      quantityAdjusted: adItem.quantityAdjusted,
+      comments: adItem.comments,
+    }));
 
     return apiClient.post(url, payload).then(() => {
       apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)

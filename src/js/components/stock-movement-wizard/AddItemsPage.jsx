@@ -486,7 +486,7 @@ class AddItemsPage extends Component {
         <span>
           <label
             htmlFor="csvInput"
-            className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+            className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
           >
             <span><i className="fa fa-download pr-2" />Import Template</span>
             <input
