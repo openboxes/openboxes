@@ -312,10 +312,10 @@ class SendMovementPage extends Component {
               </tbody>
             </table>
 
-            <button type="button" className="btn btn-outline-primary" onClick={previousPage}>
+            <button type="button" className="btn btn-outline-primary btnForm" onClick={previousPage}>
               Previous
             </button>
-            <button type="submit" className="btn btn-outline-success float-right" disabled={pristine || submitting}>Send Shipment</button>
+            <button type="submit" className="btn btn-outline-success btnForm float-right" disabled={pristine || submitting}>Send Shipment</button>
           </div>
         </form>
       </div>

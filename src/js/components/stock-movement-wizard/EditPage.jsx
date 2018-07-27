@@ -223,10 +223,10 @@ class EditItemsPage extends Component {
           stockMovementId: this.props.stockMovementId,
         }))}
         <div>
-          <button type="button" className="btn btn-outline-primary" onClick={this.props.previousPage}>
+          <button type="button" className="btn btn-outline-primary btnForm" onClick={this.props.previousPage}>
             Previous
           </button>
-          <button type="submit" className="btn btn-outline-primary float-right">Next</button>
+          <button type="submit" className="btn btn-outline-primary btnForm float-right">Next</button>
         </div>
 
       </form>
