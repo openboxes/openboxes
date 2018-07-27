@@ -151,6 +151,7 @@ class CreateStockMovement extends Component {
             this.props.change('stock-movement-wizard', 'requisitionId', resp.id);
             this.props.change('stock-movement-wizard', 'lineItems', resp.lineItems);
             this.props.change('stock-movement-wizard', 'movementNumber', resp.identifier);
+            this.props.change('stock-movement-wizard', 'shipmentName', resp.name);
           }
         })
         .catch(() => {
