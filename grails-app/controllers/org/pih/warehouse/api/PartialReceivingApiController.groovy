@@ -68,10 +68,9 @@ class PartialReceivingApiController {
         jsonObject.containers.each { containerMap ->
 
             log.info "containerMap: " + containerMap
-            // Bind the contains
-            PartialReceiptContainer partialReceiptContainer = partialReceipt.partialReceiptContainers.find {
-                it?.container?.id == containerMap["container.id"]
-            }
+            // Bind the container
+            PartialReceiptContainer partialReceiptContainer =
+                    partialReceipt.findPartialReceiptContainer(containerMap["container.id"])
 
             if (!partialReceiptContainer) {
                 log.info "container not found"

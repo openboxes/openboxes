@@ -19,6 +19,20 @@ class PartialReceipt {
 
     List<PartialReceiptContainer> partialReceiptContainers = []
 
+
+    PartialReceiptContainer findPartialReceiptContainer(String containerId) {
+        PartialReceiptContainer partialReceiptContainer =
+                partialReceiptContainers.find { it?.container?.id == containerId }
+        if (!partialReceiptContainer) {
+            partialReceiptContainer = findDefaultPartialReceiptContainer()
+        }
+        return partialReceiptContainer
+    }
+
+    PartialReceiptContainer findDefaultPartialReceiptContainer() {
+        return partialReceiptContainers.find { it.isDefault() }
+    }
+
     List<PartialReceiptItem> getPartialReceiptItems() {
         List<PartialReceiptItem> partialReceiptItems = []
         partialReceiptContainers.each {

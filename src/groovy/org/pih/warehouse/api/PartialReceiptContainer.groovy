@@ -7,6 +7,10 @@ class PartialReceiptContainer {
     Container container
     List<PartialReceiptItem> partialReceiptItems = []
 
+    Boolean isDefault() {
+        return container == null
+    }
+
 
     Map toJson() {
         return [
