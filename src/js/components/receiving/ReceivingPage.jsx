@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import PartialReceivingPage from './PartialReceivingPage';
 import ReceivingCheckScreen from './ReceivingCheckScreen';
 
 class ReceivingPage extends Component {
-  static showResults(values) {
-    window.alert(`You submitted:\n\n${JSON.stringify(values, null, 2)}`);
-  }
-
   constructor(props) {
     super(props);
 
@@ -23,9 +20,9 @@ class ReceivingPage extends Component {
     return [
       <PartialReceivingPage
         onSubmit={this.nextPage}
+        shipmentId={this.props.match.params.shipmentId}
       />,
       <ReceivingCheckScreen
-        onSubmit={ReceivingPage.showResults}
         prevPage={this.prevPage}
       />,
     ];
@@ -52,3 +49,9 @@ class ReceivingPage extends Component {
 }
 
 export default ReceivingPage;
+
+ReceivingPage.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({ shipmentId: PropTypes.string }),
+  }).isRequired,
+};
