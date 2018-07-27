@@ -16,20 +16,6 @@ class TableBodyVirtualized extends Component {
     this.debounceScrolling = _.debounce((isScrolling) => { this.setState({ isScrolling }); }, 1000);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.isScrolling !== nextState.isScrolling) {
-      return true;
-    }
-
-    return !_.isEqualWith(this.props, nextProps, (objValue, othValue) => {
-      if (typeof objValue === 'function' || typeof othValue === 'function') {
-        return true;
-      }
-
-      return undefined;
-    });
-  }
-
   getRowHeight({ index }) {
     const { fieldsConfig: { subfieldKey, getDynamicRowAttr }, fields, properties } = this.props;
 
