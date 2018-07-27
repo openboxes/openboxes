@@ -34,13 +34,14 @@ class ReceiptService {
         partialReceipt.dateShipped = shipment.actualShippingDate
         partialReceipt.dateDelivered = shipment.actualDeliveryDate
 
-        shipment.containers.collect { Container container ->
+        def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
+        shipmentItemsByContainer.collect { container, shipmentItems ->
 
             PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer()
             partialReceiptContainer.container = container
             partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
 
-            container.shipmentItems.collect { ShipmentItem shipmentItem ->
+            shipmentItems.collect { ShipmentItem shipmentItem ->
                 PartialReceiptItem partialReceiptItem = new PartialReceiptItem()
                 partialReceiptItem.shipmentItem = shipmentItem
                 partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
@@ -48,6 +49,7 @@ class ReceiptService {
         }
         return partialReceipt
     }
+
 
     void savePartialReceipt(PartialReceipt partialReceipt) {
 
