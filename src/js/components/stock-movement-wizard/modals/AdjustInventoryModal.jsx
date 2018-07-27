@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { change, formValueSelector, reduxForm } from 'redux-form';
+import { change, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
@@ -90,20 +90,10 @@ class AdjustInventoryModal extends Component {
     this.props.showSpinner();
 
     const url = '/openboxes/api/stockAdjustments';
+    console.log(values.adjustInventory);
     const payload = _.map(values.adjustInventory, (adItem) => {
-      const adjustItem = _.find(this.state.attr.fieldValue.availableItems, item => item['inventoryItem.id'] === adItem['inventoryItem.id']);
-      if (adjustItem) {
-        return {
-          id: adjustItem.id,
-          'inventoryItem.id': adItem['inventoryItem.id'],
-          'binLocation.id': adItem['binLocation.id'] || '',
-          quantityAvailable: adItem.quantityAvailable,
-          quantityAdjusted: adItem.quantityAdjusted,
-          comments: adItem.comments,
-        };
-      }
       return {
-        'inventoryItem.id': adItem['inventoryItem.id'],
+        'inventoryItem.id': adItem['inventoryItem.id'] || '' ,
         'binLocation.id': adItem['binLocation.id'] || '',
         quantityAvailable: adItem.quantityAvailable,
         quantityAdjusted: adItem.quantityAdjusted,
