@@ -101,10 +101,14 @@ const FIELDS = {
           btnOpenText: 'Adjust',
           title: 'Adjust Inventory',
         },
-        getDynamicAttr: ({ fieldValue, selectedValue, subfield }) => ({
+        getDynamicAttr: ({
+          fieldValue, selectedValue, subfield, stockMovementId, checkForInitialPicksChanges,
+        }) => ({
           product: selectedValue,
           fieldValue,
           subfield,
+          stockMovementId,
+          checkForInitialPicksChanges,
         }),
       },
     },

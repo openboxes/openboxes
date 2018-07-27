@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
+import LabelField from '../../form-elements/LabelField';
 import { renderFormField } from '../../../utils/form-utils';
 import DateField from '../../form-elements/DateField';
 import { showSpinner, hideSpinner } from '../../../actions';
@@ -18,17 +19,17 @@ const FIELDS = {
     type: ArrayField,
     disableVirtualization: true,
     fields: {
-      lotNumber: {
+      'binLocation.name': {
         type: TextField,
-        label: 'Lot #',
+        label: 'Bin',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue }) => ({
           disabled: !!fieldValue,
         }),
       },
-      'binLocation.name': {
+      lotNumber: {
         type: TextField,
-        label: 'Bin',
+        label: 'Lot #',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue }) => ({
           disabled: !!fieldValue,
@@ -44,11 +45,19 @@ const FIELDS = {
         }),
       },
       quantityAvailable: {
+        type: LabelField,
+        label: 'Previous Qty',
+      },
+      quantityAdjusted: {
         type: TextField,
-        label: 'Qty Available',
+        label: 'Current Qty',
         attributes: {
           type: 'number',
         },
+      },
+      comments: {
+        type: TextField,
+        label: 'Comments',
       },
     },
   },
@@ -81,34 +90,6 @@ class AdjustInventoryModal extends Component {
     this.props.showSpinner();
 
     const url = '/openboxes/api/stockAdjustments';
-    /*
-    const payload = {
-      adIt: _.map(values.adjustInventory, (adItem) => {
-        const adjustItem = _.find(
-          _.filter(this.state.attr.fieldValue.adIt, listItem => !listItem.initial),
-          item => item['inventoryItem.id'] === adItem['inventoryItem.id'],
-        );
-        if (adjustItem) {
-          return {
-            id: adjustItem.id,
-            'inventoryItem.id': adItem['inventoryItem.id'],
-            'binLocation.id': adItem['binLocation.id'] || '',
-            lotNumber: adItem.lotNumber,
-            expirationDate: adItem.expirationDate,
-            quantityAdjusted: adItem.quantityAvailable,
-          };
-        }
-        return {
-          'inventoryItem.id': adItem['inventoryItem.id'],
-          'binLocation.id': adItem['binLocation.id'] || '',
-          lotNumber: adItem.lotNumber,
-          expirationDate: adItem.expirationDate,
-          quantityAdjusted: adItem.quantityAvailable,
-        };
-      }),
-    };
-    */
-
 
     return apiClient.post(url, _.map(values.adjustInventory, (adItem) => {
       const adjustItem = _.find(
@@ -120,19 +101,28 @@ class AdjustInventoryModal extends Component {
           id: adjustItem.id,
           'inventoryItem.id': adItem['inventoryItem.id'],
           'binLocation.id': adItem['binLocation.id'] || '',
-          quantityAdjusted: adItem.quantityAvailable,
+          quantityAvailable: adItem.quantityAvailable,
+          quantityAdjusted: adItem.quantityAdjusted,
+          comments: adItem.comments,
         };
       }
       return {
         'inventoryItem.id': adItem['inventoryItem.id'],
-        quantityAdjusted: adItem.quantityAvailable,
+        'binLocation.id': adItem['binLocation.id'] || '',
+        quantityAvailable: adItem.quantityAvailable,
+        quantityAdjusted: adItem.quantityAdjusted,
+        comments: adItem.comments,
       };
-    })).then((resp) => {
-      const { pickPageItems } = resp.data.data.pickPage;
-      this.props.change('stock-movement-wizard', 'pickPageItems', []);
-      this.props.change('stock-movement-wizard', 'pickPageItems', this.state.attr.checkForInitialPicksChanges(pickPageItems));
+    })).then(() => {
+      apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
+        .then((resp) => {
+          const { pickPageItems } = resp.data.data.pickPage;
+          this.props.change('stock-movement-wizard', 'pickPageItems', []);
+          this.props.change('stock-movement-wizard', 'pickPageItems', this.state.attr.checkForInitialPicksChanges(pickPageItems));
 
-      this.props.hideSpinner();
+          this.props.hideSpinner();
+        })
+        .catch(() => { this.props.hideSpinner(); });
     }).catch(() => { this.props.hideSpinner(); });
   }
 
@@ -170,13 +160,13 @@ export default reduxForm({
 
 AdjustInventoryModal.propTypes = {
   change: PropTypes.func.isRequired,
-  showSpinner: PropTypes.func.isRequired,
-  hideSpinner: PropTypes.func.isRequired,
   adjustInventory: PropTypes.arrayOf(PropTypes.shape({})),
   fieldName: PropTypes.string.isRequired,
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
 };
 
