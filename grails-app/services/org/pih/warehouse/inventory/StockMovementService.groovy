@@ -521,7 +521,7 @@ class StockMovementService {
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
         editPageItem.quantityRequested = requisitionItem.quantity
-        editPageItem.quantityConsumed = 0
+        editPageItem.quantityConsumed = null
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         return editPageItem
@@ -568,11 +568,31 @@ class StockMovementService {
         if (stockMovement.driverName) additionalInformation += "Driver Name: ${stockMovement.driverName}\n"
         shipment.additionalInformation = additionalInformation
 
-        stockMovement.requisition.picklist.picklistItems.collect { PicklistItem picklistItem ->
-            ShipmentItem shipmentItem = createOrUpdateShipmentItem(picklistItem)
-            shipment.addToShipmentItems(shipmentItem)
+        if (stockMovement.origin.isSupplier()) {
+            stockMovement.lineItems.collect { StockMovementItem stockMovementItem ->
+                ShipmentItem shipmentItem = createOrUpdateShipmentItem(stockMovementItem)
+                shipment.addToShipmentItems(shipmentItem)
+            }
+        }
+        else {
+            stockMovement.requisition.picklist.picklistItems.collect { PicklistItem picklistItem ->
+                ShipmentItem shipmentItem = createOrUpdateShipmentItem(picklistItem)
+                shipment.addToShipmentItems(shipmentItem)
+            }
         }
         return shipment.save()
+    }
+
+    ShipmentItem createOrUpdateShipmentItem(StockMovementItem stockMovementItem) {
+        InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(stockMovementItem.product,
+                        stockMovementItem.lotNumber, stockMovementItem.expirationDate)
+        ShipmentItem shipmentItem = new ShipmentItem()
+        shipmentItem.product = stockMovementItem.product
+        shipmentItem.inventoryItem = inventoryItem
+        shipmentItem.lotNumber = inventoryItem.lotNumber
+        shipmentItem.expirationDate = inventoryItem.expirationDate
+        shipmentItem.quantity = stockMovementItem.quantityRequested
+        return shipmentItem
     }
 
     ShipmentItem createOrUpdateShipmentItem(PicklistItem picklistItem) {

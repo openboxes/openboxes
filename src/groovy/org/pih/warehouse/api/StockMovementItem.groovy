@@ -40,6 +40,8 @@ class StockMovementItem {
     String reasonCode
     String comments
 
+    String lotNumber
+    Date expirationDate
     String palletName
     String boxName
 
@@ -70,6 +72,8 @@ class StockMovementItem {
         cancel(nullable:true)
         revert(nullable:true)
         substitute(nullable:true)
+        lotNumber(nullable:true)
+        expirationDate(nullable:true)
         palletName(nullable:true)
         boxName(nullable:true)
         sortOrder(nullable:true)
@@ -85,6 +89,8 @@ class StockMovementItem {
                 id: id,
                 productCode: productCode,
                 product: product,
+                lotNumber: lotNumber,
+                expirationDate: expirationDate,
                 palletName: palletName,
                 boxName: boxName,
                 statusCode: statusCode,
@@ -298,11 +304,11 @@ class EditPageItem {
     List<SubstitutionItem> availableSubstitutions
 
     Integer getQuantityAvailable() {
-        availableItems ? availableItems.sum { it.quantityAvailable } : 0
+        availableItems ? availableItems.sum { it.quantityAvailable } : null
     }
 
     Integer getQuantityRevised() {
-        requisitionItem?.modificationItem ? requisitionItem?.modificationItem?.quantity : 0
+        requisitionItem?.modificationItem ? requisitionItem?.modificationItem?.quantity : null
     }
 
     Date getMinExpirationDate() {
@@ -414,7 +420,7 @@ class PickPageItem {
     }
 
     Integer getQuantityAvailable() {
-        return availableItems ? availableItems?.sum { it.quantityAvailable } : 0
+        return availableItems ? availableItems?.sum { it.quantityAvailable } : null
     }
 
 
