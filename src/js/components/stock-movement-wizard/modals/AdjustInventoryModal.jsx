@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { change, reduxForm } from 'redux-form';
+import { change, formValueSelector, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
@@ -10,6 +10,7 @@ import ArrayField from '../../form-elements/ArrayField';
 import { renderFormField } from '../../../utils/form-utils';
 import DateField from '../../form-elements/DateField';
 import { showSpinner, hideSpinner } from '../../../actions';
+import apiClient from '../../../utils/apiClient';
 
 const FIELDS = {
   adjustInventory: {
@@ -45,6 +46,9 @@ const FIELDS = {
       quantityAvailable: {
         type: TextField,
         label: 'Qty Available',
+        attributes: {
+          type: 'number',
+        },
       },
     },
   },
@@ -73,12 +77,65 @@ class AdjustInventoryModal extends Component {
     );
   }
 
-  // temporary disablers
-  /* eslint-disable class-methods-use-this */
-  /* eslint-disable no-unused-vars */
   onSave(values) {
     this.props.showSpinner();
+
+    const url = '/openboxes/api/stockAdjustments';
+    /*
+    const payload = {
+      adIt: _.map(values.adjustInventory, (adItem) => {
+        const adjustItem = _.find(
+          _.filter(this.state.attr.fieldValue.adIt, listItem => !listItem.initial),
+          item => item['inventoryItem.id'] === adItem['inventoryItem.id'],
+        );
+        if (adjustItem) {
+          return {
+            id: adjustItem.id,
+            'inventoryItem.id': adItem['inventoryItem.id'],
+            'binLocation.id': adItem['binLocation.id'] || '',
+            lotNumber: adItem.lotNumber,
+            expirationDate: adItem.expirationDate,
+            quantityAdjusted: adItem.quantityAvailable,
+          };
+        }
+        return {
+          'inventoryItem.id': adItem['inventoryItem.id'],
+          'binLocation.id': adItem['binLocation.id'] || '',
+          lotNumber: adItem.lotNumber,
+          expirationDate: adItem.expirationDate,
+          quantityAdjusted: adItem.quantityAvailable,
+        };
+      }),
+    };
+    */
+
+
+    return apiClient.post(url, _.map(values.adjustInventory, (adItem) => {
+      const adjustItem = _.find(
+        _.filter(this.state.attr.fieldValue.adItem, listItem => !listItem.initial),
+        item => item['inventoryItem.id'] === adItem['inventoryItem.id'],
+      );
+      if (adjustItem) {
+        return {
+          id: adjustItem.id,
+          'inventoryItem.id': adItem['inventoryItem.id'],
+          'binLocation.id': adItem['binLocation.id'] || '',
+          quantityAdjusted: adItem.quantityAvailable,
+        };
+      }
+      return {
+        'inventoryItem.id': adItem['inventoryItem.id'],
+        quantityAdjusted: adItem.quantityAvailable,
+      };
+    })).then((resp) => {
+      const { pickPageItems } = resp.data.data.pickPage;
+      this.props.change('stock-movement-wizard', 'pickPageItems', []);
+      this.props.change('stock-movement-wizard', 'pickPageItems', this.state.attr.checkForInitialPicksChanges(pickPageItems));
+
+      this.props.hideSpinner();
+    }).catch(() => { this.props.hideSpinner(); });
   }
+
 
   render() {
     if (this.state.attr.subfield) {
@@ -99,19 +156,30 @@ class AdjustInventoryModal extends Component {
   }
 }
 
+const selector = formValueSelector('stock-movement-wizard');
+
+const mapStateToProps = state => ({
+  adjustInventory: selector(state, 'adjustInventory'),
+});
+
 export default reduxForm({
   form: 'stock-movement-wizard',
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
-})(connect(null, { change, showSpinner, hideSpinner })(AdjustInventoryModal));
+})(connect(mapStateToProps, { change, showSpinner, hideSpinner })(AdjustInventoryModal));
 
 AdjustInventoryModal.propTypes = {
   change: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
+  adjustInventory: PropTypes.arrayOf(PropTypes.shape({})),
   fieldName: PropTypes.string.isRequired,
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
   handleSubmit: PropTypes.func.isRequired,
+};
+
+AdjustInventoryModal.defaultProps = {
+  adjustInventory: [],
 };
