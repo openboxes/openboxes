@@ -146,11 +146,11 @@ const VENDOR_FIELDS = {
     type: ArrayField,
     addButton: 'Add line',
     fields: {
-      pallet: {
+      palletName: {
         type: TextField,
         label: 'Pallet',
       },
-      box: {
+      boxName: {
         type: TextField,
         label: 'Box',
       },
@@ -239,6 +239,30 @@ class AddItemsPage extends Component {
       }
     });
 
+    if (this.props.origin.type === 'SUPPLIER') {
+      return [].concat(
+        _.map(lineItemsToBeAdded, item => ({
+          'product.id': item.product.id,
+          quantityRequested: item.quantityRequested,
+          palletName: item.palletName,
+          boxName: item.boxName,
+          lotNumber: item.lotNumber,
+          expirationDate: item.expirationDate,
+          'recipient.id': item.recipient ? item.recipient.id : '',
+        })),
+        _.map(lineItemsToBeUpdated, item => ({
+          id: item.id,
+          'product.id': item.product.id,
+          quantityRequested: item.quantityRequested,
+          palletName: item.palletName,
+          boxName: item.boxName,
+          lotNumber: item.lotNumber,
+          expirationDate: item.expirationDate,
+          'recipient.id': item.recipient ? item.recipient.id : '',
+        })),
+      );
+    }
+
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
         'product.id': item.product.id,
@@ -253,42 +277,35 @@ class AddItemsPage extends Component {
   }
 
   fetchAndSetLineItems() {
-    if (this.props.origin.type === 'SUPPLIER') {
-      const lineItems = this.props.lineItems.length ? this.props.lineItems : new Array(10).fill({});
-      this.props.change('stock-movement-wizard', 'lineItems', lineItems);
+    this.fetchLineItems().then((resp) => {
+      const { statusCode, lineItems } = resp.data.data;
+      let lineItemsData;
+      if (!lineItems.length) {
+        lineItemsData = new Array(10).fill({});
+      } else {
+        lineItemsData = _.map(
+          lineItems,
+          val => ({
+            ...val,
+            disabled: true,
+            rowKey: _.uniqueId('lineItem_'),
+            product: {
+              ...val.product,
+              label: `${val.productCode} ${val.product.name}`,
+            },
+          }),
+        );
+      }
+
+      this.props.change('stock-movement-wizard', 'lineItems', lineItemsData);
+
+      this.setState({
+        currentLineItems: lineItems,
+        statusCode,
+      });
+
       this.props.hideSpinner();
-    } else {
-      this.fetchLineItems().then((resp) => {
-        const { statusCode, lineItems } = resp.data.data;
-        let lineItemsData;
-        if (!lineItems.length) {
-          lineItemsData = new Array(10).fill({});
-        } else {
-          lineItemsData = _.map(
-            lineItems,
-            val => ({
-              ...val,
-              quantityAllowed: val.quantityAllowed,
-              disabled: true,
-              rowKey: _.uniqueId('lineItem_'),
-              product: {
-                ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
-              },
-            }),
-          );
-        }
-
-        this.props.change('stock-movement-wizard', 'lineItems', lineItemsData);
-
-        this.setState({
-          currentLineItems: lineItems,
-          statusCode,
-        });
-
-        this.props.hideSpinner();
-      }).catch(() => this.props.hideSpinner());
-    }
+    }).catch(() => this.props.hideSpinner());
   }
 
   fetchLineItems() {
@@ -310,13 +327,26 @@ class AddItemsPage extends Component {
     const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val));
     this.props.change('stock-movement-wizard', 'lineItems', lineItems);
     if (this.props.origin.type === 'SUPPLIER') {
-      this.props.goToPage(5);
+      this.props.showSpinner();
+      this.saveRequisitionItems(lineItems)
+        .then(() => {
+          if (this.state.statusCode === 'CREATED' || this.state.statusCode === 'EDITING') {
+            this.transitionToNextStep('PICKED')
+              .then(() => {
+                this.props.goToPage(5);
+              })
+              .catch(() => this.props.hideSpinner());
+          } else {
+            this.props.goToPage(5);
+          }
+        })
+        .catch(() => this.props.hideSpinner());
     } else {
       this.props.showSpinner();
       this.saveRequisitionItems(lineItems)
         .then(() => {
           if (this.state.statusCode === 'CREATED' || this.state.statusCode === 'EDITING') {
-            this.transitionToStep3()
+            this.transitionToNextStep('VERIFYING')
               .then(() => {
                 this.props.onSubmit();
               })
@@ -334,13 +364,6 @@ class AddItemsPage extends Component {
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
     const payload = {
       id: this.props.stockMovementId,
-      name: '',
-      description: this.props.description,
-      identifier: this.props.movementNumber,
-      'origin.id': this.props.origin.id,
-      'destination.id': this.props.destination.id,
-      dateRequested: this.props.dateRequested,
-      'requestedBy.id': this.props.requestedBy,
       lineItems: itemsToSave,
     };
 
@@ -360,13 +383,6 @@ class AddItemsPage extends Component {
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
     const payload = {
       id: this.props.stockMovementId,
-      name: '',
-      description: this.props.description,
-      identifier: this.props.movementNumber,
-      'origin.id': this.props.origin.id,
-      'destination.id': this.props.destination.id,
-      dateRequested: this.props.dateRequested,
-      'requestedBy.id': this.props.requestedBy,
       lineItems: itemsToSave,
     };
 
@@ -402,13 +418,6 @@ class AddItemsPage extends Component {
     const removeItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
     const payload = {
       id: this.props.stockMovementId,
-      name: '',
-      description: this.props.description,
-      identifier: this.props.movementNumber,
-      'origin.id': this.props.origin.id,
-      'destination.id': this.props.destination.id,
-      dateRequested: this.props.dateRequested,
-      'requestedBy.id': this.props.requestedBy,
       lineItems: [{
         id: itemId,
         delete: 'true',
@@ -422,9 +431,9 @@ class AddItemsPage extends Component {
       });
   }
 
-  transitionToStep3() {
+  transitionToNextStep(status) {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
-    const payload = { status: 'VERIFYING' };
+    const payload = { status };
 
     return apiClient.post(url, payload);
   }
@@ -477,7 +486,7 @@ class AddItemsPage extends Component {
         <span>
           <label
             htmlFor="csvInput"
-            className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+            className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
           >
             <span><i className="fa fa-download pr-2" />Import Template</span>
             <input
@@ -541,13 +550,9 @@ const mapStateToProps = state => ({
   origin: selector(state, 'origin'),
   lineItems: selector(state, 'lineItems'),
   stockMovementId: selector(state, 'requisitionId'),
-  destination: selector(state, 'destination'),
-  requestedBy: selector(state, 'requestedBy'),
-  description: selector(state, 'description'),
-  dateRequested: selector(state, 'dateRequested'),
-  movementNumber: selector(state, 'movementNumber'),
   recipients: state.users.data,
   recipientsFetched: state.users.fetched,
+  movementNumber: selector(state, 'movementNumber'),
 });
 
 export default reduxForm({
@@ -577,13 +582,6 @@ AddItemsPage.propTypes = {
   recipientsFetched: PropTypes.bool.isRequired,
   lineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   stockMovementId: PropTypes.string.isRequired,
-  destination: PropTypes.shape({
-    id: PropTypes.string,
-    type: PropTypes.string,
-  }).isRequired,
-  requestedBy: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  dateRequested: PropTypes.string.isRequired,
   movementNumber: PropTypes.string.isRequired,
 };
 

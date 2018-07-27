@@ -375,7 +375,7 @@ tr.crossed-out td:before {
 }
 
 .spinner-container > div {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   height: 100%;

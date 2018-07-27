@@ -1,4 +1,4 @@
-export const validate = (values) => {
+const validate = (values) => {
   const errors = {};
   if (!values.description) {
     errors.description = 'This field is required';
@@ -18,14 +18,4 @@ export const validate = (values) => {
   return errors;
 };
 
-
-export const validateSendMovement = (values) => {
-  const errors = {};
-  if (!values.shipDate) {
-    errors.shipDate = 'This field is required';
-  }
-  if (!values.shipmentType) {
-    errors.shipmentType = 'This field is required';
-  }
-  return errors;
-};
+export default validate;
