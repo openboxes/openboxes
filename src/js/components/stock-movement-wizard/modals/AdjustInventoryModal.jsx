@@ -8,10 +8,12 @@ import ModalWrapper from '../../form-elements/ModalWrapper';
 import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
 import LabelField from '../../form-elements/LabelField';
+import SelectField from '../../form-elements/SelectField';
 import { renderFormField } from '../../../utils/form-utils';
 import DateField from '../../form-elements/DateField';
 import { showSpinner, hideSpinner } from '../../../actions';
 import apiClient from '../../../utils/apiClient';
+import { BIN_LOCATION_MOCKS } from '../../../mockedData';
 
 const FIELDS = {
   adjustInventory: {
@@ -20,12 +22,15 @@ const FIELDS = {
     disableVirtualization: true,
     fields: {
       'binLocation.name': {
-        type: TextField,
+        type: SelectField,
         label: 'Bin',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue }) => ({
           disabled: !!fieldValue,
         }),
+        attributes: {
+          options: BIN_LOCATION_MOCKS,
+        },
       },
       lotNumber: {
         type: TextField,
@@ -90,7 +95,6 @@ class AdjustInventoryModal extends Component {
     this.props.showSpinner();
 
     const url = '/openboxes/api/stockAdjustments';
-    console.log(values.adjustInventory);
     const payload = _.map(values.adjustInventory, (adItem) => {
       return {
         'inventoryItem.id': adItem['inventoryItem.id'] || '' ,
@@ -132,7 +136,6 @@ class AdjustInventoryModal extends Component {
     );
   }
 }
-
 
 export default reduxForm({
   form: 'stock-movement-wizard',
