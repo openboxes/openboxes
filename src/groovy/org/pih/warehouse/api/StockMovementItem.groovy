@@ -40,6 +40,8 @@ class StockMovementItem {
     String reasonCode
     String comments
 
+    String lotNumber
+    Date expirationDate
     String palletName
     String boxName
 
@@ -70,6 +72,8 @@ class StockMovementItem {
         cancel(nullable:true)
         revert(nullable:true)
         substitute(nullable:true)
+        lotNumber(nullable:true)
+        expirationDate(nullable:true)
         palletName(nullable:true)
         boxName(nullable:true)
         sortOrder(nullable:true)
@@ -85,6 +89,8 @@ class StockMovementItem {
                 id: id,
                 productCode: productCode,
                 product: product,
+                lotNumber: lotNumber,
+                expirationDate: expirationDate,
                 palletName: palletName,
                 boxName: boxName,
                 statusCode: statusCode,
