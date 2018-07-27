@@ -308,7 +308,7 @@ class EditPageItem {
     }
 
     Integer getQuantityRevised() {
-        requisitionItem?.modificationItem ? requisitionItem?.modificationItem?.quantity : 0
+        requisitionItem?.modificationItem ? requisitionItem?.modificationItem?.quantity : null
     }
 
     Date getMinExpirationDate() {
