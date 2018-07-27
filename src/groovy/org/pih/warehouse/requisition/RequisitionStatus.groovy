@@ -14,6 +14,7 @@ enum RequisitionStatus {
     EDITING(2),
     VERIFYING(3),
 	PICKING(4),
+    PICKED(5),
 	PENDING(5),
     CHECKING(6),
 	ISSUED(7),
@@ -22,7 +23,6 @@ enum RequisitionStatus {
     DELETED(10),
     ERROR(11),
     // Removed
-    PICKED(0),
     OPEN(0),
     FULFILLED(0),
     REVIEWING(0),
