@@ -88,6 +88,7 @@ class ReceiptService {
             ReceiptItem receiptItem = new ReceiptItem();
             receiptItem.quantityReceived = partialReceiptItem.quantityReceiving
             receiptItem.binLocation = partialReceiptItem.binLocation
+            receiptItem.recipient = partialReceiptItem.recipient
             receiptItem.quantityShipped = shipmentItem.quantity;
             receiptItem.lotNumber = shipmentItem.lotNumber;
             receiptItem.product = inventoryItem.product
