@@ -304,7 +304,7 @@ class EditPageItem {
     List<SubstitutionItem> availableSubstitutions
 
     Integer getQuantityAvailable() {
-        availableItems ? availableItems.sum { it.quantityAvailable } : 0
+        availableItems ? availableItems.sum { it.quantityAvailable } : null
     }
 
     Integer getQuantityRevised() {
@@ -420,7 +420,7 @@ class PickPageItem {
     }
 
     Integer getQuantityAvailable() {
-        return availableItems ? availableItems?.sum { it.quantityAvailable } : 0
+        return availableItems ? availableItems?.sum { it.quantityAvailable } : null
     }
 
 
