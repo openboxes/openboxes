@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { reduxForm, initialize, formValueSelector, change } from 'redux-form';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import fileDownload from 'js-file-download';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -205,6 +206,7 @@ class AddItemsPage extends Component {
 
     this.props.showSpinner();
     this.removeItem = this.removeItem.bind(this);
+    this.importTemplate = this.importTemplate.bind(this);
   }
 
   componentDidMount() {
@@ -212,6 +214,45 @@ class AddItemsPage extends Component {
       this.fetchData(this.props.fetchUsers);
     }
 
+    this.fetchAndSetLineItems();
+  }
+
+  getFields() {
+    if (this.props.origin.type === 'SUPPLIER') {
+      return VENDOR_FIELDS;
+    } else if (this.props.stockList) {
+      return STOCKLIST_FIELDS;
+    }
+
+    return NO_STOCKLIST_FIELDS;
+  }
+
+  getLineItemsToBeSaved(lineItems) {
+    const lineItemsToBeAdded = _.filter(lineItems, item => !item.statusCode);
+
+    const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
+    const lineItemsToBeUpdated = [];
+    _.forEach(lineItemsWithStatus, (item) => {
+      const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
+      if (parseInt(item.quantityRequested, 10) !== parseInt(oldItem.quantityRequested, 10)) {
+        lineItemsToBeUpdated.push(item);
+      }
+    });
+
+    return [].concat(
+      _.map(lineItemsToBeAdded, item => ({
+        'product.id': item.product.id,
+        quantityRequested: item.quantityRequested,
+      })),
+      _.map(lineItemsToBeUpdated, item => ({
+        id: item.id,
+        'product.id': item.product.id,
+        quantityRequested: item.quantityRequested,
+      })),
+    );
+  }
+
+  fetchAndSetLineItems() {
     if (this.props.origin.type === 'SUPPLIER') {
       const lineItems = this.props.lineItems.length ? this.props.lineItems : new Array(10).fill({});
       this.props.change('stock-movement-wizard', 'lineItems', lineItems);
@@ -248,41 +289,6 @@ class AddItemsPage extends Component {
         this.props.hideSpinner();
       }).catch(() => this.props.hideSpinner());
     }
-  }
-
-  getFields() {
-    if (this.props.origin.type === 'SUPPLIER') {
-      return VENDOR_FIELDS;
-    } else if (this.props.stockList) {
-      return STOCKLIST_FIELDS;
-    }
-
-    return NO_STOCKLIST_FIELDS;
-  }
-
-  getLineItemsToBeSaved(lineItems) {
-    const lineItemsToBeAdded = _.filter(lineItems, item => !item.statusCode);
-
-    const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
-    const lineItemsToBeUpdated = [];
-    _.forEach(lineItemsWithStatus, (item) => {
-      const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
-      if (parseInt(item.quantityRequested, 10) !== parseInt(oldItem.quantityRequested, 10)) {
-        lineItemsToBeUpdated.push(item);
-      }
-    });
-
-    return [].concat(
-      _.map(lineItemsToBeAdded, item => ({
-        'product.id': item.product.id,
-        quantityRequested: item.quantityRequested,
-      })),
-      _.map(lineItemsToBeUpdated, item => ({
-        id: item.id,
-        'product.id': item.product.id,
-        quantityRequested: item.quantityRequested,
-      })),
-    );
   }
 
   fetchLineItems() {
@@ -349,6 +355,49 @@ class AddItemsPage extends Component {
     return Promise.resolve();
   }
 
+  saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
+    const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
+    const updateItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
+    const payload = {
+      id: this.props.stockMovementId,
+      name: '',
+      description: this.props.description,
+      identifier: this.props.movementNumber,
+      'origin.id': this.props.origin.id,
+      'destination.id': this.props.destination.id,
+      dateRequested: this.props.dateRequested,
+      'requestedBy.id': this.props.requestedBy,
+      lineItems: itemsToSave,
+    };
+
+    if (payload.lineItems.length) {
+      return apiClient.post(updateItemsUrl, payload)
+        .then((resp) => {
+          const { statusCode, lineItems } = resp.data.data;
+
+          const lineItemsBackendData = _.map(
+            lineItems,
+            val => ({
+              ...val,
+              product: {
+                ...val.product,
+                label: `${val.productCode} ${val.product.name}`,
+              },
+            }),
+          );
+          this.props.change('stock-movement-wizard', 'lineItems', lineItemsBackendData);
+
+          this.setState({
+            currentLineItems: lineItemsBackendData,
+            statusCode,
+          });
+        })
+        .catch(() => Promise.reject(new Error('Could not save requisition items')));
+    }
+
+    return Promise.resolve();
+  }
+
   removeItem(itemId) {
     const removeItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
     const payload = {
@@ -380,28 +429,95 @@ class AddItemsPage extends Component {
     return apiClient.post(url, payload);
   }
 
+  exportTemplate() {
+    this.props.showSpinner();
+
+    const lineItems = _.filter(this.props.lineItems, item =>
+      !_.isEmpty(item) && !_.isNil(item.quantityRequested));
+
+    const { movementNumber, stockMovementId } = this.props;
+    const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
+    return this.saveRequisitionItemsInCurrentStep(lineItems)
+      .then(() => {
+        apiClient.get(url, { responseType: 'blob' })
+          .then((response) => {
+            fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
+            this.props.hideSpinner();
+          })
+          .catch(() => this.props.hideSpinner());
+      });
+  }
+
+  importTemplate(event) {
+    this.props.showSpinner();
+    const formData = new FormData();
+    const file = event.target.files[0];
+    const { stockMovementId } = this.props;
+
+    formData.append('importFile', file);
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+
+    const url = `/openboxes/stockMovement/importCsv/${stockMovementId}`;
+
+    return apiClient.post(url, formData, config)
+      .then(() => {
+        this.props.hideSpinner();
+        this.fetchAndSetLineItems();
+      });
+  }
+
   render() {
     const { handleSubmit, previousPage } = this.props;
     return (
-      <form onSubmit={handleSubmit(values => this.nextPage(values))}>
-        {_.map(this.getFields(), (fieldConfig, fieldName) =>
+      <div className="d-flex flex-column">
+        <span>
+          <label
+            htmlFor="csvInput"
+            className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+          >
+            <span><i className="fa fa-download pr-2" />Import Template</span>
+            <input
+              id="csvInput"
+              type="file"
+              style={{ display: 'none' }}
+              onChange={this.importTemplate}
+              accept=".csv"
+            />
+          </label>
+          <button
+            onClick={() => this.exportTemplate()}
+            className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+            disabled={!_.some(this.props.lineItems, item =>
+              (!_.isEmpty(item)
+              && !_.isNil(item.quantityRequested)))}
+          >
+            <span><i className="fa fa-upload pr-2" />Export Template</span>
+          </button>
+        </span>
+        <form onSubmit={handleSubmit(values => this.nextPage(values))}>
+          {_.map(this.getFields(), (fieldConfig, fieldName) =>
           renderFormField(fieldConfig, fieldName, {
             stockList: this.props.stockList,
             recipients: this.props.recipients,
             removeItem: this.removeItem,
           }))}
-        <div>
-          <button type="button" className="btn btn-outline-primary btn-form" onClick={previousPage}>
+          <div>
+            <button type="button" className="btn btn-outline-primary btn-form" onClick={previousPage}>
             Previous
-          </button>
-          <button
-            type="submit"
-            className="btn btn-outline-primary btn-form float-right"
-            disabled={!_.some(this.props.lineItems, item => !_.isEmpty(item))}
-          >Next
-          </button>
-        </div>
-      </form>
+            </button>
+            <button
+              type="submit"
+              className="btn btn-outline-primary btn-form float-right"
+              disabled={!_.some(this.props.lineItems, item => !_.isEmpty(item))}
+            >Next
+            </button>
+          </div>
+        </form>
+      </div>
     );
   }
 }
