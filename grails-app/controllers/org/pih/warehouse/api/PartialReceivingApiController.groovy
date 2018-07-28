@@ -67,13 +67,11 @@ class PartialReceivingApiController {
 
         jsonObject.containers.each { containerMap ->
 
-            log.info "containerMap: " + containerMap
             // Bind the container
             PartialReceiptContainer partialReceiptContainer =
                     partialReceipt.findPartialReceiptContainer(containerMap["container.id"])
 
             if (!partialReceiptContainer) {
-                log.info "container not found"
                 partialReceiptContainer = new PartialReceiptContainer()
                 partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
             }
@@ -82,12 +80,11 @@ class PartialReceivingApiController {
             // Bind the shipment items
             containerMap.shipmentItems.each { shipmentItemMap ->
 
-                log.info "shipmentItemMap: " + shipmentItemMap
+                def shipmentItemId = shipmentItemMap.remove("shipmentItem.id")
                 PartialReceiptItem partialReceiptItem = partialReceiptContainer.partialReceiptItems.find {
-                    it?.shipmentItem?.id = shipmentItemMap["shipmentItem.id"]
+                    it?.shipmentItem?.id == shipmentItemId
                 }
                 if (!partialReceiptItem) {
-                    log.info "item not found"
                     partialReceiptItem = new PartialReceiptItem()
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
