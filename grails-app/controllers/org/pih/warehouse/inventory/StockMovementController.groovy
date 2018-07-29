@@ -16,6 +16,9 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 
 
@@ -52,13 +55,12 @@ class StockMovementController {
         def lineItems = stockMovement.lineItems.collect {
             [
                     requisitionItemId: it.id,
-                    productId: it.product.id,
                     productCode: it.product.productCode,
                     productName: it.product.name,
-                    palletName: it.palletName,
-                    boxName: it.boxName,
+                    palletName: it.palletName?:"",
+                    boxName: it.boxName?:"",
                     quantity: it.quantityRequested,
-                    recipientId: it?.recipient?.id
+                    recipientId: it?.recipient?.id?:""
             ]
         }
         String csv = dataService.generateCsv(lineItems)
@@ -68,12 +70,46 @@ class StockMovementController {
 
 
 	def importCsv = { ImportDataCommand command ->
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
-        def file = command.importFile
-        if (file.isEmpty()) {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        Requisition requisition = stockMovement.requisition
+
+        def importFile = command.importFile
+        if (importFile.isEmpty()) {
             throw new IllegalArgumentException("File cannot be empty")
         }
+
+        if (importFile.fileItem.contentType != "text/csv") {
+            throw new IllegalArgumentException("File must be in CSV format")
+        }
+
+        String csv = new String(importFile.bytes)
+        def settings = [separatorChar:',', skipLines: 1]
+        csv.toCsvReader(settings).eachLine { tokens ->
+            log.info "tokens " + tokens
+            String requisitionItemId = tokens[0]
+            String productCode = tokens[1]
+            String productName = tokens[2]
+            String palletName = tokens[3]
+            String boxName = tokens[4]
+            String quantityRequested = tokens[5]
+            String recipientId = tokens[6]
+
+            Product product = Product.findByProductCode(productCode)
+            RequisitionItem requisitionItem
+            if (requisitionItemId) {
+                requisitionItem = RequisitionItem.get(requisitionItemId)
+            }
+            else {
+                requisitionItem = new RequisitionItem()
+                requisition.addToRequisitionItems(requisitionItem)
+            }
+
+            requisitionItem.product = product
+            requisitionItem.quantity = quantityRequested.toInteger()
+            requisitionItem.save(flush:true)
+        }
+
 
         render([data: "Data will be imported successfully"] as JSON)
 	}
