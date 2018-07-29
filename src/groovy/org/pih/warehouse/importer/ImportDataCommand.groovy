@@ -9,11 +9,12 @@
 **/ 
 package org.pih.warehouse.importer
 
-import org.pih.warehouse.core.Location;
+import org.pih.warehouse.core.Location
+import org.springframework.web.multipart.MultipartFile;
 
 class ImportDataCommand {
 	def filename
-	def importFile
+	MultipartFile importFile
 	def type
 	Location location
     Date date
