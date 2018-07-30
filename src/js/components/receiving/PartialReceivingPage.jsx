@@ -113,6 +113,9 @@ const FIELDS = {
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Product',
+        attributes: {
+          className: 'text-left ml-1',
+        },
       },
       'inventoryItem.lotNumber': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),

@@ -32,6 +32,7 @@ class ReceivingPage extends Component {
       />,
       <ReceivingCheckScreen
         prevPage={this.prevPage}
+        shipmentId={this.props.match.params.shipmentId}
       />,
     ];
   }
