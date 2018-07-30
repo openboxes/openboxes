@@ -9,12 +9,11 @@ import TextField from '../form-elements/TextField';
 import { renderFormField } from '../../utils/form-utils';
 import LabelField from '../form-elements/LabelField';
 import SelectField from '../form-elements/SelectField';
-import { REASON_CODE_MOCKS } from '../../mockedData';
 import ValueSelectorField from '../form-elements/ValueSelectorField';
 import SubstitutionsModal from './modals/SubstitutionsModal';
 import apiClient from '../../utils/apiClient';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
-import { showSpinner, hideSpinner } from '../../actions';
+import { showSpinner, hideSpinner, fetchReasonCodes } from '../../actions';
 
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
@@ -95,11 +94,9 @@ const FIELDS = {
         label: 'Reason code',
         component: SelectField,
         componentConfig: {
-          attributes: {
-            options: REASON_CODE_MOCKS,
-          },
-          getDynamicAttr: ({ selectedValue, subfield }) => ({
+          getDynamicAttr: ({ selectedValue, subfield, reasonCodes }) => ({
             disabled: !selectedValue || subfield,
+            options: reasonCodes,
           }),
         },
         attributes: {
@@ -128,6 +125,11 @@ class EditItemsPage extends Component {
 
   componentDidMount() {
     this.props.change('stock-movement-wizard', 'editPageItems', []);
+
+    if (!this.props.reasonCodesFetched) {
+      this.fetchData(this.props.fetchReasonCodes);
+    }
+
     this.fetchLineItems().then((resp) => {
       const { statusCode, editPage } = resp.data.data;
       const editPageItems = _.map(
@@ -153,6 +155,13 @@ class EditItemsPage extends Component {
     }).catch(() => {
       this.props.hideSpinner();
     });
+  }
+
+  fetchData(fetchFunction) {
+    this.props.showSpinner();
+    fetchFunction()
+      .then(() => this.props.hideSpinner())
+      .catch(() => this.props.hideSpinner());
   }
 
   reviseRequisitionItems(values) {
@@ -220,8 +229,9 @@ class EditItemsPage extends Component {
     return (
       <form onSubmit={this.props.handleSubmit(values => this.nextPage(values))}>
         {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-          stockMovementId: this.props.stockMovementId,
-        }))}
+            stockMovementId: this.props.stockMovementId,
+            reasonCodes: this.props.reasonCodes,
+          }))}
         <div>
           <button type="button" className="btn btn-outline-primary btn-form" onClick={this.props.previousPage}>
             Previous
@@ -262,6 +272,8 @@ const selector = formValueSelector('stock-movement-wizard');
 
 const mapStateToProps = state => ({
   stockMovementId: selector(state, 'requisitionId'),
+  reasonCodesFetched: state.reasonCodes.fetched,
+  reasonCodes: state.reasonCodes.data,
 });
 
 export default reduxForm({
@@ -269,7 +281,9 @@ export default reduxForm({
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
   validate,
-})(connect(mapStateToProps, { change, showSpinner, hideSpinner })(EditItemsPage));
+})(connect(mapStateToProps, {
+  change, fetchReasonCodes, showSpinner, hideSpinner,
+})(EditItemsPage));
 
 EditItemsPage.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
@@ -279,4 +293,7 @@ EditItemsPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   stockMovementId: PropTypes.string.isRequired,
+  fetchReasonCodes: PropTypes.func.isRequired,
+  reasonCodesFetched: PropTypes.bool.isRequired,
+  reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

@@ -4,6 +4,7 @@ import { localeReducer } from 'react-localize-redux';
 import spinnerReducer from './spinnerReducer';
 import locationsReducer from './locationsReducer';
 import usersReducer from './usersReducer';
+import reasonCodesReducer from './reasonCodesReducer';
 
 
 const rootReducer = combineReducers({
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   locale: localeReducer,
   spinner: spinnerReducer,
   locations: locationsReducer,
+  reasonCodes: reasonCodesReducer,
   users: usersReducer,
 });
 

@@ -1,4 +1,11 @@
-import { SHOW_SPINNER, HIDE_SPINNER, FETCH_LOCATIONS, FETCH_USERS, FETCH_PRODUCTS } from './types';
+import {
+  SHOW_SPINNER,
+  HIDE_SPINNER,
+  FETCH_LOCATIONS,
+  FETCH_USERS,
+  FETCH_PRODUCTS,
+  FETCH_REASONCODES
+} from './types';
 import apiClient from '../utils/apiClient';
 
 export function showSpinner() {
@@ -21,6 +28,16 @@ export function fetchLocations() {
 
   return {
     type: FETCH_LOCATIONS,
+    payload: request,
+  };
+}
+
+export function fetchReasonCodes() {
+  const url = '/openboxes/api/reasonCodes';
+  const request = apiClient.get(url);
+
+  return {
+    type: FETCH_REASONCODES,
     payload: request,
   };
 }
