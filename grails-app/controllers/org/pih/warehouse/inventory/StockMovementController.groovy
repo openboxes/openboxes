@@ -92,7 +92,7 @@ class StockMovementController {
             String productName = tokens[2]
             String palletName = tokens[3]
             String boxName = tokens[4]
-            String quantityRequested = tokens[5]
+            Integer quantityRequested = tokens[5].toInteger()
             String recipientId = tokens[6]
 
             Product product = Product.findByProductCode(productCode)
@@ -100,14 +100,20 @@ class StockMovementController {
             if (requisitionItemId) {
                 requisitionItem = RequisitionItem.get(requisitionItemId)
             }
-            else {
+
+            if (!requisitionItem) {
                 requisitionItem = new RequisitionItem()
                 requisition.addToRequisitionItems(requisitionItem)
             }
 
-            requisitionItem.product = product
-            requisitionItem.quantity = quantityRequested.toInteger()
-            requisitionItem.save(flush:true)
+            if (quantityRequested == 0) {
+                requisition.removeFromRequisitionItems(requisitionItem)
+            }
+            else {
+                requisitionItem.product = product
+                requisitionItem.quantity = quantityRequested
+            }
+            requisition.save()
         }
 
 
