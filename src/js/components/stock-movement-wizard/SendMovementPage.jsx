@@ -348,7 +348,7 @@ class SendMovementPage extends Component {
             <button type="button" className="btn btn-outline-primary btn-form" onClick={previousPage}>
               Previous
             </button>
-            <button type="submit" className="btn btn-outline-success float-right" disabled={this.props.invalid}>Send Shipment</button>
+            <button type="submit" className="btn btn-outline-success float-right btn-form" disabled={this.props.invalid}>Send Shipment</button>
           </div>
         </form>
       </div>
