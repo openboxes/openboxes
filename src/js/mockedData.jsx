@@ -111,12 +111,6 @@ const STOCK_LIST_ITEMS_MOCKS = {
   ],
 };
 
-const REASON_CODE_MOCKS = [
-  { value: '1', label: 'Stocked out' },
-  { value: '2', label: 'Low stock' },
-  { value: '3', label: 'Because I said so' },
-];
-
 const SUBSTITUTIONS_MOCKS = {
   '00001': [
     {
@@ -305,7 +299,6 @@ export {
   LOCATION_MOCKS,
   USERNAMES_MOCKS,
   STOCK_LIST_ITEMS_MOCKS,
-  REASON_CODE_MOCKS,
   SUBSTITUTIONS_MOCKS,
   BIN_LOCATION_MOCKS,
   RECEIPT_MOCKS,
