@@ -249,7 +249,7 @@ function validate(values) {
         quantityRevised: 'Revised quantity can\'t be the same as requested quantity',
       };
     }
-    if (_.isEmpty(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable) && (item.statusCode !== 'SUBSTITUTED')) {
+    if (_.isNil(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable) && (item.statusCode !== 'SUBSTITUTED')) {
       errors.editPageItems[key] = { quantityRevised: 'Revise quantity! Quantity available is lower than requested' };
     }
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised > item.quantityAvailable)) {
