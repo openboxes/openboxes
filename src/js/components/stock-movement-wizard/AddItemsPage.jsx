@@ -500,9 +500,6 @@ class AddItemsPage extends Component {
           <button
             onClick={() => this.exportTemplate()}
             className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
-            disabled={!_.some(this.props.lineItems, item =>
-              (!_.isEmpty(item)
-              && !_.isNil(item.quantityRequested)))}
           >
             <span><i className="fa fa-upload pr-2" />Export Template</span>
           </button>
