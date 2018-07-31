@@ -9,30 +9,33 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
       className="d-flex flex-row border-bottom font-weight-bold py-2"
     >
       <div
-        className="mx-1"
+        className="mx-1 text-truncate"
         style={
           Object {
-            "flex": "1 1 0",
+            "flex": "12 1 0",
+            "minWidth": 0,
           }
         }
       >
         Name
       </div>
       <div
-        className="mx-1"
+        className="mx-1 text-truncate"
         style={
           Object {
-            "flex": "1 1 0",
+            "flex": "12 1 0",
+            "minWidth": 0,
           }
         }
       >
         Name
       </div>
       <div
-        className="mx-1"
+        className="mx-1 text-truncate"
         style={
           Object {
-            "flex": "1 1 0",
+            "flex": "12 1 0",
+            "minWidth": 0,
           }
         }
       />
@@ -51,7 +54,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -84,7 +87,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -117,7 +120,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -147,7 +150,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -180,7 +183,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -213,7 +216,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -255,30 +258,33 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
       className="d-flex flex-row border-bottom font-weight-bold py-2"
     >
       <div
-        className="mx-1"
+        className="mx-1 text-truncate"
         style={
           Object {
-            "flex": "1 1 0",
+            "flex": "12 1 0",
+            "minWidth": 0,
           }
         }
       >
         Name
       </div>
       <div
-        className="mx-1"
+        className="mx-1 text-truncate"
         style={
           Object {
-            "flex": "1 1 0",
+            "flex": "12 1 0",
+            "minWidth": 0,
           }
         }
       >
         Name
       </div>
       <div
-        className="mx-1"
+        className="mx-1 text-truncate"
         style={
           Object {
-            "flex": "1 1 0",
+            "flex": "12 1 0",
+            "minWidth": 0,
           }
         }
       />
@@ -297,7 +303,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -330,7 +336,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -363,7 +369,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -393,7 +399,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -426,7 +432,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
@@ -459,7 +465,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               className="align-self-center mx-1"
               style={
                 Object {
-                  "flex": "1 1 0",
+                  "flex": "12 1 0",
                   "minWidth": 0,
                 }
               }
