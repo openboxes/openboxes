@@ -278,7 +278,7 @@ class PartialReceivingPage extends Component {
       shipmentItems: _.filter(container.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''),
     }));
     const payload = {
-      ...formValues, containers: _.filter(containers, container => container.shipmentItems.length),
+      ...formValues, receiptStatus: 'CHECKING', containers: _.filter(containers, container => container.shipmentItems.length),
     };
 
     this.save(payload, this.props.onSubmit);
