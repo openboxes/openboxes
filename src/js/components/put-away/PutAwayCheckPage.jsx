@@ -92,8 +92,9 @@ class PutAwayCheckPage extends Component {
   savePutAways() {
     this.props.showSpinner();
     const url = '/openboxes/api/putaways';
+    const payload = { ...this.state.putAway, putawayStatus: 'COMPLETE' };
 
-    return apiClient.post(url, flattenRequest(this.state.putAway))
+    return apiClient.post(url, flattenRequest(payload))
       .then((response) => {
         const putAway = parseResponse(response.data.data);
         putAway.putawayItems = _.map(putAway.putawayItems, item => ({ _id: _.uniqueId('item_'), ...item }));

@@ -19,7 +19,7 @@ const Router = props => (
       <Switch>
         <MainLayoutRoute path="/**/putAway" component={PutAwayMainPage} />
         <MainLayoutRoute path="/**/stockMovement" component={StockMovement} />
-        <MainLayoutRoute path="/**/partialReceiving" component={ReceivingPage} />
+        <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={ReceivingPage} />
       </Switch>
     </BrowserRouter>
     <div className="spinner-container">

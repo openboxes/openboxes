@@ -39,16 +39,20 @@ class PartialReceivingApiController {
 
         JSONObject jsonObject = request.JSON
 
+        log.info "JSON " + jsonObject.toString(4)
+
         PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id)
 
         bindPartialReceiptData(partialReceipt, jsonObject)
-
 
         if (partialReceipt.receiptStatus == PartialReceiptStatus.COMPLETE) {
             log.info "Save partial receipt"
             receiptService.savePartialReceipt(partialReceipt)
             receiptService.saveInboundTransaction(partialReceipt)
             partialReceipt = receiptService.getPartialReceipt(params.id)
+        }
+        else if (partialReceipt.receiptStatus == PartialReceiptStatus.CHECKING) {
+            // do nothing for now
         }
         else if (partialReceipt.receiptStatus == PartialReceiptStatus.ROLLBACK) {
             receiptService.rollbackPartialReceipts(partialReceipt.shipment)
@@ -67,14 +71,11 @@ class PartialReceivingApiController {
 
         jsonObject.containers.each { containerMap ->
 
-            log.info "containerMap: " + containerMap
-            // Bind the contains
-            PartialReceiptContainer partialReceiptContainer = partialReceipt.partialReceiptContainers.find {
-                it?.container?.id == containerMap["container.id"]
-            }
+            // Bind the container
+            PartialReceiptContainer partialReceiptContainer =
+                    partialReceipt.findPartialReceiptContainer(containerMap["container.id"])
 
             if (!partialReceiptContainer) {
-                log.info "container not found"
                 partialReceiptContainer = new PartialReceiptContainer()
                 partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
             }
@@ -83,19 +84,18 @@ class PartialReceivingApiController {
             // Bind the shipment items
             containerMap.shipmentItems.each { shipmentItemMap ->
 
-                log.info "shipmentItemMap: " + shipmentItemMap
+                // Find item if it exists
+                String shipmentItemId = shipmentItemMap.get("shipmentItem.id")
                 PartialReceiptItem partialReceiptItem = partialReceiptContainer.partialReceiptItems.find {
-                    it?.shipmentItem?.id = shipmentItemMap["shipmentItem.id"]
+                    it?.shipmentItem?.id == shipmentItemId
                 }
+                // Create new item if not exists
                 if (!partialReceiptItem) {
-                    log.info "item not found"
                     partialReceiptItem = new PartialReceiptItem()
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
                 bindData(partialReceiptItem, shipmentItemMap)
-
             }
-
         }
     }
 }

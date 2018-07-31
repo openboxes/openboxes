@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
+import { initialize, formValueSelector } from 'redux-form';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import PartialReceivingPage from './PartialReceivingPage';
 import ReceivingCheckScreen from './ReceivingCheckScreen';
+import apiClient, { parseResponse } from '../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../actions';
 
 class ReceivingPage extends Component {
-  static showResults(values) {
-    window.alert(`You submitted:\n\n${JSON.stringify(values, null, 2)}`);
-  }
-
   constructor(props) {
     super(props);
 
@@ -19,14 +20,19 @@ class ReceivingPage extends Component {
     this.prevPage = this.prevPage.bind(this);
   }
 
+  componentDidMount() {
+    this.fetchPartialReceiptCandidates();
+  }
+
   getFormList() {
     return [
       <PartialReceivingPage
         onSubmit={this.nextPage}
+        shipmentId={this.props.match.params.shipmentId}
       />,
       <ReceivingCheckScreen
-        onSubmit={ReceivingPage.showResults}
         prevPage={this.prevPage}
+        shipmentId={this.props.match.params.shipmentId}
       />,
     ];
   }
@@ -39,16 +45,55 @@ class ReceivingPage extends Component {
     this.setState({ page: this.state.page - 1 });
   }
 
+  fetchPartialReceiptCandidates() {
+    this.props.showSpinner();
+    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}`;
+
+    return apiClient.get(url)
+      .then((response) => {
+        this.props.initialize('partial-receiving-wizard', parseResponse(response.data.data), false);
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
   render() {
     const { page } = this.state;
     const formList = this.getFormList();
 
     return (
       <div>
-        {formList[page]}
+        {this.props.shipmentNumber &&
+        <h2 className="my-2 text-center">{`${this.props.shipmentNumber} ${this.props.shipmentName}`}</h2>}
+        <div className="align-self-center">
+          {formList[page]}
+        </div>
       </div>
     );
   }
 }
 
-export default ReceivingPage;
+const selector = formValueSelector('partial-receiving-wizard');
+
+const mapStateToProps = state => ({
+  shipmentNumber: selector(state, 'shipment.shipmentNumber'),
+  shipmentName: selector(state, 'shipment.name'),
+});
+
+export default connect(mapStateToProps, { initialize, showSpinner, hideSpinner })(ReceivingPage);
+
+ReceivingPage.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({ shipmentId: PropTypes.string }),
+  }).isRequired,
+  initialize: PropTypes.func.isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
+  shipmentNumber: PropTypes.string,
+  shipmentName: PropTypes.string,
+};
+
+ReceivingPage.defaultProps = {
+  shipmentNumber: '',
+  shipmentName: '',
+};

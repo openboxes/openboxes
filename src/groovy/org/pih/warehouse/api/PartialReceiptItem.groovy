@@ -27,7 +27,9 @@ class PartialReceiptItem {
     }
 
     Integer getQuantityRemaining() {
-        Integer quantityRemaining = quantityShipped - (quantityReceived?:0) + (quantityReceiving?:0)
+        Integer quantityReceiving = quantityReceiving?:0
+        Integer quantityReceived = quantityReceived?:0
+        Integer quantityRemaining = quantityShipped - (quantityReceiving + quantityReceived)
         return !cancelRemaining ? (quantityRemaining > 0) ? quantityRemaining : 0 : 0
     }
 
