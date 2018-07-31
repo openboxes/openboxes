@@ -298,7 +298,12 @@ class PutAwayPage extends Component {
               ref={r => this.selectTable = r}
               className="-striped -highlight"
               {...extraProps}
-              defaultPageSize={10}
+              defaultPageSize={Number.MAX_SAFE_INTEGER}
+              minRows={10}
+              style={{
+                height: '500px',
+              }}
+              showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
               freezWhenExpanded

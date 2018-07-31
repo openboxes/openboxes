@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import CreateStockMovement from './CreateStockMovement';
 import AddItemsPage from './AddItemsPage';
@@ -52,6 +53,19 @@ class StockMovements extends Component {
     ];
   }
 
+  getShipmentName() {
+    if (this.props.trackingNumber) {
+      const {
+        origin, destination, dateRequested, stockList, trackingNumber, description,
+      } = this.props;
+      const stocklistPart = stockList.name ? `${stockList.name}.` : '';
+      const dateReq = moment(dateRequested, 'MM/DD/YYYY').format('DDMMMYYYY');
+      const newName = `${origin.name}.${destination.name}.${dateReq}.${stocklistPart}${trackingNumber}.${description}`;
+      return newName.toUpperCase().replace(/ /gi, '');
+    }
+    return this.props.shipmentName;
+  }
+
   nextPage() {
     this.setState({ prevPage: this.state.page, page: this.state.page + 1 });
   }
@@ -76,8 +90,11 @@ class StockMovements extends Component {
         </div>
         <div className="panel panel-primary">
           <div className="panel-heading movement-number">
-            { (this.props.movementNumber && this.props.description) &&
-            <span>{`${this.props.movementNumber} - ${this.props.description}`}</span>
+            {(this.props.movementNumber && this.props.shipmentName && !this.props.trackingNumber) &&
+              <span>{`${this.props.movementNumber} - ${this.props.shipmentName}`}</span>
+            }
+            {this.props.trackingNumber &&
+              <span>{`${this.props.movementNumber} - ${this.getShipmentName()}`}</span>
             }
           </div>
           <div className="panelBody px-1">
@@ -92,18 +109,42 @@ class StockMovements extends Component {
 const selector = formValueSelector('stock-movement-wizard');
 
 const mapStateToProps = state => ({
-  description: selector(state, 'description'),
+  shipmentName: selector(state, 'shipmentName'),
   movementNumber: selector(state, 'movementNumber'),
+  origin: selector(state, 'origin'),
+  destination: selector(state, 'destination'),
+  dateRequested: selector(state, 'dateRequested'),
+  stockList: selector(state, 'stockList'),
+  trackingNumber: selector(state, 'trackingNumber'),
+  description: selector(state, 'description'),
 });
 
 export default connect(mapStateToProps, {})(StockMovements);
 
 StockMovements.propTypes = {
   movementNumber: PropTypes.string,
+  shipmentName: PropTypes.string,
+  origin: PropTypes.shape({
+    id: PropTypes.string,
+    type: PropTypes.string,
+  }),
+  destination: PropTypes.shape({
+    id: PropTypes.string,
+    type: PropTypes.string,
+  }),
+  dateRequested: PropTypes.string,
+  stockList: PropTypes.string,
+  trackingNumber: PropTypes.string,
   description: PropTypes.string,
 };
 
 StockMovements.defaultProps = {
   movementNumber: '',
+  shipmentName: '',
+  origin: {},
+  destination: {},
+  dateRequested: '',
+  stockList: '',
+  trackingNumber: '',
   description: '',
 };
