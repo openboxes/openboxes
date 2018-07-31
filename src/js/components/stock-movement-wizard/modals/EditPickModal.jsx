@@ -18,9 +18,6 @@ const FIELDS = {
   reasonCode: {
     type: SelectField,
     label: 'Reason code',
-    attributes: {
-      required: true,
-    },
     getDynamicAttr: props => ({
       options: props.reasonCodes,
     }),
