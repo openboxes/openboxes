@@ -13,6 +13,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
@@ -72,34 +73,41 @@ class ReceiptService {
         partialReceipt.partialReceiptItems.each { partialReceiptItem ->
 
             log.info "Saving partial receipt item " + partialReceiptItem
+            if (partialReceiptItem.quantityReceiving != null) {
+                ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
+                if (!shipmentItem) {
+                    throw new IllegalArgumentException("Cannot receive item without valid shipment item")
+                }
 
-            ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
-            if (!shipmentItem) {
-                throw new IllegalArgumentException("Cannot receive item without valid shipment item")
+                InventoryItem inventoryItem =
+                        inventoryService.findOrCreateInventoryItem(shipmentItem.product, shipmentItem.lotNumber, shipmentItem.expirationDate)
+
+                if (!inventoryItem) {
+                    throw new IllegalArgumentException("Cannot receive item without valid inventory item")
+                }
+
+                ReceiptItem receiptItem = new ReceiptItem();
+                receiptItem.quantityReceived = partialReceiptItem.quantityReceiving
+                receiptItem.binLocation = partialReceiptItem.binLocation
+                receiptItem.recipient = partialReceiptItem.recipient
+                receiptItem.quantityShipped = shipmentItem.quantity;
+                receiptItem.lotNumber = shipmentItem.lotNumber;
+                receiptItem.product = inventoryItem.product
+                receiptItem.inventoryItem = inventoryItem
+                receiptItem.shipmentItem = shipmentItem
+                receipt.addToReceiptItems(receiptItem)
+                shipmentItem.addToReceiptItems(receiptItem)
             }
-
-            InventoryItem inventoryItem =
-                    inventoryService.findOrCreateInventoryItem(shipmentItem.product, shipmentItem.lotNumber, shipmentItem.expirationDate)
-
-            if (!inventoryItem) {
-                throw new IllegalArgumentException("Cannot receive item without valid inventory item")
-            }
-
-            ReceiptItem receiptItem = new ReceiptItem();
-            receiptItem.quantityReceived = partialReceiptItem.quantityReceiving
-            receiptItem.binLocation = partialReceiptItem.binLocation
-            receiptItem.recipient = partialReceiptItem.recipient
-            receiptItem.quantityShipped = shipmentItem.quantity;
-            receiptItem.lotNumber = shipmentItem.lotNumber;
-            receiptItem.product = inventoryItem.product
-            receiptItem.inventoryItem = inventoryItem
-            receiptItem.shipmentItem = shipmentItem
-            receipt.addToReceiptItems(receiptItem)
-            shipmentItem.addToReceiptItems(receiptItem)
-            receipt.save(flush:true)
         }
+        receipt.save()
         shipment.receipt = receipt
-        shipment.save()
+        shipment.save(flush:true)
+
+        // Create received shipment event
+        if (!shipment.wasReceived()) {
+            shipmentService.createShipmentEvent(shipment, shipment.receipt.actualDeliveryDate, EventCode.RECEIVED, shipment.destination);
+        }
+
     }
 
     void saveInboundTransaction(PartialReceipt partialReceipt) {
