@@ -111,12 +111,6 @@ const STOCK_LIST_ITEMS_MOCKS = {
   ],
 };
 
-const REASON_CODE_MOCKS = [
-  { value: '1', label: 'Stocked out' },
-  { value: '2', label: 'Low stock' },
-  { value: '3', label: 'Because I said so' },
-];
-
 const SUBSTITUTIONS_MOCKS = {
   '00001': [
     {
