@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
@@ -52,14 +53,20 @@ class StockMovementController {
 
 	def exportCsv = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        // We need to create at least one row to ensure an empty template
+        if (stockMovement?.lineItems?.empty) {
+            stockMovement?.lineItems.add(new StockMovementItem())
+        }
+
         def lineItems = stockMovement.lineItems.collect {
             [
-                    requisitionItemId: it.id,
-                    productCode: it.product.productCode,
-                    productName: it.product.name,
-                    palletName: it.palletName?:"",
-                    boxName: it.boxName?:"",
-                    quantity: it.quantityRequested,
+                    requisitionItemId: it?.id?:"",
+                    productCode: it?.product?.productCode?:"",
+                    productName: it?.product?.name?:"",
+                    palletName: it?.palletName?:"",
+                    boxName: it?.boxName?:"",
+                    quantity: it?.quantityRequested?:"",
                     recipientId: it?.recipient?.id?:""
             ]
         }
