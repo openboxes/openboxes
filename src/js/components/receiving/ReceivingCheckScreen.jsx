@@ -70,6 +70,7 @@ const FIELDS = {
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Product',
+        flexWidth: '18',
         attributes: {
           className: 'text-left ml-1',
         },
@@ -81,6 +82,7 @@ const FIELDS = {
       'inventoryItem.expirationDate': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Expiration Date',
+        fixedWidth: '130px',
       },
       'binLocation.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -93,10 +95,12 @@ const FIELDS = {
       quantityReceiving: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Receiving Now',
+        fixedWidth: '115px',
       },
       quantityRemaining: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Unreceived',
+        fixedWidth: '95px',
         getDynamicAttr: ({ fieldValue }) => ({
           className: !fieldValue ? '' : 'text-danger',
         }),
@@ -104,6 +108,7 @@ const FIELDS = {
       cancelRemaining: {
         type: params => (params.subfield ? <CheckboxField {...params} /> : null),
         label: 'Cancel Remaining',
+        fixedWidth: '140px',
       },
     },
   },

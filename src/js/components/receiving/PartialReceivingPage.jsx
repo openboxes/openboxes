@@ -81,13 +81,14 @@ const FIELDS = {
     fields: {
       autofillLine: {
         fieldKey: '',
+        fixedWidth: '50px',
         type: ({
           // eslint-disable-next-line react/prop-types
           subfield, parentIndex, rowIndex, autofillLines, fieldPreview, fieldValue,
         }) => (
           <Checkbox
             disabled={fieldPreview}
-            className={subfield ? 'ml-4' : ''}
+            className={subfield ? 'ml-4' : 'mr-4'}
             value={isReceiving(subfield, fieldValue)}
             indeterminate={isIndeterminate(subfield, fieldValue)}
             onChange={(value) => {
@@ -113,6 +114,7 @@ const FIELDS = {
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Product',
+        flexWidth: '18',
         attributes: {
           className: 'text-left ml-1',
         },
@@ -124,14 +126,17 @@ const FIELDS = {
       'inventoryItem.expirationDate': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Expiration Date',
+        fixedWidth: '130px',
       },
       quantityShipped: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Shipped',
+        fixedWidth: '75px',
       },
       quantityReceived: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Received',
+        fixedWidth: '75px',
         attributes: {
           formatValue: value => (value || '0'),
         },
@@ -139,6 +144,7 @@ const FIELDS = {
       quantityReceiving: {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         label: 'To Receive',
+        fixedWidth: '85px',
       },
       binLocation: {
         type: params => (
@@ -161,6 +167,7 @@ const FIELDS = {
       edit: {
         type: params => (params.subfield ? <ButtonField {...params} /> : null),
         label: '',
+        fixedWidth: '100px',
         buttonLabel: 'Edit Line',
         attributes: {
           className: 'btn btn-outline-primary',
