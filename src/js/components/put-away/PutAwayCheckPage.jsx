@@ -142,7 +142,12 @@ class PutAwayCheckPage extends Component {
               columns={columns}
               className="-striped -highlight"
               {...extraProps}
-              defaultPageSize={10}
+              defaultPageSize={Number.MAX_SAFE_INTEGER}
+              minRows={10}
+              style={{
+                height: '500px',
+              }}
+              showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
               freezWhenExpanded
