@@ -4,6 +4,7 @@ import { reduxForm, initialize, change, getFormValues } from 'redux-form';
 import { connect } from 'react-redux';
 import update from 'immutability-helper';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -344,8 +345,24 @@ const mapStateToProps = state => ({
   users: state.users.data,
 });
 
+function validate(values) {
+  const errors = {};
+
+  if (!values.dateDelivered) {
+    errors.dateDelivered = 'This field is required';
+  } else {
+    const date = moment(values.dateDelivered, 'MM/DD/YYYY');
+    if (moment().diff(date) < 0) {
+      errors.dateDelivered = 'The date cannot be in the future';
+    }
+  }
+
+  return errors;
+}
+
 export default reduxForm({
   form: 'partial-receiving-wizard',
+  validate,
   destroyOnUnmount: false,
   forceUnregisterOnUnmount: true,
 })(connect(mapStateToProps, {
