@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { initialize } from 'redux-form';
+import { initialize, formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -63,13 +63,24 @@ class ReceivingPage extends Component {
 
     return (
       <div>
-        {formList[page]}
+        {this.props.shipmentNumber &&
+        <h2 className="my-2 text-center">{`${this.props.shipmentNumber} ${this.props.shipmentName}`}</h2>}
+        <div className="align-self-center">
+          {formList[page]}
+        </div>
       </div>
     );
   }
 }
 
-export default connect(null, { initialize, showSpinner, hideSpinner })(ReceivingPage);
+const selector = formValueSelector('partial-receiving-wizard');
+
+const mapStateToProps = state => ({
+  shipmentNumber: selector(state, 'shipment.shipmentNumber'),
+  shipmentName: selector(state, 'shipment.name'),
+});
+
+export default connect(mapStateToProps, { initialize, showSpinner, hideSpinner })(ReceivingPage);
 
 ReceivingPage.propTypes = {
   match: PropTypes.shape({
@@ -78,4 +89,11 @@ ReceivingPage.propTypes = {
   initialize: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
+  shipmentNumber: PropTypes.string,
+  shipmentName: PropTypes.string,
+};
+
+ReceivingPage.defaultProps = {
+  shipmentNumber: '',
+  shipmentName: '',
 };
