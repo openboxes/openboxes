@@ -137,6 +137,7 @@ class ReceivingCheckScreen extends Component {
       .then((response) => {
         this.props.hideSpinner();
 
+        this.props.initialize('partial-receiving-wizard', {}, false);
         this.props.initialize('partial-receiving-wizard', parseResponse(response.data.data), false);
         if (callback) {
           callback();

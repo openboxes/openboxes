@@ -140,7 +140,7 @@ const FIELDS = {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         label: 'To Receive',
       },
-      'binLocation.id': {
+      binLocation: {
         type: params => (
           params.subfield ?
             <SelectField {...params} /> :
@@ -148,11 +148,15 @@ const FIELDS = {
               disabled={params.fieldPreview}
               options={params.bins}
               onChange={value => params.setLocation(params.rowIndex, value)}
+              objectValue
             />),
         label: 'Bin Location',
         getDynamicAttr: ({ bins }) => ({
           options: bins,
         }),
+        attributes: {
+          objectValue: true,
+        },
       },
       edit: {
         type: params => (params.subfield ? <ButtonField {...params} /> : null),
@@ -212,10 +216,7 @@ class PartialReceivingPage extends Component {
           shipmentItems: {
             $apply: items => (!items ? [] : items.map(item => ({
               ...item,
-              binLocation: {
-                ...item.binLocation,
-                id: location,
-              },
+              binLocation: location,
             }))),
           },
         },
@@ -283,6 +284,7 @@ class PartialReceivingPage extends Component {
       .then((response) => {
         this.props.hideSpinner();
 
+        this.props.initialize('partial-receiving-wizard', {}, false);
         this.props.initialize('partial-receiving-wizard', parseResponse(response.data.data), false);
         if (callback) {
           callback();
@@ -298,7 +300,7 @@ class PartialReceivingPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         const bins = _.map(response.data.data, bin => (
-          { value: bin.id, label: bin.name }
+          { value: { id: bin.id, name: bin.name }, label: bin.name }
         ));
         this.setState({ bins }, () => this.props.hideSpinner());
       })
