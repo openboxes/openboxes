@@ -202,17 +202,12 @@ class PartialReceivingPage extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      bins: [],
-    };
-
     this.autofillLines = this.autofillLines.bind(this);
     this.setLocation = this.setLocation.bind(this);
     this.onSave = this.onSave.bind(this);
   }
 
   componentDidMount() {
-    this.fetchBins();
     if (!this.props.usersFetched) {
       this.fetchData(this.props.fetchUsers);
     }
@@ -306,20 +301,6 @@ class PartialReceivingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  fetchBins() {
-    this.props.showSpinner();
-    const url = '/openboxes/api/internalLocations';
-
-    return apiClient.get(url)
-      .then((response) => {
-        const bins = _.map(response.data.data, bin => (
-          { value: { id: bin.id, name: bin.name }, label: bin.name }
-        ));
-        this.setState({ bins }, () => this.props.hideSpinner());
-      })
-      .catch(() => this.props.hideSpinner());
-  }
-
   fetchData(fetchFunction) {
     this.props.showSpinner();
     fetchFunction()
@@ -336,7 +317,7 @@ class PartialReceivingPage extends Component {
             autofillLines: this.autofillLines,
             setLocation: this.setLocation,
             onSave: this.onSave,
-            bins: this.state.bins,
+            bins: this.props.bins,
             users: this.props.users,
           }))}
       </form>
@@ -388,9 +369,11 @@ PartialReceivingPage.propTypes = {
   formValues: PropTypes.shape({
     containers: PropTypes.arrayOf(PropTypes.shape({})),
   }),
+  bins: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
 PartialReceivingPage.defaultProps = {
   formValues: {},
   shipmentId: '',
+  bins: [],
 };

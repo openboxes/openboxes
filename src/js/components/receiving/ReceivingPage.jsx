@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import { initialize, formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
@@ -14,6 +15,7 @@ class ReceivingPage extends Component {
 
     this.state = {
       page: 0,
+      bins: [],
     };
 
     this.nextPage = this.nextPage.bind(this);
@@ -29,6 +31,7 @@ class ReceivingPage extends Component {
       <PartialReceivingPage
         onSubmit={this.nextPage}
         shipmentId={this.props.match.params.shipmentId}
+        bins={this.state.bins}
       />,
       <ReceivingCheckScreen
         prevPage={this.prevPage}
@@ -52,7 +55,20 @@ class ReceivingPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         this.props.initialize('partial-receiving-wizard', parseResponse(response.data.data), false);
-        this.props.hideSpinner();
+        this.fetchBins();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  fetchBins() {
+    const url = '/openboxes/api/internalLocations';
+
+    return apiClient.get(url)
+      .then((response) => {
+        const bins = _.map(response.data.data, bin => (
+          { value: { id: bin.id, name: bin.name }, label: bin.name }
+        ));
+        this.setState({ bins }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
   }
