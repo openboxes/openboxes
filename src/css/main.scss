@@ -445,3 +445,26 @@ div.crossed-out .table-inner-row:before {
   flex-grow: 2;
 }
 
+/* CUSTOM CHECKBOX
+----------------------------*/
+
+.custom-checkbox input[type=checkbox] { display:none; }
+.custom-checkbox input[type=checkbox] + label {
+  margin: 0;
+}
+
+.custom-checkbox input[type=checkbox] + label:before {
+  font-family: FontAwesome;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.custom-checkbox input[type=checkbox] + label:before {
+  content: "\f068";
+  color: $red-beta;
+}
+
+.custom-checkbox input[type=checkbox]:checked + label:before {
+  content: "\f0e2";
+  color: $blue-gamma;
+}

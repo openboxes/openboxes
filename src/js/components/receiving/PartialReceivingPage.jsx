@@ -9,7 +9,6 @@ import moment from 'moment';
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import ArrayField from '../form-elements/ArrayField';
-import ButtonField from '../form-elements/ButtonField';
 import LabelField from '../form-elements/LabelField';
 import DateField from '../form-elements/DateField';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
@@ -18,6 +17,7 @@ import Select from '../../utils/Select';
 import Checkbox from '../../utils/Checkbox';
 import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
+import EditLineModal from './modals/EditLineModal';
 
 const isReceiving = (subfield, fieldValue) => {
   if (subfield) {
@@ -166,13 +166,17 @@ const FIELDS = {
         },
       },
       edit: {
-        type: params => (params.subfield ? <ButtonField {...params} /> : null),
-        label: '',
+        type: params => (params.subfield ? <EditLineModal {...params} /> : null),
+        fieldKey: '',
         fixedWidth: '100px',
-        buttonLabel: 'Edit Line',
         attributes: {
+          btnOpenText: 'Edit Line',
+          title: 'Edit Line',
           className: 'btn btn-outline-primary',
         },
+        getDynamicAttr: ({ fieldValue }) => ({
+          fieldValue,
+        }),
       },
       'recipient.id': {
         type: params => (params.subfield ? <SelectField {...params} /> : null),
