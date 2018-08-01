@@ -74,7 +74,7 @@ class TableBodyVirtualized extends Component {
         <AutoSizer disableHeight>
           {({ width }) => (
             <List
-              height={300}
+              height={450}
               overscanRowCount={3}
               rowCount={fields.length}
               rowHeight={this.getRowHeight}
