@@ -118,6 +118,7 @@ const FIELDS = {
         flexWidth: '18',
         attributes: {
           className: 'text-left ml-1',
+          showValueTooltip: true,
         },
       },
       'inventoryItem.lotNumber': {
