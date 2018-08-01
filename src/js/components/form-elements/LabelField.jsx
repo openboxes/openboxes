@@ -1,6 +1,9 @@
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'redux-form';
+import { Tooltip } from 'react-tippy';
+import LineClamp from 'shiitake';
 
 const LabelField = (props) => {
   const {
@@ -9,8 +12,7 @@ const LabelField = (props) => {
   } = props;
   const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
   const attr = { ...attributes, ...dynamicAttr };
-  const { formatValue, ...otherAttr } = attr;
-  const className = `text-truncate ${otherAttr.className ? otherAttr.className : ''}`;
+  const { formatValue, showValueTooltip, ...otherAttr } = attr;
 
   const renderField = ({ input: { value } }) => (
     <div className="form-group my-0">
@@ -32,11 +34,22 @@ const LabelField = (props) => {
   };
 
   if (arrayField) {
+    const formattedValue = formatValue ? formatValue(fieldValue) : fieldValue;
     return (
       <div className="form-group my-0">
-        <div {...otherAttr} className={className}>
-          {formatValue ? formatValue(fieldValue) : fieldValue}
-        </div>
+        <Tooltip
+          html={(<div>{formattedValue}</div>)}
+          disabled={!showValueTooltip}
+          theme="transparent"
+          arrow="true"
+          delay="150"
+          duration="250"
+          hideDelay="50"
+        >
+          <LineClamp {...otherAttr} lines={2}>
+            {_.toString(formattedValue)}
+          </LineClamp>
+        </Tooltip>
       </div>
     );
   }
