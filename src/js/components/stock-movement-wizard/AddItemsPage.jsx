@@ -69,6 +69,7 @@ const NO_STOCKLIST_FIELDS = {
           async: true,
           openOnClick: false,
           autoload: false,
+          autoFocus: true,
           loadOptions: debouncedProductsFetch,
           cache: false,
           options: [],
@@ -84,8 +85,11 @@ const NO_STOCKLIST_FIELDS = {
           type: 'number',
         },
         fieldKey: '',
-        getDynamicAttr: ({ fieldValue }) => ({
+        getDynamicAttr: ({
+          fieldValue, addRow, rowCount, rowIndex,
+        }) => ({
           disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
+          onBlur: rowCount === rowIndex + 1 ? () => addRow() : null,
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -281,7 +285,7 @@ class AddItemsPage extends Component {
       const { statusCode, lineItems } = resp.data.data;
       let lineItemsData;
       if (!lineItems.length) {
-        lineItemsData = new Array(10).fill({});
+        lineItemsData = new Array(1).fill({});
       } else {
         lineItemsData = _.map(
           lineItems,
@@ -298,7 +302,6 @@ class AddItemsPage extends Component {
       }
 
       this.props.change('stock-movement-wizard', 'lineItems', lineItemsData);
-
       this.setState({
         currentLineItems: lineItems,
         statusCode,
