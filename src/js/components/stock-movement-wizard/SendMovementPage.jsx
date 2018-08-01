@@ -301,7 +301,7 @@ class SendMovementPage extends Component {
                   <th>Product Name</th>
                   <th>Lot number</th>
                   <th>Expiry Date</th>
-                  <th>Quantity Picked</th>
+                  <th style={{ width: '150px' }}>Quantity Picked</th>
                   {!(this.state.supplier) &&
                     <th>Bin</th>
                   }
@@ -329,7 +329,7 @@ class SendMovementPage extends Component {
                         <td>
                           {item.expirationDate}
                         </td>
-                        <td>
+                        <td style={{ width: '150px' }}>
                           {item.quantityPicked || item.quantityRequested}
                         </td>
                         {!(this.state.supplier) &&

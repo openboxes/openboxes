@@ -48,7 +48,11 @@ class TableRow extends Component {
       <div {...dynamicAttr} className={className}>
         <div className="d-flex flex-row border-bottom table-inner-row">
           {_.map(fieldsConfig.fields, (config, name) => (
-            <div key={`${field}.${name}`} className="align-self-center mx-1" style={{ flex: '1 1 0', minWidth: 0 }}>
+            <div
+              key={`${field}.${name}`}
+              className="align-self-center mx-1"
+              style={{ flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`, minWidth: 0 }}
+            >
               {renderFormField(config, `${field}.${name}`, {
                 ...properties,
                 fieldPreview: this.state.fieldPreview,

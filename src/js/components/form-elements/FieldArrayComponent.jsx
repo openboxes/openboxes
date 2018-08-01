@@ -15,8 +15,13 @@ const FieldArrayComponent = (props) => {
     <div>
       <div className="text-center border mb-2">
         <div className="d-flex flex-row border-bottom font-weight-bold py-2">
-          { _.map(fieldsConfig.fields, (config, name) =>
-            <div key={name} className="mx-1" style={{ flex: '1 1 0' }}>{config.label}</div>) }
+          { _.map(fieldsConfig.fields, (config, name) => (
+            <div
+              key={name}
+              className="mx-1 text-truncate"
+              style={{ flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`, minWidth: 0 }}
+            >{config.label}
+            </div>)) }
         </div>
         <TableBodyComponent
           fields={fields}

@@ -39,6 +39,7 @@ const FIELDS = {
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
         label: 'Code',
+        fixedWidth: '200px',
       },
       productName: {
         type: LabelField,
@@ -50,19 +51,23 @@ const FIELDS = {
       quantityRequested: {
         type: LabelField,
         label: 'Qty requested',
+        fixedWidth: '130px',
       },
       quantityAvailable: {
         type: LabelField,
         label: 'Qty available',
+        fixedWidth: '130px',
       },
       quantityConsumed: {
         type: LabelField,
         label: 'Monthly consumption',
+        fixedWidth: '200px',
       },
       substituteButton: {
         label: 'Substitute available',
         type: SubstitutionsModal,
         fieldKey: '',
+        fixedWidth: '200px',
         attributes: {
           title: 'Substitutes',
         },
