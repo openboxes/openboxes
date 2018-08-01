@@ -38,11 +38,20 @@ class BaseField extends Component {
 
       input.onChange(value);
     };
+
+    const onBlur = (value) => {
+      if (attr.onBlur) {
+        attr.onBlur(value);
+      }
+
+      this.setState({ touched: true });
+    };
+
     const attributes = {
       ...attr,
       value: input.value,
       onChange,
-      onBlur: () => this.setState({ touched: true }),
+      onBlur,
     };
 
     return this.props.renderInput(attributes);
