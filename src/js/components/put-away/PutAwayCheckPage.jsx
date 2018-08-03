@@ -16,14 +16,14 @@ const SelectTreeTable = (customTreeTableHOC(ReactTable));
 class PutAwayCheckPage extends Component {
   constructor(props) {
     super(props);
-    const { putAway, pivotBy } = this.props;
+    const { putAway, pivotBy, expanded } = this.props;
     const columns = this.getColumns();
     this.state = {
       putAway,
       completed: false,
       columns,
       pivotBy,
-      expanded: {},
+      expanded,
     };
   }
 
@@ -124,7 +124,7 @@ class PutAwayCheckPage extends Component {
 
     return (
       <div className="container-fluid pt-2">
-        <h1>Put-Away </h1>
+        <h1>Put-Away - {this.state.putAway.putawayNumber}</h1>
         <div className="mb-2">
           Show by:
           <button
@@ -168,7 +168,9 @@ class PutAwayCheckPage extends Component {
               <button
                 type="button"
                 onClick={() => this.props.prevPage({
-                  putAway: this.state.putAway, pivotBy: this.state.pivotBy,
+                  putAway: this.state.putAway,
+                  pivotBy: this.state.pivotBy,
+                  expanded: this.state.expanded,
                 })}
                 className="btn btn-outline-primary my-2"
               >Edit
@@ -197,9 +199,11 @@ PutAwayCheckPage.propTypes = {
     putawayItems: PropTypes.arrayOf(PropTypes.shape({})),
   }),
   pivotBy: PropTypes.arrayOf(PropTypes.string),
+  expanded: PropTypes.shape({}),
 };
 
 PutAwayCheckPage.defaultProps = {
   putAway: [],
   pivotBy: ['stockMovement.name'],
+  expanded: {},
 };

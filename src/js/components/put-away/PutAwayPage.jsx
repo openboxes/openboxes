@@ -146,10 +146,16 @@ class PutAwayPage extends Component {
         putAway.putawayItems = _.map(putAway.putawayItems, item => ({ _id: _.uniqueId('item_'), ...item }));
 
         this.props.hideSpinner();
+        const expanded = {};
+
+        if (this.state.pivotBy.length) {
+          _.forEach(this.state.putawayItems, (item, index) => expanded[index] = true);
+        }
 
         this.props.nextPage({
           putAway,
           pivotBy: this.state.pivotBy,
+          expanded,
         });
       })
       .catch(() => this.props.hideSpinner());
