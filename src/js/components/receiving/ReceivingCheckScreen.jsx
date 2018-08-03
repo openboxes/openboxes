@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { reduxForm, initialize, getFormValues } from 'redux-form';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import Alert from 'react-s-alert';
 
 import ArrayField from '../form-elements/ArrayField';
 import CheckboxField from '../form-elements/CheckboxField';
@@ -110,6 +111,9 @@ const FIELDS = {
         type: params => (params.subfield ? <CheckboxField {...params} /> : null),
         label: 'Cancel Remaining',
         fixedWidth: '140px',
+        getDynamicAttr: ({ completed }) => ({
+          disabled: completed,
+        }),
       },
     },
   },
@@ -128,7 +132,10 @@ class ReceivingCheckScreen extends Component {
   }
 
   onComplete(formValues) {
-    this.save({ ...formValues, receiptStatus: 'COMPLETE' }, () => this.setState({ completed: true }));
+    this.save({ ...formValues, receiptStatus: 'COMPLETE' }, () => {
+      this.setState({ completed: true });
+      Alert.success('Shipment was received successfully!');
+    });
   }
 
   onSave() {
