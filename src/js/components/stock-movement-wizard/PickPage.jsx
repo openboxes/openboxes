@@ -81,6 +81,7 @@ const FIELDS = {
         label: 'Edit Pick',
         type: EditPickModal,
         fieldKey: '',
+        fixedWidth: '110px',
         attributes: {
           title: 'Edit Pick',
         },
@@ -100,6 +101,7 @@ const FIELDS = {
         label: 'Adjust Inventory',
         type: AdjustInventoryModal,
         fieldKey: '',
+        fixedWidth: '130px',
         attributes: {
           title: 'Adjust Inventory',
         },
