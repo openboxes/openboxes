@@ -52,6 +52,7 @@ const FIELDS = {
     attributes: {
       required: true,
       objectValue: true,
+      showValueTooltip: true,
     },
     getDynamicAttr: props => ({
       onChange: (value) => {
@@ -68,6 +69,7 @@ const FIELDS = {
     attributes: {
       required: true,
       objectValue: true,
+      showValueTooltip: true,
     },
     getDynamicAttr: props => ({
       onChange: (value) => {
@@ -84,6 +86,7 @@ const FIELDS = {
     getDynamicAttr: ({ origin, destination, stockLists }) => ({
       disabled: !(origin && destination && origin.id && destination.id),
       options: stockLists,
+      showValueTooltip: true,
     }),
   },
   requestedBy: {
@@ -92,6 +95,7 @@ const FIELDS = {
     attributes: {
       async: true,
       required: true,
+      showValueTooltip: true,
       openOnClick: false,
       autoload: false,
       loadOptions: debouncedUsersFetch,
