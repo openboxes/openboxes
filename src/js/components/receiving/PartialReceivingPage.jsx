@@ -64,7 +64,7 @@ const FIELDS = {
       dateFormat: 'MM/DD/YYYY',
     },
   },
-  buttons: {
+  buttonsTop: {
     // eslint-disable-next-line react/prop-types
     type: ({ autofillLines, onSave }) => (
       <div className="mb-3 d-flex justify-content-center">
@@ -187,6 +187,17 @@ const FIELDS = {
         }),
       },
     },
+  },
+  buttonsBottom: {
+    // eslint-disable-next-line react/prop-types
+    type: ({ autofillLines, onSave }) => (
+      <div className="my-3 d-flex justify-content-center">
+        <button type="button" className="btn btn-outline-primary mr-3" onClick={() => autofillLines()}>
+          Autofill quantities
+        </button>
+        <button type="button" className="btn btn-outline-primary mr-3" onClick={() => onSave()}>Save</button>
+        <button type="submit" className="btn btn-outline-primary">Next</button>
+      </div>),
   },
 };
 
