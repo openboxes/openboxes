@@ -18,6 +18,10 @@ $blue-gamma: #3bafda;
 $blue-delta: #4fc1e9;
 $blue-epsilon: #bce7f7;
 
+body {
+  overflow-x: hidden;
+}
+
 .brand-name {
   padding-left: 10px;
   font-size: 1.5em !important;
@@ -33,6 +37,12 @@ $blue-epsilon: #bce7f7;
   background-color: $gray-gamma;
   color: white;
   line-height: 1.2;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
 }
 
 .nav-link {
@@ -96,6 +106,9 @@ $blue-epsilon: #bce7f7;
 .footer {
   font-size: 12px;
   color: $gray-delta;
+  background-color: white;
+  position: sticky;
+  bottom: 0;
 }
 
 .language-selector {
