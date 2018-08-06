@@ -13,7 +13,6 @@ import { renderFormField } from '../../../utils/form-utils';
 import DateField from '../../form-elements/DateField';
 import { showSpinner, hideSpinner } from '../../../actions';
 import apiClient from '../../../utils/apiClient';
-import { BIN_LOCATION_MOCKS } from '../../../mockedData';
 
 const FIELDS = {
   adjustInventory: {
@@ -25,12 +24,10 @@ const FIELDS = {
         type: SelectField,
         label: 'Bin',
         fieldKey: 'inventoryItem.id',
-        getDynamicAttr: ({ fieldValue }) => ({
+        getDynamicAttr: ({ fieldValue, bins }) => ({
           disabled: !!fieldValue,
+          options: bins,
         }),
-        attributes: {
-          options: BIN_LOCATION_MOCKS,
-        },
       },
       lotNumber: {
         type: TextField,
@@ -79,9 +76,17 @@ class AdjustInventoryModal extends Component {
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
     const attr = { ...attributes, ...dynamicAttr };
 
-    this.state = { attr };
+    this.state = {
+      attr,
+      bins: [],
+    };
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.fetchBins = this.fetchBins.bind(this);
+  }
+
+  componentDidMount() {
+    this.fetchBins();
   }
 
   onOpen() {
@@ -117,6 +122,20 @@ class AdjustInventoryModal extends Component {
     }).catch(() => { this.props.hideSpinner(); });
   }
 
+  fetchBins() {
+    this.props.showSpinner();
+    const url = '/openboxes/api/internalLocations';
+
+    return apiClient.get(url)
+      .then((response) => {
+        const bins = _.map(response.data.data, bin => (
+          { value: bin.id, label: bin.name }
+        ));
+        this.setState({ bins }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
   render() {
     if (this.state.attr.subfield) {
       return null;
@@ -129,7 +148,9 @@ class AdjustInventoryModal extends Component {
         onSave={this.props.handleSubmit(values => this.onSave(values))}
       >
         <form className="print-mt">
-          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
+          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+            bins: this.state.bins,
+          }))}
         </form>
       </ModalWrapper>
     );
