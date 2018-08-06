@@ -101,7 +101,7 @@ const FIELDS = {
       },
       quantityRemaining: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Unreceived',
+        label: 'Remaining',
         fixedWidth: '95px',
         getDynamicAttr: ({ fieldValue }) => ({
           className: !fieldValue ? '' : 'text-danger',
