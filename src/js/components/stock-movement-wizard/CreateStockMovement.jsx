@@ -1,8 +1,8 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { reduxForm, change, formValueSelector, initialize } from 'redux-form';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
+import { Form } from 'react-final-form';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -11,6 +11,25 @@ import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 
+function validate(values) {
+  const errors = {};
+  if (!values.description) {
+    errors.description = 'This field is required';
+  }
+  if (!values.origin) {
+    errors.origin = 'This field is required';
+  }
+  if (!values.destination) {
+    errors.destination = 'This field is required';
+  }
+  if (!values.requestedBy) {
+    errors.requestedBy = 'This field is required';
+  }
+  if (!values.dateRequested) {
+    errors.dateRequested = 'This field is required';
+  }
+  return errors;
+}
 
 const debouncedUsersFetch = _.debounce((searchTerm, callback) => {
   if (searchTerm) {
@@ -147,27 +166,29 @@ const FIELDS = {
   },
 };
 
+  /** The first step of stock movement where user can add all the basic information. */
 class CreateStockMovement extends Component {
   constructor(props) {
     super(props);
     this.state = {
       stockLists: [],
+      values: this.props.initialValues,
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
   }
 
   componentDidMount() {
-    this.props.initialize('stock-movement-wizard', {
-      lineItems: [],
-      editPageItems: [],
-      pickPageItems: [],
-    }, true);
-
-    if (this.props.origin && this.props.destination) {
-      this.fetchStockLists(this.props.origin, this.props.destination);
+    if (this.state.values.origin && this.state.values.destination) {
+      this.fetchStockLists(this.state.values.origin, this.state.values.destination);
     }
   }
 
+  /**
+   * Fetch available stock lists from API with given origin and destination
+   * @param {object} origin
+   * @param {object} destination
+   * @public
+   */
   fetchStockLists(origin, destination) {
     this.props.showSpinner();
     const url = `/openboxes/api/stocklists?origin.id=${origin.id}&destination.id=${destination.id}`;
@@ -182,6 +203,16 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Create new requisition with given data using post method
+   * @param {object} origin
+   * @param {object} destination
+   * @param {object} requestedBy
+   * @param {string} dateRequested
+   * @param {string} description
+   * @param {string} stockList
+   * @public
+   */
   createNewRequisition(origin, destination, requestedBy, dateRequested, description, stockList) {
     if (origin && destination && requestedBy && dateRequested && description) {
       this.props.showSpinner();
@@ -197,20 +228,7 @@ class CreateStockMovement extends Component {
         'stocklist.id': stockList || '',
       };
 
-      return apiClient.post(requisitionUrl, payload)
-        .then((response) => {
-          if (response.data) {
-            const resp = response.data.data;
-            this.props.change('stock-movement-wizard', 'requisitionId', resp.id);
-            this.props.change('stock-movement-wizard', 'lineItems', resp.lineItems);
-            this.props.change('stock-movement-wizard', 'movementNumber', resp.identifier);
-            this.props.change('stock-movement-wizard', 'shipmentName', resp.name);
-          }
-        })
-        .catch(() => {
-          this.props.hideSpinner();
-          return Promise.reject(new Error('Could not create stock movement'));
-        });
+      return apiClient.post(requisitionUrl, payload);
     }
 
     return new Promise(((resolve, reject) => {
@@ -218,110 +236,82 @@ class CreateStockMovement extends Component {
     }));
   }
 
-  nextPage() {
-    if (!this.props.requisitionId) {
+  /**
+   * Call method creating new requisition if it is not an existing one
+   * and move user to the next page
+   * @public
+   */
+  nextPage(values) {
+    if (!values.stockMovementId) {
       this.createNewRequisition(
-        this.props.origin.id,
-        this.props.destination.id,
-        this.props.requestedBy.id,
-        this.props.dateRequested,
-        this.props.description,
-        this.props.stockList,
-      ).then(() => { this.props.onSubmit(); }).catch(() => this.props.hideSpinner());
+        values.origin.id,
+        values.destination.id,
+        values.requestedBy.id,
+        values.dateRequested,
+        values.description,
+        values.stockList,
+      )
+        .then((response) => {
+          if (response.data) {
+            const resp = response.data.data;
+            this.props.onSubmit({
+              ...values,
+              stockMovementId: resp.id,
+              lineItems: resp.lineItems,
+              movementNumber: resp.identifier,
+              shipmentName: resp.name,
+            });
+          }
+        })
+        .catch(() => {
+          this.props.hideSpinner();
+          return Promise.reject(new Error('Could not create stock movement'));
+        });
     } else {
-      this.props.onSubmit();
+      this.props.onSubmit(values);
     }
   }
 
   render() {
     return (
-      <form className="create-form" onSubmit={this.props.handleSubmit(() => this.nextPage())}>
-        {_.map(
-          FIELDS,
-          (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-            stockLists: this.state.stockLists,
-            fetchStockLists: this.fetchStockLists,
-            origin: this.props.origin,
-            destination: this.props.destination,
-          }),
+      <Form
+        onSubmit={values => this.nextPage(values)}
+        validate={validate}
+        initialValues={this.state.values}
+        render={({ handleSubmit, values }) => (
+          <form className="create-form" onSubmit={handleSubmit}>
+            {_.map(
+              FIELDS,
+              (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                stockLists: this.state.stockLists,
+                fetchStockLists: this.fetchStockLists,
+                origin: values.origin,
+                destination: values.destination,
+              }),
+            )}
+            <div>
+              <button type="submit" className="btn btn-outline-primary float-right">Next</button>
+            </div>
+          </form>
         )}
-        <div>
-          <button type="submit" className="btn btn-outline-primary float-right">Next</button>
-        </div>
-      </form>
+      />
     );
   }
 }
 
-function validate(values) {
-  const errors = {};
-  if (!values.description) {
-    errors.description = 'This field is required';
-  }
-  if (!values.origin) {
-    errors.origin = 'This field is required';
-  }
-  if (!values.destination) {
-    errors.destination = 'This field is required';
-  }
-  if (!values.requestedBy) {
-    errors.requestedBy = 'This field is required';
-  }
-  if (!values.dateRequested) {
-    errors.dateRequested = 'This field is required';
-  }
-  return errors;
-}
-
-const selector = formValueSelector('stock-movement-wizard');
-
-const mapStateToProps = state => ({
-  origin: selector(state, 'origin'),
-  destination: selector(state, 'destination'),
-  requestedBy: selector(state, 'requestedBy'),
-  description: selector(state, 'description'),
-  dateRequested: selector(state, 'dateRequested'),
-  stockList: selector(state, 'stockList'),
-  requisitionId: selector(state, 'requisitionId'),
-});
-
-export default reduxForm({
-  form: 'stock-movement-wizard',
-  destroyOnUnmount: false,
-  forceUnregisterOnUnmount: true,
-  validate,
-})(connect(mapStateToProps, {
-  showSpinner, hideSpinner, change, initialize,
-})(CreateStockMovement));
+export default connect(null, {
+  showSpinner, hideSpinner,
+})(CreateStockMovement);
 
 CreateStockMovement.propTypes = {
-  initialize: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
+  initialValues: PropTypes.shape({}).isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  change: PropTypes.func.isRequired,
+  /**
+   * Function called with the form data when the handleSubmit()
+   * is fired from within the form component.
+   */
   onSubmit: PropTypes.func.isRequired,
-  origin: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-  }),
-  destination: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-  }),
-  requestedBy: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-  }),
-  requisitionId: PropTypes.string,
-  description: PropTypes.string,
-  dateRequested: PropTypes.string,
-  stockList: PropTypes.string,
-};
-
-CreateStockMovement.defaultProps = {
-  origin: { id: '' },
-  destination: { id: '' },
-  requestedBy: { id: '' },
-  requisitionId: '',
-  description: '',
-  dateRequested: '',
-  stockList: '',
 };

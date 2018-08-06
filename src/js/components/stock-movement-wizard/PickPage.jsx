@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
-import { reduxForm, formValueSelector, change } from 'redux-form';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import _ from 'lodash';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Form } from 'react-final-form';
+import arrayMutators from 'final-form-arrays';
+import PropTypes from 'prop-types';
 
 import ArrayField from '../form-elements/ArrayField';
 import LabelField from '../form-elements/LabelField';
@@ -80,7 +81,8 @@ const FIELDS = {
           title: 'Edit Pick',
         },
         getDynamicAttr: ({
-          fieldValue, selectedValue, subfield, stockMovementId, checkForInitialPicksChanges,
+          fieldValue, selectedValue, subfield, stockMovementId,
+          checkForInitialPicksChanges, onResponse,
         }) => ({
           productCode: selectedValue,
           fieldValue,
@@ -89,6 +91,7 @@ const FIELDS = {
           checkForInitialPicksChanges,
           btnOpenText: fieldValue.hasChangedPick ? '' : 'Edit',
           btnOpenClassName: fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
+          onResponse,
         }),
       },
       buttonAdjustInventory: {
@@ -100,7 +103,8 @@ const FIELDS = {
           title: 'Adjust Inventory',
         },
         getDynamicAttr: ({
-          fieldValue, selectedValue, subfield, stockMovementId, checkForInitialPicksChanges,
+          fieldValue, selectedValue, subfield, stockMovementId,
+          checkForInitialPicksChanges, onResponse,
         }) => ({
           product: selectedValue,
           fieldValue,
@@ -109,6 +113,7 @@ const FIELDS = {
           checkForInitialPicksChanges,
           btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
+          onResponse,
         }),
       },
     },
@@ -116,6 +121,10 @@ const FIELDS = {
 };
 
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
+/**
+ * The forth step of stock movement(for movements from a depot) where user
+ * can edit pick or adjust inventory.
+ */
 class PickPage extends Component {
   constructor(props) {
     super(props);
@@ -123,8 +132,10 @@ class PickPage extends Component {
     this.state = {
       statusCode: '',
       printPicksUrl: '',
+      values: this.props.initialValues,
     };
 
+    this.saveNewItems = this.saveNewItems.bind(this);
     this.props.showSpinner();
   }
 
@@ -133,20 +144,29 @@ class PickPage extends Component {
       .then((resp) => {
         const { associations, statusCode } = resp.data.data;
         const { pickPageItems } = resp.data.data.pickPage;
-        this.props.change('stock-movement-wizard', 'pickPageItems', []);
-        this.props.change('stock-movement-wizard', 'pickPageItems', this.checkForInitialPicksChanges(pickPageItems));
 
         const printPicks = _.find(associations.documents, doc => doc.name === 'Print Picklist');
         this.setState({
           printPicksUrl: printPicks.uri,
           statusCode,
-        });
+          values: { ...this.state.values, pickPageItems: [] },
+        }, () => this.setState({
+          values: {
+            ...this.state.values,
+            pickPageItems: this.checkForInitialPicksChanges(pickPageItems),
+          },
+        }));
 
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Check if any changes has been made and adjust initial pick
+   * @param {object} pickPageItems
+   * @public
+   */
   checkForInitialPicksChanges(pickPageItems) {
     _.forEach(pickPageItems, (pickPageItem) => {
       if (pickPageItem.picklistItems.length) {
@@ -173,30 +193,56 @@ class PickPage extends Component {
     return pickPageItems;
   }
 
+  /**
+   * Fetch 4th step data from current stock movement
+   * @public
+   */
   fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=4`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
 
     return apiClient.get(url)
       .then(resp => resp)
       .catch(err => err);
   }
 
+  /**
+   * Transition to next stock movement status (PICKED)
+   * @public
+   */
   transitionToStep5() {
-    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'PICKED' };
 
     return apiClient.post(url, payload);
   }
 
-  nextPage() {
+  /**
+   * Goes to the next stock movement step
+   * @public
+   */
+  nextPage(formValues) {
     this.props.showSpinner();
     if (this.state.statusCode === 'PICKING') {
       this.transitionToStep5()
-        .then(() => this.props.onSubmit())
+        .then(() => this.props.onSubmit(formValues))
         .catch(() => this.props.hideSpinner());
     } else {
-      this.props.onSubmit();
+      this.props.onSubmit(formValues);
     }
+  }
+
+  saveNewItems(pickPageItems) {
+    this.setState({
+      values: {
+        ...this.state.values,
+        pickPageItems: [],
+      },
+    }, () => this.setState({
+      values: {
+        ...this.state.values,
+        pickPageItems,
+      },
+    }));
   }
 
   render() {
@@ -210,41 +256,44 @@ class PickPage extends Component {
         >
           <span><i className="fa fa-print pr-2" />Print Picklist</span>
         </a>
-        <form onSubmit={this.props.handleSubmit(() => this.nextPage())} className="print-mt">
-          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-            checkForInitialPicksChanges: this.checkForInitialPicksChanges,
-            stockMovementId: this.props.stockMovementId,
-          }))}
-          <div className="d-print-none">
-            <button type="button" className="btn btn-outline-primary btn-form" onClick={this.props.previousPage}>
-              Previous
-            </button>
-            <button type="submit" className="btn btn-outline-primary btn-form float-right">Next</button>
-          </div>
-        </form>
+        <Form
+          onSubmit={values => this.nextPage(values)}
+          mutators={{ ...arrayMutators }}
+          initialValues={this.state.values}
+          render={({ handleSubmit, values }) => (
+            <form onSubmit={handleSubmit} className="print-mt">
+              {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                checkForInitialPicksChanges: this.checkForInitialPicksChanges,
+                stockMovementId: values.stockMovementId,
+                onResponse: this.saveNewItems,
+              }))}
+              <div className="d-print-none">
+                <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>
+                  Previous
+                </button>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right">Next</button>
+              </div>
+            </form>
+          )}
+        />
       </div>
     );
   }
 }
 
-const selector = formValueSelector('stock-movement-wizard');
-
-const mapStateToProps = state => ({
-  stockMovementId: selector(state, 'requisitionId'),
-});
-
-export default reduxForm({
-  form: 'stock-movement-wizard',
-  destroyOnUnmount: false,
-  forceUnregisterOnUnmount: true,
-})(connect(mapStateToProps, { change, showSpinner, hideSpinner })(PickPage));
+export default connect(null, { showSpinner, hideSpinner })(PickPage);
 
 PickPage.propTypes = {
-  change: PropTypes.func.isRequired,
+  initialValues: PropTypes.shape({}).isRequired,
+  /**
+  * Function called with the form data when the handleSubmit()
+  * is fired from within the form component.
+  */
   onSubmit: PropTypes.func.isRequired,
+  /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  stockMovementId: PropTypes.string.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
 };

@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import { formValueSelector } from 'redux-form';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
@@ -11,6 +9,7 @@ import PickPage from './PickPage';
 import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
 
+/** Main stock movement form's wizard component. */
 class StockMovements extends Component {
   constructor(props) {
     super(props);
@@ -18,6 +17,7 @@ class StockMovements extends Component {
     this.state = {
       page: 1,
       prevPage: 1,
+      values: this.props.initialValues,
     };
 
     this.nextPage = this.nextPage.bind(this);
@@ -25,76 +25,107 @@ class StockMovements extends Component {
     this.goToPage = this.goToPage.bind(this);
   }
 
+  /**
+   * Return array of form steps
+   * @public
+   */
   static getStepList() {
     return ['Create', 'Add items', 'Edit', 'Pick', 'Send'];
   }
 
+  /**
+   * Return array of form's components
+   * @public
+   */
   getFormList() {
     return [
       <CreateStockMovement
+        initialValues={this.state.values}
         onSubmit={this.nextPage}
       />,
       <AddItemsPage
+        initialValues={this.state.values}
         previousPage={this.previousPage}
         goToPage={this.goToPage}
         onSubmit={this.nextPage}
       />,
       <EditPage
+        initialValues={this.state.values}
         previousPage={this.previousPage}
         onSubmit={this.nextPage}
       />,
       <PickPage
+        initialValues={this.state.values}
         previousPage={this.previousPage}
         onSubmit={this.nextPage}
       />,
       <SendMovementPage
+        initialValues={this.state.values}
         previousPage={this.previousPage}
       />,
     ];
   }
 
+  /**
+   * Return shipment's name containing shipment's origin, destination, requisition date,
+   * tracking number given by user on the last step, description and stock list if chosen
+   * @public
+   */
   getShipmentName() {
-    if (this.props.trackingNumber) {
+    if (this.state.values.trackingNumber) {
       const {
         origin, destination, dateRequested, stockList, trackingNumber, description,
-      } = this.props;
+      } = this.state.values;
       const stocklistPart = stockList.name ? `${stockList.name}.` : '';
       const dateReq = moment(dateRequested, 'MM/DD/YYYY').format('DDMMMYYYY');
       const newName = `${origin.name}.${destination.name}.${dateReq}.${stocklistPart}${trackingNumber}.${description}`;
       return newName.replace(/ /gi, '');
     }
-    return this.props.shipmentName;
+    return this.state.values.shipmentName;
   }
 
-  nextPage() {
-    this.setState({ prevPage: this.state.page, page: this.state.page + 1 });
+  /**
+   * Set current page state as a previous page and take user to the next page
+   * @public
+   */
+  nextPage(values) {
+    this.setState({ prevPage: this.state.page, page: this.state.page + 1, values });
   }
 
-  previousPage() {
-    this.setState({ prevPage: this.state.prevPage - 1, page: this.state.prevPage });
+  /**
+   * Return user to the previous page
+   * @public
+   */
+  previousPage(values) {
+    this.setState({ prevPage: this.state.prevPage - 1, page: this.state.prevPage, values });
   }
 
-  goToPage(page) {
-    this.setState({ prevPage: this.state.page, page });
+  /**
+   * Set current page state as a previous page and takes user to the given number page
+   * @param {number} page
+   * @public
+   */
+  goToPage(page, values) {
+    this.setState({ prevPage: this.state.page, page, values });
   }
 
   render() {
-    const { page } = this.state;
+    const { page, values } = this.state;
 
     const formList = this.getFormList();
 
     return (
       <div>
         <div>
-          <WizardSteps steps={StockMovements.getStepList()} currentStep={this.state.page} />
+          <WizardSteps steps={StockMovements.getStepList()} currentStep={page} />
         </div>
         <div className="panel panel-primary">
           <div className="panel-heading movement-number">
-            {(this.props.movementNumber && this.props.shipmentName && !this.props.trackingNumber) &&
-              <span>{`${this.props.movementNumber} - ${this.props.shipmentName}`}</span>
+            {(values.movementNumber && values.shipmentName && !values.trackingNumber) &&
+              <span>{`${values.movementNumber} - ${values.shipmentName}`}</span>
             }
-            {this.props.trackingNumber &&
-              <span>{`${this.props.movementNumber} - ${this.getShipmentName()}`}</span>
+            {values.trackingNumber &&
+              <span>{`${values.movementNumber} - ${this.getShipmentName()}`}</span>
             }
           </div>
           <div className="panelBody px-1">
@@ -106,45 +137,12 @@ class StockMovements extends Component {
   }
 }
 
-const selector = formValueSelector('stock-movement-wizard');
-
-const mapStateToProps = state => ({
-  shipmentName: selector(state, 'shipmentName'),
-  movementNumber: selector(state, 'movementNumber'),
-  origin: selector(state, 'origin'),
-  destination: selector(state, 'destination'),
-  dateRequested: selector(state, 'dateRequested'),
-  stockList: selector(state, 'stockList'),
-  trackingNumber: selector(state, 'trackingNumber'),
-  description: selector(state, 'description'),
-});
-
-export default connect(mapStateToProps, {})(StockMovements);
+export default StockMovements;
 
 StockMovements.propTypes = {
-  movementNumber: PropTypes.string,
-  shipmentName: PropTypes.string,
-  origin: PropTypes.shape({
-    id: PropTypes.string,
-    type: PropTypes.string,
-  }),
-  destination: PropTypes.shape({
-    id: PropTypes.string,
-    type: PropTypes.string,
-  }),
-  dateRequested: PropTypes.string,
-  stockList: PropTypes.string,
-  trackingNumber: PropTypes.string,
-  description: PropTypes.string,
+  initialValues: PropTypes.shape({}),
 };
 
 StockMovements.defaultProps = {
-  movementNumber: '',
-  shipmentName: '',
-  origin: {},
-  destination: {},
-  dateRequested: '',
-  stockList: '',
-  trackingNumber: '',
-  description: '',
+  initialValues: {},
 };
