@@ -342,6 +342,7 @@ class PutAwayPage extends Component {
         }
         <button
           type="button"
+          disabled={this.state.selection.size < 1}
           onClick={() => this.savePutAways()}
           className="btn btn-outline-primary float-right my-2"
         >Start Put-Away
