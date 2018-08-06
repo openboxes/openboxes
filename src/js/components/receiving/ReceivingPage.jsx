@@ -1,14 +1,33 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
-import { initialize, formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import arrayMutators from 'final-form-arrays';
+import moment from 'moment';
+import Alert from 'react-s-alert';
 
 import PartialReceivingPage from './PartialReceivingPage';
 import ReceivingCheckScreen from './ReceivingCheckScreen';
-import apiClient, { parseResponse } from '../../utils/apiClient';
+import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 
+function validate(values) {
+  const errors = {};
+
+  if (!values.dateDelivered) {
+    errors.dateDelivered = 'This field is required';
+  } else {
+    const date = moment(values.dateDelivered, 'MM/DD/YYYY');
+    if (moment().diff(date) < 0) {
+      errors.dateDelivered = 'The date cannot be in the future';
+    }
+  }
+
+  return errors;
+}
+
+/** Main partial receiving form's component. */
 class ReceivingPage extends Component {
   constructor(props) {
     super(props);
@@ -16,50 +35,111 @@ class ReceivingPage extends Component {
     this.state = {
       page: 0,
       bins: [],
+      formData: {},
+      completed: false,
     };
 
     this.nextPage = this.nextPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
+    this.save = this.save.bind(this);
   }
 
   componentDidMount() {
     this.fetchPartialReceiptCandidates();
   }
 
-  getFormList() {
+  onSubmit(formValues) {
+    if (this.state.page === 0) {
+      const containers = _.map(formValues.containers, container => ({
+        ...container,
+        shipmentItems: _.filter(container.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''),
+      }));
+      const payload = {
+        ...formValues, receiptStatus: 'CHECKING', containers: _.filter(containers, container => container.shipmentItems.length),
+      };
+
+      this.save(payload, this.nextPage);
+    } else {
+      this.save({ ...formValues, receiptStatus: 'COMPLETE' }, () => {
+        this.setState({ completed: true });
+        Alert.success('Shipment was received successfully!');
+      });
+    }
+  }
+
+  /**
+   * Return array of form's components
+   * @public
+   */
+  getFormList(props) {
     return [
       <PartialReceivingPage
-        onSubmit={this.nextPage}
-        shipmentId={this.props.match.params.shipmentId}
+        {...props}
         bins={this.state.bins}
+        save={this.save}
       />,
       <ReceivingCheckScreen
+        {...props}
         prevPage={this.prevPage}
-        shipmentId={this.props.match.params.shipmentId}
+        save={this.save}
+        completed={this.state.completed}
       />,
     ];
   }
 
+  save(formValues, callback) {
+    this.props.showSpinner();
+    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}`;
+
+    return apiClient.post(url, flattenRequest(formValues))
+      .then((response) => {
+        this.props.hideSpinner();
+
+        this.setState({ formData: {} }, () =>
+          this.setState({ formData: parseResponse(response.data.data) }));
+        if (callback) {
+          callback();
+        }
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  /**
+   * Take user to the next page
+   * @public
+   */
   nextPage() {
     this.setState({ page: this.state.page + 1 });
   }
 
+  /**
+   * Return user to the previous page
+   * @public
+   */
   prevPage() {
-    this.setState({ page: this.state.page - 1 });
+    this.setState({ page: this.state.page - 1, completed: false });
   }
 
+  /**
+   * Fetch available receipts from API
+   * @public
+   */
   fetchPartialReceiptCandidates() {
     this.props.showSpinner();
     const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}`;
 
     return apiClient.get(url)
       .then((response) => {
-        this.props.initialize('partial-receiving-wizard', parseResponse(response.data.data), false);
+        this.setState({ formData: parseResponse(response.data.data) });
         this.fetchBins();
       })
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Fetch available bin locations from API
+   * @public
+   */
   fetchBins() {
     const url = '/openboxes/api/internalLocations';
 
@@ -74,42 +154,41 @@ class ReceivingPage extends Component {
   }
 
   render() {
-    const { page } = this.state;
-    const formList = this.getFormList();
+    const { page, formData } = this.state;
 
     return (
-      <div>
-        {this.props.shipmentNumber &&
-        <h2 className="my-2 text-center">{`${this.props.shipmentNumber} ${this.props.shipmentName}`}</h2>}
-        <div className="align-self-center">
-          {formList[page]}
-        </div>
-      </div>
+      <Form
+        onSubmit={values => this.onSubmit(values)}
+        validate={validate}
+        mutators={{ ...arrayMutators }}
+        initialValues={formData}
+        render={({ handleSubmit, values, form }) => (
+          <div>
+            {values.shipment && values.shipment.shipmentNumber &&
+              <h2 className="my-2 text-center">{`${values.shipment.shipmentNumber} ${values.shipment.name}`}</h2>}
+            <div className="align-self-center">
+              <form onSubmit={handleSubmit}>
+                {this.getFormList({
+                  formValues: values, change: form.change,
+                })[page]}
+              </form>
+            </div>
+          </div>
+        )}
+      />
     );
   }
 }
 
-const selector = formValueSelector('partial-receiving-wizard');
-
-const mapStateToProps = state => ({
-  shipmentNumber: selector(state, 'shipment.shipmentNumber'),
-  shipmentName: selector(state, 'shipment.name'),
-});
-
-export default connect(mapStateToProps, { initialize, showSpinner, hideSpinner })(ReceivingPage);
+export default connect(null, { showSpinner, hideSpinner })(ReceivingPage);
 
 ReceivingPage.propTypes = {
+  /** React router's object which contains information about url varaiables and params */
   match: PropTypes.shape({
     params: PropTypes.shape({ shipmentId: PropTypes.string }),
   }).isRequired,
-  initialize: PropTypes.func.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  shipmentNumber: PropTypes.string,
-  shipmentName: PropTypes.string,
-};
-
-ReceivingPage.defaultProps = {
-  shipmentNumber: '',
-  shipmentName: '',
 };
