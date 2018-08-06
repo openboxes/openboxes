@@ -10,7 +10,33 @@ import SelectField from '../form-elements/SelectField';
 import DateField from '../form-elements/DateField';
 import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchLocations, fetchUsers } from '../../actions';
+import { showSpinner, hideSpinner, fetchLocations } from '../../actions';
+
+
+const debouncedUsersFetch = _.debounce((searchTerm, callback) => {
+  if (searchTerm) {
+    apiClient.get(`/openboxes/api/generic/person?name=${searchTerm}`)
+      .then(result => callback(
+        null,
+        {
+          complete: true,
+          options: _.map(result.data.data, obj => (
+            {
+              value: {
+                id: obj.id,
+                name: obj.name,
+                label: obj.name,
+              },
+              label: obj.name,
+            }
+          )),
+        },
+      ))
+      .catch(error => callback(error, { options: [] }));
+  } else {
+    callback(null, { options: [] });
+  }
+}, 500);
 
 const FIELDS = {
   description: {
@@ -64,11 +90,14 @@ const FIELDS = {
     type: SelectField,
     label: 'Requested-by',
     attributes: {
+      async: true,
       required: true,
+      openOnClick: false,
+      autoload: false,
+      loadOptions: debouncedUsersFetch,
+      cache: false,
+      options: [],
     },
-    getDynamicAttr: props => ({
-      options: props.users,
-    }),
   },
   dateRequested: {
     type: DateField,
@@ -96,9 +125,6 @@ class CreateStockMovement extends Component {
       pickPageItems: [],
     }, true);
 
-    if (!this.props.usersFetched) {
-      this.fetchData(this.props.fetchUsers);
-    }
     if (!this.props.locationsFetched) {
       this.fetchData(this.props.fetchLocations);
     }
@@ -170,7 +196,7 @@ class CreateStockMovement extends Component {
       this.createNewRequisition(
         this.props.origin.id,
         this.props.destination.id,
-        this.props.requestedBy,
+        this.props.requestedBy.id,
         this.props.dateRequested,
         this.props.description,
         this.props.stockList,
@@ -186,7 +212,6 @@ class CreateStockMovement extends Component {
         {_.map(
           FIELDS,
           (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-            users: this.props.users,
             locations: this.props.locations,
             stockLists: this.state.stockLists,
             fetchStockLists: this.fetchStockLists,
@@ -207,8 +232,6 @@ const selector = formValueSelector('stock-movement-wizard');
 const mapStateToProps = state => ({
   locationsFetched: state.locations.fetched,
   locations: state.locations.data,
-  usersFetched: state.users.fetched,
-  users: state.users.data,
   origin: selector(state, 'origin'),
   destination: selector(state, 'destination'),
   requestedBy: selector(state, 'requestedBy'),
@@ -224,7 +247,7 @@ export default reduxForm({
   forceUnregisterOnUnmount: true,
   validate,
 })(connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchLocations, fetchUsers, change, initialize,
+  showSpinner, hideSpinner, fetchLocations, change, initialize,
 })(CreateStockMovement));
 
 CreateStockMovement.propTypes = {
@@ -235,9 +258,6 @@ CreateStockMovement.propTypes = {
   fetchLocations: PropTypes.func.isRequired,
   locationsFetched: PropTypes.bool.isRequired,
   locations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  fetchUsers: PropTypes.func.isRequired,
-  usersFetched: PropTypes.bool.isRequired,
-  users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   change: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   origin: PropTypes.shape({
@@ -246,7 +266,9 @@ CreateStockMovement.propTypes = {
   destination: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }),
-  requestedBy: PropTypes.string,
+  requestedBy: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }),
   requisitionId: PropTypes.string,
   description: PropTypes.string,
   dateRequested: PropTypes.string,
@@ -256,7 +278,7 @@ CreateStockMovement.propTypes = {
 CreateStockMovement.defaultProps = {
   origin: { id: '' },
   destination: { id: '' },
-  requestedBy: '',
+  requestedBy: { id: '' },
   requisitionId: '',
   description: '',
   dateRequested: '',
