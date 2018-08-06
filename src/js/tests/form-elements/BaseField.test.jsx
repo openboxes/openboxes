@@ -2,7 +2,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import BaseField from '../../components/form-elements/BaseField';
 
-jest.mock('redux-form', () => ({
+jest.mock('react-final-form', () => ({
   Field: (props) => {
     const { component: Component, name, ...others } = props;
     const input = { onChange: () => {}, name };

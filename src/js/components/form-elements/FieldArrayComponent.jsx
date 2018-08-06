@@ -25,7 +25,7 @@ const FieldArrayComponent = (props) => {
         </div>
         <TableBodyComponent
           fields={fields}
-          properties={{ ...properties, rowCount: fields.length }}
+          properties={{ ...properties, rowCount: fields.length || 0 }}
           addRow={addRow}
           fieldsConfig={fieldsConfig}
         />
