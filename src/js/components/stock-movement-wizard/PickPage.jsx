@@ -28,6 +28,7 @@ const FIELDS = {
       productCode: {
         type: LabelField,
         label: 'Code',
+        flexWidth: '130px',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
@@ -35,34 +36,39 @@ const FIELDS = {
       'product.name': {
         type: LabelField,
         label: 'Product Name',
+        flexWidth: '150px',
         attributes: {
           className: 'text-left ml-1',
         },
       },
       lotNumber: {
         type: LabelField,
+        flexWidth: '60px',
         label: 'Lot #',
       },
       expirationDate: {
         type: LabelField,
+        flexWidth: '90px',
         label: 'Expiry Date',
       },
       'binLocation.name': {
         type: LabelField,
+        flexWidth: '60px',
         label: 'Bin',
       },
       quantityRequired: {
         type: LabelField,
         label: 'Qty required',
-        fixedWidth: '130px',
+        flexWidth: '120px',
       },
       quantityPicked: {
         type: LabelField,
         label: 'Qty picked',
-        fixedWidth: '130px',
+        flexWidth: '120px',
       },
       recipient: {
         type: ValueSelectorField,
+        flexWidth: '120px',
         label: 'Includes recipient',
         attributes: {
           formName: 'stock-movement-wizard',
@@ -81,7 +87,7 @@ const FIELDS = {
         label: 'Edit Pick',
         type: EditPickModal,
         fieldKey: '',
-        fixedWidth: '110px',
+        flexWidth: '110px',
         attributes: {
           title: 'Edit Pick',
         },
@@ -101,7 +107,7 @@ const FIELDS = {
         label: 'Adjust Inventory',
         type: AdjustInventoryModal,
         fieldKey: '',
-        fixedWidth: '130px',
+        flexWidth: '130px',
         attributes: {
           title: 'Adjust Inventory',
         },

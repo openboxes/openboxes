@@ -35,6 +35,7 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
+        flexWidth: '130px',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
@@ -42,6 +43,7 @@ const FIELDS = {
       },
       productName: {
         type: LabelField,
+        flexWidth: '150px',
         label: 'Product Name',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
@@ -50,23 +52,23 @@ const FIELDS = {
       quantityRequested: {
         type: LabelField,
         label: 'Qty requested',
-        fixedWidth: '130px',
+        flexWidth: '120px',
       },
       quantityAvailable: {
         type: LabelField,
         label: 'Qty available',
-        fixedWidth: '130px',
+        flexWidth: '120px',
       },
       quantityConsumed: {
         type: LabelField,
         label: 'Monthly consumption',
-        fixedWidth: '170px',
+        flexWidth: '170px',
       },
       substituteButton: {
         label: 'Substitute available',
         type: SubstitutionsModal,
         fieldKey: '',
-        fixedWidth: '200px',
+        flexWidth: '150px',
         attributes: {
           title: 'Substitutes',
         },
@@ -86,7 +88,7 @@ const FIELDS = {
         label: 'Revised Qty',
         type: TextField,
         fieldKey: 'statusCode',
-        fixedWidth: '140px',
+        flexWidth: '140px',
         attributes: {
           type: 'number',
         },
@@ -97,7 +99,7 @@ const FIELDS = {
       reasonCode: {
         type: ValueSelectorField,
         label: 'Reason code',
-        fixedWidth: '400px',
+        flexWidth: '200px',
         component: SelectField,
         componentConfig: {
           getDynamicAttr: ({ selectedValue, subfield, reasonCodes }) => ({
