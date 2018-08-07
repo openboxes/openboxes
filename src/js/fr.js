@@ -98,6 +98,10 @@ const fr = {
           label: 'Partial Receiving',
           link: '/openboxes/partialReceiving/index',
         },
+        putAway: {
+          label: 'Put Away',
+          link: '/openboxes/putAway/index',
+        },
       },
     },
     receiving: {
