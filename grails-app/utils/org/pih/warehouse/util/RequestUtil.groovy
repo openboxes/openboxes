@@ -9,14 +9,11 @@
 **/ 
 package org.pih.warehouse.util
 
-import org.apache.http.HttpRequest;
-
-
 class RequestUtil {
 
 	static boolean isAjax(request) {
 		def contentType = request.getHeader("Content-Type")
-		return request.isXhr() || contentType.equals("application/json")
+		return request.isXhr() || contentType.contains("application/json")
 	}
 
 }
