@@ -13,7 +13,7 @@ class RequestUtil {
 
 	static boolean isAjax(request) {
 		def contentType = request.getHeader("Content-Type")
-		return request.isXhr() || contentType.contains("application/json")
+		return request.isXhr() || (contentType && contentType?.contains("application/json"))
 	}
 
 }
