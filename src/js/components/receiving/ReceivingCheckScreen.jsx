@@ -33,20 +33,20 @@ const FIELDS = {
   buttonsTop: {
     // eslint-disable-next-line react/prop-types
     type: ({ prevPage, onSave, completed }) => (
-      <div className="mb-3 d-flex justify-content-center">
-        <button type="button" className="btn btn-outline-primary mr-3" onClick={prevPage}>
+      <div className="mb-3 text-center">
+        <button type="button" className="btn btn-outline-primary float-left btn-form" onClick={prevPage}>
           Back to Edit
         </button>
         <button
           type="button"
-          className="btn btn-outline-primary mr-3"
+          className="btn btn-outline-success margin-bottom-lg btn-form"
           onClick={onSave}
           disabled={completed}
         >Save
         </button>
         <button
           type="submit"
-          className="btn btn-outline-primary"
+          className="btn btn-outline-primary float-right btn-form"
           disabled={completed}
         >Receive shipment
         </button>
@@ -120,20 +120,20 @@ const FIELDS = {
   buttonsBottom: {
     // eslint-disable-next-line react/prop-types
     type: ({ prevPage, onSave, completed }) => (
-      <div className="my-3 d-flex justify-content-center">
-        <button type="button" className="btn btn-outline-primary mr-3" onClick={prevPage}>
+      <div className="my-3 text-center">
+        <button type="button" className="btn btn-outline-primary float-left btn-form mt-4" onClick={prevPage}>
           Back to Edit
         </button>
         <button
           type="button"
-          className="btn btn-outline-primary mr-3"
+          className="btn btn-outline-success margin-bottom-lg"
           onClick={onSave}
           disabled={completed}
         >Save
         </button>
         <button
           type="submit"
-          className="btn btn-outline-primary"
+          className="btn btn-outline-primary float-right btn-form mt-4 mb-4"
           disabled={completed}
         >Receive shipment
         </button>

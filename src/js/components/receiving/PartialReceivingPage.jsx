@@ -67,12 +67,12 @@ const FIELDS = {
   buttonsTop: {
     // eslint-disable-next-line react/prop-types
     type: ({ autofillLines, onSave }) => (
-      <div className="mb-3 d-flex justify-content-center">
-        <button type="button" className="btn btn-outline-primary mr-3" onClick={() => autofillLines()}>
-        Autofill quantities
+      <div className="mb-3 text-center">
+        <button type="button" className="btn btn-outline-success margin-bottom-lg mr-3" onClick={() => autofillLines()}>
+          Autofill quantities
         </button>
-        <button type="button" className="btn btn-outline-primary mr-3" onClick={() => onSave()}>Save</button>
-        <button type="submit" className="btn btn-outline-primary">Next</button>
+        <button type="button" className="btn btn-outline-success margin-bottom-lg" onClick={() => onSave()}>Save</button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form">Next</button>
       </div>),
   },
   containers: {
@@ -191,12 +191,12 @@ const FIELDS = {
   buttonsBottom: {
     // eslint-disable-next-line react/prop-types
     type: ({ autofillLines, onSave }) => (
-      <div className="my-3 d-flex justify-content-center">
-        <button type="button" className="btn btn-outline-primary mr-3" onClick={() => autofillLines()}>
+      <div className="my-3 text-center">
+        <button type="button" className="btn btn-outline-success margin-bottom-lg mr-3" onClick={() => autofillLines()}>
           Autofill quantities
         </button>
-        <button type="button" className="btn btn-outline-primary mr-3" onClick={() => onSave()}>Save</button>
-        <button type="submit" className="btn btn-outline-primary">Next</button>
+        <button type="button" className="btn btn-outline-success margin-bottom-lg" onClick={() => onSave()}>Save</button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form mt-4 mb-4">Next</button>
       </div>),
   },
 };
