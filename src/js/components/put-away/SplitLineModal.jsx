@@ -11,8 +11,6 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import Input from '../../utils/Input';
 import Select from '../../utils/Select';
 
-Modal.setAppElement('#root');
-
 class SplitLineModal extends Component {
   constructor(props) {
     super(props);

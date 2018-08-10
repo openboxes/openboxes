@@ -110,6 +110,10 @@ const FIELDS = {
 };
 
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
+/**
+ * The forth step of stock movement(for movements from a depot) where user
+ * can edit pick or adjust inventory.
+ */
 class PickPage extends Component {
   constructor(props) {
     super(props);
@@ -141,6 +145,11 @@ class PickPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Check if any changes has been made and adjust initial pick
+   * @param {object} pickPageItems
+   * @public
+   */
   checkForInitialPicksChanges(pickPageItems) {
     _.forEach(pickPageItems, (pickPageItem) => {
       if (pickPageItem.picklistItems.length) {
@@ -167,6 +176,10 @@ class PickPage extends Component {
     return pickPageItems;
   }
 
+  /**
+   * Fetch all data from current stock movement
+   * @public
+   */
   fetchLineItems() {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=4`;
 
@@ -175,6 +188,10 @@ class PickPage extends Component {
       .catch(err => err);
   }
 
+  /**
+   * Update status to PICKED with post method
+   * @public
+   */
   transitionToStep5() {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
     const payload = { status: 'PICKED' };
@@ -182,6 +199,11 @@ class PickPage extends Component {
     return apiClient.post(url, payload);
   }
 
+  /**
+   * Make it possible for user to go to the next page.
+   * Call method sending data to server and onSubmit function
+   * @public
+   */
   nextPage() {
     this.props.showSpinner();
     if (this.state.statusCode === 'PICKING') {
@@ -234,11 +256,21 @@ export default reduxForm({
 })(connect(mapStateToProps, { change, showSpinner, hideSpinner })(PickPage));
 
 PickPage.propTypes = {
+  /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
+  /**
+   * Function called with the form data when the handleSubmit()
+   * is fired from within the form component.
+   */
   onSubmit: PropTypes.func.isRequired,
+  /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Stock movement's ID */
   stockMovementId: PropTypes.string.isRequired,
+  /** Function that is passed to onSubmit function */
   handleSubmit: PropTypes.func.isRequired,
 };

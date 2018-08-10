@@ -119,6 +119,10 @@ const FIELDS = {
   },
 };
 
+/**
+ * The third step of stock movement(for movements form a depot) where user can see the
+ * stock available and adjust quantities or make substitutions based on that information.
+ */
 class EditItemsPage extends Component {
   constructor(props) {
     super(props);
@@ -166,6 +170,11 @@ class EditItemsPage extends Component {
     });
   }
 
+  /**
+   * Fetch data using function given as an argument(reducers components)
+   * @param {function} fetchFunction
+   * @public
+   */
   fetchData(fetchFunction) {
     this.props.showSpinner();
     fetchFunction()
@@ -173,6 +182,11 @@ class EditItemsPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Send data of revised items with post method
+   * @param {object} values
+   * @public
+   */
   reviseRequisitionItems(values) {
     const itemsToRevise = _.filter(
       values.editPageItems,
@@ -205,6 +219,10 @@ class EditItemsPage extends Component {
     return Promise.resolve();
   }
 
+  /**
+   * Update status to PICKING and createPicklist to true with post method
+   * @public
+   */
   transitionToStep4() {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
     const payload = { status: 'PICKING', createPicklist: 'true' };
@@ -212,6 +230,10 @@ class EditItemsPage extends Component {
     return apiClient.post(url, payload);
   }
 
+  /**
+   * Fetch all data from current stock movement
+   * @public
+   */
   fetchLineItems() {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=3`;
 
@@ -220,6 +242,12 @@ class EditItemsPage extends Component {
       .catch(err => err);
   }
 
+  /**
+   * Make it possible for user to go to the next page.
+   * Call methods sending data to server and onSubmit function
+   * @param {object} formValues
+   * @public
+   */
   nextPage(formValues) {
     this.props.showSpinner();
     this.reviseRequisitionItems(formValues)
@@ -295,14 +323,27 @@ export default reduxForm({
 })(EditItemsPage));
 
 EditItemsPage.propTypes = {
+  /** Function that is passed to onSubmit function */
   handleSubmit: PropTypes.func.isRequired,
+  /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
+  /**
+   * Function called with the form data when the handleSubmit()
+   * is fired from within the form component.
+   */
   onSubmit: PropTypes.func.isRequired,
+  /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Stock movement's ID */
   stockMovementId: PropTypes.string.isRequired,
+  /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
+  /** Indicator if reason codes' data is fetched */
   reasonCodesFetched: PropTypes.bool.isRequired,
+  /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

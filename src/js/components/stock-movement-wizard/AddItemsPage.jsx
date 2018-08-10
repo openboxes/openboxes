@@ -224,6 +224,11 @@ const VENDOR_FIELDS = {
   },
 };
 
+/**
+ * The second step of stock movement where user can add items to stock list.
+ * This component supports three different cases: with or without stocklist
+ * when movement is from a depot and when movement is from a vendor.
+ */
 class AddItemsPage extends Component {
   constructor(props) {
     super(props);
@@ -245,6 +250,10 @@ class AddItemsPage extends Component {
     this.fetchAndSetLineItems();
   }
 
+  /**
+   * Return proper fields depending on origin type or if stock list is chosen
+   * @public
+   */
   getFields() {
     if (this.props.origin.type === 'SUPPLIER') {
       return VENDOR_FIELDS;
@@ -255,6 +264,12 @@ class AddItemsPage extends Component {
     return NO_STOCKLIST_FIELDS;
   }
 
+  /**
+   * Return an array of stock movement's items with different fields depending on origin type.
+   * Check wheter it's an existing item or the one to update.
+   * @param {object} lineItems
+   * @public
+   */
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, item => !item.statusCode);
 
@@ -313,6 +328,11 @@ class AddItemsPage extends Component {
     );
   }
 
+  /**
+   * Create new array if requisition is empty or fill the form with previously chosen items.
+   * Use fetchLineItems function to fetch the data.
+   * @public
+   */
   fetchAndSetLineItems() {
     this.fetchLineItems().then((resp) => {
       const { statusCode, lineItems } = resp.data.data;
@@ -344,6 +364,10 @@ class AddItemsPage extends Component {
     }).catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Fetch all data from current stock movement
+   * @public
+   */
   fetchLineItems() {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=2`;
 
@@ -352,6 +376,11 @@ class AddItemsPage extends Component {
       .catch(err => err);
   }
 
+  /**
+   * Fetch data using function given as an argument(reducers components)
+   * @param {function} fetchFunction
+   * @public
+   */
   fetchData(fetchFunction) {
     this.props.showSpinner();
     fetchFunction()
@@ -359,6 +388,12 @@ class AddItemsPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Make it possible for user to go to the next page.
+   * Call methods sending data to server and onSubmit function
+   * @param {object} formValues
+   * @public
+   */
   nextPage(formValues) {
     const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val));
     this.props.change('stock-movement-wizard', 'lineItems', lineItems);
@@ -395,6 +430,11 @@ class AddItemsPage extends Component {
     }
   }
 
+  /**
+   * Update list of requisition items with post method.
+   * @param {object} lineItems
+   * @public
+   */
   saveRequisitionItems(lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
@@ -414,6 +454,11 @@ class AddItemsPage extends Component {
     return Promise.resolve();
   }
 
+  /**
+   * Update list of requisition items in current step. Used to export template.
+   * @param {object} itemCandidatesToSave
+   * @public
+   */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
@@ -450,6 +495,11 @@ class AddItemsPage extends Component {
     return Promise.resolve();
   }
 
+  /**
+   * Remove chosen item from requisition's items list
+   * @param itemId
+   * @public
+   */
   removeItem(itemId) {
     const removeItemsUrl = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
     const payload = {
@@ -467,6 +517,11 @@ class AddItemsPage extends Component {
       });
   }
 
+  /**
+   * Update status depending on given argument with post method
+   * @param {string} status
+   * @public
+   */
   transitionToNextStep(status) {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
     const payload = { status };
@@ -474,6 +529,10 @@ class AddItemsPage extends Component {
     return apiClient.post(url, payload);
   }
 
+  /**
+   * Export current state of stock movement's to csv file
+   * @public
+   */
   exportTemplate() {
     this.props.showSpinner();
 
@@ -493,6 +552,10 @@ class AddItemsPage extends Component {
       });
   }
 
+  /**
+   * Import chosen file and fetch line items
+   * @public
+   */
   importTemplate(event) {
     this.props.showSpinner();
     const formData = new FormData();
@@ -601,23 +664,43 @@ export default reduxForm({
 })(AddItemsPage));
 
 AddItemsPage.propTypes = {
+  /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
+  /** Function that is passed to onSubmit function */
   handleSubmit: PropTypes.func.isRequired,
+  /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
+  /** Function taking user to specified page */
   goToPage: PropTypes.func.isRequired,
+  /**
+   * Function called with the form data when the handleSubmit()
+   * is fired from within the form component.
+   */
   onSubmit: PropTypes.func.isRequired,
+  /** Chosen origin */
   origin: PropTypes.shape({
+    /** Origin's ID */
     id: PropTypes.string,
+    /** Origin's type. Can be either "depot" or "supplier" */
     type: PropTypes.string,
   }).isRequired,
+  /** Chosen stock list */
   stockList: PropTypes.string,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function fetching users */
   fetchUsers: PropTypes.func.isRequired,
+  /** Array of available recipients  */
   recipients: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  /** Indicator if recipients' data is fetched */
   recipientsFetched: PropTypes.bool.isRequired,
+  /** Array of chosen items  */
   lineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  /** Stock movement's ID */
   stockMovementId: PropTypes.string.isRequired,
+  /** Automatically generated unique stock movement's number */
   movementNumber: PropTypes.string.isRequired,
 };
 

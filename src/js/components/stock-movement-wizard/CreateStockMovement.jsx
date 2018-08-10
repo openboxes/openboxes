@@ -147,6 +147,7 @@ const FIELDS = {
   },
 };
 
+  /** The first step of stock movement where user can add all the basic information. */
 class CreateStockMovement extends Component {
   constructor(props) {
     super(props);
@@ -168,6 +169,12 @@ class CreateStockMovement extends Component {
     }
   }
 
+  /**
+   * Fetch available stock lists from API with given origin and destination
+   * @param {object} origin
+   * @param {object} destination
+   * @public
+   */
   fetchStockLists(origin, destination) {
     this.props.showSpinner();
     const url = `/openboxes/api/stocklists?origin.id=${origin.id}&destination.id=${destination.id}`;
@@ -182,6 +189,16 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Create new requisition with given data using post method
+   * @param {object} origin
+   * @param {object} destination
+   * @param {object} requestedBy
+   * @param {string} dateRequested
+   * @param {string} description
+   * @param {string} stockList
+   * @public
+   */
   createNewRequisition(origin, destination, requestedBy, dateRequested, description, stockList) {
     if (origin && destination && requestedBy && dateRequested && description) {
       this.props.showSpinner();
@@ -218,6 +235,11 @@ class CreateStockMovement extends Component {
     }));
   }
 
+  /**
+   * Call method creating new requisition if it is not an existing one
+   * and move user to the next page
+   * @public
+   */
   nextPage() {
     if (!this.props.requisitionId) {
       this.createNewRequisition(
@@ -295,24 +317,43 @@ export default reduxForm({
 })(CreateStockMovement));
 
 CreateStockMovement.propTypes = {
+  /** Function called after component is mounted */
   initialize: PropTypes.func.isRequired,
+  /** Function that is passed to onSubmit function */
   handleSubmit: PropTypes.func.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
+  /**
+   * Function called with the form data when the handleSubmit()
+   * is fired from within the form component.
+   */
   onSubmit: PropTypes.func.isRequired,
+  /** Chosen origin */
   origin: PropTypes.shape({
+    /** Origin's ID */
     id: PropTypes.string.isRequired,
   }),
+  /** Chosen destination */
   destination: PropTypes.shape({
+    /** Destination's ID */
     id: PropTypes.string.isRequired,
   }),
+  /** Requisitor of the stock movement */
   requestedBy: PropTypes.shape({
+    /** Requisitor's ID */
     id: PropTypes.string.isRequired,
   }),
+  /** Requisition's ID */
   requisitionId: PropTypes.string,
+  /** A short description of the requisition */
   description: PropTypes.string,
+  /** Date of the request */
   dateRequested: PropTypes.string,
+  /** Chosen stock list */
   stockList: PropTypes.string,
 };
 

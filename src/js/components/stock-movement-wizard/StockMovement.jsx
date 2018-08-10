@@ -11,6 +11,7 @@ import PickPage from './PickPage';
 import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
 
+/** Main stock movement form's component. */
 class StockMovements extends Component {
   constructor(props) {
     super(props);
@@ -25,10 +26,18 @@ class StockMovements extends Component {
     this.goToPage = this.goToPage.bind(this);
   }
 
+  /**
+   * Return array of form steps
+   * @public
+   */
   static getStepList() {
     return ['Create', 'Add items', 'Edit', 'Pick', 'Send'];
   }
 
+  /**
+   * Return array of form's components
+   * @public
+   */
   getFormList() {
     return [
       <CreateStockMovement
@@ -53,6 +62,11 @@ class StockMovements extends Component {
     ];
   }
 
+  /**
+   * Return shipment's name containing shipment's origin, destination, requisition date,
+   * tracking number given by user on the last step, description and stock list if chosen
+   * @public
+   */
   getShipmentName() {
     if (this.props.trackingNumber) {
       const {
@@ -66,14 +80,27 @@ class StockMovements extends Component {
     return this.props.shipmentName;
   }
 
+  /**
+   * Set current page state as a previous page and take user to the next page
+   * @public
+   */
   nextPage() {
     this.setState({ prevPage: this.state.page, page: this.state.page + 1 });
   }
 
+  /**
+   * Return user to the previous page
+   * @public
+   */
   previousPage() {
     this.setState({ prevPage: this.state.prevPage - 1, page: this.state.prevPage });
   }
 
+  /**
+   * Set current page state as a previous page and takes user to the given number page
+   * @param {number} page
+   * @public
+   */
   goToPage(page) {
     this.setState({ prevPage: this.state.page, page });
   }
@@ -122,19 +149,34 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {})(StockMovements);
 
 StockMovements.propTypes = {
+  /** Automatically generated unique stock movement's number */
   movementNumber: PropTypes.string,
+  /**
+   * Shipment name containing shipment's origin, destination, requisition date,
+   * tracking number, description and stock list if chosen
+   */
   shipmentName: PropTypes.string,
+  /** Chosen origin */
   origin: PropTypes.shape({
+    /** Origin's ID */
     id: PropTypes.string,
+    /** Origin's type. Can be either "depot" or "supplier" */
     type: PropTypes.string,
   }),
+  /** Chosen destination */
   destination: PropTypes.shape({
+    /** Destination's ID */
     id: PropTypes.string,
+    /** Destination's type. Can be either "depot" or "supplier" */
     type: PropTypes.string,
   }),
+  /** Date of the requisition */
   dateRequested: PropTypes.string,
+  /** Chosen stock list */
   stockList: PropTypes.string,
+  /** Tracking number given by the user on the last step */
   trackingNumber: PropTypes.string,
+  /** A short description of the requisition */
   description: PropTypes.string,
 };
 
