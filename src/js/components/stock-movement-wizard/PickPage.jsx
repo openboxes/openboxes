@@ -163,7 +163,7 @@ class PickPage extends Component {
   }
 
   /**
-   * Check if any changes has been made and adjust initial pick
+   * Checks if any changes has been made and adjusts initial pick.
    * @param {object} pickPageItems
    * @public
    */
@@ -194,7 +194,7 @@ class PickPage extends Component {
   }
 
   /**
-   * Fetch 4th step data from current stock movement
+   * Fetches 4th step data from current stock movement.
    * @public
    */
   fetchLineItems() {
@@ -206,7 +206,7 @@ class PickPage extends Component {
   }
 
   /**
-   * Transition to next stock movement status (PICKED)
+   * Transition to next stock movement status (PICKED).
    * @public
    */
   transitionToStep5() {
@@ -217,7 +217,8 @@ class PickPage extends Component {
   }
 
   /**
-   * Goes to the next stock movement step
+   * Goes to the next stock movement step.
+   * @param {object} formValues
    * @public
    */
   nextPage(formValues) {
@@ -231,6 +232,11 @@ class PickPage extends Component {
     }
   }
 
+  /**
+   * Saves changes made in edit pick or adjust inventory modals and updates data.
+   * @param {object} pickPageItems
+   * @public
+   */
   saveNewItems(pickPageItems) {
     this.setState({
       values: {
@@ -284,6 +290,7 @@ class PickPage extends Component {
 export default connect(null, { showSpinner, hideSpinner })(PickPage);
 
 PickPage.propTypes = {
+  /** Initial component's data */
   initialValues: PropTypes.shape({}).isRequired,
   /**
   * Function called with the form data when the handleSubmit()

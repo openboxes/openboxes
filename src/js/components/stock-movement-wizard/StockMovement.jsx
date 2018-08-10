@@ -26,7 +26,7 @@ class StockMovements extends Component {
   }
 
   /**
-   * Return array of form steps
+   * Returns array of form steps.
    * @public
    */
   static getStepList() {
@@ -34,7 +34,7 @@ class StockMovements extends Component {
   }
 
   /**
-   * Return array of form's components
+   * Returns array of form's components.
    * @public
    */
   getFormList() {
@@ -67,8 +67,8 @@ class StockMovements extends Component {
   }
 
   /**
-   * Return shipment's name containing shipment's origin, destination, requisition date,
-   * tracking number given by user on the last step, description and stock list if chosen
+   * Returns shipment's name containing shipment's origin, destination, requisition date,
+   * tracking number given by user on the last step, description and stock list if chosen.
    * @public
    */
   getShipmentName() {
@@ -85,7 +85,8 @@ class StockMovements extends Component {
   }
 
   /**
-   * Set current page state as a previous page and take user to the next page
+   * Sets current page state as a previous page and takes user to the next page.
+   * @param {object} values
    * @public
    */
   nextPage(values) {
@@ -93,7 +94,8 @@ class StockMovements extends Component {
   }
 
   /**
-   * Return user to the previous page
+   * Returns user to the previous page.
+   * @param {object} values
    * @public
    */
   previousPage(values) {
@@ -101,7 +103,8 @@ class StockMovements extends Component {
   }
 
   /**
-   * Set current page state as a previous page and takes user to the given number page
+   * Sets current page state as a previous page and takes user to the given number page.
+   * @param {object} values
    * @param {number} page
    * @public
    */
@@ -140,6 +143,7 @@ class StockMovements extends Component {
 export default StockMovements;
 
 StockMovements.propTypes = {
+  /** Initial components' data */
   initialValues: PropTypes.shape({}),
 };
 

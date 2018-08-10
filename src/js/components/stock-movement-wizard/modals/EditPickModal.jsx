@@ -101,7 +101,7 @@ class EditPickModal extends Component {
   }
 
   /**
-   * Load chosen items, required quantity and reason codes into modal's form
+   * Loads chosen items, required quantity and reason codes into modal's form.
    * @public
    */
   onOpen() {
@@ -115,7 +115,7 @@ class EditPickModal extends Component {
   }
 
   /**
-   * Send all the changes made by user in this modal to API and update data
+   * Sends all changes made by user in this modal to API and updates data.
    * @param {object} values
    * @public
    */
@@ -160,7 +160,8 @@ class EditPickModal extends Component {
   }
 
   /**
-   * Sum up quantity picked from all available items
+   * Sums up quantity picked from all available items.
+   * @param {object} values
    * @public
    */
   /* eslint-disable-next-line class-methods-use-this */
@@ -227,5 +228,6 @@ EditPickModal.propTypes = {
   reasonCodesFetched: PropTypes.bool.isRequired,
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  /** Function updating page on which modal is located called when user saves changes */
   onResponse: PropTypes.func.isRequired,
 };

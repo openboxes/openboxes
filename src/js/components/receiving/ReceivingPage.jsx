@@ -48,6 +48,12 @@ class ReceivingPage extends Component {
     this.fetchPartialReceiptCandidates();
   }
 
+  /**
+   * Saves all changes made by user, updates receipt status and if it's the last page of partial
+   * receiving, it informs if the shipment was received successfully.
+   * @param {object} formValues
+   * @public
+   */
   onSubmit(formValues) {
     if (this.state.page === 0) {
       const containers = _.map(formValues.containers, container => ({
@@ -68,7 +74,8 @@ class ReceivingPage extends Component {
   }
 
   /**
-   * Return array of form's components
+   * Returns array of form's components.
+   * @param {object} props
    * @public
    */
   getFormList(props) {
@@ -87,6 +94,12 @@ class ReceivingPage extends Component {
     ];
   }
 
+  /**
+  * Sends all changes made by user in this step of partial receiving to API and updates data.
+  * @param {function} callback
+  * @param {object} formValues
+  * @public
+  */
   save(formValues, callback) {
     this.props.showSpinner();
     const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}`;
@@ -105,7 +118,7 @@ class ReceivingPage extends Component {
   }
 
   /**
-   * Take user to the next page
+   * Takes user to the next page.
    * @public
    */
   nextPage() {
@@ -113,7 +126,7 @@ class ReceivingPage extends Component {
   }
 
   /**
-   * Return user to the previous page
+   * Returns user to the previous page.
    * @public
    */
   prevPage() {
@@ -121,7 +134,7 @@ class ReceivingPage extends Component {
   }
 
   /**
-   * Fetch available receipts from API
+   * Fetches available receipts from API.
    * @public
    */
   fetchPartialReceiptCandidates() {
@@ -137,7 +150,7 @@ class ReceivingPage extends Component {
   }
 
   /**
-   * Fetch available bin locations from API
+   * Fetches available bin locations from API.
    * @public
    */
   fetchBins() {

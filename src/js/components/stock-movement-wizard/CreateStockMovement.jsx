@@ -184,7 +184,7 @@ class CreateStockMovement extends Component {
   }
 
   /**
-   * Fetch available stock lists from API with given origin and destination
+   * Fetches available stock lists from API with given origin and destination.
    * @param {object} origin
    * @param {object} destination
    * @public
@@ -204,7 +204,7 @@ class CreateStockMovement extends Component {
   }
 
   /**
-   * Create new requisition with given data using post method
+   * Creates new requisition with given data using post method.
    * @param {object} origin
    * @param {object} destination
    * @param {object} requestedBy
@@ -237,8 +237,9 @@ class CreateStockMovement extends Component {
   }
 
   /**
-   * Call method creating new requisition if it is not an existing one
-   * and move user to the next page
+   * Calls method creating new requisition if it is not an existing one
+   * and moves user to the next page.
+   * @param {object} values
    * @public
    */
   nextPage(values) {
@@ -304,6 +305,7 @@ export default connect(null, {
 })(CreateStockMovement);
 
 CreateStockMovement.propTypes = {
+  /** Initial component's data */
   initialValues: PropTypes.shape({}).isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,

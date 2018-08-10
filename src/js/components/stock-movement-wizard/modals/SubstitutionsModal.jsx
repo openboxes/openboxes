@@ -97,7 +97,7 @@ class SubstitutionsModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
-  /** Load available substitutions for chosen item into modal's form
+  /** Loads available substitutions for chosen item into modal's form.
    * @public
    */
   onOpen() {
@@ -109,7 +109,7 @@ class SubstitutionsModal extends Component {
     });
   }
 
-  /** Send all the changes made by user in this modal to API and update data
+  /** Sends all changes made by user in this modal to API and updates data.
    * @param {object} values
    * @public
    */
@@ -134,7 +134,8 @@ class SubstitutionsModal extends Component {
     }).catch(() => { this.props.hideSpinner(); });
   }
 
-  /** Sum up quantity selected from all available substitutions
+  /** Sums up quantity selected from all available substitutions.
+   * @param {object} values
    * @public
    */
   /* eslint-disable-next-line class-methods-use-this */
@@ -200,5 +201,6 @@ SubstitutionsModal.propTypes = {
   reasonCodesFetched: PropTypes.bool.isRequired,
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  /** Function updating page on which modal is located called when user saves changes */
   onResponse: PropTypes.func.isRequired,
 };

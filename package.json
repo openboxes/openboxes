@@ -10,8 +10,10 @@
   },
   "scripts": {
     "watch": "webpack --watch --colors --progress",
-    "bundle": "webpack -p",
-    "test": "jest"
+    "bundle": "webpack",
+    "test": "jest",
+    "styleguide": "styleguidist server",
+    "styleguide:build": "styleguidist build"
   },
   "jest": {
     "verbose": true,
@@ -94,6 +96,7 @@
     "jest": "22.4.4",
     "jquery": "3.3.1",
     "node-sass": "4.9.2",
+    "react-styleguidist": "7.2.1",
     "react-test-renderer": "16.4.2",
     "regenerator-runtime": "0.11.1",
     "sass-loader": "7.1.0",

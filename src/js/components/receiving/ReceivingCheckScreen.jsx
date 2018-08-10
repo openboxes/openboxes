@@ -155,7 +155,7 @@ class ReceivingCheckScreen extends Component {
   }
 
   /**
-   * Call save method
+   * Calls save method.
    * @public
    */
   onSave() {
@@ -181,9 +181,11 @@ export default ReceivingCheckScreen;
 ReceivingCheckScreen.propTypes = {
   /** Function returning user to the previous page */
   prevPage: PropTypes.func.isRequired,
+  /** Function sending all changes mage by user to API and updating data */
   save: PropTypes.func.isRequired,
   /** All data in the form */
   formValues: PropTypes.shape({}),
+  /** Indicator if partial receiving has been completed */
   completed: PropTypes.bool,
 };
 

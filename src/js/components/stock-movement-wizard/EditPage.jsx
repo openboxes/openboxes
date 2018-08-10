@@ -198,7 +198,7 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Fetch data using function given as an argument(reducers components)
+   * Fetches data using function given as an argument(reducers components).
    * @param {function} fetchFunction
    * @public
    */
@@ -210,7 +210,7 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Send data of revised items with post method
+   * Sends data of revised items with post method.
    * @param {object} values
    * @public
    */
@@ -248,7 +248,7 @@ class EditItemsPage extends Component {
 
   /**
    * Transition to next stock movement status (PICKING)
-   * after sending createPicklist: 'true' to backend autopick functionality is invoked
+   * after sending createPicklist: 'true' to backend autopick functionality is invoked.
    * @public
    */
   transitionToStep4() {
@@ -259,7 +259,7 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Fetch 3rd step data from current stock movement
+   * Fetches 3rd step data from current stock movement.
    * @public
    */
   fetchLineItems() {
@@ -271,7 +271,7 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Saves current stock movement progress (line items) and goes to the next stock movement step
+   * Saves current stock movement progress (line items) and goes to the next stock movement step.
    * @param {object} formValues
    * @public
    */
@@ -289,6 +289,11 @@ class EditItemsPage extends Component {
       }).catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Saves changes made in subsitution modal and updates data.
+   * @param {object} editPageItems
+   * @public
+   */
   saveNewItems(editPageItems) {
     this.setState({
       values: {
@@ -340,6 +345,7 @@ export default connect(mapStateToProps, {
 })(EditItemsPage);
 
 EditItemsPage.propTypes = {
+  /** Initial component's data */
   initialValues: PropTypes.shape({}).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,

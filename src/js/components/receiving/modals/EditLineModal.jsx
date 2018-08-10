@@ -108,7 +108,7 @@ class EditLineModal extends Component {
   }
 
   /**
-   * Load available items into modal's form
+   * Loads available items into modal's form.
    * @public
   */
   onOpen() {
@@ -123,7 +123,7 @@ class EditLineModal extends Component {
   }
 
   /**
-   * Send all changes made by user in this modal to API and update data
+   * Sends all changes made by user in this modal to API and updates data.
    * @param {object} values
    * @public
    */

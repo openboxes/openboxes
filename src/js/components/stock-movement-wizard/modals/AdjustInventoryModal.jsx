@@ -94,7 +94,7 @@ class AdjustInventoryModal extends Component {
   }
 
   /**
-   * Load available inventories for chosen items into modal's form
+   * Loads available inventories for chosen items into modal's form.
    * @public
    */
   onOpen() {
@@ -106,7 +106,7 @@ class AdjustInventoryModal extends Component {
   }
 
   /**
-   * Send all the changes made by user in this modal to API and update data
+   * Sends all changes made by user in this modal to API and update data.
    * @param {object} values
    * @public
    */
@@ -135,7 +135,7 @@ class AdjustInventoryModal extends Component {
   }
 
   /**
-   * Fetch available bin locations from API
+   * Fetches available bin locations from API.
    * @public
    */
   fetchBins() {
@@ -183,5 +183,6 @@ AdjustInventoryModal.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function updating page on which modal is located called when user saves changes */
   onResponse: PropTypes.func.isRequired,
 };

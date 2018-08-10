@@ -266,7 +266,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Return proper fields depending on origin type or if stock list is chosen
+   * Returns proper fields depending on origin type or if stock list is chosen.
    * @public
    */
   getFields() {
@@ -335,8 +335,8 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Fetching stock movement's line items and setting them in redux form and in
-   * state as current line items
+   * Fetches stock movement's line items and sets them in redux form and in
+   * state as current line items.
    * @public
    */
   fetchAndSetLineItems() {
@@ -371,7 +371,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Fetching 2nd step data from current stock movement
+   * Fetches 2nd step data from current stock movement.
    * @public
    */
   fetchLineItems() {
@@ -383,7 +383,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Fetching data using function given as an argument
+   * Fetches data using function given as an argument.
    * @param {function} fetchFunction
    * @public
    */
@@ -395,7 +395,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Saves current stock movement progress (line items) and goes to the next stock movement step
+   * Saves current stock movement progress (line items) and goes to the next stock movement step.
    * @param {object} formValues
    * @public
    */
@@ -506,8 +506,8 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Remove chosen item from requisition's items list
-   * @param itemId
+   * Removes chosen item from requisition's items list.
+   * @param {string} itemId
    * @public
    */
   removeItem(itemId) {
@@ -528,9 +528,9 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Transition to next stock movement status
-   * - 'PICKED' if origin type is supplier
-   * - 'VERIFYING' if origin type is other than supplier
+   * Transition to next stock movement status:
+   * - 'PICKED' if origin type is supplier.
+   * - 'VERIFYING' if origin type is other than supplier.
    * @param {string} status
    * @public
    */
@@ -542,7 +542,8 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Export current state of stock movement's to csv file
+   * Exports current state of stock movement's to csv file.
+   * @param {object} formValues
    * @public
    */
   exportTemplate(formValues) {
@@ -565,7 +566,8 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Import chosen file to backend and then fetch line items
+   * Imports chosen file to backend and then fetches line items.
+   * @param {object} event
    * @public
    */
   importTemplate(event) {
@@ -661,6 +663,7 @@ export default (connect(mapStateToProps, {
 })(AddItemsPage));
 
 AddItemsPage.propTypes = {
+  /** Initial component's data */
   initialValues: PropTypes.shape({}).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,

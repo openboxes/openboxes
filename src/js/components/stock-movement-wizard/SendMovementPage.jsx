@@ -122,7 +122,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Update files' array after dropping them to dropzone area
+   * Updates files' array after dropping them to dropzone area.
    * @param {object} files
    * @public
    */
@@ -133,7 +133,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Fetch available shipment types from API
+   * Fetches available shipment types from API.
    * @public
    */
   fetchShipmentTypes() {
@@ -150,7 +150,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Fetch 5th step data from current stock movement
+   * Fetches 5th step data from current stock movement.
    * @public
    */
   fetchStockMovementData() {
@@ -160,8 +160,8 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Send files uploaded by user to backend
-   * @param file
+   * Sends files uploaded by user to backend.
+   * @param {object} file
    * @public
    */
   sendFile(file) {
@@ -174,7 +174,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Send data with shipment details
+   * Sends data with shipment details.
    * @param {object} values
    * @public
    */
@@ -193,7 +193,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Update stock movement status to ISSUED with post method
+   * Updates stock movement status to ISSUED with post method.
    * @public
    */
   stateTransitionToIssued() {
@@ -204,7 +204,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Upload files and send whole stock movement
+   * Uploads files and sends the whole stock movement.
    * @param {object} values
    * @public
    */
@@ -418,6 +418,7 @@ class SendMovementPage extends Component {
 export default connect(null, { showSpinner, hideSpinner })(SendMovementPage);
 
 SendMovementPage.propTypes = {
+  /** Initial component's data */
   initialValues: PropTypes.shape({}).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,

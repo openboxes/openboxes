@@ -243,7 +243,7 @@ class PartialReceivingPage extends Component {
   }
 
   /**
-   * Call save method
+   * Calls save method.
    * @public
    */
   onSave() {
@@ -251,7 +251,7 @@ class PartialReceivingPage extends Component {
   }
 
   /**
-   * Update items with a location of the bin
+   * Updates items with a location of the bin.
    * @public
    */
   setLocation(rowIndex, location) {
@@ -272,7 +272,7 @@ class PartialReceivingPage extends Component {
   }
 
   /**
-   * Autofill "to receive" cells in different ways depending on what user did.
+   * Autofills "to receive" cells in different ways depending on what user did.
    * If they click "Autofill quantites" button, it will automatically fill all lines.
    * If they click checkbox next to the pallet, it will automatically fill all lines in that pallet.
    * If they click checbox next to the line, it will automatically fill this line.
@@ -315,9 +315,8 @@ class PartialReceivingPage extends Component {
       this.props.change('containers', containers);
     }
   }
-
   /**
-   * Fetching data using function given as an argument
+   * Fetches data using function given as an argument.
    * @param {function} fetchFunction
    * @public
    */
@@ -328,6 +327,13 @@ class PartialReceivingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Saves changes made in edit line modal and updates data.
+   * @param {object} editLines
+   * @param {number} rowIndex
+   * @param {number} parentIndex
+   * @public
+   */
   saveEditLine(editLines, parentIndex, rowIndex) {
     const formValues = update(this.props.formValues, {
       containers: {
@@ -370,6 +376,7 @@ export default connect(mapStateToProps, {
 PartialReceivingPage.propTypes = {
   /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
+  /** Function sending all changes mage by user to API and updating data */
   save: PropTypes.func.isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
@@ -391,6 +398,5 @@ PartialReceivingPage.propTypes = {
 
 PartialReceivingPage.defaultProps = {
   formValues: {},
-  shipmentId: '',
   bins: [],
 };
