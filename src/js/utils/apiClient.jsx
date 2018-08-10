@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import _ from 'lodash';
 import axios from 'axios';
+import Alert from 'react-s-alert';
 
 const justRejectRequestError = error => Promise.reject(error);
 
@@ -49,22 +50,26 @@ const handleSuccess = response => response;
 const handleError = (error) => {
   switch (error.response.status) {
     case 400:
-      console.error('Bad request.');
+      Alert.error(`Bad request.</br>${_.get(error, 'response.data.errorMessage', '')}`);
       break;
     case 401:
-      console.error('Unauthorized.');
+      Alert.error(`Unauthorized.</br>${_.get(error, 'response.data.errorMessage', '')}`, {
+        onClose: () => {
+          window.location.reload();
+        },
+      });
       break;
     case 403:
-      console.error('Access denied.');
+      Alert.error(`Access denied.</br>${_.get(error, 'response.data.errorMessage', '')}`);
       break;
     case 404:
-      console.error('Not found.');
+      Alert.error(`Not found.</br>${_.get(error, 'response.data.errorMessage', '')}`);
       break;
     case 500:
-      console.error('Internal server error.');
+      Alert.error(`Internal server error.</br>${_.get(error, 'response.data.errorMessage', '')}`);
       break;
     default: {
-      console.error(error);
+      Alert.error(`${error}</br>${_.get(error, 'response.data.errorMessage', '')}`);
     }
   }
   return Promise.reject(error);

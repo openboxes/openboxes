@@ -482,6 +482,9 @@ class AddItemsPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         this.fetchAndSetLineItems();
+      })
+      .catch(() => {
+        this.props.hideSpinner();
       });
   }
 
