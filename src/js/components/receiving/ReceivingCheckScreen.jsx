@@ -103,8 +103,12 @@ const FIELDS = {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Remaining',
         fixedWidth: '95px',
+        fieldKey: '',
+        attributes: {
+          formatValue: fieldValue => (fieldValue.quantityRemaining),
+        },
         getDynamicAttr: ({ fieldValue }) => ({
-          className: !fieldValue ? '' : 'text-danger',
+          className: fieldValue.cancelRemaining ? 'strike-through' : 'text-danger',
         }),
       },
       cancelRemaining: {
