@@ -45,6 +45,7 @@ const debouncedProductsFetch = _.debounce((searchTerm, callback) => {
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'Delete',
+  flexWidth: '20px',
   fieldKey: '',
   buttonLabel: 'Delete',
   getDynamicAttr: ({ fieldValue, removeItem, removeRow }) => ({
@@ -155,14 +156,17 @@ const VENDOR_FIELDS = {
       palletName: {
         type: TextField,
         label: 'Pallet',
+        flexWidth: '40px',
       },
       boxName: {
         type: TextField,
         label: 'Box',
+        flexWidth: '40px',
       },
       product: {
         type: SelectField,
         label: 'Item',
+        flexWidth: '500px',
         attributes: {
           async: true,
           openOnClick: false,
@@ -176,10 +180,12 @@ const VENDOR_FIELDS = {
       lotNumber: {
         type: TextField,
         label: 'Lot',
+        flexWidth: '40px',
       },
       expirationDate: {
         type: DateField,
         label: 'Expiry',
+        flexWidth: '40px',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
         },
@@ -187,6 +193,7 @@ const VENDOR_FIELDS = {
       quantityRequested: {
         type: TextField,
         label: 'QTY',
+        flexWidth: '40px',
         attributes: {
           type: 'number',
         },
@@ -194,6 +201,7 @@ const VENDOR_FIELDS = {
       recipient: {
         type: SelectField,
         label: 'Recipient',
+        flexWidth: '70px',
         getDynamicAttr: ({ recipients }) => ({
           options: recipients,
         }),
