@@ -481,3 +481,7 @@ div.crossed-out .table-inner-row:before {
   content: "\f0e2";
   color: $blue-gamma;
 }
+
+.strike-through {
+  text-decoration: line-through;
+}
