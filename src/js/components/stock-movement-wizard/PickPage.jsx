@@ -7,7 +7,6 @@ import _ from 'lodash';
 import ArrayField from '../form-elements/ArrayField';
 import LabelField from '../form-elements/LabelField';
 import { renderFormField } from '../../utils/form-utils';
-import ValueSelectorField from '../form-elements/ValueSelectorField';
 import AdjustInventoryModal from './modals/AdjustInventoryModal';
 import EditPickModal from './modals/EditPickModal';
 import { showSpinner, hideSpinner } from '../../actions';
@@ -65,23 +64,6 @@ const FIELDS = {
         type: LabelField,
         label: 'Qty picked',
         flexWidth: '120px',
-      },
-      recipient: {
-        type: ValueSelectorField,
-        flexWidth: '120px',
-        label: 'Includes recipient',
-        attributes: {
-          formName: 'stock-movement-wizard',
-        },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `pickPage[${rowIndex}].recipient`,
-        }),
-        component: LabelField,
-        componentConfig: {
-          getDynamicAttr: ({ selectedValue }) => ({
-            className: selectedValue ? 'fa fa-user' : '',
-          }),
-        },
       },
       buttonEditPick: {
         label: 'Edit Pick',
