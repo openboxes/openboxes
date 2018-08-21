@@ -11,7 +11,7 @@ import PickPage from './PickPage';
 import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
 
-/** Main stock movement form's component. */
+/** Main stock movement form's wizard component. */
 class StockMovements extends Component {
   constructor(props) {
     super(props);

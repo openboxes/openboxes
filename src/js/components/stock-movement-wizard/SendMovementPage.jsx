@@ -49,7 +49,7 @@ const FIELDS = {
 
 /**
  * The last step of stock movement where user can see the whole movement,
- * print documents, add additional information or files and send it.
+ * print documents, upload documents, add additional information and send it.
  */
 class SendMovementPage extends Component {
   constructor(props) {
@@ -135,7 +135,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Fetch all data from current stock movement
+   * Fetch 5th step data from current stock movement
    * @public
    */
   fetchStockMovementData() {
@@ -145,7 +145,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Send files uploaded by user
+   * Send files uploaded by user to backend
    * @param file
    * @public
    */
@@ -178,7 +178,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Update status to ISSUED with post method
+   * Update stock movement status to ISSUED with post method
    * @public
    */
   stateTransitionToIssued() {
@@ -189,7 +189,7 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Send whole stock movement
+   * Upload files and send whole stock movement
    * @param {object} values
    * @public
    */

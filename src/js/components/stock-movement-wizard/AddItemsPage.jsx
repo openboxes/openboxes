@@ -265,8 +265,8 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Return an array of stock movement's items with different fields depending on origin type.
-   * Check wheter it's an existing item or the one to update.
+   * Returns an array of new stock movement's items and items to be
+   * updated (comparing to previous state of line items).
    * @param {object} lineItems
    * @public
    */
@@ -329,8 +329,8 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Create new array if requisition is empty or fill the form with previously chosen items.
-   * Use fetchLineItems function to fetch the data.
+   * Fetching stock movement's line items and setting them in redux form and in
+   * state as current line items
    * @public
    */
   fetchAndSetLineItems() {
@@ -365,7 +365,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Fetch all data from current stock movement
+   * Fetching 2nd step data from current stock movement
    * @public
    */
   fetchLineItems() {
@@ -377,7 +377,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Fetch data using function given as an argument(reducers components)
+   * Fetching data using function given as an argument
    * @param {function} fetchFunction
    * @public
    */
@@ -389,8 +389,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Make it possible for user to go to the next page.
-   * Call methods sending data to server and onSubmit function
+   * Saves current stock movement progress (line items) and goes to the next stock movement step
    * @param {object} formValues
    * @public
    */
@@ -431,7 +430,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Update list of requisition items with post method.
+   * Saves list of stock movement items with post method.
    * @param {object} lineItems
    * @public
    */
@@ -455,7 +454,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Update list of requisition items in current step. Used to export template.
+   * Saves list of requisition items in current step (without step change). Used to export template.
    * @param {object} itemCandidatesToSave
    * @public
    */
@@ -518,7 +517,9 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Update status depending on given argument with post method
+   * Transition to next stock movement status
+   * - 'PICKED' if origin type is supplier
+   * - 'VERIFYING' if origin type is other than supplier
    * @param {string} status
    * @public
    */
@@ -553,7 +554,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Import chosen file and fetch line items
+   * Import chosen file to backend and then fetch line items
    * @public
    */
   importTemplate(event) {

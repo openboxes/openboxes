@@ -120,7 +120,7 @@ const FIELDS = {
 };
 
 /**
- * The third step of stock movement(for movements form a depot) where user can see the
+ * The third step of stock movement(for movements from a depot) where user can see the
  * stock available and adjust quantities or make substitutions based on that information.
  */
 class EditItemsPage extends Component {
@@ -220,7 +220,8 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Update status to PICKING and createPicklist to true with post method
+   * Transition to next stock movement status (PICKING)
+   * after sending createPicklist: 'true' to backend autopick functionality is invoked
    * @public
    */
   transitionToStep4() {
@@ -231,7 +232,7 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Fetch all data from current stock movement
+   * Fetch 3rd step data from current stock movement
    * @public
    */
   fetchLineItems() {
@@ -243,8 +244,7 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Make it possible for user to go to the next page.
-   * Call methods sending data to server and onSubmit function
+   * Saves current stock movement progress (line items) and goes to the next stock movement step
    * @param {object} formValues
    * @public
    */

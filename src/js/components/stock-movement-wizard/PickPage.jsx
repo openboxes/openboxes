@@ -177,7 +177,7 @@ class PickPage extends Component {
   }
 
   /**
-   * Fetch all data from current stock movement
+   * Fetch 4th step data from current stock movement
    * @public
    */
   fetchLineItems() {
@@ -189,7 +189,7 @@ class PickPage extends Component {
   }
 
   /**
-   * Update status to PICKED with post method
+   * Transition to next stock movement status (PICKED)
    * @public
    */
   transitionToStep5() {
@@ -200,8 +200,7 @@ class PickPage extends Component {
   }
 
   /**
-   * Make it possible for user to go to the next page.
-   * Call method sending data to server and onSubmit function
+   * Goes to the next stock movement step
    * @public
    */
   nextPage() {
