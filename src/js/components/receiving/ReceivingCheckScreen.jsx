@@ -145,6 +145,10 @@ const FIELDS = {
   },
 };
 
+/**
+ * The second page of partial receiving where user can view all changes made during the
+ * receiving process. The user can cancel quantities not received and finalize the receipt.
+ */
 class ReceivingCheckScreen extends Component {
   constructor(props) {
     super(props);
@@ -157,6 +161,11 @@ class ReceivingCheckScreen extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
+  /**
+   * Save all changes made by user, update receipt status and inform if the shipment
+   * was received successfully
+   * @public
+   */
   onComplete(formValues) {
     this.save({ ...formValues, receiptStatus: 'COMPLETE' }, () => {
       this.setState({ completed: true });
@@ -164,10 +173,20 @@ class ReceivingCheckScreen extends Component {
     });
   }
 
+  /**
+   * Call save method
+   * @public
+   */
   onSave() {
     this.save(this.props.formValues);
   }
 
+  /**
+  * Send all changes made by user in this step of partial receiving to API and update data
+  * @param {function} callback
+  * @param {object} formValues
+  * @public
+  */
   save(formValues, callback) {
     this.props.showSpinner();
     const url = `/openboxes/api/partialReceiving/${this.props.shipmentId}`;
@@ -212,10 +231,12 @@ export default reduxForm({
 
 ReceivingCheckScreen.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  /** Function returning user to the previous page */
   prevPage: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   initialize: PropTypes.func.isRequired,
+  /** All data in the form */
   formValues: PropTypes.shape({}),
   shipmentId: PropTypes.string,
 };
