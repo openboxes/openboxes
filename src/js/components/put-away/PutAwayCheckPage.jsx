@@ -13,6 +13,20 @@ import { showSpinner, hideSpinner } from '../../actions';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-param-reassign */
+
+function getNodes(data, node = []) {
+  data.forEach((item) => {
+    if (Object.prototype.hasOwnProperty.call(item, '_subRows') && item._subRows) {
+      node = getNodes(item._subRows, node);
+    } else {
+      node.push(item._original);
+    }
+  });
+  return node;
+}
+
 class PutAwayCheckPage extends Component {
   constructor(props) {
     super(props);
@@ -24,11 +38,25 @@ class PutAwayCheckPage extends Component {
       columns,
       pivotBy,
       expanded,
+      expandedRowsCount: 0,
     };
   }
 
   onExpandedChange = (expanded) => {
-    this.setState({ expanded });
+    const expandedRecordsIds = [];
+
+    _.forEach(expanded, (value, key) => {
+      if (value) {
+        expandedRecordsIds.push(parseInt(key, 10));
+      }
+    });
+
+    const allCurrentRows = this.selectTable
+      .getWrappedInstance().getResolvedState().sortedData;
+    const expandedRows = _.at(allCurrentRows, expandedRecordsIds);
+    const expandedRowsCount = getNodes(expandedRows).length;
+
+    this.setState({ expanded, expandedRowsCount });
   };
 
   getColumns = () => [
@@ -79,9 +107,9 @@ class PutAwayCheckPage extends Component {
 
   toggleTree = () => {
     if (this.state.pivotBy.length) {
-      this.setState({ pivotBy: [], expanded: {} });
+      this.setState({ pivotBy: [], expanded: {}, expandedRowsCount: 0 });
     } else {
-      this.setState({ pivotBy: ['stockMovement.name'], expanded: {} });
+      this.setState({ pivotBy: ['stockMovement.name'], expanded: {}, expandedRowsCount: 0 });
     }
   };
 
@@ -144,7 +172,8 @@ class PutAwayCheckPage extends Component {
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={10}
+              minRows={pivotBy && pivotBy.length ?
+                10 - this.state.expandedRowsCount : 10}
               style={{
                 height: '500px',
               }}
