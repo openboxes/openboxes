@@ -35,7 +35,7 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
-        flexWidth: '130px',
+        flexWidth: '0.7',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
@@ -43,7 +43,7 @@ const FIELDS = {
       },
       productName: {
         type: LabelField,
-        flexWidth: '150px',
+        flexWidth: '6',
         label: 'Product Name',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
@@ -52,23 +52,23 @@ const FIELDS = {
       quantityRequested: {
         type: LabelField,
         label: 'Qty requested',
-        flexWidth: '120px',
+        flexWidth: '0.8',
       },
       quantityAvailable: {
         type: LabelField,
         label: 'Qty available',
-        flexWidth: '120px',
+        flexWidth: '0.8',
       },
       quantityConsumed: {
         type: LabelField,
         label: 'Monthly consumption',
-        flexWidth: '170px',
+        flexWidth: '1.35',
       },
       substituteButton: {
-        label: 'Substitute available',
+        label: 'Substitution',
         type: SubstitutionsModal,
         fieldKey: '',
-        flexWidth: '150px',
+        flexWidth: '1',
         attributes: {
           title: 'Substitutes',
         },
@@ -88,7 +88,7 @@ const FIELDS = {
         label: 'Revised Qty',
         type: TextField,
         fieldKey: 'statusCode',
-        flexWidth: '140px',
+        flexWidth: '1',
         attributes: {
           type: 'number',
         },
@@ -99,7 +99,7 @@ const FIELDS = {
       reasonCode: {
         type: ValueSelectorField,
         label: 'Reason code',
-        flexWidth: '200px',
+        flexWidth: '1.4',
         component: SelectField,
         componentConfig: {
           getDynamicAttr: ({ selectedValue, subfield, reasonCodes }) => ({
@@ -238,9 +238,9 @@ class EditItemsPage extends Component {
     return (
       <form onSubmit={this.props.handleSubmit(values => this.nextPage(values))}>
         {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-            stockMovementId: this.props.stockMovementId,
-            reasonCodes: this.props.reasonCodes,
-          }))}
+          stockMovementId: this.props.stockMovementId,
+          reasonCodes: this.props.reasonCodes,
+        }))}
         <div>
           <button type="button" className="btn btn-outline-primary btn-form" onClick={this.props.previousPage}>
             Previous
