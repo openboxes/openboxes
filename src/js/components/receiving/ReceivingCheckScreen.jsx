@@ -98,6 +98,9 @@ const FIELDS = {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Receiving Now',
         fixedWidth: '115px',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
       },
       quantityRemaining: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -105,7 +108,7 @@ const FIELDS = {
         fixedWidth: '95px',
         fieldKey: '',
         attributes: {
-          formatValue: fieldValue => (fieldValue.quantityRemaining),
+          formatValue: fieldValue => (fieldValue.quantityRemaining ? fieldValue.quantityRemaining.toLocaleString('en-US') : fieldValue.quantityRemaining),
         },
         getDynamicAttr: ({ fieldValue }) => ({
           className: fieldValue.cancelRemaining ? 'strike-through' : 'text-danger',
