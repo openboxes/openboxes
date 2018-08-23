@@ -250,7 +250,16 @@ class AddItemsPage extends Component {
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
-      if (parseInt(item.quantityRequested, 10) !== parseInt(oldItem.quantityRequested, 10)) {
+      const keyIntersection = _.remove(_.intersection(_.keys(oldItem), _.keys(item)), key => key !== 'product');
+      if (
+        this.props.origin.type === 'SUPPLIER' &&
+        (
+          !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection)) ||
+          (item.product.id !== oldItem.product.id)
+        )
+      ) {
+        lineItemsToBeUpdated.push(item);
+      } else if (parseInt(item.quantityRequested, 10) !== parseInt(oldItem.quantityRequested, 10)) {
         lineItemsToBeUpdated.push(item);
       }
     });
