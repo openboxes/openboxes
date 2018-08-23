@@ -119,6 +119,7 @@ const STOCKLIST_FIELDS = {
             async: true,
             openOnClick: false,
             autoload: false,
+            autoFocus: true,
             loadOptions: debouncedProductsFetch,
             cache: false,
             options: [],
@@ -142,6 +143,11 @@ const STOCKLIST_FIELDS = {
         attributes: {
           type: 'number',
         },
+        getDynamicAttr: ({
+          addRow, rowCount, rowIndex,
+        }) => ({
+          onBlur: rowCount === rowIndex + 1 ? () => addRow() : null,
+        }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
     },
@@ -157,6 +163,9 @@ const VENDOR_FIELDS = {
         type: TextField,
         label: 'Pallet',
         flexWidth: '1',
+        attributes: {
+          autoFocus: true,
+        },
       },
       boxName: {
         type: TextField,
@@ -203,8 +212,11 @@ const VENDOR_FIELDS = {
         type: SelectField,
         label: 'Recipient',
         flexWidth: '1.5',
-        getDynamicAttr: ({ recipients }) => ({
+        getDynamicAttr: ({
+          recipients, addRow, rowCount, rowIndex,
+        }) => ({
           options: recipients,
+          onBlur: rowCount === rowIndex + 1 ? () => addRow() : null,
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -545,7 +557,7 @@ class AddItemsPage extends Component {
             <button
               type="submit"
               className="btn btn-outline-primary btn-form float-right"
-              disabled={!_.some(this.props.lineItems, item => !_.isEmpty(item))}
+              disabled={!_.each(this.props.lineItems, item => !_.isEmpty(item))}
             >Next
             </button>
           </div>
