@@ -4,7 +4,6 @@ import { reduxForm, change, formValueSelector, initialize } from 'redux-form';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import validate from './validate';
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import DateField from '../form-elements/DateField';
@@ -252,6 +251,26 @@ class CreateStockMovement extends Component {
       </form>
     );
   }
+}
+
+function validate(values) {
+  const errors = {};
+  if (!values.description) {
+    errors.description = 'This field is required';
+  }
+  if (!values.origin) {
+    errors.origin = 'This field is required';
+  }
+  if (!values.destination) {
+    errors.destination = 'This field is required';
+  }
+  if (!values.requestedBy) {
+    errors.requestedBy = 'This field is required';
+  }
+  if (!values.dateRequested) {
+    errors.dateRequested = 'This field is required';
+  }
+  return errors;
 }
 
 const selector = formValueSelector('stock-movement-wizard');
