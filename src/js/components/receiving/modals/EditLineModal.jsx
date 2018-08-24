@@ -25,7 +25,15 @@ const FIELDS = {
     component: ArrayField,
     componentConfig: {
       disableVirtualization: true,
-      addButton: 'Add line',
+      // eslint-disable-next-line react/prop-types
+      addButton: ({ addRow, shipmentItemId }) => (
+        <button
+          type="button"
+          className="btn btn-outline-success margin-bottom-lg"
+          onClick={() => addRow({ shipmentItem: { id: shipmentItemId } })}
+        >Add line
+        </button>
+      ),
       getDynamicRowAttr: ({ rowValues }) => ({
         className: rowValues.remove ? 'crossed-out' : '',
       }),
@@ -37,7 +45,7 @@ const FIELDS = {
             custom: true,
           },
         },
-        'inventoryItem.product.productCode': {
+        'product.productCode': {
           type: TextField,
           label: 'Code',
           fieldKey: 'disabled',
@@ -45,7 +53,7 @@ const FIELDS = {
             disabled: fieldValue,
           }),
         },
-        'inventoryItem.product.name': {
+        'product.name': {
           type: TextField,
           label: 'Product',
           fieldKey: 'disabled',
@@ -64,7 +72,7 @@ const FIELDS = {
             dateFormat: 'MM/DD/YYYY',
           },
         },
-        quantity: {
+        quantityShipped: {
           type: TextField,
           label: 'Qty Shipped',
           attributes: {
@@ -104,9 +112,13 @@ class EditLineModal extends Component {
     }
   }
 
-  // TODO onSave
-  /* eslint-disable-next-line */
-  onSave(values) {}
+  onSave(values) {
+    this.state.attr.saveEditLine(
+      values.lines,
+      this.state.attr.parentIndex,
+      this.state.attr.rowIndex,
+    );
+  }
 
   render() {
     return (
@@ -117,7 +129,9 @@ class EditLineModal extends Component {
         btnSaveDisabled={this.props.invalid}
       >
         <form value={this.state.attr.productCode}>
-          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName))}
+          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+            shipmentItemId: this.state.attr.fieldValue.shipmentItem.id,
+          }))}
         </form>
       </ModalWrapper>
     );
