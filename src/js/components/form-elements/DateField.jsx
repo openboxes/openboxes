@@ -37,6 +37,9 @@ const DateField = (props) => {
           onChangeRaw={onChangeRaw}
           popperContainer={CalendarContainer}
           popperClassName="force-on-top"
+          showYearDropdown
+          scrollableYearDropdown
+          yearDropdownItemNumber={3}
         />
       </div>
     );
