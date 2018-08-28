@@ -92,6 +92,7 @@ class PutAwaySecondPage extends Component {
       Header: 'QTY',
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
+      Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
     }, {
       Header: 'Current bin',
       accessor: 'currentBins',

@@ -53,16 +53,25 @@ const FIELDS = {
         type: LabelField,
         label: 'Qty requested',
         flexWidth: '0.8',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
       },
       quantityAvailable: {
         type: LabelField,
         label: 'Qty available',
         flexWidth: '0.8',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
       },
       quantityConsumed: {
         type: LabelField,
         label: 'Monthly consumption',
         flexWidth: '1.35',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
       },
       substituteButton: {
         label: 'Substitution',

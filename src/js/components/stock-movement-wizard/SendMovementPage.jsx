@@ -331,7 +331,8 @@ class SendMovementPage extends Component {
                           {item.expirationDate}
                         </td>
                         <td style={{ width: '150px' }}>
-                          {item.quantityPicked || item.quantityRequested}
+                          {(item.quantityPicked ? item.quantityPicked.toLocaleString('en-US') : item.quantityPicked) ||
+                           (item.quantityRequested ? item.quantityRequested.toLocaleString('en-US') : item.quantityRequested)}
                         </td>
                         {!(this.state.supplier) &&
                           <td>{item['binLocation.name']}</td>

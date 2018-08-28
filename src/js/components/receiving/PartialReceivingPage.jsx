@@ -134,13 +134,16 @@ const FIELDS = {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Shipped',
         fixedWidth: '75px',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
       },
       quantityReceived: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Received',
         fixedWidth: '75px',
         attributes: {
-          formatValue: value => (value || '0'),
+          formatValue: value => (value ? value.toLocaleString('en-US') : '0'),
         },
       },
       quantityReceiving: {
