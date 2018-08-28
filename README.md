@@ -185,6 +185,15 @@ To run new frontend (React) tests type:
 ```
 npm test
 ```
+##### 13. React documentation
+Start a style guide dev server:
+```
+npm run styleguide
+```
+View your style guide in the browser:
+```
+http://localhost:6060
+```
 
 ### Troubleshooting
 

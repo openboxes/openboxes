@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 
-Modal.setAppElement('#root');
-
 class ModalWrapper extends Component {
   constructor(props) {
     super(props);
@@ -96,39 +94,39 @@ class ModalWrapper extends Component {
 export default ModalWrapper;
 
 ModalWrapper.propTypes = {
-  /* Open button properties */
+  /** Open button properties */
   btnOpenText: PropTypes.string,
   btnOpenClassName: PropTypes.string,
   btnOpenStyle: PropTypes.shape({}),
   btnOpenDisabled: PropTypes.bool,
 
-  /* Modal title property */
+  /** Modal title property */
   title: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func,
   ]).isRequired,
 
-  /* Modal body container properties */
+  /** Modal body container properties */
   children: PropTypes.element.isRequired,
   bodyContainerClassName: PropTypes.string,
   bodyContainerStyle: PropTypes.shape({}),
 
-  /* Button container properties */
+  /** Button container properties */
   btnContainerClassName: PropTypes.string,
   btnContainerStyle: PropTypes.shape({}),
 
-  /* Save button properties */
+  /** Save button properties */
   btnSaveText: PropTypes.string,
   btnSaveClassName: PropTypes.string,
   btnSaveStyle: PropTypes.shape({}),
   btnSaveDisabled: PropTypes.bool,
 
-  /* Cancel button properties */
+  /** Cancel button properties */
   btnCancelText: PropTypes.string,
   btnCancelClassName: PropTypes.string,
   btnCancelStyle: PropTypes.shape({}),
 
-  /* Functional properties */
+  /** Functional properties */
   onOpen: PropTypes.func,
   onSave: PropTypes.func,
   onClose: PropTypes.func,

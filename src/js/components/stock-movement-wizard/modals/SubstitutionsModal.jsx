@@ -58,6 +58,10 @@ const FIELDS = {
 };
 
 /* eslint no-param-reassign: "error" */
+/**
+ * Modal window where user can choose substitution and it's quantity.
+ * It is available only when there is a substitution for an item.
+ */
 class SubstitutionsModal extends Component {
   constructor(props) {
     super(props);
@@ -75,6 +79,9 @@ class SubstitutionsModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
+  /** Load available substitutions for chosen item into modal's form
+   * @public
+   */
   onOpen() {
     this.props.change(
       'substitution-form',
@@ -83,6 +90,10 @@ class SubstitutionsModal extends Component {
     );
   }
 
+  /** Send all the changes made by user in this modal to API and update data
+   * @param {object} values
+   * @public
+   */
   onSave(values) {
     this.props.showSpinner();
     const substitutions = _.filter(values.substitutions, sub => sub.quantitySelected > 0);
@@ -113,6 +124,9 @@ class SubstitutionsModal extends Component {
     }).catch(() => { this.props.hideSpinner(); });
   }
 
+  /** Sum up quantity selected from all available substitutions
+   * @public
+   */
   calculateSelected() {
     return _.reduce(this.props.substitutions, (sum, val) =>
       (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0);
@@ -173,21 +187,31 @@ export default reduxForm({
 })(SubstitutionsModal));
 
 SubstitutionsModal.propTypes = {
-  initialize: PropTypes.func.isRequired,
+  /** Indicator if data is valid */
   invalid: PropTypes.bool.isRequired,
+  /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
+  /** Array of available substitution */
   substitutions: PropTypes.arrayOf(PropTypes.shape({})),
+  /** Name of the field */
   fieldName: PropTypes.string.isRequired,
+  /** Configuration of the field */
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
+  /** Stock movement's ID */
   stockMovementId: PropTypes.string.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  rowIndex: PropTypes.number.isRequired,
+  /** Function that is passed to onSubmit function */
   handleSubmit: PropTypes.func.isRequired,
+  /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
+  /** Indicator if reason codes' data is fetched */
   reasonCodesFetched: PropTypes.bool.isRequired,
+  /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
 

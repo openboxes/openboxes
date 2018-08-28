@@ -47,6 +47,10 @@ const FIELDS = {
   },
 };
 
+/**
+ * The last step of stock movement where user can see the whole movement,
+ * print documents, upload documents, add additional information and send it.
+ */
 class SendMovementPage extends Component {
   constructor(props) {
     super(props);
@@ -102,12 +106,21 @@ class SendMovementPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Update files' array after dropping them to dropzone area
+   * @param {object} files
+   * @public
+   */
   onDrop(files) {
     this.setState({
       files,
     });
   }
 
+  /**
+   * Fetch available shipment types from API
+   * @public
+   */
   fetchShipmentTypes() {
     const url = '/openboxes/api/generic/shipmentType';
 
@@ -121,12 +134,21 @@ class SendMovementPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Fetch 5th step data from current stock movement
+   * @public
+   */
   fetchStockMovementData() {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=5`;
 
     return apiClient.get(url);
   }
 
+  /**
+   * Send files uploaded by user to backend
+   * @param file
+   * @public
+   */
   sendFile(file) {
     const url = `/openboxes/stockMovement/uploadDocument/${this.props.stockMovementId}`;
 
@@ -136,6 +158,11 @@ class SendMovementPage extends Component {
     return apiClient.post(url, data);
   }
 
+  /**
+   * Send data with shipment details
+   * @param {object} values
+   * @public
+   */
   sendShipment(values) {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}`;
     const payload = {
@@ -150,6 +177,10 @@ class SendMovementPage extends Component {
     return apiClient.post(url, payload);
   }
 
+  /**
+   * Update stock movement status to ISSUED with post method
+   * @public
+   */
   stateTransitionToIssued() {
     const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}/status`;
     const payload = { status: 'ISSUED' };
@@ -157,6 +188,11 @@ class SendMovementPage extends Component {
     return apiClient.post(url, payload);
   }
 
+  /**
+   * Upload files and send whole stock movement
+   * @param {object} values
+   * @public
+   */
   submitStockMovement(values) {
     this.props.showSpinner();
     if (this.state.files.length) {
@@ -385,10 +421,16 @@ export default reduxForm({
 })(connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage));
 
 SendMovementPage.propTypes = {
+  /** Function that is passed to onSubmit function */
   handleSubmit: PropTypes.func.isRequired,
+  /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
+  /** Indicator if data is valid */
   invalid: PropTypes.bool.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Stock movement's ID */
   stockMovementId: PropTypes.string.isRequired,
 };

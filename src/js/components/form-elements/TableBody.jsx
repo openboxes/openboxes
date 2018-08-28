@@ -25,6 +25,7 @@ const TableBody = (props) => {
   );
 };
 
+/** @component */
 export default TableBody;
 
 TableBody.propTypes = {

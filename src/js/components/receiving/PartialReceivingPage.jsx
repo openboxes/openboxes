@@ -201,6 +201,18 @@ const FIELDS = {
   },
 };
 
+/** The first page of partial receiving where user can see receipt lines and complete it in
+ * different ways depending on how they receive it.
+ * - If the user is receiving everything with no changes, they click "autofill all quantities"
+ * button what will automatically fill all of the "to receive" cells with quantity left in the line.
+ * - If the user is receiving by pallet with no changes, they click the checkbox next to the pallet
+ * they want to receive what will automatically fill "to receive" column for lines
+ * in that pallet with full quantity.
+ * - If the user is receiving by line with no lot changes, they go line by line and type in the
+ * quantity from each line they want to receive.
+ * - If the user has to change lot information, they click the edit line button which allows them
+ * to edit the line.
+ */
 class PartialReceivingPage extends Component {
   static autofillLine(clearValue, shipmentItem) {
     return {
@@ -224,10 +236,18 @@ class PartialReceivingPage extends Component {
     }
   }
 
+  /**
+   * Call save method
+   * @public
+   */
   onSave() {
     this.save(this.props.formValues);
   }
 
+  /**
+   * Update items with a location of the bin
+   * @public
+   */
   setLocation(rowIndex, location) {
     if (this.props.formValues.containers && !_.isNil(rowIndex)) {
       const containers = update(this.props.formValues.containers, {
@@ -245,6 +265,13 @@ class PartialReceivingPage extends Component {
     }
   }
 
+  /**
+   * Autofill "to receive" cells in different ways depending on what user did.
+   * If they click "Autofill quantites" button, it will automatically fill all lines.
+   * If they click checkbox next to the pallet, it will automatically fill all lines in that pallet.
+   * If they click checbox next to the line, it will automatically fill this line.
+   * @public
+   */
   autofillLines(clearValue, parentIndex, rowIndex) {
     if (this.props.formValues.containers) {
       let containers = [];
@@ -283,6 +310,11 @@ class PartialReceivingPage extends Component {
     }
   }
 
+  /**
+   * Send current partial receiving progress and goes to the next page
+   * @param {object} formValues
+   * @public
+   */
   nextPage(formValues) {
     const containers = _.map(formValues.containers, container => ({
       ...container,
@@ -295,6 +327,12 @@ class PartialReceivingPage extends Component {
     this.save(payload, this.props.onSubmit);
   }
 
+  /**
+  * Send all changes made by user in this step of partial receiving to API and update data
+  * @param {function} callback
+  * @param {object} formValues
+  * @public
+  */
   save(formValues, callback) {
     this.props.showSpinner();
     const url = `/openboxes/api/partialReceiving/${this.props.shipmentId}`;
@@ -312,6 +350,11 @@ class PartialReceivingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Fetching data using function given as an argument
+   * @param {function} fetchFunction
+   * @public
+   */
   fetchData(fetchFunction) {
     this.props.showSpinner();
     fetchFunction()
@@ -368,18 +411,26 @@ export default reduxForm({
 
 PartialReceivingPage.propTypes = {
   initialize: PropTypes.func.isRequired,
+  /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function fetching users */
   fetchUsers: PropTypes.func.isRequired,
+  /** Indicator if users' data is fetched */
   usersFetched: PropTypes.bool.isRequired,
+  /** Array of available users  */
   users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   shipmentId: PropTypes.string,
+  /** All data in the form */
   formValues: PropTypes.shape({
     containers: PropTypes.arrayOf(PropTypes.shape({})),
   }),
+  /** Array of available bin locations  */
   bins: PropTypes.arrayOf(PropTypes.shape({})),
 };
 

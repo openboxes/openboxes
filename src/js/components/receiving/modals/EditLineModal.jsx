@@ -76,6 +76,10 @@ const FIELDS = {
   },
 };
 
+/**
+ * Modal window where user can edit receiving's line. User can open it on the first page
+ * of partial receiving if they want to change lot information.
+*/
 class EditLineModal extends Component {
   constructor(props) {
     super(props);
@@ -93,6 +97,10 @@ class EditLineModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
+  /**
+   * Load available items into modal's form
+   * @public
+  */
   onOpen() {
     if (this.state.attr.fieldValue) {
       this.props.change('edit-line-form', 'lines', _.map([this.state.attr.fieldValue], value => ({
@@ -104,7 +112,11 @@ class EditLineModal extends Component {
     }
   }
 
-  // TODO onSave
+  /**
+  * Send all changes made by user in this modal to API and update data
+  * @param {object} values
+  * @public
+  */
   /* eslint-disable-next-line */
   onSave(values) {}
 
@@ -143,14 +155,22 @@ export default reduxForm({
 })(connect(null, { change, showSpinner, hideSpinner })(EditLineModal));
 
 EditLineModal.propTypes = {
+  /** removed in finalform */
   invalid: PropTypes.bool.isRequired,
+  /** removed in finalform */
   change: PropTypes.func.isRequired,
+  /** Name of the field */
   fieldName: PropTypes.string.isRequired,
+  /** Configuration of the field */
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Index  of current row */
   rowIndex: PropTypes.number.isRequired,
+  /** removed in finalform */
   handleSubmit: PropTypes.func.isRequired,
 };

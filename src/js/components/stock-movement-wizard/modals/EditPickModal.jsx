@@ -55,6 +55,7 @@ const FIELDS = {
 };
 
 /* eslint no-param-reassign: "error" */
+/** Modal window where user can edit pick. */
 class EditPickModal extends Component {
   constructor(props) {
     super(props);
@@ -71,6 +72,10 @@ class EditPickModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
+  /**
+   * Load chosen items, required quantity and reason codes into modal's form
+   * @public
+   */
   onOpen() {
     this.props.change(
       'stock-movement-wizard', 'availableItems',
@@ -81,6 +86,11 @@ class EditPickModal extends Component {
     this.props.change('stock-movement-wizard', 'quantityRequired', this.state.attr.fieldValue.quantityRequired);
   }
 
+  /**
+   * Send all the changes made by user in this modal to API and update data
+   * @param {object} values
+   * @public
+   */
   onSave(values) {
     this.props.showSpinner();
 
@@ -123,6 +133,10 @@ class EditPickModal extends Component {
     }).catch(() => { this.props.hideSpinner(); });
   }
 
+  /**
+   * Sum up quantity picked from all available items
+   * @public
+   */
   calculatePicked() {
     return _.reduce(this.props.availableItems, (sum, val) =>
       (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0);
@@ -197,19 +211,31 @@ export default reduxForm({
 })(EditPickModal));
 
 EditPickModal.propTypes = {
+  /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
+  /** Name of the field */
   fieldName: PropTypes.string.isRequired,
+  /** Configuration of the field */
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
+  /** Array of available items  */
   availableItems: PropTypes.arrayOf(PropTypes.shape({})),
+  /** Index  of current row */
   rowIndex: PropTypes.number.isRequired,
+  /** Indicator if data is valid */
   invalid: PropTypes.bool.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function that is passed to onSubmit function */
   handleSubmit: PropTypes.func.isRequired,
+  /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
+  /** Indicator if reason codes' data is fetched */
   reasonCodesFetched: PropTypes.bool.isRequired,
+  /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
 
