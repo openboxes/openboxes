@@ -237,7 +237,7 @@
         <g:if test="${(!shipmentInstance?.hasShipped()) && (shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id)}">
             <div class="action-menu-item">
                 <g:link controller="shipment" action="deleteShipment" id="${shipmentInstance.id}"><img
-                        src="${createLinkTo(dir: 'images/icons', file: 'trash.png')}"
+                        src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png')}"
                         alt="Delete Shipment" class="middle"/>&nbsp;
                     <g:if test="${request.request.requestURL.toString().contains('deleteShipment')}"><warehouse:message
                             code="shipping.deleteShipment.label"/></g:if>
