@@ -111,7 +111,7 @@ const FIELDS = {
           formatValue: fieldValue => (fieldValue.quantityRemaining ? fieldValue.quantityRemaining.toLocaleString('en-US') : fieldValue.quantityRemaining),
         },
         getDynamicAttr: ({ fieldValue }) => ({
-          className: fieldValue.cancelRemaining ? 'strike-through' : 'text-danger',
+          className: fieldValue.cancelRemaining || !fieldValue.quantityRemaining ? 'strike-through' : 'text-danger',
         }),
       },
       cancelRemaining: {
