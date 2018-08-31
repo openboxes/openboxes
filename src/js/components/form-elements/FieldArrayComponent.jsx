@@ -25,7 +25,7 @@ const FieldArrayComponent = (props) => {
         </div>
         <TableBodyComponent
           fields={fields}
-          properties={{ ...properties, rowCount: fields.length }}
+          properties={{ ...properties, rowCount: fields.length || 0 }}
           addRow={addRow}
           fieldsConfig={fieldsConfig}
         />
@@ -37,7 +37,7 @@ const FieldArrayComponent = (props) => {
               <button type="button" className="btn btn-outline-success margin-bottom-lg" onClick={() => addRow()}>
                 {AddButton}
               </button>
-            : <AddButton {...properties} addRow={addRow} />
+              : <AddButton {...properties} addRow={addRow} />
           }
         </div>
         }

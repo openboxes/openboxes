@@ -2,7 +2,7 @@ import {
   SHOW_SPINNER,
   HIDE_SPINNER,
   FETCH_USERS,
-  FETCH_REASONCODES
+  FETCH_REASONCODES,
 } from './types';
 import apiClient from '../utils/apiClient';
 

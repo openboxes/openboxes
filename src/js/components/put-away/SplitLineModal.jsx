@@ -11,8 +11,11 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import Input from '../../utils/Input';
 import Select from '../../utils/Select';
 
-Modal.setAppElement('#root');
-
+/**
+ * Modal window where user can split put-away's line. It has details of the line
+ * at the top, including total quantity to be put away. After clicking "add line",
+ * a new split line is added. User can select a bin and fill in the quantity to add to that bin.
+*/
 class SplitLineModal extends Component {
   constructor(props) {
     super(props);
@@ -26,6 +29,12 @@ class SplitLineModal extends Component {
     this.isBinSelected = this.isBinSelected.bind(this);
   }
 
+  /**
+   * Checks if there is still stock in the receiving bin and if there is, an error comes up.
+   * If user doesn't want to put away the rest of the line, split line is saved and remaining
+   * quantity will appear next time someone starts a put away.
+   * @public
+   */
   onSave() {
     const putAwayQty = this.calculatePutAwayQty();
 
@@ -48,11 +57,19 @@ class SplitLineModal extends Component {
     }
   }
 
+  /**
+   * Saves split items added by user in this modal.
+   * @public
+   */
   save() {
     this.props.saveSplitItems(_.filter(this.state.splitItems, item => item.quantity && item.quantity !== '0'));
     this.closeModal();
   }
 
+  /**
+   * Loads existing split items(default one or all added by user).
+   * @public
+   */
   openModal() {
     let splitItems = [];
 
@@ -75,10 +92,20 @@ class SplitLineModal extends Component {
     this.setState({ splitItems, showModal: true });
   }
 
+  /**
+   * Changes state of showModal to false so this modal's window is no longer visible.
+   * @public
+   */
   closeModal() {
     this.setState({ showModal: false });
   }
 
+  /**
+   * Returns true if all split items quantities are not higher than original put-away item quantity.
+   * It is needed for validation - there is no way to split lines if quantity added by user is
+   * higher than available one.
+   * @public
+   */
   isValid() {
     const qtySum = _.reduce(this.state.splitItems, (sum, val) =>
       (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0);
@@ -86,11 +113,20 @@ class SplitLineModal extends Component {
     return qtySum <= _.toInteger(this.props.putawayItem.quantity);
   }
 
+  /**
+   * Sums up quantity added by user to each split line.
+   * @public
+   */
   calculatePutAwayQty() {
     return _.reduce(this.state.splitItems, (sum, val) =>
       (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0);
   }
 
+  /**
+   * Returns true if bin location has been selected. It is needed for validation - there is no way
+   * to split lines if bin location hasn't been chosen for each line.
+   * @public
+   */
   isBinSelected() {
     return _.every(this.state.splitItems, splitItem =>
       splitItem.putawayLocation.id);
@@ -232,27 +268,36 @@ class SplitLineModal extends Component {
 export default SplitLineModal;
 
 SplitLineModal.propTypes = {
+  /** Function saving split line's items */
   saveSplitItems: PropTypes.func.isRequired,
+  /** Put-away items' data */
   putawayItem: PropTypes.shape({
+    /** Product's data */
     product: PropTypes.shape({
       productCode: PropTypes.string,
       name: PropTypes.string,
     }),
+    /** Inventory's data */
     inventoryItem: PropTypes.shape({
       expirationDate: PropTypes.string,
     }),
+    /** Item's quantity to put away. Can be either string or number. */
     quantity: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
     ]),
+    /** Facility of put-away's item */
     putawayFacility: PropTypes.shape({
       id: PropTypes.string,
     }),
+    /** Location of put-away item's bin */
     putawayLocation: PropTypes.shape({
       id: PropTypes.string,
     }),
   }),
+  /** An array of items to split */
   splitItems: PropTypes.arrayOf(PropTypes.shape({})),
+  /** An array of available bin locations */
   bins: PropTypes.arrayOf(PropTypes.shape({})),
 };
 

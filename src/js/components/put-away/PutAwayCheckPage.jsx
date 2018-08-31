@@ -27,6 +27,10 @@ function getNodes(data, node = []) {
   return node;
 }
 
+/**
+ * The last page of put-away which shows everything that user has chosen to put away.
+ * Split lines are shown as seperate lines.
+ */
 class PutAwayCheckPage extends Component {
   constructor(props) {
     super(props);
@@ -42,6 +46,11 @@ class PutAwayCheckPage extends Component {
     };
   }
 
+  /**
+   * Called when an expander is clicked. Checks expanded rows and counts their number.
+   * @param {object} expanded
+   * @public
+   */
   onExpandedChange = (expanded) => {
     const expandedRecordsIds = [];
 
@@ -59,6 +68,10 @@ class PutAwayCheckPage extends Component {
     this.setState({ expanded, expandedRowsCount });
   };
 
+  /**
+   * Returns an array of columns which are passed to the table.
+   * @public
+   */
   getColumns = () => [
     {
       Header: 'Code',
@@ -106,6 +119,11 @@ class PutAwayCheckPage extends Component {
     },
   ];
 
+  /**
+   * Changes the way od displaying table depending on after which element
+   * user wants to sort it by.
+   * @public
+   */
   toggleTree = () => {
     if (this.state.pivotBy.length) {
       this.setState({ pivotBy: [], expanded: {}, expandedRowsCount: 0 });
@@ -114,10 +132,21 @@ class PutAwayCheckPage extends Component {
     }
   };
 
+  /**
+   * Method that is passed to react table's option: defaultFilterMethod.
+   * It filters rows and converts a string to lowercase letters.
+   * @param {object} row
+   * @param {object} filter
+   * @public
+   */
   filterMethod = (filter, row) =>
     (row[filter.id] !== undefined ?
       String(row[filter.id].toLowerCase()).includes(filter.value.toLowerCase()) : true);
 
+  /**
+   * Sends all changes made by user in this step of put-away to API and updates data.
+   * @public
+   */
   savePutAways() {
     this.props.showSpinner();
     const url = '/openboxes/api/putaways';
@@ -181,7 +210,6 @@ class PutAwayCheckPage extends Component {
               showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
-              freezWhenExpanded
               defaultSorted={[{ id: 'name' }, { id: 'stockMovement.name' }]}
             />
             : null
@@ -221,14 +249,22 @@ class PutAwayCheckPage extends Component {
 export default connect(null, { showSpinner, hideSpinner })(PutAwayCheckPage);
 
 PutAwayCheckPage.propTypes = {
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function returning user to the previous page */
   prevPage: PropTypes.func.isRequired,
+  /** Function taking user to the first page */
   firstPage: PropTypes.func.isRequired,
+  /** All put-away's data */
   putAway: PropTypes.shape({
+    /** An array of all put-away's items */
     putawayItems: PropTypes.arrayOf(PropTypes.shape({})),
   }),
+  /** An array of available attributes after which a put-away can be sorted by */
   pivotBy: PropTypes.arrayOf(PropTypes.string),
+  /** List of currently expanded put-away's items */
   expanded: PropTypes.shape({}),
 };
 

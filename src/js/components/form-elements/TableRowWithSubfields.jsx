@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FieldArray } from 'redux-form';
+import { FieldArray } from 'react-final-form-arrays';
 
 import TableBody from './TableBody';
 import TableRow from './TableRow';

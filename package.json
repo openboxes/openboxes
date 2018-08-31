@@ -10,8 +10,10 @@
   },
   "scripts": {
     "watch": "webpack --watch --colors --progress",
-    "bundle": "webpack -p",
-    "test": "jest"
+    "bundle": "webpack",
+    "test": "jest",
+    "styleguide": "styleguidist server",
+    "styleguide:build": "styleguidist build"
   },
   "jest": {
     "verbose": true,
@@ -36,6 +38,8 @@
   "dependencies": {
     "axios": "0.18.0",
     "bootstrap": "4.1.3",
+    "final-form": "4.9.1",
+    "final-form-arrays": "1.0.4",
     "font-awesome": "4.7.0",
     "immutability-helper": "2.7.1",
     "jquery": "3.3.1",
@@ -50,6 +54,8 @@
     "react-datepicker": "1.6.0",
     "react-dom": "16.4.2",
     "react-dropzone": "4.3.0",
+    "react-final-form": "3.6.5",
+    "react-final-form-arrays": "1.0.6",
     "react-localize-redux": "2.17.5",
     "react-modal": "3.5.1",
     "react-overlays": "0.8.3",
@@ -90,6 +96,7 @@
     "jest": "22.4.4",
     "jquery": "3.3.1",
     "node-sass": "4.9.2",
+    "react-styleguidist": "7.2.1",
     "react-test-renderer": "16.4.2",
     "regenerator-runtime": "0.11.1",
     "sass-loader": "7.1.0",

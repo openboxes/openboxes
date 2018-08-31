@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { change, reduxForm, formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
 import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
-import { renderFormField } from '../../../utils/form-utils';
 import SelectField from '../../form-elements/SelectField';
 import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
@@ -57,6 +55,31 @@ const FIELDS = {
   },
 };
 
+function validate(values) {
+  const errors = {};
+  errors.availableItems = [];
+  _.forEach(values.availableItems, (item, key) => {
+    if (item.quantityPicked > item.quantityAvailable) {
+      errors.availableItems[key] = { quantityPicked: 'Picked quantity is higher than available' };
+    }
+  });
+
+  const pickedSum = _.reduce(
+    values.availableItems, (sum, val) =>
+      (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)),
+    0,
+  );
+
+
+  if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
+    !values.reasonCode && pickedSum !== values.quantityRequired) {
+    errors.reasonCode = 'Total quantity picked is different than required! Add reason code!';
+  }
+
+  return errors;
+}
+
+/** Modal window where user can edit pick. */
 /* eslint no-param-reassign: "error" */
 class EditPickModal extends Component {
   constructor(props) {
@@ -68,22 +91,34 @@ class EditPickModal extends Component {
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
     const attr = { ...attributes, ...dynamicAttr };
 
-    this.state = { attr };
+    this.state = {
+      attr,
+      formValues: {},
+    };
 
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
   }
 
+  /**
+   * Loads chosen items, required quantity and reason codes into modal's form.
+   * @public
+   */
   onOpen() {
-    this.props.change(
-      'stock-movement-wizard', 'availableItems',
-      this.state.attr.fieldValue.availableItems,
-    );
-    this.props.change('stock-movement-wizard', 'reasonCode', '');
-    // for validation purposes
-    this.props.change('stock-movement-wizard', 'quantityRequired', this.state.attr.fieldValue.quantityRequired);
+    this.setState({
+      formValues: {
+        availableItems: this.state.attr.fieldValue.availableItems,
+        reasonCode: '',
+        quantityRequired: this.state.attr.fieldValue.quantityRequired,
+      },
+    });
   }
 
+  /**
+   * Sends all changes made by user in this modal to API and updates data.
+   * @param {object} values
+   * @public
+   */
   onSave(values) {
     this.props.showSpinner();
 
@@ -117,18 +152,28 @@ class EditPickModal extends Component {
       apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
         .then((resp) => {
           const { pickPageItems } = resp.data.data.pickPage;
-          this.props.change('stock-movement-wizard', 'pickPageItems', []);
-          this.props.change('stock-movement-wizard', 'pickPageItems', this.state.attr.checkForInitialPicksChanges(pickPageItems));
-
+          this.props.onResponse(pickPageItems);
           this.props.hideSpinner();
         })
         .catch(() => { this.props.hideSpinner(); });
     }).catch(() => { this.props.hideSpinner(); });
   }
 
-  calculatePicked() {
-    return _.reduce(this.props.availableItems, (sum, val) =>
-      (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0);
+  /**
+   * Sums up quantity picked from all available items.
+   * @param {object} values
+   * @public
+   */
+  /* eslint-disable-next-line class-methods-use-this */
+  calculatePicked(values) {
+    return (
+      <div>
+        <div className="font-weight-bold pb-2">Quantity Picked: {_.reduce(values.availableItems, (sum, val) =>
+          (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
+        </div>
+        <hr />
+      </div>
+    );
   }
 
   render() {
@@ -140,82 +185,49 @@ class EditPickModal extends Component {
       <ModalWrapper
         {...this.state.attr}
         onOpen={this.onOpen}
-        onSave={this.props.handleSubmit(values => this.onSave(values))}
-        btnSaveDisabled={this.props.invalid}
+        onSave={this.onSave}
+        fields={FIELDS}
+        validate={validate}
+        initialValues={this.state.formValues}
+        formProps={{ reasonCodes: this.props.reasonCodes }}
+        renderBodyWithValues={this.calculatePicked}
       >
-        <form className="print-mt">
+        <div>
           <div className="font-weight-bold">Product Code: {this.state.attr.fieldValue.productCode}</div>
           <div className="font-weight-bold">Product Name: {this.state.attr.fieldValue['product.name']}</div>
           <div className="font-weight-bold">Quantity Required: {this.state.attr.fieldValue.quantityRequired}</div>
-          <div className="font-weight-bold pb-2">Quantity Picked: {this.calculatePicked()}</div>
-          <hr />
-          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-            reasonCodes: this.props.reasonCodes,
-          }))}
-        </form>
+        </div>
       </ModalWrapper>
     );
   }
 }
 
-function validate(values) {
-  const errors = {};
-  errors.availableItems = [];
-  _.forEach(values.availableItems, (item, key) => {
-    if (item.quantityPicked > item.quantityAvailable) {
-      errors.availableItems[key] = { quantityPicked: 'Picked quantity is higher than available' };
-    }
-  });
-
-  const pickedSum = _.reduce(
-    values.availableItems, (sum, val) =>
-      (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)),
-    0,
-  );
-
-
-  if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
-    !values.reasonCode && pickedSum !== values.quantityRequired) {
-    errors.reasonCode = 'Total quantity picked is different than required! Add reason code!';
-  }
-
-  return errors;
-}
-
-const selector = formValueSelector('stock-movement-wizard');
-
 const mapStateToProps = state => ({
-  availableItems: selector(state, 'availableItems'),
   reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
 });
 
-export default reduxForm({
-  form: 'stock-movement-wizard',
-  destroyOnUnmount: false,
-  forceUnregisterOnUnmount: true,
-  validate,
-})(connect(mapStateToProps, {
-  change, fetchReasonCodes, showSpinner, hideSpinner,
-})(EditPickModal));
+export default connect(mapStateToProps, {
+  fetchReasonCodes, showSpinner, hideSpinner,
+})(EditPickModal);
 
 EditPickModal.propTypes = {
-  change: PropTypes.func.isRequired,
+  /** Name of the field */
   fieldName: PropTypes.string.isRequired,
+  /** Configuration of the field */
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
-  availableItems: PropTypes.arrayOf(PropTypes.shape({})),
-  rowIndex: PropTypes.number.isRequired,
-  invalid: PropTypes.bool.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
+  /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
+  /** Indicator if reason codes' data is fetched */
   reasonCodesFetched: PropTypes.bool.isRequired,
+  /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-};
-
-EditPickModal.defaultProps = {
-  availableItems: [],
+  /** Function updating page on which modal is located called when user saves changes */
+  onResponse: PropTypes.func.isRequired,
 };

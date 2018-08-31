@@ -1,10 +1,8 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
-import { reduxForm, initialize, change, getFormValues } from 'redux-form';
 import { connect } from 'react-redux';
 import update from 'immutability-helper';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -15,7 +13,6 @@ import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import { renderFormField } from '../../utils/form-utils';
 import Select from '../../utils/Select';
 import Checkbox from '../../utils/Checkbox';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
 import EditLineModal from './modals/EditLineModal';
 
@@ -209,6 +206,18 @@ const FIELDS = {
   },
 };
 
+/** The first page of partial receiving where user can see receipt lines and complete it in
+ * different ways depending on how they receive it.
+ * - If the user is receiving everything with no changes, they click "autofill all quantities"
+ * button what will automatically fill all of the "to receive" cells with quantity left in the line.
+ * - If the user is receiving by pallet with no changes, they click the checkbox next to the pallet
+ * they want to receive what will automatically fill "to receive" column for lines
+ * in that pallet with full quantity.
+ * - If the user is receiving by line with no lot changes, they go line by line and type in the
+ * quantity from each line they want to receive.
+ * - If the user has to change lot information, they click the edit line button which allows them
+ * to edit the line.
+ */
 class PartialReceivingPage extends Component {
   static autofillLine(clearValue, shipmentItem) {
     return {
@@ -233,10 +242,18 @@ class PartialReceivingPage extends Component {
     }
   }
 
+  /**
+   * Calls save method.
+   * @public
+   */
   onSave() {
-    this.save(this.props.formValues);
+    this.props.save(this.props.formValues);
   }
 
+  /**
+   * Updates items with a location of the bin.
+   * @public
+   */
   setLocation(rowIndex, location) {
     if (this.props.formValues.containers && !_.isNil(rowIndex)) {
       const containers = update(this.props.formValues.containers, {
@@ -250,10 +267,17 @@ class PartialReceivingPage extends Component {
         },
       });
 
-      this.props.change('partial-receiving-wizard', 'containers', containers);
+      this.props.change('containers', containers);
     }
   }
 
+  /**
+   * Autofills "to receive" cells in different ways depending on what user did.
+   * If they click "Autofill quantites" button, it will automatically fill all lines.
+   * If they click checkbox next to the pallet, it will automatically fill all lines in that pallet.
+   * If they click checbox next to the line, it will automatically fill this line.
+   * @public
+   */
   autofillLines(clearValue, parentIndex, rowIndex) {
     if (this.props.formValues.containers) {
       let containers = [];
@@ -288,39 +312,14 @@ class PartialReceivingPage extends Component {
         });
       }
 
-      this.props.change('partial-receiving-wizard', 'containers', containers);
+      this.props.change('containers', containers);
     }
   }
-
-  nextPage(formValues) {
-    const containers = _.map(formValues.containers, container => ({
-      ...container,
-      shipmentItems: _.filter(container.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''),
-    }));
-    const payload = {
-      ...formValues, receiptStatus: 'CHECKING', containers: _.filter(containers, container => container.shipmentItems.length),
-    };
-
-    this.save(payload, this.props.onSubmit);
-  }
-
-  save(formValues, callback) {
-    this.props.showSpinner();
-    const url = `/openboxes/api/partialReceiving/${this.props.shipmentId}`;
-
-    return apiClient.post(url, flattenRequest(formValues))
-      .then((response) => {
-        this.props.hideSpinner();
-
-        this.props.initialize('partial-receiving-wizard', {}, false);
-        this.props.initialize('partial-receiving-wizard', parseResponse(response.data.data), false);
-        if (callback) {
-          callback();
-        }
-      })
-      .catch(() => this.props.hideSpinner());
-  }
-
+  /**
+   * Fetches data using function given as an argument.
+   * @param {function} fetchFunction
+   * @public
+   */
   fetchData(fetchFunction) {
     this.props.showSpinner();
     fetchFunction()
@@ -328,6 +327,13 @@ class PartialReceivingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Saves changes made in edit line modal and updates data.
+   * @param {object} editLines
+   * @param {number} rowIndex
+   * @param {number} parentIndex
+   * @public
+   */
   saveEditLine(editLines, parentIndex, rowIndex) {
     const formValues = update(this.props.formValues, {
       containers: {
@@ -338,13 +344,12 @@ class PartialReceivingPage extends Component {
         },
       },
     });
-    this.save(formValues);
+    this.props.save(formValues);
   }
 
   render() {
-    const { handleSubmit } = this.props;
     return (
-      <form onSubmit={handleSubmit(values => this.nextPage(values))}>
+      <div>
         {_.map(FIELDS, (fieldConfig, fieldName) =>
           renderFormField(fieldConfig, fieldName, {
             autofillLines: this.autofillLines,
@@ -354,60 +359,44 @@ class PartialReceivingPage extends Component {
             bins: this.props.bins,
             users: this.props.users,
           }))}
-      </form>
+      </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  formValues: getFormValues('partial-receiving-wizard')(state),
   usersFetched: state.users.fetched,
   users: state.users.data,
 });
 
-function validate(values) {
-  const errors = {};
-
-  if (!values.dateDelivered) {
-    errors.dateDelivered = 'This field is required';
-  } else {
-    const date = moment(values.dateDelivered, 'MM/DD/YYYY');
-    if (moment().diff(date) < 0) {
-      errors.dateDelivered = 'The date cannot be in the future';
-    }
-  }
-
-  return errors;
-}
-
-export default reduxForm({
-  form: 'partial-receiving-wizard',
-  validate,
-  destroyOnUnmount: false,
-  forceUnregisterOnUnmount: true,
-})(connect(mapStateToProps, {
-  initialize, change, showSpinner, hideSpinner, fetchUsers,
-})(PartialReceivingPage));
+export default connect(mapStateToProps, {
+  showSpinner, hideSpinner, fetchUsers,
+})(PartialReceivingPage);
 
 PartialReceivingPage.propTypes = {
-  initialize: PropTypes.func.isRequired,
+  /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
+  /** Function sending all changes mage by user to API and updating data */
+  save: PropTypes.func.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function fetching users */
   fetchUsers: PropTypes.func.isRequired,
+  /** Indicator if users' data is fetched */
   usersFetched: PropTypes.bool.isRequired,
+  /** Array of available users  */
   users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  shipmentId: PropTypes.string,
+  /** All data in the form */
   formValues: PropTypes.shape({
     containers: PropTypes.arrayOf(PropTypes.shape({})),
   }),
+  /** Array of available bin locations  */
   bins: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
 PartialReceivingPage.defaultProps = {
   formValues: {},
-  shipmentId: '',
   bins: [],
 };
