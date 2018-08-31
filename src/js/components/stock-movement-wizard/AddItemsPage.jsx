@@ -66,6 +66,7 @@ const NO_STOCKLIST_FIELDS = {
         fieldKey: 'disabled',
         type: SelectField,
         label: 'Requisition items',
+        flexWidth: '9.5',
         attributes: {
           async: true,
           openOnClick: false,
@@ -83,13 +84,26 @@ const NO_STOCKLIST_FIELDS = {
       quantityRequested: {
         type: TextField,
         label: 'Quantity',
+        flexWidth: '2.5',
         attributes: {
           type: 'number',
         },
         fieldKey: '',
         getDynamicAttr: ({
-          fieldValue, addRow, rowCount, rowIndex,
+          fieldValue,
         }) => ({
+          disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
+        }),
+      },
+      recipient: {
+        type: SelectField,
+        label: 'Recipient',
+        flexWidth: '2.5',
+        fieldKey: '',
+        getDynamicAttr: ({
+          fieldValue, recipients, addRow, rowCount, rowIndex,
+        }) => ({
+          options: recipients,
           disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
           onBlur: rowCount === rowIndex + 1 ? () => addRow() : null,
         }),
@@ -288,7 +302,7 @@ class AddItemsPage extends Component {
           boxName: item.boxName,
           lotNumber: item.lotNumber,
           expirationDate: item.expirationDate,
-          'recipient.id': item.recipient ? item.recipient.id : '',
+          'recipient.id': item.recipient ? item.recipient : '',
         })),
         _.map(lineItemsToBeUpdated, item => ({
           id: item.id,
@@ -298,7 +312,7 @@ class AddItemsPage extends Component {
           boxName: item.boxName,
           lotNumber: item.lotNumber,
           expirationDate: item.expirationDate,
-          'recipient.id': item.recipient ? item.recipient.id : '',
+          'recipient.id': item.recipient ? item.recipient : '',
         })),
       );
     }
@@ -307,11 +321,13 @@ class AddItemsPage extends Component {
       _.map(lineItemsToBeAdded, item => ({
         'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
+        'recipient.id': item.recipient ? item.recipient : '',
       })),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
         'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
+        'recipient.id': item.recipient ? item.recipient : '',
       })),
     );
   }
