@@ -17,5 +17,6 @@
     <include file="0.8.x/changelog-2018-07-09-2222-insert-internal-receiving-location-type.xml"/>
     <include file="0.8.x/changelog-2018-07-15-2301-insert-internal-cross-docking-location-type.xml"/>
     <include file="0.8.x/changelog-2018-08-28-2258-insert-stock-movement-shipment-type.xml"/>
+    <include file="0.8.x/changelog-2018-08-31-2457-alter-table-shipment-add-column-description.xml"/>
 
 </databaseChangeLog>
