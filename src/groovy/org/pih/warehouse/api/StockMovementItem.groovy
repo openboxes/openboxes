@@ -17,6 +17,8 @@ class StockMovementItem {
     Location binLocation
     Person recipient
 
+    StockMovement stockMovement
+
     BigDecimal quantityRequested
     BigDecimal quantityAllowed
     BigDecimal quantityAvailable
@@ -121,21 +123,24 @@ class StockMovementItem {
             palletName = shipmentItem?.container?.name
         }
 
-        return new StockMovementItem(id: shipmentItem?.id,
+        return new StockMovementItem(
+                id: shipmentItem?.id,
+                statusCode: null,
                 productCode: shipmentItem?.product?.productCode,
                 product: shipmentItem?.inventoryItem?.product,
                 inventoryItem: shipmentItem?.inventoryItem,
-                statusCode: null,
                 quantityRequested: shipmentItem?.quantity,
                 quantityAllowed: null,
                 quantityAvailable: null,
                 quantityCanceled: null,
                 quantityRevised: null,
+                quantityPicked: null,
+                substitutionItems: null,
                 reasonCode: null,
                 comments: null,
+                recipient: shipmentItem.recipient,
                 palletName:palletName,
                 boxName:boxName,
-                recipient: shipmentItem.recipient,
                 sortOrder: null
 
         )
@@ -149,7 +154,8 @@ class StockMovementItem {
             return StockMovementItem.createFromRequisitionItem(it)
         } : []
 
-        return new StockMovementItem(id: requisitionItem.id,
+        return new StockMovementItem(
+                id: requisitionItem.id,
                 statusCode: requisitionItem.status?.name(),
                 productCode: requisitionItem?.product?.productCode,
                 product: requisitionItem?.product,
