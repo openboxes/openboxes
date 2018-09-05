@@ -73,23 +73,8 @@ class StockMovementApiController {
             stockMovement = new StockMovement()
         }
 
-        // Remove attributes that cause issues in the default grails data binder
-        List lineItems = jsonObject.remove("lineItems")
+        bindStockMovement(stockMovement, jsonObject)
 
-        // Dates aren't bound properly using default JSON binding
-        stockMovement.dateShipped = parseDate(jsonObject.remove("dateShipped"))
-        stockMovement.dateRequested = parseDate(jsonObject.remove("dateRequested"))
-
-        // Bind the rest of the JSON attributes to the stock movement object
-        log.info "Binding line items: " + lineItems
-        bindData(stockMovement, jsonObject)
-
-        // Bind all line items
-        if (lineItems) {
-            // Need to clear the existing line items so we only process the modified ones
-            //stockMovement.lineItems.clear()
-            bindLineItems(stockMovement, lineItems)
-        }
 
         // Create or update stock movement
         stockMovementService.updateStockMovement(stockMovement)
@@ -117,7 +102,11 @@ class StockMovementApiController {
      * Peforms a status update on the stock movement and forwards to the read action.
      */
     def updateStatus = {
+
+
         JSONObject jsonObject = request.JSON
+        log.info "update status: " + jsonObject.toString(4)
+
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         Boolean statusOnly =
@@ -156,6 +145,7 @@ class StockMovementApiController {
                         if (createPicklist) stockMovementService.createPicklist(stockMovement)
                         break;
                     case RequisitionStatus.PICKED:
+                        stockMovementService.createOrUpdateShipment(stockMovement)
                         break;
                     case RequisitionStatus.ISSUED:
                         stockMovementService.sendStockMovement(params.id)
@@ -182,6 +172,27 @@ class StockMovementApiController {
     Date parseDate(String date) {
         return date ? DEFAULT_DATE_FORMAT.parse(date) : null
     }
+
+    void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
+        // Remove attributes that cause issues in the default grails data binder
+        List lineItems = jsonObject.remove("lineItems")
+
+        // Dates aren't bound properly using default JSON binding
+        stockMovement.dateShipped = parseDate(jsonObject.remove("dateShipped"))
+        stockMovement.dateRequested = parseDate(jsonObject.remove("dateRequested"))
+
+        // Bind the rest of the JSON attributes to the stock movement object
+        log.info "Binding line items: " + lineItems
+        bindData(stockMovement, jsonObject)
+
+        // Bind all line items
+        if (lineItems) {
+            // Need to clear the existing line items so we only process the modified ones
+            //stockMovement.lineItems.clear()
+            bindLineItems(stockMovement, lineItems)
+        }
+    }
+
 
     /**
      * Bind the given line items (JSONArray) to StockMovementItem objects and add them to the given
