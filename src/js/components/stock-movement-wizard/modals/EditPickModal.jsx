@@ -100,6 +100,12 @@ class EditPickModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
+  componentDidMount() {
+    if (!this.props.reasonCodesFetched) {
+      this.fetchData(this.props.fetchReasonCodes);
+    }
+  }
+
   /**
    * Loads chosen items, required quantity and reason codes into modal's form.
    * @public
@@ -157,6 +163,18 @@ class EditPickModal extends Component {
         })
         .catch(() => { this.props.hideSpinner(); });
     }).catch(() => { this.props.hideSpinner(); });
+  }
+
+  /**
+   * Fetches data using function given as an argument(reducers components).
+   * @param {function} fetchFunction
+   * @public
+   */
+  fetchData(fetchFunction) {
+    this.props.showSpinner();
+    fetchFunction()
+      .then(() => this.props.hideSpinner())
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
