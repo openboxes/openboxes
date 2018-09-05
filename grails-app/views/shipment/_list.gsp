@@ -149,44 +149,43 @@
 				</tr>
 			</g:each>
 		</tbody>
-
-
         <g:isSuperuser>
-            <g:if test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED || statusCode == org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
-                <tfoot>
-                    <tr>
-                        <td>
-                            <input type="checkbox" class="checkAll"/>
-                        </td>
-                        <td colspan="11">
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td colspan="11" class="left">
+                        <div class="bulk-actions">
                             <g:if test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}">
                                 <div class="button-group">
-                                    <button type="submit" class="button icon approve bulkReceive">
+                                    <button type="submit" class="button icon approve" data-action="bulkReceiveShipments">
                                         <warehouse:message code="bulk.receive.label" default="Bulk Receive"/>
                                     </button>
-                                    <button type="submit" class="button icon tag bulkMarkAsReceived">
+                                    <button type="submit" class="button icon tag" data-action="bulkMarkAsReceived">
                                         <warehouse:message code="bulk.markAsReceived.label" default="Bulk Mark as Received"/>
                                     </button>
                                 </div>
                                 <div class="button-group">
-                                    <button type="submit" class="button icon approve bulkRollback">
+                                    <button type="submit" class="button icon loop" data-action="bulkRollbackShipments">
                                         <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
                                     </button>
                                 </div>
                             </g:if>
                             <g:elseif test="${statusCode==org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}">
                                 <div class="button-group">
-                                    <button type="submit" class="button icon approve bulkRollback">
+                                    <button type="submit" class="button icon loop" data-action="bulkRollbackShipments">
                                         <warehouse:message code="bulk.receive.label" default="Bulk Rollback"/>
                                     </button>
                                 </div>
                             </g:elseif>
-
-
-                        </td>
-                    </tr>
-                </tfoot>
-            </g:if>
+                            <div class="button-group">
+                                <button type="submit" class="button icon remove" data-action="bulkDeleteShipments">
+                                    <warehouse:message code="bulk.delete.label" default="Delete"/>
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
         </g:isSuperuser>
 	</table>
 </div>

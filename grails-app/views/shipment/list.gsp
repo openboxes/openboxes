@@ -26,7 +26,6 @@
                 </div>
                 <div class="yui-u">
 
-
                     <g:form id="listForm" name="listForm" method="post">
                         <g:if test="${incoming}">
                             <g:hiddenField name="type" value="incoming"/>
@@ -73,17 +72,6 @@
 
 		<script type="text/javascript">
 			$(function() { 		
-				//$(".clear-dates").click(function() {
-				//	$('#statusStartDate-datepicker').val('');
-				//	$('#statusEndDate-datepicker').val('');
-				//	$('#statusStartDate').val('');
-				//	$('#statusEndDate').val('');
-				//});
-
-
-				//$(".filter").change(function() {
-				//	$(this).closest("form").submit();
-				//});
 		    	$(".tabs").tabs(
 	    			{
 	    				cookie: {
@@ -96,37 +84,14 @@
 		    	var index = $('.tabs li a').index($('a[href="#add"]').get(0));
 		    	$('.tabs').tabs({selected: index});
 
-
-                $(".bulkReceive").click(function(event){
-
+                $(".bulk-actions .button").click(function(event){
                     event.preventDefault();
-                    $("#listForm").attr("action", "bulkReceiveShipments");
-                    $("#listForm").submit();
-                    console.log(event);
-                    console.log($("#listForm"));
-
+                    let action = $(this).data("action")
+                    if (action) {
+                        $("#listForm").attr("action", action);
+                        $("#listForm").submit();
+                    }
                 });
-
-                $(".bulkRollback").click(function(event){
-                    event.preventDefault();
-                    $("#listForm").attr("action", "bulkRollbackShipments");
-                    $("#listForm").submit();
-                });
-
-                $(".bulkMarkAsReceived").click(function(event){
-                    event.preventDefault();
-                    $("#listForm").attr("action", "bulkMarkAsReceived");
-                    $("#listForm").submit();
-                });
-
-//                $(':checkbox.all').change(function(){
-//                    $(':checkbox.item').prop('checked', this.checked);
-//                });
-
-                $(":checkbox.checkAll").change(function () {
-                    $(":checkbox.shipment-item").prop('checked', $(this).prop("checked"));
-                });
-
                 $('.dataTable').dataTable({
                     "bJQueryUI": true,
                     "sPaginationType": "full_numbers"
