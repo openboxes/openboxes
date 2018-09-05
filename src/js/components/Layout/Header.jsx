@@ -13,8 +13,10 @@ const Header = () => (
     >
       Openboxes
     </a>
-    <GlobalSearch />
-    <LanguageSelector />
+    <div className="d-flex">
+      <GlobalSearch />
+      <LanguageSelector />
+    </div>
   </div>
 );
 
