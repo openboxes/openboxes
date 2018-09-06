@@ -86,16 +86,8 @@ class StockMovement {
                 description: description,
                 statusCode: statusCode,
                 identifier: requisition?.requestNumber,
-                origin: [
-                        id: origin?.id,
-                        name: origin?.name,
-                        locationType: origin?.locationType?.locationTypeCode?.name()
-                ],
-                destination: [
-                        id: destination?.id,
-                        name: destination?.name,
-                        locationType: destination?.locationType?.locationTypeCode?.name()
-                ],
+                origin: origin,
+                destination: destination,
                 stocklist: [id: stocklist?.id, name: stocklist?.name],
                 dateRequested: dateRequested?.format("MM/dd/yyyy"),
                 requestedBy: requestedBy,
