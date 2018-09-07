@@ -585,6 +585,7 @@ class StockMovementService {
         shipment.origin = stockMovement.origin
         shipment.destination = stockMovement.destination
         shipment.requisition = stockMovement.requisition
+        shipment.shipmentNumber = stockMovement.identifier
 
         // These values need defaults since they are not set until step 5
         shipment.expectedShippingDate = stockMovement.dateShipped?:new Date()+1
