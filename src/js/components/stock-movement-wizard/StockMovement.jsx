@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
@@ -8,6 +9,8 @@ import EditPage from './EditPage';
 import PickPage from './PickPage';
 import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
+import apiClient from '../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../actions';
 
 /** Main stock movement form's wizard component. */
 class StockMovements extends Component {
@@ -23,6 +26,10 @@ class StockMovements extends Component {
     this.nextPage = this.nextPage.bind(this);
     this.previousPage = this.previousPage.bind(this);
     this.goToPage = this.goToPage.bind(this);
+  }
+
+  componentDidMount() {
+    this.fetchInitialValues();
   }
 
   /**
@@ -85,6 +92,77 @@ class StockMovements extends Component {
   }
 
   /**
+   * Fetches initial values from API.
+   * @public
+   */
+  fetchInitialValues() {
+    if (this.props.match.params.stockMovementId) {
+      this.props.showSpinner();
+      const url = `/openboxes/api/stockMovements/${this.props.match.params.stockMovementId}`;
+
+      apiClient.get(url)
+        .then((response) => {
+          const resp = response.data.data;
+          const originType = resp.origin.locationType;
+          const destinationType = resp.destination.locationType;
+          const values = {
+            ...resp,
+            stockMovementId: resp.id,
+            movementNumber: resp.identifier,
+            shipmentName: resp.name,
+            origin: {
+              id: resp.origin.id,
+              type: originType ? originType.locationTypeCode : null,
+              name: resp.origin.name,
+              label: `${resp.origin.name} [${originType ? originType.description : null}]`,
+            },
+            destination: {
+              id: resp.destination.id,
+              type: destinationType ? destinationType.locationTypeCode : null,
+              name: resp.destination.name,
+              label: `${resp.destination.name} [${destinationType ? destinationType.description : null}]`,
+            },
+            requestedBy: {
+              id: resp.requestedBy.id,
+              name: resp.requestedBy.name,
+              label: resp.requestedBy.name,
+            },
+          };
+
+          let page = 1;
+          let prevPage = 1;
+          switch (values.statusCode) {
+            case 'CREATED':
+              page = 2;
+              prevPage = 1;
+              break;
+            case 'VERIFYING':
+              page = 3;
+              prevPage = 2;
+              break;
+            case 'PICKING':
+              page = 4;
+              prevPage = 3;
+              break;
+            case 'PICKED':
+              page = 5;
+              if (values.origin.type === 'SUPPLIER') {
+                prevPage = 2;
+              } else {
+                prevPage = 4;
+              }
+              break;
+            default:
+              page = 1;
+          }
+          this.setState({ values, page, prevPage });
+          this.fetchBins();
+        })
+        .catch(() => this.props.hideSpinner());
+    }
+  }
+
+  /**
    * Sets current page state as a previous page and takes user to the next page.
    * @param {object} values
    * @public
@@ -140,9 +218,17 @@ class StockMovements extends Component {
   }
 }
 
-export default StockMovements;
+export default connect(null, { showSpinner, hideSpinner })(StockMovements);
 
 StockMovements.propTypes = {
+  /** React router's object which contains information about url varaiables and params */
+  match: PropTypes.shape({
+    params: PropTypes.shape({ stockMovementId: PropTypes.string }),
+  }).isRequired,
+  /** Function called when data is loading */
+  showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
+  hideSpinner: PropTypes.func.isRequired,
   /** Initial components' data */
   initialValues: PropTypes.shape({}),
 };
