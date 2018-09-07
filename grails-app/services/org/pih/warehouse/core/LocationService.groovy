@@ -31,7 +31,7 @@ class LocationService {
 		return getAllLocations(null)
 	}
 
-	def getAllLocations(String [] fields) {
+	def getLocations(String [] fields, String name) {
 
 		def locations = Location.createCriteria().list() {
 			if (fields) {
@@ -40,6 +40,9 @@ class LocationService {
 						property(field)
 					}
 				}
+			}
+			if (name) {
+				ilike("name", name + "%")
 			}
 			eq("active", Boolean.TRUE)
 			isNull("parentLocation")
