@@ -188,7 +188,7 @@ class StockMovementApiController {
         // Bind all line items
         if (lineItems) {
             // Need to clear the existing line items so we only process the modified ones
-            //stockMovement.lineItems.clear()
+            stockMovement.lineItems.clear()
             bindLineItems(stockMovement, lineItems)
         }
     }
