@@ -5,18 +5,21 @@ import TextField from '../../components/form-elements/TextField';
 import ButtonField from '../../components/form-elements/ButtonField';
 import { renderFormField } from '../../utils/form-utils';
 
-jest.mock('redux-form', () => ({
+jest.mock('react-final-form', () => ({
   Field: (props) => {
     const { component: Component, name, ...others } = props;
     const input = { onChange: () => {}, name };
     const meta = {};
     return <Component input={input} meta={meta} {...others} />;
   },
+}));
+
+jest.mock('react-final-form-arrays', () => ({
   FieldArray: (props) => {
     const { component: Component, name, ...others } = props;
     const fields = {
       map: callback => [`${name}[0]`, `${name}[1]`].map(callback),
-      get: () => {},
+      value: [{}, {}],
       length: 2,
       name: 'test-field',
     };

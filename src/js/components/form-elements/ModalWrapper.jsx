@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
+import { Form } from 'react-final-form';
+import arrayMutators from 'final-form-arrays';
+import _ from 'lodash';
 
-Modal.setAppElement('#root');
+import { renderFormField } from '../../utils/form-utils';
 
 class ModalWrapper extends Component {
   constructor(props) {
@@ -27,8 +30,8 @@ class ModalWrapper extends Component {
     this.setState({ showModal: false });
   }
 
-  save() {
-    this.props.onSave();
+  save(values) {
+    this.props.onSave(values);
     this.setState({ showModal: false });
   }
 
@@ -52,40 +55,59 @@ class ModalWrapper extends Component {
           className="modal-content-custom"
           shouldCloseOnOverlayClick={false}
         >
-          {
+          <div className={this.props.bodyContainerClassName} style={this.props.bodyContainerStyle}>
+            {
             typeof Title === 'string' ?
               <h5 className="text-center">{Title}</h5> :
               <Title />
           }
-          <hr />
+            <hr />
+            <Form
+              onSubmit={values => this.save(values)}
+              initialValues={this.props.initialValues}
+              validate={this.props.validate}
+              mutators={{ ...arrayMutators }}
+              render={({ handleSubmit, invalid, values }) =>
+                (
+                  <form id="modalForm" onSubmit={handleSubmit}>
 
-          <div className={this.props.bodyContainerClassName} style={this.props.bodyContainerStyle}>
-            {this.props.children}
-          </div>
+                    {this.props.children}
+                    {this.props.renderBodyWithValues(values)}
 
-          <hr />
-          <div
-            className={this.props.btnContainerClassName}
-            role="group"
-            style={this.props.btnContainerStyle}
-          >
-            <button
-              type="button"
-              className={this.props.btnSaveClassName}
-              style={this.props.btnSaveStyle}
-              disabled={this.props.btnSaveDisabled}
-              onClick={() => this.save()}
-            >
-              {this.props.btnSaveText}
-            </button>
-            <button
-              type="button"
-              className={this.props.btnCancelClassName}
-              style={this.props.btnCancelStyle}
-              onClick={() => this.closeModal()}
-            >
-              {this.props.btnCancelText}
-            </button>
+                    {_.map(
+                      this.props.fields,
+                      (fieldConfig, fieldName) =>
+                        renderFormField(fieldConfig, fieldName, this.props.formProps),
+                    )}
+
+                    <hr />
+
+                    <div
+                      className={this.props.btnContainerClassName}
+                      role="group"
+                      style={this.props.btnContainerStyle}
+                    >
+                      <button
+                        type="submit"
+                        className={this.props.btnSaveClassName}
+                        style={this.props.btnSaveStyle}
+                        disabled={this.props.btnSaveDisabled || invalid}
+                      >
+                        {this.props.btnSaveText}
+                      </button>
+                      <button
+                        type="button"
+                        className={this.props.btnCancelClassName}
+                        style={this.props.btnCancelStyle}
+                        onClick={() => this.closeModal()}
+                      >
+                        {this.props.btnCancelText}
+                      </button>
+                    </div>
+                  </form>
+                )
+              }
+            />
           </div>
         </Modal>
       </div>
@@ -96,42 +118,52 @@ class ModalWrapper extends Component {
 export default ModalWrapper;
 
 ModalWrapper.propTypes = {
-  /* Open button properties */
+  /** Open button properties */
   btnOpenText: PropTypes.string,
   btnOpenClassName: PropTypes.string,
   btnOpenStyle: PropTypes.shape({}),
   btnOpenDisabled: PropTypes.bool,
 
-  /* Modal title property */
+  /** Modal title property */
   title: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func,
   ]).isRequired,
 
-  /* Modal body container properties */
-  children: PropTypes.element.isRequired,
+  /** Modal body container properties */
+  children: PropTypes.element,
   bodyContainerClassName: PropTypes.string,
   bodyContainerStyle: PropTypes.shape({}),
 
-  /* Button container properties */
+  /** Button container properties */
   btnContainerClassName: PropTypes.string,
   btnContainerStyle: PropTypes.shape({}),
 
-  /* Save button properties */
+  /** Save button properties */
   btnSaveText: PropTypes.string,
   btnSaveClassName: PropTypes.string,
   btnSaveStyle: PropTypes.shape({}),
   btnSaveDisabled: PropTypes.bool,
 
-  /* Cancel button properties */
+  /** Cancel button properties */
   btnCancelText: PropTypes.string,
   btnCancelClassName: PropTypes.string,
   btnCancelStyle: PropTypes.shape({}),
 
-  /* Functional properties */
+  /** Functional properties */
   onOpen: PropTypes.func,
   onSave: PropTypes.func,
   onClose: PropTypes.func,
+
+  /** Form elements */
+  validate: PropTypes.func,
+  renderBodyWithValues: PropTypes.func,
+  initialValues: PropTypes.oneOfType([
+    PropTypes.shape({}),
+    PropTypes.arrayOf(PropTypes.shape({})),
+  ]),
+  fields: PropTypes.shape({}),
+  formProps: PropTypes.shape({}),
 };
 
 ModalWrapper.defaultProps = {
@@ -140,6 +172,7 @@ ModalWrapper.defaultProps = {
   btnOpenStyle: {},
   btnOpenDisabled: false,
 
+  children: null,
   bodyContainerClassName: 'modal-body-container',
   bodyContainerStyle: {},
 
@@ -159,4 +192,10 @@ ModalWrapper.defaultProps = {
   onOpen: () => null,
   onSave: () => null,
   onClose: () => null,
+
+  validate: () => null,
+  renderBodyWithValues: () => null,
+  initialValues: [],
+  fields: {},
+  formProps: {},
 };

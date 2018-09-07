@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 
 const LanguageSelector = ({ languages, setActiveLanguage }) => (
-  <div className="dropdown language-selector mr-1">
+  <div className="dropdown language-selector mx-1">
     <div className="nav-item dropdown">
       <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
         {_.find(languages, language => language.active).name}

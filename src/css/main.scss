@@ -117,6 +117,11 @@ body {
   background-color: lightgrey;
 }
 
+.global-search {
+  font-size: 16px;
+  width: 400px;
+}
+
 .form-group {
   &.required {
     .col-form-label:after {
@@ -480,4 +485,8 @@ div.crossed-out .table-inner-row:before {
 .custom-checkbox input[type=checkbox]:checked + label:before {
   content: "\f0e2";
   color: $blue-gamma;
+}
+
+.strike-through {
+  text-decoration: line-through;
 }

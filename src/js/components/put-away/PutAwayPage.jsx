@@ -29,6 +29,12 @@ function getNodes(data, node = []) {
   return node;
 }
 
+/**
+ * The first page of put-away which shows everything that is currently in receiving bin.
+ * User is able to sort either by shipment or by product. By default it is not
+ * available to see lines in pending put aways but it can be changed. User can choose
+ * one or multiple shipments to view.
+ */
 class PutAwayPage extends Component {
   constructor(props) {
     super(props);
@@ -42,6 +48,7 @@ class PutAwayPage extends Component {
       selectType: 'checkbox',
       pivotBy: ['stockMovement.name'],
       expanded: {},
+      expandedRowsCount: 0,
     };
   }
 
@@ -49,10 +56,32 @@ class PutAwayPage extends Component {
     this.fetchPutAwayCandidates();
   }
 
+  /**
+   * Called when expander is clicked. Checks expanded rows and counts their number.
+   * @param {object} expanded
+   * @public
+   */
   onExpandedChange = (expanded) => {
-    this.setState({ expanded });
+    const expandedRecordsIds = [];
+
+    _.forEach(expanded, (value, key) => {
+      if (value) {
+        expandedRecordsIds.push(parseInt(key, 10));
+      }
+    });
+
+    const allCurrentRows = this.selectTable
+      .getWrappedInstance().getResolvedState().sortedData;
+    const expandedRows = _.at(allCurrentRows, expandedRecordsIds);
+    const expandedRowsCount = getNodes(expandedRows).length;
+
+    this.setState({ expanded, expandedRowsCount });
   };
 
+  /**
+   * Returns an array of columns which are passed to the table.
+   * @public
+   */
   getColumns = () => [
     {
       Header: 'Code',
@@ -78,6 +107,7 @@ class PutAwayPage extends Component {
       Header: 'Qty in receiving',
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
+      Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
     }, {
       Header: 'Stock Movement',
       accessor: 'stockMovement.name',
@@ -89,7 +119,7 @@ class PutAwayPage extends Component {
             name="aggregationCheckbox"
             checked={this.checkSelected(row)}
             value={row._subRows[0]._original.stockMovement.id}
-            ref={elem => elem && (elem.indeterminate = this.checkIndetermediate(row))}
+            ref={elem => elem && (elem.indeterminate = this.checkIndeterminate(row))}
             onChange={this.toggleSelectionsByStockMovement}
           />
           <div className={`rt-expander ${isExpanded && '-open'}`}>&bull;</div>
@@ -99,6 +129,10 @@ class PutAwayPage extends Component {
     },
   ];
 
+  /**
+   * Fetches available items to put away from API.
+   * @public
+   */
   fetchPutAwayCandidates() {
     this.props.showSpinner();
     const url = '/openboxes/api/putaways';
@@ -128,6 +162,10 @@ class PutAwayPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Sends all changes made by user in this step of put-away to API and updates data.
+   * @public
+   */
   savePutAways() {
     this.props.showSpinner();
     const url = '/openboxes/api/putaways';
@@ -161,6 +199,12 @@ class PutAwayPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Filters put away items depending on user preferences - if they want to include pending one
+   * or not.
+   * @param {boolean} includePending
+   * @public
+   */
   filterPutAways(includePending) {
     let putawayItems = [];
     if (includePending) {
@@ -172,18 +216,35 @@ class PutAwayPage extends Component {
     this.setState({ putawayItems });
   }
 
-  checkIndetermediate(row) {
+  /**
+   * Returns true if there are some selected rows but also some unselected ones. Needed in order
+   * to make stock movements' checkbox indeterminate.
+   * @param {object} row
+   * @public
+   */
+  checkIndeterminate(row) {
     return _.some(row._subRows, subRow =>
       !_.includes([...this.state.selection], subRow._original._id))
     && _.some(row._subRows, subRow =>
       _.includes([...this.state.selection], subRow._original._id));
   }
 
+  /**
+   * Returns true if every row of stock movement is selected. Needed in order to make stock
+   * movements' checkbox checked.
+   * @param {object} row
+   * @public
+   */
   checkSelected(row) {
     return _.every(row._subRows, subRow =>
       _.includes([...this.state.selection], subRow._original._id));
   }
 
+  /**
+   * Filters items to toggle by stock movement and then calls toggleSelection method.
+   *  @param {object} event
+   * @public
+   */
   toggleSelectionsByStockMovement = (event) => {
     const { target } = event;
     const { checked, value } = target;
@@ -192,6 +253,10 @@ class PutAwayPage extends Component {
     this.toggleSelection(itemsToToggle, checked);
   };
 
+  /**
+   * Adds all items that are in the current filtered data to selection array.
+   * @public
+   */
   toggleAll = () => {
     /*
       Select ALL the records that are in the current filtered data
@@ -215,17 +280,33 @@ class PutAwayPage extends Component {
     this.setState({ selectAll });
   };
 
+  /**
+   * Changes the way od displaying table depending on after which element
+   * user wants to sort it by.
+   * @public
+   */
   toggleTree = () => {
     if (this.state.pivotBy.length) {
-      this.setState({ pivotBy: [], expanded: {} });
+      this.setState({ pivotBy: [], expanded: {}, expandedRowsCount: 0 });
     } else {
-      this.setState({ pivotBy: ['stockMovement.name'], expanded: {} });
+      this.setState({ pivotBy: ['stockMovement.name'], expanded: {}, expandedRowsCount: 0 });
     }
   };
 
+  /**
+   * React table's method which detects the selection state itselfs.
+   * @param {string} key
+   * @public
+   */
   isSelected = key =>
     _.includes([...this.state.selection], key);
 
+  /**
+   * Adds or deletes item from selection array depending on what user did.
+   * @param {object} keys
+   * @param {boolean} checked
+   * @public
+   */
   toggleSelection = (keys, checked) => {
     const selection = new Set(this.state.selection);
     if (Array.isArray(keys)) {
@@ -246,6 +327,13 @@ class PutAwayPage extends Component {
     this.setState({ selection });
   };
 
+  /**
+   * Method that is passed to react table's option: defaultFilterMethod.
+   * It filters rows and converts a string to lowercase letters.
+   * @param {object} filter
+   * @param {object} row
+   * @public
+   */
   filterMethod = (filter, row) =>
     (row[filter.id] !== undefined ?
       String(row[filter.id].toLowerCase()).includes(filter.value.toLowerCase()) : true);
@@ -305,14 +393,15 @@ class PutAwayPage extends Component {
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={10}
+              minRows={pivotBy && pivotBy.length ?
+              10 - this.state.expandedRowsCount : 10}
               style={{
                 height: '500px',
               }}
               showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
-              freezWhenExpanded
+              freezeWhenExpanded
               SelectInputComponent={({
                 id, checked, onClick, row,
               }) => (
@@ -361,8 +450,11 @@ class PutAwayPage extends Component {
 export default connect(null, { showSpinner, hideSpinner })(PutAwayPage);
 
 PutAwayPage.propTypes = {
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function taking user to the next page */
   nextPage: PropTypes.func.isRequired,
 };
 

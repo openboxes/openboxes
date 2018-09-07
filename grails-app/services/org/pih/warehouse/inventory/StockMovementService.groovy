@@ -87,6 +87,86 @@ class StockMovementService {
             log.info "Creating shipment for stock movement ${stockMovement}"
             createOrUpdateShipment(stockMovement)
         }
+
+
+        if (stockMovement.lineItems) {
+            stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
+                RequisitionItem requisitionItem
+                // Try to find a matching stock movement item
+                if (stockMovementItem.id) {
+                    requisitionItem = requisition.requisitionItems.find { it.id == stockMovementItem.id }
+                    // We should not just assume that if
+                    if (!requisitionItem) {
+                        throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
+                    }
+                }
+
+                // If requisition item is found, we update it
+                if (requisitionItem) {
+                    log.info "Item found " + requisitionItem.id
+
+                    if (stockMovementItem.delete) {
+                        log.info "Item deleted " + requisitionItem.id
+                        requisitionItem.undoChanges()
+                        requisition.removeFromRequisitionItems(requisitionItem)
+                        requisitionItem.delete(flush: true)
+                    } else if (stockMovementItem.revert) {
+                        log.info "Item reverted " + requisitionItem.id
+                        requisitionItem.undoChanges()
+                    } else if (stockMovementItem.cancel) {
+                        log.info "Item canceled " + requisitionItem.id
+                        requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
+                    } else if (stockMovementItem.substitute) {
+                        log.info "Item substituted " + requisitionItem.id
+                        log.info "Substitutions: " + requisitionItem.product.substitutions
+                        if (!requisitionItem.product.isValidSubstitution(stockMovementItem?.newProduct)) {
+                            throw new IllegalArgumentException("Product ${stockMovementItem?.newProduct?.productCode} " +
+                                    "${stockMovementItem?.newProduct?.name} is not a valid substitution of " +
+                                    "${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}")
+                        }
+                        requisitionItem.chooseSubstitute(
+                                stockMovementItem.newProduct,
+                                null,
+                                stockMovementItem.newQuantity?.intValueExact(),
+                                stockMovementItem.reasonCode,
+                                stockMovementItem.comments)
+                    } else {
+                        log.info "Item updated " + requisitionItem.id
+                        if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
+                        if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
+                        if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
+                        if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
+                        if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
+                        if (stockMovementItem.quantityRevised) {
+                            requisitionItem.changeQuantity(
+                                    stockMovementItem?.quantityRevised?.intValueExact(),
+                                    stockMovementItem.reasonCode,
+                                    stockMovementItem.comments)
+                        }
+                    }
+                    requisitionItem.save()
+                }
+                // Otherwise we create a new one
+                else {
+                    log.info "Item not found"
+                    if (stockMovementItem.quantityRevised) {
+                        throw new IllegalArgumentException("Cannot specify quantityRevised when creating a new item")
+                    }
+                    requisitionItem = new RequisitionItem()
+                    requisitionItem.product = stockMovementItem.product
+                    requisitionItem.inventoryItem = stockMovementItem.inventoryItem
+                    requisitionItem.quantity = stockMovementItem.quantityRequested
+                    requisitionItem.recipient = stockMovementItem.recipient
+                    requisitionItem.orderIndex = stockMovementItem.sortOrder
+                    requisition.addToRequisitionItems(requisitionItem)
+                }
+            }
+        }
+
+        if (requisition.hasErrors() || !requisition.save(flush: true)) {
+            throw new ValidationException("Invalid requisition", requisition.errors)
+        }
+
         requisition = requisition.refresh()
 
         stockMovement = StockMovement.createFromRequisition(requisition)

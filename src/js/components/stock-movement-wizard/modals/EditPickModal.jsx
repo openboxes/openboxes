@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { change, reduxForm, formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
-import ValueSelectorField from '../../form-elements/ValueSelectorField';
 import LabelField from '../../form-elements/LabelField';
 import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
-import { renderFormField } from '../../../utils/form-utils';
 import SelectField from '../../form-elements/SelectField';
 import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
@@ -38,26 +35,13 @@ const FIELDS = {
         type: LabelField,
         label: 'Bin',
       },
-      recipient: {
-        type: ValueSelectorField,
-        label: 'Includes recipient',
-        attributes: {
-          formName: 'stock-movement-wizard',
-        },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `availableItems[${rowIndex}].recipient`,
-        }),
-        component: LabelField,
-        componentConfig: {
-          getDynamicAttr: ({ selectedValue }) => ({
-            className: selectedValue ? 'fa fa-user' : '',
-          }),
-        },
-      },
       quantityAvailable: {
         type: LabelField,
         label: 'Qty available',
         fixedWidth: '150px',
+        attributes: {
+          formatValue: value => (value.toLocaleString('en-US')),
+        },
       },
       quantityPicked: {
         type: TextField,
@@ -70,107 +54,6 @@ const FIELDS = {
     },
   },
 };
-
-/* eslint no-param-reassign: "error" */
-class EditPickModal extends Component {
-  constructor(props) {
-    super(props);
-
-    const {
-      fieldConfig: { attributes, getDynamicAttr },
-    } = props;
-    const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
-    const attr = { ...attributes, ...dynamicAttr };
-
-    this.state = { attr };
-
-    this.onOpen = this.onOpen.bind(this);
-    this.onSave = this.onSave.bind(this);
-  }
-
-  onOpen() {
-    this.props.change(
-      'stock-movement-wizard', 'availableItems',
-      this.state.attr.fieldValue.availableItems,
-    );
-    this.props.change('stock-movement-wizard', 'reasonCode', '');
-    // for validation purposes
-    this.props.change('stock-movement-wizard', 'quantityRequired', this.state.attr.fieldValue.quantityRequired);
-  }
-
-  onSave(values) {
-    this.props.showSpinner();
-
-    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}`;
-    const payload = {
-      picklistItems: _.map(values.availableItems, (avItem) => {
-        // check if this picklist item already exists
-        const picklistItem = _.find(
-          _.filter(this.state.attr.fieldValue.picklistItems, listItem => !listItem.initial),
-          item => item['inventoryItem.id'] === avItem['inventoryItem.id'],
-        );
-        if (picklistItem) {
-          return {
-            id: picklistItem.id,
-            'inventoryItem.id': avItem['inventoryItem.id'],
-            'binLocation.id': avItem['binLocation.id'] || '',
-            quantityPicked: avItem.quantityPicked,
-            reasonCode: values.reasonCode || '',
-          };
-        }
-        return {
-          'inventoryItem.id': avItem['inventoryItem.id'],
-          'binLocation.id': avItem['binLocation.id'] || '',
-          quantityPicked: avItem.quantityPicked,
-          reasonCode: values.reasonCode || '',
-        };
-      }),
-    };
-
-    return apiClient.post(url, payload).then(() => {
-      apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
-        .then((resp) => {
-          const { pickPageItems } = resp.data.data.pickPage;
-          this.props.change('stock-movement-wizard', 'pickPageItems', []);
-          this.props.change('stock-movement-wizard', 'pickPageItems', this.state.attr.checkForInitialPicksChanges(pickPageItems));
-
-          this.props.hideSpinner();
-        })
-        .catch(() => { this.props.hideSpinner(); });
-    }).catch(() => { this.props.hideSpinner(); });
-  }
-
-  calculatePicked() {
-    return _.reduce(this.props.availableItems, (sum, val) =>
-      (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0);
-  }
-
-  render() {
-    if (this.state.attr.subfield) {
-      return null;
-    }
-
-    return (
-      <ModalWrapper
-        {...this.state.attr}
-        onOpen={this.onOpen}
-        onSave={this.props.handleSubmit(values => this.onSave(values))}
-        btnSaveDisabled={this.props.invalid}
-      >
-        <form className="print-mt">
-          <div className="font-weight-bold">Product Code: {this.state.attr.fieldValue.productCode}</div>
-          <div className="font-weight-bold">Product Name: {this.state.attr.fieldValue['product.name']}</div>
-          <div className="font-weight-bold">Quantity Required: {this.state.attr.fieldValue.quantityRequired}</div>
-          <div className="font-weight-bold pb-2">Quantity Picked: {this.calculatePicked()}</div>
-          <hr />
-          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-            reasonCodes: this.props.reasonCodes,
-          }))}
-        </form>
-      </ModalWrapper>
-    );
-  }
-}
 
 function validate(values) {
   const errors = {};
@@ -196,40 +79,173 @@ function validate(values) {
   return errors;
 }
 
-const selector = formValueSelector('stock-movement-wizard');
+/** Modal window where user can edit pick. */
+/* eslint no-param-reassign: "error" */
+class EditPickModal extends Component {
+  constructor(props) {
+    super(props);
+
+    const {
+      fieldConfig: { attributes, getDynamicAttr },
+    } = props;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
+    const attr = { ...attributes, ...dynamicAttr };
+
+    this.state = {
+      attr,
+      formValues: {},
+    };
+
+    this.onOpen = this.onOpen.bind(this);
+    this.onSave = this.onSave.bind(this);
+  }
+
+  componentDidMount() {
+    if (!this.props.reasonCodesFetched) {
+      this.fetchData(this.props.fetchReasonCodes);
+    }
+  }
+
+  /**
+   * Loads chosen items, required quantity and reason codes into modal's form.
+   * @public
+   */
+  onOpen() {
+    this.setState({
+      formValues: {
+        availableItems: this.state.attr.fieldValue.availableItems,
+        reasonCode: '',
+        quantityRequired: this.state.attr.fieldValue.quantityRequired,
+      },
+    });
+  }
+
+  /**
+   * Sends all changes made by user in this modal to API and updates data.
+   * @param {object} values
+   * @public
+   */
+  onSave(values) {
+    this.props.showSpinner();
+
+    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}`;
+    const payload = {
+      picklistItems: _.map(values.availableItems, (avItem) => {
+        // check if this picklist item already exists
+        const picklistItem = _.find(
+          _.filter(this.state.attr.fieldValue.picklistItems, listItem => !listItem.initial),
+          item => item['inventoryItem.id'] === avItem['inventoryItem.id'],
+        );
+        if (picklistItem) {
+          return {
+            id: picklistItem.id,
+            'inventoryItem.id': avItem['inventoryItem.id'],
+            'binLocation.id': avItem['binLocation.id'] || '',
+            quantityPicked: avItem.quantityPicked || 0,
+            reasonCode: values.reasonCode || '',
+          };
+        }
+        return {
+          'inventoryItem.id': avItem['inventoryItem.id'],
+          'binLocation.id': avItem['binLocation.id'] || '',
+          quantityPicked: avItem.quantityPicked || 0,
+          reasonCode: values.reasonCode || '',
+        };
+      }),
+    };
+
+    return apiClient.post(url, payload).then(() => {
+      apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
+        .then((resp) => {
+          const { pickPageItems } = resp.data.data.pickPage;
+          this.props.onResponse(pickPageItems);
+          this.props.hideSpinner();
+        })
+        .catch(() => { this.props.hideSpinner(); });
+    }).catch(() => { this.props.hideSpinner(); });
+  }
+
+  /**
+   * Fetches data using function given as an argument(reducers components).
+   * @param {function} fetchFunction
+   * @public
+   */
+  fetchData(fetchFunction) {
+    this.props.showSpinner();
+    fetchFunction()
+      .then(() => this.props.hideSpinner())
+      .catch(() => this.props.hideSpinner());
+  }
+
+  /**
+   * Sums up quantity picked from all available items.
+   * @param {object} values
+   * @public
+   */
+  /* eslint-disable-next-line class-methods-use-this */
+  calculatePicked(values) {
+    return (
+      <div>
+        <div className="font-weight-bold pb-2">Quantity Picked: {_.reduce(values.availableItems, (sum, val) =>
+          (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
+        </div>
+        <hr />
+      </div>
+    );
+  }
+
+  render() {
+    if (this.state.attr.subfield) {
+      return null;
+    }
+
+    return (
+      <ModalWrapper
+        {...this.state.attr}
+        onOpen={this.onOpen}
+        onSave={this.onSave}
+        fields={FIELDS}
+        validate={validate}
+        initialValues={this.state.formValues}
+        formProps={{ reasonCodes: this.props.reasonCodes }}
+        renderBodyWithValues={this.calculatePicked}
+      >
+        <div>
+          <div className="font-weight-bold">Product Code: {this.state.attr.fieldValue.productCode}</div>
+          <div className="font-weight-bold">Product Name: {this.state.attr.fieldValue['product.name']}</div>
+          <div className="font-weight-bold">Quantity Required: {this.state.attr.fieldValue.quantityRequired}</div>
+        </div>
+      </ModalWrapper>
+    );
+  }
+}
 
 const mapStateToProps = state => ({
-  availableItems: selector(state, 'availableItems'),
   reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
 });
 
-export default reduxForm({
-  form: 'stock-movement-wizard',
-  destroyOnUnmount: false,
-  forceUnregisterOnUnmount: true,
-  validate,
-})(connect(mapStateToProps, {
-  change, fetchReasonCodes, showSpinner, hideSpinner,
-})(EditPickModal));
+export default connect(mapStateToProps, {
+  fetchReasonCodes, showSpinner, hideSpinner,
+})(EditPickModal);
 
 EditPickModal.propTypes = {
-  change: PropTypes.func.isRequired,
+  /** Name of the field */
   fieldName: PropTypes.string.isRequired,
+  /** Configuration of the field */
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
-  availableItems: PropTypes.arrayOf(PropTypes.shape({})),
-  rowIndex: PropTypes.number.isRequired,
-  invalid: PropTypes.bool.isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
+  /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
+  /** Indicator if reason codes' data is fetched */
   reasonCodesFetched: PropTypes.bool.isRequired,
+  /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-};
-
-EditPickModal.defaultProps = {
-  availableItems: [],
+  /** Function updating page on which modal is located called when user saves changes */
+  onResponse: PropTypes.func.isRequired,
 };

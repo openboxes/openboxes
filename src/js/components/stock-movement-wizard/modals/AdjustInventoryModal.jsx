@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { change, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
@@ -9,7 +8,6 @@ import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
 import LabelField from '../../form-elements/LabelField';
 import SelectField from '../../form-elements/SelectField';
-import { renderFormField } from '../../../utils/form-utils';
 import DateField from '../../form-elements/DateField';
 import { showSpinner, hideSpinner } from '../../../actions';
 import apiClient from '../../../utils/apiClient';
@@ -50,6 +48,9 @@ const FIELDS = {
         type: LabelField,
         label: 'Previous Qty',
         fixedWidth: '150px',
+        attributes: {
+          formatValue: value => (value.toLocaleString('en-US')),
+        },
       },
       quantityAdjusted: {
         type: TextField,
@@ -67,6 +68,7 @@ const FIELDS = {
   },
 };
 
+/** Modal window where user can adjust existing inventory or add a new one. */
 class AdjustInventoryModal extends Component {
   constructor(props) {
     super(props);
@@ -80,6 +82,7 @@ class AdjustInventoryModal extends Component {
     this.state = {
       attr,
       bins: [],
+      formValues: {},
     };
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
@@ -90,14 +93,23 @@ class AdjustInventoryModal extends Component {
     this.fetchBins();
   }
 
+  /**
+   * Loads available inventories for chosen items into modal's form.
+   * @public
+   */
   onOpen() {
-    this.props.change(
-      'stock-movement-wizard',
-      'adjustInventory',
-      this.state.attr.fieldValue.availableItems,
-    );
+    this.setState({
+      formValues: {
+        adjustInventory: this.state.attr.fieldValue.availableItems,
+      },
+    });
   }
 
+  /**
+   * Sends all changes made by user in this modal to API and update data.
+   * @param {object} values
+   * @public
+   */
   onSave(values) {
     this.props.showSpinner();
 
@@ -114,8 +126,7 @@ class AdjustInventoryModal extends Component {
       apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
         .then((resp) => {
           const { pickPageItems } = resp.data.data.pickPage;
-          this.props.change('stock-movement-wizard', 'pickPageItems', []);
-          this.props.change('stock-movement-wizard', 'pickPageItems', this.state.attr.checkForInitialPicksChanges(pickPageItems));
+          this.props.onResponse(pickPageItems);
 
           this.props.hideSpinner();
         })
@@ -123,6 +134,10 @@ class AdjustInventoryModal extends Component {
     }).catch(() => { this.props.hideSpinner(); });
   }
 
+  /**
+   * Fetches available bin locations from API.
+   * @public
+   */
   fetchBins() {
     this.props.showSpinner();
     const url = '/openboxes/api/internalLocations';
@@ -146,36 +161,28 @@ class AdjustInventoryModal extends Component {
       <ModalWrapper
         {...this.state.attr}
         onOpen={this.onOpen}
-        onSave={this.props.handleSubmit(values => this.onSave(values))}
-      >
-        <form className="print-mt">
-          {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-            bins: this.state.bins,
-          }))}
-        </form>
-      </ModalWrapper>
+        onSave={this.onSave}
+        fields={FIELDS}
+        initialValues={this.state.formValues}
+        formProps={{ bins: this.state.bins }}
+      />
     );
   }
 }
 
-export default reduxForm({
-  form: 'stock-movement-wizard',
-  destroyOnUnmount: false,
-  forceUnregisterOnUnmount: true,
-})(connect(null, { change, showSpinner, hideSpinner })(AdjustInventoryModal));
+export default connect(null, { showSpinner, hideSpinner })(AdjustInventoryModal);
 
 AdjustInventoryModal.propTypes = {
-  change: PropTypes.func.isRequired,
-  adjustInventory: PropTypes.arrayOf(PropTypes.shape({})),
+  /** Name of the field */
   fieldName: PropTypes.string.isRequired,
+  /** Configuration of the field */
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-};
-
-AdjustInventoryModal.defaultProps = {
-  adjustInventory: [],
+  /** Function updating page on which modal is located called when user saves changes */
+  onResponse: PropTypes.func.isRequired,
 };

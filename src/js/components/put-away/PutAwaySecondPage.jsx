@@ -16,6 +16,24 @@ import { showSpinner, hideSpinner } from '../../actions';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-param-reassign */
+
+function getNodes(data, node = []) {
+  data.forEach((item) => {
+    if (Object.prototype.hasOwnProperty.call(item, '_subRows') && item._subRows) {
+      node = getNodes(item._subRows, node);
+    } else {
+      node.push(item._original);
+    }
+  });
+  return node;
+}
+
+/**
+ * The second page of put-away where user can choose put-away bin, split a line
+ * or generate put-away list(pdf). It can be sorted either by shipment or by product.
+ */
 class PutAwaySecondPage extends Component {
   constructor(props) {
     super(props);
@@ -28,6 +46,7 @@ class PutAwaySecondPage extends Component {
       pivotBy,
       expanded,
       bins: [],
+      expandedRowsCount: 0,
     };
   }
 
@@ -35,10 +54,32 @@ class PutAwaySecondPage extends Component {
     this.fetchBins();
   }
 
+  /**
+   * Called when an expander is clicked. Checks expanded rows and counts their number.
+   * @param {object} expanded
+   * @public
+   */
   onExpandedChange = (expanded) => {
-    this.setState({ expanded });
+    const expandedRecordsIds = [];
+
+    _.forEach(expanded, (value, key) => {
+      if (value) {
+        expandedRecordsIds.push(parseInt(key, 10));
+      }
+    });
+
+    const allCurrentRows = this.selectTable
+      .getWrappedInstance().getResolvedState().sortedData;
+    const expandedRows = _.at(allCurrentRows, expandedRecordsIds);
+    const expandedRowsCount = getNodes(expandedRows).length;
+
+    this.setState({ expanded, expandedRowsCount });
   };
 
+  /**
+   * Returns an array of columns which are passed to the table.
+   * @public
+   */
   getColumns = () => [
     {
       Header: 'Code',
@@ -64,6 +105,7 @@ class PutAwaySecondPage extends Component {
       Header: 'QTY',
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
+      Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
     }, {
       Header: 'Current bin',
       accessor: 'currentBins',
@@ -116,18 +158,34 @@ class PutAwaySecondPage extends Component {
     },
   ];
 
+  /**
+   * Changes the way od displaying table depending on after which element
+   * user wants to sort it by.
+   * @public
+   */
   toggleTree = () => {
     if (this.state.pivotBy.length) {
-      this.setState({ pivotBy: [], expanded: {} });
+      this.setState({ pivotBy: [], expanded: {}, expandedRowsCount: 0 });
     } else {
-      this.setState({ pivotBy: ['stockMovement.name'], expanded: {} });
+      this.setState({ pivotBy: ['stockMovement.name'], expanded: {}, expandedRowsCount: 0 });
     }
   };
 
+  /**
+   * Method that is passed to react table's option: defaultFilterMethod.
+   * It filters rows and converts a string to lowercase letters.
+   * @param {object} filter
+   * @param {object} row
+   * @public
+   */
   filterMethod = (filter, row) =>
     (row[filter.id] !== undefined ?
       String(row[filter.id].toLowerCase()).includes(filter.value.toLowerCase()) : true);
 
+  /**
+   * Fetches available bin locations from API.
+   * @public
+   */
   fetchBins() {
     this.props.showSpinner();
     const url = '/openboxes/api/internalLocations';
@@ -142,6 +200,10 @@ class PutAwaySecondPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+  * Sends all changes made by user in this step of put-away to API and updates data.
+  * @public
+  */
   savePutAways() {
     this.props.showSpinner();
     const url = '/openboxes/api/putaways';
@@ -162,6 +224,10 @@ class PutAwaySecondPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  /**
+   * Generates a pdf that shows what should be putted away.
+   * @public
+   */
   generatePutAwayList() {
     this.props.showSpinner();
     const url = '/openboxes/putAway/generatePdf/ff80818164ae89800164affcfe6e0001';
@@ -217,14 +283,14 @@ class PutAwaySecondPage extends Component {
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={10}
+              minRows={pivotBy && pivotBy.length ?
+                10 - this.state.expandedRowsCount : 10}
               style={{
                 height: '500px',
               }}
               showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
-              freezWhenExpanded
               defaultSorted={[{ id: 'name' }, { id: 'stockMovement.name' }]}
             />
             : null
@@ -243,13 +309,20 @@ class PutAwaySecondPage extends Component {
 export default connect(null, { showSpinner, hideSpinner })(PutAwaySecondPage);
 
 PutAwaySecondPage.propTypes = {
+  /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
+  /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function taking user to the next page */
   nextPage: PropTypes.func.isRequired,
+  /** All put-away's data */
   putAway: PropTypes.shape({
+    /** An array of all put-away's items */
     putawayItems: PropTypes.arrayOf(PropTypes.shape({})),
   }),
+  /** An array of available attributes after which a put-away can be sorted by */
   pivotBy: PropTypes.arrayOf(PropTypes.string),
+  /** List of currently expanded put-away's items */
   expanded: PropTypes.shape({}),
 };
 
