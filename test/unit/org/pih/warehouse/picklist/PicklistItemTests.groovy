@@ -1,6 +1,7 @@
 package org.pih.warehouse.picklist
 
 import grails.test.GrailsUnitTestCase
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
@@ -26,7 +27,7 @@ class PicklistItemTests extends GrailsUnitTestCase
                 product: product,
                 quantity: 3000,
                 comment: "good",
-                recipient: "peter"
+                recipient: new Person(firstName: "peter", lastName: "zhao")
         )
 
         def picklistItem = new PicklistItem(

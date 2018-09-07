@@ -176,7 +176,7 @@ class StockMovementService {
                         if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
                         if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                         if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
-                        //if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
+                        if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
                         if (stockMovementItem.quantityRevised) {
                             requisitionItem.changeQuantity(
@@ -197,7 +197,7 @@ class StockMovementService {
                     requisitionItem.product = stockMovementItem.product
                     requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                     requisitionItem.quantity = stockMovementItem.quantityRequested
-                    //requisitionItem.recipient = stockMovementItem.recipient
+                    requisitionItem.recipient = stockMovementItem.recipient
                     requisitionItem.orderIndex = stockMovementItem.sortOrder
                     requisition.addToRequisitionItems(requisitionItem)
                 }
