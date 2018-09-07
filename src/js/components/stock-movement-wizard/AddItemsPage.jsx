@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import fileDownload from 'js-file-download';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
+import Alert from 'react-s-alert';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -275,11 +276,7 @@ class AddItemsPage extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.recipientsFetched) {
-      this.fetchData(this.props.fetchUsers);
-    }
-
-    this.fetchAndSetLineItems();
+    this.fetchAllData(false);
   }
 
   /**
@@ -351,6 +348,19 @@ class AddItemsPage extends Component {
         'recipient.id': item.recipient ? item.recipient : '',
       })),
     );
+  }
+
+  /**
+   * Fetches all required data.
+   * @param {boolean} forceFetch
+   * @public
+   */
+  fetchAllData(forceFetch) {
+    if (!this.props.recipientsFetched || forceFetch) {
+      this.fetchData(this.props.fetchUsers);
+    }
+
+    this.fetchAndSetLineItems();
   }
 
   /**
@@ -525,6 +535,25 @@ class AddItemsPage extends Component {
   }
 
   /**
+   * Saves list of requisition items in current step (without step change) and refetch the data.
+   * @param {object} formValues
+   * @public
+   */
+  saveAndRefresh(formValues) {
+    this.props.showSpinner();
+
+    const lineItems = _.filter(formValues.lineItems, item =>
+      !_.isEmpty(item) && !_.isNil(item.quantityRequested));
+
+    return this.saveRequisitionItemsInCurrentStep(lineItems)
+      .then(() => {
+        this.fetchAllData(true);
+        Alert.success('Changes saved successfully!');
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  /**
    * Removes chosen item from requisition's items list.
    * @param {string} itemId
    * @public
@@ -622,7 +651,7 @@ class AddItemsPage extends Component {
         validate={validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values }) => (
+        render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <span>
               <label
@@ -641,9 +670,17 @@ class AddItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => this.exportTemplate(values)}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
               >
                 <span><i className="fa fa-upload pr-2" />Export Template</span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.saveAndRefresh(values)}
+                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+              >
+                <span><i className="fa fa-save pr-2" />Save & Refresh</span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
