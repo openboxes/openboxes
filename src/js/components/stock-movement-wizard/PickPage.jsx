@@ -266,7 +266,7 @@ class PickPage extends Component {
     }, () => this.setState({
       values: {
         ...this.state.values,
-        pickPageItems,
+        pickPageItems: this.checkForInitialPicksChanges(pickPageItems),
       },
     }));
   }
