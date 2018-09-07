@@ -32,6 +32,7 @@ import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -447,7 +448,7 @@ class StockMovementService {
         if (!stockMovement.identifier && !requisition.requestNumber) {
             requisition.requestNumber = identifierService.generateRequisitionIdentifier()
         }
-
+        requisition.type = RequisitionType.DEFAULT
         requisition.name = stockMovement.name;
         requisition.description = stockMovement.description
         requisition.destination = stockMovement.destination
