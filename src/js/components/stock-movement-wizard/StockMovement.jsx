@@ -147,7 +147,7 @@ class StockMovements extends Component {
             case 'PICKED':
               page = 5;
               if (values.origin.type === 'SUPPLIER') {
-                prevPage = 1;
+                prevPage = 2;
               } else {
                 prevPage = 4;
               }
