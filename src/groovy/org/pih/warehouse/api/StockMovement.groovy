@@ -77,18 +77,6 @@ class StockMovement {
         comments(nullable:true)
     }
 
-    StockMovementType getStockMovementType() {
-        return isInbound ? StockMovementType.INBOUND : isOutbound ? StockMovementType.OUTBOUND : null
-    }
-
-    Boolean getIsInbound() {
-        return origin?.isSupplier()
-    }
-
-    Boolean getIsOutbound() {
-        return !isInbound
-    }
-
 
     Map toJson() {
         return [
