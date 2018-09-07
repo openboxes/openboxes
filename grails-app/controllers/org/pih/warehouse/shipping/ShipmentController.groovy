@@ -354,6 +354,23 @@ class ShipmentController {
 	}
 
 
+	def bulkDeleteShipments = {
+		def shipmentIds = params.list("shipment.id")
+
+		log.info "Shipment ids: " + shipmentIds
+		try {
+			shipmentIds.each { shipmentId ->
+				Shipment shipment = Shipment.get(shipmentId)
+				shipmentService.deleteShipment(shipment)
+			}
+			flash.message = "Successfully deleted ${shipmentIds?.size()} shipments"
+
+		} catch (Exception e) {
+			flash.message = "Error occurred while bulk deleting shipments: " + e.message
+		}
+		redirect(action: "list", params:[type:params.type, status: params.status])
+	}
+
 	def bulkReceiveShipments = {
 		def shipmentIds = params.list("shipment.id")
 		try {
