@@ -449,12 +449,12 @@ class StockMovementService {
             requisition.requestNumber = identifierService.generateRequisitionIdentifier()
         }
         requisition.type = RequisitionType.DEFAULT
-        requisition.name = stockMovement.name;
         requisition.description = stockMovement.description
         requisition.destination = stockMovement.destination
         requisition.origin = stockMovement.origin
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
+        requisition.name = stockMovement.generateName();
 
         // If the user specified a stocklist then we should automatically clone it as long as there are no
         // requisition items already added to the requisition
@@ -484,10 +484,10 @@ class StockMovementService {
         if (stockMovement.identifier) requisition.requestNumber = stockMovement.identifier
         if (stockMovement.destination) requisition.destination = stockMovement.destination
         if (stockMovement.origin) requisition.origin = stockMovement.origin
-        if (stockMovement.name) requisition.name = stockMovement.name
         if (stockMovement.description) requisition.description = stockMovement.description
         if (stockMovement.requestedBy) requisition.requestedBy = stockMovement.requestedBy
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
+        requisition.name = stockMovement.generateName()
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
