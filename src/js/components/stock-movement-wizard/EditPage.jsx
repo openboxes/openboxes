@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
+import Alert from 'react-s-alert';
 
 import ArrayField from '../form-elements/ArrayField';
 import TextField from '../form-elements/TextField';
@@ -166,7 +167,16 @@ class EditItemsPage extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.reasonCodesFetched) {
+    this.fetchAllData(false);
+  }
+
+  /**
+   * Fetches all required data.
+   * @param {boolean} forceFetch
+   * @public
+   */
+  fetchAllData(forceFetch) {
+    if (!this.props.reasonCodesFetched || forceFetch) {
       this.fetchData(this.props.fetchReasonCodes);
     }
 
@@ -188,9 +198,9 @@ class EditItemsPage extends Component {
       this.setState({
         statusCode,
         revisedItems: _.filter(editPageItems, item => item.statusCode === 'CHANGED'),
+        values: { ...this.state.values, editPageItems },
       });
 
-      this.setState({ values: { ...this.state.values, editPageItems } });
       this.props.hideSpinner();
     }).catch(() => {
       this.props.hideSpinner();
@@ -244,6 +254,22 @@ class EditItemsPage extends Component {
     }
 
     return Promise.resolve();
+  }
+
+  /**
+   * Saves list of requisition items in current step (without step change) and refetch the data.
+   * @param {object} formValues
+   * @public
+   */
+  saveAndRefresh(formValues) {
+    this.props.showSpinner();
+
+    return this.reviseRequisitionItems(formValues)
+      .then(() => {
+        this.fetchAllData(true);
+        Alert.success('Changes saved successfully!');
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -315,20 +341,32 @@ class EditItemsPage extends Component {
         validate={validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values }) => (
-          <form onSubmit={handleSubmit}>
-            {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+        render={({ handleSubmit, values, invalid }) => (
+          <div className="d-flex flex-column">
+            <span>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.saveAndRefresh(values)}
+                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+              >
+                <span><i className="fa fa-save pr-2" />Save & Refresh</span>
+              </button>
+            </span>
+            <form onSubmit={handleSubmit}>
+              {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stockMovementId: values.stockMovementId,
                 reasonCodes: this.props.reasonCodes,
                 onResponse: this.saveNewItems,
               }))}
-            <div>
-              <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>
-                Previous
-              </button>
-              <button type="submit" className="btn btn-outline-primary btn-form float-right">Next</button>
-            </div>
-          </form>
+              <div>
+                <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>
+                  Previous
+                </button>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right">Next</button>
+              </div>
+            </form>
+          </div>
         )}
       />
     );
