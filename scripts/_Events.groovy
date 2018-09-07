@@ -130,7 +130,7 @@ eventCreateWarStart = { warName, stagingDir ->
 }
 
 eventTestPhaseStart = {name ->
-    if (name == "unit2") {
+    if (name == "unit") {
         println "Starting React Tests"
         def command = """npm run test"""
         def proc = command.execute()
