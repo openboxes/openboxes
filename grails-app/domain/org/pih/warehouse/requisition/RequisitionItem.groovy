@@ -63,7 +63,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 	Float unitPrice	
 	Person requestedBy	// the person who actually requested the item
 	Boolean substitutable = false
-    String recipient
     String comment
     Integer orderIndex = 0
 
@@ -72,6 +71,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     RequisitionItem substitutionItem
     RequisitionItem modificationItem
 
+    Person recipient
 
 	// Audit fields
 	Date dateCreated
