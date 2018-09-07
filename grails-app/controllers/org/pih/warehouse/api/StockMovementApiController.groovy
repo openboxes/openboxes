@@ -54,7 +54,7 @@ class StockMovementApiController {
     def update = { //StockMovement stockMovement ->
 
         JSONObject jsonObject = request.JSON
-        log.info "json: " + jsonObject
+        log.info "update: " + jsonObject.toString(4)
 
         // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
@@ -200,8 +200,8 @@ class StockMovementApiController {
             stockMovementItem.reasonCode = lineItem.reasonCode
             stockMovementItem.comments = lineItem.comments
 
-            // Not supported yet because recipient is a String on Requisition Item and a Person on Shipment Item.
-            //stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
+            // Update recipient
+            stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
 
             stockMovement.lineItems.add(stockMovementItem)
         }
