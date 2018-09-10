@@ -39,6 +39,8 @@ class PartialReceiptItem {
                 "shipmentItem.id": shipmentItem?.id,
                 "container.id": shipmentItem?.container?.id,
                 "container.name": shipmentItem?.container?.name,
+                "parentContainer.id": shipmentItem?.container?.parentContainer?.id,
+                "parentContainer.name": shipmentItem?.container?.parentContainer?.name,
                 "product.id": shipmentItem?.inventoryItem?.product?.id,
                 "product.productCode": shipmentItem?.inventoryItem?.product?.productCode,
                 "product.name": shipmentItem?.inventoryItem?.product?.name,
