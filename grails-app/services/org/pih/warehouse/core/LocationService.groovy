@@ -31,7 +31,9 @@ class LocationService {
 		return getAllLocations(null)
 	}
 
-	def getAllLocations(String [] fields) {
+	def getLocations(String [] fields, Map params) {
+
+        LocationTypeCode locationTypeCode = params.locationTypeCode?:null
 
 		def locations = Location.createCriteria().list() {
 			if (fields) {
@@ -41,6 +43,14 @@ class LocationService {
 					}
 				}
 			}
+			if (params.name) {
+				ilike("name", "%" + params.name + "%")
+			}
+            if (params.locationTypeCode) {
+                locationType {
+                    eq("locationTypeCode", locationTypeCode)
+                }
+            }
 			eq("active", Boolean.TRUE)
 			isNull("parentLocation")
 		}
