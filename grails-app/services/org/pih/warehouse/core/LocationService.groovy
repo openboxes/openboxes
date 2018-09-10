@@ -28,7 +28,7 @@ class LocationService {
 	
 
 	def getAllLocations() {
-		return getAllLocations(null, [:])
+		return getLocations(null, [:])
 	}
 
 	def getLocations(String [] fields, Map params) {
