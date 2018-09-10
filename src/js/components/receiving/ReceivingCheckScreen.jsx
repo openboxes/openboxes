@@ -52,11 +52,20 @@ const FIELDS = {
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
     fields: {
-      'container.name': {
+      'parentContainer.name': {
+        fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
-        label: 'Packaging Unit',
+        label: 'Pallet',
         attributes: {
-          formatValue: value => (value || 'Unpacked'),
+          formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
+        },
+      },
+      'container.name': {
+        fieldKey: '',
+        type: params => (!params.subfield ? <LabelField {...params} /> : null),
+        label: 'Box',
+        attributes: {
+          formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
         },
       },
       'product.productCode': {
