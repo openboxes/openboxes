@@ -16,6 +16,8 @@ class PartialReceiptContainer {
         return [
                 "container.id": container?.id,
                 "container.name": container?.name,
+                "parentContainer.id": container?.parentContainer?.id,
+                "parentContainer.name": container?.parentContainer?.name,
                 "container.type": container?.containerType?.name,
                 shipmentItems: partialReceiptItems
         ]
