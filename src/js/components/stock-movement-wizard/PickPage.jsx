@@ -14,6 +14,7 @@ import EditPickModal from './modals/EditPickModal';
 import { showSpinner, hideSpinner } from '../../actions';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import apiClient from '../../utils/apiClient';
+import ButtonField from '../form-elements/ButtonField';
 
 const FIELDS = {
   pickPageItems: {
@@ -117,6 +118,20 @@ const FIELDS = {
           onResponse,
         }),
       },
+      revert: {
+        type: ButtonField,
+        label: 'Undo',
+        flexWidth: '1',
+        fieldKey: '',
+        buttonLabel: 'Undo',
+        getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
+          onClick: fieldValue['requisitionItem.id'] ? () => revertUserPick(fieldValue['requisitionItem.id']) : () => null,
+          hidden: subfield || fieldValue.pickStatusCode === 'NOT_PICKED',
+        }),
+        attributes: {
+          className: 'btn btn-outline-danger',
+        },
+      },
     },
   },
 };
@@ -136,6 +151,7 @@ class PickPage extends Component {
       values: this.props.initialValues,
     };
 
+    this.revertUserPick = this.revertUserPick.bind(this);
     this.saveNewItems = this.saveNewItems.bind(this);
     this.props.showSpinner();
   }
@@ -271,6 +287,45 @@ class PickPage extends Component {
     }));
   }
 
+  /**
+   * Reverts to previous state of picks for requisition item
+   * @param {string} itemId
+   * @public
+   */
+  revertUserPick(itemId) {
+    this.props.showSpinner();
+
+    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
+    const pickPageItemData = _.find(
+      this.state.values.pickPageItems,
+      item => item['requisitionItem.id'] === itemId,
+    );
+
+    const resetPicksPayload = {
+      picklistItems: _.map(pickPageItemData.picklistItems, item => ({
+        id: item.id,
+        quantityPicked: 0,
+      })),
+    };
+
+    const initialPicksPayload = {
+      picklistItems: pickPageItemData.suggestedItems,
+    };
+
+    return apiClient.post(itemsUrl, resetPicksPayload).then(() => {
+      apiClient.post(itemsUrl, initialPicksPayload).then(() => {
+        apiClient.get(url)
+          .then((resp) => {
+            const { pickPageItems } = resp.data.data.pickPage;
+            this.saveNewItems(pickPageItems);
+            this.props.hideSpinner();
+          })
+          .catch(() => { this.props.hideSpinner(); });
+      }).catch(() => { this.props.hideSpinner(); });
+    }).catch(() => { this.props.hideSpinner(); });
+  }
+
   render() {
     return (
       <Form
@@ -302,6 +357,7 @@ class PickPage extends Component {
                   checkForInitialPicksChanges: this.checkForInitialPicksChanges,
                   stockMovementId: values.stockMovementId,
                   onResponse: this.saveNewItems,
+                  revertUserPick: this.revertUserPick,
                 }))}
               <div className="d-print-none">
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>
