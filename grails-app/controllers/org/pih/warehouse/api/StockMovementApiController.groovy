@@ -75,9 +75,6 @@ class StockMovementApiController {
         }
 
         bindStockMovement(stockMovement, jsonObject)
-
-
-        // Create or update stock movement
         stockMovementService.updateStockMovement(stockMovement)
 
         forward(action: "read")

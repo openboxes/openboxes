@@ -77,8 +77,7 @@ class StockMovementService {
 
 
     StockMovement updateStockMovement(StockMovement stockMovement) {
-        log.info "Update stock movement " + stockMovement
-        log.info "StockMovement.lineItems = " + stockMovement?.lineItems
+        log.info "Update stock movement " + new JSONObject(stockMovement.toJson()).toString(4)
 
         Requisition requisition = updateRequisition(stockMovement)
 
@@ -86,81 +85,6 @@ class StockMovementService {
         if (stockMovement.dateShipped && stockMovement.shipmentType) {
             log.info "Creating shipment for stock movement ${stockMovement}"
             createOrUpdateShipment(stockMovement)
-        }
-
-
-        if (stockMovement.lineItems) {
-            stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
-                RequisitionItem requisitionItem
-                // Try to find a matching stock movement item
-                if (stockMovementItem.id) {
-                    requisitionItem = requisition.requisitionItems.find { it.id == stockMovementItem.id }
-                    // We should not just assume that if
-                    if (!requisitionItem) {
-                        throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
-                    }
-                }
-
-                // If requisition item is found, we update it
-                if (requisitionItem) {
-                    log.info "Item found " + requisitionItem.id
-
-                    if (stockMovementItem.delete) {
-                        log.info "Item deleted " + requisitionItem.id
-                        requisitionItem.undoChanges()
-                        requisition.removeFromRequisitionItems(requisitionItem)
-                        requisitionItem.delete(flush: true)
-                    } else if (stockMovementItem.revert) {
-                        log.info "Item reverted " + requisitionItem.id
-                        requisitionItem.undoChanges()
-                    } else if (stockMovementItem.cancel) {
-                        log.info "Item canceled " + requisitionItem.id
-                        requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
-                    } else if (stockMovementItem.substitute) {
-                        log.info "Item substituted " + requisitionItem.id
-                        log.info "Substitutions: " + requisitionItem.product.substitutions
-                        if (!requisitionItem.product.isValidSubstitution(stockMovementItem?.newProduct)) {
-                            throw new IllegalArgumentException("Product ${stockMovementItem?.newProduct?.productCode} " +
-                                    "${stockMovementItem?.newProduct?.name} is not a valid substitution of " +
-                                    "${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}")
-                        }
-                        requisitionItem.chooseSubstitute(
-                                stockMovementItem.newProduct,
-                                null,
-                                stockMovementItem.newQuantity?.intValueExact(),
-                                stockMovementItem.reasonCode,
-                                stockMovementItem.comments)
-                    } else {
-                        log.info "Item updated " + requisitionItem.id
-                        if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
-                        if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
-                        if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
-                        if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
-                        if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
-                        if (stockMovementItem.quantityRevised) {
-                            requisitionItem.changeQuantity(
-                                    stockMovementItem?.quantityRevised?.intValueExact(),
-                                    stockMovementItem.reasonCode,
-                                    stockMovementItem.comments)
-                        }
-                    }
-                    requisitionItem.save()
-                }
-                // Otherwise we create a new one
-                else {
-                    log.info "Item not found"
-                    if (stockMovementItem.quantityRevised) {
-                        throw new IllegalArgumentException("Cannot specify quantityRevised when creating a new item")
-                    }
-                    requisitionItem = new RequisitionItem()
-                    requisitionItem.product = stockMovementItem.product
-                    requisitionItem.inventoryItem = stockMovementItem.inventoryItem
-                    requisitionItem.quantity = stockMovementItem.quantityRequested
-                    requisitionItem.recipient = stockMovementItem.recipient
-                    requisitionItem.orderIndex = stockMovementItem.sortOrder
-                    requisition.addToRequisitionItems(requisitionItem)
-                }
-            }
         }
 
         if (requisition.hasErrors() || !requisition.save(flush: true)) {
@@ -614,7 +538,7 @@ class StockMovementService {
                         if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
                         if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                         if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
-                        //if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
+                        if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
                         if (stockMovementItem.quantityRevised) {
                             requisitionItem.changeQuantity(
@@ -623,7 +547,6 @@ class StockMovementService {
                                     stockMovementItem.comments)
                         }
                     }
-                    requisitionItem.save()
                 }
                 // Otherwise we create a new one
                 else {
@@ -635,7 +558,7 @@ class StockMovementService {
                     requisitionItem.product = stockMovementItem.product
                     requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                     requisitionItem.quantity = stockMovementItem.quantityRequested
-                    //requisitionItem.recipient = stockMovementItem.recipient
+                    requisitionItem.recipient = stockMovementItem.recipient
                     requisitionItem.orderIndex = stockMovementItem.sortOrder
                     requisition.addToRequisitionItems(requisitionItem)
                 }
@@ -715,40 +638,36 @@ class StockMovementService {
         return shipment
     }
 
-    ShipmentItem findShipmentItem(StockMovementItem stockMovementItem) {
-        log.info "Find shipment item: " + new JSONObject(stockMovementItem.toJson()).toString(4)
-        ShipmentItem shipmentItem = ShipmentItem.createCriteria().get {
-            eq("shipment", stockMovementItem?.stockMovement?.shipment)
-            eq("inventoryItem", stockMovementItem?.inventoryItem)
-            //eq("container", stockMovementItem.pallet)
-        }
-        log.info "Found shipment item: ${shipmentItem}"
-        return shipmentItem
-    }
-
-
     ShipmentItem createOrUpdateShipmentItem(StockMovementItem stockMovementItem) {
+
+        // FIXME Determine whether this will ever return multiple (my guess is no)
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        ShipmentItem shipmentItem = ShipmentItem.findByRequisitionItem(requisitionItem)
+
+        if(!shipmentItem) {
+            shipmentItem = new ShipmentItem()
+        }
 
         InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(stockMovementItem.product,
                         stockMovementItem.lotNumber, stockMovementItem.expirationDate)
 
-        stockMovementItem.inventoryItem = inventoryItem
-
-        ShipmentItem shipmentItem = findShipmentItem(stockMovementItem)
-        if(!shipmentItem) {
-            shipmentItem = new ShipmentItem()
-        }
+        shipmentItem.requisitionItem = requisitionItem
         shipmentItem.product = stockMovementItem.product
         shipmentItem.inventoryItem = inventoryItem
         shipmentItem.lotNumber = inventoryItem.lotNumber
         shipmentItem.expirationDate = inventoryItem.expirationDate
         shipmentItem.quantity = stockMovementItem.quantityRequested
+        shipmentItem.recipient = stockMovementItem.recipient
         return shipmentItem
     }
 
     ShipmentItem createOrUpdateShipmentItem(PicklistItem picklistItem) {
+
+        // FIXME Need to deal with multiple shipment items per requisition item (bin location might be a good discriminator)
         ShipmentItem shipmentItem = ShipmentItem.findByRequisitionItem(picklistItem?.requisitionItem)
-        if (!shipmentItem) shipmentItem = new ShipmentItem()
+        if (!shipmentItem) {
+            shipmentItem = new ShipmentItem()
+        }
         shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
         shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
         shipmentItem.product = picklistItem?.inventoryItem?.product
@@ -756,7 +675,6 @@ class StockMovementService {
         shipmentItem.requisitionItem = picklistItem.requisitionItem
         shipmentItem.recipient = picklistItem?.requisitionItem?.recipient
         shipmentItem.inventoryItem = picklistItem?.inventoryItem
-        //shipmentItem.container = picklistItem?.requisitionItem?.palletName
         shipmentItem.binLocation = picklistItem?.binLocation
         return shipmentItem
     }
