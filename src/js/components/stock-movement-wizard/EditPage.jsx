@@ -15,6 +15,7 @@ import SubstitutionsModal from './modals/SubstitutionsModal';
 import apiClient from '../../utils/apiClient';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../actions';
+import ButtonField from '../form-elements/ButtonField';
 
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
@@ -118,6 +119,21 @@ const FIELDS = {
           showValueTooltip: true,
         }),
       },
+      revert: {
+        type: ButtonField,
+        label: 'Undo',
+        flexWidth: '1',
+        fieldKey: '',
+        buttonLabel: 'Undo',
+        getDynamicAttr: ({ fieldValue, revertItem }) => ({
+          onClick: fieldValue.requisitionItemId ?
+            () => revertItem(fieldValue.requisitionItemId) : () => null,
+          hidden: fieldValue.statusCode ? fieldValue.statusCode !== 'CHANGED' : false,
+        }),
+        attributes: {
+          className: 'btn btn-outline-danger',
+        },
+      },
     },
   },
 };
@@ -162,6 +178,7 @@ class EditItemsPage extends Component {
       values: { ...this.props.initialValues, editPageItems: [] },
     };
 
+    this.revertItem = this.revertItem.bind(this);
     this.saveNewItems = this.saveNewItems.bind(this);
     this.props.showSpinner();
   }
@@ -192,6 +209,10 @@ class EditItemsPage extends Component {
             ...val.product,
             label: `${val.productCode} ${val.productName}`,
           },
+          substitutionItems: _.map(val.substitutionItems, sub => ({
+            ...sub,
+            requisitionItemId: val.requisitionItemId,
+          })),
         }),
       );
 
@@ -329,9 +350,44 @@ class EditItemsPage extends Component {
     }, () => this.setState({
       values: {
         ...this.state.values,
-        editPageItems,
+        editPageItems: _.map(editPageItems, item => ({
+          ...item,
+          substitutionItems: _.map(item.substitutionItems, sub => ({
+            ...sub,
+            requisitionItemId: item.requisitionItemId,
+          })),
+        })),
       },
     }));
+  }
+
+  /**
+   * Reverts to previous state of requisition item (reverts substitutions and quantity revisions)
+   * @param {string} itemId
+   * @public
+   */
+  revertItem(itemId) {
+    this.props.showSpinner();
+    const revertItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=3`;
+    const payload = {
+      id: this.state.values.stockMovementId,
+      lineItems: [{
+        id: itemId,
+        revert: 'true',
+      }],
+    };
+
+    return apiClient.post(revertItemsUrl, payload)
+      .then((response) => {
+        const { editPageItems } = response.data.data.editPage;
+        this.setState({ redoAutopick: true });
+        this.saveNewItems(editPageItems);
+        this.props.hideSpinner();
+      })
+      .catch(() => {
+        this.props.hideSpinner();
+        return Promise.reject(new Error('Could not revert requisition items'));
+      });
   }
 
   render() {
@@ -358,6 +414,7 @@ class EditItemsPage extends Component {
                 stockMovementId: values.stockMovementId,
                 reasonCodes: this.props.reasonCodes,
                 onResponse: this.saveNewItems,
+                revertItem: this.revertItem,
               }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>
