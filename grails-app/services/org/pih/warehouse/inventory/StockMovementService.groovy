@@ -541,9 +541,9 @@ class StockMovementService {
                                 stockMovementItem.comments)
                     } else {
                         log.info "Item updated " + requisitionItem.id
-                        requisitionItem.product = stockMovementItem.product
-                        requisitionItem.quantity = stockMovementItem.quantityRequested
-                        requisitionItem.recipient = stockMovementItem.recipient
+                        if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
+                        if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
+                        if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
                         if (stockMovementItem.quantityRevised != null) {
