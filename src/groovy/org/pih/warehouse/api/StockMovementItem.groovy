@@ -147,6 +147,7 @@ class StockMovementItem {
     }
 
 
+
     static StockMovementItem createFromRequisitionItem(RequisitionItem requisitionItem) {
 
         List<StockMovementItem> substitutionItems = requisitionItem?.substitutionItems ?
@@ -164,7 +165,7 @@ class StockMovementItem {
                 quantityAllowed: null,
                 quantityAvailable: null,
                 quantityCanceled: requisitionItem?.quantityCanceled,
-                quantityRevised: requisitionItem?.modificationItem?.quantity,
+                quantityRevised: requisitionItem.calculateQuantityRevised(),
                 quantityPicked: requisitionItem?.totalQuantityPicked(),
                 substitutionItems: substitutionItems,
                 reasonCode: requisitionItem.cancelReasonCode,
@@ -313,8 +314,13 @@ class EditPageItem {
         availableItems ? availableItems.sum { it.quantityAvailable } : null
     }
 
+    Integer getQuantityAfterCancellation() {
+        return requisitionItem.quantityCanceled ? (requisitionItem.quantity - requisitionItem.quantityCanceled) : null
+    }
+
     Integer getQuantityRevised() {
-        requisitionItem?.modificationItem ? requisitionItem?.modificationItem?.quantity : null
+        requisitionItem?.modificationItem ?
+                requisitionItem?.modificationItem?.quantity : requisitionItem.quantityCanceled ? quantityAfterCancellation : null
     }
 
     Date getMinExpirationDate() {
@@ -420,12 +426,9 @@ class PickPageItem {
         return quantityRemaining > 0 ? quantityRemaining : 0
     }
 
-    // FIXME Don't love this logic in multiple places (see StockMovementItem). Refactor method to use
-    // StockMovementItem instead of RequisitionItem
     Integer getQuantityRequired() {
-        return requisitionItem?.modificationItem?.quantity?:requisitionItem?.quantity?:0
+        return requisitionItem?.calculateQuantityRequired()?:0
     }
-
 
     Integer getQuantityRequested() {
         requisitionItem?.quantity?:0
