@@ -72,6 +72,7 @@ class Shipment implements Comparable, Serializable {
 	Person carrier 					// the person or organization that actually carries the goods from A to B
 	Person recipient				// the person or organization that is receiving the goods	
 	Donor donor						// the information about the donor (OPTIONAL)
+	String driverName				// added for stock movements (should use carrier)
 
 	// One-to-many associations
 	SortedSet events;
@@ -165,6 +166,7 @@ class Shipment implements Comparable, Serializable {
 		carrier(nullable:true)
 		recipient(nullable:true)
 		donor(nullable:true)
+		driverName(nullable:true)
 		statedValue(nullable:true, max:99999999F)
 		totalValue(nullable:true, max:99999999F)
 		dateCreated(nullable:true)

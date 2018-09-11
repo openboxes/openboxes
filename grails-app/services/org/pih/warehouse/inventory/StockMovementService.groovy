@@ -33,6 +33,8 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -45,6 +47,8 @@ class StockMovementService {
     def requisitionService
     def shipmentService
     def inventoryService
+
+    static String TRACKING_NUMBER_TYPE = "Tracking Number"
 
     boolean transactional = true
 
@@ -597,12 +601,31 @@ class StockMovementService {
         // Last step will be to update the generated name
         shipment.name = stockMovement.generateName()
 
-        // FIXME Associated tracking number and driver name with reference number and carrier (respectively)
-        String additionalInformation = ""
-        if (stockMovement.comments) additionalInformation += "Comments: ${stockMovement.comments}\n"
-        if (stockMovement.trackingNumber) additionalInformation += "Tracking Number: ${stockMovement.trackingNumber}\n"
-        if (stockMovement.driverName) additionalInformation += "Driver Name: ${stockMovement.driverName}\n"
-        shipment.additionalInformation = additionalInformation
+
+        if (stockMovement.comments) {
+            shipment.additionalInformation = stockMovement.comments
+        }
+
+        if (stockMovement.trackingNumber) {
+            ReferenceNumberType trackingNumberType = ReferenceNumberType.findByName(TRACKING_NUMBER_TYPE)
+            if (!trackingNumberType) {
+                throw new IllegalStateException("Must configure reference number type '${TRACKING_NUMBER_TYPE}'")
+            }
+            ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
+                refNum.referenceNumberType == trackingNumberType
+            }
+
+            if (!referenceNumber) {
+                referenceNumber = new ReferenceNumber()
+                referenceNumber.referenceNumberType = trackingNumberType
+                shipment.addToReferenceNumbers(referenceNumber)
+            }
+            referenceNumber.identifier = stockMovement.trackingNumber
+        }
+
+        if (stockMovement.driverName) {
+            shipment.driverName = stockMovement.driverName
+        }
 
         if (stockMovement.origin.isSupplier()) {
             stockMovement.lineItems.collect { StockMovementItem stockMovementItem ->

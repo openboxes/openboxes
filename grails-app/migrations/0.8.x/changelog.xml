@@ -19,5 +19,7 @@
     <include file="0.8.x/changelog-2018-08-28-2258-insert-stock-movement-shipment-type.xml"/>
     <include file="0.8.x/changelog-2018-08-31-2457-alter-table-shipment-add-column-description.xml"/>
     <include file="0.8.x/changelog-2018-09-06-2049-alter-table-requisition-add-column-recipient-id.xml"/>
+    <include file="0.8.x/changelog-2018-09-10-2157-insert-reference-number-type-tracking-number.xml"/>
+    <include file="0.8.x/changelog-2018-09-10-2212-alter-table-add-column-driver-name.xml"/>
 
 </databaseChangeLog>
