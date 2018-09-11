@@ -131,7 +131,7 @@ class PutAwaySecondPage extends Component {
       Filter,
     }, {
       Header: 'Put Away Bin',
-      accessor: 'putawayLocation.id',
+      accessor: 'putawayLocation',
       Cell: (cellInfo) => {
         const splitItems = _.get(this.state.putAway.putawayItems, `[${cellInfo.index}].splitItems`);
 
@@ -141,10 +141,11 @@ class PutAwaySecondPage extends Component {
 
         return (<Select
           options={this.state.bins}
+          objectValue
           value={_.get(this.state.putAway.putawayItems, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
           onChange={value => this.setState({
             putAway: update(this.state.putAway, {
-              putawayItems: { [cellInfo.index]: { putawayLocation: { id: { $set: value } } } },
+              putawayItems: { [cellInfo.index]: { putawayLocation: { $set: value } } },
             }),
           })}
         />);
@@ -203,7 +204,7 @@ class PutAwaySecondPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         const bins = _.map(response.data.data, bin => (
-          { value: bin.id, label: bin.name }
+          { value: { id: bin.id, name: bin.name }, label: bin.name }
         ));
         this.setState({ bins }, () => this.props.hideSpinner());
       })
