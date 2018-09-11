@@ -26,7 +26,7 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 
 	Integer quantityShipped				// Quantity that was shipped
 	Integer quantityReceived			// Quantity could be a class on its own
-	
+	Integer quantityCanceled 			// Quantity canceled
 	//Integer quantityAccepted
 	//Integer quantityRejected
 	//String rejectionReason
@@ -55,7 +55,8 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 		inventoryItem(nullable:true)
 		binLocation(nullable:true)
 		quantityShipped(range: 0..2147483646, nullable:false)
-		quantityReceived(range: 0..2147483646, nullable:false)		
+		quantityReceived(range: 0..2147483646, nullable:false)
+		quantityCanceled(nullable:true)
 		recipient(nullable:true)
 		comment(nullable:true, maxSize: 255)
 	}

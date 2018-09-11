@@ -176,8 +176,13 @@ class StockMovementApiController {
         List lineItems = jsonObject.remove("lineItems")
 
         // Dates aren't bound properly using default JSON binding
-        stockMovement.dateShipped = parseDate(jsonObject.remove("dateShipped"))
-        stockMovement.dateRequested = parseDate(jsonObject.remove("dateRequested"))
+        if (jsonObject.containsKey("dateShipped")) {
+            stockMovement.dateShipped = parseDate(jsonObject.remove("dateShipped"))
+        }
+
+        if (jsonObject.containsKey("dateRequested")) {
+            stockMovement.dateRequested = parseDate(jsonObject.remove("dateRequested"))
+        }
 
         // Bind the rest of the JSON attributes to the stock movement object
         log.info "Binding line items: " + lineItems
