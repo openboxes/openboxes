@@ -310,7 +310,11 @@ class PickPage extends Component {
     };
 
     const initialPicksPayload = {
-      picklistItems: pickPageItemData.suggestedItems,
+      picklistItems: _.map(pickPageItemData.suggestedItems, item => ({
+        ...item,
+        'binLocation.id': item['binLocation.id'] || '',
+        reasonCode: '',
+      })),
     };
 
     return apiClient.post(itemsUrl, resetPicksPayload).then(() => {
