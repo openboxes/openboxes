@@ -13,6 +13,7 @@ import Select from '../../utils/Select';
 import SplitLineModal from './SplitLineModal';
 import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
+import Filter from '../../utils/Filter';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -85,31 +86,38 @@ class PutAwaySecondPage extends Component {
       Header: 'Code',
       accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
+      Filter,
     }, {
       Header: 'Name',
       accessor: 'product.name',
       style: { whiteSpace: 'normal' },
+      Filter,
     }, {
       Header: 'Lot',
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
+      Filter,
     }, {
       Header: 'Expiry',
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
+      Filter,
     }, {
       Header: 'Recipient',
       accessor: 'recipient.name',
       style: { whiteSpace: 'normal' },
+      Filter,
     }, {
       Header: 'QTY',
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
+      Filter,
     }, {
       Header: 'Current bin',
       accessor: 'currentBins',
       style: { whiteSpace: 'normal' },
+      Filter,
     }, {
       Header: 'Stock Movement',
       accessor: 'stockMovement.name',
@@ -120,6 +128,7 @@ class PutAwaySecondPage extends Component {
         </span>
       ),
       filterable: true,
+      Filter,
     }, {
       Header: 'Put Away Bin',
       accessor: 'putawayLocation.id',
@@ -140,6 +149,7 @@ class PutAwaySecondPage extends Component {
           })}
         />);
       },
+      Filter,
     }, {
       Header: '',
       accessor: 'splitItems',
