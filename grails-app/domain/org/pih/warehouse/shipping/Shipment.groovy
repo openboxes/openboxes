@@ -87,6 +87,8 @@ class Shipment implements Comparable, Serializable {
 	List documents;
 	List comments;
 	List referenceNumbers;
+
+	SortedSet shipmentItems
 	
 	static transients = [
 			"allShipmentItems",
