@@ -506,6 +506,18 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return quantityPicked?:0
     }
 
+
+
+    def calculateQuantityRevised() {
+        return modificationItem ? modificationItem?.quantity :
+                quantityCanceled ? (quantity - quantityCanceled) : null
+    }
+
+    def calculateQuantityRequired() {
+        return modificationItem ? modificationItem?.quantity :
+                quantityCanceled ? (quantity - quantityCanceled) : quantity
+    }
+
 	def calculateQuantityRemaining() {
         long startTime = System.currentTimeMillis()
 		def quantityRemaining = totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())

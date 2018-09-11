@@ -202,29 +202,33 @@ class StockMovementService {
      */
     void createPicklist(StockMovementItem stockMovementItem) {
 
-        log.info "Create picklist for stock movement item ${stockMovementItem}"
+        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
 
         // This is kind of a hack, but it's the only way I could figure out how to get the origin field
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
         Product product = requisitionItem.product
         Location location = requisitionItem?.requisition?.origin
-        Integer quantityRequired = stockMovementItem?.quantityRequired
+        Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
 
-        // Retrieve all available items and then calculate suggested
-        List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, product)
-        log.info "Available items: ${availableItems}"
-        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
-        log.info "Suggested items " + suggestedItems
-        if (suggestedItems) {
-            clearPicklist(stockMovementItem)
-            for (SuggestedItem suggestedItem : suggestedItems) {
-                createOrUpdatePicklistItem(stockMovementItem,
-                        null,
-                        suggestedItem.inventoryItem,
-                        suggestedItem.binLocation,
-                        suggestedItem.quantityPicked.intValueExact(),
-                        null,
-                        null)
+        log.info "QUANTITY REQUIRED: ${quantityRequired}"
+
+        if (quantityRequired) {
+            // Retrieve all available items and then calculate suggested
+            List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, product)
+            log.info "Available items: ${availableItems}"
+            List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
+            log.info "Suggested items " + suggestedItems
+            if (suggestedItems) {
+                clearPicklist(stockMovementItem)
+                for (SuggestedItem suggestedItem : suggestedItems) {
+                    createOrUpdatePicklistItem(stockMovementItem,
+                            null,
+                            suggestedItem.inventoryItem,
+                            suggestedItem.binLocation,
+                            suggestedItem.quantityPicked.intValueExact(),
+                            null,
+                            null)
+                }
             }
         }
     }
@@ -426,10 +430,7 @@ class StockMovementService {
         Location location = requisitionItem?.requisition?.origin
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
 
-        // FIXME Don't love this logic in multiple places (see StockMovementItem). Refactor method to use
-        // StockMovementItem instead of RequisitionItem
-        Integer quantityRequired = requisitionItem?.modificationItem?.quantity?:requisitionItem?.quantity
-
+        Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         pickPageItem.availableItems = availableItems
         pickPageItem.suggestedItems = suggestedItems
@@ -540,11 +541,14 @@ class StockMovementService {
                         if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
                         if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
-                        if (stockMovementItem.quantityRevised) {
-                            requisitionItem.changeQuantity(
-                                    stockMovementItem?.quantityRevised?.intValueExact(),
-                                    stockMovementItem.reasonCode,
-                                    stockMovementItem.comments)
+                        if (stockMovementItem.quantityRevised != null) {
+                            // Cannot cancel quantity if it has already been canceled
+                            if (!requisitionItem.quantityCanceled) {
+                                requisitionItem.changeQuantity(
+                                        stockMovementItem?.quantityRevised?.intValueExact(),
+                                        stockMovementItem.reasonCode,
+                                        stockMovementItem.comments)
+                            }
                         }
                     }
                 }
