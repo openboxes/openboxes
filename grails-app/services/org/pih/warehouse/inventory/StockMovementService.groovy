@@ -24,6 +24,7 @@ import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
@@ -723,6 +724,30 @@ class StockMovementService {
         }
 
         shipmentService.sendShipment(shipments[0], null, user, requisition.origin, new Date())
+
+        // Create temporary staging area for the Partial Receipt process
+        LocationType locationType = LocationType.findByName("Receiving")
+        if (!locationType) {
+            throw new IllegalArgumentException("Unable to find location type 'Receiving'")
+        }
+        createInternalLocation(stockMovement.name, stockMovement.identifier, locationType, stockMovement.destination)
+    }
+
+
+    Location createInternalLocation(String name, String locationNumber, LocationType locationType, Location parentLocation) {
+
+        log.info "creating internal location name=${name}, type=${locationType}"
+
+        if (!name || !locationNumber || !locationType || !parentLocation) {
+            throw new IllegalArgumentException("Must specify name, location number, location type, and parent location in order to create internal location")
+        }
+
+        Location location = new Location()
+        location.name = "${locationNumber}.${name}"
+        location.locationNumber = locationNumber
+        location.locationType = locationType
+        location.parentLocation = parentLocation
+        return location.save(failOnError: true)
     }
 
     void rollbackStockMovement(String id) {
