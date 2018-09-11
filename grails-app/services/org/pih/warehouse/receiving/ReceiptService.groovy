@@ -88,14 +88,20 @@ class ReceiptService {
                 }
 
                 ReceiptItem receiptItem = new ReceiptItem();
-                receiptItem.quantityReceived = partialReceiptItem.quantityReceiving
                 receiptItem.binLocation = partialReceiptItem.binLocation
                 receiptItem.recipient = partialReceiptItem.recipient
                 receiptItem.quantityShipped = shipmentItem.quantity;
+                receiptItem.quantityReceived = partialReceiptItem.quantityReceiving
                 receiptItem.lotNumber = shipmentItem.lotNumber;
                 receiptItem.product = inventoryItem.product
                 receiptItem.inventoryItem = inventoryItem
                 receiptItem.shipmentItem = shipmentItem
+
+                if (partialReceiptItem.cancelRemaining) {
+                    Integer quantityRemaining = shipmentItem.totalQuantityShipped() - shipmentItem.totalQuantityReceived()
+                    receiptItem.quantityCanceled = quantityRemaining
+                }
+
                 receipt.addToReceiptItems(receiptItem)
                 shipmentItem.addToReceiptItems(receiptItem)
             }
@@ -105,8 +111,13 @@ class ReceiptService {
         shipment.save(flush:true)
 
         // Create received shipment event
-        if (!shipment.wasReceived()) {
-            shipmentService.createShipmentEvent(shipment, shipment.receipt.actualDeliveryDate, EventCode.RECEIVED, shipment.destination);
+        if (!shipment.wasReceived() && !shipment.wasPartiallyReceived()) {
+            shipmentService.createShipmentEvent(shipment,
+                    shipment.receipt.actualDeliveryDate,
+                    EventCode.PARTIALLY_RECEIVED,
+                    shipment.destination);
+
+
         }
 
     }

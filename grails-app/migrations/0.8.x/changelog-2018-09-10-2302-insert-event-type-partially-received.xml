@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1536638630891-1">
+        <insert tableName="event_type">
+            <column name="id" value="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2018-09-10T00:00:00.0"/>
+            <column name="description" value="Shipment has been partially received"/>
+            <column name="event_code" value="PARTIALLY_RECEIVED"/>
+            <column name="last_updated" valueDate="2018-09-10T00:00:00.0"/>
+            <column name="name" value="Partially Received"/>
+            <column name="sort_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

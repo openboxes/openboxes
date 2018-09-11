@@ -26,10 +26,17 @@ class PartialReceiptItem {
         return receiptItems ? receiptItems?.sum { it.quantityReceived } : 0
     }
 
+    Integer getQuantityCanceled() {
+        def receiptItems = ReceiptItem.findAllByShipmentItem(shipmentItem)
+        return receiptItems ? receiptItems?.sum { it.quantityCanceled } : 0
+    }
+
+
     Integer getQuantityRemaining() {
+        Integer quantityCanceled = quantityCanceled?:0
         Integer quantityReceiving = quantityReceiving?:0
         Integer quantityReceived = quantityReceived?:0
-        Integer quantityRemaining = quantityShipped - (quantityReceiving + quantityReceived)
+        Integer quantityRemaining = quantityShipped - (quantityReceiving + quantityReceived + quantityCanceled)
         return !cancelRemaining ? (quantityRemaining > 0) ? quantityRemaining : 0 : 0
     }
 

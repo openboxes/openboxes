@@ -3,11 +3,17 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet author="jmiranda" id="1536284997693-1">
+    <changeSet author="jmiranda" id="1536637889233-1">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="requisition_item" columnName="recipient"/>
+            <not>
+                <columnExists tableName="receipt_item" columnName="quantity_canceled"/>
+            </not>
         </preConditions>
-        <dropColumn tableName="requisition_item" columnName="recipient"/>
+        <addColumn tableName="receipt_item">
+            <column name="quantity_canceled" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

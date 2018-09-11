@@ -286,6 +286,10 @@ class Shipment implements Comparable, Serializable {
 	Boolean wasReceived() { 
 		return events.any { it.eventType?.eventCode == EventCode.RECEIVED }
 	}
+
+	Boolean wasPartiallyReceived() {
+		return events.any { it.eventType?.eventCode == EventCode.PARTIALLY_RECEIVED }
+	}
 	
 	/*
 	Boolean isIncoming(Location currentLocation) { 
@@ -365,6 +369,11 @@ class Shipment implements Comparable, Serializable {
 			                             date:this.getActualDeliveryDate(),
 			                             location:this.destination] )
 		}
+        else if (wasPartiallyReceived()) {
+            return new ShipmentStatus( [ code:ShipmentStatusCode.PARTIALLY_RECEIVED,
+                                         date:this.getActualDeliveryDate(),
+                                         location:this.destination] )
+        }
 		else if (this.hasShipped()) {
 			return new ShipmentStatus( [ code:ShipmentStatusCode.SHIPPED,
 			                             date:this.getActualShippingDate(),
