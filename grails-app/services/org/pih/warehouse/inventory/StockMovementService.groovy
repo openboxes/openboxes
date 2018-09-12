@@ -743,7 +743,7 @@ class StockMovementService {
         }
 
         Location location = new Location()
-        location.name = "${locationNumber}.${name}"
+        location.name = "Receiving ${locationNumber}"
         location.locationNumber = locationNumber
         location.locationType = locationType
         location.parentLocation = parentLocation
