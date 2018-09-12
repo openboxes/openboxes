@@ -25,7 +25,35 @@ class LocationService {
 	
 	def grailsApplication
 	boolean transactional = true
-	
+
+
+	Location findInternalLocation(Location parentLocation, String name) {
+		return Location.createCriteria().get {
+			eq("parentLocation", parentLocation)
+			eq("name", name)
+		}
+	}
+
+	Location findOrCreateInternalLocation(String name, String locationNumber, LocationType locationType, Location parentLocation) {
+		log.info "find or create internal location name=${name}, type=${locationType}"
+		if (!name || !locationNumber || !locationType || !parentLocation) {
+			throw new IllegalArgumentException("Must specify name, location number, location type, and parent location in order to create internal location")
+		}
+
+		Location location = findInternalLocation(parentLocation, name)
+		if (!location) {
+			log.info "creating internal location name=${name}, type=${locationType}"
+			location = new Location()
+			location.name = name
+			location.locationNumber = locationNumber
+			location.locationType = locationType
+			location.parentLocation = parentLocation
+			location.save(failOnError: true)
+		}
+		return location
+	}
+
+
 
 	def getAllLocations() {
 		return getLocations(null, [:])

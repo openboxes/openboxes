@@ -48,6 +48,7 @@ class StockMovementService {
     def requisitionService
     def shipmentService
     def inventoryService
+    def locationService
 
     static String TRACKING_NUMBER_TYPE = "Tracking Number"
 
@@ -731,26 +732,12 @@ class StockMovementService {
             if (!locationType) {
                 throw new IllegalArgumentException("Unable to find location type 'Receiving'")
             }
-            createInternalLocation(stockMovement.name, stockMovement.identifier, locationType, stockMovement.destination)
+            locationService.findOrCreateInternalLocation("Receiving ${stockMovement.identifier}",
+                    stockMovement.identifier, locationType, stockMovement.destination)
         }
     }
 
 
-    Location createInternalLocation(String name, String locationNumber, LocationType locationType, Location parentLocation) {
-
-        log.info "creating internal location name=${name}, type=${locationType}"
-
-        if (!name || !locationNumber || !locationType || !parentLocation) {
-            throw new IllegalArgumentException("Must specify name, location number, location type, and parent location in order to create internal location")
-        }
-
-        Location location = new Location()
-        location.name = "Receiving ${locationNumber}"
-        location.locationNumber = locationNumber
-        location.locationType = locationType
-        location.parentLocation = parentLocation
-        return location.save(failOnError: true)
-    }
 
     void rollbackStockMovement(String id) {
         StockMovement stockMovement = getStockMovement(id)

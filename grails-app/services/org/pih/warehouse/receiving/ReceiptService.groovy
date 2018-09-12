@@ -26,6 +26,7 @@ class ReceiptService {
 
     def shipmentService
     def inventoryService
+    def locationService
 
     PartialReceipt getPartialReceipt(String id) {
         Shipment shipment = Shipment.get(id)
@@ -37,7 +38,7 @@ class ReceiptService {
         partialReceipt.dateDelivered = shipment.actualDeliveryDate
 
         Location defaultBinLocation =
-                findDefaultBinLocation(shipment.destination, "Receiving ${shipment.shipmentNumber}")
+                locationService.findInternalLocation(shipment.destination, "Receiving ${shipment.shipmentNumber}")
 
         def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
@@ -59,12 +60,7 @@ class ReceiptService {
         return partialReceipt
     }
 
-    Location findDefaultBinLocation(Location parentLocation, String name) {
-        return Location.createCriteria().get {
-            eq("parentLocation", parentLocation)
-            eq("name", name)
-        }
-    }
+
 
     void savePartialReceipt(PartialReceipt partialReceipt) {
 
