@@ -726,11 +726,13 @@ class StockMovementService {
         shipmentService.sendShipment(shipments[0], null, user, requisition.origin, new Date())
 
         // Create temporary staging area for the Partial Receipt process
-        LocationType locationType = LocationType.findByName("Receiving")
-        if (!locationType) {
-            throw new IllegalArgumentException("Unable to find location type 'Receiving'")
+        if (stockMovement.origin.isSupplier()) {
+            LocationType locationType = LocationType.findByName("Receiving")
+            if (!locationType) {
+                throw new IllegalArgumentException("Unable to find location type 'Receiving'")
+            }
+            createInternalLocation(stockMovement.name, stockMovement.identifier, locationType, stockMovement.destination)
         }
-        createInternalLocation(stockMovement.name, stockMovement.identifier, locationType, stockMovement.destination)
     }
 
 
