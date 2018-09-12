@@ -24,6 +24,7 @@ import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
@@ -47,6 +48,7 @@ class StockMovementService {
     def requisitionService
     def shipmentService
     def inventoryService
+    def locationService
 
     static String TRACKING_NUMBER_TYPE = "Tracking Number"
 
@@ -540,9 +542,9 @@ class StockMovementService {
                                 stockMovementItem.comments)
                     } else {
                         log.info "Item updated " + requisitionItem.id
-                        requisitionItem.product = stockMovementItem.product
-                        requisitionItem.quantity = stockMovementItem.quantityRequested
-                        requisitionItem.recipient = stockMovementItem.recipient
+                        if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
+                        if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
+                        if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
                         if (stockMovementItem.quantityRevised != null) {
@@ -723,7 +725,19 @@ class StockMovementService {
         }
 
         shipmentService.sendShipment(shipments[0], null, user, requisition.origin, new Date())
+
+        // Create temporary staging area for the Partial Receipt process
+        if (stockMovement.origin.isSupplier()) {
+            LocationType locationType = LocationType.findByName("Receiving")
+            if (!locationType) {
+                throw new IllegalArgumentException("Unable to find location type 'Receiving'")
+            }
+            locationService.findOrCreateInternalLocation("Receiving ${stockMovement.identifier}",
+                    stockMovement.identifier, locationType, stockMovement.destination)
+        }
     }
+
+
 
     void rollbackStockMovement(String id) {
         StockMovement stockMovement = getStockMovement(id)
