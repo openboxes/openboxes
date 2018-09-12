@@ -12,9 +12,6 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.requisition.Requisition
-
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
  */
@@ -63,11 +60,10 @@ class PutawayApiController {
             putaway.putawayItems.add(putawayItem)
         }
 
-        // Need to process the split items
-        putawayService.processSplitItems(putaway)
-
         // Putaway stock
         if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETE)) {
+            // Need to process the split items
+            putawayService.processSplitItems(putaway)
             putawayService.putawayStock(putaway)
         }
 
