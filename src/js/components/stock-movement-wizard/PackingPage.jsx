@@ -13,9 +13,8 @@ import LabelField from '../form-elements/LabelField';
 import SelectField from '../form-elements/SelectField';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
-import ButtonField from '../form-elements/ButtonField';
 import DateField from '../form-elements/DateField';
-
+import PackingSplitLineModal from './modals/PackingSplitLineModal';
 
 const debouncedUsersFetch = _.debounce((searchTerm, callback) => {
   if (searchTerm) {
@@ -114,14 +113,23 @@ const FIELDS = {
         flexWidth: '0.8',
       },
       splitLine: {
-        type: ButtonField,
+        type: PackingSplitLineModal,
         label: 'Split Line',
         flexWidth: '1',
         fieldKey: '',
-        buttonLabel: 'Split Line',
         attributes: {
-          className: 'btn btn-outline-success',
+          title: 'Split Line',
         },
+        getDynamicAttr: ({
+          fieldValue, stockMovementId, onResponse,
+        }) => ({
+          productCode: fieldValue.productCode,
+          btnOpenText: 'Split Line',
+          btnOpenClassName: 'btn btn-outline-success',
+          lineItem: fieldValue,
+          stockMovementId,
+          onResponse,
+        }),
       },
     },
   },
@@ -217,6 +225,8 @@ class PackingPage extends Component {
     // TODO: save packing data request
   }
 
+  saveSplittedLines() {}
+
   render() {
     return (
       <Form
@@ -239,6 +249,7 @@ class PackingPage extends Component {
             <form onSubmit={handleSubmit}>
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stockMovementId: values.stockMovementId,
+                onResponse: this.saveSplittedLines(),
               }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>
