@@ -14,6 +14,7 @@ import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
 import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
@@ -35,6 +36,9 @@ class ReceiptService {
         partialReceipt.dateShipped = shipment.actualShippingDate
         partialReceipt.dateDelivered = shipment.actualDeliveryDate
 
+        Location defaultBinLocation =
+                findDefaultBinLocation(shipment.destination, "Receiving ${shipment.shipmentNumber}")
+
         def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
 
@@ -46,12 +50,21 @@ class ReceiptService {
                 PartialReceiptItem partialReceiptItem = new PartialReceiptItem()
                 partialReceiptItem.shipmentItem = shipmentItem
                 partialReceiptItem.recipient = shipmentItem.recipient
+                if (defaultBinLocation) {
+                    partialReceiptItem.binLocation = defaultBinLocation
+                }
                 partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
             }
         }
         return partialReceipt
     }
 
+    Location findDefaultBinLocation(Location parentLocation, String name) {
+        return Location.createCriteria().get {
+            eq("parentLocation", parentLocation)
+            eq("name", name)
+        }
+    }
 
     void savePartialReceipt(PartialReceipt partialReceipt) {
 
@@ -68,7 +81,6 @@ class ReceiptService {
         receipt.shipment = partialReceipt.shipment
         receipt.expectedDeliveryDate = partialReceipt.dateDelivered
         receipt.actualDeliveryDate = partialReceipt.dateDelivered
-
 
         // Update receipt items
         partialReceipt.partialReceiptItems.each { partialReceiptItem ->
@@ -138,7 +150,6 @@ class ReceiptService {
             }
         }
     }
-
 
     void rollbackPartialReceipts(Shipment shipment) {
         log.info "Rollback partial receipts for shipment " + shipment
