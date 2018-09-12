@@ -23,12 +23,12 @@ class PartialReceiptItem {
 
     Integer getQuantityReceived() {
         def receiptItems = ReceiptItem.findAllByShipmentItem(shipmentItem)
-        return receiptItems ? receiptItems?.sum { it.quantityReceived } : 0
+        return receiptItems ? receiptItems?.sum { it?.quantityReceived?:0 } : 0
     }
 
     Integer getQuantityCanceled() {
         def receiptItems = ReceiptItem.findAllByShipmentItem(shipmentItem)
-        return receiptItems ? receiptItems?.sum { it.quantityCanceled } : 0
+        return receiptItems ? receiptItems?.sum { it?.quantityCanceled?:0 } : 0
     }
 
 

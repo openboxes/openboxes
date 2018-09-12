@@ -51,7 +51,7 @@ class ShipmentItem implements Comparable, Serializable {
 	
 	static hasMany = [ orderShipments : OrderShipment, receiptItems: ReceiptItem]
 
-	static transients = ["comments"]
+	static transients = ["comments", "quantityReceivedAndCanceled", "quantityRemaining"]
 
 	//static hasOne = [receiptItem: ReceiptItem]
 	
@@ -73,7 +73,11 @@ class ShipmentItem implements Comparable, Serializable {
 		donor(nullable:true)
         requisitionItem(nullable:true)
 	}
-    
+
+	Boolean isFullyReceived() {
+		return quantityReceivedAndCanceled >= quantity
+	}
+
 	/**
 	 * @return	the lot number of the inventory item (or the lot number of the shipment item for backwards compatibility)
 	 */
@@ -93,7 +97,7 @@ class ShipmentItem implements Comparable, Serializable {
 		return orderShipments.collect{it.orderItem}
 	}
 
-	
+
 	def totalQuantityShipped() {
 		int totalQuantityShipped = 0
 		// Should use inventory item instead of comparing product & lot number
@@ -133,9 +137,21 @@ class ShipmentItem implements Comparable, Serializable {
 	*/
 
 
-    def quantityReceived() {
-        return (receiptItems) ? receiptItems.sum { it.quantityReceived } : 0
+    Integer quantityReceived() {
+        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem -> receiptItem?.quantityReceived?:0 } : 0
     }
+
+    Integer quantityCanceled() {
+        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem -> receiptItem?.quantityCanceled?:0 } : 0
+    }
+
+    Integer getQuantityRemaining()  {
+        return quantity - quantityReceivedAndCanceled
+    }
+
+    Integer getQuantityReceivedAndCanceled() {
+		return quantityReceived() + quantityCanceled()
+	}
 
 
 	String [] getComments() {

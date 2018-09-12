@@ -110,8 +110,7 @@ class ReceiptService {
                 receiptItem.shipmentItem = shipmentItem
 
                 if (partialReceiptItem.cancelRemaining) {
-                    Integer quantityRemaining = shipmentItem.totalQuantityShipped() - shipmentItem.totalQuantityReceived()
-                    receiptItem.quantityCanceled = quantityRemaining
+                    receiptItem.quantityCanceled = shipmentItem.quantityRemaining - partialReceiptItem.quantityReceiving
                 }
 
                 receipt.addToReceiptItems(receiptItem)
@@ -122,16 +121,24 @@ class ReceiptService {
         shipment.receipt = receipt
         shipment.save(flush:true)
 
-        // Create received shipment event
-        if (!shipment.wasReceived() && !shipment.wasPartiallyReceived()) {
-            shipmentService.createShipmentEvent(shipment,
-                    shipment.receipt.actualDeliveryDate,
-                    EventCode.PARTIALLY_RECEIVED,
-                    shipment.destination);
-
-
+        if (shipment.isFullyReceived()) {
+            if (!shipment.wasReceived()) {
+                shipmentService.createShipmentEvent(shipment,
+                        shipment.receipt.actualDeliveryDate,
+                        EventCode.RECEIVED,
+                        shipment.destination);
+            }
         }
+        else {
 
+            // Create received shipment event
+            if (!shipment.wasPartiallyReceived()) {
+                shipmentService.createShipmentEvent(shipment,
+                        shipment.receipt.actualDeliveryDate,
+                        EventCode.PARTIALLY_RECEIVED,
+                        shipment.destination);
+            }
+        }
     }
 
     void saveInboundTransaction(PartialReceipt partialReceipt) {
