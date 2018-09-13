@@ -122,10 +122,6 @@ const en = {
           label: 'Create Stock Movement',
           link: '/openboxes/stockMovement/index',
         },
-        partialReceiving: {
-          label: 'Partial Receiving',
-          link: '/openboxes/partialReceiving/index',
-        },
         putAway: {
           label: 'Put Away',
           link: '/openboxes/putAway/index',
