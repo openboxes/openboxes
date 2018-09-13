@@ -187,7 +187,7 @@ class PackingPage extends Component {
    */
   transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'ISSUED' };
+    const payload = { status: 'PICKED' };
 
     return apiClient.post(url, payload);
   }

@@ -259,9 +259,9 @@ class PickPage extends Component {
    * Transition to next stock movement status (PICKED).
    * @public
    */
-  transitionToStep5() {
+  transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'PICKED' };
+    const payload = { status: 'CHECKING' };
 
     return apiClient.post(url, payload);
   }
@@ -274,7 +274,7 @@ class PickPage extends Component {
   nextPage(formValues) {
     this.props.showSpinner();
     if (this.state.statusCode === 'PICKING') {
-      this.transitionToStep5()
+      this.transitionToNextStep()
         .then(() => this.props.onSubmit(formValues))
         .catch(() => this.props.hideSpinner());
     } else {

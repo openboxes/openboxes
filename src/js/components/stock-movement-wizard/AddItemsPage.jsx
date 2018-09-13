@@ -475,11 +475,11 @@ class AddItemsPage extends Component {
           if (this.state.statusCode === 'CREATED' || this.state.statusCode === 'EDITING') {
             this.transitionToNextStep('PICKED')
               .then(() => {
-                this.props.goToPage(5, values);
+                this.props.goToPage(6, values);
               })
               .catch(() => this.props.hideSpinner());
           } else {
-            this.props.goToPage(5, values);
+            this.props.goToPage(6, values);
           }
         })
         .catch(() => this.props.hideSpinner());
