@@ -409,6 +409,7 @@ class PickPageItem {
                 availableItems      : availableItems,
                 suggestedItems      : suggestedItems,
                 picklistItems       : picklistItems,
+                recipient           : requisitionItem?.recipient,
         ]
     }
 

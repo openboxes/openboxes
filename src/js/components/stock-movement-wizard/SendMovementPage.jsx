@@ -96,10 +96,9 @@ class SendMovementPage extends Component {
         if (!_.isEmpty(stockMovementData) && stockMovementData.pickPage.pickPageItems.length &&
           !_.some(stockMovementData.pickPage.pickPageItems, item => _.isEmpty(item.picklistItems))
         ) {
-          tableItems = _.reduce(
-            stockMovementData.pickPage.pickPageItems,
-            (result, item) => _.concat(result, item.picklistItems), [],
-          );
+          tableItems = _.reduce(stockMovementData.pickPage.pickPageItems, (result, item) =>
+            _.concat(result, _.map(item.picklistItems, picklistItem =>
+              ({ ...picklistItem, recipient: item.recipient }))), []);
           supplier = false;
         } else {
           tableItems = stockMovementData.lineItems;
@@ -394,7 +393,7 @@ class SendMovementPage extends Component {
                               <td>{item['binLocation.name']}</td>
                             }
                             <td>
-                              {item.recipient ? <span className="fa fa-user" /> : null}
+                              {item.recipient ? item.recipient.name : null}
                             </td>
                           </tr>
                         ),
