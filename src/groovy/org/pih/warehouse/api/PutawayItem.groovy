@@ -69,7 +69,8 @@ class PutawayItem {
                 "putawayFacility.name": putawayFacility?.name,
                 "putawayLocation.id": putawayLocation?.id,
                 "putawayLocation.name": putawayLocation?.name,
-                quantity: quantity
+                quantity: quantity,
+                splitItems: splitItems.collect { it?.toJson() }
         ]
     }
 }
