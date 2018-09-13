@@ -655,7 +655,7 @@ class AddItemsPage extends Component {
     const file = event.target.files[0];
     const { stockMovementId } = this.state.values;
 
-    formData.append('importFile', file);
+    formData.append('importFile', file.slice(0, file.size, 'text/csv'));
     const config = {
       headers: {
         'content-type': 'multipart/form-data',
