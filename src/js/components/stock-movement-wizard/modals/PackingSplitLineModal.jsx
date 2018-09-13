@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -10,30 +9,7 @@ import LabelField from '../../form-elements/LabelField';
 import SelectField from '../../form-elements/SelectField';
 import DateField from '../../form-elements/DateField';
 import { showSpinner, hideSpinner } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
-
-const debouncedUsersFetch = _.debounce((searchTerm, callback) => {
-  if (searchTerm) {
-    apiClient.get(`/openboxes/api/generic/person?name=${searchTerm}`)
-      .then(result => callback(
-        null,
-        {
-          complete: true,
-          options: _.map(result.data.data, obj => (
-            {
-              value: {
-                ...obj,
-              },
-              name: obj.name,
-            }
-          )),
-        },
-      ))
-      .catch(error => callback(error, { options: [] }));
-  } else {
-    callback(null, { options: [] });
-  }
-}, 500);
+import { debouncedUsersFetch } from '../../../utils/option-utils';
 
 const FIELDS = {
   splitLine: {

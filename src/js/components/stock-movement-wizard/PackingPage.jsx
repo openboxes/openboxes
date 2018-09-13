@@ -15,29 +15,7 @@ import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import DateField from '../form-elements/DateField';
 import PackingSplitLineModal from './modals/PackingSplitLineModal';
-
-const debouncedUsersFetch = _.debounce((searchTerm, callback) => {
-  if (searchTerm) {
-    apiClient.get(`/openboxes/api/generic/person?name=${searchTerm}`)
-      .then(result => callback(
-        null,
-        {
-          complete: true,
-          options: _.map(result.data.data, obj => (
-            {
-              value: {
-                ...obj,
-              },
-              name: obj.name,
-            }
-          )),
-        },
-      ))
-      .catch(error => callback(error, { options: [] }));
-  } else {
-    callback(null, { options: [] });
-  }
-}, 500);
+import { debouncedUsersFetch } from '../../utils/option-utils';
 
 const FIELDS = {
   packingPageItems: {

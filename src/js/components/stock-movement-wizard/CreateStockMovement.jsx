@@ -11,6 +11,7 @@ import DateField from '../form-elements/DateField';
 import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
+import { debouncedUsersFetch, debouncedLocationsFetch } from '../../utils/option-utils';
 
 function validate(values) {
   const errors = {};
@@ -31,57 +32,6 @@ function validate(values) {
   }
   return errors;
 }
-
-const debouncedUsersFetch = _.debounce((searchTerm, callback) => {
-  if (searchTerm) {
-    apiClient.get(`/openboxes/api/generic/person?name=${searchTerm}`)
-      .then(result => callback(
-        null,
-        {
-          complete: true,
-          options: _.map(result.data.data, obj => (
-            {
-              value: {
-                id: obj.id,
-                name: obj.name,
-                label: obj.name,
-              },
-              label: obj.name,
-            }
-          )),
-        },
-      ))
-      .catch(error => callback(error, { options: [] }));
-  } else {
-    callback(null, { options: [] });
-  }
-}, 500);
-
-const debouncedLocationsFetch = _.debounce((searchTerm, callback) => {
-  if (searchTerm) {
-    apiClient.get(`/openboxes/api/locations?name=${searchTerm}`)
-      .then(result => callback(
-        null,
-        {
-          complete: true,
-          options: _.map(result.data.data, obj => (
-            {
-              value: {
-                id: obj.id,
-                type: obj.locationType.locationTypeCode,
-                name: obj.name,
-                label: `${obj.name} [${obj.locationType.description}]`,
-              },
-              label: `${obj.name} [${obj.locationType.description}]`,
-            }
-          )),
-        },
-      ))
-      .catch(error => callback(error, { options: [] }));
-  } else {
-    callback(null, { options: [] });
-  }
-}, 500);
 
 const FIELDS = {
   description: {
@@ -155,6 +105,7 @@ const FIELDS = {
       loadOptions: debouncedUsersFetch,
       cache: false,
       options: [],
+      labelKey: 'name',
     },
   },
   dateRequested: {
