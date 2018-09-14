@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import TextField from '../../form-elements/TextField';
@@ -15,6 +16,7 @@ const FIELDS = {
   splitLine: {
     addButton: 'Add Line',
     type: ArrayField,
+    disableVirtualization: true,
     fields: {
       productName: {
         type: LabelField,
@@ -78,6 +80,13 @@ const FIELDS = {
   },
 };
 
+const validate = (values) => {
+  // TODO: validate for total packs quantitiy not exceeding quantity for this item
+  const errors = {};
+  errors.splitLine = [];
+  return errors;
+};
+
 /** Modal window where user can split line for Packing Page item */
 class PackingSplitLineModal extends Component {
   constructor(props) {
@@ -120,6 +129,23 @@ class PackingSplitLineModal extends Component {
     // TODO: send splitted lines to backend
   }
 
+  /**
+   * Sums up quantity packed from all available lines.
+   * @param {object} values
+   * @public
+   */
+  /* eslint-disable-next-line class-methods-use-this */
+  calculatePacked(values) {
+    return (
+      <div>
+        <div className="font-weight-bold pb-2">Quantity Packed: {_.reduce(values.splitLine, (sum, val) =>
+          (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0)}
+        </div>
+        <hr />
+      </div>
+    );
+  }
+
   render() {
     return (
       <ModalWrapper
@@ -128,7 +154,13 @@ class PackingSplitLineModal extends Component {
         onSave={this.onSave}
         fields={FIELDS}
         initialValues={this.state.formValues}
-      />
+        validate={validate}
+        renderBodyWithValues={this.calculatePacked}
+      >
+        <div>
+          <div className="font-weight-bold">Total Quantity: {this.state.attr.fieldValue.totalQuantity} </div>
+        </div>
+      </ModalWrapper>
     );
   }
 }
