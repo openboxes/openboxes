@@ -407,9 +407,10 @@ class StockMovementService {
             }
         } else if (requisitionItem.modificationItem) {
             pickPageItems << buildPickPageItem(requisitionItem.modificationItem)
-        }
-        else {
-            pickPageItems << buildPickPageItem(requisitionItem)
+        } else {
+            if (!requisitionItem.isCanceled()) {
+                pickPageItems << buildPickPageItem(requisitionItem)
+            }
         }
         return pickPageItems
     }
