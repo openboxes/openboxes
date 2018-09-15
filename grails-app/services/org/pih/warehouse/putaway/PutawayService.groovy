@@ -16,6 +16,7 @@ import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.inventory.TransferStockCommand
 
 class PutawayService {
@@ -28,15 +29,17 @@ class PutawayService {
 
     def getPutawayCandidates(Location location) {
         List putawayItems = []
-        List<Location> internalLocations = locationService.getInternalLocations(location, [ActivityCode.RECEIVE_STOCK] as ActivityCode[])
+        List<Location> internalLocations = locationService.getInternalLocations(location,
+                [ActivityCode.RECEIVE_STOCK] as ActivityCode[])
+
         log.info "internalLocations " + internalLocations
         internalLocations.each { internalLocation ->
             List putawayItemsTemp = inventoryService.getQuantityByBinLocation(location, internalLocation)
             if (putawayItemsTemp) {
                 putawayItemsTemp = putawayItemsTemp.collect {
 
-                    List<AvailableItem> availableItems =
-                            inventoryService.getAvailableBinLocations(location, it.product)
+                    // FIXME Removed because it was causing very slow performance - determine if this is even necessary
+                    List<AvailableItem> availableItems = []
 
                     PutawayItem putawayItem = new PutawayItem()
                     // FIXME Should be PENDING if there are existing putaways that are in-progress
@@ -62,13 +65,6 @@ class PutawayService {
         putaway.putawayItems.toArray().each { PutawayItem oldPutawayItem ->
 
             if (oldPutawayItem.splitItems) {
-
-                Integer totalSplitQuantity = oldPutawayItem.splitItems.sum { it.quantity }
-                // Validate quantity
-                if (totalSplitQuantity != oldPutawayItem?.quantity) {
-                    throw new IllegalArgumentException("Sum of split quantities " +
-                            "must equal original quantity [${totalSplitQuantity} != ${oldPutawayItem?.quantity}]")
-                }
 
                 // Iterate over split items and create new putaway items for them
                 // NOTE: The only fields we change from the original are the putaway bin and quantity.

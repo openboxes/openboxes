@@ -90,7 +90,7 @@
     </div>
 
     <div class="content">
-        <h1><warehouse:message code="putaway.label"/></h1>
+        <h1><warehouse:message code="putawayOrder.label"/></h1>
         <table>
             <tr>
                 <td>
@@ -98,10 +98,6 @@
                 </td>
                 <td>
                     ${jsonObject?.putawayNumber}
-
-                </td>
-                <td>
-                    ${jsonObject?.putawayName }
                 </td>
             </tr>
         </table>
@@ -116,8 +112,8 @@
             </thead>
             <g:each var="putawayItem" in="${jsonObject.putawayItems}">
                 <tr>
-                    <td>${putawayItem?.product?.name}</td>
-                    <td>${putawayItem?.putawayLocation?.name}</td>
+                    <td>${putawayItem["product.name"]}</td>
+                    <td>${putawayItem["putawayLocation.name"]}</td>
                     <td>${putawayItem?.quantity}</td>
                 </tr>
             </g:each>
