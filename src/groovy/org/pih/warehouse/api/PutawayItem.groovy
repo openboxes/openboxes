@@ -60,7 +60,7 @@ class PutawayItem {
                 "product.name": product?.name,
                 "inventoryItem.id": inventoryItem?.id,
                 "inventoryItem.lotNumber": inventoryItem?.lotNumber,
-                "inventoryItem.expirationDate": inventoryItem?.expirationDate,
+                "inventoryItem.expirationDate": inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
                 "recipient.id": recipient?.id,
                 "recipient.name": recipient?.name,
                 currentBins: currentBins,

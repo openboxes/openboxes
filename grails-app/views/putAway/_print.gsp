@@ -105,20 +105,59 @@
         <table>
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Putaway Location</th>
-                    <th>Quantity</th>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Lot Number</th>
+                    <th>Expiration Date</th>
+                    <th>Putaway Bin</th>
+                    <th>Putaway Quantity</th>
+                    <th>Total Quantity</th>
                 </tr>
             </thead>
             <g:each var="putawayItem" in="${jsonObject.putawayItems}">
-                <tr>
-                    <td>${putawayItem["product.name"]}</td>
-                    <td>${putawayItem["putawayLocation.name"]}</td>
-                    <td>${putawayItem?.quantity}</td>
-                </tr>
+                <g:if test="${putawayItem.splitItems.empty}">
+                    <tr>
+                        <td>${putawayItem["product.productCode"]}</td>
+                        <td>${putawayItem["product.name"]}</td>
+                        <td>${putawayItem["inventoryItem.lotNumber"]}</td>
+                        <td>${putawayItem["inventoryItem.expirationDate"]}</td>
+                        <td>${putawayItem["putawayLocation.name"]}</td>
+                        <td>${putawayItem?.quantity}</td>
+                        <td>${putawayItem?.quantity}</td>
+
+                    </tr>
+                </g:if>
+                <g:else>
+                    <g:each var="splitItem" in="${putawayItem.splitItems}" status="status">
+                        <tr>
+                            <td>${status==0 ? putawayItem["product.productCode"] : ""}</td>
+                            <td>${status==0 ? putawayItem["product.name"]: ""}</td>
+                            <td>${status==0 ? putawayItem["inventoryItem.lotNumber"]: ""}</td>
+                            <td>${status==0 ? putawayItem["inventoryItem.expirationDate"]: ""}</td>
+                            <td>${splitItem["putawayLocation.name"]}</td>
+                            <td>${splitItem["quantity"]?:""}</td>
+                            <td>${status==0 ? putawayItem?.quantity: ""}</td>
+                        </tr>
+                    </g:each>
+
+                </g:else>
             </g:each>
         </table>
 
+        <table>
+            <tr>
+                <th><g:message code="putawayOrder.createdBy.label"/></th>
+                <td width="50%"></td>
+            </tr>
+            <tr>
+                <th><g:message code="putawayOrder.completedBy.label"/></th>
+                <td></td>
+            </tr>
+            <tr>
+                <th><g:message code="putawayOrder.putawayDate.label"/></th>
+                <td></td>
+            </tr>
+        </table>
 
 
 </div>
