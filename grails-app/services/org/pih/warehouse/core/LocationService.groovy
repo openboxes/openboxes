@@ -157,17 +157,22 @@ class LocationService {
 	}
 
 	List getInternalLocations(Location parentLocation, ActivityCode[] activityCodes) {
-		List<Location> internalLocationsSupportingActivityCodes = []
+		return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL] as LocationTypeCode[], activityCodes)
+	}
+
+	List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes) {
+
 		log.info "Get internal locations for parent ${parentLocation} with activity codes ${activityCodes}"
 		List<Location> internalLocations = Location.createCriteria().list() {
 			eq("active", Boolean.TRUE)
 			eq("parentLocation", parentLocation)
 			locationType {
-				'in'("locationTypeCode", [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION])
+				'in'("locationTypeCode", locationTypeCodes)
 			}
 		}
 
 		// Filter by activity code
+		List<Location> internalLocationsSupportingActivityCodes = []
 		if (activityCodes) {
 			activityCodes.each { activityCode ->
 				internalLocations = internalLocations.findAll { internalLocation ->
