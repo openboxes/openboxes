@@ -63,13 +63,6 @@ class PutawayService {
 
             if (oldPutawayItem.splitItems) {
 
-                Integer totalSplitQuantity = oldPutawayItem.splitItems.sum { it.quantity }
-                // Validate quantity
-                if (totalSplitQuantity != oldPutawayItem?.quantity) {
-                    throw new IllegalArgumentException("Sum of split quantities " +
-                            "must equal original quantity [${totalSplitQuantity} != ${oldPutawayItem?.quantity}]")
-                }
-
                 // Iterate over split items and create new putaway items for them
                 // NOTE: The only fields we change from the original are the putaway bin and quantity.
                 oldPutawayItem.splitItems.each { PutawayItem splitPutawayItem ->
