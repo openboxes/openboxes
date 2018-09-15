@@ -263,8 +263,13 @@ class StockMovementService {
         if (quantity <= 0) {
             picklist.removeFromPicklistItems(picklistItem)
         }
-        // Update picklist item
+        // Populate picklist item
         else {
+
+            // If we've modified the requisition item we need to associate picks with the modified item
+            if (requisitionItem.modificationItem) {
+                requisitionItem = requisitionItem.modificationItem
+            }
             picklistItem.requisitionItem = requisitionItem
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
@@ -400,6 +405,8 @@ class StockMovementService {
             pickPageItems = requisitionItem.substitutionItems.collect {
                 return buildPickPageItem(it)
             }
+        } else if (requisitionItem.modificationItem) {
+            pickPageItems << buildPickPageItem(requisitionItem.modificationItem)
         } else {
             if (!requisitionItem.isCanceled()) {
                 pickPageItems << buildPickPageItem(requisitionItem)
