@@ -401,7 +401,9 @@ class StockMovementService {
                 return buildPickPageItem(it)
             }
         } else {
-            pickPageItems << buildPickPageItem(requisitionItem)
+            if (!requisitionItem.isCanceled()) {
+                pickPageItems << buildPickPageItem(requisitionItem)
+            }
         }
         return pickPageItems
     }
