@@ -7,8 +7,36 @@ import ModalWrapper from '../../form-elements/ModalWrapper';
 import ArrayField from '../../form-elements/ArrayField';
 import TextField from '../../form-elements/TextField';
 import DateField from '../../form-elements/DateField';
+import SelectField from '../../form-elements/SelectField';
 import CheckboxField from '../../form-elements/CheckboxField';
 import { showSpinner, hideSpinner } from '../../../actions';
+import apiClient from '../../../utils/apiClient';
+
+const debouncedProductsFetch = _.debounce((searchTerm, callback) => {
+  if (searchTerm) {
+    apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}`)
+      .then(result => callback(
+        null,
+        {
+          complete: true,
+          options: _.map(result.data.data, obj => (
+            {
+              value: {
+                id: obj.id,
+                name: obj.name,
+                productCode: obj.productCode,
+                label: `${obj.productCode} - ${obj.name}`,
+              },
+              label: `${obj.productCode} - ${obj.name}`,
+            }
+          )),
+        },
+      ))
+      .catch(error => callback(error, { options: [] }));
+  } else {
+    callback(null, { options: [] });
+  }
+}, 500);
 
 const FIELDS = {
   lines: {
@@ -34,18 +62,20 @@ const FIELDS = {
           custom: true,
         },
       },
-      'product.productCode': {
-        type: TextField,
-        label: 'Code',
-        fieldKey: 'disabled',
-        getDynamicAttr: ({ fieldValue }) => ({
-          disabled: fieldValue,
-        }),
-      },
-      'product.name': {
-        type: TextField,
+      product: {
+        type: SelectField,
         label: 'Product',
         fieldKey: 'disabled',
+        attributes: {
+          className: 'text-left',
+          async: true,
+          openOnClick: false,
+          autoload: false,
+          loadOptions: debouncedProductsFetch,
+          cache: false,
+          options: [],
+          showValueTooltip: true,
+        },
         getDynamicAttr: ({ fieldValue }) => ({
           disabled: fieldValue,
         }),
@@ -116,6 +146,10 @@ class EditLineModal extends Component {
       formValues: {
         lines: _.map([this.state.attr.fieldValue], value => ({
           ...value,
+          product: {
+            ...value.product,
+            label: `${_.get(value, 'product.productCode')} - ${_.get(value, 'product.name')}`,
+          },
           disabled: true,
         })),
       },
