@@ -144,16 +144,13 @@ class StockMovements extends Component {
               page = 4;
               prevPage = 3;
               break;
-            case 'PICKED':
+            default:
               page = 5;
               if (values.origin.type === 'SUPPLIER') {
                 prevPage = 2;
               } else {
                 prevPage = 4;
               }
-              break;
-            default:
-              page = 1;
           }
           this.setState({ values, page, prevPage });
           this.fetchBins();
