@@ -490,3 +490,59 @@ div.crossed-out .table-inner-row:before {
 .strike-through {
   text-decoration: line-through;
 }
+
+/* LOCATION CHOOSER
+----------------------------*/
+
+.react-tabs {
+  -webkit-tap-highlight-color: transparent;
+  margin: 0 0 10px;
+  display: flex;
+
+  &__tab-list {
+    margin: 0;
+    padding: 0;
+    background-color: $gray-gamma;
+    border: 1px solid $gray-gamma;
+    border-radius: 5px 0 0 5px;
+    border-right: none;
+    flex: 0 0 auto;
+  }
+
+  &__tab {
+    list-style: none;
+    color: black;
+    cursor: pointer;
+    border: 1px solid $gray-alpha;
+    border-radius: 5px 0 0 5px;
+    padding: 6px 12px;
+    margin: 6px 0 6px 6px;
+    background-color: $gray-alpha;
+
+    &--selected {
+      background-color: white;
+      border-color: white;
+    }
+
+    &--disabled {
+      color: $gray-delta;
+      cursor: default;
+    }
+  }
+
+  &__tab-panel {
+    display: none;
+
+    &--selected {
+      display: block;
+    }
+  }
+}
+
+.tabs-panel-container {
+  border: 1px solid $gray-gamma;
+  border-radius: 0 5px 5px 0;
+  border-left: none;
+  padding: 6px 12px;
+  flex: 1 1 auto;
+}
