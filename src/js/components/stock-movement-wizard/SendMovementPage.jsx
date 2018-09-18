@@ -128,6 +128,7 @@ class SendMovementPage extends Component {
           printDeliveryNote: !_.isEmpty(printDeliveryNote) ? printDeliveryNote.uri : '',
           printPackingList: !_.isEmpty(printPackingList) ? printPackingList.uri : '',
           printCertOfDonation: !_.isEmpty(printCertOfDonation) ? printCertOfDonation.uri : '',
+          values: { ...this.state.values, ...stockMovementData, shipmentType: _.get(stockMovementData, 'shipmentType.id') },
         }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());

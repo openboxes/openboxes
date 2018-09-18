@@ -146,6 +146,20 @@ class StockMovementService {
         }
         else if (stepNumber.equals("5")) {
             stockMovement.pickPage = getPickPage(id)
+            if (RequisitionStatus.ISSUED == requisition.status) {
+                Shipment shipment = requisition?.shipments[0]
+                if (shipment) {
+                    stockMovement.comments = shipment.additionalInformation
+                    stockMovement.shipmentType = shipment.shipmentType
+                    stockMovement.dateShipped = shipment.expectedShippingDate
+                    stockMovement.driverName = shipment.driverName
+
+                    def referenceNumbers = shipment.referenceNumbers
+                    if (referenceNumbers) {
+                        stockMovement.trackingNumber = referenceNumbers[0].identifier
+                    }
+                }
+            }
         }
 
         return stockMovement
