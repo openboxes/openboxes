@@ -227,7 +227,7 @@ class StockMovementApiController {
             // FIXME Lookup inventory item by product, lot number, expiration date
             stockMovementItem.inventoryItem = lineItem["inventoryItem.id"] ? InventoryItem.load(lineItem["inventoryItem.id"]) : null
             stockMovementItem.lotNumber = lineItem["lotNumber"]
-            stockMovementItem.expirationDate = lineItem["expirationDate"] != JSONObject.NULL ?
+            stockMovementItem.expirationDate = !(lineItem["expirationDate"] == JSONObject.NULL || lineItem["expirationDate"] == null) ?
                     DEFAULT_DATE_FORMAT.parse(lineItem["expirationDate"]) : null
 
             // Sort order (optional)

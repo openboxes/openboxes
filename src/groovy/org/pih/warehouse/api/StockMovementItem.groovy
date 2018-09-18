@@ -171,12 +171,11 @@ class StockMovementItem {
                 reasonCode: requisitionItem.cancelReasonCode,
                 comments: requisitionItem.cancelComments,
                 recipient: requisitionItem.recipient,
-                palletName: requisitionItem?.palletName,
-                boxName: requisitionItem?.boxName,
-                lotNumber: requisitionItem?.lotNumber,
-                expirationDate: requisitionItem.expirationDate,
-                sortOrder: requisitionItem.orderIndex
-
+                palletName: requisitionItem?.palletName?:"",
+                boxName: requisitionItem?.boxName?:"",
+                lotNumber: requisitionItem?.lotNumber?:"",
+                expirationDate: requisitionItem?.expirationDate,
+                sortOrder: requisitionItem?.orderIndex
         )
     }
 
