@@ -388,10 +388,10 @@ class SendMovementPage extends Component {
                         (
                           <tr key={index}>
                             {(this.state.supplier) &&
-                              <td>{item.pallet}</td>
+                              <td>{item.palletName}</td>
                             }
                             {(this.state.supplier) &&
-                              <td>{item.box}</td>
+                              <td>{item.boxName}</td>
                             }
                             <td>{item.productCode || item.product.productCode}</td>
                             <td className="text-left">
