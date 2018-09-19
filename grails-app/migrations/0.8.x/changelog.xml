@@ -23,5 +23,6 @@
     <include file="0.8.x/changelog-2018-09-10-2157-insert-reference-number-type-tracking-number.xml"/>
     <include file="0.8.x/changelog-2018-09-10-2212-alter-table-add-column-driver-name.xml"/>
     <include file="0.8.x/changelog-2018-09-10-2302-insert-event-type-partially-received.xml"/>
+    <include file="0.8.x/changelog-2018-09-19-0002-add-transfer-order-columns.xml"/>
 
 </databaseChangeLog>

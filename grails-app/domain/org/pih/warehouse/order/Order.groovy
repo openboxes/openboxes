@@ -14,15 +14,19 @@ import org.pih.warehouse.core.*
 class Order implements Serializable {
 	
 	String id
-	OrderStatus status 
-	String description 		// a user-defined, searchable name for the order 
+	OrderStatus status
+	OrderTypeCode orderTypeCode
+	String name
+	String description 		// a user-defined, searchable name for the order
 	String orderNumber 		// an auto-generated shipment number
 	Location origin			// the vendor
 	Location destination 	// the customer location 
 	Person recipient
 	Person orderedBy
 	Date dateOrdered
-	
+	Person completedBy
+	Date dateCompleted
+
 	
 	// Audit fields
 	Date dateCreated
@@ -40,6 +44,8 @@ class Order implements Serializable {
 	
 	static constraints = { 
 		status(nullable:true)
+		orderTypeCode(nullable:false)
+		name(nullable:true)
 		description(nullable:false, blank: false, maxSize: 255)
 		orderNumber(nullable:true, maxSize: 255)
 		origin(nullable:false)
@@ -47,6 +53,8 @@ class Order implements Serializable {
 		recipient(nullable:true)
 		orderedBy(nullable:false)
 		dateOrdered(nullable:true)
+        completedBy(nullable:true)
+        dateCompleted(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
 	}	

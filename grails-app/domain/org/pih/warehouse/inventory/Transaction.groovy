@@ -13,6 +13,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment;
 
@@ -51,17 +52,18 @@ class Transaction implements Comparable, Serializable {
     }
 	
 	String id
-    Location source	    		
+    TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
+    Date transactionDate	    		// Date entered into the warehouse
+    String transactionNumber
+    Location source
     Location destination
+    String comment
 
-	Date transactionDate	    		// Date entered into the warehouse
 	Shipment outgoingShipment			// Outgoing shipment associated with a transfer out transasction
 	Shipment incomingShipment			// Incoming shipment associated with a transfer in transasction
 	Requisition requisition				// associated requisition
-	String transactionNumber
-    TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
-	String comment
-	
+	Order order
+
 	// Auditing fields
 	Boolean confirmed = Boolean.FALSE;	// Transactions need to be confirmed by a supervisor
 	User confirmedBy
