@@ -145,6 +145,8 @@ class StockMovementService {
         }
         else if (stepNumber.equals("5")) {
             stockMovement.pickPage = getPickPage(id)
+
+            // FIXME This should be replaced once the changes in Stock Movement are working
             if (RequisitionStatus.ISSUED == requisition.status) {
                 Shipment shipment = requisition?.shipments[0]
                 if (shipment) {
