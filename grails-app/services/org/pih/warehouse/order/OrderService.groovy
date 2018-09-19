@@ -29,12 +29,22 @@ class OrderService {
 	def shipmentService;
 	def identifierService
 	def inventoryService
-	
-	List<Order> getOrdersPlacedByLocation(Location orderPlacedBy, Location orderPlacedWith, User orderedBy, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
+
+
+	List<Order> getOrders(String name, String orderNumber, Location destination, Location origin, User orderedBy, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
 		def orders = Order.withCriteria {
 			and {
-				eq("destination", orderPlacedBy)
-				if (orderPlacedWith) { eq("origin", orderPlacedWith) }
+				if (name) {
+					or {
+						ilike("name", "%" + name + "%")
+						ilike("description", "%" + name + "%")
+					}
+				}
+				if (orderNumber) {
+					ilike("orderNumber", "%" + orderNumber + "%")
+				}
+				if (destination) eq("destination", destination)
+				if (origin) { eq("origin", origin) }
 				if (status) { eq("status", status) }
 				if (orderedFromDate) { ge("dateOrdered", orderedFromDate) }
 				if (orderedToDate) { le("dateOrdered", orderedToDate) }

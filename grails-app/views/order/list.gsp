@@ -31,6 +31,7 @@
 									<th>${warehouse.message(code: 'order.orderNumber.label')}</th>
 									<th>${warehouse.message(code: 'default.description.label')}</th>
 									<th>${warehouse.message(code: 'order.origin.label')}</th>
+									<th>${warehouse.message(code: 'order.destination.label')}</th>
                                     <th>${warehouse.message(code: 'order.orderedBy.label')}</th>
 									<th>${warehouse.message(code: 'order.dateOrdered.label')}</th>
 									<th>${warehouse.message(code: 'order.orderItems.label')}</th>
@@ -41,7 +42,7 @@
 							<tbody>
 								<g:unless test="${orders}">
 									<tr class="prop">
-										<td colspan="9">
+										<td colspan="11">
 											<div class="empty fade center">
 												<warehouse:message code="orders.none.message"/>
 											</div>
@@ -72,6 +73,9 @@
 										</td>
 										<td class="middle">
 											${fieldValue(bean: orderInstance, field: "origin.name")}
+										</td>
+										<td class="middle">
+											${fieldValue(bean: orderInstance, field: "destination.name")}
 										</td>
                                         <td class="middle center">
                                             ${orderInstance?.orderedBy?.name}

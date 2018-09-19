@@ -20,7 +20,7 @@
 		<div class="action-menu-item">
 			<g:link target="_blank" controller="order" action="print" id="${orderInstance?.id}">
 				<img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
-				<warehouse:message code="order.print.label" default="Print purchase order"/>
+				<warehouse:message code="order.print.label" default="Print order"/>
 			</g:link>
 		</div>
 		<div class="action-menu-item">
