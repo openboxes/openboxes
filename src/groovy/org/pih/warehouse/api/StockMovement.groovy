@@ -162,27 +162,27 @@ class StockMovement {
 
     }
 
-    static StockMovement createFromShipment(Shipment shipment) {
-        StockMovement stockMovement = new StockMovement(
-                id: shipment?.id,
-                name: shipment?.name,
-                identifier: shipment?.shipmentNumber,
-                description: shipment.description,
-                statusCode: shipment?.status?.code?.name(),
-                origin: shipment?.origin,
-                destination: shipment?.destination,
-                dateRequested: shipment?.dateCreated,
-                requestedBy: shipment?.recipient,
-                requisition: null,
-                shipment: shipment
-        )
-
-        shipment.shipmentItems.each { shipmentItem ->
-            StockMovementItem stockMovementItem = StockMovementItem.createFromShipmentItem(shipmentItem)
-            stockMovement.lineItems.add(stockMovementItem)
-        }
-        return stockMovement
-    }
+//    static StockMovement createFromShipment(Shipment shipment) {
+//        StockMovement stockMovement = new StockMovement(
+//                id: shipment?.id,
+//                name: shipment?.name,
+//                identifier: shipment?.shipmentNumber,
+//                description: shipment.description,
+//                statusCode: shipment?.status?.code?.name(),
+//                origin: shipment?.origin,
+//                destination: shipment?.destination,
+//                dateRequested: shipment?.dateCreated,
+//                requestedBy: shipment?.recipient,
+//                requisition: null,
+//                shipment: shipment
+//        )
+//
+//        shipment.shipmentItems.each { shipmentItem ->
+//            StockMovementItem stockMovementItem = StockMovementItem.createFromShipmentItem(shipmentItem)
+//            stockMovement.lineItems.add(stockMovementItem)
+//        }
+//        return stockMovement
+//    }
 }
 
 enum DocumentGroupCode {

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1537243341655-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition_item" columnName="pallet_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition_item">
+            <column name="pallet_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda" id="1537243341655-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition_item" columnName="box_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition_item">
+            <column name="box_name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda" id="1537243341655-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition_item" columnName="lot_number"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition_item">
+            <column name="lot_number" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda" id="1537243341655-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition_item" columnName="expiration_date"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition_item">
+            <column name="expiration_date" type="DATETIME">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

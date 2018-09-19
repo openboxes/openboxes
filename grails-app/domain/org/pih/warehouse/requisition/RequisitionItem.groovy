@@ -66,6 +66,12 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     String comment
     Integer orderIndex = 0
 
+    // Used only with supplier stock movements
+    String palletName
+    String boxName
+    String lotNumber
+    Date expirationDate
+
 	// Parent requisition item
 	RequisitionItem parentRequisitionItem
     RequisitionItem substitutionItem
@@ -120,6 +126,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         substitutable(nullable:false)
         comment(nullable:true)
         recipient(nullable:true)
+        palletName(nullable:true)
+        boxName(nullable:true)
+        lotNumber(nullable:true)
+        expirationDate(nullable:true)
         orderIndex(nullable: true)
 		parentRequisitionItem(nullable:true)
         createdBy(nullable: true)
