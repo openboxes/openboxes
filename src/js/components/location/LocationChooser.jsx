@@ -80,7 +80,12 @@ class LocationChooser extends Component {
           shouldCloseOnOverlayClick={false}
         >
           <div>
-            <h5 className="text-center">Choose Location</h5>
+            <div>
+              <button className="btn btn-danger float-right" onClick={() => this.closeModal()}>
+                <i className="fa fa-close" />
+              </button>
+              <h5 className="text-center">Choose Location</h5>
+            </div>
             <hr />
             <Tabs>
               <TabList>
