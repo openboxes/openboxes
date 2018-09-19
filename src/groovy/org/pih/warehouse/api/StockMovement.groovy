@@ -2,10 +2,13 @@ package org.pih.warehouse.api
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
 
@@ -133,6 +136,11 @@ class StockMovement {
 
 
     static StockMovement createFromRequisition(Requisition requisition) {
+        Shipment shipment = Shipment.findByRequisition(requisition)
+        ReferenceNumber trackingNumber = shipment?.referenceNumbers?.find { ReferenceNumber rn ->
+            rn.referenceNumberType.id == Constants.TRACKING_NUMBER_TYPE_ID
+        }
+
         StockMovement stockMovement = new StockMovement(
                 id: requisition.id,
                 name: requisition.name,
@@ -144,10 +152,13 @@ class StockMovement {
                 dateRequested: requisition.dateRequested,
                 requestedBy: requisition.requestedBy,
                 requisition: requisition,
-                shipment: null
+                shipment: shipment,
+                comments: shipment?.additionalInformation,
+                shipmentType: shipment?.shipmentType,
+                dateShipped: shipment?.expectedShippingDate,
+                driverName: shipment?.driverName,
+                trackingNumber: trackingNumber?.identifier
         )
-
-        stockMovement.shipment = Shipment.findByRequisition(requisition)
 
         // Include all requisition items except those that are substitutions or modifications because the
         // original requisition item will represent these changes

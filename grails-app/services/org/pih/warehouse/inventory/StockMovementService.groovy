@@ -51,8 +51,6 @@ class StockMovementService {
     def inventoryService
     def locationService
 
-    static String TRACKING_NUMBER_TYPE = "Tracking Number"
-
     boolean transactional = true
 
     def grailsApplication
@@ -646,9 +644,9 @@ class StockMovementService {
         }
 
         if (stockMovement.trackingNumber) {
-            ReferenceNumberType trackingNumberType = ReferenceNumberType.findByName(TRACKING_NUMBER_TYPE)
+            ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(TRACKING_NUMBER_TYPE_ID)
             if (!trackingNumberType) {
-                throw new IllegalStateException("Must configure reference number type '${TRACKING_NUMBER_TYPE}'")
+                throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${TRACKING_NUMBER_TYPE_ID}'")
             }
             ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
                 refNum.referenceNumberType == trackingNumberType
