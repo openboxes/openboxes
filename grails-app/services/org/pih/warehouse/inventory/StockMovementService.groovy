@@ -19,6 +19,8 @@ import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PickPage
 import org.pih.warehouse.api.PickPageItem
+import org.pih.warehouse.api.PackPage
+import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SubstitutionItem
@@ -206,6 +208,10 @@ class StockMovementService {
             stockMovement.pickPage = getPickPage(id)
         }
         else if (stepNumber.equals("5")) {
+            stockMovement.lineItems = null
+            stockMovement.packPage = getPackPage(id)
+        }
+        else if (stepNumber.equals("6")) {
             stockMovement.pickPage = getPickPage(id)
         }
 
@@ -460,6 +466,18 @@ class StockMovementService {
         return pickPage
     }
 
+
+    PackPage getPackPage(String id) {
+        PackPage packPage = new PackPage()
+
+        StockMovement stockMovement = getStockMovement(id)
+        stockMovement.lineItems.each { stockMovementItem ->
+            List packPageItems = getPackPageItems(stockMovementItem)
+            packPage.packPageItems.addAll(packPageItems)
+        }
+        return packPage
+    }
+
     /**
      * Get a list of pick page items for the given stock movement item.
      *
@@ -520,6 +538,24 @@ class StockMovementService {
 
         return pickPageItem
     }
+
+
+    List getPackPageItems(StockMovementItem stockMovementItem) {
+        List packPageItems = []
+        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
+        pickPageItems << buildPackPageItem(requisitionItem)
+        return packPageItems
+    }
+
+
+    PackPageItem buildPackPageItem(RequisitionItem requisitionItem) {
+
+        Location location = requisitionItem?.requisition?.origin
+        PackPageItem packPageItem = new PackPageItem(requisitionItem: requisitionItem, binLocation: location)
+
+        return packPageItem
+    }
+
 
 
     Requisition createRequisition(StockMovement stockMovement) {

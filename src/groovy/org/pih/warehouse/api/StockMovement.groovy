@@ -244,3 +244,17 @@ class EditPage {
         ]
     }
 }
+
+class PackPage {
+    List<PackPageItem> packPageItems = []
+
+    static constraints = {
+        packPageItems(nullable:true)
+    }
+
+    Map toJson() {
+        return [
+                packPageItems: packPageItems
+        ]
+    }
+}

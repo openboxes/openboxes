@@ -516,3 +516,29 @@ class PickPageItem {
     }
 
 }
+
+class PackPageItem {
+    RequisitionItem requisitionItem
+    InventoryItem inventoryItem
+    Location binLocation
+
+
+    Map toJson() {
+        return [
+                requisitionItemId   : requisitionItem?.id,
+                productName         : requisitionItem?.product?.name,
+                productCode         : requisitionItem?.product?.productCode,
+                quantityRequested   : requisitionItem.quantity,
+                recipient           : requisitionItem?.recipient,
+                expirationDate      : requisitionItem?.expirationDate,
+                lotNumber           : requisitionItem?.lotNumber,
+                binLocationName     : binLocation?.name,
+                shipped             : requisitionItem?.shipped, // ?
+                uom                 : requisitionItem?.uom, // ?
+                palletName          : requisitionItem?.palletName,
+                boxName             : requisitionItem?.boxName,
+
+
+        ]
+    }
+}
