@@ -12,6 +12,9 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
+import org.pih.warehouse.order.Order
+
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
  */
@@ -32,11 +35,56 @@ class PutawayApiController {
         render ([data:putawayItems.collect { it.toJson() }] as JSON)
 	}
 
+    def read = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("No putaway found for order ID ${params.id}")
+        }
+
+        Putaway putaway = Putaway.createFromOrder(order)
+        putaway.putawayItems.each { PutawayItem putawayItem ->
+            putawayItem.availableItems =
+                    inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
+        }
+        render ([data:putaway?.toJson()] as JSON)
+    }
+
+
     def create = { Putaway putaway ->
         JSONObject jsonObject = request.JSON
 
+        Location currentLocation = Location.get(session.warehouse.id)
+        if (!currentLocation) {
+            throw new IllegalArgumentException("User must be logged into a location to perform putaway")
+        }
+
+        User currentUser = User.get(session.user.id)
+
+        bindPutawayData(putaway, currentUser, currentLocation, jsonObject)
+
+        // Putaway stock
+        if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETED)) {
+            // Need to process the split items
+            putawayService.processSplitItems(putaway)
+            putawayService.completePutaway(putaway)
+        }
+
+        render ([data:putaway?.toJson()] as JSON)
+    }
+
+
+    Putaway bindPutawayData(Putaway putaway, User currentUser, Location currentLocation, JSONObject jsonObject) {
         // Bind the putaway
         bindData(putaway, jsonObject)
+
+        putaway.origin = currentLocation
+        putaway.destination = currentLocation
+
+        if (!putaway.putawayNumber) {
+            putaway.putawayNumber = identifierService.generateOrderIdentifier()
+        }
+
+        putaway.putawayAssignee = currentUser
 
         // Bind the putaway items
         jsonObject.putawayItems.each { putawayItemMap ->
@@ -50,25 +98,15 @@ class PutawayApiController {
                 putawayItem.splitItems.add(splitItem)
             }
 
-            if (!putaway.putawayNumber) {
-                putaway.putawayNumber = identifierService.generateOrderIdentifier()
-            }
-
             putawayItem.availableItems =
                     inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
 
             putaway.putawayItems.add(putawayItem)
         }
 
-        // Putaway stock
-        if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETE)) {
-            // Need to process the split items
-            putawayService.processSplitItems(putaway)
-            putawayService.putawayStock(putaway)
-        }
-
-        render ([data:putaway?.toJson()] as JSON)
+        return putaway
     }
+
 
 
 }

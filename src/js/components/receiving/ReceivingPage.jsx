@@ -66,7 +66,7 @@ class ReceivingPage extends Component {
 
       this.save(payload, this.nextPage);
     } else {
-      this.save({ ...formValues, receiptStatus: 'COMPLETE' }, () => {
+      this.save({ ...formValues, receiptStatus: 'COMPLETED' }, () => {
         this.setState({ completed: true });
         Alert.success('Shipment was received successfully!');
       });

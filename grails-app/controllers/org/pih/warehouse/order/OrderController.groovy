@@ -34,14 +34,16 @@ class OrderController {
 		
 		def suppliers = orderService.getSuppliers().sort();
 
-		def destination = Location.get(session.warehouse.id)
+		def name = params.name
+		def orderNumber = params.orderNumber
+		def destination = params.destination ? Location.get(params.destination) : null
 		def origin = params.origin ? Location.get(params.origin) : null
 		def status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
         def orderedBy = params.orderedById ? User.get(params.orderedById) : null
 				
-		def orders = orderService.getOrdersPlacedByLocation(destination, origin, orderedBy, status, statusStartDate, statusEndDate)
+		def orders = orderService.getOrders(name, orderNumber, destination, origin, orderedBy, status, statusStartDate, statusEndDate)
 		
 		// sort by order date
 		orders = orders.sort( { a, b ->

@@ -17,7 +17,14 @@ import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.order.OrderTypeCode
 
 class PutawayService {
 
@@ -43,7 +50,7 @@ class PutawayService {
 
                     PutawayItem putawayItem = new PutawayItem()
                     // FIXME Should be PENDING if there are existing putaways that are in-progress
-                    putawayItem.putawayStatus = PutawayStatus.TODO
+                    putawayItem.putawayStatus = PutawayStatus.READY
                     putawayItem.product = it.product
                     putawayItem.inventoryItem = it.inventoryItem
                     putawayItem.currentFacility = location
@@ -85,7 +92,12 @@ class PutawayService {
     }
 
 
-    def putawayStock(Putaway putaway) {
+    def completePutaway(Putaway putaway) {
+
+
+        // Save the putaway as a transfer order
+        Order order = savePutaway(putaway)
+
         putaway.putawayItems.each { PutawayItem putawayItem ->
             TransferStockCommand command = new TransferStockCommand()
             command.location = putawayItem.currentFacility
@@ -95,9 +107,59 @@ class PutawayService {
             command.otherLocation = putawayItem.putawayFacility
             command.otherBinLocation = putawayItem.putawayLocation
             command.transferOut = Boolean.TRUE
-            putawayItem.transaction = inventoryService.transferStock(command)
+
+            // Save
+            Transaction transaction = inventoryService.transferStock(command)
+            transaction.order = order
+            transaction.save(failOnError: true)
+
         }
 
+    }
+
+
+    Order savePutaway(Putaway putaway) {
+
+        Order order = new Order()
+        order.orderTypeCode = OrderTypeCode.TRANSFER_ORDER
+        order.description = "Putaway ${putaway.putawayNumber}"
+        order.orderNumber = putaway.putawayNumber
+        order.orderedBy = putaway.putawayAssignee
+        order.completedBy = putaway.putawayAssignee
+        order.dateOrdered = putaway.putawayDate?:new Date()
+        order.status = OrderStatus.valueOf(putaway.putawayStatus.toString())
+        order.origin = putaway.origin
+        order.destination = putaway.destination
+
+        putaway.putawayItems.toArray().each { PutawayItem putawayItem ->
+
+            OrderItem orderItem = createOrderItem(putawayItem)
+            order.addToOrderItems(orderItem)
+            putawayItem.splitItems.each { PutawayItem splitItem ->
+                OrderItem childOrderItem = createOrderItem(splitItem)
+                childOrderItem.parentOrderItem = orderItem
+                order.addToOrderItems(childOrderItem)
+            }
+        }
+
+        order.save(failOnError: true)
+        return order
+    }
+
+
+    OrderItem createOrderItem(PutawayItem putawayItem) {
+        OrderItemStatusCode orderItemStatusCode =
+                !putawayItem?.splitItems?.empty ? OrderItemStatusCode.CANCELED : OrderItemStatusCode.COMPLETED
+
+        OrderItem orderItem = new OrderItem()
+        orderItem.orderItemStatusCode = orderItemStatusCode
+        orderItem.product = putawayItem.product
+        orderItem.inventoryItem = putawayItem.inventoryItem
+        orderItem.quantity = putawayItem.quantity
+        orderItem.recipient = putawayItem.recipient
+        orderItem.originBinLocation = putawayItem.currentLocation
+        orderItem.destinationBinLocation = putawayItem.putawayLocation
+        return orderItem
     }
 
 }

@@ -9,12 +9,14 @@
 **/ 
 package org.pih.warehouse.order
 
-public enum OrderStatus {
+enum OrderStatus {
 
 	PENDING(1),
 	PLACED(2),
 	PARTIALLY_RECEIVED(3),
-	RECEIVED(4)
+	RECEIVED(4),
+    COMPLETED(5),
+	CANCELED(6)
 	
 	int sortOrder
 
@@ -25,7 +27,7 @@ public enum OrderStatus {
 	}
 	
 	static list() {
-		[ PENDING, PLACED, PARTIALLY_RECEIVED, RECEIVED ]
+		[ PENDING, PLACED, PARTIALLY_RECEIVED, RECEIVED, COMPLETED, CANCELED ]
 	}
 	
 	String toString() { return name() }

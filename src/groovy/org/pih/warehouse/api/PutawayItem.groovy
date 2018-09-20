@@ -6,6 +6,8 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Container
 
@@ -42,13 +44,41 @@ class PutawayItem {
         return StringUtils.abbreviate(currentBins, 25)
     }
 
+    static PutawayItem createFromOrderItem(OrderItem orderItem) {
+        PutawayItem putawayItem = new PutawayItem()
+        putawayItem.id = orderItem.id
+        putawayItem.product = orderItem.product
+        putawayItem.inventoryItem = orderItem.inventoryItem
+        putawayItem.quantity = orderItem.quantity
+        putawayItem.putawayStatus = PutawayItem.getPutawayItemStatus(orderItem.orderItemStatusCode)
+        putawayItem.currentFacility = orderItem.order.origin
+        putawayItem.currentLocation = orderItem.originBinLocation
+        putawayItem.putawayFacility = orderItem.order.destination
+        putawayItem.putawayLocation = orderItem.destinationBinLocation
+        putawayItem.recipient = orderItem.recipient?:orderItem.order.recipient
+        return putawayItem
+    }
+
+    static PutawayStatus getPutawayItemStatus(OrderItemStatusCode orderItemStatusCode) {
+        switch (orderItemStatusCode) {
+            case OrderItemStatusCode.PENDING:
+                return PutawayStatus.PENDING;
+            case OrderItemStatusCode.COMPLETED:
+                return PutawayStatus.COMPLETED
+            case OrderItemStatusCode.CANCELED:
+                return PutawayStatus.COMPLETED
+            default:
+                return null
+        }
+    }
+
 
     Map toJson() {
         return [
                 id: id,
                 "stockMovement.id": currentLocation?.name,
                 "stockMovement.name": currentLocation?.name,
-                putawayStatus: transaction ? PutawayStatus.COMPLETE.name() : putawayStatus?.name(),
+                putawayStatus: putawayStatus?.name(),
                 transactionNumber: transaction?.transactionNumber,
                 "currentFacility.id": currentFacility?.id,
                 "currentFacility.name": currentFacility?.name,
