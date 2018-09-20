@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.order.Order" %>
+<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -43,10 +44,21 @@
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="default.status.label" /></label>
                                     </td>
-                                    <td valign="top" id="shipmentStatus" class="value">
+                                    <td valign="top" id="status" class="value">
                                         <format:metadata obj="${orderInstance?.status}"/>
                                     </td>
                                 </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="order.orderTypeCode.label" /></label>
+                                    </td>
+                                    <td valign="top" id="orderTypeCode" class="value">
+                                        <format:metadata obj="${orderInstance?.orderTypeCode}"/>
+                                    </td>
+                                </tr>
+
+
+
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="order.destination.label"/></label>
@@ -112,17 +124,31 @@
                                         <table class="table table-bordered">
                                             <thead>
                                             <tr class="odd">
+                                                <th><warehouse:message code="orderItem.orderItemStatusCode.label" /></th>
                                                 <th><warehouse:message code="product.productCode.label" /></th>
                                                 <th><warehouse:message code="product.label" /></th>
                                                 <th><warehouse:message code="order.qtyOrdered.label" /></th>
-                                                <th><warehouse:message code="order.qtyFulfilled.label" /></th>
-                                                <th><warehouse:message code="order.unitPrice.label" /></th>
-                                                <th><warehouse:message code="order.totalPrice.label" /></th>
+                                                <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
+                                                    <th><warehouse:message code="order.qtyFulfilled.label" /></th>
+                                                    <th><warehouse:message code="order.unitPrice.label" /></th>
+                                                    <th><warehouse:message code="order.totalPrice.label" /></th>
+                                                </g:if>
+                                                <g:elseif test="${orderInstance.orderTypeCode==OrderTypeCode.TRANSFER_ORDER}">
+
+                                                    <th><warehouse:message code="inventoryItem.lotNumber.label" /></th>
+                                                    <th><warehouse:message code="inventoryItem.expirationDate.label" /></th>
+                                                    <th><warehouse:message code="orderItem.originBinLocation.label" /></th>
+                                                    <th><warehouse:message code="orderItem.destinationBinLocation.label" /></th>
+                                                </g:elseif>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
                                                 <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}">
+                                                    <td>
+                                                        ${orderItem?.orderItemStatusCode}
+                                                    </td>
+
                                                     <td>
                                                         ${orderItem?.product?.productCode?:""}
                                                     </td>
@@ -141,33 +167,50 @@
                                                         ${orderItem?.quantity}
                                                         ${orderItem?.product?.unitOfMeasure?:"EA"}
                                                     </td>
-                                                    <td class="order-item-fullfilled">
-                                                        ${orderItem?.quantityFulfilled()}
-                                                        ${orderItem?.product?.unitOfMeasure?:"EA"}
-                                                    </td>
-                                                    <td class="">
-                                                        <g:formatNumber number="${orderItem?.unitPrice?:0}" />
-                                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                                    </td>
-                                                    <td class="">
-                                                        <g:formatNumber number="${orderItem?.totalPrice()?:0}" />
-                                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-
-                                                    </td>
+                                                    <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
+                                                        <td class="order-item-fullfilled">
+                                                            ${orderItem?.quantityFulfilled()}
+                                                            ${orderItem?.product?.unitOfMeasure?:"EA"}
+                                                        </td>
+                                                        <td class="">
+                                                            <g:formatNumber number="${orderItem?.unitPrice?:0}" />
+                                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                                        </td>
+                                                        <td class="">
+                                                            <g:formatNumber number="${orderItem?.totalPrice()?:0}" />
+                                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                                        </td>
+                                                    </g:if>
+                                                    <g:elseif test="${orderInstance.orderTypeCode==OrderTypeCode.TRANSFER_ORDER}">
+                                                        <td>
+                                                            ${orderItem?.inventoryItem?.lotNumber}
+                                                        </td>
+                                                        <td>
+                                                            <g:formatDate date="${orderItem?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
+                                                        </td>
+                                                        <td>
+                                                            ${orderItem?.originBinLocation}
+                                                        </td>
+                                                        <td>
+                                                            ${orderItem?.destinationBinLocation}
+                                                        </td>
+                                                    </g:elseif>
                                                 </tr>
                                             </g:each>
                                             </tbody>
-                                            <tfoot>
-                                            <tr class="">
-                                                <th colspan="5" class="left">
-                                                    <warehouse:message code="default.total.label"/>
-                                                </th>
-                                                <th colspan="1" class="left">
-                                                    <g:formatNumber number="${orderInstance?.totalPrice()?:0.0 }"/>
-                                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                                </th>
-                                            </tr>
-                                            </tfoot>
+                                            <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
+                                                <tfoot>
+                                                <tr class="">
+                                                    <th colspan="6" class="left">
+                                                        <warehouse:message code="default.total.label"/>
+                                                    </th>
+                                                    <th colspan="1" class="left">
+                                                        <g:formatNumber number="${orderInstance?.totalPrice()?:0.0 }"/>
+                                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                                    </th>
+                                                </tr>
+                                                </tfoot>
+                                            </g:if>
 
                                         </table>
                                     </g:if>

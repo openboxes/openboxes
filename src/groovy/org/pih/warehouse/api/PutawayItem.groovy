@@ -44,7 +44,7 @@ class PutawayItem {
         return StringUtils.abbreviate(currentBins, 25)
     }
 
-    PutawayItem createFromOrderItem(OrderItem orderItem) {
+    static PutawayItem createFromOrderItem(OrderItem orderItem) {
         PutawayItem putawayItem = new PutawayItem()
         putawayItem.id = orderItem.id
         putawayItem.product = orderItem.product
@@ -56,6 +56,7 @@ class PutawayItem {
         putawayItem.putawayFacility = orderItem.order.destination
         putawayItem.putawayLocation = orderItem.destinationBinLocation
         putawayItem.recipient = orderItem.recipient?:orderItem.order.recipient
+        return putawayItem
     }
 
     static PutawayStatus getPutawayItemStatus(OrderItemStatusCode orderItemStatusCode) {
@@ -63,9 +64,9 @@ class PutawayItem {
             case OrderItemStatusCode.PENDING:
                 return PutawayStatus.PENDING;
             case OrderItemStatusCode.COMPLETED:
-                return PutawayStatus.COMPLETE
+                return PutawayStatus.COMPLETED
             case OrderItemStatusCode.CANCELED:
-                return PutawayStatus.COMPLETE
+                return PutawayStatus.COMPLETED
             default:
                 return null
         }

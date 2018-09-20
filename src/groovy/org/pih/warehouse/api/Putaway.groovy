@@ -45,7 +45,7 @@ class Putaway {
         Putaway putaway = new Putaway(
                 id: order.id,
                 origin: order.origin,
-                destination: order.description,
+                destination: order.destination,
                 putawayNumber: order.orderNumber,
                 putawayStatus: Putaway.getPutawayStatus(order.status),
                 putawayAssignee: order.completedBy,

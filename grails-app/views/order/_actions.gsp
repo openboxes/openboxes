@@ -14,11 +14,7 @@
 			<g:render template="/order/actionsPending" model="[orderInstance:orderInstance,hideDelete:hideDelete]"/>
 		</g:elseif>
 		<g:else>
-			<div class="actions" style="min-width: 200px;">
-				<div class="action-menu-item">
-					<warehouse:message code="default.unknownState.label"/>
-				</div>
-			</div>
+			<g:render template="/order/actionsReceived" model="[orderInstance:orderInstance,hideDelete:hideDelete]"/>
 		</g:else>
 	</span>
 </g:if>
