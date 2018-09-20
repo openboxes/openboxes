@@ -45,7 +45,7 @@ class PartialReceivingApiController {
 
         bindPartialReceiptData(partialReceipt, jsonObject)
 
-        if (partialReceipt.receiptStatus == PartialReceiptStatus.COMPLETE) {
+        if (partialReceipt.receiptStatus == PartialReceiptStatus.COMPLETED) {
             log.info "Save partial receipt"
             receiptService.savePartialReceipt(partialReceipt)
             receiptService.saveInboundTransaction(partialReceipt)
