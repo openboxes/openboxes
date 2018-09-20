@@ -83,5 +83,8 @@ class Constants {
 	static final String DEFAULT_REQUISITION_NUMBER_FORMAT = "NNNLLL"
 	static final String DEFAULT_SHIPMENT_NUMBER_FORMAT = "NNNLLL"
 	static final String DEFAULT_TRANSACTION_NUMBER_FORMAT = "AAA-AAA-AAA"
-	
+
+	static final String TRACKING_NUMBER_TYPE_ID = "10"
+
+
 }
