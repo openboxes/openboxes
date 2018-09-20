@@ -141,6 +141,8 @@ class StockMovementApiController {
                         if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
                         if (createPicklist) stockMovementService.createPicklist(stockMovement)
                         break;
+                    case RequisitionStatus.CHECKING:
+                        break;
                     case RequisitionStatus.PICKED:
                         stockMovementService.createOrUpdateShipment(stockMovement)
                         break;
