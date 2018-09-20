@@ -128,7 +128,7 @@ const FIELDS = {
         getDynamicAttr: ({ fieldValue, revertItem }) => ({
           onClick: fieldValue.requisitionItemId ?
             () => revertItem(fieldValue.requisitionItemId) : () => null,
-          hidden: fieldValue.statusCode ? fieldValue.statusCode !== 'CHANGED' : false,
+          hidden: fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
         }),
         attributes: {
           className: 'btn btn-outline-danger',

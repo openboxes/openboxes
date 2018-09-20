@@ -92,7 +92,7 @@ class StockMovementItem {
                 productCode: productCode,
                 product: product,
                 lotNumber: lotNumber,
-                expirationDate: expirationDate,
+                expirationDate: expirationDate?.format("MM/dd/yyyy"),
                 palletName: palletName,
                 boxName: boxName,
                 statusCode: statusCode,
@@ -171,10 +171,11 @@ class StockMovementItem {
                 reasonCode: requisitionItem.cancelReasonCode,
                 comments: requisitionItem.cancelComments,
                 recipient: requisitionItem.recipient,
-                palletName:null,
-                boxName:null,
-                sortOrder: requisitionItem.orderIndex
-
+                palletName: requisitionItem?.palletName?:"",
+                boxName: requisitionItem?.boxName?:"",
+                lotNumber: requisitionItem?.lotNumber?:"",
+                expirationDate: requisitionItem?.expirationDate,
+                sortOrder: requisitionItem?.orderIndex
         )
     }
 
