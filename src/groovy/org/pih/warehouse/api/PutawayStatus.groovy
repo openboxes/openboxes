@@ -1,5 +1,5 @@
 package org.pih.warehouse.api
 
 enum PutawayStatus {
-    TODO, PENDING, COMPLETE
+    READY, PENDING, COMPLETED
 }

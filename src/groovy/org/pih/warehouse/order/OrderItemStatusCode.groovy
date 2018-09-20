@@ -3,10 +3,9 @@ package org.pih.warehouse.order
 enum OrderItemStatusCode {
 
     PENDING(1),
-    READY(2),
-    COMPLETED(3),   // Meaning depends on context i.e. picked, putaway, delivered, received
-    CANCELED(4),
-    BACKORDER(5)
+    COMPLETED(2),   // Meaning depends on context i.e. picked, putaway, delivered, received
+    CANCELED(3),
+    BACKORDER(4)
 
 
     final Integer sortOrder
@@ -16,7 +15,7 @@ enum OrderItemStatusCode {
     }
 
     static list() {
-        [PENDING, READY, COMPLETED, CANCELED, BACKORDER]
+        [PENDING, COMPLETED, CANCELED, BACKORDER]
     }
 
 }

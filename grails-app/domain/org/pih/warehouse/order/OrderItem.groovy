@@ -69,6 +69,8 @@ class OrderItem implements Serializable {
         parentOrderItem(nullable:true)
 		originBinLocation(nullable:true)
 		destinationBinLocation(nullable:true)
+		recipient(nullable:true)
+		currencyCode(nullable:true)
 	}
 
 	

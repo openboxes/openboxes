@@ -103,6 +103,7 @@ class Transaction implements Comparable, Serializable {
 		updatedBy(nullable:true)
 		outgoingShipment(nullable:true)
 		incomingShipment(nullable:true)
+        order(nullable:true)
 		requisition(nullable:true)
         outboundTransfer(nullable:true)
         inboundTransfer(nullable:true)
