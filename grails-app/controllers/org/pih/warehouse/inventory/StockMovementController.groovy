@@ -22,6 +22,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -52,6 +53,9 @@ class StockMovementController {
     def list = {
         User currentUser = User.get(session?.user?.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
+        params.origin = params.origin?:currentLocation
+        params.destination = params.destination?:currentLocation
+
         Requisition requisition = new Requisition(params)
         requisition.discard()
         StockMovement stockMovement = new StockMovement()
@@ -68,8 +72,16 @@ class StockMovementController {
         def stockMovements = stockMovementService.getStockMovements(stockMovement, params.max?params.max as int:10, params.offset?params.offset as int:0)
         def statistics = requisitionService.getRequisitionStatistics(requisition.origin, requisition.destination, currentUser)
 
-        render(view:"list", model:[stockMovements: stockMovements, statistics:statistics])
+        render(view:"list", params:params, model:[stockMovements: stockMovements, statistics:statistics])
 
+    }
+
+    def shipments = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
+
+
+        render(template: "/shipment/list", model: [shipments:shipments])
     }
 
 
