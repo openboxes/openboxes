@@ -73,11 +73,13 @@ class StockMovementService {
         if (!status in RequisitionStatus.list()) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
         } else if (status < requisition.status) {
-            throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
+            // Ignore backwards state transitions since it occurs normally when users go back and edit pages earlier in the workflow
+            log.warn("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
         }
-
-        requisition.status = status
-        requisition.save(flush: true)
+        else {
+            requisition.status = status
+            requisition.save(flush: true)
+        }
     }
 
 
