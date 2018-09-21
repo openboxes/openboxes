@@ -141,11 +141,23 @@ class StockMovementService {
                 }
             }
 
-            if (stockMovement?.destination) {
-                eq("destination", stockMovement.destination)
+            if (stockMovement.destination == stockMovement?.origin) {
+                or {
+                    if (stockMovement?.destination) {
+                        eq("destination", stockMovement.destination)
+                    }
+                    if (stockMovement?.origin) {
+                        eq("origin", stockMovement.origin)
+                    }
+                }
             }
-            if (stockMovement?.origin) {
-                eq("origin", stockMovement.origin)
+            else {
+                if (stockMovement?.destination) {
+                    eq("destination", stockMovement.destination)
+                }
+                if (stockMovement?.origin) {
+                    eq("origin", stockMovement.origin)
+                }
             }
             if (stockMovement.statusCode) {
                 eq("status", RequisitionStatus.valueOf(stockMovement.statusCode))

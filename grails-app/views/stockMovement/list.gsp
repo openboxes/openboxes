@@ -13,11 +13,10 @@
 <body>
 
 <g:set var="pageParams"
-       value="['origin.id':params?.origin?.id, q:params.q, commodityClass:params.commodityClass, status:params.status,
+       value="['origin.id':params?.origin?.id, 'destination.id':params?.destination?.id, q:params.q, commodityClass:params.commodityClass, status:params.status,
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
                'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order, relatedToMe:params.relatedToMe,
                'requestedBy.id': params?.requestedBy?.id]"/>
-
 
 <div class="body">
     <g:if test="${flash.message}">
@@ -93,15 +92,15 @@
                         <div class="filter-list-item">
                             <label><warehouse:message code="stockMovement.origin.label"/></label>
                             <p>
-                                <g:selectLocation name="origin.id" value="${params?.origin?.id}"
+                                <g:selectLocation name="origin.id" value="${params?.origin?.id?:session?.warehouse?.id}"
                                                         noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
                         <div class="filter-list-item">
                             <label><warehouse:message code="stockMovement.destination.label"/></label>
                             <p>
-                                <g:selectLocation name="destination.id" value="${params?.destination?.id}"
-                                                  noSelection="['null':'']" class="chzn-select"/>
+                                <g:selectLocation name="destination.id" value="${params?.destination?.id?:session?.warehouse?.id}"
+                                                  noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
                         <%--
