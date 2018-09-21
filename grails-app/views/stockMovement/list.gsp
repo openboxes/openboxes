@@ -15,7 +15,8 @@
 <g:set var="pageParams"
        value="['origin.id':params?.origin?.id, q:params.q, commodityClass:params.commodityClass, status:params.status,
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
-               'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order, relatedToMe:params.relatedToMe]"/>
+               'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order, relatedToMe:params.relatedToMe,
+               'requestedBy.id': params?.requestedBy?.id]"/>
 
 
 <div class="body">
@@ -31,13 +32,13 @@
 
     <div class="buttonBar">
         <div class="button-group">
-            <g:link controller="requisition" action="list" params="['relatedToMe':true]" class="button icon user">
+            <g:link controller="stockMovement" action="list" params="['requestedBy.id':session?.user?.id]" class="button icon user">
                 ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}
                 (${statistics["MINE"]?:0 })
             </g:link>
         </div>
         <div class="button-group">
-            <g:link controller="requisition" action="list" class="button ${(!params.status)?'primary':''}">
+            <g:link controller="stockMovement" action="list" class="button ${(!params.status)?'primary':''}">
                 <warehouse:message code="default.all.label"/>
                 (${statistics["ALL"]})
             </g:link>
@@ -125,7 +126,6 @@
         </div>
         <div class="yui-u">
             <div class="box">
-                <%--<g:render template="list" model="[requisitions:requisitions,pageParams:pageParams]"/>--%>
                 <h2>
                     <warehouse:message code="stockMovements.label"/> (${stockMovements?.totalCount?:0})
                 </h2>
@@ -171,21 +171,21 @@
                     <g:each in="${stockMovements}" status="i" var="stockMovement">
                         <g:set var="requisition" value="${stockMovement.requisition}"/>
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                            <td style="width: 60px; text-align: center;" class="middle center">
+                            <td>
                                 <g:render template="/stockMovement/actions" model="[stockMovement:stockMovement]"/>
                             </td>
-                            <td class="left middle">
+                            <td>
                                 <div class="count">${stockMovement?.lineItems?.size()?:0}</div>
                             </td>
-                            <td class="middle">
+                            <td>
                                 <label class="status"><format:metadata obj="${stockMovement?.status}"/></label>
                             </td>
-                            <td class="middle">
+                            <td>
                                 <g:link controller="stockMovement" action="show" id="${stockMovement.id}">
                                     <strong>${stockMovement.identifier }</strong>
                                 </g:link>
                             </td>
-                            <td class="middle">
+                            <td>
                                 <g:link controller="stockMovement" action="show" id="${stockMovement.id}">
                                     <div title="${stockMovement.name}">${stockMovement.description}</div>
                                 </g:link>
@@ -199,10 +199,10 @@
                             <td>
                                 ${stockMovement?.stocklist?.name?:"N/A"}
                             </td>
-                            <td class="middle">
+                            <td>
                                 ${stockMovement.requestedBy?:warehouse.message(code:'default.noone.label')}
                             </td>
-                            <td class="middle">
+                            <td>
                                 <div title="<g:formatDate date="${stockMovement.dateRequested }"/>">
                                     <g:prettyDateFormat date="${stockMovement.dateRequested}"/>
                                 </div>
@@ -211,13 +211,11 @@
                     </g:each>
                     </tbody>
                 </table>
+                <div class="paginateButtons">
+                    <g:paginate total="${stockMovements.totalCount}" controller="stockMovement" action="list" max="${params.max}"
+                                params="${pageParams.findAll {it.value}}"/>
 
-
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${stockMovements.totalCount}" controller="stockMovement" action="list" max="${params.max}"
-                            params="${pageParams.findAll {it.value}}"/>
-
+                </div>
             </div>
         </div>
     </div>

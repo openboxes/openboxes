@@ -58,12 +58,13 @@ class StockMovementController {
             stockMovement.name = "%" + params.q + "%"
             stockMovement.description = "%" + params.q + "%"
         }
+        stockMovement.requestedBy = requisition.requestedBy
         stockMovement.origin = requisition.origin
         stockMovement.destination = requisition.destination
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, params.max?:10, params.offset?:0)
-        def statistics = requisitionService.getRequisitionStatistics(currentLocation, null, currentUser)
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params.max?params.max as int:10, params.offset?params.offset as int:0)
+        def statistics = requisitionService.getRequisitionStatistics(requisition.origin, requisition.destination, currentUser)
 
         render(view:"list", model:[stockMovements: stockMovements, statistics:statistics])
 
