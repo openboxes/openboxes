@@ -16,12 +16,12 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.shipping.Shipment
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -31,12 +31,43 @@ class StockMovementController {
 
     def dataService
     def stockMovementService
+    def requisitionService
 
     static DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy")
 
 	def index = {
 		render(template: "/stockMovement/create")
 	}
+
+    def show = {
+
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        [stockMovement: stockMovement]
+
+    }
+
+    def list = {
+        User currentUser = User.get(session?.user?.id)
+        Location currentLocation = Location.get(session?.warehouse?.id)
+        Requisition requisition = new Requisition(params)
+        requisition.discard()
+        StockMovement stockMovement = new StockMovement()
+        if (params.q) {
+            stockMovement.identifier = "%" + params.q + "%"
+            stockMovement.name = "%" + params.q + "%"
+            stockMovement.description = "%" + params.q + "%"
+        }
+        stockMovement.origin = requisition.origin
+        stockMovement.destination = requisition.destination
+        stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
+
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params.max?:10, params.offset?:0)
+        def statistics = requisitionService.getRequisitionStatistics(currentLocation, null, currentUser)
+
+        render(view:"list", model:[stockMovements: stockMovements, statistics:statistics])
+
+    }
 
 
     def uploadDocument = { DocumentCommand command ->
