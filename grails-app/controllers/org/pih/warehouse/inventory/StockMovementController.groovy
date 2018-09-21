@@ -22,6 +22,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -70,6 +71,14 @@ class StockMovementController {
 
         render(view:"list", model:[stockMovements: stockMovements, statistics:statistics])
 
+    }
+
+    def shipments = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
+
+
+        render(template: "/shipment/list", model: [shipments:shipments])
     }
 
 

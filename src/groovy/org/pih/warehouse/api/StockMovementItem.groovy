@@ -19,6 +19,7 @@ class StockMovementItem {
     Person recipient
 
     StockMovement stockMovement
+    RequisitionItem requisitionItem
 
     BigDecimal quantityRequested
     BigDecimal quantityAllowed
@@ -176,7 +177,8 @@ class StockMovementItem {
                 boxName: requisitionItem?.boxName?:"",
                 lotNumber: requisitionItem?.lotNumber?:"",
                 expirationDate: requisitionItem?.expirationDate,
-                sortOrder: requisitionItem?.orderIndex
+                sortOrder: requisitionItem?.orderIndex,
+                requisitionItem: requisitionItem
         )
     }
 

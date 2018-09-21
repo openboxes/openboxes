@@ -31,27 +31,44 @@
     </div>
 
     <div class="buttonBar">
+
+        <div class="right">
+
+            <div class="button-group">
+                <g:link controller="stockMovement" action="list" params="['requestedBy.id':session?.user?.id]" class="button icon user">
+                    ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}
+                    (${statistics["MINE"]?:0 })
+                </g:link>
+            </div>
+            <div class="button-group">
+                <g:link controller="stockMovement" action="list" class="button ${(!params.status)?'primary':''}">
+                    <warehouse:message code="default.all.label"/>
+                    (${statistics["ALL"]})
+                </g:link>
+                <g:each var="status" in="${RequisitionStatus.list()}">
+                    <g:if test="${statistics[status]>0}">
+                        <g:set var="isPrimary" value="${params.status==status.name()?true:false}"/>
+                        <g:link controller="stockMovement" action="list" params="[status:status]" class="button ${isPrimary?'primary':''}">
+                            <format:metadata obj="${status}"/>
+                            (${statistics[status]?:0 })
+                        </g:link>
+                    </g:if>
+                </g:each>
+            </div>
+        </div>
+
         <div class="button-group">
-            <g:link controller="stockMovement" action="list" params="['requestedBy.id':session?.user?.id]" class="button icon user">
-                ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}
-                (${statistics["MINE"]?:0 })
+            <g:link controller="stockMovement" action="list" class="button">
+                <warehouse:message code="default.list.label" args="[g.message(code: 'stockMovements.label')]"/>
             </g:link>
         </div>
         <div class="button-group">
-            <g:link controller="stockMovement" action="list" class="button ${(!params.status)?'primary':''}">
-                <warehouse:message code="default.all.label"/>
-                (${statistics["ALL"]})
+            <g:link controller="stockMovement" action="index" class="button">
+                <warehouse:message code="default.create.label" args="[g.message(code: 'stockMovement.label')]"/>
             </g:link>
-            <g:each var="status" in="${RequisitionStatus.list()}">
-                <g:if test="${statistics[status]>0}">
-                    <g:set var="isPrimary" value="${params.status==status.name()?true:false}"/>
-                    <g:link controller="stockMovement" action="list" params="[status:status]" class="button ${isPrimary?'primary':''}">
-                        <format:metadata obj="${status}"/>
-                        (${statistics[status]?:0 })
-                    </g:link>
-                </g:if>
-            </g:each>
         </div>
+
+
     </div>
 
     <div class="yui-gf">
