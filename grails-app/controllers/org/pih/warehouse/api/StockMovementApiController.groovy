@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
@@ -23,8 +24,6 @@ import java.text.SimpleDateFormat
 class StockMovementApiController {
 
     StockMovementService stockMovementService
-
-    static DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy")
 
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
@@ -168,7 +167,7 @@ class StockMovementApiController {
      * @param dateField
      */
     Date parseDate(String date) {
-        return date ? DEFAULT_DATE_FORMAT.parse(date) : null
+        return date ? Constants.EXPIRATION_DATE_FORMATTER.parse(date) : null
     }
 
     void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
@@ -214,6 +213,7 @@ class StockMovementApiController {
         lineItems.each { lineItem ->
             StockMovementItem stockMovementItem = new StockMovementItem()
             stockMovementItem.id = lineItem.id
+            stockMovementItem.stockMovement = stockMovement
 
             // Required properties
             stockMovementItem.product = lineItem["product.id"] ? Product.load(lineItem["product.id"]) : null
@@ -228,7 +228,7 @@ class StockMovementApiController {
             stockMovementItem.inventoryItem = lineItem["inventoryItem.id"] ? InventoryItem.load(lineItem["inventoryItem.id"]) : null
             stockMovementItem.lotNumber = lineItem["lotNumber"]
             stockMovementItem.expirationDate = !(lineItem["expirationDate"] == JSONObject.NULL || lineItem["expirationDate"] == null) ?
-                    DEFAULT_DATE_FORMAT.parse(lineItem["expirationDate"]) : null
+                    Constants.EXPIRATION_DATE_FORMATTER.parse(lineItem["expirationDate"]) : null
 
             // Sort order (optional)
             stockMovementItem.sortOrder = lineItem.sortOrder && !lineItem.isNull("sortOrder") ? new Integer(lineItem.sortOrder) : null
@@ -250,8 +250,6 @@ class StockMovementApiController {
 
             // Update recipient
             stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
-
-            stockMovementItem.stockMovement = stockMovement
 
             stockMovement.lineItems.add(stockMovementItem)
         }

@@ -1,5 +1,6 @@
 package org.pih.warehouse.api
 
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
@@ -178,6 +179,55 @@ class StockMovementItem {
                 sortOrder: requisitionItem?.orderIndex
         )
     }
+
+
+    static StockMovementItem createFromTokens(String [] tokens) {
+        String requisitionItemId = tokens[0] ?: null
+        String productCode = tokens[1] ?: null
+        String productName = tokens[2] ?: null
+        String palletName = tokens[3] ?: null
+        String boxName = tokens[4] ?: null
+        String lotNumber = tokens[5] ?: null
+        Date expirationDate = tokens[6] ? Constants.EXPIRATION_DATE_FORMATTER.parse(tokens[6]) : null
+        Integer quantityRequested = tokens[7].toInteger() ?: null
+        String recipientId = tokens[8]
+
+        Person recipient = recipientId ? Person.get(recipientId) : null
+        if (!recipient && recipientId) {
+            String[] names = recipientId.split(" ")
+            if (names.length != 2) {
+                throw new IllegalArgumentException("Please enter recipient's first and last name only")
+            }
+
+            String firstName = names[0], lastName = names[1]
+            recipient = Person.findByFirstNameAndLastName(firstName, lastName)
+            if (!recipient) {
+                throw new IllegalArgumentException("Unable to locate person with first name ${firstName} and last name ${lastName}")
+            }
+        }
+
+        StockMovementItem stockMovementItem = new StockMovementItem()
+        stockMovementItem.id = requisitionItemId
+
+        if (quantityRequested == 0) {
+            stockMovementItem.delete = true
+        }
+
+        // Required properties
+        Product product = Product.findByProductCode(productCode)
+        if (!product) {
+            throw new IllegalArgumentException("Product '${productCode} ${productName}' could not be found")
+        }
+        stockMovementItem.product = product
+        stockMovementItem.quantityRequested = quantityRequested
+        stockMovementItem.palletName = palletName
+        stockMovementItem.boxName = boxName
+        stockMovementItem.lotNumber = lotNumber
+        stockMovementItem.expirationDate = expirationDate
+        stockMovementItem.recipient = recipient
+        return stockMovementItem
+    }
+
 
 }
 

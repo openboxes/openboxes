@@ -31,8 +31,11 @@ class Constants {
 	static final String DEFAULT_TIME_FORMAT = "HH:mm:ss z"
 	static final String DEFAULT_MONTH_YEAR_DATE_FORMAT = "dd/MMM/yyyy"
 	static final String SHORT_MONTH_YEAR_DATE_FORMAT = "MM/yyyy"
-	
-	static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT);	
+	static final String EXPIRATION_DATE_FORMAT = "MM/dd/yyyy"
+
+
+	static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+	static final DateFormat EXPIRATION_DATE_FORMATTER = new SimpleDateFormat(EXPIRATION_DATE_FORMAT)
 
 	static final String DEFAULT_WEIGHT_UNITS = "lbs"
 	static final String DEFAULT_VOLUME_UNITS = "ft"

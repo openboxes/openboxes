@@ -33,8 +33,6 @@ class StockMovementController {
     def stockMovementService
     def requisitionService
 
-    static DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy")
-
 	def index = {
 		render(template: "/stockMovement/create")
 	}
@@ -122,75 +120,37 @@ class StockMovementController {
 
 	def importCsv = { ImportDataCommand command ->
 
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        Requisition requisition = stockMovement.requisition
+        try {
+            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+            Requisition requisition = stockMovement.requisition
 
-        def importFile = command.importFile
-        if (importFile.isEmpty()) {
-            throw new IllegalArgumentException("File cannot be empty")
-        }
-
-        if (importFile.fileItem.contentType != "text/csv") {
-            throw new IllegalArgumentException("File must be in CSV format")
-        }
-
-        String csv = new String(importFile.bytes)
-        def settings = [separatorChar:',', skipLines: 1]
-        csv.toCsvReader(settings).eachLine { tokens ->
-
-            log.info "tokens " + tokens
-            String requisitionItemId = tokens[0]?:null
-            String productCode = tokens[1]?:null
-            String productName = tokens[2]?:null
-            String palletName = tokens[3]?:null
-            String boxName = tokens[4]?:null
-            String lotNumber = tokens[5]?:null
-            Date expirationDate = tokens[6] ? DEFAULT_DATE_FORMAT.parse(tokens[6]):null
-            Integer quantityRequested = tokens[7].toInteger()?:null
-            String recipientId = tokens[8]
-
-            Person recipient = recipientId ? Person.get(recipientId) : null
-            if (!recipient && recipientId) {
-                String [] names = recipientId.split(" ")
-                if (names.length != 2) {
-                    throw new IllegalArgumentException("Please enter recipient's first and last name only")
-                }
-
-                String firstName = names[0], lastName = names[1]
-                recipient = Person.findByFirstNameAndLastName(firstName, lastName)
-                if (!recipient) {
-                    throw new IllegalArgumentException("Unable to locate person with first name ${firstName} and last name ${lastName}")
-                }
-            }
-            log.info "RECIPIENT: " + recipient
-
-            StockMovementItem stockMovementItem = new StockMovementItem()
-            stockMovementItem.id = requisitionItemId
-
-            if (quantityRequested == 0) {
-                stockMovementItem.delete = true
+            def importFile = command.importFile
+            if (importFile.isEmpty()) {
+                throw new IllegalArgumentException("File cannot be empty")
             }
 
-            // Required properties
-            Product product = Product.findByProductCode(productCode)
-            if (product.name != productName) {
-                throw new IllegalArgumentException("Product '${product.productCode} ${product?.name}' does not match product in CSV '${productCode} ${productName}'")
+            if (importFile.fileItem.contentType != "text/csv") {
+                throw new IllegalArgumentException("File must be in CSV format")
             }
-            stockMovementItem.product = product
-            stockMovementItem.quantityRequested = quantityRequested
-            stockMovementItem.palletName = palletName
-            stockMovementItem.boxName = boxName
-            stockMovementItem.lotNumber = lotNumber
-            stockMovementItem.expirationDate = expirationDate
-            stockMovementItem.recipient = recipient
 
-            stockMovementItem.stockMovement = stockMovement
+            String csv = new String(importFile.bytes)
+            def settings = [separatorChar: ',', skipLines: 1]
+            csv.toCsvReader(settings).eachLine { tokens ->
 
-            stockMovement.lineItems.add(stockMovementItem)
-
+                log.info "Tokens " + tokens.class
+                StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens)
+                stockMovementItem.stockMovement = stockMovement
+                stockMovement.lineItems.add(stockMovementItem)
+            }
             stockMovementService.updateStockMovement(stockMovement)
-        }
 
+        } catch (Exception e) {
+            // FIXME The global error handler does not return JSON for multipart uploads
+            log.warn("Error occurred while importing CSV: " + e.message, e)
+            response.status = 500
+            render([errorCode: 500, errorMessage: e?.message?:"An unknown error occurred during import"] as JSON)
+            return
+        }
 
         render([data: "Data will be imported successfully"] as JSON)
 	}
