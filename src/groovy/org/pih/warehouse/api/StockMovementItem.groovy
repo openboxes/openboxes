@@ -27,7 +27,11 @@ class StockMovementItem {
     BigDecimal quantityRevised
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
+    BigDecimal quantityShipped
 
+    String shipmentItemId
+
+    List<StockMovementItem> splitLineItems = []
     List<StockMovementItem> substitutionItems = []
 
     // Actions
@@ -518,27 +522,23 @@ class PickPageItem {
 }
 
 class PackPageItem {
-    RequisitionItem requisitionItem
-    InventoryItem inventoryItem
-    Location binLocation
-
+    ShipmentItem shipmentItem
+    String palletName
+    String boxName
 
     Map toJson() {
         return [
-                requisitionItemId   : requisitionItem?.id,
-                productName         : requisitionItem?.product?.name,
-                productCode         : requisitionItem?.product?.productCode,
-                quantityRequested   : requisitionItem.quantity,
-                recipient           : requisitionItem?.recipient,
-                expirationDate      : requisitionItem?.expirationDate,
-                lotNumber           : requisitionItem?.lotNumber,
-                binLocationName     : binLocation?.name,
-                shipped             : requisitionItem?.shipped, // ?
-                uom                 : requisitionItem?.uom, // ?
-                palletName          : requisitionItem?.palletName,
-                boxName             : requisitionItem?.boxName,
-
-
+                shipmentItemId    : shipmentItem?.id,
+                productName       : shipmentItem?.product?.name,
+                productCode       : shipmentItem?.product?.productCode,
+                lotNumber         : shipmentItem?.lotNumber,
+                expirationDate    : shipmentItem?.expirationDate,
+                binLocationName   : shipmentItem?.binLocation?.name,
+                uom               : shipmentItem?.product?.unitOfMeasure,
+                quantityShipped   : shipmentItem?.quantity,
+                recipient         : shipmentItem?.recipient,
+                palletName        : palletName,
+                boxName           : boxName,
         ]
     }
 }

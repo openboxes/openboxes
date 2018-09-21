@@ -142,9 +142,10 @@ class StockMovementApiController {
                         if (createPicklist) stockMovementService.createPicklist(stockMovement)
                         break;
                     case RequisitionStatus.CHECKING:
+                        stockMovementService.createOrUpdateShipment(stockMovement, true)
                         break;
                     case RequisitionStatus.PICKED:
-                        stockMovementService.createOrUpdateShipment(stockMovement)
+                        stockMovementService.createOrUpdateShipment(stockMovement, false)
                         break;
                     case RequisitionStatus.ISSUED:
                         stockMovementService.sendStockMovement(params.id)
@@ -212,6 +213,12 @@ class StockMovementApiController {
      */
     void bindLineItems(StockMovement stockMovement, List lineItems) {
         log.info "line items: " + lineItems
+        List<StockMovementItem> stockMovementItems = createLineItemsFromJson(stockMovement, lineItems)
+        stockMovement.lineItems.addAll(stockMovementItems)
+    }
+
+    List<StockMovementItem> createLineItemsFromJson(StockMovement stockMovement, List lineItems) {
+        List<StockMovementItem> stockMovementItems = new ArrayList<StockMovementItem>()
         lineItems.each { lineItem ->
             StockMovementItem stockMovementItem = new StockMovementItem()
             stockMovementItem.id = lineItem.id
@@ -253,8 +260,16 @@ class StockMovementApiController {
             // Update recipient
             stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
 
-            stockMovement.lineItems.add(stockMovementItem)
+            // Pack page fields
+            stockMovementItem.quantityShipped = lineItem.quantityShipped ? new BigDecimal(lineItem.quantityShipped) : null
+            stockMovementItem.shipmentItemId = lineItem.shipmentItemId
+            List splitLineItems = lineItem.splitLineItems
+            if (splitLineItems) {
+                stockMovementItem.splitLineItems = createLineItemsFromJson(stockMovement, splitLineItems)
+            }
+
         }
+        return stockMovementItems
     }
 
 }

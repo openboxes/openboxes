@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -18,7 +20,7 @@ import PackingSplitLineModal from './modals/PackingSplitLineModal';
 import { debouncedUsersFetch } from '../../utils/option-utils';
 
 const FIELDS = {
-  packingPageItems: {
+  packPageItems: {
     type: ArrayField,
     fields: {
       productCode: {
@@ -34,7 +36,7 @@ const FIELDS = {
           className: 'text-left ml-1',
         },
       },
-      'binLocation.name': {
+      binLocationName: {
         type: LabelField,
         label: 'Bin Location',
         flexWidth: '1',
@@ -53,7 +55,7 @@ const FIELDS = {
           disabled: true,
         },
       },
-      shipped: {
+      quantityShipped: {
         type: LabelField,
         label: 'Shipped',
         flexWidth: '0.8',
@@ -80,17 +82,17 @@ const FIELDS = {
           labelKey: 'name',
         },
       },
-      pallet: {
+      palletName: {
         type: TextField,
         label: 'Pallet',
         flexWidth: '0.8',
       },
-      box: {
+      boxName: {
         type: TextField,
         label: 'Box',
         flexWidth: '0.8',
       },
-      splitLine: {
+      splitLineItems: {
         type: PackingSplitLineModal,
         label: 'Split Line',
         flexWidth: '1',
@@ -115,7 +117,7 @@ const FIELDS = {
 
 function validate(values) {
   const errors = {};
-  errors.PackingPageItems = [];
+  errors.packPageItems = [];
   return errors;
 }
 
@@ -128,7 +130,7 @@ class PackingPage extends Component {
     super(props);
 
     this.state = {
-      values: { ...this.props.initialValues, packingPageItems: [] },
+      values: { ...this.props.initialValues, packPageItems: [] },
     };
 
     this.props.showSpinner();
@@ -136,8 +138,8 @@ class PackingPage extends Component {
 
   componentDidMount() {
     this.fetchLineItems().then((resp) => {
-      const { packingPageItems } = resp.data.data;
-      this.setState({ values: { ...this.state.values, packingPageItems } });
+      const { packPageItems } = resp.data.data.packPage;
+      this.setState({ values: { ...this.state.values, packPageItems } });
       this.props.hideSpinner();
     }).catch(() => {
       this.props.hideSpinner();
@@ -196,10 +198,10 @@ class PackingPage extends Component {
 
   /**
    * Saves packing data
-   * @param {object} PackingPageItems
+   * @param {object} packPageItems
    * @public
    */
-  savePackingData(PackingPageItems) {
+  savePackingData(packPageItems) {
     // TODO: save packing data request
   }
 

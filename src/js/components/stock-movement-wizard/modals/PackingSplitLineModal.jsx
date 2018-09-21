@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -13,7 +15,7 @@ import { showSpinner, hideSpinner } from '../../../actions';
 import { debouncedUsersFetch } from '../../../utils/option-utils';
 
 const FIELDS = {
-  splitLine: {
+  splitLineItems: {
     addButton: 'Add Line',
     type: ArrayField,
     disableVirtualization: true,
@@ -37,11 +39,11 @@ const FIELDS = {
           disabled: true,
         },
       },
-      'binLocation.name': {
+      binLocationName: {
         type: LabelField,
         label: 'Bin',
       },
-      quantity: {
+      quantityShipped: {
         type: TextField,
         label: 'QTY',
         fixedWidth: '150px',
@@ -66,14 +68,14 @@ const FIELDS = {
           labelKey: 'name',
         },
       },
-      pallet: {
+      palletName: {
         type: TextField,
         label: 'Pallet',
         fixedWidth: '150px',
       },
-      box: {
+      boxName: {
         type: TextField,
-        label: 'box',
+        label: 'Box',
         fixedWidth: '150px',
       },
     },
@@ -83,7 +85,7 @@ const FIELDS = {
 const validate = (values) => {
   // TODO: validate for total packs quantitiy not exceeding quantity for this item
   const errors = {};
-  errors.splitLine = [];
+  errors.splitLineItems = [];
   return errors;
 };
 
@@ -115,7 +117,7 @@ class PackingSplitLineModal extends Component {
   onOpen() {
     this.setState({
       formValues: {
-        splitLine: [],
+        splitLineItems: [],
       },
     });
   }
@@ -138,7 +140,7 @@ class PackingSplitLineModal extends Component {
   calculatePacked(values) {
     return (
       <div>
-        <div className="font-weight-bold pb-2">Quantity Packed: {_.reduce(values.splitLine, (sum, val) =>
+        <div className="font-weight-bold pb-2">Quantity Packed: {_.reduce(values.splitLineItems, (sum, val) =>
           (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0)}
         </div>
         <hr />
@@ -158,7 +160,7 @@ class PackingSplitLineModal extends Component {
         renderBodyWithValues={this.calculatePacked}
       >
         <div>
-          <div className="font-weight-bold">Total Quantity: {this.state.attr.fieldValue.totalQuantity} </div>
+          {/*<div className="font-weight-bold">Total Quantity: {this.state.attr.fieldValue.totalQuantity} </div>*/}
         </div>
       </ModalWrapper>
     );
