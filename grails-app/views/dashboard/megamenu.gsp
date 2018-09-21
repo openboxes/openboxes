@@ -224,7 +224,12 @@
         <a href="javascript:void(0)"><warehouse:message code="stockMovement.label" /></a>
         <div class="buttonsBar" style="min-width: 200px;">
             <div class="megaButton">
-                <g:link controller="stockMovement">
+                <g:link controller="stockMovement" action="list">
+                    <warehouse:message code="stockMovement.list.label"/>
+                </g:link>
+            </div>
+            <div class="megaButton">
+                <g:link controller="stockMovement" action="create">
                     <warehouse:message code="stockMovement.create.label"/>
                 </g:link>
             </div>
