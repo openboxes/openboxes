@@ -118,6 +118,10 @@ const en = {
       label: 'Stock Movement',
       link: '#',
       subsections: {
+        listStockMovements: {
+          label: 'List of Stock Movements',
+          link: '/openboxes/stockMovement/list',
+        },
         creteStockMovement: {
           label: 'Create Stock Movement',
           link: '/openboxes/stockMovement/index',
