@@ -235,7 +235,7 @@ class SendMovementPage extends Component {
         this.stateTransitionToIssued()
           .then(() => {
             // redirect to requisition list
-            window.location = '/openboxes/requisition/list';
+            window.location = `/openboxes/stockMovement/show/${this.state.values.stockMovementId}`;
           })
           .catch(() => this.props.hideSpinner());
       })
