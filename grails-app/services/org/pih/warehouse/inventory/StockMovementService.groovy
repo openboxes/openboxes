@@ -24,6 +24,7 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
@@ -691,9 +692,9 @@ class StockMovementService {
         }
 
         if (stockMovement.trackingNumber) {
-            ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(TRACKING_NUMBER_TYPE_ID)
+            ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
             if (!trackingNumberType) {
-                throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${TRACKING_NUMBER_TYPE_ID}'")
+                throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
             }
             ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
                 refNum.referenceNumberType == trackingNumberType
