@@ -71,7 +71,8 @@
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:selectRequisitionTemplate id="requisitionTemplate" name="id" noSelection="['null':'']" class="chzn-select-deselect"/>
+                                    <g:selectRequisitionTemplate id="requisitionTemplate" name="id"
+																 noSelection="['null':'']" class="chzn-select-deselect"/>
                                 </td>
                             </tr>
                         </tbody>

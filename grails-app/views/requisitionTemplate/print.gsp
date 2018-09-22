@@ -33,18 +33,18 @@
     <table style="width:auto;" border="0">
         <tr class="header">
             <td>
-                <label><warehouse:message code="requisition.depot.label"/>:</label>
+                <label><warehouse:message code="requisition.origin.label"/>:</label>
             </td>
             <td class="right">
-                ${requisition.destination?.name}
+                ${requisition.origin?.name}
             </td>
         </tr>
         <tr class="header">
             <td>
-                <label><warehouse:message code="requisition.ward.label"/>:</label>
+                <label><warehouse:message code="requisition.destination.label"/>:</label>
             </td>
             <td class="right">
-                ${requisition.origin?.name}
+                ${requisition.destination?.name}
             </td>
         </tr>
 

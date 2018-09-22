@@ -51,7 +51,7 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 			["product.id":product2.id, quantity: 400, orderIndex: 1]
 		]
 		def jsonNull = new org.codehaus.groovy.grails.web.json.JSONObject.Null()
-		Map data = [id: jsonNull, "origin.id": miami.id, "requestedBy.id": john.id,
+		Map data = [id: jsonNull, "destination.id": miami.id, "requestedBy.id": john.id,
 			dateRequested: today, requestedDeliveryDate: tomorrow, commodityClass: CommodityClass.MEDICATION,
 			name: "testRequisition", requisitionItems: items]
 		//def service = new RequisitionService()
@@ -65,9 +65,9 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 
 		assert requisition == requisitionPersisted
 		assert requisition.requestedBy == john
-		assert requisition.origin == miami
+		assert requisition.origin == boston
 		assert requisition.status == RequisitionStatus.CREATED
-		assert requisition.destination == boston
+		assert requisition.destination == miami
 		assert requisition.dateRequested == today
 		assert requisition.requestedDeliveryDate == tomorrow
 		assert requisition.requisitionItems.any{ item -> item.product == product1 && item.quantity == 300 && item.orderIndex == 0}
@@ -104,7 +104,7 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 			[id: oldItem1.id, "product.id":product1.id, quantity: 300, orderIndex: 0],
 			[id: oldItem2.id, "product.id":product2.id, quantity: 400, orderIndex: 1]
 		]
-		Map data = [id: oldRequisition.id, "origin.id": miami.id, "requestedBy.id": john.id,
+		Map data = [id: oldRequisition.id, "destination.id": miami.id, "requestedBy.id": john.id,
 			dateRequested: today, requestedDeliveryDate: tomorrow,
 			name: "testRequisition",
 			requisitionItems: items]
@@ -118,8 +118,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		assert requisition.status == oldRequisition.status
 		assert requisition.description == oldRequisition.description
 		assert requisition.requestedBy == john
-		assert requisition.origin == miami
-		assert requisition.destination == boston
+		assert requisition.origin == boston
+		assert requisition.destination == miami
 		assert requisition.dateRequested == today
 		assert requisition.requestedDeliveryDate == tomorrow
 		assert requisition.requisitionItems.size() == 2
@@ -155,7 +155,7 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		def items = [
 			[id: oldItem2.id, "product.id":product2.id, quantity: 400, orderIndex: 1]
 		]
-		Map data = [id: oldRequisition.id, "origin.id": miami.id, "requestedBy.id": john.id,
+		Map data = [id: oldRequisition.id, "destination.id": miami.id, "requestedBy.id": john.id,
 			dateRequested: today, requestedDeliveryDate: tomorrow,
 			name: "testRequisition",
 			requisitionItems: items]
@@ -169,8 +169,8 @@ class RequisitionServiceTests extends GrailsUnitTestCase {
 		assert requisition.id == oldRequisition.id
 		assert requisition.description == oldRequisition.description
 		assert requisition.requestedBy == john
-		assert requisition.origin == miami
-		assert requisition.destination == boston
+		assert requisition.origin == boston
+		assert requisition.destination == miami
 		assert requisition.dateRequested == today
 		assert requisition.requestedDeliveryDate == tomorrow
 		assert requisition.requisitionItems.size() == 1

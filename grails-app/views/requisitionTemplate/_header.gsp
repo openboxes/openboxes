@@ -64,7 +64,6 @@
                         </label>
                     </td>
                     <td class="value">
-
                         <span id="destination.id"> ${requisition?.destination?.name }</span>
                     </td>
                 </tr>
