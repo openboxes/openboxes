@@ -117,14 +117,15 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+
     def selectRequisitionTemplate = { attrs, body ->
         def requisitionCriteria = new Requisition(isTemplate: true)
-        requisitionCriteria.destination = session.warehouse
+        requisitionCriteria.origin = session.warehouse
         def requisitionTemplates = requisitionService.getAllRequisitionTemplates(requisitionCriteria, [max: -1, offset: 0])
-        requisitionTemplates.sort { it.origin.name }
+        requisitionTemplates.sort { it.destination.name }
         attrs.from = requisitionTemplates
         attrs.optionKey = "id"
-        attrs.optionValue = { it.name + " - " + it.origin.name + " (" + format.metadata(obj:it?.commodityClass) + ")" }
+        attrs.optionValue = { it.name + " - ${it.origin.name} - ${it.destination.name} (" + format.metadata(obj:it?.commodityClass) + ")" }
         out << g.select(attrs)
 
     }

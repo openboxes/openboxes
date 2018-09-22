@@ -246,7 +246,7 @@ class LocationService {
 	}
 
 	List getRequestDestinations(Location currentLocation) {
-		return getLocationsSupportingActivity(ActivityCode.FULFILL_REQUEST)// - currentLocation
+		return getLocationsSupportingActivity(ActivityCode.RECEIVE_STOCK)// - currentLocation
 	}
 
 	List getTransactionSources(Location currentLocation) { 

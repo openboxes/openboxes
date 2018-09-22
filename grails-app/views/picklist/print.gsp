@@ -87,18 +87,18 @@
                 </tr>
                 <tr class="header">
                     <td class="name right">
-                        <label><warehouse:message code="requisition.destination.label"/>:</label>
-                    </td>
-                    <td>
-                        ${requisition.destination?.name}
-                    </td>
-                </tr>
-                <tr class="header">
-                    <td class="name right">
                         <label><warehouse:message code="requisition.origin.label"/>:</label>
                     </td>
                     <td>
                         ${requisition.origin?.name}
+                    </td>
+                </tr>
+                <tr class="header">
+                    <td class="name right">
+                        <label><warehouse:message code="requisition.destination.label"/>:</label>
+                    </td>
+                    <td>
+                        ${requisition.destination?.name}
                     </td>
                 </tr>
 

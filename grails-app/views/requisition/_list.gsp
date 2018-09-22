@@ -10,6 +10,9 @@
 			<th>
 				<warehouse:message code="default.actions.label"/>
 			</th>
+            <th>
+                <g:message code="requisition.requisitionType.label"/>
+            </th>
 			<g:sortableColumn property="status" params="${pageParams}"
 				title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
 
@@ -212,6 +215,9 @@
 				<td>
                     <g:render template="/requisition/actions" model="[requisition:requisition]"/>
 				</td>
+                <td>
+                    ${requisition.type}
+                </td>
 				<td>
 					<label class="status"><format:metadata obj="${requisition?.status}"/></label>
 				</td>

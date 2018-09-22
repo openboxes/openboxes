@@ -37,8 +37,8 @@ class RequisitionTemplateController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         def requisitionCriteria = new Requisition()
         requisitionCriteria.name = "%" + params.q + "%"
-        requisitionCriteria.destination = Location.get(session.warehouse.id)
-        requisitionCriteria.origin = params?.originId ? Location.get(params?.originId): null
+        requisitionCriteria.origin = Location.get(session.warehouse.id)
+        requisitionCriteria.destination = params?.destination?.id ? Location.get(params?.destination?.id): null
         requisitionCriteria.commodityClass = params.commodityClass?:null
         requisitionCriteria.type = params.requisitionType?:null
         requisitionCriteria.isTemplate = true
@@ -334,7 +334,7 @@ class RequisitionTemplateController {
             }
 
             response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename='Stock List - ${requisition.origin.name} - ${date.format("yyyyMMdd-hhmmss")}.csv'")
+            response.setHeader("Content-disposition", "attachment; filename='Stock List - ${requisition?.destination?.name} - ${date.format("yyyyMMdd-hhmmss")}.csv'")
             render(contentType:"text/csv", text: csv.writer.toString())
             return;
         }
