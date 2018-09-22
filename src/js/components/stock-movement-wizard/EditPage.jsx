@@ -197,6 +197,7 @@ class EditItemsPage extends Component {
       this.fetchData(this.props.fetchReasonCodes);
     }
 
+    this.props.showSpinner();
     this.fetchLineItems().then((resp) => {
       const { statusCode, editPage } = resp.data.data;
       const editPageItems = _.map(
@@ -278,19 +279,28 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Saves list of requisition items in current step (without step change) and refetch the data.
+   * Saves list of requisition items in current step (without step change).
    * @param {object} formValues
    * @public
    */
-  saveAndRefresh(formValues) {
+  save(formValues) {
     this.props.showSpinner();
 
     return this.reviseRequisitionItems(formValues)
       .then(() => {
-        this.fetchAllData(true);
+        this.props.hideSpinner();
         Alert.success('Changes saved successfully!');
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  /**
+   * Refetch the data, all not saved changes will be lost.
+   * @public
+   */
+  refresh() {
+    this.setState({ revisedItems: [], values: { ...this.state.values, editPageItems: [] } });
+    this.fetchAllData(true);
   }
 
   /**
@@ -402,11 +412,18 @@ class EditItemsPage extends Component {
             <span>
               <button
                 type="button"
+                onClick={() => this.refresh()}
+                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+              >
+                <span><i className="fa fa-refresh pr-2" />Refresh</span>
+              </button>
+              <button
+                type="button"
                 disabled={invalid}
-                onClick={() => this.saveAndRefresh(values)}
+                onClick={() => this.save(values)}
                 className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
               >
-                <span><i className="fa fa-save pr-2" />Save & Refresh</span>
+                <span><i className="fa fa-save pr-2" />Save</span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
