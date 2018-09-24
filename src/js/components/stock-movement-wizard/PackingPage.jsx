@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -7,15 +5,15 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
+import update from 'immutability-helper';
 
 import ArrayField from '../form-elements/ArrayField';
 import TextField from '../form-elements/TextField';
 import { renderFormField } from '../../utils/form-utils';
 import LabelField from '../form-elements/LabelField';
 import SelectField from '../form-elements/SelectField';
-import apiClient from '../../utils/apiClient';
+import apiClient, { flattenRequest } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
-import DateField from '../form-elements/DateField';
 import PackingSplitLineModal from './modals/PackingSplitLineModal';
 import { debouncedUsersFetch } from '../../utils/option-utils';
 
@@ -31,7 +29,7 @@ const FIELDS = {
       productName: {
         type: LabelField,
         label: 'Product Name',
-        flexWidth: '6',
+        flexWidth: '3',
         attributes: {
           className: 'text-left ml-1',
         },
@@ -47,13 +45,9 @@ const FIELDS = {
         flexWidth: '1',
       },
       expirationDate: {
-        type: DateField,
+        type: LabelField,
         label: 'Expires',
         flexWidth: '1',
-        attributes: {
-          dateFormat: 'MM/DD/YYYY',
-          disabled: true,
-        },
       },
       quantityShipped: {
         type: LabelField,
@@ -99,27 +93,17 @@ const FIELDS = {
         fieldKey: '',
         attributes: {
           title: 'Split Line',
-        },
-        getDynamicAttr: ({
-          fieldValue, stockMovementId, onResponse,
-        }) => ({
-          productCode: fieldValue.productCode,
           btnOpenText: 'Split Line',
           btnOpenClassName: 'btn btn-outline-success',
+        },
+        getDynamicAttr: ({ fieldValue, rowIndex, onSave }) => ({
           lineItem: fieldValue,
-          stockMovementId,
-          onResponse,
+          onSave: splitLineItems => onSave(rowIndex, splitLineItems),
         }),
       },
     },
   },
 };
-
-function validate(values) {
-  const errors = {};
-  errors.packPageItems = [];
-  return errors;
-}
 
 /**
  * The fifth step of stock movement(for movements from a depot) where user can see the
@@ -137,6 +121,14 @@ class PackingPage extends Component {
   }
 
   componentDidMount() {
+    this.fetchAllData();
+  }
+
+  /**
+   * Fetches all required data.
+   * @public
+   */
+  fetchAllData() {
     this.fetchLineItems().then((resp) => {
       const { packPageItems } = resp.data.data.packPage;
       this.setState({ values: { ...this.state.values, packPageItems } });
@@ -147,18 +139,28 @@ class PackingPage extends Component {
   }
 
   /**
-   * Saves packing data and refreshes page data
+   * Saves packing data
    * @param {object} formValues
    * @public
    */
-  saveAndRefresh(formValues) {
+  save(formValues) {
     this.props.showSpinner();
-    this.savePackingData(formValues)
-      .then(() => {
+    this.savePackingData(formValues.packPageItems)
+      .then((resp) => {
+        const { packPageItems } = resp.data.data.packPage;
+        this.setState({ values: { ...this.state.values, packPageItems } });
         this.props.hideSpinner();
         Alert.success('Changes saved successfully!');
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  /**
+   * Refetch the data, all not saved changes will be lost.
+   * @public
+   */
+  refresh() {
+    this.fetchAllData();
   }
 
   /**
@@ -191,27 +193,65 @@ class PackingPage extends Component {
    */
   nextPage(formValues) {
     this.props.showSpinner();
-    this.savePackingData(formValues)
-      .then(() => this.props.onSubmit(formValues))
+    this.savePackingData(formValues.packPageItems)
+      .then(() => {
+        this.transitionToNextStep()
+          .then(() => {
+            this.props.hideSpinner();
+            this.props.onSubmit(formValues);
+          })
+          .catch(() => this.props.hideSpinner());
+      })
       .catch(() => this.props.hideSpinner());
   }
 
   /**
    * Saves packing data
-   * @param {object} packPageItems
+   * @param {object} lineItems
    * @public
    */
-  savePackingData(packPageItems) {
-    // TODO: save packing data request
+  savePackingData(lineItems) {
+    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const payload = {
+      id: this.state.values.stockMovementId,
+      stepNumber: '5',
+      lineItems,
+    };
+
+    if (payload.lineItems.length) {
+      return apiClient.post(updateItemsUrl, flattenRequest(payload))
+        .catch(() => Promise.reject(new Error('Could not save requisition items')));
+    }
+
+    return Promise.resolve();
   }
 
-  saveSplittedLines() {}
+  /**
+   * Saves split line items
+   * @param {object} formValues
+   * @param {number} lineItemIndex
+   * @param {object} splitLineItems
+   * @public
+   */
+  saveSplitLines(formValues, lineItemIndex, splitLineItems) {
+    this.props.showSpinner();
+    this.savePackingData(update(formValues.packPageItems, {
+      [lineItemIndex]: {
+        splitLineItems: { $set: splitLineItems },
+      },
+    }))
+      .then((resp) => {
+        const { packPageItems } = resp.data.data.packPage;
+        this.setState({ values: { ...this.state.values, packPageItems } });
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
 
   render() {
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
-        validate={validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
@@ -219,17 +259,24 @@ class PackingPage extends Component {
             <span>
               <button
                 type="button"
+                onClick={() => this.refresh()}
+                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+              >
+                <span><i className="fa fa-refresh pr-2" />Refresh</span>
+              </button>
+              <button
+                type="button"
                 disabled={invalid}
-                onClick={() => this.saveAndRefresh(values)}
+                onClick={() => this.save(values)}
                 className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
               >
-                <span><i className="fa fa-save pr-2" />Save & Refresh</span>
+                <span><i className="fa fa-save pr-2" />Save</span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                stockMovementId: values.stockMovementId,
-                onResponse: this.saveSplittedLines(),
+                onSave: (lineItemIndex, splitLineItems) =>
+                  this.saveSplitLines(values, lineItemIndex, splitLineItems),
               }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>

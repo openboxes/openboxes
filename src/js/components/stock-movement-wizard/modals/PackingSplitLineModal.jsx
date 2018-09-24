@@ -1,43 +1,46 @@
-/* eslint-disable */
-
+import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import _ from 'lodash';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
 import LabelField from '../../form-elements/LabelField';
 import SelectField from '../../form-elements/SelectField';
-import DateField from '../../form-elements/DateField';
 import { showSpinner, hideSpinner } from '../../../actions';
 import { debouncedUsersFetch } from '../../../utils/option-utils';
 
 const FIELDS = {
   splitLineItems: {
-    addButton: 'Add Line',
+    // eslint-disable-next-line react/prop-types
+    addButton: ({ addRow, lineItem }) => (
+      <button
+        type="button"
+        className="btn btn-outline-success margin-bottom-lg"
+        onClick={() => addRow({
+          productName: lineItem.productName,
+          lotNumber: lineItem.lotNumber,
+          expirationDate: lineItem.expirationDate,
+          binLocationName: lineItem.binLocationName,
+        })}
+      >Add line
+      </button>
+    ),
     type: ArrayField,
     disableVirtualization: true,
     fields: {
       productName: {
         type: LabelField,
-        flexWidth: '6',
         label: 'Product Name',
       },
       lotNumber: {
         type: LabelField,
         label: 'Lot #',
-        fieldKey: 'inventoryItem.id',
       },
       expirationDate: {
-        type: DateField,
+        type: LabelField,
         label: 'Expiry Date',
-        fieldKey: 'inventoryItem.id',
-        attributes: {
-          dateFormat: 'YYYY/MM/DD',
-          disabled: true,
-        },
       },
       binLocationName: {
         type: LabelField,
@@ -54,7 +57,6 @@ const FIELDS = {
       recipient: {
         type: SelectField,
         label: 'Recipient',
-        flexWidth: '2.5',
         fieldKey: '',
         attributes: {
           async: true,
@@ -82,15 +84,34 @@ const FIELDS = {
   },
 };
 
-const validate = (values) => {
-  // TODO: validate for total packs quantitiy not exceeding quantity for this item
-  const errors = {};
-  errors.splitLineItems = [];
-  return errors;
-};
-
 /** Modal window where user can split line for Packing Page item */
 class PackingSplitLineModal extends Component {
+  /**
+   * Sums up quantity packed from all available lines.
+   * @param {object} values
+   * @public
+   */
+  static calculatePacked(values) {
+    return (_.reduce(values, (sum, val) =>
+      (sum + (val.quantityShipped ? _.toInteger(val.quantityShipped) : 0)), 0));
+  }
+
+  /**
+   * Display sum of quantity packed from all available lines.
+   * @param {object} values
+   * @public
+   */
+  static displayPackedSum(values) {
+    return (
+      <div>
+        <div className="font-weight-bold pb-2">
+          Quantity Packed: {PackingSplitLineModal.calculatePacked(values.splitLineItems)}
+        </div>
+        <hr />
+      </div>
+    );
+  }
+
   constructor(props) {
     super(props);
 
@@ -105,10 +126,8 @@ class PackingSplitLineModal extends Component {
       formValues: {},
     };
     this.onOpen = this.onOpen.bind(this);
-    this.onSave = this.onSave.bind(this);
+    this.validate = this.validate.bind(this);
   }
-
-  componentDidMount() {}
 
   /**
    * Loads current packing lines for specified item
@@ -117,35 +136,34 @@ class PackingSplitLineModal extends Component {
   onOpen() {
     this.setState({
       formValues: {
-        splitLineItems: [],
+        splitLineItems: [
+          {
+            productName: this.state.attr.lineItem.productName,
+            lotNumber: this.state.attr.lineItem.lotNumber,
+            expirationDate: this.state.attr.lineItem.expirationDate,
+            binLocationName: this.state.attr.lineItem.binLocationName,
+            quantityShipped: this.state.attr.lineItem.quantityShipped,
+            recipient: this.state.attr.lineItem.recipient,
+            palletName: this.state.attr.lineItem.palletName,
+            boxName: this.state.attr.lineItem.boxName,
+          },
+        ],
       },
     });
   }
 
-  /**
-   * Sends all changes made by user in this modal to API and updates data.
-   * @param {object} values
-   * @public
-   */
-  onSave(values) {
-    // TODO: send splitted lines to backend
-  }
+  validate(values) {
+    const shippedQty = _.toInteger(this.state.attr.lineItem.quantityShipped);
+    const splitItemsQty = PackingSplitLineModal.calculatePacked(values.splitLineItems);
+    const errors = { splitLineItems: [] };
 
-  /**
-   * Sums up quantity packed from all available lines.
-   * @param {object} values
-   * @public
-   */
-  /* eslint-disable-next-line class-methods-use-this */
-  calculatePacked(values) {
-    return (
-      <div>
-        <div className="font-weight-bold pb-2">Quantity Packed: {_.reduce(values.splitLineItems, (sum, val) =>
-          (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0)}
-        </div>
-        <hr />
-      </div>
-    );
+    _.forEach(values.splitLineItems, (item, key) => {
+      if (shippedQty !== splitItemsQty) {
+        errors.splitLineItems[key] = { quantityShipped: 'Sum of all quantities must equal the original quantity' };
+      }
+    });
+
+    return errors;
   }
 
   render() {
@@ -153,14 +171,16 @@ class PackingSplitLineModal extends Component {
       <ModalWrapper
         {...this.state.attr}
         onOpen={this.onOpen}
-        onSave={this.onSave}
+        onSave={values =>
+          this.state.attr.onSave(_.filter(values.splitLineItems, item => item.quantityShipped))}
         fields={FIELDS}
         initialValues={this.state.formValues}
-        validate={validate}
-        renderBodyWithValues={this.calculatePacked}
+        formProps={{ lineItem: this.state.attr.lineItem }}
+        validate={this.validate}
+        renderBodyWithValues={PackingSplitLineModal.displayPackedSum}
       >
         <div>
-          {/*<div className="font-weight-bold">Total Quantity: {this.state.attr.fieldValue.totalQuantity} </div>*/}
+          <div className="font-weight-bold">Total Quantity: {this.state.attr.lineItem.quantityShipped} </div>
         </div>
       </ModalWrapper>
     );
@@ -180,6 +200,4 @@ PackingSplitLineModal.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  /** Function updating page on which modal is located called when user saves changes */
-  onResponse: PropTypes.func.isRequired,
 };

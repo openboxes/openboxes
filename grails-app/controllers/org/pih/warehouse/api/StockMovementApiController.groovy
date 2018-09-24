@@ -268,6 +268,7 @@ class StockMovementApiController {
                 stockMovementItem.splitLineItems = createLineItemsFromJson(stockMovement, splitLineItems)
             }
 
+            stockMovementItems.add(stockMovementItem)
         }
         return stockMovementItems
     }

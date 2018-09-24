@@ -529,10 +529,11 @@ class PackPageItem {
     Map toJson() {
         return [
                 shipmentItemId    : shipmentItem?.id,
+                "product.id"      : shipmentItem?.product?.id,
                 productName       : shipmentItem?.product?.name,
                 productCode       : shipmentItem?.product?.productCode,
                 lotNumber         : shipmentItem?.lotNumber,
-                expirationDate    : shipmentItem?.expirationDate,
+                expirationDate    : shipmentItem?.expirationDate?.format("MM/dd/yyyy"),
                 binLocationName   : shipmentItem?.binLocation?.name,
                 uom               : shipmentItem?.product?.unitOfMeasure,
                 quantityShipped   : shipmentItem?.quantity,
