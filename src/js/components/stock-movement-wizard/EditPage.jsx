@@ -368,6 +368,7 @@ class EditItemsPage extends Component {
           })),
         })),
       },
+      redoAutopick: true,
     }));
   }
 
