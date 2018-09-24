@@ -75,6 +75,9 @@
                                 </g:each>
                             </g:if>
                             <g:else>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.newsSummary.enabled}">
+                                    <g:render template="newsSummary"/>
+                                </g:if>
                                 <g:if test="${grailsApplication.config.openboxes.dashboard.activitySummary.enabled}">
                                     <g:render template="activitySummary"/>
                                 </g:if>

@@ -586,8 +586,5 @@
             </div>
         </li>
     </g:isUserAdmin>
-
-
-
 </ul>
 <!--MegaMenu Ends-->

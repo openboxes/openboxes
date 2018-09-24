@@ -462,16 +462,19 @@ openboxes.dashboard.shipmentSummary.enabled=true
 openboxes.dashboard.indicatorSummary.enabled=false
 openboxes.dashboard.valueSummary.enabled=false
 openboxes.dashboard.productSummary.enabled=true
-openboxes.dashboard.genericProductSummary.enabled=true
+openboxes.dashboard.genericProductSummary.enabled=false
 openboxes.dashboard.binLocationSummary.enabled=true
 openboxes.dashboard.expiringSummary.enabled=true
 openboxes.dashboard.activitySummary.enabled=true
 openboxes.dashboard.tagSummary.enabled=true
+openboxes.dashboard.newsSummary.enabled=true
 
 // Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
 openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummary","receiptSummary","shipmentSummary","indicatorSummary"]
 openboxes.dashboard.column2.widgets=["binLocationSummary","valueSummary","productSummary","genericProductSummary","expiringSummary"]
 openboxes.dashboard.column3.widgets=["activitySummary","tagSummary"]
+
+openboxes.dashboard.newsSummary.newsItems = []
 
 // OpenBoxes identifier config
 openboxes.identifier.numeric = Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS
