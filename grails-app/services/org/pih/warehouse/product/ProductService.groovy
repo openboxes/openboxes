@@ -11,23 +11,14 @@ package org.pih.warehouse.product
 
 import grails.validation.ValidationException
 import groovy.xml.Namespace
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.TransactionCode
-import org.pih.warehouse.inventory.TransactionEntry
 import util.ReportUtil
 
 import java.text.SimpleDateFormat
-
-import org.grails.plugins.csv.CSVWriter
-
 /**
  * @author jmiranda
  *
@@ -373,7 +364,7 @@ class ProductService {
                 }
 
                 or {
-                    if (params.name) ilike("name", params.name + "%")
+                    if (params.name) ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
                     if (params.description) ilike("description", params.description + "%")
                     if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
                     if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
