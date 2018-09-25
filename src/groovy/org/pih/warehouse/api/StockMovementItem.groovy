@@ -27,7 +27,11 @@ class StockMovementItem {
     BigDecimal quantityRevised
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
+    BigDecimal quantityShipped
 
+    String shipmentItemId
+
+    List<StockMovementItem> splitLineItems = []
     List<StockMovementItem> substitutionItems = []
 
     // Actions
@@ -515,4 +519,27 @@ class PickPageItem {
         return new PickPageItem(requisitionItem: requisitionItem)
     }
 
+}
+
+class PackPageItem {
+    ShipmentItem shipmentItem
+    String palletName
+    String boxName
+
+    Map toJson() {
+        return [
+                shipmentItemId    : shipmentItem?.id,
+                "product.id"      : shipmentItem?.product?.id,
+                productName       : shipmentItem?.product?.name,
+                productCode       : shipmentItem?.product?.productCode,
+                lotNumber         : shipmentItem?.lotNumber,
+                expirationDate    : shipmentItem?.expirationDate?.format("MM/dd/yyyy"),
+                binLocationName   : shipmentItem?.binLocation?.name,
+                uom               : shipmentItem?.product?.unitOfMeasure,
+                quantityShipped   : shipmentItem?.quantity,
+                recipient         : shipmentItem?.recipient,
+                palletName        : palletName,
+                boxName           : boxName,
+        ]
+    }
 }

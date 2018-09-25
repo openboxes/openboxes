@@ -13,6 +13,8 @@ import grails.util.Environment
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
+import org.pih.warehouse.api.PackPage
+import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -341,6 +343,14 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(PickPageItem) { PickPageItem pickPageItem ->
             return pickPageItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PackPage) { PackPage packPage ->
+            return packPage.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PackPageItem) { PackPageItem packPageItem ->
+            return packPageItem.toJson()
         }
 
         JSON.registerObjectMarshaller(StockAdjustment) { StockAdjustment stockAdjustment ->

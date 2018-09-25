@@ -7,6 +7,7 @@ import CreateStockMovement from './CreateStockMovement';
 import AddItemsPage from './AddItemsPage';
 import EditPage from './EditPage';
 import PickPage from './PickPage';
+import PackingPage from './PackingPage';
 import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
 import apiClient from '../../utils/apiClient';
@@ -37,7 +38,7 @@ class StockMovements extends Component {
    * @public
    */
   static getStepList() {
-    return ['Create', 'Add items', 'Edit', 'Pick', 'Send'];
+    return ['Create', 'Add items', 'Edit', 'Pick', 'Pack', 'Send'];
   }
 
   /**
@@ -62,6 +63,11 @@ class StockMovements extends Component {
         onSubmit={this.nextPage}
       />,
       <PickPage
+        initialValues={this.state.values}
+        previousPage={this.previousPage}
+        onSubmit={this.nextPage}
+      />,
+      <PackingPage
         initialValues={this.state.values}
         previousPage={this.previousPage}
         onSubmit={this.nextPage}
@@ -144,12 +150,16 @@ class StockMovements extends Component {
               page = 4;
               prevPage = 3;
               break;
-            default:
+            case 'PICKED':
               page = 5;
+              prevPage = 4;
+              break;
+            default:
+              page = 6;
               if (values.origin.type === 'SUPPLIER') {
                 prevPage = 2;
               } else {
-                prevPage = 4;
+                prevPage = 5;
               }
           }
           this.setState({ values, page, prevPage });
