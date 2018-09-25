@@ -473,7 +473,7 @@ class AddItemsPage extends Component {
             values = { ...formValues, lineItems: resp.data.data.lineItems };
           }
           if (this.state.statusCode === 'CREATED' || this.state.statusCode === 'EDITING') {
-            this.transitionToNextStep('PICKED')
+            this.transitionToNextStep('CHECKING')
               .then(() => {
                 this.props.goToPage(6, values);
               })
@@ -619,7 +619,7 @@ class AddItemsPage extends Component {
 
   /**
    * Transition to next stock movement status:
-   * - 'PICKED' if origin type is supplier.
+   * - 'CHECKING' if origin type is supplier.
    * - 'VERIFYING' if origin type is other than supplier.
    * @param {string} status
    * @public

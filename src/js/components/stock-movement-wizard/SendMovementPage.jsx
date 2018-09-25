@@ -106,12 +106,8 @@ class SendMovementPage extends Component {
 
         let tableItems;
         let supplier;
-        if (!_.isEmpty(stockMovementData) && stockMovementData.pickPage.pickPageItems.length &&
-          !_.some(stockMovementData.pickPage.pickPageItems, item => _.isEmpty(item.picklistItems))
-        ) {
-          tableItems = _.reduce(stockMovementData.pickPage.pickPageItems, (result, item) =>
-            _.concat(result, _.map(item.picklistItems, picklistItem =>
-              ({ ...picklistItem, recipient: item.recipient }))), []);
+        if (!_.isEmpty(stockMovementData) && stockMovementData.packPage.packPageItems.length) {
+          tableItems = stockMovementData.packPage.packPageItems;
           supplier = false;
         } else {
           tableItems = stockMovementData.lineItems;
@@ -387,18 +383,18 @@ class SendMovementPage extends Component {
                             <td>{item.boxName}</td>
                             <td>{item.productCode || item.product.productCode}</td>
                             <td className="text-left">
-                              <span className="ml-4">{item['product.name'] || item.product.name}</span>
+                              <span className="ml-4">{item.productName || item.product.name}</span>
                             </td>
                             <td>{item.lotNumber}</td>
                             <td>
                               {item.expirationDate}
                             </td>
                             <td style={{ width: '150px' }}>
-                              {(item.quantityPicked ? item.quantityPicked.toLocaleString('en-US') : item.quantityPicked) ||
+                              {(item.quantityShipped ? item.quantityShipped.toLocaleString('en-US') : item.quantityShipped) ||
                               (item.quantityRequested ? item.quantityRequested.toLocaleString('en-US') : item.quantityRequested)}
                             </td>
                             {!(this.state.supplier) &&
-                              <td>{item['binLocation.name']}</td>
+                              <td>{item.binLocationName}</td>
                             }
                             <td>
                               {item.recipient ? item.recipient.name : null}

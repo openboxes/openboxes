@@ -150,7 +150,7 @@ class StockMovements extends Component {
               page = 4;
               prevPage = 3;
               break;
-            case 'CHECKING':
+            case 'PICKED':
               page = 5;
               prevPage = 4;
               break;

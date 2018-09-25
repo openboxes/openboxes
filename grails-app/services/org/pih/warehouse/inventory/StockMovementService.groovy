@@ -219,7 +219,7 @@ class StockMovementService {
             stockMovement.packPage = getPackPage(id)
         }
         else if (stepNumber.equals("6")) {
-            stockMovement.pickPage = getPickPage(id)
+            stockMovement.packPage = getPackPage(id)
         }
 
         return stockMovement
@@ -786,7 +786,7 @@ class StockMovementService {
                 }
             }
         }
-        else if (RequisitionStatus.CHECKING == stockMovement?.requisition?.status) {
+        else if (RequisitionStatus.PICKED == stockMovement?.requisition?.status) {
             stockMovement?.lineItems?.collect { StockMovementItem packPageItem ->
                 updateShipmentItemAndProcessSplitLines(packPageItem)
             }
@@ -862,6 +862,12 @@ class StockMovementService {
         ShipmentItem shipmentItem = ShipmentItem.get(stockMovementItem?.shipmentItemId)
 
         if (stockMovementItem?.splitLineItems && shipmentItem) {
+            StockMovementItem item = stockMovementItem.splitLineItems.pop();
+            shipmentItem.quantity = item?.quantityShipped
+            shipmentItem.recipient = item?.recipient
+            shipmentItem.container = createOrUpdateContainer(shipmentItem.shipment, item?.palletName, item?.boxName)
+            shipmentItem.save(flush: true)
+
             for (StockMovementItem splitLineItem : stockMovementItem.splitLineItems) {
                 ShipmentItem splitItem = new ShipmentItem()
                 splitItem.requisitionItem = shipmentItem.requisitionItem
@@ -870,6 +876,7 @@ class StockMovementService {
                 splitItem.lotNumber = shipmentItem.lotNumber
                 splitItem.expirationDate = shipmentItem.expirationDate
                 splitItem.binLocation = shipmentItem.binLocation
+                splitItem.inventoryItem = shipmentItem.inventoryItem
 
                 splitItem.quantity = splitLineItem?.quantityShipped
                 splitItem.recipient = splitLineItem?.recipient
@@ -878,9 +885,6 @@ class StockMovementService {
                 splitItem.shipment.addToShipmentItems(splitItem)
                 splitItem.save(flush: true)
             }
-
-//            shipmentItem.shipment.removeFromShipmentItems(shipmentItem)
-//            shipmentItem.delete(flush: true)
         }
         else if (shipmentItem) {
             shipmentItem.quantity = stockMovementItem?.quantityShipped

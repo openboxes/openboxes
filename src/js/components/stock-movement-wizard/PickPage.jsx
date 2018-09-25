@@ -261,7 +261,7 @@ class PickPage extends Component {
    */
   transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'CHECKING' };
+    const payload = { status: 'PICKED' };
 
     return apiClient.post(url, payload);
   }

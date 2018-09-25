@@ -18,9 +18,6 @@ import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionStatus
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-
 class StockMovementApiController {
 
     StockMovementService stockMovementService
@@ -141,10 +138,10 @@ class StockMovementApiController {
                         if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
                         if (createPicklist) stockMovementService.createPicklist(stockMovement)
                         break;
-                    case RequisitionStatus.CHECKING:
+                    case RequisitionStatus.PICKED:
                         stockMovementService.createOrUpdateShipment(stockMovement, true)
                         break;
-                    case RequisitionStatus.PICKED:
+                    case RequisitionStatus.CHECKING:
                         stockMovementService.createOrUpdateShipment(stockMovement, false)
                         break;
                     case RequisitionStatus.ISSUED:
