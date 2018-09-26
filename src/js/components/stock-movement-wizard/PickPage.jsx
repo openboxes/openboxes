@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
 
 import ArrayField from '../form-elements/ArrayField';
 import LabelField from '../form-elements/LabelField';
@@ -192,7 +193,19 @@ class PickPage extends Component {
    * @public
    */
   refresh() {
-    this.fetchAllData();
+    confirmAlert({
+      title: 'Confirm refresh',
+      message: 'Are you sure you want to refresh? Your progress since last save will be lost.',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => this.fetchAllData(),
+        },
+        {
+          label: 'No',
+        },
+      ],
+    });
   }
 
   /**
@@ -366,7 +379,7 @@ class PickPage extends Component {
                 onClick={() => this.refresh()}
                 className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
               >
-                <span><i className="fa fa-save pr-2" />Refresh</span>
+                <span><i className="fa fa-refresh pr-2" />Refresh</span>
               </button>
             </span>
             <form onSubmit={handleSubmit} className="print-mt">
