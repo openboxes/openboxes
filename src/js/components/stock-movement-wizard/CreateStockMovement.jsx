@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
+import { confirmAlert } from 'react-confirm-alert';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -155,55 +156,45 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  /**
-   * Creates new requisition with given data using post method.
-   * @param {object} origin
-   * @param {object} destination
-   * @param {object} requestedBy
-   * @param {string} dateRequested
-   * @param {string} description
-   * @param {string} stockList
-   * @public
-   */
-  createNewRequisition(origin, destination, requestedBy, dateRequested, description, stockList) {
-    if (origin && destination && requestedBy && dateRequested && description) {
-      this.props.showSpinner();
-      const requisitionUrl = '/openboxes/api/stockMovements';
+  checkStockMovementChange(newValues) {
+    const checkOrigin = newValues.origin && this.props.initialValues.origin ?
+      newValues.origin.id !== this.props.initialValues.origin.id : false;
+    const checkDest = newValues.destination && this.props.initialValues.destination ?
+      newValues.destination.id !== this.props.initialValues.destination.id : false;
+    const checkStockList = newValues.stockMovementId ?
+      newValues.stockList !== this.props.initialValues.stockList : false;
 
-      const payload = {
-        name: '',
-        description,
-        dateRequested,
-        'origin.id': origin,
-        'destination.id': destination,
-        'requestedBy.id': requestedBy,
-        'stocklist.id': stockList || '',
-      };
-
-      return apiClient.post(requisitionUrl, payload);
-    }
-
-    return new Promise(((resolve, reject) => {
-      reject(new Error('Missing required parameters'));
-    }));
+    return (checkOrigin || checkDest || checkStockList);
   }
 
   /**
-   * Calls method creating new requisition if it is not an existing one
-   * and moves user to the next page.
+   * Creates or updates stock movement with given data
    * @param {object} values
    * @public
    */
-  nextPage(values) {
-    if (!values.stockMovementId) {
-      this.createNewRequisition(
-        values.origin.id,
-        values.destination.id,
-        values.requestedBy.id,
-        values.dateRequested,
-        values.description,
-        values.stockList,
-      )
+  saveStockMovement(values) {
+    if (values.origin && values.destination && values.requestedBy &&
+      values.dateRequested && values.description) {
+      this.props.showSpinner();
+
+      let stockMovementUrl = '';
+      if (values.stockMovementId) {
+        stockMovementUrl = `/openboxes/api/stockMovements/${values.stockMovementId}`;
+      } else {
+        stockMovementUrl = '/openboxes/api/stockMovements';
+      }
+
+      const payload = {
+        name: '',
+        description: values.description,
+        dateRequested: values.dateRequested,
+        'origin.id': values.origin.id,
+        'destination.id': values.destination.id,
+        'requestedBy.id': values.requestedBy.id,
+        'stocklist.id': values.stockList || '',
+      };
+
+      apiClient.post(stockMovementUrl, payload)
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
@@ -221,8 +212,46 @@ class CreateStockMovement extends Component {
           this.props.hideSpinner();
           return Promise.reject(new Error('Could not create stock movement'));
         });
+    }
+
+    return new Promise(((resolve, reject) => {
+      reject(new Error('Missing required parameters'));
+    }));
+  }
+
+  resetToInitialValues() {
+    this.setState({
+      values: {},
+    }, () => this.setState({
+      values: this.props.initialValues,
+    }));
+  }
+
+  /**
+   * Calls method creating or saving stock movement and moves user to the next page.
+   * @param {object} values
+   * @public
+   */
+  nextPage(values) {
+    const showModal = this.checkStockMovementChange(values);
+    if (!showModal) {
+      this.saveStockMovement(values);
     } else {
-      this.props.onSubmit(values);
+      confirmAlert({
+        title: 'Confirm change',
+        message: 'Do you want to change stock movement data? ' +
+          'Changing origin, destination or stock list can cause loss of your current work.',
+        buttons: [
+          {
+            label: 'No',
+            onClick: () => this.resetToInitialValues(),
+          },
+          {
+            label: 'Yes',
+            onClick: () => this.saveStockMovement(values),
+          },
+        ],
+      });
     }
   }
 
@@ -259,7 +288,15 @@ export default withRouter(connect(null, {
 
 CreateStockMovement.propTypes = {
   /** Initial component's data */
-  initialValues: PropTypes.shape({}).isRequired,
+  initialValues: PropTypes.shape({
+    origin: PropTypes.shape({
+      id: PropTypes.string,
+    }),
+    destination: PropTypes.shape({
+      id: PropTypes.string,
+    }),
+    stockList: PropTypes.shape({}),
+  }).isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
