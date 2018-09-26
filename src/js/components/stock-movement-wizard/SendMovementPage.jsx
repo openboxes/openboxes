@@ -106,7 +106,8 @@ class SendMovementPage extends Component {
 
         let tableItems;
         let supplier;
-        if (!_.isEmpty(stockMovementData) && stockMovementData.packPage.packPageItems.length) {
+        if (!_.isEmpty(stockMovementData) && stockMovementData.packPage
+          && stockMovementData.packPage.packPageItems.length) {
           tableItems = stockMovementData.packPage.packPageItems;
           supplier = false;
         } else {
