@@ -214,6 +214,10 @@ class StockMovementApiController {
         stockMovement.lineItems.addAll(stockMovementItems)
     }
 
+    Boolean isNull(String stringValue) {
+        return stringValue == JSONObject.NULL || stringValue == null || stringValue?.equals("")
+    }
+
     List<StockMovementItem> createLineItemsFromJson(StockMovement stockMovement, List lineItems) {
         List<StockMovementItem> stockMovementItems = new ArrayList<StockMovementItem>()
         lineItems.each { lineItem ->
@@ -233,7 +237,7 @@ class StockMovementApiController {
             // FIXME Lookup inventory item by product, lot number, expiration date
             stockMovementItem.inventoryItem = lineItem["inventoryItem.id"] ? InventoryItem.load(lineItem["inventoryItem.id"]) : null
             stockMovementItem.lotNumber = lineItem["lotNumber"]
-            stockMovementItem.expirationDate = !(lineItem["expirationDate"] == JSONObject.NULL || lineItem["expirationDate"] == null) ?
+            stockMovementItem.expirationDate = (!isNull(lineItem["expirationDate"])) ?
                     Constants.EXPIRATION_DATE_FORMATTER.parse(lineItem["expirationDate"]) : null
 
             // Sort order (optional)
