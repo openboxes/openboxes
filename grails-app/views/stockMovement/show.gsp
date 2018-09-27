@@ -26,7 +26,7 @@
 
     </div>
 
-    <div class="button-bar">
+    <div class="button-bar ">
 
         <%--
             <g:if test="${stockMovement.id}">
@@ -49,28 +49,31 @@
             </g:if>
         --%>
 
+        <div class="button-group">
+            <g:link controller="stockMovement" action="list" class="button icon arrowleft">
+                <warehouse:message code="default.list.label" args="[g.message(code: 'stockMovements.label')]"/>
+            </g:link>
+        </div>
+        <div class="button-group">
+            <g:link controller="stockMovement" action="index" class="button icon add">
+                <warehouse:message code="default.create.label" args="[g.message(code: 'stockMovement.label')]"/>
+            </g:link>
+        </div>
 
-    <div class="button-group">
-        <g:link controller="stockMovement" action="list" class="button">
-            <warehouse:message code="default.list.label" args="[g.message(code: 'stockMovements.label')]"/>
-        </g:link>
+        <div class="button-group">
+            <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button icon edit">
+                <warehouse:message code="default.edit.label" args="[g.message(code: 'stockMovement.label')]"/>
+            </g:link>
+        </div>
+
+        <g:if test="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}">
+            <div class="button-group">
+                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button icon approve">
+                    <warehouse:message code="default.receive.label" args="[g.message(code: 'stockMovement.label')]"/>
+                </g:link>
+            </div>
+        </g:if>
     </div>
-    <div class="button-group">
-        <g:link controller="stockMovement" action="index" class="button">
-            <warehouse:message code="default.create.label" args="[g.message(code: 'stockMovement.label')]"/>
-        </g:link>
-    </div>
-    <div class="button-group">
-        <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button">
-            <warehouse:message code="default.edit.label" args="[g.message(code: 'stockMovement.label')]"/>
-        </g:link>
-    </div>
-    <div class="button-group">
-        <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-            <warehouse:message code="default.receive.label" args="[g.message(code: 'stockMovement.label')]"/>
-        </g:link>
-    </div>
-</div>
 
 
 <div class="yui-gf">
@@ -343,17 +346,12 @@
                             </g:each>
                         </table>
                     </div>
-
                 </div>
-
-
             </div>
-
-
         </div>
     </div>
-
 </div>
+
 <script type="text/javascript">
     $(document).ready(function() {
         $(".tabs").tabs({
