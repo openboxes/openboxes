@@ -255,7 +255,7 @@ class AvailableItem {
                 "product.name"    : inventoryItem?.product?.name,
                 "productCode"     : inventoryItem?.product?.productCode,
                 lotNumber         : inventoryItem?.lotNumber,
-                expirationDate    : inventoryItem?.expirationDate,
+                expirationDate    : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
                 "binLocation.id"  : binLocation?.id,
                 "binLocation.name": binLocation?.name,
                 quantityAvailable : quantityAvailable,

@@ -35,7 +35,7 @@ class Putaway {
                 id: id,
                 putawayNumber: putawayNumber,
                 putawayStatus: putawayStatus?.name(),
-                putawayDate: putawayDate,
+                putawayDate: putawayDate?.format("MM/dd/yyyy"),
                 putawayAssignee: putawayAssignee,
                 putawayItems: putawayItems.collect { it?.toJson() }
         ]
