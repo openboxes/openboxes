@@ -75,6 +75,9 @@ class Constants {
 	static final String OTHER_CONTAINER_TYPE_ID = "7"
 	static final String CRATE_CONTAINER_TYPE_ID = "8"
 
+	// direct reference to stock movement shipment type
+	static final String DEFAULT_SHIPMENT_TYPE_ID = "5"
+
 	// Characters that should be included with each of the random number types 	
 	static final String RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS = "ABCDEFGHJKMNPQRSTUVXYZ"
 	static final String RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS = "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"

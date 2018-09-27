@@ -736,7 +736,9 @@ class StockMovementService {
 
         // These values need defaults since they are not set until step 6
         shipment.expectedShippingDate = stockMovement.dateShipped?:new Date()
-        shipment.shipmentType = stockMovement.shipmentType?:ShipmentType.get(5)
+
+        // Set default shipment type so we can save to the database without user input
+        shipment.shipmentType = stockMovement.shipmentType?:ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         // Last step will be to update the generated name
         shipment.name = stockMovement.generateName()
