@@ -5,6 +5,7 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
+import { confirmAlert } from 'react-confirm-alert';
 
 import ArrayField from '../form-elements/ArrayField';
 import TextField from '../form-elements/TextField';
@@ -311,8 +312,25 @@ class EditItemsPage extends Component {
    * @public
    */
   refresh() {
-    this.setState({ revisedItems: [], values: { ...this.state.values, editPageItems: [] } });
-    this.fetchAllData(true);
+    confirmAlert({
+      title: 'Confirm refresh',
+      message: 'Are you sure you want to refresh? Your progress since last save will be lost.',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => {
+            this.setState({
+              revisedItems: [],
+              values: { ...this.state.values, editPageItems: [] },
+            });
+            this.fetchAllData(true);
+          },
+        },
+        {
+          label: 'No',
+        },
+      ],
+    });
   }
 
   /**
