@@ -73,6 +73,17 @@
                 </g:link>
             </div>
         </g:if>
+
+        <g:isSuperuser>
+            <div class="button-group">
+                <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button icon remove"
+                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                    <warehouse:message code="default.delete.label" args="[g.message(code: 'stockMovement.label')]"/>
+                </g:link>
+            </div>
+        </g:isSuperuser>
+
+
     </div>
 
 
