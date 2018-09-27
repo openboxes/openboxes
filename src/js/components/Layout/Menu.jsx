@@ -1,15 +1,21 @@
-import React from 'react';
 import _ from 'lodash';
+import React from 'react';
+import { connect } from 'react-redux';
 import { Scrollbars } from 'react-custom-scrollbars';
 import { Translate } from 'react-localize-redux';
+import PropTypes from 'prop-types';
+
 import en from '../../en';
 
 const { navbar } = en;
 
-const Menu = () => (
-  <div className="collapse navbar-collapse w-100 menu-container" id="navbarSupportedContent">
-    <ul className="navbar-nav mr-auto flex-wrap">
-      { _.map(navbar, (section, key) => {
+const Menu = ({ hasBinLocationSupport }) => {
+  const isDisabled = subKey => subKey === 'createPutAway' && !hasBinLocationSupport;
+
+  return (
+    <div className="collapse navbar-collapse w-100 menu-container" id="navbarSupportedContent">
+      <ul className="navbar-nav mr-auto flex-wrap">
+        { _.map(navbar, (section, key) => {
         if (!section.subsections) {
           return (
             <li className="nav-item" key={key}>
@@ -35,9 +41,9 @@ const Menu = () => (
                 {
                 _.map(section.subsections, (subsection, subKey) => (
                   <a
-                    className="dropdown-item"
+                    className={`dropdown-item ${isDisabled(subKey) ? 'disabled' : ''}`}
                     key={subKey}
-                    href={subsection.link}
+                    href={isDisabled(subKey) ? '#' : subsection.link}
                   >
                     <Translate id={`navbar.${key}.subsections.${subKey}.label`} />
                   </a>
@@ -49,8 +55,18 @@ const Menu = () => (
         );
         })
       }
-    </ul>
-  </div>
-);
+      </ul>
+    </div>
+  );
+};
 
-export default Menu;
+const mapStateToProps = state => ({
+  hasBinLocationSupport: state.location.currentLocation.hasBinLocationSupport,
+});
+
+export default connect(mapStateToProps)(Menu);
+
+Menu.propTypes = {
+  /** Is true when currently selected location supports bins */
+  hasBinLocationSupport: PropTypes.bool.isRequired,
+};

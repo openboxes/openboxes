@@ -3,6 +3,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import ReduxPromise from 'redux-promise';
+import reduxThunk from 'redux-thunk';
 import { initialize, addTranslationForLanguage } from 'react-localize-redux';
 
 import 'bootstrap/dist/js/bootstrap';
@@ -15,7 +16,7 @@ import rootReducer from './reducers';
 import en from './en';
 import fr from './fr';
 
-const createStoreWithMiddleware = applyMiddleware(ReduxPromise)(createStore);
+const createStoreWithMiddleware = applyMiddleware(ReduxPromise, reduxThunk)(createStore);
 const store = createStoreWithMiddleware(rootReducer);
 
 const languages = [

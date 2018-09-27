@@ -162,14 +162,15 @@ const FIELDS = {
           params.subfield ?
             <SelectField {...params} /> :
             <Select
-              disabled={params.fieldPreview}
+              disabled={!params.hasBinLocationSupport}
               options={params.bins}
               onChange={value => params.setLocation(params.rowIndex, value)}
               objectValue
             />),
         label: 'Bin Location',
-        getDynamicAttr: ({ bins }) => ({
+        getDynamicAttr: ({ bins, hasBinLocationSupport }) => ({
           options: bins,
+          disabled: !hasBinLocationSupport,
         }),
         attributes: {
           objectValue: true,
@@ -367,6 +368,7 @@ class PartialReceivingPage extends Component {
             saveEditLine: this.saveEditLine,
             bins: this.props.bins,
             users: this.props.users,
+            hasBinLocationSupport: this.props.hasBinLocationSupport,
           }))}
       </div>
     );
@@ -376,6 +378,7 @@ class PartialReceivingPage extends Component {
 const mapStateToProps = state => ({
   usersFetched: state.users.fetched,
   users: state.users.data,
+  hasBinLocationSupport: state.location.currentLocation.hasBinLocationSupport,
 });
 
 export default connect(mapStateToProps, {
@@ -397,6 +400,8 @@ PartialReceivingPage.propTypes = {
   usersFetched: PropTypes.bool.isRequired,
   /** Array of available users  */
   users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  /** Is true when currently selected location supports bins */
+  hasBinLocationSupport: PropTypes.bool.isRequired,
   /** All data in the form */
   formValues: PropTypes.shape({
     containers: PropTypes.arrayOf(PropTypes.shape({})),
