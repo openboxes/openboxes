@@ -735,7 +735,7 @@ class StockMovementService {
         shipment.shipmentNumber = stockMovement.identifier
 
         // These values need defaults since they are not set until step 6
-        shipment.expectedShippingDate = stockMovement.dateShipped?:new Date()+1
+        shipment.expectedShippingDate = stockMovement.dateShipped?:new Date()
         shipment.shipmentType = stockMovement.shipmentType?:ShipmentType.get(5)
 
         // Last step will be to update the generated name
