@@ -481,7 +481,7 @@ class StockMovementService {
         PackPage packPage = new PackPage()
 
         StockMovement stockMovement = getStockMovement(id)
-        stockMovement.requisition?.picklist?.picklistItems?.collect { PicklistItem picklistItem ->
+        stockMovement.requisition?.picklist?.picklistItems?.each { PicklistItem picklistItem ->
             List packPageItems = getPackPageItems(picklistItem)
             packPage.packPageItems.addAll(packPageItems)
         }
