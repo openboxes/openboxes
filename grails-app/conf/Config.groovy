@@ -462,7 +462,7 @@ openboxes.dashboard.shipmentSummary.enabled=true
 openboxes.dashboard.indicatorSummary.enabled=false
 openboxes.dashboard.valueSummary.enabled=false
 openboxes.dashboard.productSummary.enabled=true
-openboxes.dashboard.genericProductSummary.enabled=true
+openboxes.dashboard.genericProductSummary.enabled=false
 openboxes.dashboard.binLocationSummary.enabled=true
 openboxes.dashboard.expiringSummary.enabled=true
 openboxes.dashboard.activitySummary.enabled=true
@@ -599,6 +599,32 @@ openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es' , 'pt']
 openboxes.locale.defaultCurrencyCode = "USD"
 openboxes.locale.defaultCurrencySymbol = "\$"
 //openboxes.locale.supportedCurrencyCodes = ["USD","CFA"]
+
+// Global megamenu configuration
+openboxes.megamenu.dashboard.enabled = true
+openboxes.megamenu.analytics.enabled = true
+openboxes.megamenu.inventory.enabled = true
+openboxes.megamenu.orders.enabled = true
+openboxes.megamenu.requisitions.enabled = true
+openboxes.megamenu.shipping.enabled = true
+openboxes.megamenu.stockMovement.enabled = true
+openboxes.megamenu.receiving.enabled = true
+openboxes.megamenu.reporting.enabled = true
+openboxes.megamenu.products.enabled = true
+openboxes.megamenu.configuration.enabled = true
+openboxes.megamenu.customLinks.enabled = false
+
+// Custom links example
+//openboxes {
+//	megamenu {
+//		customLinks {
+//			content = [
+//					[label: "Search Google", href: "https://www.google.com", target: "_blank"]
+//			]
+//		}
+//	}
+//}
+
 
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true

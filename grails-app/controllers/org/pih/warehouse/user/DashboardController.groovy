@@ -38,7 +38,9 @@ class DashboardController {
 	def inventoryService
 	def productService
     def requisitionService
+	def userService
 	def sessionFactory
+	def grailsApplication
 	
 	def showCacheStatistics = {
 		def statistics = sessionFactory.statistics
@@ -372,18 +374,18 @@ class DashboardController {
 		categories = category.categories
 		categories = categories.groupBy { it?.parentCategory }
 
-        //println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
-
 		[
-			categories: categories,
-			inboundShipmentsTotal: inboundShipmentsTotal?:0,
-			inboundShipmentsCount: inboundShipmentsCount,
-			outboundShipmentsTotal: outboundShipmentsTotal?:0,
-			outboundShipmentsCount: outboundShipmentsCount,
-			incomingOrders: incomingOrders,
-            requisitionStatistics: requisitionStatistics,
-			quickCategories:productService.getQuickCategories(),
-			tags:productService.getAllTags()
+				categories            : categories,
+				isSuperuser			  : userService.isSuperuser(session?.user),
+				megamenuConfig        : grailsApplication.config.openboxes.megamenu,
+				inboundShipmentsTotal : inboundShipmentsTotal ?: 0,
+				inboundShipmentsCount : inboundShipmentsCount,
+				outboundShipmentsTotal: outboundShipmentsTotal ?: 0,
+				outboundShipmentsCount: outboundShipmentsCount,
+				incomingOrders        : incomingOrders,
+				requisitionStatistics : requisitionStatistics,
+				quickCategories       : productService.getQuickCategories(),
+				tags                  : productService.getAllTags()
 		]
 
 		
