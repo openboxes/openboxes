@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1538107129483-1">
+        <sql>
+            UPDATE `order` SET order_type_code = 'PURCHASE_ORDER' WHERE order_type_code IS NULL;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
+
+

@@ -44,10 +44,8 @@
                     <td>
                         <label><warehouse:message code="order.origin.label"/></label>
                         <div>
-                            <g:select id="origin" name="origin" class="chzn-select-deselect"
-                                      from="${suppliers}"
-                                      optionKey="id" optionValue="name" value="${origin}"
-                                      noSelection="['': warehouse.message(code: 'default.all.label')]"/>
+                            <g:selectLocation id="origin" name="origin" class="chzn-select-deselect"
+                                      optionKey="id" optionValue="name" value="${params.origin}" noSelection="['':'']" />
                         </div>
                     </td>
                 </tr>
@@ -56,10 +54,9 @@
                     <td>
                         <label><warehouse:message code="order.destination.label"/></label>
                         <div>
-                            <g:select id="destination" name="destination" class="chzn-select-deselect"
-                                      from="${[session.warehouse]}"
+                            <g:selectLocation id="destination" name="destination" class="chzn-select-deselect"
                                       optionKey="id" optionValue="name"
-                                      value="${session.warehouse.id}"/>
+                                      value="${params.destination?:session?.warehouse?.id}" noSelection="['':'']" />
                         </div>
                     </td>
                 </tr>

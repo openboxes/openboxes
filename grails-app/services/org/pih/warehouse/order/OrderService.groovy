@@ -31,7 +31,7 @@ class OrderService {
 	def inventoryService
 
 
-	List<Order> getOrders(String name, String orderNumber, Location destination, Location origin, User orderedBy, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
+	List<Order> getOrders(String name, String orderNumber, Location destination, Location origin, User orderedBy, OrderTypeCode orderTypeCode, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
 		def orders = Order.withCriteria {
 			and {
 				if (name) {
@@ -42,6 +42,9 @@ class OrderService {
 				}
 				if (orderNumber) {
 					ilike("orderNumber", "%" + orderNumber + "%")
+				}
+				if (orderTypeCode) {
+					eq("orderTypeCode", orderTypeCode)
 				}
 				if (destination) eq("destination", destination)
 				if (origin) { eq("origin", origin) }
