@@ -107,7 +107,7 @@
                             <g:message code="stockMovement.status.label"/>
                         </td>
                         <td class="value">
-                            <format:metadata obj="${stockMovement?.requisition?.status}"/>
+                            <format:metadata obj="${stockMovement?.status}"/>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -277,45 +277,38 @@
 
                                 <tr>
                                     <th></th>
-                                    <th></th>
                                     <th><g:message code="default.status.label"/></th>
                                     <th><g:message code="product.label"/></th>
                                     <th><g:message code="product.uom.label"/></th>
                                     <th width="1%"><g:message code="stockMovement.quantityRequested.label"/></th>
-                                    <th width="1%"><g:message code="stockMovement.quantityPicked.label"/></th>
-                                    <th width="1%"><g:message code="stockMovement.quantityRemaining.label"/></th>
                                 </tr>
 
                                 <g:each var="stockMovementItem" in="${stockMovement.lineItems}" status="i">
                                 <g:set var="requisitionItem" value="${stockMovementItem?.requisitionItem}"/>
                                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                                    <td class="">
+                                    <td class="center">
                                         ${i+1}
                                     </td>
                                     <td class="">
-                                        <g:if test="${requisitionItem?.isSubstituted()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"
-                                        </g:if>
-                                        <g:elseif test="${requisitionItem?.isSubstitution()}">
-                                            <img src="${resource(dir:'images/icons',file:'indent.gif')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${requisitionItem?.isChanged()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${requisitionItem?.isPending()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${requisitionItem?.isCanceled()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${requisitionItem?.isApproved()||requisitionItem?.isCompleted()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"/>
-                                        </g:elseif>
-                                    </td>
-
-                                    </td>
-                                    <td>
                                         <div class="tag tag-success">
+                                            <g:if test="${requisitionItem?.isSubstituted()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"/>
+                                            </g:if>
+                                            <g:elseif test="${requisitionItem?.isSubstitution()}">
+                                                <img src="${resource(dir:'images/icons',file:'indent.gif')}"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem?.isChanged()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem?.isCanceled()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem?.isApproved()||requisitionItem?.isCompleted()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem?.isPending()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}"/>
+                                            </g:elseif>
                                             <format:metadata obj="${requisitionItem?.status}"/>
                                         </div>
                                     </td>
@@ -325,14 +318,8 @@
                                     <td>
                                         ${stockMovementItem.product?.unitOfMeasure?:g.message(code:'default.each.label')}
                                     </td>
-                                    <td>
-                                        ${stockMovementItem.quantityRequested?:0}
-                                    </td>
-                                    <td>
-                                        ${stockMovementItem.quantityRevised?:0}
-                                    </td>
-                                    <td>
-                                        ${stockMovementItem.quantityPicked?:0}
+                                    <td class="center">
+                                        ${stockMovementItem?.quantityRequested?:0}
                                     </td>
 
                                 </tr>
