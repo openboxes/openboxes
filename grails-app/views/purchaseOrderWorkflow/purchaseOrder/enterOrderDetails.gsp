@@ -28,6 +28,8 @@
 			</g:hasErrors>
 		</g:each>
 		<g:form action="purchaseOrder" method="post">
+
+            <g:hiddenField name="orderTypeCode" value="PURCHASE_ORDER"/>
 			<div class="dialog">
                 <g:render template="/order/summary" model="[orderInstance:order,currentState:'editOrder']"/>
                 <div class="box">
