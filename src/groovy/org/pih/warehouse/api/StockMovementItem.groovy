@@ -542,4 +542,19 @@ class PackPageItem {
                 boxName           : boxName,
         ]
     }
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        PackPageItem that = (PackPageItem) o
+
+        if (shipmentItem?.id != that.shipmentItem?.id) return false
+
+        return true
+    }
+
+    int hashCode() {
+        return (shipmentItem?.id != null ? shipmentItem?.id?.hashCode() : 0)
+    }
 }

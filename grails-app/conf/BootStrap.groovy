@@ -118,7 +118,7 @@ class BootStrap {
                         productCode: inventoryItem?.product?.productCode
                 ],
                 lotNumber: inventoryItem.lotNumber,
-                expirationDate: inventoryItem.expirationDate
+                expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy")
         ]}
 
         JSON.registerObjectMarshaller(Location) { Location location -> [
@@ -147,7 +147,7 @@ class BootStrap {
                 name: picklist.name,
                 description: picklist.description,
                 picker: picklist.picker,
-                datePicked: picklist.datePicked,
+                datePicked: picklist.datePicked?.format("MM/dd/yyyy"),
                 picklistItems: picklist.picklistItems,
                 "requisition.id": picklist?.requisition?.id
         ]}
@@ -161,7 +161,7 @@ class BootStrap {
                 "product.name": picklistItem?.inventoryItem?.product?.name,
                 "productCode": picklistItem?.inventoryItem?.product?.productCode,
                 lotNumber: picklistItem?.inventoryItem?.lotNumber,
-                expirationDate: picklistItem?.inventoryItem?.expirationDate,
+                expirationDate: picklistItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
                 "binLocation.id": picklistItem?.binLocation?.id,
                 "binLocation.name": picklistItem?.binLocation?.name,
                 quantityPicked: picklistItem.quantity,
@@ -219,13 +219,13 @@ class BootStrap {
                 type: requisition?.type?.name(),
                 status: requisition?.status?.name(),
                 commodityClass: requisition?.commodityClass?.name(),
-                dateRequested: requisition.dateRequested,
-                dateReviewed: requisition.dateReviewed,
-                dateVerified: requisition.dateVerified,
-                dateChecked: requisition.dateChecked,
-                dateDelivered: requisition.dateDelivered,
-                dateIssued: requisition.dateIssued,
-                dateReceived: requisition.dateReceived,
+                dateRequested: requisition.dateRequested?.format("MM/dd/yyyy"),
+                dateReviewed: requisition.dateReviewed?.format("MM/dd/yyyy"),
+                dateVerified: requisition.dateVerified?.format("MM/dd/yyyy"),
+                dateChecked: requisition.dateChecked?.format("MM/dd/yyyy"),
+                dateDelivered: requisition.dateDelivered?.format("MM/dd/yyyy"),
+                dateIssued: requisition.dateIssued?.format("MM/dd/yyyy"),
+                dateReceived: requisition.dateReceived?.format("MM/dd/yyyy"),
                 origin: requisition.origin,
                 destination: requisition.destination,
                 requestedBy: requisition.requestedBy,
@@ -280,10 +280,10 @@ class BootStrap {
                             type: shipment?.destination?.locationType?.locationTypeCode?.name()
 
                     ],
-                    expectedShippingDate: shipment.expectedShippingDate,
-                    actualShippingDate: shipment.actualShippingDate,
-                    expectedDeliveryDate: shipment.expectedDeliveryDate,
-                    actualDeliveryDate: shipment.actualDeliveryDate,
+                    expectedShippingDate: shipment.expectedShippingDate?.format("MM/dd/yyyy"),
+                    actualShippingDate: shipment.actualShippingDate?.format("MM/dd/yyyy"),
+                    expectedDeliveryDate: shipment.expectedDeliveryDate?.format("MM/dd/yyyy"),
+                    actualDeliveryDate: shipment.actualDeliveryDate?.format("MM/dd/yyyy"),
                     shipmentItems: shipment.shipmentItems,
                     containers: containerList
         ]}
