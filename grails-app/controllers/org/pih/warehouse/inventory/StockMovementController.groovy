@@ -54,8 +54,19 @@ class StockMovementController {
     def list = {
         User currentUser = User.get(session?.user?.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
-        params.origin = params.origin?:currentLocation
-        params.destination = params.destination?:currentLocation
+
+        if (params.direction=="OUTBOUND") {
+            params.origin = params.origin?:currentLocation
+            params.destination = params.destination?:null
+        }
+        else if (params.direction=="INBOUND") {
+            params.origin = params.origin?:null
+            params.destination = params.destination?:currentLocation
+        }
+        else {
+            params.origin = params.origin?:currentLocation
+            params.destination = params.destination?:currentLocation
+        }
 
         Requisition requisition = new Requisition(params)
         requisition.discard()
