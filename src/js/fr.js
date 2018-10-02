@@ -22,6 +22,10 @@ const fr = {
       label: 'Reception',
       link: '#',
       subsections: {
+        receiveStockMovement: {
+          label: 'Receive Stock Movement',
+          link: '/openboxes/stockMovement/list?status=ISSUED&direction=INBOUND',
+        },
         listPutAways: {
           label: 'List Put Aways',
           link: '/openboxes/putAway/list',
