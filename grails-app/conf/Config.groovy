@@ -625,7 +625,7 @@ openboxes.megamenu.customLinks.enabled = false
 //	}
 //}
 
-openboxes.generateName.separator = "-"
+openboxes.generateName.separator = " - "
 
 
 // Disable feature during development
