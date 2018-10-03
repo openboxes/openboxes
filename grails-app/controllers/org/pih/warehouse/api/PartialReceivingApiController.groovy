@@ -11,14 +11,8 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.receiving.Receipt
-import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
-
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 class PartialReceivingApiController {
 
@@ -51,8 +45,8 @@ class PartialReceivingApiController {
             receiptService.saveInboundTransaction(partialReceipt)
             partialReceipt = receiptService.getPartialReceipt(params.id)
         }
-        else if (partialReceipt.receiptStatus == PartialReceiptStatus.CHECKING) {
-            // do nothing for now
+        else if (partialReceipt.receiptStatus == PartialReceiptStatus.PENDING || partialReceipt.receiptStatus == PartialReceiptStatus.CHECKING) {
+            receiptService.savePartialReceipt(partialReceipt)
         }
         else if (partialReceipt.receiptStatus == PartialReceiptStatus.ROLLBACK) {
             receiptService.rollbackPartialReceipts(partialReceipt.shipment)
@@ -85,13 +79,17 @@ class PartialReceivingApiController {
             containerMap.shipmentItems.each { shipmentItemMap ->
 
                 // Find item if it exists
-                String shipmentItemId = shipmentItemMap.get("shipmentItem.id")
+                String shipmentItemId = shipmentItemMap.get("shipmentItemId")
+                String receiptItemId = shipmentItemMap.get("receiptItemId")
+                boolean newLine = Boolean.valueOf(shipmentItemMap.newLine ?: "false")
                 PartialReceiptItem partialReceiptItem = partialReceiptContainer.partialReceiptItems.find {
-                    it?.shipmentItem?.id == shipmentItemId
+                    receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId
                 }
                 // Create new item if not exists
-                if (!partialReceiptItem) {
+                if (!partialReceiptItem || newLine) {
                     partialReceiptItem = new PartialReceiptItem()
+                    partialReceiptItem.shipmentItem = ShipmentItem.get(shipmentItemId)
+                    partialReceiptItem.product = shipmentItemMap.get("product.id") ? Product.load(shipmentItemMap.get("product.id")) : null
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
                 bindData(partialReceiptItem, shipmentItemMap)

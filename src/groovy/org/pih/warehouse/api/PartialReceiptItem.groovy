@@ -2,6 +2,8 @@ package org.pih.warehouse.api
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.shipping.ShipmentItem
@@ -16,10 +18,10 @@ class PartialReceiptItem {
     Person recipient
     Boolean cancelRemaining = Boolean.FALSE
 
-
-    Integer getQuantityShipped() {
-        return shipmentItem?.quantity?:0
-    }
+    String lotNumber
+    Date expirationDate
+    Integer quantityShipped
+    Product product
 
     Integer getQuantityReceived() {
         def receiptItems = getReceiptItemsByStatus([ReceiptStatusCode.RECEIVED] as ReceiptStatusCode[])
@@ -44,21 +46,28 @@ class PartialReceiptItem {
         return receiptItems.findAll { ReceiptItem receiptItem -> receiptItem?.receipt?.receiptStatusCode in receiptStatusCodes }
     }
 
+    InventoryItem getInventoryItem() {
+        receiptItem ? receiptItem.inventoryItem : shipmentItem?.inventoryItem
+    }
+
+    Product getProduct() {
+        return product ?: inventoryItem?.product
+    }
+
     Map toJson() {
         return [
 
-                "receiptItem.id": receiptItem?.id,
-                "shipmentItem.id": shipmentItem?.id,
+                "receiptItemId": receiptItem?.id,
+                "shipmentItemId": shipmentItem?.id,
                 "container.id": shipmentItem?.container?.id,
                 "container.name": shipmentItem?.container?.name,
                 "parentContainer.id": shipmentItem?.container?.parentContainer?.id,
                 "parentContainer.name": shipmentItem?.container?.parentContainer?.name,
-                "product.id": shipmentItem?.inventoryItem?.product?.id,
-                "product.productCode": shipmentItem?.inventoryItem?.product?.productCode,
-                "product.name": shipmentItem?.inventoryItem?.product?.name,
-                "inventoryItem.id": shipmentItem?.inventoryItem?.id,
-                "inventoryItem.lotNumber": shipmentItem?.inventoryItem?.lotNumber,
-                "inventoryItem.expirationDate": shipmentItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                "product.id": inventoryItem?.product?.id,
+                "product.productCode": inventoryItem?.product?.productCode,
+                "product.name": inventoryItem?.product?.name,
+                "lotNumber": lotNumber,
+                "expirationDate": expirationDate?.format("MM/dd/yyyy"),
                 "binLocation.id": binLocation?.id,
                 "binLocation.name": binLocation?.name,
                 "recipient.id": recipient?.id,
