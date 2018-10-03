@@ -469,8 +469,21 @@ class RequisitionService {
 	}
 
 	void deleteRequisition(Requisition requisition) {
-		requisition.delete(flush: true)
+        requisition?.requisitionItems?.toArray().each { RequisitionItem requisitionItem ->
+            deleteRequisitionItem(requisitionItem)
+        }
+
+        if (requisition?.picklist) {
+            requisition.picklist.delete()
+        }
+		requisition.delete()
 	}
+
+    void deleteRequisitionItem(RequisitionItem requisitionItem) {
+        requisitionItem.undoChanges()
+        requisitionItem.delete()
+    }
+
 
     void clearRequisition(Requisition requisition) {
         //def ids = requisition.requisitionItems.collect { it }

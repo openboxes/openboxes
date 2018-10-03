@@ -192,7 +192,7 @@
                     <g:each in="${stockMovements}" status="i" var="stockMovement">
                         <g:set var="requisition" value="${stockMovement.requisition}"/>
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                            <td>
+                            <td class="middle center">
                                 <g:render template="/stockMovement/actions" model="[stockMovement:stockMovement]"/>
                             </td>
                             <td>

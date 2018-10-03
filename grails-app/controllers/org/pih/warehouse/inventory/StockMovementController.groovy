@@ -89,21 +89,27 @@ class StockMovementController {
     }
 
     def delete = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        Requisition requisition = stockMovement?.requisition
-        if (requisition) {
-            List shipments = stockMovement?.requisition?.shipments
-            shipments.toArray().each { Shipment shipment ->
-                if (!shipment?.events?.empty) {
-                    shipmentService.rollbackLastEvent(shipment)
+
+        try {
+            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+            Requisition requisition = stockMovement?.requisition
+            if (requisition) {
+                List shipments = stockMovement?.requisition?.shipments
+                shipments.toArray().each { Shipment shipment ->
+                    if (!shipment?.events?.empty) {
+                        shipmentService.rollbackLastEvent(shipment)
+                    }
+                    shipmentService.deleteShipment(shipment)
                 }
-                shipmentService.deleteShipment(shipment)
+                //requisitionService.rollbackRequisition(requisition)
+                requisitionService.deleteRequisition(requisition)
             }
-            requisitionService.rollbackRequisition(requisition)
-            requisitionService.deleteRequisition(requisition)
+            flash.message = "Successfully deleted stock movement with ID ${params.id}"
+        } catch (Exception e) {
+            log.warn ("Unable to delete stock movement withID ${params.id}: " + e.message)
+            flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
         }
-        flash.message = "Successfully deleted stock movement with ID ${params.id}"
-        
+
         redirect(action: "list")
     }
 
