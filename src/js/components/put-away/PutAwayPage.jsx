@@ -143,7 +143,7 @@ class PutAwayPage extends Component {
    */
   fetchPutAwayCandidates() {
     this.props.showSpinner();
-    const url = '/openboxes/api/putaways';
+    const url = `/openboxes/api/putaways?location.id=${this.props.locationId}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -176,7 +176,7 @@ class PutAwayPage extends Component {
    */
   savePutAways() {
     this.props.showSpinner();
-    const url = '/openboxes/api/putaways';
+    const url = `/openboxes/api/putaways?location.id=${this.props.locationId}`;
     const payload = {
       putawayNumber: '',
       'putawayAssignee.id': '',
@@ -464,5 +464,7 @@ PutAwayPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function taking user to the next page */
   nextPage: PropTypes.func.isRequired,
+  /** Location ID (currently chosen). To be used in putaways requests. */
+  locationId: PropTypes.string.isRequired,
 };
 

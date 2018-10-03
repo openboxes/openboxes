@@ -19,32 +19,6 @@ import { renderFormField } from '../../utils/form-utils';
 import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
 import apiClient from '../../utils/apiClient';
 
-const debouncedProductsFetch = _.debounce((searchTerm, callback) => {
-  if (searchTerm) {
-    apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}`)
-      .then(result => callback(
-        null,
-        {
-          complete: true,
-          options: _.map(result.data.data, obj => (
-            {
-              value: {
-                id: obj.id,
-                name: obj.name,
-                productCode: obj.productCode,
-                label: `${obj.productCode} - ${obj.name}`,
-              },
-              label: `${obj.productCode} - ${obj.name}`,
-            }
-          )),
-        },
-      ))
-      .catch(error => callback(error, { options: [] }));
-  } else {
-    callback(null, { options: [] });
-  }
-}, 500);
-
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'Delete',
@@ -75,14 +49,14 @@ const NO_STOCKLIST_FIELDS = {
           openOnClick: false,
           autoload: false,
           autoFocus: true,
-          loadOptions: debouncedProductsFetch,
           filterOptions: options => options,
           cache: false,
           options: [],
           showValueTooltip: true,
         },
-        getDynamicAttr: ({ fieldValue }) => ({
+        getDynamicAttr: ({ fieldValue, productsFetch }) => ({
           disabled: !!fieldValue,
+          loadOptions: _.debounce(productsFetch, 500),
         }),
       },
       quantityRequested: {
@@ -143,14 +117,14 @@ const STOCKLIST_FIELDS = {
             openOnClick: false,
             autoload: false,
             autoFocus: true,
-            loadOptions: debouncedProductsFetch,
             filterOptions: options => options,
             cache: false,
             options: [],
             showValueTooltip: true,
           },
-          getDynamicAttr: ({ selectedValue }) => ({
+          getDynamicAttr: ({ selectedValue, productsFetch }) => ({
             disabled: !!selectedValue,
+            loadOptions: _.debounce(productsFetch, 500),
           }),
         },
       },
@@ -207,12 +181,14 @@ const VENDOR_FIELDS = {
           async: true,
           openOnClick: false,
           autoload: false,
-          loadOptions: debouncedProductsFetch,
           filterOptions: options => options,
           cache: false,
           options: [],
           showValueTooltip: true,
         },
+        getDynamicAttr: ({ productsFetch }) => ({
+          loadOptions: _.debounce(productsFetch, 500),
+        }),
       },
       lotNumber: {
         type: TextField,
@@ -285,6 +261,7 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
     this.removeItem = this.removeItem.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
+    this.productsFetch = this.productsFetch.bind(this);
   }
 
   componentDidMount() {
@@ -384,6 +361,32 @@ class AddItemsPage extends Component {
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
       })),
     );
+  }
+
+  productsFetch(searchTerm, callback) {
+    if (searchTerm) {
+      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${this.state.values.origin.id}`)
+        .then(result => callback(
+          null,
+          {
+            complete: true,
+            options: _.map(result.data.data, obj => (
+              {
+                value: {
+                  id: obj.id,
+                  name: obj.name,
+                  productCode: obj.productCode,
+                  label: `${obj.productCode} - ${obj.name}`,
+                },
+                label: `${obj.productCode} - ${obj.name}`,
+              }
+            )),
+          },
+        ))
+        .catch(error => callback(error, { options: [] }));
+    } else {
+      callback(null, { options: [] });
+    }
   }
 
   /**
@@ -754,6 +757,7 @@ class AddItemsPage extends Component {
                   stockList: values.stockList,
                   recipients: this.props.recipients,
                   removeItem: this.removeItem,
+                  productsFetch: this.productsFetch,
                 }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => previousPage(values)}>
