@@ -45,9 +45,9 @@ class ReceiptService {
             partialReceiptContainer.container = container
             partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
 
-            shipmentItems.collect { ShipmentItem shipmentItem ->
+            shipmentItems.each { ShipmentItem shipmentItem ->
                 if (shipmentItem.receiptItems) {
-                    shipmentItem.receiptItems.collect { ReceiptItem receiptItem ->
+                    shipmentItem.receiptItems.each { ReceiptItem receiptItem ->
                         partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(receiptItem))
                     }
                 } else {
@@ -158,13 +158,19 @@ class ReceiptService {
         // Save shipment
         shipment.receipt = receipt
         shipment.save(flush:true)
+    }
+
+    void saveAndCompletePartialReceipt(PartialReceipt partialReceipt) {
+        savePartialReceipt(partialReceipt)
+
+        Shipment shipment = partialReceipt.shipment
 
         if (shipment.isFullyReceived()) {
             if (!shipment.wasReceived()) {
                 shipmentService.createShipmentEvent(shipment,
                         shipment.receipt.actualDeliveryDate,
                         EventCode.RECEIVED,
-                        shipment.destination);
+                        shipment.destination)
             }
         }
         else {
@@ -174,7 +180,7 @@ class ReceiptService {
                 shipmentService.createShipmentEvent(shipment,
                         shipment.receipt.actualDeliveryDate,
                         EventCode.PARTIALLY_RECEIVED,
-                        shipment.destination);
+                        shipment.destination)
             }
         }
     }
