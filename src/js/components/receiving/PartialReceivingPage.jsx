@@ -127,11 +127,11 @@ const FIELDS = {
           showValueTooltip: true,
         },
       },
-      'inventoryItem.lotNumber': {
+      lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Lot/Serial No',
       },
-      'inventoryItem.expirationDate': {
+      expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Expiration Date',
         fixedWidth: '130px',
