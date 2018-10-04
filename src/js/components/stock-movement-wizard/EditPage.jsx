@@ -184,7 +184,6 @@ class EditItemsPage extends Component {
     super(props);
 
     this.state = {
-      statusCode: '',
       redoAutopick: false,
       revisedItems: [],
       values: { ...this.props.initialValues, editPageItems: [] },
@@ -211,7 +210,7 @@ class EditItemsPage extends Component {
 
     this.props.showSpinner();
     this.fetchLineItems().then((resp) => {
-      const { statusCode, editPage } = resp.data.data;
+      const { editPage } = resp.data.data;
       const editPageItems = _.map(
         editPage.editPageItems,
         val => ({
@@ -231,7 +230,6 @@ class EditItemsPage extends Component {
       );
 
       this.setState({
-        statusCode,
         revisedItems: _.filter(editPageItems, item => item.statusCode === 'CHANGED'),
         values: { ...this.state.values, editPageItems },
       });
@@ -366,7 +364,7 @@ class EditItemsPage extends Component {
     this.props.showSpinner();
     this.reviseRequisitionItems(formValues)
       .then(() => {
-        if (this.state.statusCode === 'VERIFYING' || this.state.redoAutopick) {
+        if (this.state.redoAutopick) {
           this.transitionToNextStep()
             .then(() => this.props.onSubmit(formValues))
             .catch(() => this.props.hideSpinner());
