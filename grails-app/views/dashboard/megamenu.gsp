@@ -262,7 +262,7 @@
                     <div class="buttonsBar" style="min-width: 200px;">
                         <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
                             <div class="megaButton">
-                                <g:link controller="stockMovement" action="list" params="[status: 'ISSUED',direction:'INBOUND']">
+                                <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
                                     <warehouse:message code="default.receive.label" args="[g.message(code:'stockMovements.label')]"/>
                                 </g:link>
                             </div>
