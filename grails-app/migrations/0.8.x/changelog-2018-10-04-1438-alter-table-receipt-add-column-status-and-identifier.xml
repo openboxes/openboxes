@@ -20,6 +20,15 @@
             <column name="receipt_status_code" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1538681211885-3">
+        <sql>
+            UPDATE receipt
+            SET receipt_status_code = 'RECEIVED'
+            WHERE receipt_status_code IS NULL;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
 
 

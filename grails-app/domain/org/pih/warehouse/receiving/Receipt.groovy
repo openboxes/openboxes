@@ -16,7 +16,7 @@ class Receipt implements Serializable, Comparable<Receipt> {
 
 	String id
     String receiptNumber
-    ReceiptStatusCode receiptStatusCode
+    ReceiptStatusCode receiptStatusCode = ReceiptStatusCode.PENDING
 	Date expectedDeliveryDate
 	Date actualDeliveryDate				 
 	Person recipient					
@@ -33,7 +33,7 @@ class Receipt implements Serializable, Comparable<Receipt> {
 
 	// Constraints
 	static constraints = {
-        shipment(nullable:false)
+        shipment(nullable:true)
         recipient(nullable:true)
         receiptNumber(nullable:true, blank: false)
         receiptStatusCode(nullable:true)
