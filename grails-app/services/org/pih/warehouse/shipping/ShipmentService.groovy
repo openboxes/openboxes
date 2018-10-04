@@ -1315,7 +1315,7 @@ class ShipmentService {
 		}
 		shipmentIds.each { shipmentId ->
             Shipment shipment = Shipment.get(shipmentId)
-            shipment.receipt = createReceipt(shipment, shipment.actualShippingDate+1)
+            createReceipt(shipment, shipment.actualShippingDate+1)
 			receiveShipment(shipmentId, comment, userId, locationId, creditStockOnReceipt)
 		}
 	}
@@ -1518,12 +1518,11 @@ class ShipmentService {
 	 */
 	Receipt createReceipt(Shipment shipmentInstance, Date dateDelivered) {
 		Receipt receiptInstance = new Receipt()
-		shipmentInstance.receipt = receiptInstance
-		receiptInstance.shipment = shipmentInstance		
+		receiptInstance.shipment = shipmentInstance
 		receiptInstance.recipient = shipmentInstance?.recipient
 		receiptInstance.expectedDeliveryDate = shipmentInstance?.expectedDeliveryDate;
 		receiptInstance.actualDeliveryDate = dateDelivered;
-		shipmentInstance.shipmentItems.each { shipmentItem ->
+		shipmentInstance.shipmentItems.each { ShipmentItem shipmentItem ->
 			ReceiptItem receiptItem = new ReceiptItem();
 			receiptItem.quantityShipped = shipmentItem.quantity
 			receiptItem.quantityReceived = shipmentItem.quantity
@@ -1585,7 +1584,6 @@ class ShipmentService {
 		shipmentInstance.save(flush:true);
 
 		return creditTransaction;
-
 	}
 
     /**
