@@ -241,16 +241,16 @@
                     </a>
                 </li>
                 <li>
+                    <a href="${request.contextPath}/stockMovement/receipts/${stockMovement?.id}">
+                        <warehouse:message code="receipts.label" default="Receipts"/>
+                    </a>
+                </li>
+                <li>
                     <a href="#documents-tab">
                         <warehouse:message code="documents.label" default="Documents"/>
                     </a>
                 </li>
                 <%--
-                <li>
-                    <a href="${request.contextPath}/stockMovement/receipts/${stockMovement?.id}">
-                        <warehouse:message code="receipts.label" default="Receipts"/>
-                    </a>
-                </li>
                 <li>
                     <a href="#comments-tab">
                         <warehouse:message code="comments.label" default="Comments"/>
@@ -315,11 +315,9 @@
                                     <td>
                                         ${stockMovementItem?.product?.productCode} ${stockMovementItem?.product?.name}
                                     </td>
-                                    <td>
-                                        ${stockMovementItem.product?.unitOfMeasure?:g.message(code:'default.each.label')}
-                                    </td>
                                     <td class="center">
                                         ${stockMovementItem?.quantityRequested?:0}
+                                        ${stockMovementItem.product?.unitOfMeasure?:g.message(code:'default.each.label')}
                                     </td>
 
                                 </tr>
