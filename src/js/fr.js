@@ -24,7 +24,7 @@ const fr = {
       subsections: {
         receiveStockMovement: {
           label: 'Receive Stock Movement',
-          link: '/openboxes/stockMovement/list?status=ISSUED&direction=INBOUND',
+          link: '/openboxes/stockMovement/list?direction=INBOUND',
         },
         listPutAways: {
           label: 'List Put Aways',
