@@ -123,8 +123,8 @@ class StockMovementController {
     def receipts = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        def receipts = shipments*.receipts?.flatten()
-        render(template: "receipts", model: [receipts:receipts])
+        def receiptItems = shipments*.receipts*.receiptItems?.flatten()
+        render(template: "receipts", model: [receiptItems:receiptItems])
     }
 
 

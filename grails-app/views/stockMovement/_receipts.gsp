@@ -5,50 +5,56 @@
     </h2>
     <table>
         <tr>
+            <th><g:message code="shipping.shipmentNumber.label"/></th>
+            <th><g:message code="receipt.receiptNumber.label"/></th>
+            <th><g:message code="receipt.receiptStatusCode.label"/></th>
             <th><g:message code="product.productCode.label"/></th>
             <th><g:message code="product.label"/></th>
-            <th><g:message code="location.binLocation.label"/></th>
             <th><g:message code="inventoryItem.lotNumber.label"/></th>
             <th><g:message code="inventoryItem.expirationDate.label"/></th>
-            <th><g:message code="receiptItem.quantityShipped.label" default="Shipped"/></th>
+            <th><g:message code="location.binLocation.label"/></th>
             <th><g:message code="receiptItem.quantityReceived.label" default="Received"/></th>
             <th><g:message code="receiptItem.quantityCanceled.label" default="Canceled"/></th>
         </tr>
-        <g:each var="receipt" in="${receipts}">
-            <tr>
-                <th colspan="8">Receipt ${receipt?.id}</th>
+        <g:each var="receiptItem" in="${receiptItems}" status="status">
+            <tr class="prop ${status%2?'even':'odd'}">
+                <td>
+                    ${receiptItem?.receipt?.shipment?.shipmentNumber}
+                </td>
+                <td>
+                    ${receiptItem?.receipt.receiptNumber?:receiptItem?.receipt?.id}
+                </td>
+                <td>
+                    <format:metadata obj="${receiptItem?.receipt.receiptStatusCode}"/>
+                </td>
+                <td>
+                    ${receiptItem?.product.productCode}
+                </td>
+                <td>
+                    <format:product product="${receiptItem?.product}"/>
+                </td>
+                <td>
+                    ${receiptItem?.inventoryItem?.lotNumber?:"Default"}
+                </td>
+                <td>
+                    <g:expirationDate date="${receiptItem?.inventoryItem?.expirationDate}"/>
+                </td>
+                <td>
+                    ${receiptItem?.binLocation?.name}
+                </td>
+                <td>
+                    ${receiptItem?.quantityReceived?:0}
+                </td>
+                <td>
+                    ${receiptItem?.quantityCanceled?:0}
+                </td>
             </tr>
-            <g:each var="receiptItem" in="${receipt?.receiptItems}" status="status">
-                <tr class="prop ${status%2?'even':'odd'}">
-                    <td>
-                        ${receiptItem?.product.productCode}
-                    </td>
-                    <td>
-                        <format:product product="${receiptItem?.product}"/>
-                    </td>
-                    <td>
-                        ${receiptItem?.binLocation?.name}
-                    </td>
-                    <td>
-                        ${receiptItem?.inventoryItem?.lotNumber}
-                    </td>
-                    <td>
-                        <g:expirationDate date="${receiptItem?.inventoryItem?.expirationDate}"/>
-                    </td>
-                    <td>
-                        ${receiptItem?.quantityShipped?:0}
-                    </td>
-                    <td>
-                        ${receiptItem?.quantityReceived?:0}
-                    </td>
-                    <td>
-                        ${receiptItem?.quantityCanceled?:0}
-                    </td>
-                </tr>
-            </g:each>
         </g:each>
+
     </table>
-    <g:unless test="${receipts || shipmentInstance?.wasReceived()}">
+
+
+    <g:unless test="${receiptItems}">
         <div class="empty fade center">
             <g:message code="shipment.noReceipt.message" default="Shipment has not been received yet"/>
         </div>
