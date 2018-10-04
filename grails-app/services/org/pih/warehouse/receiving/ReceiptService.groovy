@@ -27,6 +27,7 @@ class ReceiptService {
     def shipmentService
     def inventoryService
     def locationService
+    def identifierService
 
     PartialReceipt getPartialReceipt(String id) {
         Shipment shipment = Shipment.get(id)
@@ -67,15 +68,14 @@ class ReceiptService {
         log.info "Saving partial receipt " + partialReceipt
 
         Shipment shipment = partialReceipt?.shipment
-        Receipt receipt = shipment?.receipt
 
-        if (!receipt)
-            receipt = new Receipt()
-
-        // Update receipt header
+        // Create new receipt
+        Receipt receipt = new Receipt()
+        receipt.receiptNumber = identifierService.generateReceiptIdentifier()
+        receipt.receiptStatusCode = ReceiptStatusCode.PENDING
         receipt.recipient = partialReceipt.recipient
         receipt.shipment = partialReceipt.shipment
-        receipt.expectedDeliveryDate = partialReceipt.dateDelivered
+        receipt.expectedDeliveryDate = partialReceipt?.shipment?.expectedDeliveryDate
         receipt.actualDeliveryDate = partialReceipt.dateDelivered
         receipt.save(flush:true)
 
@@ -116,13 +116,13 @@ class ReceiptService {
         }
 
         // Save shipment
-        shipment.receipt = receipt
+        shipment.addToReceipts(receipt)
         shipment.save(flush:true)
 
         if (shipment.isFullyReceived()) {
             if (!shipment.wasReceived()) {
                 shipmentService.createShipmentEvent(shipment,
-                        shipment.receipt.actualDeliveryDate,
+                        receipt.actualDeliveryDate,
                         EventCode.RECEIVED,
                         shipment.destination);
             }
@@ -132,7 +132,7 @@ class ReceiptService {
             // Create received shipment event
             if (!shipment.wasPartiallyReceived()) {
                 shipmentService.createShipmentEvent(shipment,
-                        shipment.receipt.actualDeliveryDate,
+                        receipt.actualDeliveryDate,
                         EventCode.PARTIALLY_RECEIVED,
                         shipment.destination);
             }
@@ -164,9 +164,12 @@ class ReceiptService {
 
         rollbackInboundTransactions(shipment)
 
-        if (shipment.receipt) {
-            shipment.receipt?.delete()
-            shipment.receipt = null
+        if (shipment.receipts) {
+            shipment.receipts.toArray().each { Receipt receipt ->
+                shipment.removeFromReceipts(receipt)
+                receipt.delete()
+            }
+
         }
     }
 
