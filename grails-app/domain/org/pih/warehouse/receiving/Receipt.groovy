@@ -15,7 +15,9 @@ import org.pih.warehouse.shipping.Shipment
 class Receipt implements Serializable, Comparable<Receipt> {
 
 	String id
-	Date expectedDeliveryDate			 
+    String receiptNumber
+    ReceiptStatusCode receiptStatusCode
+	Date expectedDeliveryDate
 	Date actualDeliveryDate				 
 	Person recipient					
 	Date dateCreated;
@@ -33,6 +35,8 @@ class Receipt implements Serializable, Comparable<Receipt> {
 	static constraints = {
         shipment(nullable:false)
         recipient(nullable:true)
+        receiptNumber(nullable:true, blank: false)
+        receiptStatusCode(nullable:true)
 		expectedDeliveryDate(nullable:true)
 		actualDeliveryDate(nullable:false, 
 			// can't be delivered in the future

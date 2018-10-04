@@ -149,7 +149,7 @@ class Shipment implements Comparable, Serializable {
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
 		description(nullable:true, blank: true)
-		shipmentNumber(nullable:true, maxSize: 255)
+		shipmentNumber(nullable:true, blank: false, maxSize: 255)
 		origin(nullable:false, 
 			validator: { value, obj -> !value.equals(obj.destination)})
 		destination(nullable:false)		
