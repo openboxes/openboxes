@@ -15,6 +15,7 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment;
 
@@ -111,7 +112,14 @@ class IdentifierService {
 		return generateIdentifier(grailsApplication.config.openboxes.identifier.shipment.format)
 	}
 
-	/**
+    /**
+     * @return
+     */
+    def generateReceiptIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.receipt.format)
+    }
+
+    /**
 	 * @return
 	 */
 	def generateTransactionIdentifier() {
@@ -179,6 +187,22 @@ class IdentifierService {
             }
         }
     }
+
+    void assignReceiptIdentifiers() {
+        def receipts = Receipt.findAll("from Receipt as s where receiptNumber is null or receiptNumber = ''")
+        receipts.each { Receipt receipt ->
+            println "Assigning identifier to receipt " + receipt.id
+            try {
+                receipt.receiptNumber = generateReceiptIdentifier()
+                if (!receipt.merge(flush: true, validate: false)) {
+                    println receipt.errors
+                }
+            } catch (Exception e) {
+                println("Unable to assign identifier to receipt with ID " + receipt?.id + ": " + e.message)
+            }
+        }
+    }
+
 
     void assignRequisitionIdentifiers() {
         def requisitions = Requisition.findAll("from Requisition as r where (requestNumber is null or requestNumber = '') and (isTemplate is null or isTemplate = false)")
