@@ -78,6 +78,9 @@ class Constants {
 	// direct reference to stock movement shipment type
 	static final String DEFAULT_SHIPMENT_TYPE_ID = "5"
 
+	// Default character separator for generated names
+	static final String DEFAULT_NAME_SEPARATOR = "-"
+
 	// Characters that should be included with each of the random number types 	
 	static final String RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS = "ABCDEFGHJKMNPQRSTUVXYZ"
 	static final String RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS = "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"

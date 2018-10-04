@@ -369,6 +369,7 @@ class PartialReceivingPage extends Component {
             bins: this.props.bins,
             users: this.props.users,
             hasBinLocationSupport: this.props.hasBinLocationSupport,
+            locationId: this.props.locationId,
           }))}
       </div>
     );
@@ -408,6 +409,8 @@ PartialReceivingPage.propTypes = {
   }),
   /** Array of available bin locations  */
   bins: PropTypes.arrayOf(PropTypes.shape({})),
+  /** Location ID (destination). Needs to be used in /api/products request. */
+  locationId: PropTypes.string.isRequired,
 };
 
 PartialReceivingPage.defaultProps = {

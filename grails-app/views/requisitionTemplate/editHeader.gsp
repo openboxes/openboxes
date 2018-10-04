@@ -44,6 +44,7 @@
 			<g:form name="requisitionForm" method="post" action="update">
                 <g:hiddenField name="id" value="${requisition.id}"/>
                 <g:hiddenField name="version" value="${requisition.version}"/>
+                <g:hiddenField name="viewName" value="editHeader"/>
 
 				<div id="requisition-template-details" class="dialog ui-validation box">
 

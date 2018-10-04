@@ -211,9 +211,11 @@ class BootStrap {
                 recipient: receiptItem.recipient
         ]}
 
-        JSON.registerObjectMarshaller(Requisition) { Requisition requisition -> [
+        JSON.registerObjectMarshaller(Requisition) { Requisition requisition ->
+            def defaultName = requisition?.isTemplate ? "Stocklist ${requisition?.id}" : null
+            [
                 id: requisition.id,
-                name: requisition.name,
+                name: requisition.name?:defaultName,
                 requisitionNumber: requisition.requestNumber,
                 description: requisition.description,
                 isTemplate: requisition.isTemplate,

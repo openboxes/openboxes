@@ -181,7 +181,7 @@ class IdentifierService {
     }
 
     void assignRequisitionIdentifiers() {
-        def requisitions = Requisition.findAll("from Requisition as r where requestNumber is null or requestNumber = ''")
+        def requisitions = Requisition.findAll("from Requisition as r where (requestNumber is null or requestNumber = '') and (isTemplate is null or isTemplate = false)")
         requisitions.each { requisition ->
             try {
                 println "Assigning identifier to requisition " + requisition.id + " " + requisition.name

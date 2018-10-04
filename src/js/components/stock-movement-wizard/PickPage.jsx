@@ -106,7 +106,7 @@ const FIELDS = {
         },
         getDynamicAttr: ({
           fieldValue, selectedValue, subfield, stockMovementId,
-          checkForInitialPicksChanges, onResponse, bins,
+          checkForInitialPicksChanges, onResponse, bins, locationId,
         }) => ({
           product: selectedValue,
           fieldValue,
@@ -117,6 +117,7 @@ const FIELDS = {
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse,
           bins,
+          locationId,
         }),
       },
       revert: {
@@ -256,7 +257,7 @@ class PickPage extends Component {
    * @public
    */
   fetchBins() {
-    const url = '/openboxes/api/internalLocations';
+    const url = `/openboxes/api/internalLocations?location.id=${this.state.values.origin.id}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -389,6 +390,7 @@ class PickPage extends Component {
                   onResponse: this.saveNewItems,
                   revertUserPick: this.revertUserPick,
                   bins: this.state.bins,
+                  locationId: this.state.values.origin.id,
                 }))}
               <div className="d-print-none">
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>

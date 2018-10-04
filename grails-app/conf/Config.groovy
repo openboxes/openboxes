@@ -625,6 +625,8 @@ openboxes.megamenu.customLinks.enabled = false
 //	}
 //}
 
+openboxes.generateName.separator = " - "
+
 
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true

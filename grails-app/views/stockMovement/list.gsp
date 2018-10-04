@@ -5,7 +5,7 @@
     <meta name="layout" content="custom" />
     <g:set var="entityName" value="${warehouse.message(code: 'stockMovements.label', default: 'Stock Movements')}" />
     <title>
-        <warehouse:message code="stockMovements.label"/>
+        ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
     </title>
     <content tag="pageTitle">${entityName}</content>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.16.1/daterangepicker.min.css" />
@@ -25,7 +25,7 @@
 
     <div class="summary">
         <div class="title">
-            ${entityName}
+            ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
         </div>
     </div>
 
@@ -92,14 +92,14 @@
                         <div class="filter-list-item">
                             <label><warehouse:message code="stockMovement.origin.label"/></label>
                             <p>
-                                <g:selectLocation name="origin.id" value="${params?.origin?.id?:session?.warehouse?.id}"
+                                <g:selectLocation name="origin.id" value="${params?.origin?.id}"
                                                         noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
                         <div class="filter-list-item">
                             <label><warehouse:message code="stockMovement.destination.label"/></label>
                             <p>
-                                <g:selectLocation name="destination.id" value="${params?.destination?.id?:session?.warehouse?.id}"
+                                <g:selectLocation name="destination.id" value="${params?.destination?.id}"
                                                   noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
@@ -143,7 +143,8 @@
         <div class="yui-u">
             <div class="box">
                 <h2>
-                    <warehouse:message code="stockMovements.label"/> (${stockMovements?.totalCount?:0})
+                    ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
+                    (${stockMovements?.totalCount?:0})
                 </h2>
                 <table>
                     <thead>
@@ -156,6 +157,10 @@
                         </th>
                         <g:sortableColumn property="status" params="${pageParams}"
                                           title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
+
+                        <th>
+                            <warehouse:message code="receiving.status.label"/>
+                        </th>
 
                         <g:sortableColumn property="requestNumber" params="${pageParams}"
                                           title="${warehouse.message(code: 'stockMovement.identifier.label', default: 'Stock movement number')}" />
@@ -187,7 +192,7 @@
                     <g:each in="${stockMovements}" status="i" var="stockMovement">
                         <g:set var="requisition" value="${stockMovement.requisition}"/>
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                            <td>
+                            <td class="middle center">
                                 <g:render template="/stockMovement/actions" model="[stockMovement:stockMovement]"/>
                             </td>
                             <td>
@@ -196,6 +201,10 @@
                             <td>
                                 <label class="status"><format:metadata obj="${stockMovement?.status}"/></label>
                             </td>
+                            <td>
+                                <label class="status"><format:metadata obj="${stockMovement?.shipment?.status}"/></label>
+                            </td>
+
                             <td>
                                 <g:link controller="stockMovement" action="show" id="${stockMovement.id}">
                                     <strong>${stockMovement.identifier }</strong>
