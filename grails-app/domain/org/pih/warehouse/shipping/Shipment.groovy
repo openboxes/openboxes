@@ -68,7 +68,6 @@ class Shipment implements Comparable, Serializable {
 	Location destination			// the location to which the shipment will arrive
 	ShipmentType shipmentType		// the shipment type: Air, Sea Freight, Suitcase
 	ShipmentMethod shipmentMethod	// the shipping carrier and shipping service used	
-	Receipt receipt					// the receipt for this shipment
 	Person carrier 					// the person or organization that actually carries the goods from A to B
 	Person recipient				// the person or organization that is receiving the goods	
 	Donor donor						// the information about the donor (OPTIONAL)
@@ -89,6 +88,7 @@ class Shipment implements Comparable, Serializable {
 	List referenceNumbers;
 
 	SortedSet shipmentItems
+    SortedSet receipts
 	
 	static transients = [
 			"allShipmentItems",
@@ -100,7 +100,8 @@ class Shipment implements Comparable, Serializable {
 			"actualDeliveryDate",
 			"recipients",
 			"consignorAddress",
-			"consigneeAddress"
+			"consigneeAddress",
+            "receipt"
     ]
 	
 	static mappedBy = [
@@ -114,6 +115,7 @@ class Shipment implements Comparable, Serializable {
 			comments : Comment,
 			containers : Container,
 			documents : Document,
+			receipts: Receipt,
 			shipmentItems : ShipmentItem,
 			referenceNumbers : ReferenceNumber,
 			outgoingTransactions : Transaction,
@@ -135,19 +137,12 @@ class Shipment implements Comparable, Serializable {
 		additionalInformation type: "text"
 		events cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"
-		//containers cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
-		//shipmentItems cascade: "all-delete-orphan"
         shipmentItemCount(formula: '(select count(shipment_item.id) from shipment_item where (shipment_item.shipment_id = id))')
 		shipmentMethod cascade: "all-delete-orphan"
 		referenceNumbers cascade: "all-delete-orphan"
-		receipt cascade: "all-delete-orphan"
+		receipts cascade: "all-delete-orphan"
 		containers sort: 'sortOrder', order: 'asc'
-		//shipmentItems sort: 'lotNumber', order: 'asc'
-		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
-        //outgoingTransactions cascade: "all-delete-orphan"
-        //incomingTransactions cascade: "all-delete-orphan"
-
 	}
 
 	// Constraints
@@ -163,7 +158,6 @@ class Shipment implements Comparable, Serializable {
 		expectedDeliveryDate(nullable:true)	// optional		
 		shipmentType(nullable:false)
 		shipmentMethod(nullable:true)
-		receipt(nullable:true)
 		additionalInformation(nullable:true, maxSize: 2147483646)
 		carrier(nullable:true)
 		recipient(nullable:true)
@@ -192,6 +186,7 @@ class Shipment implements Comparable, Serializable {
         createdBy(nullable:true)
         updatedBy(nullable:true)
     }
+
 
 	String toString() { return "$name"; }
 	
@@ -319,10 +314,18 @@ class Shipment implements Comparable, Serializable {
 	}
 	*/
 
+    Boolean isStockMovement() {
+        return requisition != null
+    }
+
 	Boolean isReceiveAllowed() { 
 		return hasShipped() && !wasReceived()
 	}
-	
+
+    Boolean isPartialReceiveAllowed() {
+        return isReceiveAllowed() && isStockMovement()
+    }
+
 	Boolean isSendAllowed() { 
 		return !hasShipped() && !wasReceived()
 	}
@@ -411,7 +414,12 @@ class Shipment implements Comparable, Serializable {
 		return container
 	}
 
-
+    Receipt getReceipt() {
+        if (receipts?.size()>1) {
+            throw new IllegalStateException("Multiple receipts not supported on existing inbound shipments")
+        }
+        return receipts ? receipts.first() : null
+    }
 
     /**
      * Get all recipients for this shipment

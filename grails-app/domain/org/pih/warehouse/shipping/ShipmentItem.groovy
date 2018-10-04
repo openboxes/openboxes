@@ -15,6 +15,7 @@ import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderShipment
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.RequisitionItem
 
@@ -115,10 +116,14 @@ class ShipmentItem implements Comparable, Serializable {
 	def totalQuantityReceived() {
 		int totalQuantityReceived = 0
 		// Should use inventory item instead of comparing product & lot number
-		if (shipment.receipt) { 
-			shipment.receipt.receiptItems.each {
-				if (it.product == this.product && it.lotNumber == this.lotNumber) {
-					totalQuantityReceived += it.quantityReceived
+		if (shipment.receipts) {
+			shipment.receipts.each { Receipt receipt ->
+				if (receipt) {
+					receipt.receiptItems.each {
+						if (it.product == this.product && it.lotNumber == this.lotNumber) {
+							totalQuantityReceived += it.quantityReceived
+						}
+					}
 				}
 			}
 		}
