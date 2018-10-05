@@ -21,7 +21,7 @@
         </div>
 
         <div class="title">
-            ${entityName} &rsaquo; ${stockMovement?.identifier} ${stockMovement?.name}
+            <small>${stockMovement?.identifier}</small> ${stockMovement?.name}
         </div>
 
     </div>
@@ -51,37 +51,32 @@
 
         <div class="button-group">
             <g:link controller="stockMovement" action="list" class="button icon arrowleft">
-                <warehouse:message code="default.list.label" args="[g.message(code: 'stockMovements.label')]"/>
+                <warehouse:message code="default.button.list.label" />
             </g:link>
         </div>
         <div class="button-group">
             <g:link controller="stockMovement" action="index" class="button icon add">
-                <warehouse:message code="default.create.label" args="[g.message(code: 'stockMovement.label')]"/>
+                <warehouse:message code="default.button.create.label" />
             </g:link>
         </div>
 
         <div class="button-group">
             <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button icon edit">
-                <warehouse:message code="default.edit.label" args="[g.message(code: 'stockMovement.label')]"/>
+                <warehouse:message code="default.button.edit.label" />
             </g:link>
-        </div>
+            <g:if test="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}">
+                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button icon approve">
+                        <warehouse:message code="default.button.receive.label" />
+                    </g:link>
+            </g:if>
 
-        <g:if test="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}">
-            <div class="button-group">
-                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button icon approve">
-                    <warehouse:message code="default.receive.label" args="[g.message(code: 'stockMovement.label')]"/>
-                </g:link>
-            </div>
-        </g:if>
-
-        <g:isSuperuser>
-            <div class="button-group">
+            <g:isSuperuser>
                 <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button icon remove"
                         onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                    <warehouse:message code="default.delete.label" args="[g.message(code: 'stockMovement.label')]"/>
+                    <warehouse:message code="default.button.delete.label" />
                 </g:link>
-            </div>
-        </g:isSuperuser>
+            </g:isSuperuser>
+        </div>
 
 
     </div>
