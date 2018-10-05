@@ -184,7 +184,6 @@ class EditItemsPage extends Component {
     super(props);
 
     this.state = {
-      redoAutopick: false,
       revisedItems: [],
       values: { ...this.props.initialValues, editPageItems: [] },
     };
@@ -282,7 +281,6 @@ class EditItemsPage extends Component {
     };
 
     if (payload.lineItems.length) {
-      this.setState({ redoAutopick: true });
       return apiClient.post(url, payload);
     }
 
@@ -364,13 +362,9 @@ class EditItemsPage extends Component {
     this.props.showSpinner();
     this.reviseRequisitionItems(formValues)
       .then(() => {
-        if (this.state.redoAutopick) {
-          this.transitionToNextStep()
-            .then(() => this.props.onSubmit(formValues))
-            .catch(() => this.props.hideSpinner());
-        } else {
-          this.props.onSubmit(formValues);
-        }
+        this.transitionToNextStep()
+          .then(() => this.props.onSubmit(formValues))
+          .catch(() => this.props.hideSpinner());
       }).catch(() => this.props.hideSpinner());
   }
 
@@ -396,7 +390,6 @@ class EditItemsPage extends Component {
           })),
         })),
       },
-      redoAutopick: true,
     }));
   }
 
@@ -419,7 +412,6 @@ class EditItemsPage extends Component {
     return apiClient.post(revertItemsUrl, payload)
       .then((response) => {
         const { editPageItems } = response.data.data.editPage;
-        this.setState({ redoAutopick: true });
         this.saveNewItems(editPageItems);
         this.props.hideSpinner();
       })
