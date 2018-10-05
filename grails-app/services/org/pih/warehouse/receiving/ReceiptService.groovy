@@ -255,9 +255,70 @@ class ReceiptService {
         Shipment shipment = partialReceipt.shipment
         if (shipment) {
             rollbackInboundTransactions(shipment)
-            shipmentService.createInboundTransaction(shipment)
+            createInboundTransaction(partialReceipt)
         }
     }
+
+
+    Transaction createInboundTransaction(PartialReceipt partialReceipt) {
+
+        Receipt receipt = partialReceipt.receipt
+        if (!receipt) {
+            throw new IllegalStateException("Must have a receipt")
+        }
+
+        Shipment shipment = partialReceipt.shipment
+        if (!shipment) {
+            throw IllegalStateException("Must have a shipment")
+        }
+
+        if (!shipment?.destination?.inventory) {
+            throw new IllegalStateException("Destination ${shipment?.destination?.name} must have an inventory in order to receive stock")
+        }
+
+        // Create a new transaction for incoming items
+        Transaction creditTransaction = new Transaction()
+        creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
+        creditTransaction.incomingShipment = shipment
+        creditTransaction.receipt = receipt
+        creditTransaction.source = shipment?.origin
+        creditTransaction.destination = null
+        creditTransaction.inventory = shipment?.destination?.inventory
+        creditTransaction.transactionDate = receipt?.actualDeliveryDate
+
+        receipt?.receiptItems.each {
+            def inventoryItem =
+                    inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)
+
+            if (inventoryItem.hasErrors()) {
+                inventoryItem.errors.allErrors.each { error->
+                    def errorObj = [inventoryItem, error.field, error.rejectedValue] as Object[]
+                    shipment.errors.reject("inventoryItem.invalid",
+                            errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ");
+                }
+                throw new ValidationException("Failed to receive shipment while saving inventory item ", shipment.errors)
+            }
+
+            // Create a new transaction entry
+            TransactionEntry transactionEntry = new TransactionEntry();
+            transactionEntry.quantity = it.quantityReceived;
+            transactionEntry.binLocation = it.binLocation
+            transactionEntry.inventoryItem = inventoryItem;
+            creditTransaction.addToTransactionEntries(transactionEntry);
+        }
+
+        if (creditTransaction.hasErrors() || !creditTransaction.save()) {
+            // did not save successfully, display errors message
+            throw new ValidationException("Failed to receive shipment due to error while saving transaction", creditTransaction.errors)
+        }
+
+        // Associate the incoming transaction with the shipment
+        shipment.addToIncomingTransactions(creditTransaction)
+        shipment.save(flush:true);
+
+        return creditTransaction;
+    }
+
 
     void rollbackInboundTransactions(Shipment shipment) {
         if (shipment.incomingTransactions) {
