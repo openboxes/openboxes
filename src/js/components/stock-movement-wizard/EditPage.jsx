@@ -184,6 +184,7 @@ class EditItemsPage extends Component {
     super(props);
 
     this.state = {
+      statusCode: '',
       revisedItems: [],
       values: { ...this.props.initialValues, editPageItems: [] },
     };
@@ -209,7 +210,7 @@ class EditItemsPage extends Component {
 
     this.props.showSpinner();
     this.fetchLineItems().then((resp) => {
-      const { editPage } = resp.data.data;
+      const { statusCode, editPage } = resp.data.data;
       const editPageItems = _.map(
         editPage.editPageItems,
         val => ({
@@ -229,6 +230,7 @@ class EditItemsPage extends Component {
       );
 
       this.setState({
+        statusCode,
         revisedItems: _.filter(editPageItems, item => item.statusCode === 'CHANGED'),
         values: { ...this.state.values, editPageItems },
       });
@@ -336,7 +338,10 @@ class EditItemsPage extends Component {
    */
   transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'PICKING', createPicklist: 'true' };
+    const payload = {
+      status: 'PICKING',
+      createPicklist: this.state.statusCode === 'VERIFYING' ? 'true' : 'false',
+    };
 
     return apiClient.post(url, payload);
   }
