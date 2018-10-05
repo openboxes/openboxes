@@ -771,7 +771,8 @@ class StockMovementService {
 
         if (stockMovement.origin.isSupplier()) {
             stockMovement.lineItems.collect { StockMovementItem stockMovementItem ->
-                log.info "Process item ${stockMovementItem.toJson()}"
+                log.info "Process stock movement item " + (new JSONObject(stockMovementItem.toJson())).toString(4)
+
                 if (stockMovementItem.delete) {
                     log.info "Delete item ${stockMovementItem}"
                     ShipmentItem shipmentItem = ShipmentItem.get(stockMovementItem?.id)
@@ -857,7 +858,8 @@ class StockMovementService {
         shipmentItem.product = picklistItem?.inventoryItem?.product
         shipmentItem.quantity = picklistItem?.quantity
         shipmentItem.requisitionItem = picklistItem.requisitionItem
-        shipmentItem.recipient = picklistItem?.requisitionItem?.recipient
+        shipmentItem.recipient = picklistItem?.requisitionItem?.recipient?:
+                picklistItem?.requisitionItem?.parentRequisitionItem?.recipient
         shipmentItem.inventoryItem = picklistItem?.inventoryItem
         shipmentItem.binLocation = picklistItem?.binLocation
         return shipmentItem
