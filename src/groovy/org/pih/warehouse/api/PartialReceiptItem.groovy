@@ -3,13 +3,13 @@ package org.pih.warehouse.api
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.shipping.ShipmentItem
 
 class PartialReceiptItem {
 
+    ReceiptItem receiptItem
     ShipmentItem shipmentItem
-//    Integer quantityShipped
-//    Integer quantityReceived
     Integer quantityReceiving
 
     Location binLocation
@@ -22,15 +22,14 @@ class PartialReceiptItem {
     }
 
     Integer getQuantityReceived() {
-        def receiptItems = ReceiptItem.findAllByShipmentItem(shipmentItem)
+        def receiptItems = getReceiptItemsByStatus([ReceiptStatusCode.RECEIVED] as ReceiptStatusCode[])
         return receiptItems ? receiptItems?.sum { it?.quantityReceived?:0 } : 0
     }
 
     Integer getQuantityCanceled() {
-        def receiptItems = ReceiptItem.findAllByShipmentItem(shipmentItem)
+        def receiptItems = getReceiptItemsByStatus([ReceiptStatusCode.RECEIVED] as ReceiptStatusCode[])
         return receiptItems ? receiptItems?.sum { it?.quantityCanceled?:0 } : 0
     }
-
 
     Integer getQuantityRemaining() {
         Integer quantityCanceled = quantityCanceled?:0
@@ -40,9 +39,15 @@ class PartialReceiptItem {
         return !cancelRemaining ? (quantityRemaining > 0) ? quantityRemaining : 0 : 0
     }
 
+    Set<ReceiptItem> getReceiptItemsByStatus(ReceiptStatusCode[] receiptStatusCodes) {
+        def receiptItems = ReceiptItem.findAllByShipmentItem(shipmentItem)
+        return receiptItems.findAll { ReceiptItem receiptItem -> receiptItem?.receipt?.receiptStatusCode in receiptStatusCodes }
+    }
 
     Map toJson() {
         return [
+
+                "receiptItem.id": receiptItem?.id,
                 "shipmentItem.id": shipmentItem?.id,
                 "container.id": shipmentItem?.container?.id,
                 "container.name": shipmentItem?.container?.name,

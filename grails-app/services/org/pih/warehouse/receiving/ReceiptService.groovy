@@ -17,7 +17,9 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -146,10 +148,21 @@ class ReceiptService {
 
         Shipment shipment = partialReceipt?.shipment
 
+        // Find pending receipt
+        Set<Receipt> receipts = shipment.receipts.findAll { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.PENDING }
+        if (receipts?.size() > 1) {
+            throw IllegalStateException("Shipments should only have one pending receipt at any given time")
+        }
+
         // Create new receipt
-        Receipt receipt = new Receipt()
-        receipt.receiptNumber = identifierService.generateReceiptIdentifier()
-        receipt.receiptStatusCode = ReceiptStatusCode.PENDING
+        Receipt receipt = receipts ? receipts.first() : null
+        if (!receipt) {
+            receipt = new Receipt()
+            receipt.receiptNumber = identifierService.generateReceiptIdentifier()
+            receipt.receiptStatusCode = ReceiptStatusCode.PENDING
+            shipment.addToReceipts(receipt)
+        }
+
         receipt.recipient = partialReceipt.recipient
         receipt.shipment = partialReceipt.shipment
         receipt.expectedDeliveryDate = partialReceipt?.shipment?.expectedDeliveryDate
@@ -159,7 +172,7 @@ class ReceiptService {
         // Add receipt items
         partialReceipt.partialReceiptItems.each { partialReceiptItem ->
 
-            log.info "Saving partial receipt item " + partialReceiptItem
+            log.info "Saving partial receipt item " + partialReceiptItem?.toJson()
             if (partialReceiptItem.quantityReceiving != null) {
                 ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
                 if (!shipmentItem) {
@@ -173,7 +186,30 @@ class ReceiptService {
                     throw new IllegalArgumentException("Cannot receive item without valid inventory item")
                 }
 
-                ReceiptItem receiptItem = new ReceiptItem();
+                ReceiptItem receiptItem
+
+                // FIXME We need to figure out a way to lookup the receipt item if it already exists
+                // This is useful if we start saving the partial receipt on the first click or if the user clicks
+                // Save on the second page of the workflow. Otherwise we'll create a new receipt item each time
+                // this method is invoked. The issue is that we don't currently have a way of getting the receipt
+                // item. Here are a couple of ways we could do it, but I'll let it up to you since I think you
+                // already had some thoughts on the subject.
+
+                // FIXME We could have it bound when we submit the POST
+                //receiptItem = partialReceiptItem?.receiptItem
+
+                // FIXME My first thought is to add an ID to partial receipt item so we can just do a quick lookup.
+                //receiptItem = ReceiptItem.get(partialReceiptItem?.receiptItem?.id)
+
+                // FIXME Otherwise we need to look it up by some combination of fields like below. As you pointed out,
+                // this isn't going to work for split lines that share these
+                //receiptItem = receipt?.receiptItems?.find {
+                //    it.shipmentItem == shipmentItem && it.inventoryItem == inventoryItem &&
+                //            it.binLocation == partialReceiptItem?.binLocation
+                //}
+                if (!receiptItem) {
+                    receiptItem = new ReceiptItem();
+                }
                 receiptItem.binLocation = partialReceiptItem.binLocation
                 receiptItem.recipient = partialReceiptItem.recipient
                 receiptItem.quantityShipped = shipmentItem.quantity;
