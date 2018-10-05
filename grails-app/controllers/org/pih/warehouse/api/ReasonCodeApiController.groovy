@@ -36,7 +36,7 @@ class ReasonCodeApiController {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listInventoryAdjustmentReasonCodes()))
         }
         else {
-            reasonCodes.addAll(getReasonCodes(ReasonCode.list()))
+            reasonCodes.addAll(getReasonCodes(ReasonCode.listDefault()))
         }
         render ([data:reasonCodes.collect { it.toJson() }] as JSON)
 	}
