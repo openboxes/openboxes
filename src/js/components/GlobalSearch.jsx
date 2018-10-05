@@ -37,6 +37,7 @@ const GlobalSearch = () => (
       cache={false}
       options={[]}
       showValueTooltip
+      filterOptions={options => options}
       onChange={(value) => { window.location = value.url; }}
     />
   </div>
