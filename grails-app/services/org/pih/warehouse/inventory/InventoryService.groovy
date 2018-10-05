@@ -1040,6 +1040,8 @@ class InventoryService implements ApplicationContextAware {
                             ilike("unitOfMeasure", "%" + term + "%")
                             ilike("productCode", "%" + term + "%")
                             ilike("ps.name", "%" + term + "%")
+							ilike("ps.code", "%" + term + "%")
+							ilike("ps.productCode", "%" + term + "%")
                             ilike("ps.manufacturerCode", "%" + term + "%")
                             ilike("ps.manufacturerName", "%" + term + "%")
                             ilike("ps.supplierCode", "%" + term + "%")
