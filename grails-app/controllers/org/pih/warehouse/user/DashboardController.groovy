@@ -63,8 +63,8 @@ class DashboardController {
     }
 
     def globalSearch = {
-
-        def transaction = Transaction.findByTransactionNumber(params.searchTerms)
+		
+		def transaction = Transaction.findByTransactionNumber(params.searchTerms)
 		if (transaction) { 
 			redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
 			return;
@@ -94,13 +94,18 @@ class DashboardController {
 			return;
 		}
 
+		def receipt = Receipt.findByReceiptNumber(params.searchTerms)
+		if (receipt) {
+			redirect(controller: "receipt", action: "show", id: receipt.id)
+			return;
+		}
         def order = Order.findByOrderNumber(params.searchTerms)
         if (order) {
             redirect(controller: "order", action: "show", id: order.id)
             return;
         }
 
-        redirect(controller: "inventory", action: "browse", params:params)
+		redirect(controller: "inventory", action: "browse", params:params)
 			
 	}
     def throwException = {
