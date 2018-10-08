@@ -72,6 +72,7 @@ class ShipmentItem implements Comparable, Serializable {
 		inventoryItem(nullable:true)
 		donor(nullable:true)
         requisitionItem(nullable:true)
+		shipment(nullable:true)
 	}
 
 	Boolean isFullyReceived() {

@@ -139,10 +139,10 @@ class StockMovementApiController {
                         if (createPicklist) stockMovementService.createPicklist(stockMovement)
                         break;
                     case RequisitionStatus.PICKED:
-                        stockMovementService.createOrUpdateShipment(stockMovement, true)
+                        stockMovementService.createOrUpdateShipment(stockMovement)
                         break;
                     case RequisitionStatus.CHECKING:
-                        stockMovementService.createOrUpdateShipment(stockMovement, false)
+                        stockMovementService.createOrUpdateShipment(stockMovement)
                         break;
                     case RequisitionStatus.ISSUED:
                         stockMovementService.sendStockMovement(params.id)
@@ -173,6 +173,7 @@ class StockMovementApiController {
     void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         // Remove attributes that cause issues in the default grails data binder
         List lineItems = jsonObject.remove("lineItems")
+        List packPageItems = jsonObject.remove("packPageItems")
 
         // Dates aren't bound properly using default JSON binding
         if (jsonObject.containsKey("dateShipped")) {
@@ -187,11 +188,16 @@ class StockMovementApiController {
         log.info "Binding line items: " + lineItems
         bindData(stockMovement, jsonObject)
 
+        // Need to clear the existing line items so we only process the modified ones
+        stockMovement.lineItems.clear()
+
         // Bind all line items
         if (lineItems) {
-            // Need to clear the existing line items so we only process the modified ones
-            stockMovement.lineItems.clear()
             bindLineItems(stockMovement, lineItems)
+        }
+
+        if (packPageItems) {
+            bindPackPage(stockMovement, packPageItems)
         }
     }
 
@@ -274,4 +280,30 @@ class StockMovementApiController {
         return stockMovementItems
     }
 
+    void bindPackPage(StockMovement stockMovement, List lineItems) {
+        log.info "line items: " + lineItems
+        List<PackPageItem> packPageItems = createPackPageItemsFromJson(stockMovement, lineItems)
+        PackPage packPage = new PackPage(packPageItems: packPageItems)
+        stockMovement.packPage = packPage
+    }
+
+    List<PackPageItem> createPackPageItemsFromJson(StockMovement stockMovement, List lineItems) {
+        List<PackPageItem> packPageItems = new ArrayList<PackPageItem>()
+        lineItems.each { lineItem ->
+            PackPageItem packPageItem = new PackPageItem()
+            packPageItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
+            packPageItem.palletName = lineItem["palletName"]
+            packPageItem.boxName = lineItem["boxName"]
+            packPageItem.quantityShipped = lineItem.quantityShipped ? new BigDecimal(lineItem.quantityShipped) : null
+            packPageItem.shipmentItemId = lineItem.shipmentItemId
+
+            List splitLineItems = lineItem.splitLineItems
+            if (splitLineItems) {
+                packPageItem.splitLineItems = createPackPageItemsFromJson(stockMovement, splitLineItems)
+            }
+
+            packPageItems.add(packPageItem)
+        }
+        return packPageItems
+    }
 }

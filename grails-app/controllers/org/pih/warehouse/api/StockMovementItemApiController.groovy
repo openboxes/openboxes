@@ -48,6 +48,8 @@ class StockMovementItemApiController {
         Boolean clearPicklist = jsonObject.clearPicklist ?
                 Boolean.parseBoolean(jsonObject.clearPicklist):Boolean.FALSE
 
+        stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+
         if (createPicklist) {
             log.info "Auto creating picklist for stock movement item ${stockMovementItem}"
             stockMovementService.createPicklist(stockMovementItem)

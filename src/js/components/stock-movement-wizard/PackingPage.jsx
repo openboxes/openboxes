@@ -224,18 +224,18 @@ class PackingPage extends Component {
 
   /**
    * Saves packing data
-   * @param {object} lineItems
+   * @param {object} packPageItems
    * @public
    */
-  savePackingData(lineItems) {
+  savePackingData(packPageItems) {
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
     const payload = {
       id: this.state.values.stockMovementId,
       stepNumber: '5',
-      lineItems,
+      packPageItems,
     };
 
-    if (payload.lineItems.length) {
+    if (payload.packPageItems.length) {
       return apiClient.post(updateItemsUrl, flattenRequest(payload))
         .catch(() => Promise.reject(new Error('Could not save requisition items')));
     }

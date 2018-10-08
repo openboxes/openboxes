@@ -17,10 +17,10 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
-import org.pih.warehouse.api.PickPage
-import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.PackPage
 import org.pih.warehouse.api.PackPageItem
+import org.pih.warehouse.api.PickPage
+import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SubstitutionItem
@@ -43,7 +43,6 @@ import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
 class StockMovementService {
@@ -90,30 +89,26 @@ class StockMovementService {
     StockMovement updateStockMovement(StockMovement stockMovement) {
         log.info "Update stock movement " + new JSONObject(stockMovement.toJson()).toString(4)
 
-        Requisition requisition = Requisition.get(stockMovement.id)
-
-        if (!requisition) {
-            throw new ObjectNotFoundException(stockMovement.id, StockMovement.class.toString())
-        }
+        Requisition requisition = updateRequisition(stockMovement)
 
         log.info "Date shipped: " + stockMovement.dateShipped
         if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status) {
             log.info "Creating shipment for stock movement ${stockMovement}"
-            createOrUpdateShipment(stockMovement, false)
-        } else {
-            updateRequisition(stockMovement, requisition)
-
-            if (requisition.hasErrors() || !requisition.save(flush: true)) {
-                throw new ValidationException("Invalid requisition", requisition.errors)
-            }
-
-            requisition = requisition.refresh()
-
-            stockMovement = StockMovement.createFromRequisition(requisition)
+            createOrUpdateShipment(stockMovement)
         }
 
-        return stockMovement
+        if (requisition.hasErrors() || !requisition.save(flush: true)) {
+            throw new ValidationException("Invalid requisition", requisition.errors)
+        }
 
+        requisition = requisition.refresh()
+
+        stockMovement = StockMovement.createFromRequisition(requisition)
+
+        createMissingPicklistItems(stockMovement)
+        createMissingShipmentItems(stockMovement)
+
+        return stockMovement
     }
 
     void deleteStockMovement(String id) {
@@ -247,6 +242,9 @@ class StockMovementService {
 
     void clearPicklist(StockMovementItem stockMovementItem) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        if (requisitionItem.modificationItem) {
+            requisitionItem = requisitionItem.modificationItem
+        }
         Picklist picklist = requisitionItem?.requisition?.picklist
         log.info "Clear picklist"
         if (picklist) {
@@ -254,6 +252,27 @@ class StockMovementService {
                 picklist.removeFromPicklistItems(it)
             }
             picklist.save()
+        }
+    }
+
+    void createMissingPicklistItems(StockMovement stockMovement) {
+        if (stockMovement.requisition?.status >= RequisitionStatus.PICKING) {
+            stockMovement?.lineItems?.each { StockMovementItem stockMovementItem ->
+                if (stockMovementItem.statusCode == 'SUBSTITUTED') {
+                    for (StockMovementItem subStockMovementItem : stockMovementItem.substitutionItems) {
+                        createMissingPicklistItems(stockMovementItem)
+                    }
+                }
+                else {
+                    createMissingPicklistItems(stockMovementItem)
+                }
+            }
+        }
+    }
+
+    void createMissingPicklistItems(StockMovementItem stockMovementItem) {
+        if (!stockMovementItem.requisitionItem?.picklistItems) {
+            createPicklist(stockMovementItem)
         }
     }
 
@@ -322,7 +341,6 @@ class StockMovementService {
             }
         }
     }
-
 
     void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
@@ -481,10 +499,12 @@ class StockMovementService {
         PackPage packPage = new PackPage()
 
         StockMovement stockMovement = getStockMovement(id)
+        Set<PackPageItem> packPageItems = new LinkedHashSet<PackPageItem>()
         stockMovement.requisition?.picklist?.picklistItems?.each { PicklistItem picklistItem ->
-            List packPageItems = getPackPageItems(picklistItem)
-            packPage.packPageItems.addAll(packPageItems)
+            packPageItems.addAll(getPackPageItems(picklistItem))
         }
+
+        packPage.packPageItems.addAll(packPageItems)
         return packPage
     }
 
@@ -615,7 +635,11 @@ class StockMovementService {
     }
 
 
-    Requisition updateRequisition(StockMovement stockMovement, Requisition requisition) {
+    Requisition updateRequisition(StockMovement stockMovement) {
+        Requisition requisition = Requisition.get(stockMovement.id)
+        if (!requisition) {
+            throw new ObjectNotFoundException(id, StockMovement.class.toString())
+        }
 
         if (stockMovement.identifier) requisition.requestNumber = stockMovement.identifier
         if (stockMovement.destination) requisition.destination = stockMovement.destination
@@ -639,6 +663,8 @@ class StockMovementService {
                 // If requisition item is found, we update it
                 if (requisitionItem) {
                     log.info "Item found " + requisitionItem.id
+
+                    removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
 
                     if (stockMovementItem.delete) {
                         log.info "Item deleted " + requisitionItem.id
@@ -715,8 +741,30 @@ class StockMovementService {
         return requisition
     }
 
+    void removeShipmentItemsForModifiedRequisitionItem(StockMovementItem stockMovementItem) {
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem?.id)
+        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+    }
 
-    Shipment createOrUpdateShipment(StockMovement stockMovement, boolean updateDepotShipmentItems) {
+    void removeShipmentItemsForModifiedRequisitionItem(RequisitionItem requisitionItem) {
+        List<ShipmentItem> shipmentItems = new ArrayList<ShipmentItem>()
+        shipmentItems.addAll(ShipmentItem.findAllByRequisitionItem(requisitionItem))
+
+        requisitionItem?.requisitionItems?.each { RequisitionItem item ->
+            shipmentItems.addAll(ShipmentItem.findAllByRequisitionItem(item))
+        }
+
+        shipmentItems.each { ShipmentItem shipmentItem ->
+            Shipment shipment = shipmentItem.shipment
+            shipment.removeFromShipmentItems(shipmentItem)
+            shipment.save(flush: true)
+            shipmentItem.requisitionItem = null
+            shipmentItem.save(flush: true, failOnError: true)
+//            shipmentItem.delete(flush: true)
+        }
+    }
+
+    Shipment createOrUpdateShipment(StockMovement stockMovement) {
 
         log.info "create or update shipment " + (new JSONObject(stockMovement.toJson())).toString(4)
 
@@ -791,17 +839,12 @@ class StockMovementService {
                     shipment.addToShipmentItems(shipmentItem)
                 }
             }
-        }
-        else if (RequisitionStatus.PICKED == stockMovement?.requisition?.status) {
-            stockMovement?.lineItems?.collect { StockMovementItem packPageItem ->
+        } else if (stockMovement.packPage?.packPageItems) {
+            stockMovement.packPage.packPageItems.each { PackPageItem packPageItem ->
                 updateShipmentItemAndProcessSplitLines(packPageItem)
             }
-        }
-        else if (updateDepotShipmentItems) {
-            stockMovement.requisition?.picklist?.picklistItems?.collect { PicklistItem picklistItem ->
-                ShipmentItem shipmentItem = createOrUpdateShipmentItem(picklistItem)
-                shipment.addToShipmentItems(shipmentItem)
-            }
+        } else {
+            createMissingShipmentItems(stockMovement.requisition, shipment)
         }
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
@@ -845,37 +888,67 @@ class StockMovementService {
         return box ?: pallet ?: null
     }
 
+    void createMissingShipmentItems(StockMovement stockMovement) {
+        Requisition requisition = stockMovement.requisition.refresh()
 
-    ShipmentItem createOrUpdateShipmentItem(PicklistItem picklistItem) {
+        if (requisition) {
+            Shipment shipment = Shipment.findByRequisition(requisition)
+            if (shipment && requisition.status >= RequisitionStatus.PICKED) {
+                createMissingShipmentItems(requisition, shipment)
 
-        // FIXME Need to deal with multiple shipment items per requisition item (bin location might be a good discriminator)
-        ShipmentItem shipmentItem = ShipmentItem.findByRequisitionItem(picklistItem?.requisitionItem)
-        if (!shipmentItem) {
-            shipmentItem = new ShipmentItem()
+                if (shipment.hasErrors() || !shipment.save(flush: true)) {
+                    throw new ValidationException("Invalid shipment", shipment.errors)
+                }
+            }
         }
-        shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
-        shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
-        shipmentItem.product = picklistItem?.inventoryItem?.product
-        shipmentItem.quantity = picklistItem?.quantity
-        shipmentItem.requisitionItem = picklistItem.requisitionItem
-        shipmentItem.recipient = picklistItem?.requisitionItem?.recipient?:
-                picklistItem?.requisitionItem?.parentRequisitionItem?.recipient
-        shipmentItem.inventoryItem = picklistItem?.inventoryItem
-        shipmentItem.binLocation = picklistItem?.binLocation
-        return shipmentItem
     }
 
-    void updateShipmentItemAndProcessSplitLines(StockMovementItem stockMovementItem) {
-        ShipmentItem shipmentItem = ShipmentItem.get(stockMovementItem?.shipmentItemId)
+    void createMissingShipmentItems(Requisition requisition, Shipment shipment) {
+        requisition.requisitionItems?.each { RequisitionItem requisitionItem ->
+            List<ShipmentItem> shipmentItems = createShipmentItems(requisitionItem)
 
-        if (stockMovementItem?.splitLineItems && shipmentItem) {
-            StockMovementItem item = stockMovementItem.splitLineItems.pop();
+            shipmentItems.each { ShipmentItem shipmentItem ->
+                shipment.addToShipmentItems(shipmentItem)
+            }
+        }
+    }
+
+    List<ShipmentItem> createShipmentItems(RequisitionItem requisitionItem) {
+        List<ShipmentItem> shipmentItems = new ArrayList<ShipmentItem>()
+
+        if (ShipmentItem.findAllByRequisitionItem(requisitionItem)) {
+            return shipmentItems
+        }
+
+        requisitionItem?.picklistItems?.each { PicklistItem picklistItem ->
+            ShipmentItem shipmentItem = new ShipmentItem()
+            shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
+            shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
+            shipmentItem.product = picklistItem?.inventoryItem?.product
+            shipmentItem.quantity = picklistItem?.quantity
+            shipmentItem.requisitionItem = picklistItem.requisitionItem
+            shipmentItem.recipient = picklistItem?.requisitionItem?.recipient?:
+                picklistItem?.requisitionItem?.parentRequisitionItem?.recipient
+            shipmentItem.inventoryItem = picklistItem?.inventoryItem
+            shipmentItem.binLocation = picklistItem?.binLocation
+
+            shipmentItems.add(shipmentItem)
+        }
+
+        return shipmentItems
+    }
+
+    void updateShipmentItemAndProcessSplitLines(PackPageItem packPageItem) {
+        ShipmentItem shipmentItem = ShipmentItem.get(packPageItem?.shipmentItemId)
+
+        if (packPageItem?.splitLineItems && shipmentItem) {
+            PackPageItem item = packPageItem.splitLineItems.pop()
             shipmentItem.quantity = item?.quantityShipped
             shipmentItem.recipient = item?.recipient
             shipmentItem.container = createOrUpdateContainer(shipmentItem.shipment, item?.palletName, item?.boxName)
             shipmentItem.save(flush: true)
 
-            for (StockMovementItem splitLineItem : stockMovementItem.splitLineItems) {
+            for (PackPageItem splitLineItem : packPageItem.splitLineItems) {
                 ShipmentItem splitItem = new ShipmentItem()
                 splitItem.requisitionItem = shipmentItem.requisitionItem
                 splitItem.shipment = shipmentItem.shipment
@@ -894,9 +967,9 @@ class StockMovementService {
             }
         }
         else if (shipmentItem) {
-            shipmentItem.quantity = stockMovementItem?.quantityShipped
-            shipmentItem.recipient = stockMovementItem?.recipient
-            shipmentItem.container = createOrUpdateContainer(shipmentItem.shipment, stockMovementItem?.palletName, stockMovementItem?.boxName)
+            shipmentItem.quantity = packPageItem?.quantityShipped
+            shipmentItem.recipient = packPageItem?.recipient
+            shipmentItem.container = createOrUpdateContainer(shipmentItem.shipment, packPageItem?.palletName, packPageItem?.boxName)
         }
     }
 
