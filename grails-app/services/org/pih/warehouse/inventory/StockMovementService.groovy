@@ -757,10 +757,8 @@ class StockMovementService {
         shipmentItems.each { ShipmentItem shipmentItem ->
             Shipment shipment = shipmentItem.shipment
             shipment.removeFromShipmentItems(shipmentItem)
-            shipment.save(flush: true)
-            shipmentItem.requisitionItem = null
-            shipmentItem.save(flush: true, failOnError: true)
-//            shipmentItem.delete(flush: true)
+            shipment.save()
+            shipmentItem.delete()
         }
     }
 
