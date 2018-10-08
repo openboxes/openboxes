@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.receiving
 
+import grails.validation.ValidationException
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
