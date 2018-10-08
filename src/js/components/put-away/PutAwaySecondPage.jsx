@@ -93,7 +93,7 @@ class PutAwaySecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Lot',
+      Header: 'Lot/Serial No.',
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
       Filter,
@@ -272,7 +272,7 @@ class PutAwaySecondPage extends Component {
 
     return (
       <div className="container-fluid pt-2">
-        <h1>Put-Away - {this.state.putAway.putawayNumber}</h1>
+        <h1>Put Away - {this.state.putAway.putawayNumber}</h1>
         <div className="mb-2">
           Show by:
           <button
