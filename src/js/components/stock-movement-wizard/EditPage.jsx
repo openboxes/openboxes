@@ -185,7 +185,6 @@ class EditItemsPage extends Component {
 
     this.state = {
       statusCode: '',
-      redoAutopick: false,
       revisedItems: [],
       values: { ...this.props.initialValues, editPageItems: [] },
     };
@@ -284,7 +283,6 @@ class EditItemsPage extends Component {
     };
 
     if (payload.lineItems.length) {
-      this.setState({ redoAutopick: true });
       return apiClient.post(url, payload);
     }
 
@@ -340,7 +338,10 @@ class EditItemsPage extends Component {
    */
   transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'PICKING', createPicklist: 'true' };
+    const payload = {
+      status: 'PICKING',
+      createPicklist: this.state.statusCode === 'VERIFYING' ? 'true' : 'false',
+    };
 
     return apiClient.post(url, payload);
   }
@@ -366,13 +367,9 @@ class EditItemsPage extends Component {
     this.props.showSpinner();
     this.reviseRequisitionItems(formValues)
       .then(() => {
-        if (this.state.statusCode === 'VERIFYING' || this.state.redoAutopick) {
-          this.transitionToNextStep()
-            .then(() => this.props.onSubmit(formValues))
-            .catch(() => this.props.hideSpinner());
-        } else {
-          this.props.onSubmit(formValues);
-        }
+        this.transitionToNextStep()
+          .then(() => this.props.onSubmit(formValues))
+          .catch(() => this.props.hideSpinner());
       }).catch(() => this.props.hideSpinner());
   }
 
@@ -398,7 +395,6 @@ class EditItemsPage extends Component {
           })),
         })),
       },
-      redoAutopick: true,
     }));
   }
 
@@ -421,7 +417,6 @@ class EditItemsPage extends Component {
     return apiClient.post(revertItemsUrl, payload)
       .then((response) => {
         const { editPageItems } = response.data.data.editPage;
-        this.setState({ redoAutopick: true });
         this.saveNewItems(editPageItems);
         this.props.hideSpinner();
       })
