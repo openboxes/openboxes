@@ -632,6 +632,29 @@ class AddItemsPage extends Component {
     return apiClient.post(removeItemsUrl, payload)
       .catch(() => {
         this.props.hideSpinner();
+        return Promise.reject(new Error('Could not delete requisition item'));
+      });
+  }
+
+  /**
+   * Removes all items from requisition's items list.
+   * @public
+   */
+  removeAll() {
+    this.fetchAndSetLineItems();
+    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const payload = {
+      id: this.state.values.stockMovementId,
+      lineItems: _.map(this.state.values.lineItems, item => ({
+        id: item.id,
+        delete: 'true',
+      })),
+    };
+    this.fetchAndSetLineItems();
+
+    return apiClient.post(removeItemsUrl, payload)
+      .catch(() => {
+        this.props.hideSpinner();
         return Promise.reject(new Error('Could not delete requisition items'));
       });
   }
@@ -746,9 +769,17 @@ class AddItemsPage extends Component {
                 type="button"
                 disabled={invalid}
                 onClick={() => this.save(values)}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
               >
                 <span><i className="fa fa-save pr-2" />Save</span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.removeAll()}
+                className="float-right py-1 mb-1 btn btn-outline-danger align-self-end"
+              >
+                <span><i className="fa fa-remove pr-2" />Delete all</span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
