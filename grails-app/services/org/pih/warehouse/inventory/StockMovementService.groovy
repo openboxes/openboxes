@@ -760,6 +760,15 @@ class StockMovementService {
             shipment.save()
             shipmentItem.delete()
         }
+
+        List<PicklistItem> picklistItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
+        picklistItems.each { PicklistItem picklistItem ->
+            Requisition requisition = requisitionItem.requisition
+            Picklist picklist = picklistItem.picklist
+            picklist.removeFromPicklistItems(picklistItem)
+            requisitionItem.removeFromPicklistItems(picklistItem)
+            requisition.save()
+        }
     }
 
     Shipment createOrUpdateShipment(StockMovement stockMovement) {
