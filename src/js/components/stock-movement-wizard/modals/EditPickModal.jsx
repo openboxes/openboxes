@@ -106,6 +106,16 @@ class EditPickModal extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    const {
+      fieldConfig: { attributes, getDynamicAttr },
+    } = nextProps;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
+    const attr = { ...attributes, ...dynamicAttr };
+
+    this.setState({ attr });
+  }
+
   /**
    * Loads chosen items, required quantity and reason codes into modal's form.
    * @public
