@@ -45,7 +45,7 @@ const FIELDS = {
       },
       lotNumber: {
         type: LabelField,
-        flexWidth: '0.7',
+        flexWidth: '1.3',
         label: 'Lot #',
       },
       expirationDate: {
