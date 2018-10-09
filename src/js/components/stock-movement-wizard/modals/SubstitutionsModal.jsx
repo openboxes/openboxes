@@ -103,6 +103,16 @@ class SubstitutionsModal extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    const {
+      fieldConfig: { attributes, getDynamicAttr },
+    } = nextProps;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
+    const attr = { ...attributes, ...dynamicAttr };
+
+    this.setState({ attr });
+  }
+
   /** Loads available substitutions for chosen item into modal's form.
    * @public
    */
