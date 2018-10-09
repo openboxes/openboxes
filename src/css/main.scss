@@ -442,13 +442,20 @@ div.crossed-out .table-inner-row:before {
 }
 
 .dropzone {
-  border-width: 2px;
-  border-color: rgb(102, 102, 102);
-  border-style: dashed;
+  border: 2px dashed $gray-zeta;
   border-radius: 5px;
+  a {
+    color: $gray-zeta;
+  }
 }
 
-.dropzone div {
+.dropzone:hover {
+  a {
+    color: $white-alpha;
+  }
+}
+
+.dropzone > div {
   border: none !important;
   width: 100% !important;
   height: auto !important;
@@ -457,6 +464,15 @@ div.crossed-out .table-inner-row:before {
 .chosen-file {
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+.remove-button {
+  width: 20px;
+  margin-left: 10px;
+}
+
+.remove-button:hover {
+  color: $red-beta !important;
 }
 
 #stockMovementInfo {
