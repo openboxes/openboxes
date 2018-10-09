@@ -103,7 +103,7 @@ class ReceivingPage extends Component {
   */
   save(formValues, callback) {
     this.props.showSpinner();
-    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}`;
+    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=${this.state.page + 1}`;
 
     return apiClient.post(url, flattenRequest(formValues))
       .then((response) => {
@@ -123,7 +123,7 @@ class ReceivingPage extends Component {
    * @public
    */
   nextPage() {
-    this.setState({ page: this.state.page + 1 });
+    this.setState({ page: this.state.page + 1 }, () => this.fetchPartialReceiptCandidates());
   }
 
   /**
@@ -131,7 +131,8 @@ class ReceivingPage extends Component {
    * @public
    */
   prevPage() {
-    this.setState({ page: this.state.page - 1, completed: false });
+    this.setState({ page: this.state.page - 1, completed: false }, () =>
+      this.fetchPartialReceiptCandidates());
   }
 
   /**
@@ -140,7 +141,7 @@ class ReceivingPage extends Component {
    */
   fetchPartialReceiptCandidates() {
     this.props.showSpinner();
-    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}`;
+    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=${this.state.page + 1}`;
 
     return apiClient.get(url)
       .then((response) => {

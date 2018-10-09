@@ -32,7 +32,7 @@ class ReceiptService {
     def locationService
     def identifierService
 
-    PartialReceipt getPartialReceipt(String id) {
+    PartialReceipt getPartialReceipt(String id, String stepNumber) {
         Shipment shipment = Shipment.get(id)
         if (!shipment) {
             throw new IllegalArgumentException("Unable to find shipment with ID ${id}")
@@ -41,13 +41,14 @@ class ReceiptService {
         // Getting pending receipts and try to create a partial receipt from them
         Set<Receipt> receipts = shipment.receipts.findAll { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.PENDING }
         if (receipts?.size() > 1) {
-            throw IllegalStateException("Shipments should only have one pending receipt at any given time")
+            throw new IllegalStateException("Shipments should only have one pending receipt at any given time")
         }
 
         PartialReceipt partialReceipt
         Receipt receipt = receipts ? receipts.first() : null
         if (receipt) {
-            partialReceipt = getPartialReceiptFromReceipt(receipt)
+            boolean includeShipmentItems = stepNumber == "1"
+            partialReceipt = getPartialReceiptFromReceipt(receipt, includeShipmentItems)
         }
         else {
             partialReceipt = getPartialReceiptFromShipment(shipment)
@@ -79,13 +80,7 @@ class ReceiptService {
             partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
 
             shipmentItems.each { ShipmentItem shipmentItem ->
-                if (shipmentItem.receiptItems) {
-                    shipmentItem.receiptItems.each { ReceiptItem receiptItem ->
-                        partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(receiptItem))
-                    }
-                } else {
-                    partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(shipmentItem, defaultBinLocation))
-                }
+                partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(shipmentItem, defaultBinLocation))
             }
         }
         return partialReceipt
@@ -97,45 +92,38 @@ class ReceiptService {
      * @param receipt
      * @return
      */
-    PartialReceipt getPartialReceiptFromReceipt(Receipt receipt) {
+    PartialReceipt getPartialReceiptFromReceipt(Receipt receipt, boolean includeShipmentItems) {
 
         PartialReceipt partialReceipt = new PartialReceipt()
+        partialReceipt.receipt = receipt
         partialReceipt.shipment = receipt.shipment
         partialReceipt.recipient = receipt.recipient
         partialReceipt.dateShipped = receipt?.shipment?.actualShippingDate
         partialReceipt.dateDelivered = receipt.actualDeliveryDate
 
         Location defaultBinLocation =
-                locationService.findInternalLocation(receipt?.shipment?.destination, "Receiving ${receipt?.shipment?.shipmentNumber}")
+                locationService.findInternalLocation(receipt.shipment.destination, "Receiving ${receipt.shipment.shipmentNumber}")
 
         def shipmentItemsByContainer = receipt.shipment.shipmentItems.groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
 
             PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer(container: container)
-            partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
 
-            shipmentItems.collect { ShipmentItem shipmentItem ->
-
-                // FIXME When building these partial receipt items for an existing receipt we need to build the
-                // partial receipt items ...
-                // a) from both the shipment item and its receipt item(s)
-                // b) from the existing receipt item (in the case of split lines)
-
-                // For scenario (b) we'll be able to use the receiptItem.id as the identity
-
-                // Calculate pending quantity received
+            shipmentItems.each { ShipmentItem shipmentItem ->
                 Set<ReceiptItem> pendingReceiptItems =
                         receipt.receiptItems.findAll { ReceiptItem receiptItem -> receiptItem.shipmentItem == shipmentItem }
-                Integer quantityReceiving = pendingReceiptItems.sum { it.quantityReceived } ?: null
 
-                PartialReceiptItem partialReceiptItem = new PartialReceiptItem()
-                partialReceiptItem.quantityReceiving = quantityReceiving
-                partialReceiptItem.shipmentItem = shipmentItem
-                partialReceiptItem.recipient = shipmentItem.recipient
-                if (defaultBinLocation) {
-                    partialReceiptItem.binLocation = defaultBinLocation
+                if (pendingReceiptItems) {
+                    pendingReceiptItems.each { ReceiptItem receiptItem ->
+                        partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(receiptItem))
+                    }
+                } else if (includeShipmentItems) {
+                    partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(shipmentItem, defaultBinLocation))
                 }
-                partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
+            }
+
+            if (partialReceiptContainer.partialReceiptItems) {
+                partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
             }
         }
         return partialReceipt
@@ -170,7 +158,7 @@ class ReceiptService {
         return partialReceiptItem
     }
 
-    ReceiptItem createReceiptItem(PartialReceiptItem partialReceiptItem) {
+    ReceiptItem createOrUpdateReceiptItem(PartialReceiptItem partialReceiptItem) {
         ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
         if (!partialReceiptItem.shipmentItem) {
             throw new IllegalArgumentException("Cannot receive item without valid shipment item")
@@ -209,26 +197,21 @@ class ReceiptService {
         return receiptItem
     }
 
-    void savePartialReceipt(PartialReceipt partialReceipt) {
+    void savePartialReceipt(PartialReceipt partialReceipt, boolean completed) {
 
         log.info "Saving partial receipt " + partialReceipt
 
         Shipment shipment = partialReceipt?.shipment
-
-        // Find pending receipt
-        Set<Receipt> receipts = shipment.receipts.findAll { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.PENDING }
-        if (receipts?.size() > 1) {
-            throw IllegalStateException("Shipments should only have one pending receipt at any given time")
-        }
+        Receipt receipt = partialReceipt?.receipt
 
         // Create new receipt
-        Receipt receipt = receipts ? receipts.first() : null
         if (!receipt) {
             receipt = new Receipt()
             receipt.receiptNumber = identifierService.generateReceiptIdentifier()
-            receipt.receiptStatusCode = ReceiptStatusCode.PENDING
             shipment.addToReceipts(receipt)
         }
+
+        receipt.receiptStatusCode = completed ? ReceiptStatusCode.RECEIVED : ReceiptStatusCode.PENDING
 
         receipt.recipient = partialReceipt.recipient
         receipt.shipment = partialReceipt.shipment
@@ -241,7 +224,7 @@ class ReceiptService {
 
             log.info "Saving partial receipt item " + partialReceiptItem?.toJson()
             if (partialReceiptItem.quantityReceiving != null) {
-                ReceiptItem receiptItem = createReceiptItem(partialReceiptItem)
+                ReceiptItem receiptItem = createOrUpdateReceiptItem(partialReceiptItem)
                 receipt.addToReceiptItems(receiptItem)
                 ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
                 shipmentItem.addToReceiptItems(receiptItem)
@@ -253,14 +236,15 @@ class ReceiptService {
     }
 
     void saveAndCompletePartialReceipt(PartialReceipt partialReceipt) {
-        savePartialReceipt(partialReceipt)
+        savePartialReceipt(partialReceipt, true)
 
         Shipment shipment = partialReceipt.shipment
+        Receipt receipt = partialReceipt.receipt
 
         if (shipment.isFullyReceived()) {
             if (!shipment.wasReceived()) {
                 shipmentService.createShipmentEvent(shipment,
-                        receipt.actualDeliveryDate,
+                        receipt?.actualDeliveryDate,
                         EventCode.RECEIVED,
                         shipment.destination)
             }
@@ -270,7 +254,7 @@ class ReceiptService {
             // Create received shipment event
             if (!shipment.wasPartiallyReceived()) {
                 shipmentService.createShipmentEvent(shipment,
-                        receipt.actualDeliveryDate,
+                        receipt?.actualDeliveryDate,
                         EventCode.PARTIALLY_RECEIVED,
                         shipment.destination)
             }
@@ -295,7 +279,7 @@ class ReceiptService {
 
         Shipment shipment = partialReceipt.shipment
         if (!shipment) {
-            throw IllegalStateException("Must have a shipment")
+            throw new IllegalStateException("Must have a shipment")
         }
 
         if (!shipment?.destination?.inventory) {
@@ -312,7 +296,7 @@ class ReceiptService {
         creditTransaction.inventory = shipment?.destination?.inventory
         creditTransaction.transactionDate = receipt?.actualDeliveryDate
 
-        receipt?.receiptItems.each {
+        receipt?.receiptItems?.each {
             def inventoryItem =
                     inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)
 
@@ -320,17 +304,17 @@ class ReceiptService {
                 inventoryItem.errors.allErrors.each { error->
                     def errorObj = [inventoryItem, error.field, error.rejectedValue] as Object[]
                     shipment.errors.reject("inventoryItem.invalid",
-                            errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ");
+                            errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ")
                 }
                 throw new ValidationException("Failed to receive shipment while saving inventory item ", shipment.errors)
             }
 
             // Create a new transaction entry
-            TransactionEntry transactionEntry = new TransactionEntry();
-            transactionEntry.quantity = it.quantityReceived;
+            TransactionEntry transactionEntry = new TransactionEntry()
+            transactionEntry.quantity = it.quantityReceived
             transactionEntry.binLocation = it.binLocation
-            transactionEntry.inventoryItem = inventoryItem;
-            creditTransaction.addToTransactionEntries(transactionEntry);
+            transactionEntry.inventoryItem = inventoryItem
+            creditTransaction.addToTransactionEntries(transactionEntry)
         }
 
         if (creditTransaction.hasErrors() || !creditTransaction.save()) {
@@ -340,15 +324,15 @@ class ReceiptService {
 
         // Associate the incoming transaction with the shipment
         shipment.addToIncomingTransactions(creditTransaction)
-        shipment.save(flush:true);
+        shipment.save(flush:true)
 
-        return creditTransaction;
+        return creditTransaction
     }
 
 
     void rollbackInboundTransactions(Shipment shipment) {
         if (shipment.incomingTransactions) {
-            shipment.incomingTransactions?.toArray().each {
+            shipment.incomingTransactions?.toArray()?.each {
                 shipment.removeFromIncomingTransactions(it)
                 it.delete()
             }

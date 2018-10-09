@@ -41,6 +41,14 @@ const isIndeterminate = (subfield, fieldValue) => {
     && _.some(fieldValue.shipmentItems, item => _.isNil(item.quantityReceiving) || item.quantityReceiving === '');
 };
 
+const isAnyItemSelected = (containers) => {
+  if (!_.size(containers)) {
+    return false;
+  }
+
+  return _.some(containers, cont => _.size(cont.shipmentItems) && _.some(cont.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''));
+};
+
 const FIELDS = {
   'origin.name': {
     type: LabelField,
@@ -63,13 +71,13 @@ const FIELDS = {
   },
   buttonsTop: {
     // eslint-disable-next-line react/prop-types
-    type: ({ autofillLines, onSave }) => (
+    type: ({ autofillLines, onSave, saveDisabled }) => (
       <div className="mb-3 text-center">
         <button type="button" className="btn btn-outline-success margin-bottom-lg mr-3" onClick={() => autofillLines()}>
           Autofill quantities
         </button>
-        <button type="button" className="btn btn-outline-success margin-bottom-lg" onClick={() => onSave()}>Save</button>
-        <button type="submit" className="btn btn-outline-primary float-right btn-form">Next</button>
+        <button type="button" className="btn btn-outline-success margin-bottom-lg" disabled={saveDisabled} onClick={() => onSave()}>Save</button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form" disabled={saveDisabled}>Next</button>
       </div>),
   },
   containers: {
@@ -204,13 +212,13 @@ const FIELDS = {
   },
   buttonsBottom: {
     // eslint-disable-next-line react/prop-types
-    type: ({ autofillLines, onSave }) => (
+    type: ({ autofillLines, onSave, saveDisabled }) => (
       <div className="my-3 text-center">
         <button type="button" className="btn btn-outline-success margin-bottom-lg mr-3" onClick={() => autofillLines()}>
           Autofill quantities
         </button>
-        <button type="button" className="btn btn-outline-success margin-bottom-lg" onClick={() => onSave()}>Save</button>
-        <button type="submit" className="btn btn-outline-primary float-right btn-form mt-4 mb-4">Next</button>
+        <button type="button" className="btn btn-outline-success margin-bottom-lg" disabled={saveDisabled} onClick={() => onSave()}>Save</button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form mt-4 mb-4" disabled={saveDisabled}>Next</button>
       </div>),
   },
 };
@@ -368,6 +376,7 @@ class PartialReceivingPage extends Component {
             bins: this.props.bins,
             users: this.props.users,
             locationId: this.props.locationId,
+            saveDisabled: !isAnyItemSelected(this.props.formValues.containers),
           }))}
       </div>
     );

@@ -25,7 +25,7 @@ class PartialReceivingApiController {
     }
 
     def read = {
-        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id)
+        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
         render([data:partialReceipt] as JSON)
     }
 
@@ -35,7 +35,7 @@ class PartialReceivingApiController {
 
         log.info "JSON " + jsonObject.toString(4)
 
-        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id)
+        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
 
         bindPartialReceiptData(partialReceipt, jsonObject)
 
@@ -43,14 +43,13 @@ class PartialReceivingApiController {
             log.info "Save partial receipt"
             receiptService.saveAndCompletePartialReceipt(partialReceipt)
             receiptService.saveInboundTransaction(partialReceipt)
-            partialReceipt = receiptService.getPartialReceipt(params.id)
         }
         else if (partialReceipt.receiptStatus == PartialReceiptStatus.PENDING || partialReceipt.receiptStatus == PartialReceiptStatus.CHECKING) {
-            receiptService.savePartialReceipt(partialReceipt)
+            receiptService.savePartialReceipt(partialReceipt, false)
         }
         else if (partialReceipt.receiptStatus == PartialReceiptStatus.ROLLBACK) {
             receiptService.rollbackPartialReceipts(partialReceipt.shipment)
-            partialReceipt = receiptService.getPartialReceipt(params.id)
+            partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
         }
 
 

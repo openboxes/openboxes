@@ -17,6 +17,7 @@ import org.pih.warehouse.order.OrderShipment
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.requisition.RequisitionItem
 
 // import java.util.Date
@@ -144,11 +145,17 @@ class ShipmentItem implements Comparable, Serializable {
 
 
     Integer quantityReceived() {
-        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem -> receiptItem?.quantityReceived?:0 } : 0
+        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem ->
+            ReceiptStatusCode.RECEIVED == receiptItem?.receipt?.receiptStatusCode && receiptItem?.product == product &&
+                    receiptItem?.quantityReceived ? receiptItem.quantityReceived : 0
+        } : 0
     }
 
     Integer quantityCanceled() {
-        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem -> receiptItem?.quantityCanceled?:0 } : 0
+        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem ->
+            ReceiptStatusCode.RECEIVED == receiptItem?.receipt?.receiptStatusCode && receiptItem?.product == product &&
+                    receiptItem?.quantityCanceled ? receiptItem.quantityCanceled : 0
+        } : 0
     }
 
     Integer getQuantityRemaining()  {
