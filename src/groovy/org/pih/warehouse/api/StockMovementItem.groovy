@@ -526,6 +526,11 @@ class PackPageItem {
     String palletName
     String boxName
 
+    String shipmentItemId
+    Person recipient
+    Integer quantityShipped
+    List<PackPageItem> splitLineItems
+
     Map toJson() {
         return [
                 shipmentItemId    : shipmentItem?.id,
