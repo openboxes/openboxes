@@ -15,7 +15,9 @@ import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderShipment
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.requisition.RequisitionItem
 
 // import java.util.Date
@@ -115,10 +117,14 @@ class ShipmentItem implements Comparable, Serializable {
 	def totalQuantityReceived() {
 		int totalQuantityReceived = 0
 		// Should use inventory item instead of comparing product & lot number
-		if (shipment.receipt) { 
-			shipment.receipt.receiptItems.each {
-				if (it.product == this.product && it.lotNumber == this.lotNumber) {
-					totalQuantityReceived += it.quantityReceived
+		if (shipment.receipts) {
+			shipment.receipts.each { Receipt receipt ->
+				if (receipt) {
+					receipt.receiptItems.each {
+						if (it.product == this.product && it.lotNumber == this.lotNumber) {
+							totalQuantityReceived += it.quantityReceived
+						}
+					}
 				}
 			}
 		}
@@ -139,11 +145,17 @@ class ShipmentItem implements Comparable, Serializable {
 
 
     Integer quantityReceived() {
-        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem -> receiptItem?.quantityReceived?:0 } : 0
+        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem ->
+            ReceiptStatusCode.RECEIVED == receiptItem?.receipt?.receiptStatusCode && receiptItem?.product == product &&
+                    receiptItem?.quantityReceived ? receiptItem.quantityReceived : 0
+        } : 0
     }
 
     Integer quantityCanceled() {
-        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem -> receiptItem?.quantityCanceled?:0 } : 0
+        return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem ->
+            ReceiptStatusCode.RECEIVED == receiptItem?.receipt?.receiptStatusCode && receiptItem?.product == product &&
+                    receiptItem?.quantityCanceled ? receiptItem.quantityCanceled : 0
+        } : 0
     }
 
     Integer getQuantityRemaining()  {

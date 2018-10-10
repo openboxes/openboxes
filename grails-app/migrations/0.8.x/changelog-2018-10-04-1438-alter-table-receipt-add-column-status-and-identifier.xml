@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1538681211885-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="receipt" columnName="receipt_number"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="receipt">
+            <column name="receipt_number" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1538681211885-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="receipt" columnName="receipt_status_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="receipt">
+            <column name="receipt_status_code" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1538681211885-3">
+        <sql>
+            UPDATE receipt
+            SET receipt_status_code = 'RECEIVED'
+            WHERE receipt_status_code IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+
+

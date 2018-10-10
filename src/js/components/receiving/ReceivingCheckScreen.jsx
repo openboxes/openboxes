@@ -27,7 +27,7 @@ const FIELDS = {
   },
   buttonsTop: {
     // eslint-disable-next-line react/prop-types
-    type: ({ prevPage, onSave, completed }) => (
+    type: ({ prevPage, onSave, saveDisabled }) => (
       <div className="mb-3 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form" onClick={prevPage}>
           Back to Edit
@@ -36,13 +36,13 @@ const FIELDS = {
           type="button"
           className="btn btn-outline-success margin-bottom-lg btn-form"
           onClick={onSave}
-          disabled={completed}
+          disabled={saveDisabled}
         >Save
         </button>
         <button
           type="submit"
           className="btn btn-outline-primary float-right btn-form"
-          disabled={completed}
+          disabled={saveDisabled}
         >Receive shipment
         </button>
       </div>),
@@ -122,15 +122,15 @@ const FIELDS = {
         type: params => (params.subfield ? <CheckboxField {...params} /> : null),
         label: 'Cancel Remaining',
         fixedWidth: '140px',
-        getDynamicAttr: ({ completed }) => ({
-          disabled: completed,
+        getDynamicAttr: ({ saveDisabled }) => ({
+          disabled: saveDisabled,
         }),
       },
     },
   },
   buttonsBottom: {
     // eslint-disable-next-line react/prop-types
-    type: ({ prevPage, onSave, completed }) => (
+    type: ({ prevPage, onSave, saveDisabled }) => (
       <div className="my-3 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form mt-4" onClick={prevPage}>
           Back to Edit
@@ -139,13 +139,13 @@ const FIELDS = {
           type="button"
           className="btn btn-outline-success margin-bottom-lg"
           onClick={onSave}
-          disabled={completed}
+          disabled={saveDisabled}
         >Save
         </button>
         <button
           type="submit"
           className="btn btn-outline-primary float-right btn-form mt-4 mb-4"
-          disabled={completed}
+          disabled={saveDisabled}
         >Receive shipment
         </button>
       </div>),
@@ -178,7 +178,7 @@ class ReceivingCheckScreen extends Component {
           renderFormField(fieldConfig, fieldName, {
             prevPage: this.props.prevPage,
             onSave: this.onSave,
-            completed: this.props.completed,
+            saveDisabled: this.props.completed || !_.size(this.props.formValues.containers),
           }))}
       </div>
     );
@@ -193,7 +193,9 @@ ReceivingCheckScreen.propTypes = {
   /** Function sending all changes mage by user to API and updating data */
   save: PropTypes.func.isRequired,
   /** All data in the form */
-  formValues: PropTypes.shape({}),
+  formValues: PropTypes.shape({
+    containers: PropTypes.arrayOf(PropTypes.shape({})),
+  }),
   /** Indicator if partial receiving has been completed */
   completed: PropTypes.bool,
 };

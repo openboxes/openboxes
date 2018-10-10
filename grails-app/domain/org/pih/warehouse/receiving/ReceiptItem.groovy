@@ -46,7 +46,7 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 		id generator: 'uuid', sqlType: "char(38)"
 	}
 	
-	static belongsTo = [ receipt : Receipt ]
+	static belongsTo = [ receipt : Receipt, shipmentItem: ShipmentItem ]
 	static constraints = {
 		product(nullable:false)
 		lotNumber(nullable:true, maxSize: 255)

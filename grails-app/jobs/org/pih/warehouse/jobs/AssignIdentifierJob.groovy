@@ -19,6 +19,7 @@ class AssignIdentifierJob {
 
         identifierService.assignProductIdentifiers()
         identifierService.assignShipmentIdentifiers()
+        identifierService.assignReceiptIdentifiers()
         identifierService.assignOrderIdentifiers()
         identifierService.assignRequisitionIdentifiers()
         identifierService.assignTransactionIdentifiers()
