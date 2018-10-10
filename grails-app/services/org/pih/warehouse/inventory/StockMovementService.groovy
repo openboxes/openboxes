@@ -747,27 +747,31 @@ class StockMovementService {
     }
 
     void removeShipmentItemsForModifiedRequisitionItem(RequisitionItem requisitionItem) {
-        List<ShipmentItem> shipmentItems = new ArrayList<ShipmentItem>()
-        shipmentItems.addAll(ShipmentItem.findAllByRequisitionItem(requisitionItem))
 
+        // Get all shipment items associated with the given requisition item
+        List<ShipmentItem> shipmentItems = ShipmentItem.findAllByRequisitionItem(requisitionItem)
+
+        // Get all shipment items associated with the given requisition item's children
         requisitionItem?.requisitionItems?.each { RequisitionItem item ->
             shipmentItems.addAll(ShipmentItem.findAllByRequisitionItem(item))
         }
 
+        // Delete all shipment items
         shipmentItems.each { ShipmentItem shipmentItem ->
-            Shipment shipment = shipmentItem.shipment
-            shipment.removeFromShipmentItems(shipmentItem)
-            shipment.save()
             shipmentItem.delete()
         }
 
+        // Find all picklist items associated with the given requisition item
         List<PicklistItem> picklistItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
+
+        // Find all picklist items associated with the given requisition item's children
+        requisitionItem?.requisitionItems?.each { RequisitionItem item ->
+            picklistItems.addAll(PicklistItem.findAllByRequisitionItem(item))
+        }
+
         picklistItems.each { PicklistItem picklistItem ->
-            Requisition requisition = requisitionItem.requisition
-            Picklist picklist = picklistItem.picklist
-            picklist.removeFromPicklistItems(picklistItem)
-            requisitionItem.removeFromPicklistItems(picklistItem)
-            requisition.save()
+            picklistItem.delete()
+
         }
     }
 
