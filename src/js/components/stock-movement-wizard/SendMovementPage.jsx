@@ -8,11 +8,12 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 
 import { renderFormField } from '../../utils/form-utils';
-import TextField from '../form-elements/TextField';
-import SelectField from '../form-elements/SelectField';
-import DateField from '../form-elements/DateField';
-import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
+import apiClient from '../../utils/apiClient';
+import DateField from '../form-elements/DateField';
+import DocumentButton from '../DocumentButton';
+import SelectField from '../form-elements/SelectField';
+import TextField from '../form-elements/TextField';
 
 const FIELDS = {
   dateShipped: {
@@ -86,9 +87,7 @@ class SendMovementPage extends Component {
       stockMovementData: {},
       tableItems: [],
       supplier: false,
-      printDeliveryNote: '',
-      printPackingList: '',
-      printCertOfDonation: '',
+      documents: [],
       files: [],
       values: this.props.initialValues,
     };
@@ -114,17 +113,13 @@ class SendMovementPage extends Component {
           tableItems = stockMovementData.lineItems;
           supplier = true;
         }
-        const printDeliveryNote = _.find(associations.documents, doc => doc.name === 'Delivery Note');
-        const printPackingList = _.find(associations.documents, doc => doc.name === 'Download Packing List');
-        const printCertOfDonation = _.find(associations.documents, doc => doc.name === 'Download Suitcase Letter');
+        const documents = _.filter(associations.documents, doc => doc.stepNumber === 5);
 
         this.setState({
           stockMovementData,
           tableItems,
           supplier,
-          printDeliveryNote: !_.isEmpty(printDeliveryNote) ? printDeliveryNote.uri : '',
-          printPackingList: !_.isEmpty(printPackingList) ? printPackingList.uri : '',
-          printCertOfDonation: !_.isEmpty(printCertOfDonation) ? printCertOfDonation.uri : '',
+          documents,
           values: {
             ...this.state.values,
             dateShipped: stockMovementData.dateShipped,
@@ -140,13 +135,26 @@ class SendMovementPage extends Component {
 
   /**
    * Updates files' array after dropping them to dropzone area.
-   * @param {object} files
+   * @param {object} newFiles
    * @public
    */
-  onDrop(files) {
+  onDrop(newFiles) {
+    const { files } = this.state;
+    const difference = _.differenceBy(files, newFiles, 'name');
     this.setState({
-      files,
+      files: _.concat(difference, newFiles),
     });
+  }
+
+  /**
+   * Removes a file by name from files array
+   * @param {string} name
+   * @public
+   */
+  removeFile(name) {
+    const { files } = this.state;
+    _.remove(files, file => file.name === name);
+    this.setState({ files });
   }
 
   /**
@@ -319,30 +327,14 @@ class SendMovementPage extends Component {
                   </div>
                 </div>
                 <div className="print-buttons-container col-md-3 flex-grow-1">
-                  <a
-                    href={this.state.printDeliveryNote}
-                    className="py-1 mb-1 btn btn-outline-secondary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span><i className="fa fa-print pr-2" />Print Delivery Note</span>
-                  </a>
-                  <a
-                    href={this.state.printPackingList}
-                    className="py-1 mb-1 btn btn-outline-secondary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span><i className="fa fa-print pr-2" />Print Packing List</span>
-                  </a>
-                  <a
-                    href={this.state.printCertOfDonation}
-                    className="py-1 mb-1 btn btn-outline-secondary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span><i className="fa fa-print pr-2" />Print Certificate of Donation</span>
-                  </a>
+                  {this.state.documents.length && _.map(this.state.documents, (document, idx) => (
+                    <DocumentButton
+                      link={document.uri}
+                      buttonTitle={document.name}
+                      {...document}
+                      key={idx}
+                    />
+                  ))}
                   <div className="dropzone btn btn-outline-secondary">
                     <Dropzone
                       disabled={values.statusCode === 'ISSUED'}
@@ -351,7 +343,19 @@ class SendMovementPage extends Component {
                     >
                       <span><i className="fa fa-upload pr-2" />Upload Documents</span>
                       {_.map(this.state.files, file => (
-                        <div key={file.name} className="chosen-file"><span>{file.name}</span></div>
+                        <div key={file.name} className="chosen-file d-flex justify-content-center align-items-center">
+                          <div className="text-truncate">{file.name}</div>
+                          <a
+                            href="#"
+                            className="remove-button"
+                            onClick={(event) => {
+                              this.removeFile(file.name);
+                              event.stopPropagation();
+                            }}
+                          >
+                            <span className="fa fa-remove" />
+                          </a>
+                        </div>
                       ))}
                     </Dropzone>
                   </div>

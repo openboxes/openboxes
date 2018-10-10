@@ -28,6 +28,15 @@
             </tr>
             <tr class="prop">
                 <td class="name">
+                    <label for="productCode"><warehouse:message code="productSupplier.productCode.label"/></label>
+                </td>
+                <td class="value ">
+                    <g:textField name="productCode" size="80" class="medium text" value="${productSupplier?.productCode}" />
+                </td>
+            </tr>
+
+            <tr class="prop">
+                <td class="name">
                     <label for="name"><warehouse:message code="default.name.label"/></label>
                 </td>
                 <td class="value ">
@@ -70,14 +79,6 @@
                 </td>
             </tr>
 
-            <tr class="prop">
-                <td class="name">
-                    <label for="productCode"><warehouse:message code="productSupplier.productCode.label"/></label>
-                </td>
-                <td class="value ">
-                    <g:textField name="productCode" size="80" class="medium text" value="${productSupplier?.productCode}" />
-                </td>
-            </tr>
 
             <tr class="prop">
                 <td class="name">

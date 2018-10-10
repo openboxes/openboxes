@@ -69,7 +69,7 @@ class DashboardController {
 			redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
 			return;
 		}
-		
+
 		def product = Product.findByProductCodeOrId(params.searchTerms, params.searchTerms)
 		if (product) {
 			redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
@@ -93,6 +93,17 @@ class DashboardController {
 			redirect(controller: "shipment", action: "showDetails", id: shipment.id)
 			return;
 		}
+
+		def receipt = Receipt.findByReceiptNumber(params.searchTerms)
+		if (receipt) {
+			redirect(controller: "receipt", action: "show", id: receipt.id)
+			return;
+		}
+        def order = Order.findByOrderNumber(params.searchTerms)
+        if (order) {
+            redirect(controller: "order", action: "show", id: order.id)
+            return;
+        }
 
 		redirect(controller: "inventory", action: "browse", params:params)
 			

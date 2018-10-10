@@ -1040,6 +1040,8 @@ class InventoryService implements ApplicationContextAware {
                             ilike("unitOfMeasure", "%" + term + "%")
                             ilike("productCode", "%" + term + "%")
                             ilike("ps.name", "%" + term + "%")
+							ilike("ps.code", "%" + term + "%")
+							ilike("ps.productCode", "%" + term + "%")
                             ilike("ps.manufacturerCode", "%" + term + "%")
                             ilike("ps.manufacturerName", "%" + term + "%")
                             ilike("ps.supplierCode", "%" + term + "%")
@@ -4689,12 +4691,13 @@ class InventoryService implements ApplicationContextAware {
 		}
 		availableBinLocations = availableBinLocations.findAll { it.quantityAvailable > 0 }
 
-		// Sort empty expiration dates last
+		// Sort empty expiration dates last and then by available quantity
 		availableBinLocations = availableBinLocations.sort { a, b ->
 			!a?.inventoryItem?.expirationDate ?
 					!b?.inventoryItem?.expirationDate ? 0 : 1 :
 					!b?.inventoryItem?.expirationDate ? -1 :
-							a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
+							a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?:
+								a?.quantityAvailable <=> b?.quantityAvailable
 		}
 
 

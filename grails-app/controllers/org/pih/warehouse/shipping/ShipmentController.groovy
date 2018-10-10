@@ -324,16 +324,9 @@ class ShipmentController {
 			return;
 		}
 		else {
-			if ("POST".equalsIgnoreCase(request.getMethod())) {	
-				//shipmentInstance.shipmentItems.clear();
-				//shipmentInstance.containers.clear();
-				Shipment.withTransaction { tx -> 
-					shipmentInstance.delete();
-					
-					
-					//tx.setRollbackOnly();
-				}
-				
+			if ("POST".equalsIgnoreCase(request.getMethod())) {
+				shipmentService.deleteShipment(shipmentInstance)
+
 				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(controller: "dashboard", action: "index")
 				return;

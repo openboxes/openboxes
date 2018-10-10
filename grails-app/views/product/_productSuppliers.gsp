@@ -13,6 +13,8 @@
             --%>
             <g:sortableColumn property="code" title="${warehouse.message(code: 'default.code.label', default: 'Code')}" />
 
+            <th><g:message code="productSupplier.productCode.label" /></th>
+
             <th><g:message code="default.name.label" default="Name" /></th>
 
             <th><g:message code="productSupplier.supplier.label" default="Supplier" /></th>
@@ -55,6 +57,8 @@
                             --%>
                             <td>${fieldValue(bean: productSupplier, field: "code")?:g.message(code:'default.none.label')}</td>
 
+                            <td>${fieldValue(bean: productSupplier, field: "productCode")?:g.message(code:'default.none.label')}</td>
+
                             <td>${fieldValue(bean: productSupplier, field: "name")?:g.message(code:'default.none.label')}</td>
 
                             <td>${fieldValue(bean: productSupplier, field: "supplier")}</td>
@@ -94,7 +98,7 @@
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="11">
+                <td colspan="12">
                     <div class="center">
                         <button class="button btn-show-dialog"
                                 data-target="#product-supplier-dialog"

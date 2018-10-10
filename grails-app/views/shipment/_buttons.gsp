@@ -108,14 +108,14 @@
                          class="middle"/>&nbsp;
                     <warehouse:message code="shipping.receiveShipment.label"/>
                 </g:link>
-
-                <g:link controller="partialReceiving" action="create" id="${shipmentInstance.id}"
-                        name="receiveShipmentLink" class="button">
-                    <img src="${createLinkTo(dir: 'images/icons', file: 'handtruck.png')}"
-                         class="middle"/>&nbsp;
-                    <warehouse:message code="shipping.partialReceipt.label" default="Partial Receipt"/>
-                </g:link>
-
+                <g:if test="${shipmentInstance?.isPartialReceiveAllowed()}">
+                    <g:link controller="partialReceiving" action="create" id="${shipmentInstance.id}"
+                            name="receiveShipmentLink" class="button">
+                        <img src="${createLinkTo(dir: 'images/icons', file: 'handtruck.png')}"
+                             class="middle"/>&nbsp;
+                        <warehouse:message code="shipping.partialReceipt.label" default="Partial Receipt"/>
+                    </g:link>
+                </g:if>
 
             </g:if>
             <g:else>

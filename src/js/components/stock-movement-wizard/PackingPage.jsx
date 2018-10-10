@@ -97,9 +97,11 @@ const FIELDS = {
           btnOpenText: 'Split Line',
           btnOpenClassName: 'btn btn-outline-success',
         },
-        getDynamicAttr: ({ fieldValue, rowIndex, onSave }) => ({
+        getDynamicAttr: ({
+          fieldValue, rowIndex, onSave, formValues,
+        }) => ({
           lineItem: fieldValue,
-          onSave: splitLineItems => onSave(rowIndex, splitLineItems),
+          onSave: splitLineItems => onSave(formValues, rowIndex, splitLineItems),
         }),
       },
     },
@@ -117,6 +119,8 @@ class PackingPage extends Component {
     this.state = {
       values: { ...this.props.initialValues, packPageItems: [] },
     };
+
+    this.saveSplitLines = this.saveSplitLines.bind(this);
 
     this.props.showSpinner();
   }
@@ -220,18 +224,18 @@ class PackingPage extends Component {
 
   /**
    * Saves packing data
-   * @param {object} lineItems
+   * @param {object} packPageItems
    * @public
    */
-  savePackingData(lineItems) {
+  savePackingData(packPageItems) {
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
     const payload = {
       id: this.state.values.stockMovementId,
       stepNumber: '5',
-      lineItems,
+      packPageItems,
     };
 
-    if (payload.lineItems.length) {
+    if (payload.packPageItems.length) {
       return apiClient.post(updateItemsUrl, flattenRequest(payload))
         .catch(() => Promise.reject(new Error('Could not save requisition items')));
     }
@@ -288,8 +292,8 @@ class PackingPage extends Component {
             </span>
             <form onSubmit={handleSubmit}>
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                onSave: (lineItemIndex, splitLineItems) =>
-                  this.saveSplitLines(values, lineItemIndex, splitLineItems),
+                onSave: this.saveSplitLines,
+                formValues: values,
               }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>

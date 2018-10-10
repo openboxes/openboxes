@@ -176,7 +176,7 @@ class StockMovementItem {
                 substitutionItems: substitutionItems,
                 reasonCode: requisitionItem.cancelReasonCode,
                 comments: requisitionItem.cancelComments,
-                recipient: requisitionItem.recipient,
+                recipient: requisitionItem.recipient?:requisitionItem?.parentRequisitionItem?.recipient,
                 palletName: requisitionItem?.palletName?:"",
                 boxName: requisitionItem?.boxName?:"",
                 lotNumber: requisitionItem?.lotNumber?:"",
@@ -525,6 +525,11 @@ class PackPageItem {
     ShipmentItem shipmentItem
     String palletName
     String boxName
+
+    String shipmentItemId
+    Person recipient
+    Integer quantityShipped
+    List<PackPageItem> splitLineItems
 
     Map toJson() {
         return [

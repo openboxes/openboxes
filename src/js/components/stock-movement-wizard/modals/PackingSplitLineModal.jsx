@@ -129,6 +129,16 @@ class PackingSplitLineModal extends Component {
     this.validate = this.validate.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    const {
+      fieldConfig: { attributes, getDynamicAttr },
+    } = nextProps;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
+    const attr = { ...attributes, ...dynamicAttr };
+
+    this.setState({ attr });
+  }
+
   /**
    * Loads current packing lines for specified item
    * @public

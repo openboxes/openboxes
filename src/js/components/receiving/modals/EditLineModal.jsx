@@ -21,7 +21,12 @@ const FIELDS = {
       <button
         type="button"
         className="btn btn-outline-success margin-bottom-lg"
-        onClick={() => addRow({ shipmentItem: { id: shipmentItemId } })}
+        onClick={() => addRow({
+          shipmentItemId,
+          receiptItemId: null,
+          newLine: true,
+          quantityReceiving: 0,
+        })}
       >Add line
       </button>
     ),
@@ -55,11 +60,11 @@ const FIELDS = {
           loadOptions: _.debounce(productsFetch, 500),
         }),
       },
-      'inventoryItem.lotNumber': {
+      lotNumber: {
         type: TextField,
         label: 'Lot',
       },
-      'inventoryItem.expirationDate': {
+      expirationDate: {
         type: DateField,
         label: 'Expiry',
         attributes: {
@@ -111,6 +116,16 @@ class EditLineModal extends Component {
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
     this.productsFetch = this.productsFetch.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {
+      fieldConfig: { attributes, getDynamicAttr },
+    } = nextProps;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
+    const attr = { ...attributes, ...dynamicAttr };
+
+    this.setState({ attr });
   }
 
   /**
@@ -181,7 +196,7 @@ class EditLineModal extends Component {
         initialValues={this.state.formValues}
         fields={FIELDS}
         formProps={{
-          shipmentItemId: this.state.attr.fieldValue.shipmentItem.id,
+          shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
           productsFetch: this.productsFetch,
         }}
       />
