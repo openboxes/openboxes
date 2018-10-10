@@ -941,7 +941,7 @@ class ShipmentService {
 	 * 
 	 * @param shipment
 	 */
-	void deleteShipment(Shipment shipment) { 
+	void deleteShipment(Shipment shipment) {
 		shipment.delete(flush:true)
 	}
 
