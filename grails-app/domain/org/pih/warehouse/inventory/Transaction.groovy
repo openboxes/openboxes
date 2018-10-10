@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment;
 
@@ -62,6 +63,7 @@ class Transaction implements Comparable, Serializable {
 	Shipment outgoingShipment			// Outgoing shipment associated with a transfer out transasction
 	Shipment incomingShipment			// Incoming shipment associated with a transfer in transasction
 	Requisition requisition				// associated requisition
+	Receipt receipt
 	Order order
 
 	// Auditing fields
@@ -103,8 +105,9 @@ class Transaction implements Comparable, Serializable {
 		updatedBy(nullable:true)
 		outgoingShipment(nullable:true)
 		incomingShipment(nullable:true)
-        order(nullable:true)
 		requisition(nullable:true)
+		receipt(nullable:true)
+        order(nullable:true)
         outboundTransfer(nullable:true)
         inboundTransfer(nullable:true)
 		confirmed(nullable:true)

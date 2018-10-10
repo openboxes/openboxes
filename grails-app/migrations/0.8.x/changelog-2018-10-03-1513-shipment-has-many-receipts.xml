@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1538597274510-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="receipt" columnName="shipment_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="receipt">
+            <column name="shipment_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1538597274510-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="transaction" columnName="receipt_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="transaction">
+            <column name="receipt_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1538597274510-3">
+        <comment>Migrate data from shipment-has-a-receipt association to shipment-has-many-receipts.</comment>
+        <sql>
+            UPDATE receipt
+            SET shipment_id =
+                (SELECT id FROM shipment WHERE shipment.receipt_id = receipt.id);
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="jmiranda (generated)" id="1538597274510-4">
+        <comment>Migrate data to reference receipt on transactions related to inbound transactions.</comment>
+        <sql>
+            UPDATE transaction
+            JOIN shipment ON shipment.id = transaction.incoming_shipment_id
+            SET transaction.receipt_id = shipment.receipt_id
+            WHERE incoming_shipment_id IS NOT NULL
+            AND transaction.receipt_id IS NULL;
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="jmiranda (generated)" id="1538597274510-5">
+        <comment>
+            Clear out data from shipment receipt association (shipment.receipt_id). The reason for the join is so we
+            clear out only rows that we know have receipts. We want to throw an error here to make sure earlier
+            migrations completed successfully.
+        </comment>
+        <sql>
+            UPDATE shipment
+            JOIN receipt ON shipment.id = receipt.shipment_id
+            SET shipment.receipt_id = NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1538597274510-6">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="FKE139719AF7076438"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="shipment" constraintName="FKE139719AF7076438"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1538597274510-7">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="shipment" columnName="receipt_id"/>
+        </preConditions>
+        <dropColumn tableName="shipment" columnName="receipt_id"/>
+    </changeSet>
+
+
+
+    <changeSet author="jmiranda (generated)" id="1538597274510-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK408272383B5F6286"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="receipt"
+                                 constraintName="FK408272383B5F6286" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="shipment"/>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1538597274510-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7FA0D2DEF7076438"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="receipt_id" baseTableName="transaction"
+                                 constraintName="FK7FA0D2DEF7076438" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="receipt"/>
+    </changeSet>
+
+
+
+</databaseChangeLog>
+
+

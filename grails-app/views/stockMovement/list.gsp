@@ -57,13 +57,13 @@
         </div>
 
         <div class="button-group">
-            <g:link controller="stockMovement" action="list" class="button">
-                <warehouse:message code="default.list.label" args="[g.message(code: 'stockMovements.label')]"/>
+            <g:link controller="stockMovement" action="list" class="button icon arrowleft">
+                <warehouse:message code="default.button.list.label" />
             </g:link>
         </div>
         <div class="button-group">
-            <g:link controller="stockMovement" action="index" class="button">
-                <warehouse:message code="default.create.label" args="[g.message(code: 'stockMovement.label')]"/>
+            <g:link controller="stockMovement" action="index" class="button icon add">
+                <warehouse:message code="default.button.create.label" />
             </g:link>
         </div>
 
