@@ -14,20 +14,23 @@ import org.junit.Ignore
 import org.junit.Test
 
 class LocationTests extends GrailsUnitTestCase {
-    def location1
-    def location2
-    def location3
-    def location4
+    Location location1
+    Location location2
+    Location location3
+    Location location4
+    Location location5
 
     protected void setUp() {
         super.setUp()
         def depot = new LocationType(name: "Depot", description: "Depot", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
         def supplier = new LocationType(name: "Supplier", description: "Supplier")
         def ward = new LocationType(name: "Ward", description: "Ward")
+
         location1 = new Location(name: "Boston", locationType: depot, supportedActivities: [ActivityCode.MANAGE_INVENTORY])
         location2 = new Location(name: "Miami", locationType: depot)
         location3 = new Location(name: "supplier", locationType: supplier, supportedActivities: [ActivityCode.RECEIVE_STOCK])
         location4 = new Location(name: "ward", locationType: ward, supportedActivities: [ActivityCode.RECEIVE_STOCK])
+        location5 = new Location(name: "New York", locationType: depot, supportedActivities: [ActivityCode.PICK_STOCK, ActivityCode.PUTAWAY_STOCK])
 
         mockDomain(LocationType, [depot, supplier, ward])
         mockDomain(Location, [location1, location2, location3, location4])
@@ -38,6 +41,15 @@ class LocationTests extends GrailsUnitTestCase {
         assert location1.supports(ActivityCode.MANAGE_INVENTORY)
         assert location2.supports(ActivityCode.MANAGE_INVENTORY)
         assert !location3.supports(ActivityCode.MANAGE_INVENTORY)
+
+        // Test supports any
+        assertTrue(location5.supportsAny([ActivityCode.RECEIVE_STOCK, ActivityCode.PUTAWAY_STOCK] as ActivityCode[]))
+        assertFalse(location5.supportsAny([ActivityCode.SEND_STOCK, ActivityCode.RECEIVE_STOCK] as ActivityCode[]))
+
+        // Test supports all
+        assertTrue(location5.supportsAll([ActivityCode.PICK_STOCK, ActivityCode.PUTAWAY_STOCK] as ActivityCode[]))
+        assertFalse(location5.supportsAll([ActivityCode.PICK_STOCK, ActivityCode.PUTAWAY_STOCK, ActivityCode.CROSS_DOCKING] as ActivityCode[]))
+
 
     }
 
