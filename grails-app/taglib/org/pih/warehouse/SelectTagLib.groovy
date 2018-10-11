@@ -338,6 +338,7 @@ class SelectTagLib {
         }
         else {
             out << g.message(code: "default.notSupported.label")
+            out << g.hiddenField(id: attrs.id, name: attrs.name, value: attrs.value)
         }
     }
 
