@@ -680,17 +680,32 @@ class StockMovementService {
                     } else if (stockMovementItem.substitute) {
                         log.info "Item substituted " + requisitionItem.id
                         log.info "Substitutions: " + requisitionItem.product.substitutions
-                        if (!requisitionItem.product.isValidSubstitution(stockMovementItem?.newProduct)) {
+                        if (requisitionItem.product == stockMovementItem.newProduct) {
+                            Integer changedQuantity = requisitionItem.quantity - stockMovementItem.newQuantity?.intValueExact()
+                            requisitionItem.quantity = changedQuantity > 0 ? changedQuantity : 0
+
+                            RequisitionItem newItem = new RequisitionItem()
+                            newItem.product = stockMovementItem.newProduct
+                            newItem.quantity = stockMovementItem.newQuantity?.intValueExact()
+                            newItem.orderIndex = stockMovementItem.sortOrder
+                            newItem.recipient = requisitionItem.recipient
+                            newItem.palletName = requisitionItem.palletName
+                            newItem.boxName = requisitionItem.boxName
+                            newItem.lotNumber = requisitionItem.lotNumber
+                            newItem.expirationDate = requisitionItem.expirationDate
+                            requisition.addToRequisitionItems(newItem)
+                        } else if (!requisitionItem.product.isValidSubstitution(stockMovementItem?.newProduct)) {
                             throw new IllegalArgumentException("Product ${stockMovementItem?.newProduct?.productCode} " +
                                     "${stockMovementItem?.newProduct?.name} is not a valid substitution of " +
                                     "${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}")
+                        } else {
+                            requisitionItem.chooseSubstitute(
+                                    stockMovementItem.newProduct,
+                                    null,
+                                    stockMovementItem.newQuantity?.intValueExact(),
+                                    stockMovementItem.reasonCode,
+                                    stockMovementItem.comments)
                         }
-                        requisitionItem.chooseSubstitute(
-                                stockMovementItem.newProduct,
-                                null,
-                                stockMovementItem.newQuantity?.intValueExact(),
-                                stockMovementItem.reasonCode,
-                                stockMovementItem.comments)
                     } else {
                         log.info "Item updated " + requisitionItem.id
                         if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product

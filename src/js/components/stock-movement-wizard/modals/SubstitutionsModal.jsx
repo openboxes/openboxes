@@ -14,17 +14,21 @@ import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
 const FIELDS = {
   reasonCode: {
     type: SelectField,
-    label: 'Reason code',
+    label: 'Reason for not fulfilling full qty',
     attributes: {
       required: true,
     },
     getDynamicAttr: props => ({
       options: props.reasonCodes,
+      hidden: !props.originalQtyAvailable,
     }),
   },
   substitutions: {
     type: ArrayField,
     disableVirtualization: true,
+    getDynamicRowAttr: ({ rowValues }) => ({
+      className: rowValues.originalItem ? 'font-weight-bold' : '',
+    }),
     fields: {
       productCode: {
         type: LabelField,
@@ -91,6 +95,7 @@ class SubstitutionsModal extends Component {
     this.state = {
       attr,
       formValues: {},
+      originalQtyAvailable: false,
     };
 
     this.onOpen = this.onOpen.bind(this);
@@ -117,11 +122,23 @@ class SubstitutionsModal extends Component {
    * @public
    */
   onOpen() {
+    let substitutions = this.state.attr.lineItem.availableSubstitutions;
+    let originalQtyAvailable = false;
+
+    if (_.toInteger(this.state.attr.lineItem.quantityAvailable) > 0) {
+      substitutions = [
+        { ...this.state.attr.lineItem, originalItem: true },
+        ...this.state.attr.lineItem.availableSubstitutions,
+      ];
+      originalQtyAvailable = true;
+    }
+
     this.setState({
       formValues: {
-        substitutions: this.state.attr.lineItem.availableSubstitutions,
-        reasonCode: '',
+        substitutions,
+        reasonCode: originalQtyAvailable ? '' : 'SUBSTITUTION',
       },
+      originalQtyAvailable,
     });
   }
 
@@ -188,7 +205,10 @@ class SubstitutionsModal extends Component {
         fields={FIELDS}
         validate={validate}
         initialValues={this.state.formValues}
-        formProps={{ reasonCodes: this.props.reasonCodes }}
+        formProps={{
+          reasonCodes: this.props.reasonCodes,
+          originalQtyAvailable: this.state.originalQtyAvailable,
+        }}
         renderBodyWithValues={this.calculateSelected}
       >
         <div>
