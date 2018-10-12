@@ -6,6 +6,7 @@ import fileDownload from 'js-file-download';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import Alert from 'react-s-alert';
+import { confirmAlert } from 'react-confirm-alert';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -17,32 +18,6 @@ import ValueSelectorField from '../form-elements/ValueSelectorField';
 import { renderFormField } from '../../utils/form-utils';
 import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
 import apiClient from '../../utils/apiClient';
-
-const debouncedProductsFetch = _.debounce((searchTerm, callback) => {
-  if (searchTerm) {
-    apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}`)
-      .then(result => callback(
-        null,
-        {
-          complete: true,
-          options: _.map(result.data.data, obj => (
-            {
-              value: {
-                id: obj.id,
-                name: obj.name,
-                productCode: obj.productCode,
-                label: `${obj.productCode} - ${obj.name}`,
-              },
-              label: `${obj.productCode} - ${obj.name}`,
-            }
-          )),
-        },
-      ))
-      .catch(error => callback(error, { options: [] }));
-  } else {
-    callback(null, { options: [] });
-  }
-}, 500);
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -74,13 +49,14 @@ const NO_STOCKLIST_FIELDS = {
           openOnClick: false,
           autoload: false,
           autoFocus: true,
-          loadOptions: debouncedProductsFetch,
+          filterOptions: options => options,
           cache: false,
           options: [],
           showValueTooltip: true,
         },
-        getDynamicAttr: ({ fieldValue }) => ({
+        getDynamicAttr: ({ fieldValue, productsFetch }) => ({
           disabled: !!fieldValue,
+          loadOptions: _.debounce(productsFetch, 500),
         }),
       },
       quantityRequested: {
@@ -111,6 +87,7 @@ const NO_STOCKLIST_FIELDS = {
         }),
         attributes: {
           labelKey: 'name',
+          openOnClick: false,
         },
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -140,13 +117,14 @@ const STOCKLIST_FIELDS = {
             openOnClick: false,
             autoload: false,
             autoFocus: true,
-            loadOptions: debouncedProductsFetch,
+            filterOptions: options => options,
             cache: false,
             options: [],
             showValueTooltip: true,
           },
-          getDynamicAttr: ({ selectedValue }) => ({
+          getDynamicAttr: ({ selectedValue, productsFetch }) => ({
             disabled: !!selectedValue,
+            loadOptions: _.debounce(productsFetch, 500),
           }),
         },
       },
@@ -203,11 +181,14 @@ const VENDOR_FIELDS = {
           async: true,
           openOnClick: false,
           autoload: false,
-          loadOptions: debouncedProductsFetch,
+          filterOptions: options => options,
           cache: false,
           options: [],
           showValueTooltip: true,
         },
+        getDynamicAttr: ({ productsFetch }) => ({
+          loadOptions: _.debounce(productsFetch, 500),
+        }),
       },
       lotNumber: {
         type: TextField,
@@ -242,6 +223,7 @@ const VENDOR_FIELDS = {
         }),
         attributes: {
           labelKey: 'name',
+          openOnClick: false,
         },
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -272,13 +254,13 @@ class AddItemsPage extends Component {
     super(props);
     this.state = {
       currentLineItems: [],
-      statusCode: '',
       values: this.props.initialValues,
     };
 
     this.props.showSpinner();
     this.removeItem = this.removeItem.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
+    this.productsFetch = this.productsFetch.bind(this);
   }
 
   componentDidMount() {
@@ -380,6 +362,32 @@ class AddItemsPage extends Component {
     );
   }
 
+  productsFetch(searchTerm, callback) {
+    if (searchTerm) {
+      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${this.state.values.origin.id}`)
+        .then(result => callback(
+          null,
+          {
+            complete: true,
+            options: _.map(result.data.data, obj => (
+              {
+                value: {
+                  id: obj.id,
+                  name: obj.name,
+                  productCode: obj.productCode,
+                  label: `${obj.productCode} - ${obj.name}`,
+                },
+                label: `${obj.productCode} - ${obj.name}`,
+              }
+            )),
+          },
+        ))
+        .catch(error => callback(error, { options: [] }));
+    } else {
+      callback(null, { options: [] });
+    }
+  }
+
   /**
    * Fetches all required data.
    * @param {boolean} forceFetch
@@ -401,7 +409,7 @@ class AddItemsPage extends Component {
   fetchAndSetLineItems() {
     this.props.showSpinner();
     this.fetchLineItems().then((resp) => {
-      const { statusCode, lineItems } = resp.data.data;
+      const { lineItems } = resp.data.data;
       let lineItemsData;
       if (!lineItems.length) {
         lineItemsData = new Array(1).fill({});
@@ -422,7 +430,6 @@ class AddItemsPage extends Component {
 
       this.setState({
         currentLineItems: lineItems,
-        statusCode,
         values: { ...this.state.values, lineItems: lineItemsData },
       });
 
@@ -470,15 +477,11 @@ class AddItemsPage extends Component {
           if (resp) {
             values = { ...formValues, lineItems: resp.data.data.lineItems };
           }
-          if (this.state.statusCode === 'CREATED' || this.state.statusCode === 'EDITING') {
-            this.transitionToNextStep('PICKED')
-              .then(() => {
-                this.props.goToPage(5, values);
-              })
-              .catch(() => this.props.hideSpinner());
-          } else {
-            this.props.goToPage(5, values);
-          }
+          this.transitionToNextStep('CHECKING')
+            .then(() => {
+              this.props.goToPage(6, values);
+            })
+            .catch(() => this.props.hideSpinner());
         })
         .catch(() => this.props.hideSpinner());
     } else {
@@ -489,15 +492,11 @@ class AddItemsPage extends Component {
           if (resp) {
             values = { ...formValues, lineItems: resp.data.data.lineItems };
           }
-          if (this.state.statusCode === 'CREATED' || this.state.statusCode === 'EDITING') {
-            this.transitionToNextStep('VERIFYING')
-              .then(() => {
-                this.props.onSubmit(values);
-              })
-              .catch(() => this.props.hideSpinner());
-          } else {
-            this.props.onSubmit(values);
-          }
+          this.transitionToNextStep('VERIFYING')
+            .then(() => {
+              this.props.onSubmit(values);
+            })
+            .catch(() => this.props.hideSpinner());
         })
         .catch(() => this.props.hideSpinner());
     }
@@ -540,7 +539,7 @@ class AddItemsPage extends Component {
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
-          const { statusCode, lineItems } = resp.data.data;
+          const { lineItems } = resp.data.data;
 
           const lineItemsBackendData = _.map(
             lineItems,
@@ -557,7 +556,6 @@ class AddItemsPage extends Component {
 
           this.setState({
             currentLineItems: lineItemsBackendData,
-            statusCode,
           });
         })
         .catch(() => Promise.reject(new Error('Could not save requisition items')));
@@ -590,7 +588,19 @@ class AddItemsPage extends Component {
    * @public
    */
   refresh() {
-    this.fetchAllData(true);
+    confirmAlert({
+      title: 'Confirm refresh',
+      message: 'Are you sure you want to refresh? Your progress since last save will be lost.',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => this.fetchAllData(true),
+        },
+        {
+          label: 'No',
+        },
+      ],
+    });
   }
 
   /**
@@ -611,13 +621,36 @@ class AddItemsPage extends Component {
     return apiClient.post(removeItemsUrl, payload)
       .catch(() => {
         this.props.hideSpinner();
+        return Promise.reject(new Error('Could not delete requisition item'));
+      });
+  }
+
+  /**
+   * Removes all items from requisition's items list.
+   * @public
+   */
+  removeAll() {
+    this.fetchAndSetLineItems();
+    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const payload = {
+      id: this.state.values.stockMovementId,
+      lineItems: _.map(this.state.values.lineItems, item => ({
+        id: item.id,
+        delete: 'true',
+      })),
+    };
+    this.fetchAndSetLineItems();
+
+    return apiClient.post(removeItemsUrl, payload)
+      .catch(() => {
+        this.props.hideSpinner();
         return Promise.reject(new Error('Could not delete requisition items'));
       });
   }
 
   /**
    * Transition to next stock movement status:
-   * - 'PICKED' if origin type is supplier.
+   * - 'CHECKING' if origin type is supplier.
    * - 'VERIFYING' if origin type is other than supplier.
    * @param {string} status
    * @public
@@ -725,9 +758,17 @@ class AddItemsPage extends Component {
                 type="button"
                 disabled={invalid}
                 onClick={() => this.save(values)}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
               >
                 <span><i className="fa fa-save pr-2" />Save</span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.removeAll()}
+                className="float-right py-1 mb-1 btn btn-outline-danger align-self-end"
+              >
+                <span><i className="fa fa-remove pr-2" />Delete all</span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -736,6 +777,7 @@ class AddItemsPage extends Component {
                   stockList: values.stockList,
                   recipients: this.props.recipients,
                   removeItem: this.removeItem,
+                  productsFetch: this.productsFetch,
                 }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => previousPage(values)}>

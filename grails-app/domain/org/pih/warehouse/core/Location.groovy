@@ -99,6 +99,15 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	int compareTo(Location location) {
 		return sortOrder <=> location?.sortOrder ?: name <=> location?.name
 	}
+
+
+	Boolean supportsAll(ActivityCode [] activityCodes) {
+		activityCodes.every { supports(it) }
+	}
+
+	Boolean supportsAny(ActivityCode [] activityCodes) {
+		activityCodes.any { supports(it) }
+	}
 	
 	/**
 	 * Indicates whether the location supports the given activity.
@@ -151,7 +160,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
 
     /**
-     * @return true is location is a ward or pharmacy
+     * @return true if location is a ward or pharmacy
      */
     @Deprecated
     Boolean isWardOrPharmacy() {
@@ -197,6 +206,11 @@ class Location implements Comparable<Location>, java.io.Serializable {
     Boolean isVirtual() {
         return locationType.locationTypeCode == LocationTypeCode.VIRTUAL
     }
+
+	Boolean hasBinLocationSupport() {
+		ActivityCode[] requiredActivities = [ActivityCode.PICK_STOCK, ActivityCode.PUTAWAY_STOCK]
+		return supportsAny(requiredActivities) && !binLocations?.empty
+	}
 
     /**
      * @return all physical locations

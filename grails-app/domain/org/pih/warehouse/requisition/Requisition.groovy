@@ -10,11 +10,6 @@
 package org.pih.warehouse.requisition
 
 import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.Event;
-
-
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
@@ -138,7 +133,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     static constraints = {
         status(nullable: true)
         type(nullable: true)
-        name(nullable: true)
+        name(nullable: false, blank: false)
         description(nullable: true)
         requestNumber(nullable: true, maxSize: 255)
         origin(nullable: false)
@@ -183,18 +178,6 @@ class Requisition implements Comparable<Requisition>, Serializable {
         isPublished(nullable: true)
         datePublished(nullable: true)
     }
-
-    /*
-    def getPicklist() {
-        return Picklist.findByRequisition(this)
-    }
-    */
-
-
-    //def getTransactions() {
-    //    return Transaction.findAllByRequisition(this)
-    //}
-
 
     List<Shipment> getShipments() {
         return Shipment.findAllByRequisition(this)

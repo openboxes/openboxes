@@ -2,12 +2,12 @@ package org.pih.warehouse.api
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
@@ -50,6 +50,7 @@ class StockMovement {
 
     PickPage pickPage
     EditPage editPage
+    PackPage packPage
 
     List<StockMovementItem> lineItems =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class));
@@ -100,6 +101,7 @@ class StockMovement {
                 lineItems: lineItems,
                 pickPage: pickPage,
                 editPage: editPage,
+                packPage: packPage,
                 associations: [
                     requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
                     shipment: [id: shipment?.id, shipmentNUmber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
@@ -125,11 +127,16 @@ class StockMovement {
      * @return
      */
     String generateName() {
-        String name = "${origin?.name}.${destination?.name}"
-        if (dateRequested) name += ".${dateRequested?.format("ddMMMyyyy")}"
-        if (stocklist?.name) name += ".${stocklist.name}"
-        if (trackingNumber) name += ".${trackingNumber}"
-        if (description) name += ".${description}"
+        final String separator =
+                ConfigurationHolder.config.openboxes.generateName.separator?:Constants.DEFAULT_NAME_SEPARATOR
+
+        String originIdentifier = origin?.locationNumber?:origin?.name
+        String destinationIdentifier = destination?.locationNumber?:destination?.name
+        String name = "${originIdentifier}${separator}${destinationIdentifier}"
+        if (dateRequested) name += "${separator}${dateRequested?.format("ddMMMyyyy")}"
+        if (stocklist?.name) name += "${separator}${stocklist.name}"
+        if (trackingNumber) name += "${separator}${trackingNumber}"
+        if (description) name += "${separator}${description}"
         name = name.replace(" ", "")
         return name
     }
@@ -241,6 +248,20 @@ class EditPage {
     Map toJson() {
         return [
                 editPageItems: editPageItems
+        ]
+    }
+}
+
+class PackPage {
+    List<PackPageItem> packPageItems = []
+
+    static constraints = {
+        packPageItems(nullable:true)
+    }
+
+    Map toJson() {
+        return [
+                packPageItems: packPageItems
         ]
     }
 }

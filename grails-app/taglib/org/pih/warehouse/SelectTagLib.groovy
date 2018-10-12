@@ -328,16 +328,25 @@ class SelectTagLib {
 
     def selectBinLocation = { attrs, body ->
         def currentLocation = Location.get(session?.warehouse?.id)
-        attrs.from = Location.findAllByParentLocationAndActive(currentLocation, true).sort { it?.name?.toLowerCase() };
-        attrs.optionKey = 'id'
-        attrs.optionValue = 'name'
-        out << g.select(attrs)
+        if (currentLocation.hasBinLocationSupport()) {
+            attrs.from = Location.findAllByParentLocationAndActive(currentLocation, true).sort {
+                it?.name?.toLowerCase()
+            };
+            attrs.optionKey = 'id'
+            attrs.optionValue = 'name'
+            out << g.select(attrs)
+        }
+        else {
+            out << g.message(code: "default.notSupported.label")
+            out << g.hiddenField(id: attrs.id, name: attrs.name, value: attrs.value)
+        }
     }
 
     def selectBinLocationByLocation = { attrs, body ->
         log.info "selectBinLocationByLocation: " + attrs
         def location = Location.get(attrs.id)
-        if (location) {
+
+        if (location && location.hasBinLocationSupport()) {
             attrs.from = Location.findAllByParentLocationAndActive(location, true).sort { it?.name?.toLowerCase() };
         }
 

@@ -13,6 +13,8 @@ import grails.util.Environment
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
+import org.pih.warehouse.api.PackPage
+import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -116,7 +118,7 @@ class BootStrap {
                         productCode: inventoryItem?.product?.productCode
                 ],
                 lotNumber: inventoryItem.lotNumber,
-                expirationDate: inventoryItem.expirationDate
+                expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy")
         ]}
 
         JSON.registerObjectMarshaller(Location) { Location location -> [
@@ -127,7 +129,8 @@ class BootStrap {
                 locationGroup: location.locationGroup,
                 parentLocation: location.parentLocation,
                 locationType: location.locationType,
-                sortOrder: location.sortOrder
+                sortOrder: location.sortOrder,
+                hasBinLocationSupport: location.hasBinLocationSupport()
         ]}
 
         JSON.registerObjectMarshaller(Person) { Person person -> [
@@ -145,7 +148,7 @@ class BootStrap {
                 name: picklist.name,
                 description: picklist.description,
                 picker: picklist.picker,
-                datePicked: picklist.datePicked,
+                datePicked: picklist.datePicked?.format("MM/dd/yyyy"),
                 picklistItems: picklist.picklistItems,
                 "requisition.id": picklist?.requisition?.id
         ]}
@@ -159,7 +162,7 @@ class BootStrap {
                 "product.name": picklistItem?.inventoryItem?.product?.name,
                 "productCode": picklistItem?.inventoryItem?.product?.productCode,
                 lotNumber: picklistItem?.inventoryItem?.lotNumber,
-                expirationDate: picklistItem?.inventoryItem?.expirationDate,
+                expirationDate: picklistItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
                 "binLocation.id": picklistItem?.binLocation?.id,
                 "binLocation.name": picklistItem?.binLocation?.name,
                 quantityPicked: picklistItem.quantity,
@@ -208,22 +211,24 @@ class BootStrap {
                 recipient: receiptItem.recipient
         ]}
 
-        JSON.registerObjectMarshaller(Requisition) { Requisition requisition -> [
+        JSON.registerObjectMarshaller(Requisition) { Requisition requisition ->
+            def defaultName = requisition?.isTemplate ? "Stocklist ${requisition?.id}" : null
+            [
                 id: requisition.id,
-                name: requisition.name,
+                name: requisition.name?:defaultName,
                 requisitionNumber: requisition.requestNumber,
                 description: requisition.description,
                 isTemplate: requisition.isTemplate,
                 type: requisition?.type?.name(),
                 status: requisition?.status?.name(),
                 commodityClass: requisition?.commodityClass?.name(),
-                dateRequested: requisition.dateRequested,
-                dateReviewed: requisition.dateReviewed,
-                dateVerified: requisition.dateVerified,
-                dateChecked: requisition.dateChecked,
-                dateDelivered: requisition.dateDelivered,
-                dateIssued: requisition.dateIssued,
-                dateReceived: requisition.dateReceived,
+                dateRequested: requisition.dateRequested?.format("MM/dd/yyyy"),
+                dateReviewed: requisition.dateReviewed?.format("MM/dd/yyyy"),
+                dateVerified: requisition.dateVerified?.format("MM/dd/yyyy"),
+                dateChecked: requisition.dateChecked?.format("MM/dd/yyyy"),
+                dateDelivered: requisition.dateDelivered?.format("MM/dd/yyyy"),
+                dateIssued: requisition.dateIssued?.format("MM/dd/yyyy"),
+                dateReceived: requisition.dateReceived?.format("MM/dd/yyyy"),
                 origin: requisition.origin,
                 destination: requisition.destination,
                 requestedBy: requisition.requestedBy,
@@ -278,10 +283,10 @@ class BootStrap {
                             type: shipment?.destination?.locationType?.locationTypeCode?.name()
 
                     ],
-                    expectedShippingDate: shipment.expectedShippingDate,
-                    actualShippingDate: shipment.actualShippingDate,
-                    expectedDeliveryDate: shipment.expectedDeliveryDate,
-                    actualDeliveryDate: shipment.actualDeliveryDate,
+                    expectedShippingDate: shipment.expectedShippingDate?.format("MM/dd/yyyy"),
+                    actualShippingDate: shipment.actualShippingDate?.format("MM/dd/yyyy"),
+                    expectedDeliveryDate: shipment.expectedDeliveryDate?.format("MM/dd/yyyy"),
+                    actualDeliveryDate: shipment.actualDeliveryDate?.format("MM/dd/yyyy"),
                     shipmentItems: shipment.shipmentItems,
                     containers: containerList
         ]}
@@ -341,6 +346,14 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(PickPageItem) { PickPageItem pickPageItem ->
             return pickPageItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PackPage) { PackPage packPage ->
+            return packPage.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PackPageItem) { PackPageItem packPageItem ->
+            return packPageItem.toJson()
         }
 
         JSON.registerObjectMarshaller(StockAdjustment) { StockAdjustment stockAdjustment ->

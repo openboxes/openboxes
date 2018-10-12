@@ -484,6 +484,7 @@ openboxes.identifier.transaction.format = Constants.DEFAULT_TRANSACTION_NUMBER_F
 openboxes.identifier.order.format = Constants.DEFAULT_ORDER_NUMBER_FORMAT
 openboxes.identifier.product.format = Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
 openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
+openboxes.identifier.receipt.format = Constants.DEFAULT_RECEIPT_NUMBER_FORMAT
 openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
 openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
 
@@ -602,6 +603,34 @@ openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es' , 'pt']
 openboxes.locale.defaultCurrencyCode = "USD"
 openboxes.locale.defaultCurrencySymbol = "\$"
 //openboxes.locale.supportedCurrencyCodes = ["USD","CFA"]
+
+// Global megamenu configuration
+openboxes.megamenu.dashboard.enabled = true
+openboxes.megamenu.analytics.enabled = true
+openboxes.megamenu.inventory.enabled = true
+openboxes.megamenu.orders.enabled = true
+openboxes.megamenu.requisitions.enabled = true
+openboxes.megamenu.shipping.enabled = true
+openboxes.megamenu.stockMovement.enabled = true
+openboxes.megamenu.receiving.enabled = true
+openboxes.megamenu.reporting.enabled = true
+openboxes.megamenu.products.enabled = true
+openboxes.megamenu.configuration.enabled = true
+openboxes.megamenu.customLinks.enabled = false
+
+// Custom links example
+//openboxes {
+//	megamenu {
+//		customLinks {
+//			content = [
+//					[label: "Search Google", href: "https://www.google.com", target: "_blank"]
+//			]
+//		}
+//	}
+//}
+
+openboxes.generateName.separator = " - "
+
 
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true

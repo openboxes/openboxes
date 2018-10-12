@@ -26,4 +26,7 @@
     <include file="0.8.x/changelog-2018-09-17-2302-alter-table-requisition-item-add-columns.xml"/>
     <include file="0.8.x/changelog-2018-09-19-0002-add-transfer-order-columns.xml"/>
     <include file="0.8.x/changelog-2018-09-21-2000-reverse-requisition-origin-and-destination.xml"/>
+    <include file="0.8.x/changelog-2018-09-27-2257-update-existing-purchase-orders.xml"/>
+    <include file="0.8.x/changelog-2018-10-03-1513-shipment-has-many-receipts.xml"/>
+    <include file="0.8.x/changelog-2018-10-04-1438-alter-table-receipt-add-column-status-and-identifier.xml"/>
 </databaseChangeLog>

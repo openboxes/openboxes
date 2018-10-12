@@ -27,9 +27,6 @@ module.exports = {
     new ExtractTextPlugin('../css/bundle.css', {
       allChunks: true,
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      comments: false,
-    }),
   ],
   module: {
     loaders: [

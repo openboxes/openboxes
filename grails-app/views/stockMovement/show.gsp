@@ -21,12 +21,12 @@
         </div>
 
         <div class="title">
-            ${entityName} &rsaquo; ${stockMovement?.identifier} ${stockMovement?.name}
+            <small>${stockMovement?.identifier}</small> ${stockMovement?.name}
         </div>
 
     </div>
 
-    <div class="button-bar">
+    <div class="button-bar ">
 
         <%--
             <g:if test="${stockMovement.id}">
@@ -49,28 +49,37 @@
             </g:if>
         --%>
 
+        <div class="button-group">
+            <g:link controller="stockMovement" action="list" class="button icon arrowleft">
+                <warehouse:message code="default.button.list.label" />
+            </g:link>
+        </div>
+        <div class="button-group">
+            <g:link controller="stockMovement" action="index" class="button icon add">
+                <warehouse:message code="default.button.create.label" />
+            </g:link>
+        </div>
 
-    <div class="button-group">
-        <g:link controller="stockMovement" action="list" class="button">
-            <warehouse:message code="default.list.label" args="[g.message(code: 'stockMovements.label')]"/>
-        </g:link>
+        <div class="button-group">
+            <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button icon edit">
+                <warehouse:message code="default.button.edit.label" />
+            </g:link>
+            <g:if test="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}">
+                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button icon approve">
+                        <warehouse:message code="default.button.receive.label" />
+                    </g:link>
+            </g:if>
+
+            <g:isSuperuser>
+                <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button icon remove"
+                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                    <warehouse:message code="default.button.delete.label" />
+                </g:link>
+            </g:isSuperuser>
+        </div>
+
+
     </div>
-    <div class="button-group">
-        <g:link controller="stockMovement" action="index" class="button">
-            <warehouse:message code="default.create.label" args="[g.message(code: 'stockMovement.label')]"/>
-        </g:link>
-    </div>
-    <div class="button-group">
-        <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button">
-            <warehouse:message code="default.edit.label" args="[g.message(code: 'stockMovement.label')]"/>
-        </g:link>
-    </div>
-    <div class="button-group">
-        <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-            <warehouse:message code="default.receive.label" args="[g.message(code: 'stockMovement.label')]"/>
-        </g:link>
-    </div>
-</div>
 
 
 <div class="yui-gf">
@@ -93,7 +102,7 @@
                             <g:message code="stockMovement.status.label"/>
                         </td>
                         <td class="value">
-                            <format:metadata obj="${stockMovement?.requisition?.status}"/>
+                            <format:metadata obj="${stockMovement?.status}"/>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -227,16 +236,16 @@
                     </a>
                 </li>
                 <li>
+                    <a href="${request.contextPath}/stockMovement/receipts/${stockMovement?.id}">
+                        <warehouse:message code="receipts.label" default="Receipts"/>
+                    </a>
+                </li>
+                <li>
                     <a href="#documents-tab">
                         <warehouse:message code="documents.label" default="Documents"/>
                     </a>
                 </li>
                 <%--
-                <li>
-                    <a href="${request.contextPath}/stockMovement/receipts/${stockMovement?.id}">
-                        <warehouse:message code="receipts.label" default="Receipts"/>
-                    </a>
-                </li>
                 <li>
                     <a href="#comments-tab">
                         <warehouse:message code="comments.label" default="Comments"/>
@@ -263,62 +272,47 @@
 
                                 <tr>
                                     <th></th>
-                                    <th></th>
                                     <th><g:message code="default.status.label"/></th>
                                     <th><g:message code="product.label"/></th>
                                     <th><g:message code="product.uom.label"/></th>
                                     <th width="1%"><g:message code="stockMovement.quantityRequested.label"/></th>
-                                    <th width="1%"><g:message code="stockMovement.quantityPicked.label"/></th>
-                                    <th width="1%"><g:message code="stockMovement.quantityRemaining.label"/></th>
                                 </tr>
 
                                 <g:each var="stockMovementItem" in="${stockMovement.lineItems}" status="i">
                                 <g:set var="requisitionItem" value="${stockMovementItem?.requisitionItem}"/>
                                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                                    <td class="">
+                                    <td class="center">
                                         ${i+1}
                                     </td>
                                     <td class="">
-                                        <g:if test="${requisitionItem?.isSubstituted()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"
-                                        </g:if>
-                                        <g:elseif test="${requisitionItem?.isSubstitution()}">
-                                            <img src="${resource(dir:'images/icons',file:'indent.gif')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${requisitionItem?.isChanged()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${requisitionItem?.isPending()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${requisitionItem?.isCanceled()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${requisitionItem?.isApproved()||requisitionItem?.isCompleted()}">
-                                            <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"/>
-                                        </g:elseif>
-                                    </td>
-
-                                    </td>
-                                    <td>
                                         <div class="tag tag-success">
+                                            <g:if test="${requisitionItem?.isSubstituted()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"/>
+                                            </g:if>
+                                            <g:elseif test="${requisitionItem?.isSubstitution()}">
+                                                <img src="${resource(dir:'images/icons',file:'indent.gif')}"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem?.isChanged()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem?.isCanceled()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem?.isApproved()||requisitionItem?.isCompleted()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem?.isPending()}">
+                                                <img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}"/>
+                                            </g:elseif>
                                             <format:metadata obj="${requisitionItem?.status}"/>
                                         </div>
                                     </td>
                                     <td>
                                         ${stockMovementItem?.product?.productCode} ${stockMovementItem?.product?.name}
                                     </td>
-                                    <td>
+                                    <td class="center">
+                                        ${stockMovementItem?.quantityRequested?:0}
                                         ${stockMovementItem.product?.unitOfMeasure?:g.message(code:'default.each.label')}
-                                    </td>
-                                    <td>
-                                        ${stockMovementItem.quantityRequested?:0}
-                                    </td>
-                                    <td>
-                                        ${stockMovementItem.quantityRevised?:0}
-                                    </td>
-                                    <td>
-                                        ${stockMovementItem.quantityPicked?:0}
                                     </td>
 
                                 </tr>
@@ -343,17 +337,12 @@
                             </g:each>
                         </table>
                     </div>
-
                 </div>
-
-
             </div>
-
-
         </div>
     </div>
-
 </div>
+
 <script type="text/javascript">
     $(document).ready(function() {
         $(".tabs").tabs({

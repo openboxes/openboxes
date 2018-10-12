@@ -324,16 +324,9 @@ class ShipmentController {
 			return;
 		}
 		else {
-			if ("POST".equalsIgnoreCase(request.getMethod())) {	
-				//shipmentInstance.shipmentItems.clear();
-				//shipmentInstance.containers.clear();
-				Shipment.withTransaction { tx -> 
-					shipmentInstance.delete();
-					
-					
-					//tx.setRollbackOnly();
-				}
-				
+			if ("POST".equalsIgnoreCase(request.getMethod())) {
+				shipmentService.deleteShipment(shipmentInstance)
+
 				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(controller: "dashboard", action: "index")
 				return;
@@ -512,11 +505,9 @@ class ShipmentController {
 	def receiveShipment = { ReceiveShipmentCommand command ->
 		log.info "params: " + params
 		def receiptInstance
-		def shipmentItems
 		def location = Location.get(session.warehouse.id)
 		def shipmentInstance = Shipment.get(params.id)
         def userInstance = User.get(session.user.id)
-		def binLocations = Location.findAllByParentLocation(location)
 
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -532,7 +523,7 @@ class ShipmentController {
             receiptInstance = shipmentInstance.receipt
             if (!receiptInstance) {
                 receiptInstance = new Receipt(params)
-                shipmentInstance.receipt = receiptInstance
+                shipmentInstance.addToReceipts(receiptInstance)
             }
             else {
                 receiptInstance.properties = params

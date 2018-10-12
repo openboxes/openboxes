@@ -38,7 +38,9 @@ class DashboardController {
 	def inventoryService
 	def productService
     def requisitionService
+	def userService
 	def sessionFactory
+	def grailsApplication
 	
 	def showCacheStatistics = {
 		def statistics = sessionFactory.statistics
@@ -67,7 +69,7 @@ class DashboardController {
 			redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
 			return;
 		}
-		
+
 		def product = Product.findByProductCodeOrId(params.searchTerms, params.searchTerms)
 		if (product) {
 			redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
@@ -91,6 +93,17 @@ class DashboardController {
 			redirect(controller: "shipment", action: "showDetails", id: shipment.id)
 			return;
 		}
+
+		def receipt = Receipt.findByReceiptNumber(params.searchTerms)
+		if (receipt) {
+			redirect(controller: "receipt", action: "show", id: receipt.id)
+			return;
+		}
+        def order = Order.findByOrderNumber(params.searchTerms)
+        if (order) {
+            redirect(controller: "order", action: "show", id: order.id)
+            return;
+        }
 
 		redirect(controller: "inventory", action: "browse", params:params)
 			
@@ -359,10 +372,10 @@ class DashboardController {
 		categories = category.categories
 		categories = categories.groupBy { it?.parentCategory }
 
-        //println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Megamenu: " + (System.currentTimeMillis() - startTime) + " ms"
-
 		[
 				categories            : categories,
+				isSuperuser			  : userService.isSuperuser(session?.user),
+				megamenuConfig        : grailsApplication.config.openboxes.megamenu,
 				inboundShipmentsTotal : inboundShipmentsTotal ?: 0,
 				inboundShipmentsCount : inboundShipmentsCount,
 				outboundShipmentsTotal: outboundShipmentsTotal ?: 0,

@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 class ImportDataCommand {
 	def filename
-	MultipartFile importFile
+	def importFile
 	def type
 	Location location
     Date date

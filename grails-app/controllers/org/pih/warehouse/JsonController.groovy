@@ -1166,18 +1166,16 @@ class JsonController {
         def quantityMap = [:]
 		def terms = params.term?.split(" ")
         def location = Location.get(session.warehouse.id)
-		terms?.each{ term ->
-            // Get all products that match terms
-            def products = inventoryService.getProductsByTermsAndCategories(terms, [], true, location.inventory, 25, 0)
+        // Get all products that match terms
+        def products = inventoryService.getProductsByTermsAndCategories(terms, [], true, location.inventory, 25, 0)
 
-            // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
-            if (products) {
-                quantityMap = getQuantityByProductMapCached(location, products);
-                log.info "Quantity map: " + quantityMap?.size()
-            }
-            items.addAll(products)
-		}
-		
+        // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
+        if (products) {
+            quantityMap = getQuantityByProductMapCached(location, products);
+            log.info "Quantity map: " + quantityMap?.size()
+        }
+        items.addAll(products)
+
 		items.unique{ it.id }
 		def json = items.collect{
             def quantity = quantityMap[it]?:0
@@ -1188,7 +1186,7 @@ class JsonController {
                 type: it.class,
                 url: request.contextPath + "/" + type  + "/redirect/" + it.id,
 				value: it.name,
-                label: it.productCode + " " + it.name + " (" + manufuacturerInfo + ") x " + quantity + " " + it.unitOfMeasure ]
+                label: it.productCode + " " + it.name + " (" + manufuacturerInfo + ") x " + quantity + " " + (it?.unitOfMeasure?:"EA") ]
 		}
 		render json as JSON
 	}

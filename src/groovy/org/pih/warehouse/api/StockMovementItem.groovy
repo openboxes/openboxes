@@ -27,7 +27,11 @@ class StockMovementItem {
     BigDecimal quantityRevised
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
+    BigDecimal quantityShipped
 
+    String shipmentItemId
+
+    List<StockMovementItem> splitLineItems = []
     List<StockMovementItem> substitutionItems = []
 
     // Actions
@@ -172,7 +176,7 @@ class StockMovementItem {
                 substitutionItems: substitutionItems,
                 reasonCode: requisitionItem.cancelReasonCode,
                 comments: requisitionItem.cancelComments,
-                recipient: requisitionItem.recipient,
+                recipient: requisitionItem.recipient?:requisitionItem?.parentRequisitionItem?.recipient,
                 palletName: requisitionItem?.palletName?:"",
                 boxName: requisitionItem?.boxName?:"",
                 lotNumber: requisitionItem?.lotNumber?:"",
@@ -251,7 +255,7 @@ class AvailableItem {
                 "product.name"    : inventoryItem?.product?.name,
                 "productCode"     : inventoryItem?.product?.productCode,
                 lotNumber         : inventoryItem?.lotNumber,
-                expirationDate    : inventoryItem?.expirationDate,
+                expirationDate    : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
                 "binLocation.id"  : binLocation?.id,
                 "binLocation.name": binLocation?.name,
                 quantityAvailable : quantityAvailable,
@@ -515,4 +519,47 @@ class PickPageItem {
         return new PickPageItem(requisitionItem: requisitionItem)
     }
 
+}
+
+class PackPageItem {
+    ShipmentItem shipmentItem
+    String palletName
+    String boxName
+
+    String shipmentItemId
+    Person recipient
+    Integer quantityShipped
+    List<PackPageItem> splitLineItems
+
+    Map toJson() {
+        return [
+                shipmentItemId    : shipmentItem?.id,
+                "product.id"      : shipmentItem?.product?.id,
+                productName       : shipmentItem?.product?.name,
+                productCode       : shipmentItem?.product?.productCode,
+                lotNumber         : shipmentItem?.lotNumber,
+                expirationDate    : shipmentItem?.expirationDate?.format("MM/dd/yyyy"),
+                binLocationName   : shipmentItem?.binLocation?.name,
+                uom               : shipmentItem?.product?.unitOfMeasure,
+                quantityShipped   : shipmentItem?.quantity,
+                recipient         : shipmentItem?.recipient,
+                palletName        : palletName,
+                boxName           : boxName,
+        ]
+    }
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        PackPageItem that = (PackPageItem) o
+
+        if (shipmentItem?.id != that.shipmentItem?.id) return false
+
+        return true
+    }
+
+    int hashCode() {
+        return (shipmentItem?.id != null ? shipmentItem?.id?.hashCode() : 0)
+    }
 }

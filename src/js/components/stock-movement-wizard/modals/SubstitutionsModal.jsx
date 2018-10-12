@@ -43,7 +43,7 @@ const FIELDS = {
         label: 'Qty Available',
         fixedWidth: '150px',
         attributes: {
-          formatValue: value => (value.toLocaleString('en-US')),
+          formatValue: value => (value ? value.toLocaleString('en-US') : null),
         },
       },
       quantitySelected: {
@@ -101,6 +101,16 @@ class SubstitutionsModal extends Component {
     if (!this.props.reasonCodesFetched) {
       this.fetchData(this.props.fetchReasonCodes);
     }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {
+      fieldConfig: { attributes, getDynamicAttr },
+    } = nextProps;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
+    const attr = { ...attributes, ...dynamicAttr };
+
+    this.setState({ attr });
   }
 
   /** Loads available substitutions for chosen item into modal's form.

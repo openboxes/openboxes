@@ -37,6 +37,7 @@ class ReceivingPage extends Component {
       bins: [],
       formData: {},
       completed: false,
+      locationId: '',
     };
 
     this.nextPage = this.nextPage.bind(this);
@@ -102,7 +103,7 @@ class ReceivingPage extends Component {
   */
   save(formValues, callback) {
     this.props.showSpinner();
-    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}`;
+    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=${this.state.page + 1}`;
 
     return apiClient.post(url, flattenRequest(formValues))
       .then((response) => {
@@ -122,7 +123,7 @@ class ReceivingPage extends Component {
    * @public
    */
   nextPage() {
-    this.setState({ page: this.state.page + 1 });
+    this.setState({ page: this.state.page + 1 }, () => this.fetchPartialReceiptCandidates());
   }
 
   /**
@@ -130,7 +131,8 @@ class ReceivingPage extends Component {
    * @public
    */
   prevPage() {
-    this.setState({ page: this.state.page - 1, completed: false });
+    this.setState({ page: this.state.page - 1, completed: false }, () =>
+      this.fetchPartialReceiptCandidates());
   }
 
   /**
@@ -139,12 +141,12 @@ class ReceivingPage extends Component {
    */
   fetchPartialReceiptCandidates() {
     this.props.showSpinner();
-    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}`;
+    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=${this.state.page + 1}`;
 
     return apiClient.get(url)
       .then((response) => {
-        this.setState({ formData: parseResponse(response.data.data) });
-        this.fetchBins();
+        const formData = parseResponse(response.data.data);
+        this.setState({ formData, locationId: formData.destination.id }, () => this.fetchBins());
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -154,7 +156,7 @@ class ReceivingPage extends Component {
    * @public
    */
   fetchBins() {
-    const url = '/openboxes/api/internalLocations';
+    const url = `/openboxes/api/internalLocations?location.id=${this.state.locationId}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -167,29 +169,37 @@ class ReceivingPage extends Component {
   }
 
   render() {
-    const { page, formData } = this.state;
+    const { page, formData, locationId } = this.state;
 
-    return (
-      <Form
-        onSubmit={values => this.onSubmit(values)}
-        validate={validate}
-        mutators={{ ...arrayMutators }}
-        initialValues={formData}
-        render={({ handleSubmit, values, form }) => (
-          <div>
-            {values.shipment && values.shipment.shipmentNumber &&
-              <h2 className="my-2 text-center">{`${values.shipment.shipmentNumber} ${values.shipment.name}`}</h2>}
-            <div className="align-self-center">
-              <form onSubmit={handleSubmit}>
-                {this.getFormList({
-                  formValues: values, change: form.change,
-                })[page]}
-              </form>
+    if (locationId) {
+      return (
+        <Form
+          onSubmit={values => this.onSubmit(values)}
+          validate={validate}
+          mutators={{ ...arrayMutators }}
+          initialValues={formData}
+          render={({ handleSubmit, values, form }) => (
+            <div>
+              {values.shipment && values.shipment.shipmentNumber &&
+              <h2 className="my-2 text-center">
+                {`${values.shipment.shipmentNumber} ${values.shipment.name}`}
+              </h2>}
+              <div className="align-self-center">
+                <form onSubmit={handleSubmit}>
+                  {this.getFormList({
+                    formValues: values,
+                    change: form.change,
+                    locationId,
+                  })[page]}
+                </form>
+              </div>
             </div>
-          </div>
-        )}
-      />
-    );
+          )}
+        />
+      );
+    }
+
+    return null;
   }
 }
 

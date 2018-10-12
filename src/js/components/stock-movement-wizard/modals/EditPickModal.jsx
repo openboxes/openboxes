@@ -40,7 +40,7 @@ const FIELDS = {
         label: 'Qty available',
         fixedWidth: '150px',
         attributes: {
-          formatValue: value => (value.toLocaleString('en-US')),
+          formatValue: value => (value ? value.toLocaleString('en-US') : null),
         },
       },
       quantityPicked: {
@@ -104,6 +104,16 @@ class EditPickModal extends Component {
     if (!this.props.reasonCodesFetched) {
       this.fetchData(this.props.fetchReasonCodes);
     }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {
+      fieldConfig: { attributes, getDynamicAttr },
+    } = nextProps;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
+    const attr = { ...attributes, ...dynamicAttr };
+
+    this.setState({ attr });
   }
 
   /**

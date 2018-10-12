@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
 
 import ArrayField from '../form-elements/ArrayField';
 import LabelField from '../form-elements/LabelField';
@@ -44,7 +45,7 @@ const FIELDS = {
       },
       lotNumber: {
         type: LabelField,
-        flexWidth: '0.7',
+        flexWidth: '1.3',
         label: 'Lot #',
       },
       expirationDate: {
@@ -105,7 +106,7 @@ const FIELDS = {
         },
         getDynamicAttr: ({
           fieldValue, selectedValue, subfield, stockMovementId,
-          checkForInitialPicksChanges, onResponse,
+          checkForInitialPicksChanges, onResponse, bins, locationId,
         }) => ({
           product: selectedValue,
           fieldValue,
@@ -115,6 +116,8 @@ const FIELDS = {
           btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse,
+          bins,
+          locationId,
         }),
       },
       revert: {
@@ -145,7 +148,7 @@ class PickPage extends Component {
     super(props);
 
     this.state = {
-      statusCode: '',
+      bins: [],
       printPicksUrl: '',
       values: this.props.initialValues,
     };
@@ -167,22 +170,19 @@ class PickPage extends Component {
     this.props.showSpinner();
     this.fetchLineItems()
       .then((resp) => {
-        const { associations, statusCode } = resp.data.data;
+        const { associations } = resp.data.data;
         const { pickPageItems } = resp.data.data.pickPage;
 
         const printPicks = _.find(associations.documents, doc => doc.name === 'Print Picklist');
         this.setState({
           printPicksUrl: printPicks.uri,
-          statusCode,
           values: { ...this.state.values, pickPageItems: [] },
         }, () => this.setState({
           values: {
             ...this.state.values,
             pickPageItems: this.checkForInitialPicksChanges(pickPageItems),
           },
-        }));
-
-        this.props.hideSpinner();
+        }, () => this.fetchBins()));
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -192,7 +192,19 @@ class PickPage extends Component {
    * @public
    */
   refresh() {
-    this.fetchAllData();
+    confirmAlert({
+      title: 'Confirm refresh',
+      message: 'Are you sure you want to refresh? Your progress since last save will be lost.',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => this.fetchAllData(),
+        },
+        {
+          label: 'No',
+        },
+      ],
+    });
   }
 
   /**
@@ -239,10 +251,27 @@ class PickPage extends Component {
   }
 
   /**
+   * Fetches available bin locations from API.
+   * @public
+   */
+  fetchBins() {
+    const url = `/openboxes/api/internalLocations?location.id=${this.state.values.origin.id}`;
+
+    return apiClient.get(url)
+      .then((response) => {
+        const bins = _.map(response.data.data, bin => (
+          { value: bin.id, label: bin.name, name: bin.name }
+        ));
+        this.setState({ bins }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  /**
    * Transition to next stock movement status (PICKED).
    * @public
    */
-  transitionToStep5() {
+  transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'PICKED' };
 
@@ -256,13 +285,9 @@ class PickPage extends Component {
    */
   nextPage(formValues) {
     this.props.showSpinner();
-    if (this.state.statusCode === 'PICKING') {
-      this.transitionToStep5()
-        .then(() => this.props.onSubmit(formValues))
-        .catch(() => this.props.hideSpinner());
-    } else {
-      this.props.onSubmit(formValues);
-    }
+    this.transitionToNextStep()
+      .then(() => this.props.onSubmit(formValues))
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -349,7 +374,7 @@ class PickPage extends Component {
                 onClick={() => this.refresh()}
                 className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
               >
-                <span><i className="fa fa-save pr-2" />Refresh</span>
+                <span><i className="fa fa-refresh pr-2" />Refresh</span>
               </button>
             </span>
             <form onSubmit={handleSubmit} className="print-mt">
@@ -358,6 +383,8 @@ class PickPage extends Component {
                   stockMovementId: values.stockMovementId,
                   onResponse: this.saveNewItems,
                   revertUserPick: this.revertUserPick,
+                  bins: this.state.bins,
+                  locationId: this.state.values.origin.id,
                 }))}
               <div className="d-print-none">
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>

@@ -33,6 +33,7 @@ class StockMovementController {
     def dataService
     def stockMovementService
     def requisitionService
+    def shipmentService
 
 	def index = {
 		render(template: "/stockMovement/create")
@@ -53,8 +54,19 @@ class StockMovementController {
     def list = {
         User currentUser = User.get(session?.user?.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
-        params.origin = params.origin?:currentLocation
-        params.destination = params.destination?:currentLocation
+
+        if (params.direction=="OUTBOUND") {
+            params.origin = params.origin?:currentLocation
+            params.destination = params.destination?:null
+        }
+        else if (params.direction=="INBOUND") {
+            params.origin = params.origin?:null
+            params.destination = params.destination?:currentLocation
+        }
+        else {
+            params.origin = params.origin?:currentLocation
+            params.destination = params.destination?:currentLocation
+        }
 
         Requisition requisition = new Requisition(params)
         requisition.discard()
@@ -76,12 +88,43 @@ class StockMovementController {
 
     }
 
+    def delete = {
+
+        try {
+            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+            Requisition requisition = stockMovement?.requisition
+            if (requisition) {
+                List shipments = stockMovement?.requisition?.shipments
+                shipments.toArray().each { Shipment shipment ->
+                    if (!shipment?.events?.empty) {
+                        shipmentService.rollbackLastEvent(shipment)
+                    }
+                    shipmentService.deleteShipment(shipment)
+                }
+                //requisitionService.rollbackRequisition(requisition)
+                requisitionService.deleteRequisition(requisition)
+            }
+            flash.message = "Successfully deleted stock movement with ID ${params.id}"
+        } catch (Exception e) {
+            log.warn ("Unable to delete stock movement withID ${params.id}: " + e.message)
+            flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+        }
+
+        redirect(action: "list")
+    }
+
+
     def shipments = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
+        render(template: "shipments", model: [shipments:shipments])
+    }
 
-
-        render(template: "/shipment/list", model: [shipments:shipments])
+    def receipts = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
+        def receiptItems = shipments*.receipts*.receiptItems?.flatten()
+        render(template: "receipts", model: [receiptItems:receiptItems])
     }
 
 

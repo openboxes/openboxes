@@ -12,32 +12,6 @@ import CheckboxField from '../../form-elements/CheckboxField';
 import { showSpinner, hideSpinner } from '../../../actions';
 import apiClient from '../../../utils/apiClient';
 
-const debouncedProductsFetch = _.debounce((searchTerm, callback) => {
-  if (searchTerm) {
-    apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}`)
-      .then(result => callback(
-        null,
-        {
-          complete: true,
-          options: _.map(result.data.data, obj => (
-            {
-              value: {
-                id: obj.id,
-                name: obj.name,
-                productCode: obj.productCode,
-                label: `${obj.productCode} - ${obj.name}`,
-              },
-              label: `${obj.productCode} - ${obj.name}`,
-            }
-          )),
-        },
-      ))
-      .catch(error => callback(error, { options: [] }));
-  } else {
-    callback(null, { options: [] });
-  }
-}, 500);
-
 const FIELDS = {
   lines: {
     type: ArrayField,
@@ -47,7 +21,12 @@ const FIELDS = {
       <button
         type="button"
         className="btn btn-outline-success margin-bottom-lg"
-        onClick={() => addRow({ shipmentItem: { id: shipmentItemId } })}
+        onClick={() => addRow({
+          shipmentItemId,
+          receiptItemId: null,
+          newLine: true,
+          quantityReceiving: 0,
+        })}
       >Add line
       </button>
     ),
@@ -71,20 +50,21 @@ const FIELDS = {
           async: true,
           openOnClick: false,
           autoload: false,
-          loadOptions: debouncedProductsFetch,
+          filterOptions: options => options,
           cache: false,
           options: [],
           showValueTooltip: true,
         },
-        getDynamicAttr: ({ fieldValue }) => ({
+        getDynamicAttr: ({ fieldValue, productsFetch }) => ({
           disabled: fieldValue,
+          loadOptions: _.debounce(productsFetch, 500),
         }),
       },
-      'inventoryItem.lotNumber': {
+      lotNumber: {
         type: TextField,
         label: 'Lot',
       },
-      'inventoryItem.expirationDate': {
+      expirationDate: {
         type: DateField,
         label: 'Expiry',
         attributes: {
@@ -135,6 +115,17 @@ class EditLineModal extends Component {
 
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.productsFetch = this.productsFetch.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {
+      fieldConfig: { attributes, getDynamicAttr },
+    } = nextProps;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
+    const attr = { ...attributes, ...dynamicAttr };
+
+    this.setState({ attr });
   }
 
   /**
@@ -169,6 +160,32 @@ class EditLineModal extends Component {
     );
   }
 
+  productsFetch(searchTerm, callback) {
+    if (searchTerm) {
+      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${this.props.locationId}`)
+        .then(result => callback(
+          null,
+          {
+            complete: true,
+            options: _.map(result.data.data, obj => (
+              {
+                value: {
+                  id: obj.id,
+                  name: obj.name,
+                  productCode: obj.productCode,
+                  label: `${obj.productCode} - ${obj.name}`,
+                },
+                label: `${obj.productCode} - ${obj.name}`,
+              }
+            )),
+          },
+        ))
+        .catch(error => callback(error, { options: [] }));
+    } else {
+      callback(null, { options: [] });
+    }
+  }
+
   render() {
     return (
       <ModalWrapper
@@ -178,7 +195,10 @@ class EditLineModal extends Component {
         validate={validate}
         initialValues={this.state.formValues}
         fields={FIELDS}
-        formProps={{ shipmentItemId: this.state.attr.fieldValue.shipmentItem.id }}
+        formProps={{
+          shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
+          productsFetch: this.productsFetch,
+        }}
       />
     );
   }
@@ -199,4 +219,6 @@ EditLineModal.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Index  of current row */
   rowIndex: PropTypes.number.isRequired,
+  /** Location ID (destination). Needs to be used in /api/products request. */
+  locationId: PropTypes.string.isRequired,
 };

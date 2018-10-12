@@ -1040,6 +1040,8 @@ class InventoryService implements ApplicationContextAware {
                             ilike("unitOfMeasure", "%" + term + "%")
                             ilike("productCode", "%" + term + "%")
                             ilike("ps.name", "%" + term + "%")
+							ilike("ps.code", "%" + term + "%")
+							ilike("ps.productCode", "%" + term + "%")
                             ilike("ps.manufacturerCode", "%" + term + "%")
                             ilike("ps.manufacturerName", "%" + term + "%")
                             ilike("ps.supplierCode", "%" + term + "%")
@@ -1613,26 +1615,29 @@ class InventoryService implements ApplicationContextAware {
      * @return
      */
     Map<Product, Integer> getQuantityOnHandByProduct(Location location, Date date) {
-        log.debug "getQuantityOnHandByProduct " + location + " " + date
-        def startTime = System.currentTimeMillis()
-        def results = InventorySnapshot.executeQuery("""
-                    select i.date, product, category.name, i.quantityOnHand
-                    from InventorySnapshot i, Product product, Category category
-                    where i.location = :location
-                    and i.date = :date
-                    and i.product = product
-                    and i.product.category = category
-                    """, [location:location, date: date])
+		def quantityMap = [:]
+		if (date && location) {
+			log.info "getQuantityOnHandByProduct " + location + " " + date
+			def startTime = System.currentTimeMillis()
+			def results = InventorySnapshot.executeQuery("""
+						select i.date, product, category.name, i.quantityOnHand
+						from InventorySnapshot i, Product product, Category category
+						where i.location = :location
+						and i.date = :date
+						and i.product = product
+						and i.product.category = category
+						""", [location: location, date: date])
 
-        log.debug "Results: " + results.size()
-        log.debug "Query response time: " + (System.currentTimeMillis() - startTime)
-        startTime = System.currentTimeMillis()
+			log.info "Results: " + results.size()
+			log.info "Query response time: " + (System.currentTimeMillis() - startTime)
+			startTime = System.currentTimeMillis()
 
-        def quantityMap = [:]
-        results.each {
-            quantityMap[it[1]] = it[3]
-        }
-        log.debug "Post-processing response time: " + (System.currentTimeMillis() - startTime)
+
+			results.each {
+				quantityMap[it[1]] = it[3]
+			}
+			log.debug "Post-processing response time: " + (System.currentTimeMillis() - startTime)
+		}
 
         return quantityMap
     }
@@ -1644,7 +1649,6 @@ class InventoryService implements ApplicationContextAware {
      */
     Date getMostRecentInventoryItemSnapshotDate() {
         return InventoryItemSnapshot.executeQuery('select max(date) from InventoryItemSnapshot')[0]
-
     }
 
 	/**
@@ -1655,29 +1659,28 @@ class InventoryService implements ApplicationContextAware {
      */
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location) {
         def startTime = System.currentTimeMillis()
-
+		def quantityMap = [:]
         Date date = getMostRecentInventoryItemSnapshotDate()
+		if (location && date) {
+			def results = InventoryItemSnapshot.executeQuery("""
+						select iis.date, ii, product.category.name, iis.quantityOnHand
+						from InventoryItemSnapshot iis, Product product, Category category, InventoryItem ii
+						where iis.location = :location
+						and iis.date = :date
+						and iis.product = product
+						and iis.inventoryItem = ii
+						and iis.product.category = category
+						""", [location: location, date: date])
 
-        def results = InventoryItemSnapshot.executeQuery("""
-                    select iis.date, ii, product.category.name, iis.quantityOnHand
-                    from InventoryItemSnapshot iis, Product product, Category category, InventoryItem ii
-                    where iis.location = :location
-                    and iis.date = :date
-                    and iis.product = product
-                    and iis.inventoryItem = ii
-                    and iis.product.category = category
-                    """, [location:location, date: date])
+			log.info "Results: " + results.size()
+			log.info "Query response time: " + (System.currentTimeMillis() - startTime)
+			startTime = System.currentTimeMillis()
 
-        log.info "Results: " + results.size()
-        log.info "Query response time: " + (System.currentTimeMillis() - startTime)
-        startTime = System.currentTimeMillis()
-
-        def quantityMap = [:]
-        results.each {
-            quantityMap[it[1]] = it[3]
-        }
-        log.info "Post-processing response time: " + (System.currentTimeMillis() - startTime)
-
+			results.each {
+				quantityMap[it[1]] = it[3]
+			}
+			log.info "Post-processing response time: " + (System.currentTimeMillis() - startTime)
+		}
         return quantityMap
     }
 
@@ -4687,6 +4690,11 @@ class InventoryService implements ApplicationContextAware {
             )
 		}
 		availableBinLocations = availableBinLocations.findAll { it.quantityAvailable > 0 }
+
+		// Sort bins  by available quantity
+		availableBinLocations = availableBinLocations.sort { a, b ->
+			a?.quantityAvailable <=> b?.quantityAvailable
+		}
 
 		// Sort empty expiration dates last
 		availableBinLocations = availableBinLocations.sort { a, b ->

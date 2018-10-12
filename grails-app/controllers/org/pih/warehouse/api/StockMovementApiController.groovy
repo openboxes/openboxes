@@ -18,9 +18,6 @@ import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionStatus
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-
 class StockMovementApiController {
 
     StockMovementService stockMovementService
@@ -144,6 +141,9 @@ class StockMovementApiController {
                     case RequisitionStatus.PICKED:
                         stockMovementService.createOrUpdateShipment(stockMovement)
                         break;
+                    case RequisitionStatus.CHECKING:
+                        stockMovementService.createOrUpdateShipment(stockMovement)
+                        break;
                     case RequisitionStatus.ISSUED:
                         stockMovementService.sendStockMovement(params.id)
                         break;
@@ -173,6 +173,7 @@ class StockMovementApiController {
     void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         // Remove attributes that cause issues in the default grails data binder
         List lineItems = jsonObject.remove("lineItems")
+        List packPageItems = jsonObject.remove("packPageItems")
 
         // Dates aren't bound properly using default JSON binding
         if (jsonObject.containsKey("dateShipped")) {
@@ -187,11 +188,16 @@ class StockMovementApiController {
         log.info "Binding line items: " + lineItems
         bindData(stockMovement, jsonObject)
 
+        // Need to clear the existing line items so we only process the modified ones
+        stockMovement.lineItems.clear()
+
         // Bind all line items
         if (lineItems) {
-            // Need to clear the existing line items so we only process the modified ones
-            stockMovement.lineItems.clear()
             bindLineItems(stockMovement, lineItems)
+        }
+
+        if (packPageItems) {
+            bindPackPage(stockMovement, packPageItems)
         }
     }
 
@@ -210,6 +216,16 @@ class StockMovementApiController {
      */
     void bindLineItems(StockMovement stockMovement, List lineItems) {
         log.info "line items: " + lineItems
+        List<StockMovementItem> stockMovementItems = createLineItemsFromJson(stockMovement, lineItems)
+        stockMovement.lineItems.addAll(stockMovementItems)
+    }
+
+    Boolean isNull(String stringValue) {
+        return stringValue == JSONObject.NULL || stringValue == null || stringValue?.equals("")
+    }
+
+    List<StockMovementItem> createLineItemsFromJson(StockMovement stockMovement, List lineItems) {
+        List<StockMovementItem> stockMovementItems = new ArrayList<StockMovementItem>()
         lineItems.each { lineItem ->
             StockMovementItem stockMovementItem = new StockMovementItem()
             stockMovementItem.id = lineItem.id
@@ -227,7 +243,7 @@ class StockMovementApiController {
             // FIXME Lookup inventory item by product, lot number, expiration date
             stockMovementItem.inventoryItem = lineItem["inventoryItem.id"] ? InventoryItem.load(lineItem["inventoryItem.id"]) : null
             stockMovementItem.lotNumber = lineItem["lotNumber"]
-            stockMovementItem.expirationDate = !(lineItem["expirationDate"] == JSONObject.NULL || lineItem["expirationDate"] == null) ?
+            stockMovementItem.expirationDate = (!isNull(lineItem["expirationDate"])) ?
                     Constants.EXPIRATION_DATE_FORMATTER.parse(lineItem["expirationDate"]) : null
 
             // Sort order (optional)
@@ -251,8 +267,43 @@ class StockMovementApiController {
             // Update recipient
             stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
 
-            stockMovement.lineItems.add(stockMovementItem)
+            // Pack page fields
+            stockMovementItem.quantityShipped = lineItem.quantityShipped ? new BigDecimal(lineItem.quantityShipped) : null
+            stockMovementItem.shipmentItemId = lineItem.shipmentItemId
+            List splitLineItems = lineItem.splitLineItems
+            if (splitLineItems) {
+                stockMovementItem.splitLineItems = createLineItemsFromJson(stockMovement, splitLineItems)
+            }
+
+            stockMovementItems.add(stockMovementItem)
         }
+        return stockMovementItems
     }
 
+    void bindPackPage(StockMovement stockMovement, List lineItems) {
+        log.info "line items: " + lineItems
+        List<PackPageItem> packPageItems = createPackPageItemsFromJson(stockMovement, lineItems)
+        PackPage packPage = new PackPage(packPageItems: packPageItems)
+        stockMovement.packPage = packPage
+    }
+
+    List<PackPageItem> createPackPageItemsFromJson(StockMovement stockMovement, List lineItems) {
+        List<PackPageItem> packPageItems = new ArrayList<PackPageItem>()
+        lineItems.each { lineItem ->
+            PackPageItem packPageItem = new PackPageItem()
+            packPageItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
+            packPageItem.palletName = lineItem["palletName"]
+            packPageItem.boxName = lineItem["boxName"]
+            packPageItem.quantityShipped = lineItem.quantityShipped ? new BigDecimal(lineItem.quantityShipped) : null
+            packPageItem.shipmentItemId = lineItem.shipmentItemId
+
+            List splitLineItems = lineItem.splitLineItems
+            if (splitLineItems) {
+                packPageItem.splitLineItems = createPackPageItemsFromJson(stockMovement, splitLineItems)
+            }
+
+            packPageItems.add(packPageItem)
+        }
+        return packPageItems
+    }
 }

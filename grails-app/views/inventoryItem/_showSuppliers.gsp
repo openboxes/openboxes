@@ -8,6 +8,8 @@
             <thead>
             <g:sortableColumn property="code" title="${warehouse.message(code: 'productSupplier.code.label', default: 'Code')}" />
 
+            <th><g:message code="productSupplier.productCode.label" /></th>
+
             <th><g:message code="default.name.label" default="Name" /></th>
 
             <th><g:message code="productSupplier.supplier.label" default="Supplier" /></th>
@@ -34,6 +36,8 @@
                     <tr class="prop ${status%2==0?'odd':'even'}">
 
                         <td>${fieldValue(bean: productSupplier, field: "code")?:g.message(code:'default.none.label')}</td>
+
+                        <td>${fieldValue(bean: productSupplier, field: "productCode")?:g.message(code:'default.none.label')}</td>
 
                         <td>${fieldValue(bean: productSupplier, field: "name")?:g.message(code:'default.none.label')}</td>
 

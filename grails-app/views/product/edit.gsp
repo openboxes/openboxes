@@ -437,12 +437,6 @@
 						<div id="tabs-packages" class="ui-tabs-hide">
                             <g:render template="productPackages" model="[productInstance:productInstance]"/>
 						</div>
-                        %{--<div id="tabs-catalogs" class="ui-tabs-hide">--}%
-                            %{--<g:render template="productCatalogs" model="[productInstance:productInstance]"/>--}%
-                        %{--</div>--}%
-
-
-
                         <div id="inventory-level-dialog" class="dialog hidden" title="Add a new stock level">
                             <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new InventoryLevel()]"/>
                         </div>
@@ -456,7 +450,7 @@
                             <g:render template="productPackageDialog" model="[productInstance:productInstance,packageInstance:packageInstance]"/>
                         </div>
 					</g:if>
-				</div>	
+				</div>
 			</div>
 		</div>
 

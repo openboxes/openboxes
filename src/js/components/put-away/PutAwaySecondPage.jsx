@@ -93,7 +93,7 @@ class PutAwaySecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Lot',
+      Header: 'Lot/Serial No.',
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
       Filter,
@@ -199,7 +199,7 @@ class PutAwaySecondPage extends Component {
    */
   fetchBins() {
     this.props.showSpinner();
-    const url = '/openboxes/api/internalLocations';
+    const url = `/openboxes/api/internalLocations?location.id=${this.props.locationId}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -217,7 +217,7 @@ class PutAwaySecondPage extends Component {
   */
   savePutAways() {
     this.props.showSpinner();
-    const url = '/openboxes/api/putaways';
+    const url = `/openboxes/api/putaways?location.id=${this.props.locationId}`;
 
     return apiClient.post(url, flattenRequest(this.state.putAway))
       .then((response) => {
@@ -272,7 +272,7 @@ class PutAwaySecondPage extends Component {
 
     return (
       <div className="container-fluid pt-2">
-        <h1>Put-Away - {this.state.putAway.putawayNumber}</h1>
+        <h1>Put Away - {this.state.putAway.putawayNumber}</h1>
         <div className="mb-2">
           Show by:
           <button
@@ -339,6 +339,8 @@ PutAwaySecondPage.propTypes = {
   pivotBy: PropTypes.arrayOf(PropTypes.string),
   /** List of currently expanded put-away's items */
   expanded: PropTypes.shape({}),
+  /** Location ID (currently chosen). To be used in internalLocations and putaways requests. */
+  locationId: PropTypes.string.isRequired,
 };
 
 PutAwaySecondPage.defaultProps = {

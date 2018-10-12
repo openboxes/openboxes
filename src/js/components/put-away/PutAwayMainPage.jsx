@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import PutAwayPage from './PutAwayPage';
 import PutAwaySecondPage from './PutAwaySecondPage';
@@ -23,19 +25,22 @@ class PutAwayMainPage extends Component {
    * Returns array of form's components.
    * @public
    */
-  getFormList() {
+  getFormList(locationId) {
     return [
       <PutAwayPage
         nextPage={this.nextPage}
+        locationId={locationId}
       />,
       <PutAwaySecondPage
         {...this.state.props}
         nextPage={this.nextPage}
+        locationId={locationId}
       />,
       <PutAwayCheckPage
         {...this.state.props}
         prevPage={this.prevPage}
         firstPage={this.firstPage}
+        locationId={locationId}
       />,
     ];
   }
@@ -68,14 +73,28 @@ class PutAwayMainPage extends Component {
 
   render() {
     const { page } = this.state;
-    const formList = this.getFormList();
+    const { locationId } = this.props;
 
-    return (
-      <div>
-        {formList[page]}
-      </div>
-    );
+    if (locationId) {
+      const formList = this.getFormList(locationId);
+
+      return (
+        <div>
+          {formList[page]}
+        </div>
+      );
+    }
+
+    return null;
   }
 }
 
-export default PutAwayMainPage;
+const mapStateToProps = state => ({
+  locationId: state.location.currentLocation.id,
+});
+
+export default connect(mapStateToProps, {})(PutAwayMainPage);
+
+PutAwayMainPage.propTypes = {
+  locationId: PropTypes.string.isRequired,
+};

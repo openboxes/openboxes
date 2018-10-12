@@ -18,13 +18,14 @@ const FIELDS = {
     type: ArrayField,
     disableVirtualization: true,
     fields: {
-      'binLocation.name': {
+      binLocation: {
         type: SelectField,
         label: 'Bin',
         fieldKey: 'inventoryItem.id',
-        getDynamicAttr: ({ fieldValue, bins }) => ({
-          disabled: !!fieldValue,
+        getDynamicAttr: ({ fieldValue, bins, hasBinLocationSupport }) => ({
+          disabled: !!fieldValue || !hasBinLocationSupport,
           options: bins,
+          labelKey: 'name',
         }),
       },
       lotNumber: {
@@ -49,7 +50,7 @@ const FIELDS = {
         label: 'Previous Qty',
         fixedWidth: '150px',
         attributes: {
-          formatValue: value => (value.toLocaleString('en-US')),
+          formatValue: value => (value ? value.toLocaleString('en-US') : null),
         },
       },
       quantityAdjusted: {
@@ -81,16 +82,20 @@ class AdjustInventoryModal extends Component {
 
     this.state = {
       attr,
-      bins: [],
       formValues: {},
     };
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
-    this.fetchBins = this.fetchBins.bind(this);
   }
 
-  componentDidMount() {
-    this.fetchBins();
+  componentWillReceiveProps(nextProps) {
+    const {
+      fieldConfig: { attributes, getDynamicAttr },
+    } = nextProps;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
+    const attr = { ...attributes, ...dynamicAttr };
+
+    this.setState({ attr });
   }
 
   /**
@@ -100,7 +105,13 @@ class AdjustInventoryModal extends Component {
   onOpen() {
     this.setState({
       formValues: {
-        adjustInventory: this.state.attr.fieldValue.availableItems,
+        adjustInventory: _.map(this.state.attr.fieldValue.availableItems, item => ({
+          ...item,
+          binLocation: {
+            id: item['binLocation.id'],
+            name: item['binLocation.name'],
+          },
+        })),
       },
     });
   }
@@ -113,14 +124,24 @@ class AdjustInventoryModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const url = '/openboxes/api/stockAdjustments';
-    const payload = _.map(values.adjustInventory, adItem => ({
-      'inventoryItem.id': adItem['inventoryItem.id'] || '',
-      'binLocation.id': adItem['binLocation.id'] || '',
-      quantityAvailable: adItem.quantityAvailable,
-      quantityAdjusted: adItem.quantityAdjusted,
-      comments: adItem.comments,
-    }));
+    const url = `/openboxes/api/stockAdjustments?location.id=${this.props.locationId}`;
+    const payload = _.map(values.adjustInventory, (adItem) => {
+      if (!adItem['inventoryItem.id']) {
+        return {
+          'binLocation.id': adItem.binLocation || '',
+          lotNumber: adItem.lotNumber,
+          expirationDate: adItem.expirationDate,
+          quantityAdjusted: parseInt(adItem.quantityAdjusted, 10),
+          comments: adItem.comments,
+        };
+      }
+      return {
+        'inventoryItem.id': adItem['inventoryItem.id'] || '',
+        'binLocation.id': adItem['binLocation.id'] || '',
+        quantityAdjusted: parseInt(adItem.quantityAdjusted, 10),
+        comments: adItem.comments,
+      };
+    });
 
     return apiClient.post(url, payload).then(() => {
       apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
@@ -132,24 +153,6 @@ class AdjustInventoryModal extends Component {
         })
         .catch(() => { this.props.hideSpinner(); });
     }).catch(() => { this.props.hideSpinner(); });
-  }
-
-  /**
-   * Fetches available bin locations from API.
-   * @public
-   */
-  fetchBins() {
-    this.props.showSpinner();
-    const url = '/openboxes/api/internalLocations';
-
-    return apiClient.get(url)
-      .then((response) => {
-        const bins = _.map(response.data.data, bin => (
-          { value: bin.id, label: bin.name }
-        ));
-        this.setState({ bins }, () => this.props.hideSpinner());
-      })
-      .catch(() => this.props.hideSpinner());
   }
 
   render() {
@@ -164,13 +167,20 @@ class AdjustInventoryModal extends Component {
         onSave={this.onSave}
         fields={FIELDS}
         initialValues={this.state.formValues}
-        formProps={{ bins: this.state.bins }}
+        formProps={{
+          bins: this.props.bins,
+          hasBinLocationSupport: this.props.hasBinLocationSupport,
+        }}
       />
     );
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(AdjustInventoryModal);
+const mapStateToProps = state => ({
+  hasBinLocationSupport: state.location.currentLocation.hasBinLocationSupport,
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(AdjustInventoryModal);
 
 AdjustInventoryModal.propTypes = {
   /** Name of the field */
@@ -185,4 +195,14 @@ AdjustInventoryModal.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function updating page on which modal is located called when user saves changes */
   onResponse: PropTypes.func.isRequired,
+  /** Is true when currently selected location supports bins */
+  hasBinLocationSupport: PropTypes.bool.isRequired,
+  /** Available bin locations fetched from API. */
+  bins: PropTypes.arrayOf(PropTypes.shape({})),
+  /** Location ID (origin of stock movement). To be used in stockAdjustments request. */
+  locationId: PropTypes.string.isRequired,
+};
+
+AdjustInventoryModal.defaultProps = {
+  bins: [],
 };

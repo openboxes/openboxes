@@ -5,6 +5,7 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
+import { confirmAlert } from 'react-confirm-alert';
 
 import ArrayField from '../form-elements/ArrayField';
 import TextField from '../form-elements/TextField';
@@ -63,8 +64,19 @@ const FIELDS = {
         type: LabelField,
         label: 'Qty available',
         flexWidth: '0.8',
+        fieldKey: '',
+        getDynamicAttr: ({ fieldValue }) => {
+          let className = '';
+          if (!fieldValue.quantityAvailable ||
+            fieldValue.quantityAvailable < fieldValue.quantityRequested) {
+            className = 'text-danger';
+          }
+          return {
+            className,
+          };
+        },
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
       quantityConsumed: {
@@ -173,7 +185,6 @@ class EditItemsPage extends Component {
 
     this.state = {
       statusCode: '',
-      redoAutopick: false,
       revisedItems: [],
       values: { ...this.props.initialValues, editPageItems: [] },
     };
@@ -206,6 +217,7 @@ class EditItemsPage extends Component {
           ...val,
           disabled: true,
           rowKey: _.uniqueId('lineItem_'),
+          quantityAvailable: val.quantityAvailable > 0 ? val.quantityAvailable : 0,
           product: {
             ...val.product,
             label: `${val.productCode} ${val.productName}`,
@@ -271,7 +283,6 @@ class EditItemsPage extends Component {
     };
 
     if (payload.lineItems.length) {
-      this.setState({ redoAutopick: true });
       return apiClient.post(url, payload);
     }
 
@@ -299,8 +310,25 @@ class EditItemsPage extends Component {
    * @public
    */
   refresh() {
-    this.setState({ revisedItems: [], values: { ...this.state.values, editPageItems: [] } });
-    this.fetchAllData(true);
+    confirmAlert({
+      title: 'Confirm refresh',
+      message: 'Are you sure you want to refresh? Your progress since last save will be lost.',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => {
+            this.setState({
+              revisedItems: [],
+              values: { ...this.state.values, editPageItems: [] },
+            });
+            this.fetchAllData(true);
+          },
+        },
+        {
+          label: 'No',
+        },
+      ],
+    });
   }
 
   /**
@@ -308,9 +336,12 @@ class EditItemsPage extends Component {
    * after sending createPicklist: 'true' to backend autopick functionality is invoked.
    * @public
    */
-  transitionToStep4() {
+  transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'PICKING', createPicklist: 'true' };
+    const payload = {
+      status: 'PICKING',
+      createPicklist: this.state.statusCode === 'VERIFYING' ? 'true' : 'false',
+    };
 
     return apiClient.post(url, payload);
   }
@@ -336,13 +367,9 @@ class EditItemsPage extends Component {
     this.props.showSpinner();
     this.reviseRequisitionItems(formValues)
       .then(() => {
-        if (this.state.statusCode === 'VERIFYING' || this.state.redoAutopick) {
-          this.transitionToStep4()
-            .then(() => this.props.onSubmit(formValues))
-            .catch(() => this.props.hideSpinner());
-        } else {
-          this.props.onSubmit(formValues);
-        }
+        this.transitionToNextStep()
+          .then(() => this.props.onSubmit(formValues))
+          .catch(() => this.props.hideSpinner());
       }).catch(() => this.props.hideSpinner());
   }
 
@@ -390,7 +417,6 @@ class EditItemsPage extends Component {
     return apiClient.post(revertItemsUrl, payload)
       .then((response) => {
         const { editPageItems } = response.data.data.editPage;
-        this.setState({ redoAutopick: true });
         this.saveNewItems(editPageItems);
         this.props.hideSpinner();
       })
