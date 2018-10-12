@@ -362,17 +362,7 @@ class Product implements Comparable, Serializable {
      * @return
      */
     Set<Product> alternativeProducts() {
-        def products = []
-        productGroups.each { productGroup ->
-            productGroup.products.each { product ->
-                if (product != this) {
-                    products.add(product)
-
-                }
-            }
-        }
-        products = products.unique()
-        return products
+        return substitutions*.associatedProduct
     }
 
     /**
@@ -386,7 +376,7 @@ class Product implements Comparable, Serializable {
             return null
         }
 
-        attributes.find { it.attribute == attribute }
+        return attributes.find { ProductAttribute productAttribute -> productAttribute.attribute == attribute }
     }
 
 

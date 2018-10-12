@@ -38,7 +38,8 @@ class ProductAssociationController {
                 return
             }
 
-            redirect(action: "list", id: productAssociationInstance.id)
+            redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
+            //redirect(action: "list", id: productAssociationInstance.id)
         }
         else {
             render(view: "create", model: [productAssociationInstance: productAssociationInstance])
@@ -82,7 +83,9 @@ class ProductAssociationController {
             productAssociationInstance.properties = params
             if (!productAssociationInstance.hasErrors() && productAssociationInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), productAssociationInstance.id])}"
-                redirect(action: "list", id: productAssociationInstance.id)
+                //redirect(action: "list", id: productAssociationInstance.id)
+                redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
+
             }
             else {
                 render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
