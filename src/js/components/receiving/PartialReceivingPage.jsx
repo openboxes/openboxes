@@ -103,6 +103,13 @@ const FIELDS = {
     type: ArrayField,
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
+    getDynamicRowAttr: ({ rowValues, subfield }) => {
+      let className = '';
+      if (isReceived(subfield, rowValues)) {
+        className = 'text-disabled';
+      }
+      return { className };
+    },
     fields: {
       autofillLine: {
         fieldKey: '',
