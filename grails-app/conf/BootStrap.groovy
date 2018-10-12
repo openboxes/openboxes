@@ -129,7 +129,8 @@ class BootStrap {
                 locationGroup: location.locationGroup,
                 parentLocation: location.parentLocation,
                 locationType: location.locationType,
-                sortOrder: location.sortOrder
+                sortOrder: location.sortOrder,
+                hasBinLocationSupport: location.hasBinLocationSupport()
         ]}
 
         JSON.registerObjectMarshaller(Person) { Person person -> [

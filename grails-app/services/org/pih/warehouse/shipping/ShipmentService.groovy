@@ -27,6 +27,7 @@ import org.pih.warehouse.inventory.*
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
@@ -1400,10 +1401,10 @@ class ShipmentService {
 		else {
 			log.info "Receipt does not exists, please prepare one"
 			receiptInstance = new Receipt(recipient:shipmentInstance?.recipient, shipment: shipmentInstance, actualDeliveryDate: new Date());
-			shipmentInstance.receipt = receiptInstance
+			shipmentInstance.addToReceipts(receiptInstance)
 
 			def shipmentItems = shipmentInstance.shipmentItems.sort{  it?.container?.sortOrder }
-			shipmentItems.each { shipmentItem ->
+			shipmentItems.each { ShipmentItem shipmentItem ->
 
 				def inventoryItem =
 						//inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
@@ -1485,6 +1486,8 @@ class ShipmentService {
 
 			// Save updated shipment instance
 			shipmentInstance.save(flush:true);
+
+            shipmentInstance.receipt.receiptStatusCode = ReceiptStatusCode.RECEIVED
 			shipmentInstance.receipt.save(flush:true)
 
 			// only need to create a transaction if the destination is a warehouse
@@ -1865,10 +1868,13 @@ class ShipmentService {
    }
 
 
-	void deleteReceipt(Shipment shipmentInstance) {
-		if (shipmentInstance?.receipt) {
-			shipmentInstance?.receipt.delete()
-			shipmentInstance?.receipt = null
+	void deleteReceipts(Shipment shipment) {
+		if (shipment?.receipts) {
+            shipment?.receipts.toArray().each { Receipt receipt ->
+                shipment.removeFromReceipts(receipt)
+                receipt.delete()
+                shipment.save()
+            }
 		}
 	}
 
@@ -1921,12 +1927,12 @@ class ShipmentService {
 		try {
 			
 			if (eventInstance?.eventType?.eventCode == EventCode.RECEIVED) {
-				deleteReceipt(shipmentInstance)
+				deleteReceipts(shipmentInstance)
 				deleteInboundTransactions(shipmentInstance)
 				deleteEvent(shipmentInstance, eventInstance)
 			}
 			else if (eventInstance?.eventType?.eventCode == EventCode.SHIPPED) {
-				deleteReceipt(shipmentInstance)
+				deleteReceipts(shipmentInstance)
 				deleteOutboundTransactions(shipmentInstance)
 				deleteEvent(shipmentInstance, eventInstance)
 			}
@@ -1936,7 +1942,7 @@ class ShipmentService {
 			
 		} catch (Exception e) {
 			log.error("Error rolling back most recent event", e)
-			throw new RuntimeException("Error rolling back most recent event")
+			throw new RuntimeException("Error rolling back most recent event", e)
 		}
 	}
 

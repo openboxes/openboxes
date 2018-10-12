@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-import apiClient from '../../utils/apiClient';
 import PutAwayPage from './PutAwayPage';
 import PutAwaySecondPage from './PutAwaySecondPage';
 import PutAwayCheckPage from './PutAwayCheckPage';
@@ -14,27 +14,11 @@ class PutAwayMainPage extends Component {
     this.state = {
       page: 0,
       props: null,
-      locationId: '',
     };
 
     this.nextPage = this.nextPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
     this.firstPage = this.firstPage.bind(this);
-  }
-
-  componentDidMount() {
-    this.getCurrentLocation();
-  }
-
-  getCurrentLocation() {
-    const url = '/openboxes/api/getSession';
-
-    return apiClient.get(url)
-      .then((response) => {
-        const locationId = _.get(response, 'data.data.location.id');
-
-        this.setState({ locationId });
-      });
   }
 
   /**
@@ -88,7 +72,8 @@ class PutAwayMainPage extends Component {
   }
 
   render() {
-    const { page, locationId } = this.state;
+    const { page } = this.state;
+    const { locationId } = this.props;
 
     if (locationId) {
       const formList = this.getFormList(locationId);
@@ -104,4 +89,12 @@ class PutAwayMainPage extends Component {
   }
 }
 
-export default PutAwayMainPage;
+const mapStateToProps = state => ({
+  locationId: state.location.currentLocation.id,
+});
+
+export default connect(mapStateToProps, {})(PutAwayMainPage);
+
+PutAwayMainPage.propTypes = {
+  locationId: PropTypes.string.isRequired,
+};

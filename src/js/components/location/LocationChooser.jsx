@@ -1,8 +1,11 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Modal from 'react-modal';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import PropTypes from 'prop-types';
 
+import { fetchCurrentLocation, changeCurrentLocation } from '../../actions';
 import apiClient from '../../utils/apiClient';
 
 class LocationChooser extends Component {
@@ -11,7 +14,6 @@ class LocationChooser extends Component {
 
     this.state = {
       showModal: false,
-      currentLocationName: '',
       locations: {},
     };
 
@@ -21,18 +23,7 @@ class LocationChooser extends Component {
 
   componentDidMount() {
     this.fetchLocations();
-    this.getCurrentLocation();
-  }
-
-  getCurrentLocation() {
-    const url = '/openboxes/api/getSession';
-
-    return apiClient.get(url)
-      .then((response) => {
-        const currentLocationName = _.get(response, 'data.data.location.name');
-
-        this.setState({ currentLocationName });
-      });
+    this.props.fetchCurrentLocation();
   }
 
   openModal() {
@@ -41,15 +32,9 @@ class LocationChooser extends Component {
 
   closeModal(location) {
     if (location) {
-      const url = `/openboxes/api/chooseLocation/${location.id}`;
-
-      apiClient.put(url)
-        .then(() => {
-          this.setState({ showModal: false, currentLocationName: location.name });
-        });
-    } else {
-      this.setState({ showModal: false });
+      this.props.changeCurrentLocation(location);
     }
+    this.setState({ showModal: false });
   }
 
   fetchLocations() {
@@ -71,7 +56,7 @@ class LocationChooser extends Component {
           className="btn btn-light ml-1"
           onClick={() => this.openModal()}
         >
-          {this.state.currentLocationName || 'Choose Location'}
+          {this.props.currentLocationName || 'Choose Location'}
         </button>
         <Modal
           isOpen={this.state.showModal}
@@ -113,4 +98,19 @@ class LocationChooser extends Component {
   }
 }
 
-export default LocationChooser;
+const mapStateToProps = state => ({
+  currentLocationName: state.location.currentLocation.name,
+});
+
+export default connect(mapStateToProps, {
+  fetchCurrentLocation, changeCurrentLocation,
+})(LocationChooser);
+
+LocationChooser.propTypes = {
+  /** Function called to get the currently selected location */
+  fetchCurrentLocation: PropTypes.func.isRequired,
+  /** Function called to change the currently selected location */
+  changeCurrentLocation: PropTypes.func.isRequired,
+  /** Name of the currently selected location */
+  currentLocationName: PropTypes.bool.isRequired,
+};

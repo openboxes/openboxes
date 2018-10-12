@@ -22,8 +22,8 @@ const FIELDS = {
         type: SelectField,
         label: 'Bin',
         fieldKey: 'inventoryItem.id',
-        getDynamicAttr: ({ fieldValue, bins }) => ({
-          disabled: !!fieldValue,
+        getDynamicAttr: ({ fieldValue, bins, hasBinLocationSupport }) => ({
+          disabled: !!fieldValue || !hasBinLocationSupport,
           options: bins,
           labelKey: 'name',
         }),
@@ -167,13 +167,20 @@ class AdjustInventoryModal extends Component {
         onSave={this.onSave}
         fields={FIELDS}
         initialValues={this.state.formValues}
-        formProps={{ bins: this.props.bins }}
+        formProps={{
+          bins: this.props.bins,
+          hasBinLocationSupport: this.props.hasBinLocationSupport,
+        }}
       />
     );
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(AdjustInventoryModal);
+const mapStateToProps = state => ({
+  hasBinLocationSupport: state.location.currentLocation.hasBinLocationSupport,
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(AdjustInventoryModal);
 
 AdjustInventoryModal.propTypes = {
   /** Name of the field */
@@ -188,6 +195,8 @@ AdjustInventoryModal.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function updating page on which modal is located called when user saves changes */
   onResponse: PropTypes.func.isRequired,
+  /** Is true when currently selected location supports bins */
+  hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Available bin locations fetched from API. */
   bins: PropTypes.arrayOf(PropTypes.shape({})),
   /** Location ID (origin of stock movement). To be used in stockAdjustments request. */
