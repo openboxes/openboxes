@@ -162,34 +162,38 @@ class LocationService {
 
 	List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes) {
 
-		log.info "Get internal locations for parent ${parentLocation} with activity codes ${activityCodes} and location type codes ${locationTypeCodes}"
-		List<Location> internalLocations = Location.createCriteria().list() {
-			eq("active", Boolean.TRUE)
-			eq("parentLocation", parentLocation)
-			locationType {
-				'in'("locationTypeCode", locationTypeCodes)
-			}
-		}
-
-		// Filter by activity code
 		List<Location> internalLocationsSupportingActivityCodes = []
-		if (activityCodes) {
-			activityCodes.each { activityCode ->
-				internalLocations = internalLocations.findAll { internalLocation ->
-					internalLocation.supports(activityCode)
+
+		if (parentLocation.hasBinLocationSupport()) {
+			log.info "Get internal locations for parent ${parentLocation} with activity codes ${activityCodes} and location type codes ${locationTypeCodes}"
+			List<Location> internalLocations = Location.createCriteria().list() {
+				eq("active", Boolean.TRUE)
+				eq("parentLocation", parentLocation)
+				locationType {
+					'in'("locationTypeCode", locationTypeCodes)
 				}
+			}
+
+			// Filter by activity code
+			if (activityCodes) {
+				activityCodes.each { activityCode ->
+					internalLocations = internalLocations.findAll { internalLocation ->
+						internalLocation.supports(activityCode)
+					}
+					internalLocationsSupportingActivityCodes.addAll(internalLocations)
+				}
+			} else {
 				internalLocationsSupportingActivityCodes.addAll(internalLocations)
 			}
-		}
-		else {
-			internalLocationsSupportingActivityCodes.addAll(internalLocations)
+
+			// Sort locations by sort order, then name
+			internalLocationsSupportingActivityCodes =
+					internalLocationsSupportingActivityCodes.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
+
+			internalLocationsSupportingActivityCodes = internalLocationsSupportingActivityCodes.unique()
 		}
 
-		// Sort locations by sort order, then name
-		internalLocationsSupportingActivityCodes =
-				internalLocationsSupportingActivityCodes.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
-
-		return internalLocationsSupportingActivityCodes.unique()
+		return internalLocationsSupportingActivityCodes
 	}
 
 	List getPutawayLocations(Location parentLocation) {
