@@ -217,9 +217,7 @@ class ShipmentController {
 			redirect(action: "list")
 		}
 	}
-	
-	
-	
+
 	def showDetails = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
@@ -227,6 +225,13 @@ class ShipmentController {
 			redirect(action: "list", params:[type: params.type])
 		}
 		else {
+
+			// Redirect to stock movement details page
+			if (shipmentInstance?.requisition && !params?.override) {
+				redirect(controller: "stockMovement", action: "show", id: shipmentInstance?.requisition?.id)
+				return
+			}
+
 			def eventTypes =  org.pih.warehouse.core.EventType.list();
 			def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
 			[shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, shippingEventTypes : eventTypes]

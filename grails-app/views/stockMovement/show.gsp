@@ -49,18 +49,14 @@
             </g:if>
         --%>
 
-        <div class="button-group">
             <g:link controller="stockMovement" action="list" class="button icon arrowleft">
                 <warehouse:message code="default.button.list.label" />
             </g:link>
-        </div>
-        <div class="button-group">
+
             <g:link controller="stockMovement" action="index" class="button icon add">
                 <warehouse:message code="default.button.create.label" />
             </g:link>
-        </div>
 
-        <div class="button-group">
             <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button icon edit">
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
@@ -77,7 +73,6 @@
                 </g:link>
             </g:isSuperuser>
         </div>
-
 
     </div>
 
@@ -166,7 +161,7 @@
                             <g:message code="shipping.shipment.label"/>
                         </td>
                         <td class="value">
-                            <g:link controller="shipment" action="showDetails" id="${stockMovement?.shipment?.id}">
+                            <g:link controller="shipment" action="showDetails" id="${stockMovement?.shipment?.id}" params="[override:true]">
                                 ${g.message(code:'default.view.label', args: [g.message(code: 'shipment.label')])}
                             </g:link>
                         </td>
@@ -176,7 +171,7 @@
                             <g:message code="requisition.label"/>
                         </td>
                         <td class="value">
-                            <g:link controller="requisition" action="show" id="${stockMovement?.id}">
+                            <g:link controller="requisition" action="show" id="${stockMovement?.id}" params="[override:true]">
                                 ${g.message(code:'default.view.label', args: [g.message(code: 'requisition.label')])}
                             </g:link>
                         </td>
@@ -273,8 +268,8 @@
                                 <tr>
                                     <th></th>
                                     <th><g:message code="default.status.label"/></th>
+                                    <th><g:message code="product.productCode.label"/></th>
                                     <th><g:message code="product.label"/></th>
-                                    <th><g:message code="product.uom.label"/></th>
                                     <th width="1%"><g:message code="stockMovement.quantityRequested.label"/></th>
                                 </tr>
 
@@ -308,7 +303,14 @@
                                         </div>
                                     </td>
                                     <td>
-                                        ${stockMovementItem?.product?.productCode} ${stockMovementItem?.product?.name}
+                                        <g:link controller="inventoryItem" action="showStockCard" id=${stockMovementItem?.product?.id}">
+                                            ${stockMovementItem?.product?.productCode}
+                                        </g:link>
+                                    </td>
+                                    <td>
+                                        <g:link controller="inventoryItem" action="showStockCard" id="${stockMovementItem?.product?.id}">
+                                            ${stockMovementItem?.product?.name}
+                                        </g:link>
                                     </td>
                                     <td class="center">
                                         ${stockMovementItem?.quantityRequested?:0}

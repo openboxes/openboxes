@@ -540,12 +540,18 @@ class RequisitionController {
 
     def show = {
         def requisition = Requisition.get(params.id)
-        //def requisition = Requisition.findById(params.id, [fetch: [requisitionItems: 'join']])
         if (!requisition) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
         }
         else {
+
+            // Redirect to stock movement page
+            if (requisition?.type == RequisitionType.DEFAULT && !params?.override) {
+                redirect(controller: "stockMovement", action: "show", id: requisition?.id)
+                return
+            }
+
             return [requisition: requisition]
         }
     }
