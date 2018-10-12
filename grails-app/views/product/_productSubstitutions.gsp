@@ -46,13 +46,13 @@
                             </td>
 
                             <td>
-                                <g:link controller="product" action="edit" id="${productSubstitution?.product?.id}">
+                                <g:link controller="product" action="edit" id="${productSubstitution?.associatedProduct?.id}">
                                     ${fieldValue(bean: productSubstitution?.associatedProduct, field: "productCode")}
                                     ${fieldValue(bean: productSubstitution?.associatedProduct, field: "name")}
                                 </g:link>
                             </td>
 
-                            <td>${fieldValue(bean: productSubstitution, field: "quantity")}</td>
+                            <td>1:${fieldValue(bean: productSubstitution, field: "quantity")}</td>
 
                             <td>${fieldValue(bean: productSubstitution, field: "comments")}</td>
 
@@ -76,18 +76,25 @@
                         </tr>
                     </g:unless>
                 </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="8">
+                        <div class="center">
+                            <button class="button btn-show-dialog"
+                                    data-target="#product-substitution-dialog"
+                                    data-title="${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}"
+                                    data-url="${request.contextPath}/productAssociation/dialog?product.id=${productInstance?.id}">
+                                ${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tfoot>
 
             </table>
         </div>
     </div>
-    <div class="center">
-        <button class="button btn-show-dialog"
-                data-target="#product-substitution-dialog"
-                data-title="${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}"
-                data-url="${request.contextPath}/productAssociation/dialog?product.id=${productInstance?.id}">
-            ${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}
-        </button>
-    </div>
+
 
 </div>
 
