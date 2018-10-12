@@ -142,6 +142,7 @@ class EditLineModal extends Component {
             label: `${_.get(value, 'product.productCode')} - ${_.get(value, 'product.name')}`,
           },
           disabled: true,
+          quantityReceiving: 0,
         })),
       },
     });
