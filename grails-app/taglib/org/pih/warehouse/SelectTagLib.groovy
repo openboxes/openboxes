@@ -345,7 +345,8 @@ class SelectTagLib {
     def selectBinLocationByLocation = { attrs, body ->
         log.info "selectBinLocationByLocation: " + attrs
         def location = Location.get(attrs.id)
-        if (location) {
+
+        if (location && location.hasBinLocationSupport()) {
             attrs.from = Location.findAllByParentLocationAndActive(location, true).sort { it?.name?.toLowerCase() };
         }
 
