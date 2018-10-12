@@ -26,6 +26,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.util.LocalizationUtil
 
@@ -84,13 +85,23 @@ class DashboardController {
 
 		def requisition = Requisition.findByRequestNumber(params.searchTerms)
 		if (requisition) {
-			redirect(controller: "requisition", action: "show", id: requisition.id)
+			if (requisition.type == RequisitionType.DEFAULT) {
+				redirect(controller: "stockMovement", action: "show", id: requisition.id)
+			}
+			else {
+				redirect(controller: "requisition", action: "show", id: requisition.id)
+			}
 			return;
 		}
 		
 		def shipment = Shipment.findByShipmentNumber(params.searchTerms)
 		if (shipment) {
-			redirect(controller: "shipment", action: "showDetails", id: shipment.id)
+            if (shipment?.isStockMovement()) {
+                redirect(controller: "stockMovement", action: "show", id: shipment?.requisition?.id)
+            }
+            else {
+                redirect(controller: "shipment", action: "showDetails", id: shipment.id)
+            }
 			return;
 		}
 
