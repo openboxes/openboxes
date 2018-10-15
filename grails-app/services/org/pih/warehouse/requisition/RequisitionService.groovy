@@ -33,20 +33,6 @@ class RequisitionService {
 	def shipmentService;
 	def inventoryService;
 
-    /*
-    def getRequisitionStats(requisition, params) {
-        def criteria = Requisition.createCriteria()
-        def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
-    }
-    */
-
-    def getRequisitionStatistics(destination, origin) {
-        return getRequisitionStatistics(destination, origin, null, null)
-    }
-
-    def getRequisitionStatistics(Location destination, Location origin) {
-        return getRequisitionStatistics(destination, origin, null, null, null)
-    }
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
         return getRequisitionStatistics(destination, origin, user, null, null)
@@ -80,13 +66,6 @@ class RequisitionService {
                     if (destination) eq("destination", destination)
                     if (origin) eq("origin", origin)
                 }
-                //if (user) {
-                //    or {
-                //        eq("createdBy", user)
-                //        eq("updatedBy", user)
-                //        eq("requestedBy", user)
-                //    }
-                //}
             }
             isNotNull("status")
             if (excludedStatuses) {
@@ -725,16 +704,12 @@ class RequisitionService {
 
     }
 
-    public List<RequisitionItem> getCanceledRequisitionItems(Location location, List cancelReasonCodes, Date dateRequestedFrom, Date dateRequestedTo, max, offset) {
-        println "Get canceled items " + cancelReasonCodes + " " + max + " " + offset
+    List<RequisitionItem> getCanceledRequisitionItems(Location location, List cancelReasonCodes, Date dateRequestedFrom, Date dateRequestedTo, max, offset) {
+
         def requisitionItems = RequisitionItem.createCriteria().list(max: max, offset: offset) {
             requisition {
-                eq("destination", location)
+                eq("origin", location)
                 eq("status", RequisitionStatus.ISSUED)
-                //not {
-                //    eq("status", RequisitionStatus.CANCELED)
-                //
-                //}
                 if (dateRequestedFrom && dateRequestedTo) {
                     between("dateRequested", dateRequestedFrom, dateRequestedTo)
                 }
@@ -746,47 +721,15 @@ class RequisitionService {
                 }
                 order("dateRequested", "desc")
             }
-            /*
-            or {
-                gt("quantityCanceled", 0)
-                isNotNull("cancelReasonCode")
-                isNotNull("cancelComments")
-            }*/
             if (cancelReasonCodes) {
                 'in'("cancelReasonCode", cancelReasonCodes)
             }
-
-            //eq("cancelReasonCode", "STOCKOUT")
-            //eq("status", RequisitionItemStatus.CANCELED)
-            //firstResult(offset)
-            //maxResults(max)
         }
         println requisitionItems
 
         return requisitionItems
 
     }
-
-    public List<RequisitionItem> getRequisitionItemsByReasonCode(Location location,  max, offset) {
-        println "get canceled items "
-        def requisitionItems = RequisitionItem.createCriteria().list(max: max, offset: offset) {
-            requisition {
-                eq("destination", location)
-                eq("status", RequisitionStatus.ISSUED)
-                //not {
-                //    eq("status", RequisitionStatus.CANCELED)
-                //
-                //}
-            }
-            eq("cancelReasonCode", "STOCKOUT")
-        }
-        println requisitionItems
-
-        return requisitionItems
-
-    }
-
-
 
     void generatePicklist(Requisition requisition) {
         requisition.requisitionItems.each { requisitionItem ->
