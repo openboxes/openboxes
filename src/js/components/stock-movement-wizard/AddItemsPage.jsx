@@ -37,7 +37,17 @@ const DELETE_BUTTON_FIELD = {
 const NO_STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
-    addButton: 'Add line',
+    // eslint-disable-next-line react/prop-types
+    addButton: ({ addRow, getSortOrder }) => (
+      <button
+        type="button"
+        className="btn btn-outline-success margin-bottom-lg"
+        onClick={() => addRow({
+          sortOrder: getSortOrder(),
+        })}
+      >Add line
+      </button>
+    ),
     fields: {
       product: {
         fieldKey: 'disabled',
@@ -79,11 +89,13 @@ const NO_STOCKLIST_FIELDS = {
         flexWidth: '2.5',
         fieldKey: '',
         getDynamicAttr: ({
-          fieldValue, recipients, addRow, rowCount, rowIndex,
+          fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder,
         }) => ({
           options: recipients,
           disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
-          onBlur: rowCount === rowIndex + 1 ? () => addRow() : null,
+          onBlur: rowCount === rowIndex + 1 ? () => addRow({
+            sortOrder: getSortOrder(),
+          }) : null,
         }),
         attributes: {
           labelKey: 'name',
@@ -98,7 +110,17 @@ const NO_STOCKLIST_FIELDS = {
 const STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
-    addButton: 'Add line',
+    // eslint-disable-next-line react/prop-types
+    addButton: ({ addRow, getSortOrder }) => (
+      <button
+        type="button"
+        className="btn btn-outline-success margin-bottom-lg"
+        onClick={() => addRow({
+          sortOrder: getSortOrder(),
+        })}
+      >Add line
+      </button>
+    ),
     fields: {
       product: {
         type: ValueSelectorField,
@@ -144,9 +166,11 @@ const STOCKLIST_FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({
-          addRow, rowCount, rowIndex,
+          addRow, rowCount, rowIndex, getSortOrder,
         }) => ({
-          onBlur: rowCount === rowIndex + 1 ? () => addRow() : null,
+          onBlur: rowCount === rowIndex + 1 ? () => addRow({
+            sortOrder: getSortOrder(),
+          }) : null,
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -157,7 +181,17 @@ const STOCKLIST_FIELDS = {
 const VENDOR_FIELDS = {
   lineItems: {
     type: ArrayField,
-    addButton: 'Add line',
+    // eslint-disable-next-line react/prop-types
+    addButton: ({ addRow, getSortOrder }) => (
+      <button
+        type="button"
+        className="btn btn-outline-success margin-bottom-lg"
+        onClick={() => addRow({
+          sortOrder: getSortOrder(),
+        })}
+      >Add line
+      </button>
+    ),
     fields: {
       palletName: {
         type: TextField,
@@ -216,10 +250,12 @@ const VENDOR_FIELDS = {
         label: 'Recipient',
         flexWidth: '1.5',
         getDynamicAttr: ({
-          recipients, addRow, rowCount, rowIndex,
+          recipients, addRow, rowCount, rowIndex, getSortOrder,
         }) => ({
           options: recipients,
-          onBlur: rowCount === rowIndex + 1 ? () => addRow() : null,
+          onBlur: rowCount === rowIndex + 1 ? () => addRow({
+            sortOrder: getSortOrder(),
+          }) : null,
         }),
         attributes: {
           labelKey: 'name',
@@ -254,6 +290,7 @@ class AddItemsPage extends Component {
     super(props);
     this.state = {
       currentLineItems: [],
+      sortOrder: 0,
       values: this.props.initialValues,
     };
 
@@ -261,6 +298,7 @@ class AddItemsPage extends Component {
     this.removeItem = this.removeItem.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
     this.productsFetch = this.productsFetch.bind(this);
+    this.getSortOrder = this.getSortOrder.bind(this);
   }
 
   componentDidMount() {
@@ -289,7 +327,6 @@ class AddItemsPage extends Component {
    */
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, item => !item.statusCode);
-
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -333,6 +370,7 @@ class AddItemsPage extends Component {
           lotNumber: item.lotNumber,
           expirationDate: item.expirationDate,
           'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
+          sortOrder: item.sortOrder,
         })),
         _.map(lineItemsToBeUpdated, item => ({
           id: item.id,
@@ -343,23 +381,35 @@ class AddItemsPage extends Component {
           lotNumber: item.lotNumber,
           expirationDate: item.expirationDate,
           'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
+          sortOrder: item.sortOrder,
         })),
       );
     }
+
 
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
         'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
+        sortOrder: item.sortOrder,
       })),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
         'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
+        sortOrder: item.sortOrder,
       })),
     );
+  }
+
+  getSortOrder() {
+    this.setState({
+      sortOrder: this.state.sortOrder + 100,
+    });
+
+    return this.state.sortOrder;
   }
 
   productsFetch(searchTerm, callback) {
@@ -412,7 +462,7 @@ class AddItemsPage extends Component {
       const { lineItems } = resp.data.data;
       let lineItemsData;
       if (!lineItems.length) {
-        lineItemsData = new Array(1).fill({});
+        lineItemsData = new Array(1).fill({ sortOrder: 100 });
       } else {
         lineItemsData = _.map(
           lineItems,
@@ -428,9 +478,11 @@ class AddItemsPage extends Component {
         );
       }
 
+      const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
       this.setState({
         currentLineItems: lineItems,
         values: { ...this.state.values, lineItems: lineItemsData },
+        sortOrder,
       });
 
       this.props.hideSpinner();
@@ -467,7 +519,8 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(formValues) {
-    const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val));
+    const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val) &&
+        !_.isNil(val.quantityRequested));
 
     if (formValues.origin.type === 'SUPPLIER') {
       this.props.showSpinner();
@@ -778,6 +831,7 @@ class AddItemsPage extends Component {
                   recipients: this.props.recipients,
                   removeItem: this.removeItem,
                   productsFetch: this.productsFetch,
+                  getSortOrder: this.getSortOrder,
                 }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form" onClick={() => previousPage(values)}>

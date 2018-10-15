@@ -8,6 +8,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
@@ -169,10 +170,13 @@ class StockMovement {
 
         // Include all requisition items except those that are substitutions or modifications because the
         // original requisition item will represent these changes
-        requisition.requisitionItems.each { requisitionItem ->
-            if (!requisitionItem.parentRequisitionItem) {
-                StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
-                stockMovement.lineItems.add(stockMovementItem)
+        if (requisition.requisitionItems) {
+            SortedSet<RequisitionItem> requisitionItems = new TreeSet<RequisitionItem>(requisition.requisitionItems)
+            requisitionItems.each { requisitionItem ->
+                if (!requisitionItem.parentRequisitionItem) {
+                    StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+                    stockMovement.lineItems.add(stockMovementItem)
+                }
             }
         }
         return stockMovement
