@@ -9,7 +9,7 @@
 }
 </style>
 <div class="filters">
-	<g:form method="POST" controller="consumption" action="show">
+	<g:form method="get" controller="consumption" action="show">
 
     <div class="box dialog">
         <h2><warehouse:message code="consumption.filters.label" default="Report parameters"/></h2>
@@ -58,8 +58,7 @@
                 </td>
             </tr>
 
-            <%--
-            <g:if test="${!command?.toLocations || command?.toLocations?.size() < 10}">
+            <g:if test="${!command?.toLocations || command?.toLocations?.size() < 25}">
                 <tr class="prop">
                     <td colspan="2">
                         <label>
@@ -67,11 +66,11 @@
                         </label>
                         <g:selectLocation name="toLocations" value="${command?.toLocations?.id}" multiple="true" class="chzn-select-deselect"
                                           data-placeholder="${warehouse.message(code:'consumption.toLocations.label', default:'Destinations(s)')}"/>
+                        <span class="fade"><g:message code="consumption.destinations.optional.message"/></span>
                     </td>
                 </tr>
             </g:if>
-            --%>
-            <g:if test="${command?.toLocations}">
+            <g:elseif test="${command?.toLocations}">
                 <tr class="prop">
                     <td colspan="2">
                         <label>
@@ -133,7 +132,7 @@
                         </g:unless>
                     </td>
                 </tr>
-            </g:if>
+            </g:elseif>
             <tr class="prop">
                 <td colspan="2">
                     <label><warehouse:message code="consumption.additionalColumns.label" default="Additional columns"/></label>

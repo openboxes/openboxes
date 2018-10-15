@@ -13,6 +13,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -37,6 +38,22 @@ class ConsumptionController {
 
     def show = { ShowConsumptionCommand command ->
         log.info "Consumption " + params
+
+        log.info "toLocations" + command.toLocations
+
+        def jsonObject = new JSONObject(params)
+
+        log.info "Base64: " + jsonObject?.toString()
+
+        String encoded = jsonObject.toString().bytes.encodeBase64().toString()
+
+        log.info "encoded: " + encoded
+
+        def decoded = new String(encoded.decodeBase64())
+
+        log.info "decoded: " + decoded
+
+
         if (command.hasErrors()) {
             render(view: "show", model: [command:command])
             return;
@@ -335,7 +352,7 @@ class ConsumptionController {
         else {
             println "Render as HTML " + params
 
-            [command:command]
+            [command:command, encoded: encoded, decoded: decoded]
         }
     }
 

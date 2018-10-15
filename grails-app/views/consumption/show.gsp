@@ -17,8 +17,6 @@
             </div>
         </g:hasErrors>
 
-
-
         <div class="yui-gf">
 
             <div class="yui-u first">
@@ -196,7 +194,8 @@
 
                                 <tr>
                                     <th></th>
-                                    <th class="border-right"><warehouse:message code="product.label"/></th>
+                                    <th><warehouse:message code="product.productCode.label"/></th>
+                                    <th><warehouse:message code="product.label"/></th>
 
                                     <%--
                                     <th class="border-right"><warehouse:message code="category.label"/></th>
@@ -248,9 +247,14 @@
                                             ${(numberOfMonthsLeft<3&&numberOfMonthsLeft>0)?'error':} ${(numberOfMonthsLeft<0)?'notice':''}"
                                         --%>
                                         <td>${i+1}</td>
-                                        <td class="border-right">
+                                        <td>
                                             <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
-                                                ${product?.productCode} ${product?.name}
+                                                ${product?.productCode}
+                                            </g:link>
+                                        </td>
+                                        <td>
+                                            <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
+                                                ${product?.name}
                                             </g:link>
 
                                             &nbsp;
