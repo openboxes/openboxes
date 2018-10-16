@@ -1,5 +1,8 @@
 
+<%@ page import="org.pih.warehouse.core.ReasonCode" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionItem" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -15,8 +18,6 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-
-
             <div class="yui-gf">
                 <div class="yui-u first">
                     <div class="box">
@@ -32,15 +33,9 @@
                                 </div>
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="reasonCode.label" default="Reason code"/></label>
-                                    <%--
-                                    <g:selectReasonCode multiple="true" name="cancelReasonCode" noSelection="['null':'']"
-                                                        value="${params.list('cancelReasonCode')}" class="chzn-select-deselect" />
-
-
-                                    --%>
                                     <div class="chzn-field">
-                                        <g:select name="cancelReasonCode" from="${org.pih.warehouse.core.ReasonCode.values()}" noSelection="['null':'']"
-                                                  class="chzn-select-deselect" keys="${org.pih.warehouse.core.ReasonCode.values()*.name()}"
+                                        <g:select name="cancelReasonCode" from="${ReasonCode.values()}" noSelection="['null':'']"
+                                                  class="chzn-select-deselect" keys="${ReasonCode.values()*.name()}"
                                                   multiple="true" value="${params.list('cancelReasonCode')}" data-placeholder=" "/>
                                     </div>
                                 </div>
@@ -49,6 +44,7 @@
                                 </div>
                                 <div class="filter-list-item">
                                     <button name="search" class="button icon search">${warehouse.message(code:'default.search.label')}</button>
+                                    <g:link controller="requisitionItem" action="list"><warehouse:message code="default.clear.label"/></g:link>
                                 </div>
                             </div>
                         </g:form>
@@ -57,14 +53,11 @@
                 <div class="yui-u">
 
                     <div class="button-bar">
-                        <div class="button-group">
-                            <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="['requisitionItem']"/></g:link>
-                            <%--
-                            <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="['requisitionItem']"/></g:link>
-                            --%>
-                            <g:link class="button icon arrowdown" action="export" params="${params}"><warehouse:message code="default.export.label" args="['requisitionItem']"/></g:link>
-
-                        </div>
+                        <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="['requisitionItem']"/></g:link>
+                        <%--
+                        <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="['requisitionItem']"/></g:link>
+                        --%>
+                        <g:link class="button icon arrowdown" action="export" params="${params}"><warehouse:message code="default.export.label" args="['requisitionItem']"/></g:link>
                     </div>
                     <div class="list">
 
@@ -81,19 +74,21 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th></th>
                                         <%--
                                         <g:sortableColumn property="id" title="${warehouse.message(code: 'requisitionItem.id.label', default: 'Id')}" />
                                         --%>
+                                        <th><warehouse:message code="requisition.status.label" /></th>
+                                        <th><warehouse:message code="requisition.requestNumber.label" /></th>
                                         <th><warehouse:message code="requisitionItem.requisition.label" default="Requisition" /></th>
                                         <th><warehouse:message code="requisitionItem.dateRequested.label" default="Date requested" /></th>
-                                        <th><warehouse:message code="requisitionItem.product.label" default="Product" /></th>
-                                        <th><warehouse:message code="product.genericProduct.label" default="Product group" /></th>
+                                        <th><warehouse:message code="product.productCode.label" /></th>
+                                        <th><warehouse:message code="product.label" /></th>
                                         <th><warehouse:message code="requisitionItem.cancelReasonCode.label" default="Cancel reason code" /></th>
                                         <th><warehouse:message code="requisitionItem.cancelComments.label" default="Cancel comments" /></th>
                                         <th><warehouse:message code="requisitionItem.quantityApproved.label" default="Quantity approved" /></th>
                                         <th><warehouse:message code="requisitionItem.quantityCanceled.label" default="Quantity canceled" /></th>
                                         <th><warehouse:message code="requisitionItem.quantity.label" default="Quantity requested" /></th>
+                                        <th><warehouse:message code="default.actions.label" default="Actions" /></th>
 
                                     </tr>
                                 </thead>
@@ -102,29 +97,31 @@
                                     <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
                                         <td>
-                                            <g:link action="edit" id="${requisitionItemInstance.id}">
-                                                <warehouse:message code="default.button.edit.label"/>
+                                            <g:link controller="requisition" action="show" id="${requisitionItemInstance.requisition.id}">
+                                                ${fieldValue(bean: requisitionItemInstance.requisition, field: "status")}
                                             </g:link>
                                         </td>
                                         <td>
                                             <g:link controller="requisition" action="show" id="${requisitionItemInstance.requisition.id}">
                                                 ${fieldValue(bean: requisitionItemInstance.requisition, field: "requestNumber")}
+                                            </g:link>
+                                        </td>
+                                        <td>
+                                            <g:link controller="requisition" action="show" id="${requisitionItemInstance.requisition.id}">
                                                 ${fieldValue(bean: requisitionItemInstance.requisition, field: "name")}
                                             </g:link>
                                         </td>
                                         <td>
                                             ${fieldValue(bean: requisitionItemInstance.requisition, field: "dateRequested")}
                                         </td>
+                                        <td>
+                                            ${fieldValue(bean: requisitionItemInstance.product, field: "productCode")}
+                                        </td>
 
                                         <td>
                                             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItemInstance.product.id}">
-                                                ${fieldValue(bean: requisitionItemInstance.product, field: "productCode")}
                                                 ${fieldValue(bean: requisitionItemInstance, field: "product")}
                                             </g:link>
-                                        </td>
-                                        <td>
-                                            ${requisitionItemInstance?.product?.genericProduct?.name?:""}
-
                                         </td>
 
                                         <td>${fieldValue(bean: requisitionItemInstance, field: "cancelReasonCode")}</td>
@@ -135,6 +132,11 @@
                                         <td>${fieldValue(bean: requisitionItemInstance, field: "quantityCanceled")}</td>
 
                                         <td>${fieldValue(bean: requisitionItemInstance, field: "quantity")}</td>
+                                        <td>
+                                            <g:link action="edit" id="${requisitionItemInstance.id}" class="button">
+                                                <warehouse:message code="default.button.edit.label"/>
+                                            </g:link>
+                                        </td>
                                     </tr>
                                 </g:each>
                                 </tbody>
