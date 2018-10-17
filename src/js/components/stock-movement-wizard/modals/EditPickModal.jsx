@@ -62,6 +62,9 @@ function validate(values) {
     if (item.quantityPicked > item.quantityAvailable) {
       errors.availableItems[key] = { quantityPicked: 'Picked quantity is higher than available' };
     }
+    if (item.quantityPicked < 0) {
+      errors.availableItems[key] = { quantityPicked: 'Picked quantity can\'t be negative' };
+    }
   });
 
   const pickedSum = _.reduce(

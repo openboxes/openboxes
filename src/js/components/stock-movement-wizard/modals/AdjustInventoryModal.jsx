@@ -69,6 +69,19 @@ const FIELDS = {
   },
 };
 
+function validate(values) {
+  const errors = {};
+  errors.adjustInventory = [];
+
+  _.forEach(values.adjustInventory, (item, key) => {
+    if (item.quantityAdjusted < 0) {
+      errors.adjustInventory[key] = { quantityAdjusted: 'Adjusted quantity can\'t be negative' };
+    }
+  });
+  return errors;
+}
+
+
 /** Modal window where user can adjust existing inventory or add a new one. */
 class AdjustInventoryModal extends Component {
   constructor(props) {
@@ -166,6 +179,7 @@ class AdjustInventoryModal extends Component {
         onOpen={this.onOpen}
         onSave={this.onSave}
         fields={FIELDS}
+        validate={validate}
         initialValues={this.state.formValues}
         formProps={{
           bins: this.props.bins,
