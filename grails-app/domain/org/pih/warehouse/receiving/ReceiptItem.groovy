@@ -36,7 +36,9 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 	ShipmentItem shipmentItem
 	InventoryItem inventoryItem
 	Location binLocation
-		
+
+	Boolean isSplitItem = Boolean.FALSE
+
 	Person recipient 					// Recipient of an item	
 	
 	Date dateCreated;
@@ -58,6 +60,7 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 		quantityReceived(range: 0..2147483646, nullable:false)
 		quantityCanceled(nullable:true)
 		recipient(nullable:true)
+		isSplitItem(nullable:true)
 		comment(nullable:true, maxSize: 255)
 	}
 	

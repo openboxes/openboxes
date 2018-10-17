@@ -154,6 +154,7 @@ class ReceiptService {
         partialReceiptItem.lotNumber = receiptItem.inventoryItem?.lotNumber
         partialReceiptItem.expirationDate = receiptItem.inventoryItem?.expirationDate
         partialReceiptItem.quantityShipped = receiptItem?.quantityShipped?:0
+        partialReceiptItem.isSplitItem = receiptItem.isSplitItem
 
         return partialReceiptItem
     }
@@ -188,6 +189,7 @@ class ReceiptService {
         receiptItem.product = inventoryItem.product
         receiptItem.inventoryItem = inventoryItem
         receiptItem.shipmentItem = partialReceiptItem.shipmentItem
+        receiptItem.isSplitItem = partialReceiptItem.isSplitItem
 
         if (partialReceiptItem.cancelRemaining) {
             receiptItem.quantityCanceled = shipmentItem.quantityRemaining - partialReceiptItem.quantityReceiving
