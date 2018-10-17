@@ -217,7 +217,10 @@ class ReceiptService {
         receipt.shipment = partialReceipt.shipment
         receipt.expectedDeliveryDate = partialReceipt?.shipment?.expectedDeliveryDate
         receipt.actualDeliveryDate = partialReceipt.dateDelivered
-        receipt.save(flush:true)
+
+        if (receipt.hasErrors() || !receipt.save()) {
+            throw new ValidationException("Receipt is invalid", receipt.errors)
+        }
 
         // Add receipt items
         partialReceipt.partialReceiptItems.each { partialReceiptItem ->
