@@ -260,7 +260,7 @@ class StockMovementService {
             stockMovement?.lineItems?.each { StockMovementItem stockMovementItem ->
                 if (stockMovementItem.statusCode == 'SUBSTITUTED') {
                     for (StockMovementItem subStockMovementItem : stockMovementItem.substitutionItems) {
-                        createMissingPicklistItems(stockMovementItem)
+                        createMissingPicklistItems(subStockMovementItem)
                     }
                 }
                 else {
