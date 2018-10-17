@@ -61,12 +61,15 @@
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
             <g:if test="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}">
-                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button icon approve">
-                        <warehouse:message code="default.button.receive.label" />
-                    </g:link>
+                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button icon approve">
+                    <warehouse:message code="default.button.receive.label" />
+                </g:link>
             </g:if>
 
             <g:isSuperuser>
+                <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button icon loop">
+                    <warehouse:message code="default.button.rollback.label" />
+                </g:link>
                 <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button icon remove"
                         onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                     <warehouse:message code="default.button.delete.label" />
@@ -303,7 +306,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <g:link controller="inventoryItem" action="showStockCard" id=${stockMovementItem?.product?.id}">
+                                        <g:link controller="inventoryItem" action="showStockCard" id="${stockMovementItem?.product?.id}">
                                             ${stockMovementItem?.product?.productCode}
                                         </g:link>
                                     </td>

@@ -1882,6 +1882,7 @@ class ShipmentService {
 		def transactions = Transaction.findAllByIncomingShipment(shipmentInstance)
 		transactions.each { transactionInstance ->
 			if (transactionInstance) {
+				transactionInstance?.receipt = null
 				shipmentInstance.removeFromIncomingTransactions(transactionInstance)
 				transactionInstance?.delete();
 			}
