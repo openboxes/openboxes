@@ -171,6 +171,9 @@ class PackingSplitLineModal extends Component {
       if (shippedQty !== splitItemsQty) {
         errors.splitLineItems[key] = { quantityShipped: 'Sum of all quantities must equal the original quantity' };
       }
+      if (item.quantityShipped < 0) {
+        errors.splitLineItems[key] = { quantityShipped: 'Shipped quantity can\'t be negative' };
+      }
     });
 
     return errors;

@@ -171,6 +171,9 @@ function validate(values) {
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised > item.quantityAvailable)) {
       errors.editPageItems[key] = { quantityRevised: 'Revised quantity exceeds quantity available' };
     }
+    if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised < 0)) {
+      errors.editPageItems[key] = { quantityRevised: 'Revised quantity can\'t be negative' };
+    }
   });
   return errors;
 }

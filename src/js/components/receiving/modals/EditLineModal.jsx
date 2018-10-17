@@ -90,6 +90,9 @@ function validate(values) {
     if (line && _.isNil(line.quantityShipped)) {
       errors.lines[key] = { quantityShipped: 'Enter quantity shipped' };
     }
+    if (line.quantityShipped < 0) {
+      errors.lines[key] = { quantityShipped: 'Quantity shipped can\'t be negative' };
+    }
   });
 
   return errors;

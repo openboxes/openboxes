@@ -70,6 +70,9 @@ function validate(values) {
     if (item.quantitySelected > item.quantityAvailable) {
       errors.substitutions[key] = { quantitySelected: 'Selected quantity is higher than available' };
     }
+    if (item.quantitySelected < 0) {
+      errors.substitutions[key] = { quantitySelected: 'Selected quantity can\'t be negative' };
+    }
   });
 
   if (!values.reasonCode) {

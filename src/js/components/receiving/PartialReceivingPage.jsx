@@ -280,11 +280,12 @@ class PartialReceivingPage extends Component {
     if (isReceived(true, shipmentItem)) {
       return shipmentItem;
     }
+    const autofillQuantity = _.toInteger(shipmentItem.quantityShipped) -
+          _.toInteger(shipmentItem.quantityReceived);
 
     return {
       ...shipmentItem,
-      quantityReceiving: clearValue ? null
-        : _.toInteger(shipmentItem.quantityShipped) - _.toInteger(shipmentItem.quantityReceived),
+      quantityReceiving: clearValue || autofillQuantity < 0 ? null : autofillQuantity,
     };
   }
 
