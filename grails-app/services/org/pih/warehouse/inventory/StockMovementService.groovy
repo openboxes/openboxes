@@ -461,6 +461,20 @@ class StockMovementService {
         return availableSubstitutions
     }
 
+    List<SubstitutionItem> getSubstitutionItems(Location location, RequisitionItem requisitionItem) {
+        !requisitionItem?.substitutionItems ? null : requisitionItem?.substitutionItems?.collect { RequisitionItem item ->
+            List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, item.product)
+
+            SubstitutionItem substitutionItem = new SubstitutionItem()
+            substitutionItem.productId = item?.product?.id
+            substitutionItem.productName = item?.product?.name
+            substitutionItem.productCode = item?.product?.productCode
+            substitutionItem.quantitySelected = item?.quantity
+            substitutionItem.availableItems = availableItems
+            return substitutionItem
+        }
+    }
+
     // These two methods do very different things
 //    List<SubstitutionItem> getSubstitutionItems(StockMovementItem stockMovementItem) {
 //        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
@@ -538,6 +552,7 @@ class StockMovementService {
         Location location = requisitionItem?.requisition?.origin
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
         List<SubstitutionItem> availableSubstitutions = getAvailableSubstitutions(location, requisitionItem.product)
+        List<SubstitutionItem> substitutionItems = getSubstitutionItems(location, requisitionItem)
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id
         editPageItem.productCode = requisitionItem.product.productCode
@@ -546,6 +561,7 @@ class StockMovementService {
         editPageItem.quantityConsumed = null
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
+        editPageItem.substitutionItems = substitutionItems
         return editPageItem
     }
 

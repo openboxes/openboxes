@@ -315,17 +315,6 @@ class SubstitutionItem {
                 quantityRequested : quantitySelected
         ]
     }
-
-
-    static SubstitutionItem createFromRequisitionItem(RequisitionItem requisitionItem) {
-        SubstitutionItem substitutionItem = new SubstitutionItem()
-        substitutionItem.productId = requisitionItem?.product?.id
-        substitutionItem.productName = requisitionItem?.product?.name
-        substitutionItem.productCode = requisitionItem?.product?.productCode
-        substitutionItem.quantitySelected = requisitionItem?.quantity
-        return substitutionItem
-    }
-
 }
 
 enum SubstitutionStatusCode {
@@ -368,6 +357,7 @@ class EditPageItem {
 
     List<AvailableItem> availableItems
     List<SubstitutionItem> availableSubstitutions
+    List<SubstitutionItem> substitutionItems
 
     Integer getQuantityAvailable() {
         availableItems ? availableItems.sum { it.quantityAvailable } : null
@@ -391,13 +381,6 @@ class EditPageItem {
 
     Date getMinExpirationDateForSubstitutionItems() {
         return availableSubstitutions ? availableSubstitutions?.collect { it.minExpirationDate }?.min() : null
-    }
-
-    List<SubstitutionItem> getSubstitutionItems() {
-        return requisitionItem?.substitutionItems ?
-                requisitionItem?.substitutionItems?.collect { RequisitionItem requsitionItem ->
-                    SubstitutionItem.createFromRequisitionItem(requsitionItem) } :
-                null
     }
 
     Boolean hasEarlierExpirationDate() {
