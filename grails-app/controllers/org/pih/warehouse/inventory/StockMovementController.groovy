@@ -83,6 +83,29 @@ class StockMovementController {
 
     }
 
+    def rollback = {
+
+        try {
+            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+            if (stockMovement) {
+                List shipments = stockMovement?.requisition?.shipments
+                shipments.toArray().each { Shipment shipment ->
+                    if (!shipment?.events?.empty) {
+                        shipmentService.rollbackLastEvent(shipment)
+                    }
+                }
+            }
+            flash.message = "Successfully rolled back stock movement with ID ${params.id}"
+        } catch (Exception e) {
+            log.warn ("Unable to delete stock movement withID ${params.id}: " + e.message)
+            flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+        }
+
+        redirect(action: "list")
+    }
+
+
+
     def delete = {
 
         try {
