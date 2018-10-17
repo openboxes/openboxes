@@ -18,17 +18,25 @@ class PartialReceiptItem {
     Person recipient
     Boolean cancelRemaining = Boolean.FALSE
 
+    Boolean isSplitItem = Boolean.FALSE
+
     String lotNumber
     Date expirationDate
     Integer quantityShipped
     Product product
 
     Integer getQuantityReceived() {
+        if (isSplitItem) {
+            return 0
+        }
         def receiptItems = getReceiptItemsByStatus([ReceiptStatusCode.RECEIVED] as ReceiptStatusCode[])
         return receiptItems ? receiptItems?.sum { it?.quantityReceived?:0 } : 0
     }
 
     Integer getQuantityCanceled() {
+        if (isSplitItem) {
+            return 0
+        }
         def receiptItems = getReceiptItemsByStatus([ReceiptStatusCode.RECEIVED] as ReceiptStatusCode[])
         return receiptItems ? receiptItems?.sum { it?.quantityCanceled?:0 } : 0
     }

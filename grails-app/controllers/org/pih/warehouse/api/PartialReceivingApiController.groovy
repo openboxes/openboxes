@@ -89,6 +89,7 @@ class PartialReceivingApiController {
                     partialReceiptItem = new PartialReceiptItem()
                     partialReceiptItem.shipmentItem = ShipmentItem.get(shipmentItemId)
                     partialReceiptItem.product = shipmentItemMap.get("product.id") ? Product.load(shipmentItemMap.get("product.id")) : null
+                    partialReceiptItem.isSplitItem = newLine
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
                 bindData(partialReceiptItem, shipmentItemMap)
