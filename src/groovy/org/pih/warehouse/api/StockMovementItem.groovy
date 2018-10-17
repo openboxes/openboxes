@@ -413,7 +413,7 @@ class EditPageItem {
             return SubstitutionStatusCode.EARLIER
         }
         else {
-            return (!availableSubstitutions?.empty) ? SubstitutionStatusCode.YES : SubstitutionStatusCode.NO
+            return (!availableSubstitutions?.empty && availableSubstitutions.sum { it.quantityAvailable } > 0) ? SubstitutionStatusCode.YES : SubstitutionStatusCode.NO
         }
     }
 
