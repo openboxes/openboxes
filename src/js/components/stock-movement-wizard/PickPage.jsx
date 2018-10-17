@@ -222,7 +222,7 @@ class PickPage extends Component {
           // if yes -> compare quantityPicked of item in picklist with sugestion
           const pick = _.find(
             pickPageItem.picklistItems,
-            item => suggestion['inventoryItem.id'] === item['inventoryItem.id'],
+            item => (suggestion['inventoryItem.id']) === item['inventoryItem.id'] && (item['binLocation.id'] === suggestion['binLocation.id']),
           );
           if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
             initialPicks.push({
