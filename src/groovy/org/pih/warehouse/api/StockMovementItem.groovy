@@ -364,6 +364,7 @@ class EditPageItem {
     Integer quantityRequested
     //Integer quantityAvailable
     Integer quantityConsumed
+    Integer sortOrder
 
     List<AvailableItem> availableItems
     List<SubstitutionItem> availableSubstitutions
@@ -432,7 +433,8 @@ class EditPageItem {
                 quantityAvailable: quantityAvailable,
                 substitutionStatus    : substitutionStatusCode,
                 availableSubstitutions: availableSubstitutions,
-                substitutionItems     : substitutionItems
+                substitutionItems     : substitutionItems,
+                sortOrder        : sortOrder
         ]
     }
 }
@@ -442,6 +444,7 @@ class PickPageItem {
     RequisitionItem requisitionItem
     InventoryItem inventoryItem
     Location binLocation
+    Integer sortOrder
 
     Set<PicklistItem> picklistItems = []
     Set<AvailableItem> availableItems = []
@@ -468,6 +471,7 @@ class PickPageItem {
                 suggestedItems      : suggestedItems,
                 picklistItems       : picklistItems,
                 recipient           : requisitionItem?.recipient,
+                sortOrder           : sortOrder,
         ]
     }
 
@@ -525,6 +529,7 @@ class PackPageItem {
     ShipmentItem shipmentItem
     String palletName
     String boxName
+    Integer sortOrder
 
     String shipmentItemId
     Person recipient
@@ -545,6 +550,7 @@ class PackPageItem {
                 recipient         : shipmentItem?.recipient,
                 palletName        : palletName,
                 boxName           : boxName,
+                sortOrder         : sortOrder,
         ]
     }
 
