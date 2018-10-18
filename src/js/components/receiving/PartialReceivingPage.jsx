@@ -80,7 +80,8 @@ const FIELDS = {
     type: DateField,
     label: 'Delivered On',
     attributes: {
-      dateFormat: 'MM/DD/YYYY',
+      showTimeSelect: true,
+      dateFormat: 'MM/DD/YYYY HH:mm',
     },
     getDynamicAttr: ({ shipmentReceived }) => ({
       disabled: shipmentReceived,
