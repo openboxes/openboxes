@@ -36,6 +36,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
@@ -669,15 +670,7 @@ class StockMovementService {
         requisition.name = stockMovement.generateName()
 
         if (forceUpdate) {
-            requisition.requisitionItems?.toArray()?.each { RequisitionItem requisitionItem ->
-                if (!requisitionItem.parentRequisitionItem) {
-                    removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
-                    requisitionItem.undoChanges()
-
-                    requisition.removeFromRequisitionItems(requisitionItem)
-                    requisitionItem.delete()
-                }
-            }
+            removeRequisitionItems(requisition)
             addStockListItemsToRequisition(stockMovement, requisition)
         } else if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
@@ -800,6 +793,40 @@ class StockMovementService {
         }
         return requisition
     }
+
+    /**
+     * Remove all requisition items for a requisition, modification and substitution items first.
+     *
+     * @param requisition
+     */
+    void removeRequisitionItems(Requisition requisition) {
+
+        def originalRequisitionItems =
+                requisition.requisitionItems.findAll { RequisitionItem requisitionItem ->
+                    requisitionItem.requisitionItemType == RequisitionItemType.ORIGINAL
+                }
+        def otherRequisitionItems =
+                requisition.requisitionItems.minus(originalRequisitionItems)
+
+        // Remove substitutions and modifications, then remove the original requisition items
+        removeRequisitionItems(otherRequisitionItems)
+        removeRequisitionItems(originalRequisitionItems)
+    }
+
+    void removeRequisitionItems(Set<RequisitionItem> requisitionItems) {
+        requisitionItems?.toArray()?.each { RequisitionItem requisitionItem ->
+            removeRequisitionItem(requisitionItem)
+        }
+    }
+
+    void removeRequisitionItem(RequisitionItem requisitionItem) {
+        Requisition requisition = requisitionItem.requisition
+        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+        requisitionItem.undoChanges()
+        requisition.removeFromRequisitionItems(requisitionItem)
+        requisitionItem.delete()
+    }
+
 
     void removeShipmentItemsForModifiedRequisitionItem(StockMovementItem stockMovementItem) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem?.id)
