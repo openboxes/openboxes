@@ -36,6 +36,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
@@ -86,10 +87,10 @@ class StockMovementService {
     }
 
 
-    StockMovement updateStockMovement(StockMovement stockMovement) {
+    StockMovement updateStockMovement(StockMovement stockMovement, Boolean forceUpdate) {
         log.info "Update stock movement " + new JSONObject(stockMovement.toJson()).toString(4)
 
-        Requisition requisition = updateRequisition(stockMovement)
+        Requisition requisition = updateRequisition(stockMovement, forceUpdate)
 
         log.info "Date shipped: " + stockMovement.dateShipped
         if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status) {
@@ -633,6 +634,14 @@ class StockMovementService {
         requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName();
 
+        addStockListItemsToRequisition(stockMovement, requisition)
+        if (requisition.hasErrors() || !requisition.save(flush: true)) {
+            throw new ValidationException("Invalid requisition", requisition.errors)
+        }
+        return requisition
+    }
+
+    void addStockListItemsToRequisition(StockMovement stockMovement, Requisition requisition) {
         // If the user specified a stocklist then we should automatically clone it as long as there are no
         // requisition items already added to the requisition
         if (stockMovement.stocklist && !requisition.requisitionItems) {
@@ -644,14 +653,9 @@ class StockMovementService {
                 requisition.addToRequisitionItems(requisitionItem)
             }
         }
-        if (requisition.hasErrors() || !requisition.save(flush: true)) {
-            throw new ValidationException("Invalid requisition", requisition.errors)
-        }
-        return requisition
     }
 
-
-    Requisition updateRequisition(StockMovement stockMovement) {
+    Requisition updateRequisition(StockMovement stockMovement, Boolean forceUpdate) {
         Requisition requisition = Requisition.get(stockMovement.id)
         if (!requisition) {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
@@ -665,7 +669,10 @@ class StockMovementService {
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName()
 
-        if (stockMovement.lineItems) {
+        if (forceUpdate) {
+            removeRequisitionItems(requisition)
+            addStockListItemsToRequisition(stockMovement, requisition)
+        } else if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 RequisitionItem requisitionItem
                 // Try to find a matching stock movement item
@@ -786,6 +793,40 @@ class StockMovementService {
         }
         return requisition
     }
+
+    /**
+     * Remove all requisition items for a requisition, modification and substitution items first.
+     *
+     * @param requisition
+     */
+    void removeRequisitionItems(Requisition requisition) {
+
+        def originalRequisitionItems =
+                requisition.requisitionItems.findAll { RequisitionItem requisitionItem ->
+                    requisitionItem.requisitionItemType == RequisitionItemType.ORIGINAL
+                }
+        def otherRequisitionItems =
+                requisition.requisitionItems.minus(originalRequisitionItems)
+
+        // Remove substitutions and modifications, then remove the original requisition items
+        removeRequisitionItems(otherRequisitionItems)
+        removeRequisitionItems(originalRequisitionItems)
+    }
+
+    void removeRequisitionItems(Set<RequisitionItem> requisitionItems) {
+        requisitionItems?.toArray()?.each { RequisitionItem requisitionItem ->
+            removeRequisitionItem(requisitionItem)
+        }
+    }
+
+    void removeRequisitionItem(RequisitionItem requisitionItem) {
+        Requisition requisition = requisitionItem.requisition
+        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+        requisitionItem.undoChanges()
+        requisition.removeFromRequisitionItems(requisitionItem)
+        requisitionItem.delete()
+    }
+
 
     void removeShipmentItemsForModifiedRequisitionItem(StockMovementItem stockMovementItem) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem?.id)
