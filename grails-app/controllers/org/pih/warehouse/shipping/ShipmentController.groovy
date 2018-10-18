@@ -275,7 +275,7 @@ class ShipmentController {
 			// handle a submit
 			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
 				// make sure a shipping date has been specified and that is not the future
-				if (!params.actualShippingDate || Date.parse("MM/dd/yyyy", params.actualShippingDate) > new Date()) {
+				if (!params.actualShippingDate || Date.parse("MM/dd/yyyy HH:mm", params.actualShippingDate) > new Date()) {
 					flash.message = "${warehouse.message(code: 'shipping.specifyValidShipmentDate.message')}"	
 					render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
 					return
@@ -287,7 +287,7 @@ class ShipmentController {
 				try { 
 					// send the shipment
 					shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse, 
-													Date.parse("MM/dd/yyyy", params.actualShippingDate));
+													Date.parse("MM/dd/yyyy HH:mm", params.actualShippingDate));
 					//triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
 				catch (TransactionException e) { 

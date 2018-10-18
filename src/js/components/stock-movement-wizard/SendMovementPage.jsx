@@ -20,8 +20,9 @@ const FIELDS = {
     type: DateField,
     label: 'Ship Date',
     attributes: {
-      dateFormat: 'MM/DD/YYYY',
+      dateFormat: 'MM/DD/YYYY HH:mm',
       required: true,
+      showTimeSelect: true,
     },
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
