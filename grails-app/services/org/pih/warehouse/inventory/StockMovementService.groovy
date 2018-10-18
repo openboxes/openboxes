@@ -86,10 +86,10 @@ class StockMovementService {
     }
 
 
-    StockMovement updateStockMovement(StockMovement stockMovement) {
+    StockMovement updateStockMovement(StockMovement stockMovement, Boolean forceUpdate) {
         log.info "Update stock movement " + new JSONObject(stockMovement.toJson()).toString(4)
 
-        Requisition requisition = updateRequisition(stockMovement)
+        Requisition requisition = updateRequisition(stockMovement, forceUpdate)
 
         log.info "Date shipped: " + stockMovement.dateShipped
         if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status) {
@@ -633,6 +633,14 @@ class StockMovementService {
         requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName();
 
+        addStockListItemsToRequisition(stockMovement, requisition)
+        if (requisition.hasErrors() || !requisition.save(flush: true)) {
+            throw new ValidationException("Invalid requisition", requisition.errors)
+        }
+        return requisition
+    }
+
+    void addStockListItemsToRequisition(StockMovement stockMovement, Requisition requisition) {
         // If the user specified a stocklist then we should automatically clone it as long as there are no
         // requisition items already added to the requisition
         if (stockMovement.stocklist && !requisition.requisitionItems) {
@@ -644,14 +652,9 @@ class StockMovementService {
                 requisition.addToRequisitionItems(requisitionItem)
             }
         }
-        if (requisition.hasErrors() || !requisition.save(flush: true)) {
-            throw new ValidationException("Invalid requisition", requisition.errors)
-        }
-        return requisition
     }
 
-
-    Requisition updateRequisition(StockMovement stockMovement) {
+    Requisition updateRequisition(StockMovement stockMovement, Boolean forceUpdate) {
         Requisition requisition = Requisition.get(stockMovement.id)
         if (!requisition) {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
@@ -665,7 +668,18 @@ class StockMovementService {
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName()
 
-        if (stockMovement.lineItems) {
+        if (forceUpdate) {
+            requisition.requisitionItems?.toArray()?.each { RequisitionItem requisitionItem ->
+                if (!requisitionItem.parentRequisitionItem) {
+                    removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+                    requisitionItem.undoChanges()
+
+                    requisition.removeFromRequisitionItems(requisitionItem)
+                    requisitionItem.delete()
+                }
+            }
+            addStockListItemsToRequisition(stockMovement, requisition)
+        } else if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 RequisitionItem requisitionItem
                 // Try to find a matching stock movement item

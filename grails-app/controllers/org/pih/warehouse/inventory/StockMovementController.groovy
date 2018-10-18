@@ -17,16 +17,10 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
-
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-
 
 class StockMovementController {
 
@@ -197,7 +191,7 @@ class StockMovementController {
                 stockMovementItem.stockMovement = stockMovement
                 stockMovement.lineItems.add(stockMovementItem)
             }
-            stockMovementService.updateStockMovement(stockMovement)
+            stockMovementService.updateStockMovement(stockMovement, false)
 
         } catch (Exception e) {
             // FIXME The global error handler does not return JSON for multipart uploads
