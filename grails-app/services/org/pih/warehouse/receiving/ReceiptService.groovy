@@ -227,7 +227,7 @@ class ReceiptService {
         // Add receipt items
         partialReceipt.partialReceiptItems.each { partialReceiptItem ->
 
-            log.info "Saving partial receipt item " + partialReceiptItem?.toJson()
+            log.info "Saving partial receipt item " + partialReceiptItem
             if (partialReceiptItem.quantityReceiving != null) {
                 ReceiptItem receiptItem = createOrUpdateReceiptItem(partialReceiptItem)
                 receipt.addToReceiptItems(receiptItem)
