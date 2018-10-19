@@ -14,7 +14,7 @@ https://openboxes.ngrok.io/openboxes/api/login
 ```
 
 
-## 
+## Using Generic API
 Once that's done, let's start with the views that require the read/list APIs like shipments and requisitions. For this we're going to use 
 what I'm calling the [Generic API](http://docs.openboxes.com/en/latest/api-guide/generic/). You should be able to handle most (if not all) 
 of the basic CRUD operations through the Generic API. 
