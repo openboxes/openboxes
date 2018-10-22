@@ -13,7 +13,8 @@
 <body>
 
 <g:set var="pageParams"
-       value="['origin.id':params?.origin?.id, 'destination.id':params?.destination?.id, q:params.q, commodityClass:params.commodityClass, status:params.status,
+       value="['origin.id':params?.origin?.id, 'destination.id':params?.destination?.id, q:params.q,
+               commodityClass:params.commodityClass, status:params.status, direction: params?.direction,
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
                'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order, relatedToMe:params.relatedToMe,
                'requestedBy.id': params?.requestedBy?.id]"/>
@@ -75,6 +76,9 @@
             <div class="box">
                 <h2><warehouse:message code="default.filters.label"/></h2>
                 <g:form action="list" method="GET">
+                    <g:hiddenField name="max" value="${params.max}"/>
+                    <g:hiddenField name="offset" value="${params.offset}"/>
+                    <g:hiddenField name="direction" value="${params.direction}"/>
                     <div class="filter-list">
                         <div class="filter-list-item">
                             <label><warehouse:message code="default.search.label"/></label>
