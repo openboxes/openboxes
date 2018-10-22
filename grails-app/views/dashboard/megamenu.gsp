@@ -235,7 +235,7 @@
                                 </g:link>
                             </div>
                         </g:if>
-                        <g:if test="${megamenuConfig.shipping.enabled || isSuperuser}">
+                        <g:if test="${megamenuConfig.receiving.enabled || isSuperuser}">
                             <hr/>
                             <div class="megaButton">
                                 <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create"><warehouse:message code="shipping.createIncomingShipment.label"/></g:link>
@@ -282,7 +282,7 @@
                             </g:link>
                         </div>
                     </g:if>
-                    <g:if test="${megamenuConfig.receiving.enabled || isSuperuser}">
+                    <g:if test="${megamenuConfig.shipping.enabled || isSuperuser}">
                         <hr/>
                         <div class="megaButton">
                             <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create"><warehouse:message code="shipping.createOutgoingShipment.label"/></g:link>
