@@ -205,81 +205,37 @@
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.shipping.enabled || isSuperuser}">
-        <g:authorize activity="[ActivityCode.SEND_STOCK]">
-            <li>
-                <a href="javascript:void(0)"><warehouse:message code="shipping.label" /></a>
-                <div class="buttonsBar" style="min-width: 200px;">
-                    <div class="megaButton">
-                        <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create"><warehouse:message code="shipping.createOutgoingShipment.label"/></g:link>
-                    </div>
-                    <hr/>
-                    <div class="megaButton">
-                        <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
-                            <warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/>
-                        </g:link>
-                    </div>
-                    <div class="megaButton">
-                        <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
-                            <warehouse:message code="default.all.label"/> (${outboundShipmentsTotal})
-                        </g:link>
-                    </div>
-                    <g:each in="${outboundShipmentsCount}" var="statusRow">
-                        <div class="megaButton">
-                            <g:link controller="shipment" action="list" params="[status:statusRow.status]" class="shipment-status-${statusRow.status }">
-                                <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
-                            </g:link>
-                        </div>
-                    </g:each>
-                </div>
 
-            </li>
-        </g:authorize>
-    </g:if>
 
-    <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
-        <li>
-            <a href="javascript:void(0)"><warehouse:message code="stockMovement.label" /></a>
-            <div class="buttonsBar" style="min-width: 200px;">
-                <div class="megaButton">
-                    <g:link controller="stockMovement" action="list" params="[direction:'OUTBOUND']">
-                        <warehouse:message code="stockMovement.list.label"/>
-                    </g:link>
-                </div>
-                <div class="megaButton">
-                    <g:link controller="stockMovement" action="create">
-                        <warehouse:message code="stockMovement.create.label"/>
-                    </g:link>
-                </div>
-            </div>
-        </li>
-    </g:if>
-
-    <g:if test="${megamenuConfig.receiving.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.inbound.enabled || isSuperuser}">
         <g:authorize activity="[ActivityCode.RECEIVE_STOCK]">
             <li>
-                <a href="javascript:void(0)"><warehouse:message code="receiving.label" /></a>
+                <a href="javascript:void(0)"><warehouse:message code="default.inbound.label" /></a>
                     <div class="buttonsBar" style="min-width: 200px;">
                         <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
                             <div class="megaButton">
+                                <g:link controller="stockMovement" action="create">
+                                    <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.inbound.label')]"/>
+                                </g:link>
+                            </div>
+                            <div class="megaButton">
                                 <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
-                                    <warehouse:message code="default.receive.label" args="[g.message(code:'stockMovements.label')]"/>
+                                    <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
                                 </g:link>
                             </div>
                             <hr/>
-                            <div class="megaButton">
-                                <g:link controller="order" action="list" params="[orderTypeCode: 'TRANSFER_ORDER']">
-                                    <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
-                                </g:link>
-                            </div>
                             <div class="megaButton">
                                 <g:link controller="putAway" action="index">
                                     <warehouse:message code="default.create.label" args="[g.message(code:'putAway.label')]"/>
                                 </g:link>
                             </div>
+                            <div class="megaButton">
+                                <g:link controller="order" action="list" params="[orderTypeCode: 'TRANSFER_ORDER']">
+                                    <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
+                                </g:link>
+                            </div>
                         </g:if>
-
-                        <g:if test="${!megamenuConfig.stockMovement.enabled || isSuperuser}">
+                        <g:if test="${megamenuConfig.shipping.enabled || isSuperuser}">
                             <hr/>
                             <div class="megaButton">
                                 <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create"><warehouse:message code="shipping.createIncomingShipment.label"/></g:link>
@@ -309,6 +265,50 @@
         </g:authorize>
     </g:if>
 
+    <g:if test="${megamenuConfig.outbound.enabled}">
+        <g:authorize activity="[ActivityCode.SEND_STOCK]">
+            <li>
+                <a href="javascript:void(0)"><warehouse:message code="default.outbound.label" /></a>
+                <div class="buttonsBar" style="min-width: 200px;">
+                    <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
+                        <div class="megaButton">
+                            <g:link controller="stockMovement" action="create">
+                                <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.outbound.label')]"/>
+                            </g:link>
+                        </div>
+                        <div class="megaButton">
+                            <g:link controller="stockMovement" action="list" params="[direction:'OUTBOUND']">
+                                <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.outbound.label')]"/>
+                            </g:link>
+                        </div>
+                    </g:if>
+                    <g:if test="${megamenuConfig.receiving.enabled || isSuperuser}">
+                        <hr/>
+                        <div class="megaButton">
+                            <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create"><warehouse:message code="shipping.createOutgoingShipment.label"/></g:link>
+                        </div>
+                        <div class="megaButton">
+                            <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
+                                <warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/>
+                            </g:link>
+                        </div>
+                        <div class="megaButton">
+                            <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
+                                <warehouse:message code="default.all.label"/> (${outboundShipmentsTotal})
+                            </g:link>
+                        </div>
+                        <g:each in="${outboundShipmentsCount}" var="statusRow">
+                            <div class="megaButton">
+                                <g:link controller="shipment" action="list" params="[status:statusRow.status]" class="shipment-status-${statusRow.status }">
+                                    <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
+                                </g:link>
+                            </div>
+                        </g:each>
+                    </g:if>
+                </div>
+            </li>
+        </g:authorize>
+    </g:if>
 
     <g:if test="${megamenuConfig.reporting.enabled || isSuperuser}">
         <li>

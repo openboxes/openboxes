@@ -622,6 +622,9 @@ openboxes.megamenu.reporting.enabled = true
 openboxes.megamenu.products.enabled = true
 openboxes.megamenu.configuration.enabled = true
 openboxes.megamenu.customLinks.enabled = false
+openboxes.megamenu.inbound.enabled = true
+openboxes.megamenu.outbound.enabled = true
+
 
 // Custom links example
 //openboxes {
