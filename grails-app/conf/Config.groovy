@@ -467,7 +467,6 @@ openboxes.dashboard.binLocationSummary.enabled=true
 openboxes.dashboard.expiringSummary.enabled=true
 openboxes.dashboard.activitySummary.enabled=true
 openboxes.dashboard.tagSummary.enabled=true
-openboxes.dashboard.newsSummary.enabled=true
 
 // Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
 openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummary","receiptSummary","shipmentSummary","indicatorSummary"]
@@ -637,6 +636,9 @@ openboxes.shipping.splitPickItems.enabled = true
 
 // Add item to shipment search
 openboxes.shipping.search.maxResults = 1000
+
+// Automatically create temporary receiving locations for shipments
+openboxes.receiving.createReceivingLocation.enabled = true
 
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"

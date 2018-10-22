@@ -44,6 +44,7 @@ import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
 class StockMovementService {
@@ -1088,8 +1089,8 @@ class StockMovementService {
 
         shipmentService.sendShipment(shipments[0], null, user, requisition.origin, new Date())
 
-        // Create temporary staging area for the Partial Receipt process
-        if (stockMovement.origin.isSupplier()) {
+        // Create temporary receiving area for the Partial Receipt process
+        if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled) {
             LocationType locationType = LocationType.findByName("Receiving")
             if (!locationType) {
                 throw new IllegalArgumentException("Unable to find location type 'Receiving'")
