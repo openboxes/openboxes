@@ -13,6 +13,11 @@ const Input = (props) => {
   return (
     <input
       type="text"
+      onKeyPress={(event) => {
+        if (event.which === 13 /* Enter */) {
+          event.preventDefault();
+        }
+      }}
       {...props}
       onChange={onChange}
     />
