@@ -8,24 +8,38 @@
         <g:hiddenField name="transferOut" value="true"/>
 
         <table>
-
-        <tr class="prop">
-            <td valign="top" class="name" width="20%">
-                <label><g:message code="product.label"/></label>
-            </td>
-            <td valign="top" class="value">
-                ${inventoryItem?.product?.productCode}
-                ${inventoryItem?.product?.name}
-            </td>
-        </tr>
-        <tr class="prop">
-            <td valign="top" class="name">
-                <label><g:message code="inventoryItem.lotNumber.label"/></label>
-            </td>
-            <td valign="top" class="value">
-                ${inventoryItem?.lotNumber}
-            </td>
-        </tr>
+            <thead>
+            <tr>
+                <th width="20%"></th>
+                <th width="40%">${warehouse.message(code: 'default.origin.label')}</th>
+                <th width="40%">${warehouse.message(code: 'default.destination.label')}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="prop">
+                <td valign="top" class="name" width="20%">
+                    <label><g:message code="product.label"/></label>
+                </td>
+                <td valign="top" class="value">
+                    ${inventoryItem?.product?.productCode}
+                    ${inventoryItem?.product?.name}
+                </td>
+                <td valign="top" class="value">
+                    ${inventoryItem?.product?.productCode}
+                    ${inventoryItem?.product?.name}
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><g:message code="inventoryItem.lotNumber.label"/></label>
+                </td>
+                <td valign="top" class="value">
+                    ${inventoryItem?.lotNumber?:warehouse.message(code:'default.label')}
+                </td>
+                <td valign="top" class="value">
+                    ${inventoryItem?.lotNumber?:warehouse.message(code:'default.label')}
+                </td>
+            </tr>
             <tr class="prop">
                 <td valign="top" class="name">
                     <label><g:message code="inventoryItem.expirationDate.label"/></label>
@@ -38,19 +52,15 @@
                         <span class="fade">${warehouse.message(code: 'default.never.label')}</span>
                     </g:else>
                 </td>
+                <td valign="top" class="value">
+                    <g:if test="${inventoryItem?.expirationDate }">
+                        <g:formatDate date="${inventoryItem?.expirationDate }" format="d MMM yyyy"/>
+                    </g:if>
+                    <g:else>
+                        <span class="fade">${warehouse.message(code: 'default.never.label')}</span>
+                    </g:else>
+                </td>
             </tr>
-        </table>
-
-        <table>
-            <thead>
-            <tr>
-                <th width="20%"></th>
-                <th width="40%">${warehouse.message(code: 'default.origin.label')}</th>
-                <th width="40%">${warehouse.message(code: 'default.destination.label')}</th>
-            </tr>
-
-            </thead>
-            <tbody>
             <tr class="prop">
                 <td valign="top" class="name">
                     <label><g:message code="location.label"/></label>

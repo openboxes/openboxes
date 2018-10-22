@@ -104,8 +104,8 @@
         $(".btn-show-dialog").click(function(event) {
             var url = $(this).data("url");
             var title = $(this).data("title");
-            $("#dlgShowDialog").attr("title", title);
             $("#dlgShowDialog").dialog({
+                title: title,
                 autoOpen: true,
                 modal: true,
                 width: 800,

@@ -6,7 +6,7 @@
         </button>
         <div class="actions">
             <div class="action-menu-item">
-                <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.transferStock.label')}"
+                <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.editItem.label')}"
                    data-url="${request.contextPath}/inventoryItem/showDialog?id=${itemInstance?.id}&binLocation=${binLocation?.id}&template=editItemDialog">
                     <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
                     <g:message code="inventory.editItem.label"/>
@@ -14,7 +14,7 @@
             </div>
             <g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
                 <div class="action-menu-item">
-                    <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.transferStock.label')}"
+                    <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.adjustStock.label')}"
                        data-url="${request.contextPath}/inventoryItem/showDialog?id=${itemInstance?.id}&binLocation=${binLocation?.id}&template=adjustStock">
                         <img src="${resource(dir: 'images/icons/silk', file: 'book_open.png')}"/>&nbsp;
                         <g:message code="inventory.adjustStock.label"/>
