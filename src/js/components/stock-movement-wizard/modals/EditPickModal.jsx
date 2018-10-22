@@ -21,7 +21,6 @@ const FIELDS = {
   },
   availableItems: {
     type: ArrayField,
-    disableVirtualization: true,
     fields: {
       lotNumber: {
         type: LabelField,

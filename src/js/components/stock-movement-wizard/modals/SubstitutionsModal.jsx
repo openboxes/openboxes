@@ -25,7 +25,6 @@ const FIELDS = {
   },
   substitutions: {
     type: ArrayField,
-    disableVirtualization: true,
     getDynamicRowAttr: ({ rowValues }) => ({
       className: rowValues.originalItem ? 'font-weight-bold' : '',
     }),
