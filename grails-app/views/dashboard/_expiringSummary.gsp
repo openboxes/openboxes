@@ -87,13 +87,6 @@
 <script>
     $(window).load(function(){
 
-        // Sort the rows in reverse
-        $("#expirationSummary table tbody").each(function(elem,index){
-            var arr = $.makeArray($("tr",this).detach());
-            arr.reverse();
-            $(this).append(arr);
-        });
-
         // Pull the data from the server
         $.ajax({
             dataType: "json",

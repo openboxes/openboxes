@@ -454,25 +454,31 @@ openboxes.logo.label = "OpenBoxes"
 grails.plugins.raven.active = false
 grails.plugins.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PROJECT_ID}"
 
-// Dashboard configuration to indicate whether widgets are enabled/disabled
+// Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
+openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummary","receiptSummary","shipmentSummary","indicatorSummary"]
+openboxes.dashboard.column2.widgets=["binLocationSummary", "expiringSummary","productSummary","genericProductSummary",]
+openboxes.dashboard.column3.widgets=["newsSummary","activitySummary","valueSummary","tagSummary"]
+
+// Column 1
 openboxes.dashboard.requisitionItemSummary.enabled=true
-openboxes.dashboard.requisitionSummary.enabled=true
+openboxes.dashboard.requisitionSummary.enabled=false
 openboxes.dashboard.receiptSummary.enabled=true
 openboxes.dashboard.shipmentSummary.enabled=true
 openboxes.dashboard.indicatorSummary.enabled=false
-openboxes.dashboard.valueSummary.enabled=false
+
+// Column 2
+openboxes.dashboard.binLocationSummary.enabled=true
 openboxes.dashboard.productSummary.enabled=true
 openboxes.dashboard.genericProductSummary.enabled=false
-openboxes.dashboard.binLocationSummary.enabled=true
 openboxes.dashboard.expiringSummary.enabled=true
+
+// Column 3
+openboxes.dashboard.newsSummary.enabled=false
 openboxes.dashboard.activitySummary.enabled=true
+openboxes.dashboard.valueSummary.enabled=false
 openboxes.dashboard.tagSummary.enabled=true
 
-// Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
-openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummary","receiptSummary","shipmentSummary","indicatorSummary"]
-openboxes.dashboard.column2.widgets=["binLocationSummary","valueSummary","productSummary","genericProductSummary","expiringSummary"]
-openboxes.dashboard.column3.widgets=["activitySummary","tagSummary"]
-
+// Default value for news summary
 openboxes.dashboard.newsSummary.newsItems = []
 
 // OpenBoxes identifier config
