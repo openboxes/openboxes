@@ -1,9 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ArrayField component is correctly rendering with Add button 1`] = `
-<div>
+<div
+  className="d-flex flex-column"
+>
   <div
-    className="text-center border mb-2"
+    className="text-center border"
   >
     <div
       className="d-flex flex-row border-bottom font-weight-bold py-2"
@@ -40,197 +42,201 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
         }
       />
     </div>
-    <div>
+  </div>
+  <div
+    className="text-center border mb-2 flex-grow-1"
+    style={
+      Object {
+        "maxHeight": "calc(100vh - 450px)",
+        "overflowY": "scroll",
+      }
+    }
+  >
+    <div
+      className="table-row even-row "
+    >
       <div
-        style={Object {}}
+        className="d-flex flex-row border-bottom table-inner-row"
       >
         <div
-          className="table-row even-row "
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
         >
           <div
-            className="d-flex flex-row border-bottom table-inner-row"
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={undefined}
           >
             <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
+              className="form-group my-0   "
             >
-              <div
-                className=""
-                style={
-                  Object {
-                    "display": "inline",
-                  }
-                }
-                tabIndex={undefined}
-                title={undefined}
-              >
-                <div
-                  className="form-group my-0   "
-                >
-                  <input
-                    className="form-control"
-                    id="test-field[0].textField"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    type="text"
-                    value={undefined}
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
-            >
-              <div
-                className=""
-                style={
-                  Object {
-                    "display": "inline",
-                  }
-                }
-                tabIndex={undefined}
-                title={undefined}
-              >
-                <div
-                  className="form-group my-0   "
-                >
-                  <input
-                    className="form-control"
-                    id="test-field[0].textField2"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    type="text"
-                    value={undefined}
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
-            >
-              <button
-                className="btn btn-outline-danger"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
-              >
-                Delete
-              </button>
+              <input
+                className="form-control"
+                id="test-field[0].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
             </div>
           </div>
         </div>
-      </div>
-      <div
-        style={Object {}}
-      >
         <div
-          className="table-row  "
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
         >
           <div
-            className="d-flex flex-row border-bottom table-inner-row"
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={undefined}
           >
             <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
+              className="form-group my-0   "
             >
-              <div
-                className=""
-                style={
-                  Object {
-                    "display": "inline",
-                  }
-                }
-                tabIndex={undefined}
-                title={undefined}
-              >
-                <div
-                  className="form-group my-0   "
-                >
-                  <input
-                    className="form-control"
-                    id="test-field[1].textField"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    type="text"
-                    value={undefined}
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
-            >
-              <div
-                className=""
-                style={
-                  Object {
-                    "display": "inline",
-                  }
-                }
-                tabIndex={undefined}
-                title={undefined}
-              >
-                <div
-                  className="form-group my-0   "
-                >
-                  <input
-                    className="form-control"
-                    id="test-field[1].textField2"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    type="text"
-                    value={undefined}
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
-            >
-              <button
-                className="btn btn-outline-danger"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
-              >
-                Delete
-              </button>
+              <input
+                className="form-control"
+                id="test-field[0].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
             </div>
           </div>
+        </div>
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <button
+            className="btn btn-outline-danger"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      className="table-row  "
+    >
+      <div
+        className="d-flex flex-row border-bottom table-inner-row"
+      >
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={undefined}
+          >
+            <div
+              className="form-group my-0   "
+            >
+              <input
+                className="form-control"
+                id="test-field[1].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={undefined}
+          >
+            <div
+              className="form-group my-0   "
+            >
+              <input
+                className="form-control"
+                id="test-field[1].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <button
+            className="btn btn-outline-danger"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
@@ -250,9 +256,11 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
 `;
 
 exports[`ArrayField component is correctly rendering with no Add button 1`] = `
-<div>
+<div
+  className="d-flex flex-column"
+>
   <div
-    className="text-center border mb-2"
+    className="text-center border"
   >
     <div
       className="d-flex flex-row border-bottom font-weight-bold py-2"
@@ -289,197 +297,201 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
         }
       />
     </div>
-    <div>
+  </div>
+  <div
+    className="text-center border mb-2 flex-grow-1"
+    style={
+      Object {
+        "maxHeight": "calc(100vh - 450px)",
+        "overflowY": "scroll",
+      }
+    }
+  >
+    <div
+      className="table-row even-row "
+    >
       <div
-        style={Object {}}
+        className="d-flex flex-row border-bottom table-inner-row"
       >
         <div
-          className="table-row even-row "
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
         >
           <div
-            className="d-flex flex-row border-bottom table-inner-row"
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={undefined}
           >
             <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
+              className="form-group my-0   "
             >
-              <div
-                className=""
-                style={
-                  Object {
-                    "display": "inline",
-                  }
-                }
-                tabIndex={undefined}
-                title={undefined}
-              >
-                <div
-                  className="form-group my-0   "
-                >
-                  <input
-                    className="form-control"
-                    id="test-field[0].textField"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    type="text"
-                    value={undefined}
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
-            >
-              <div
-                className=""
-                style={
-                  Object {
-                    "display": "inline",
-                  }
-                }
-                tabIndex={undefined}
-                title={undefined}
-              >
-                <div
-                  className="form-group my-0   "
-                >
-                  <input
-                    className="form-control"
-                    id="test-field[0].textField2"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    type="text"
-                    value={undefined}
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
-            >
-              <button
-                className="btn btn-outline-danger"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
-              >
-                Delete
-              </button>
+              <input
+                className="form-control"
+                id="test-field[0].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
             </div>
           </div>
         </div>
-      </div>
-      <div
-        style={Object {}}
-      >
         <div
-          className="table-row  "
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
         >
           <div
-            className="d-flex flex-row border-bottom table-inner-row"
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={undefined}
           >
             <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
+              className="form-group my-0   "
             >
-              <div
-                className=""
-                style={
-                  Object {
-                    "display": "inline",
-                  }
-                }
-                tabIndex={undefined}
-                title={undefined}
-              >
-                <div
-                  className="form-group my-0   "
-                >
-                  <input
-                    className="form-control"
-                    id="test-field[1].textField"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    type="text"
-                    value={undefined}
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
-            >
-              <div
-                className=""
-                style={
-                  Object {
-                    "display": "inline",
-                  }
-                }
-                tabIndex={undefined}
-                title={undefined}
-              >
-                <div
-                  className="form-group my-0   "
-                >
-                  <input
-                    className="form-control"
-                    id="test-field[1].textField2"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    type="text"
-                    value={undefined}
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              className="align-self-center mx-1"
-              style={
-                Object {
-                  "flex": "12 1 0",
-                  "minWidth": 0,
-                }
-              }
-            >
-              <button
-                className="btn btn-outline-danger"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
-              >
-                Delete
-              </button>
+              <input
+                className="form-control"
+                id="test-field[0].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
             </div>
           </div>
+        </div>
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <button
+            className="btn btn-outline-danger"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      className="table-row  "
+    >
+      <div
+        className="d-flex flex-row border-bottom table-inner-row"
+      >
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={undefined}
+          >
+            <div
+              className="form-group my-0   "
+            >
+              <input
+                className="form-control"
+                id="test-field[1].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={undefined}
+          >
+            <div
+              className="form-group my-0   "
+            >
+              <input
+                className="form-control"
+                id="test-field[1].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <button
+            className="btn btn-outline-danger"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
