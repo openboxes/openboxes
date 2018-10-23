@@ -115,6 +115,7 @@ const FIELDS = {
           checkForInitialPicksChanges,
           btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
+          btnOpenDisabled: true,
           onResponse,
           bins,
           locationId,
