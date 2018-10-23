@@ -15,7 +15,6 @@ import apiClient from '../../../utils/apiClient';
 const FIELDS = {
   lines: {
     type: ArrayField,
-    disableVirtualization: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, shipmentItemId }) => (
       <button

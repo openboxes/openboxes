@@ -21,6 +21,7 @@ exports[`TextField component is correctly rendering renders correctly 1`] = `
         id="test-field"
         onBlur={[Function]}
         onChange={[Function]}
+        onKeyPress={[Function]}
         type="text"
         value={undefined}
       />

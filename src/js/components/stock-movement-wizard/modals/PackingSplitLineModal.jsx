@@ -28,7 +28,6 @@ const FIELDS = {
       </button>
     ),
     type: ArrayField,
-    disableVirtualization: true,
     fields: {
       productName: {
         type: LabelField,
