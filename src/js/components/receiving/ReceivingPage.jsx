@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import moment from 'moment';
-import Alert from 'react-s-alert';
 
 import PartialReceivingPage from './PartialReceivingPage';
 import ReceivingCheckScreen from './ReceivingCheckScreen';
@@ -82,7 +81,8 @@ class ReceivingPage extends Component {
     } else {
       this.save({ ...formValues, receiptStatus: 'COMPLETED' }, () => {
         this.setState({ completed: true });
-        Alert.success('Shipment was received successfully!');
+        const { requisition } = formValues;
+        window.location = `/openboxes/stockMovement/show/${requisition}`;
       });
     }
   }
