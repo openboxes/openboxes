@@ -218,7 +218,7 @@ class InventoryItemController {
 
 
 
-	def showPendingRequisitions = { StockCardCommand cmd ->
+	def showPendingOutbound = { StockCardCommand cmd ->
         def startTime = System.currentTimeMillis()
         //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
         // add the current warehouse to the command object
@@ -243,10 +243,10 @@ class InventoryItemController {
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
 
-        render(template: "showPendingRequestLog", model: [commandInstance:commandInstance, requisitionItems:requisitionItems])
+        render(template: "showPendingOutbound", model: [commandInstance:commandInstance, requisitionItems:requisitionItems])
     }
 
-    def showPendingShipments = { StockCardCommand cmd ->
+    def showPendingInbound = { StockCardCommand cmd ->
         long startTime = System.currentTimeMillis()
         //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
         // add the current warehouse to the command object
@@ -269,7 +269,7 @@ class InventoryItemController {
 
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        render(template: "showPendingShipmentLog", model: [commandInstance:commandInstance])
+        render(template: "showPendingInbound", model: [commandInstance:commandInstance])
     }
 
     def showConsumption = { StockCardCommand cmd ->
