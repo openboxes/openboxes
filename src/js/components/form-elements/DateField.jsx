@@ -53,6 +53,7 @@ const DateField = (props) => {
           timeFormat={timeFormat}
           timeIntervals={15}
           yearDropdownItemNumber={3}
+          utcOffset={0}
         />
       </div>
     );
