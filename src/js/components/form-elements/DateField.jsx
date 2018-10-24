@@ -1,6 +1,7 @@
 import React from 'react';
 import DatePicker from 'react-datepicker';
 import { Portal } from 'react-overlays';
+import moment from 'moment';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -18,9 +19,12 @@ const CalendarContainer = ({ children }) => {
 };
 
 const DateField = (props) => {
-  const renderInput = (attributes) => {
+  const renderInput = ({
+    // eslint-disable-next-line react/prop-types
+    value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', ...attributes
+  }) => {
     const onChange = (date) => {
-      const val = !date || typeof date === 'string' ? date : date.format(attributes.dateFormat);
+      const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
       attributes.onChange(val);
     };
 
@@ -33,6 +37,7 @@ const DateField = (props) => {
         <DatePicker
           className="form-control"
           {...attributes}
+          selected={moment(value, dateFormat).isValid() ? moment(value, dateFormat) : null}
           onChange={date => onChange(date)}
           onChangeRaw={onChangeRaw}
           popperContainer={CalendarContainer}
@@ -44,7 +49,8 @@ const DateField = (props) => {
           popperClassName="force-on-top"
           showYearDropdown
           scrollableYearDropdown
-          timeFormat="HH:mm"
+          dateFormat={dateFormat}
+          timeFormat={timeFormat}
           timeIntervals={15}
           yearDropdownItemNumber={3}
         />
