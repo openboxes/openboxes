@@ -330,11 +330,21 @@
                     <div class="box">
                         <table>
                             <tr>
-                                <th><g:message code="document.label"/></th>
+                                <th><g:message code="document.name.label"/></th>
+                                <th><g:message code="documentType.label"/></th>
+                                <th><g:message code="document.contentType.label"/></th>
+                                <th></th>
                             </tr>
                             <g:each var="document" in="${stockMovement.documents}" status="i">
                                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                                    <td><g:link url="${document.uri}" target="_blank">${document.name}</g:link></td>
+                                    <td>${document.name}</td>
+                                    <td>${document.documentType}</td>
+                                    <td>${document.contentType}</td>
+                                    <td>
+                                        <g:link url="${document.uri}" target="_blank" class="button">
+                                            <warehouse:message code="default.button.download.label"/>
+                                        </g:link>
+                                    </td>
                                 </tr>
                             </g:each>
                         </table>

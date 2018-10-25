@@ -1195,6 +1195,13 @@ class StockMovementService {
                         contentType : "text/html",
                         stepNumber  : 5,
                         uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                ],
+                [
+                        name        : g.message(code: "goodsReceiptNote.label"),
+                        documentType: DocumentGroupCode.GOODS_RECEIPT_NOTE.name(),
+                        contentType : "text/html",
+                        stepNumber  : null,
+                        uri         : g.createLink(controller: 'goodsReceiptNote', action: "print", id: stockMovement?.shipment?.id, absolute: true)
                 ]
         ]
         return documentList
