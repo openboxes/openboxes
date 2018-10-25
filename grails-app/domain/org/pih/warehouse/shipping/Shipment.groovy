@@ -451,11 +451,11 @@ class Shipment implements Comparable, Serializable {
     }
 
     String getConsigneeAddress() {
-        return destination.address.description?:destination?.locationGroup.address?.description
+        return destination?.address?.description?:destination?.locationGroup?.address?.description
     }
 
     String getConsignorAddress() {
-        return origin.address.description?:origin?.locationGroup.address?.description
+        return origin?.address?.description?:origin?.locationGroup?.address?.description
     }
 
 	/**
