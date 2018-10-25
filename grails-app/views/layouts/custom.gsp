@@ -40,7 +40,7 @@
         <script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
     </g:if>
 
-    <!-- Grails Layout : write head element for page-->
+<!-- Grails Layout : write head element for page-->
     <g:layoutHead />
 
     <g:render template="/common/customCss"/>
@@ -112,12 +112,12 @@
         <div id="breadcrumb">
             <g:render template="/common/breadcrumb"/>
         </div>
-        <%--
-        <div class="box center" style="margin:0;">
-            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
-                            jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
-        </div>
-        --%>
+    <%--
+    <div class="box center" style="margin:0;">
+        <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
+                        jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
+    </div>
+    --%>
     </g:if>
 
 
@@ -179,6 +179,10 @@
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.jira.issue.collector.enabled)}">
     <script type="text/javascript" src="${grailsApplication.config.openboxes.jira.issue.collector.url}"></script>
 </g:if>
+
+<script>
+    let contextPath = '${request.contextPath}';
+</script>
 
 <!-- Localization -->
 <g:if test="${session.useDebugLocale}">
@@ -496,44 +500,7 @@
 
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.scannerDetection.enabled)}">
     <script src="${createLinkTo(dir:'js/jquery.scannerdetection', file:'jquery.scannerdetection.js')}" type="text/javascript" ></script>
-    <script>
-        $(document).ready(function() {
-            var scanner = $("body").scannerDetection();
-            scanner.bind('scannerDetectionComplete',function(event,data){
-                console.log("scanner detected");
-                console.log(event);
-                console.log(data);
-                var barcode = data.string;
-                $.ajax({
-                    dataType: "json",
-                    url: "${request.contextPath}/json/scanBarcode?barcode=" + barcode,
-                    success: function (data) {
-                        console.log(data);
-                        if (data.url) {
-                            if (confirm("The system has detected that a USB scanner was used and the barcode '" + barcode + "' was successfully found.  You are about to be redirected to the " + data.type + " page (" + data.url + ").\n\nAre you sure you want to redirected?")) {
-                                window.location.replace(data.url);
-                            }
-                        }
-                        else {
-
-                            if (confirm("The system has detected that a USB scanner was used, but the barcode '" + barcode + "' was not found.  Would you like to be redirected to Google?")) {
-                                window.location.replace("http://www.google.com?q=" + barcode);
-                            }
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(status);
-                    }
-                });
-            });
-
-            scanner.bind('scannerDetectionError',function(event,data){
-                //console.log("Error detecting barcode scanner input", event, data);
-                //console.log(event);
-                //console.log(data);
-            });
-        });
-    </script>
+    <script src="${createLinkTo(dir:'js/barcode.js')}" type="text/javascript"></script>
 </g:if>
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.uservoice.widget.enabled)}">
     <script type="text/javascript">
