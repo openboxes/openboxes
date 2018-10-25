@@ -21,7 +21,7 @@ const CalendarContainer = ({ children }) => {
 const DateField = (props) => {
   const renderInput = ({
     // eslint-disable-next-line react/prop-types
-    value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', ...attributes
+    value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', className = '', ...attributes
   }) => {
     const onChange = (date) => {
       const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
@@ -35,7 +35,7 @@ const DateField = (props) => {
     return (
       <div className="date-field">
         <DatePicker
-          className="form-control"
+          className={`form-control form-control-xs ${className}`}
           {...attributes}
           selected={moment(value, dateFormat).isValid() ? moment(value, dateFormat) : null}
           onChange={date => onChange(date)}

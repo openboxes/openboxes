@@ -19,7 +19,7 @@ const LabelField = (props) => {
       <div className="row">
         {
             typeof FieldLabel === 'string' ?
-              <label htmlFor={attr.id} className="col-md-2 col-form-label text-right">{ FieldLabel }</label> :
+              <label htmlFor={attr.id} className="col-md-2 col-form-label col-form-label-xs text-right">{ FieldLabel }</label> :
               <FieldLabel />
           }
         <div className="col-md-4 align-self-center">

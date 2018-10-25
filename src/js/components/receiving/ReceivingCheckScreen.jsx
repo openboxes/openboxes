@@ -34,7 +34,7 @@ const FIELDS = {
         </button>
         <button
           type="button"
-          className="btn btn-outline-success margin-bottom-lg btn-form"
+          className="btn btn-outline-success btn-form"
           onClick={onSave}
           disabled={saveDisabled}
         >Save
@@ -138,7 +138,7 @@ const FIELDS = {
         </button>
         <button
           type="button"
-          className="btn btn-outline-success margin-bottom-lg"
+          className="btn btn-outline-success"
           onClick={onSave}
           disabled={saveDisabled}
         >Save

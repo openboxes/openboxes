@@ -160,6 +160,61 @@ body {
   margin-right: 10px;
 }
 
+.font-size-xs {
+  font-size: .875rem;
+}
+
+.btn-xs {
+  padding: 0 .5rem;
+  font-size: .875rem;
+  border-radius: .2rem;
+}
+
+.form-control-xs {
+  height: calc(1.5rem + 2px);
+  padding: .0rem .5rem;
+  font-size: .875rem;
+  border-radius: .2rem;
+}
+
+.col-form-label-xs {
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.select-xs {
+  font-size: .875rem;
+  border-radius: .2rem;
+
+  .Select-control {
+    height: 26px;
+
+    .Select-value {
+      line-height: 26px !important;
+    }
+
+    .Select-placeholder {
+      line-height: 26px;
+    }
+
+    .Select-input {
+      height: 24px;
+
+      input {
+        padding: 0;
+        line-height: 26px;
+      }
+    }
+  }
+}
+
+.table-xs th, .table-xs td {
+  padding: 0.3rem;
+  font-size: 0.875rem;
+}
+
 .movement-number {
   height: auto;
   margin-bottom: 15px;
@@ -174,8 +229,6 @@ body {
 
 .help-block {
   display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
   color: $gray-epsilon;
 }
 
@@ -423,12 +476,12 @@ tr.crossed-out td:before {
 }
 
 .table-row {
-  height: 50px;
+  height: 28px;
 }
 
 .table-inner-row {
   position: relative;
-  height: 50px;
+  height: 28px;
 }
 
 div.crossed-out .table-inner-row:before {

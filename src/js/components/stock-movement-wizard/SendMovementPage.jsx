@@ -271,7 +271,7 @@ class SendMovementPage extends Component {
               <div className="d-flex">
                 <div id="stockMovementInfo" style={{ flexGrow: 2 }}>
                   <div className="row">
-                    <span className="col-md-2 col-form-label text-right">
+                    <span className="col-md-2 col-form-label col-form-label-xs text-right">
                       Description
                     </span>
                     <span className="col-md-4 align-self-center">
@@ -279,7 +279,7 @@ class SendMovementPage extends Component {
                     </span>
                   </div>
                   <div className="row">
-                    <span className="col-md-2 col-form-label text-right">
+                    <span className="col-md-2 col-form-label col-form-label-xs text-right">
                       From
                     </span>
                     <span className="col-md-4 align-self-center">
@@ -287,7 +287,7 @@ class SendMovementPage extends Component {
                     </span>
                   </div>
                   <div className="row">
-                    <span className="col-md-2 col-form-label text-right">
+                    <span className="col-md-2 col-form-label col-form-label-xs text-right">
                       To
                     </span>
                     <span className="col-md-4 align-self-center">
@@ -295,7 +295,7 @@ class SendMovementPage extends Component {
                     </span>
                   </div>
                   <div className="row">
-                    <span className="col-md-2 col-form-label text-right">
+                    <span className="col-md-2 col-form-label col-form-label-xs text-right">
                       Stock List
                     </span>
                     <span className="col-md-4 align-self-center">
@@ -303,7 +303,7 @@ class SendMovementPage extends Component {
                     </span>
                   </div>
                   <div className="row">
-                    <span className="col-md-2 col-form-label text-right">
+                    <span className="col-md-2 col-form-label col-form-label-xs text-right">
                       Requested by
                     </span>
                     <span className="col-md-4 align-self-center">
@@ -311,7 +311,7 @@ class SendMovementPage extends Component {
                     </span>
                   </div>
                   <div className="row">
-                    <span className="pb-2 col-md-2 col-form-label text-right">
+                    <span className="pb-2 col-md-2 col-form-label col-form-label-xs text-right">
                       Date requested
                     </span>
                     <span className="col-md-4 align-self-center">
@@ -319,7 +319,7 @@ class SendMovementPage extends Component {
                     </span>
                   </div>
                   <div className="row">
-                    <span className="pb-2 col-md-2 col-form-label text-right">
+                    <span className="pb-2 col-md-2 col-form-label col-form-label-xs text-right">
                       Shipment name
                     </span>
                     <span className="col-md-4 align-self-center">
@@ -369,7 +369,7 @@ class SendMovementPage extends Component {
                     shipmentTypes: this.state.shipmentTypes,
                     issued: values.statusCode === 'ISSUED',
                   }))}
-                <table className="table table-striped text-center border">
+                <table className="table table-striped text-center border my-2 table-xs">
                   <thead>
                     <tr>
                       <th>Pallet</th>

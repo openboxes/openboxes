@@ -41,7 +41,7 @@ const NO_STOCKLIST_FIELDS = {
     addButton: ({ addRow, getSortOrder }) => (
       <button
         type="button"
-        className="btn btn-outline-success margin-bottom-lg"
+        className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
@@ -114,7 +114,7 @@ const STOCKLIST_FIELDS = {
     addButton: ({ addRow, getSortOrder }) => (
       <button
         type="button"
-        className="btn btn-outline-success margin-bottom-lg"
+        className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
@@ -185,7 +185,7 @@ const VENDOR_FIELDS = {
     addButton: ({ addRow, getSortOrder }) => (
       <button
         type="button"
-        className="btn btn-outline-success margin-bottom-lg"
+        className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
