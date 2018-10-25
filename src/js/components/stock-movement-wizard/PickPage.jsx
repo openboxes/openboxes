@@ -364,7 +364,7 @@ class PickPage extends Component {
             <span>
               <a
                 href={this.state.printPicksUrl}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -373,7 +373,7 @@ class PickPage extends Component {
               <button
                 type="button"
                 onClick={() => this.refresh()}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+                className="float-right  mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
                 <span><i className="fa fa-refresh pr-2" />Refresh</span>
               </button>
@@ -388,10 +388,10 @@ class PickPage extends Component {
                   locationId: this.state.values.origin.id,
                 }))}
               <div className="d-print-none">
-                <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>
+                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
                     Previous
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right">Next</button>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">Next</button>
               </div>
             </form>
           </div>

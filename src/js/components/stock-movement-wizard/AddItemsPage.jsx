@@ -781,7 +781,7 @@ class AddItemsPage extends Component {
             <span>
               <label
                 htmlFor="csvInput"
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-download pr-2" />Import Template</span>
                 <input
@@ -795,14 +795,14 @@ class AddItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => this.exportTemplate(values)}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-upload pr-2" />Export Template</span>
               </button>
               <button
                 type="button"
                 onClick={() => this.refresh()}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-refresh pr-2" />Refresh</span>
               </button>
@@ -810,7 +810,7 @@ class AddItemsPage extends Component {
                 type="button"
                 disabled={invalid}
                 onClick={() => this.save(values)}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-save pr-2" />Save</span>
               </button>
@@ -818,7 +818,7 @@ class AddItemsPage extends Component {
                 type="button"
                 disabled={invalid}
                 onClick={() => this.removeAll().then(() => this.fetchAndSetLineItems())}
-                className="float-right py-1 mb-1 btn btn-outline-danger align-self-end"
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
               >
                 <span><i className="fa fa-remove pr-2" />Delete all</span>
               </button>
@@ -833,12 +833,12 @@ class AddItemsPage extends Component {
                   getSortOrder: this.getSortOrder,
                 }))}
               <div>
-                <button type="button" className="btn btn-outline-primary btn-form" onClick={() => previousPage(values)}>
+                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => previousPage(values)}>
                   Previous
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-outline-primary btn-form float-right"
+                  className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
                 >Next
                 </button>

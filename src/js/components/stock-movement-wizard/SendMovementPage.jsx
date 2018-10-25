@@ -420,14 +420,14 @@ class SendMovementPage extends Component {
                 </table>
                 <button
                   type="button"
-                  className="btn btn-outline-primary btn-form"
+                  className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
                   onClick={() => previousPage(values)}
                 >Previous
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-outline-success float-right btn-form"
+                  className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={invalid || values.statusCode === 'ISSUED'}
                 >Send Shipment
                 </button>

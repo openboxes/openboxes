@@ -8,7 +8,7 @@ import TableBodyVirtualized from './TableBodyVirtualized';
 const FieldArrayComponent = (props) => {
   const { fieldsConfig, properties, fields } = props;
   const AddButton = fieldsConfig.addButton;
-  const { maxTableHeight = 'calc(100vh - 450px)', virtualize } = fieldsConfig;
+  const { maxTableHeight = 'calc(100vh - 400px)', virtualize } = fieldsConfig;
   const addRow = (row = {}) => fields.push(row);
   const TableBodyComponent = virtualize ? TableBodyVirtualized : TableBody;
 
