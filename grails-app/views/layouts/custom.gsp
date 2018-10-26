@@ -40,7 +40,7 @@
         <script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
     </g:if>
 
-<!-- Grails Layout : write head element for page-->
+    <!-- Grails Layout : write head element for page-->
     <g:layoutHead />
 
     <g:render template="/common/customCss"/>

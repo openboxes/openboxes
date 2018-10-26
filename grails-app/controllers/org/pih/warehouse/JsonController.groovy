@@ -377,13 +377,17 @@ class JsonController {
         def location = Location.get(session?.warehouse?.id)
         def result = dashboardService.getTotalStockValue(location)
         def totalValue = g.formatNumber(number: result.totalStockValue)
-        def lastUpdated = inventorySnapshotService.getLastUpdatedInventorySnapshotDate()
-        if (lastUpdated) {
-            lastUpdated = "Last updated " + prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) + "."
-        }
-        else {
-            lastUpdated = "No data available"
-        }
+        def lastUpdated = inventoryService.getLastUpdatedInventorySnapshotDate()
+        lastUpdated = lastUpdated ?
+                prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) :
+                g.message(code:'default.never.label')
+//        def lastUpdated = inventorySnapshotService.getLastUpdatedInventorySnapshotDate()
+//        if (lastUpdated) {
+//            lastUpdated = "Last updated " + prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) + "."
+//        }
+//        else {
+//            lastUpdated = "No data available"
+//        }
         def data = [
                 lastUpdated: lastUpdated,
                 totalStockValue:result.totalStockValue,

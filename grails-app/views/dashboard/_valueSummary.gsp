@@ -20,13 +20,6 @@
             </ul>
             <div id="value-summary">
                 <table class="zebra">
-                    <thead>
-                    <tr class="prop odd">
-                        <td colspan="3">
-                            <label class="fade lastUpdated"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></label>
-                        </td>
-                    </tr>
-                    </thead>
                     <tbody>
                     <tr>
                         <td class="center" style="width: 1%">
@@ -55,6 +48,19 @@
                             (<small id="progressPercentage">0%</small>)
                         </td>
                     </tr>
+                <tr>
+                <td class="center" style="width: 1%">
+                    <img src="${createLinkTo(dir:'images/icons/silk/time.png')}" class="middle"/>
+                </td>
+                <td>
+                    <warehouse:message code="default.lastUpdated.label" default="Last updated"/>
+                </td>
+                <td class="right">
+                    <div id="lastUpdated">
+                        <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                    </div>
+                </td>
+            </tr>
                     </tbody>
                     <tfoot>
                     <tr class="odd">
@@ -145,7 +151,7 @@
                 var progressSummary = data.hitCount + " out of " + data.totalCount;
                 var progressPercentage = progress*100;
                 var lastUpdated = data.lastUpdated;
-                $(".lastUpdated").html(lastUpdated);
+                $("#lastUpdated").html(lastUpdated);
 
 
                 $('#totalStockValue').html(value);
@@ -157,9 +163,6 @@
 
             },
             error: function(xhr, status, error) {
-                //console.log(xhr);
-                //console.log(status);
-                //console.log(error);
                 $('#totalStockValue').html('ERROR');
                 $("#totalStockSummary").html('Unable to calculate total value due to error: ' + error + " " + status + " " + xhr);
             }
