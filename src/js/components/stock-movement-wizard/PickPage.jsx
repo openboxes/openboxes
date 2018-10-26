@@ -174,9 +174,12 @@ class PickPage extends Component {
         const { associations } = resp.data.data;
         const { pickPageItems } = resp.data.data.pickPage;
 
-        const printPicks = _.find(associations.documents, doc => doc.name === 'Print Picklist');
+        const printPicks = _.find(
+          associations.documents,
+          doc => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
+        );
         this.setState({
-          printPicksUrl: printPicks.uri,
+          printPicksUrl: printPicks ? printPicks.uri : '/',
           values: { ...this.state.values, pickPageItems: [] },
         }, () => this.setState({
           values: {
