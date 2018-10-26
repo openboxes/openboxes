@@ -46,6 +46,7 @@ class StockMovement {
     String trackingNumber
     String driverName
     String comments
+    String currentStatus
 
     StockMovementType stockMovementType
 
@@ -95,6 +96,7 @@ class StockMovement {
                 dateRequested: dateRequested?.format("MM/dd/yyyy"),
                 dateShipped: dateShipped?.format("MM/dd/yyyy HH:mm"),
                 shipmentType: shipmentType,
+                shipmentStatus: currentStatus,
                 trackingNumber: trackingNumber,
                 driverName: driverName,
                 comments: comments,
@@ -165,7 +167,8 @@ class StockMovement {
                 shipmentType: shipment?.shipmentType,
                 dateShipped: shipment?.expectedShippingDate,
                 driverName: shipment?.driverName,
-                trackingNumber: trackingNumber?.identifier
+                trackingNumber: trackingNumber?.identifier,
+                currentStatus: shipment?.currentStatus,
         )
 
         // Include all requisition items except those that are substitutions or modifications because the

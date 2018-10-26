@@ -27,6 +27,7 @@ class StockMovements extends Component {
     this.nextPage = this.nextPage.bind(this);
     this.previousPage = this.previousPage.bind(this);
     this.goToPage = this.goToPage.bind(this);
+    this.setValues = this.setValues.bind(this);
   }
 
   componentDidMount() {
@@ -75,8 +76,13 @@ class StockMovements extends Component {
       <SendMovementPage
         initialValues={this.state.values}
         previousPage={this.previousPage}
+        setValues={this.setValues}
       />,
     ];
+  }
+
+  setValues(values) {
+    this.setState({ values });
   }
 
   /**
@@ -94,7 +100,7 @@ class StockMovements extends Component {
       const newName = `${origin.name}.${destination.name}.${dateReq}.${stocklistPart}${trackingNumber}.${description}`;
       return newName.replace(/ /gi, '');
     }
-    return this.state.values.shipmentName;
+    return this.state.values.name;
   }
 
   /**
@@ -115,7 +121,6 @@ class StockMovements extends Component {
             ...resp,
             stockMovementId: resp.id,
             movementNumber: resp.identifier,
-            shipmentName: resp.name,
             origin: {
               id: resp.origin.id,
               type: originType ? originType.locationTypeCode : null,
@@ -208,8 +213,8 @@ class StockMovements extends Component {
         </div>
         <div className="panel panel-primary">
           <div className="panel-heading movement-number">
-            {(values.movementNumber && values.shipmentName && !values.trackingNumber) &&
-              <span>{`${values.movementNumber} - ${values.shipmentName}`}</span>
+            {(values.movementNumber && values.name && !values.trackingNumber) &&
+              <span>{`${values.movementNumber} - ${values.name}`}</span>
             }
             {values.trackingNumber &&
               <span>{`${values.movementNumber} - ${this.getShipmentName()}`}</span>
