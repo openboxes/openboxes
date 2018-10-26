@@ -39,7 +39,9 @@
     </td>
     --%>
     <td class="middle">
-        <format:metadata obj="${requisitionItem?.status}"/>
+        <div class="tag tag-alert">
+            <format:metadata obj="${requisitionItem?.status}"/>
+        </div>
     </td>
     <td class="middle">
         <%--

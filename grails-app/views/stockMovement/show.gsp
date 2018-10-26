@@ -311,14 +311,28 @@
                         <div>
                             <table>
 
-                                <tr>
+                                <thead>
+                                <tr class="odd">
                                     <th></th>
-                                    <th><g:message code="default.status.label"/></th>
-                                    <th><g:message code="product.productCode.label"/></th>
-                                    <th><g:message code="product.label"/></th>
-                                    <th width="1%"><g:message code="stockMovement.quantityRequested.label"/></th>
+                                    <th></th>
+                                    <th><warehouse:message code="requisition.status.label"/></th>
+                                    <th><warehouse:message code="product.label" /></th>
+                                    <th class="center"><warehouse:message code="product.uom.label" /></th>
+                                    <th class="center"><warehouse:message code="requisitionItem.quantityRequested.label" default="Requested" /></th>
+                                    <th class="center"><warehouse:message code="requisitionItem.quantityApproved.label" /></th>
+                                    <th class="center"><warehouse:message code="requisitionItem.quantityPicked.label" default="Picked"/></th>
+                                    <th class="center"><warehouse:message code="requisitionItem.quantityRemaining.label" /></th>
                                 </tr>
+                                </thead>
+                                <tbody>
+                                    <g:each var="requisitionItem" in="${stockMovement?.requisition?.originalRequisitionItems.sort()}" status="i">
+                                        <g:render template="../requisition/showRequisitionItem" model="[i:i,requisitionItem:requisitionItem]"/>
 
+                                    </g:each>
+                                </tbody>
+
+
+                                <%--
                                 <g:each var="stockMovementItem" in="${stockMovement.lineItems}" status="i">
                                 <g:set var="requisitionItem" value="${stockMovementItem?.requisitionItem}"/>
                                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
@@ -365,6 +379,7 @@
 
                                 </tr>
                                 </g:each>
+                                --%>
 
 
                             </table>
