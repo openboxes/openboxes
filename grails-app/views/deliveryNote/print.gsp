@@ -24,7 +24,7 @@
 
 <body>
 <div id="print-header" style="line-height: 40px">
-    <span class="title"><warehouse:message code="deliveryNote.print.label" default="Print delivery note"/></span>
+    <span class="title"><warehouse:message code="deliveryNote.label" default="Delivery note"/></span>
     <div style="float: right;">
 
         <div class="button-group">

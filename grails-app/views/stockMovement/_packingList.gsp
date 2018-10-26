@@ -1,6 +1,6 @@
 <g:set var="shipmentInstance" value="${stockMovement?.shipment}"/>
 <g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
-<div id="packingList" class="box">
+<div id="packingList" class="box dialog">
     <h2>
         <img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
         ${warehouse.message(code:'shipping.packingList.label')}
@@ -21,8 +21,8 @@
             </th>
             <th class="left"><warehouse:message code="default.lotSerialNo.label"/></th>
             <th class="center"><warehouse:message code="default.expires.label"/></th>
-            <th class="center"><warehouse:message code="shipping.shipped.label"/></th>
-            <g:if test="${shipmentInstance?.wasReceived()}">
+            <th class="center"><warehouse:message code="shipmentItem.quantityShipped.label"/></th>
+            <g:if test="${shipmentInstance?.wasReceived()||shipmentInstance?.wasPartiallyReceived()}">
                 <th class="center"><warehouse:message code="shipmentItem.quantityReceived.label" default="Received"/></th>
                 <th class="center"><warehouse:message code="shipmentItem.quantityCanceled.label" default="Canceled"/></th>
             </g:if>
@@ -105,7 +105,7 @@
                         <g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />
 
                     </td>
-                    <g:if test="${shipmentInstance?.wasReceived()}">
+                    <g:if test="${shipmentInstance?.wasReceived()||shipmentInstance?.wasPartiallyReceived()}">
                         <td class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}">
                             <g:formatNumber number="${shipmentItem?.quantityReceived()}" format="###,##0"/>
                         </td>

@@ -107,6 +107,17 @@ class StockMovementController {
         redirect(action: "list")
     }
 
+    def requisition = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "requisition", model: [stockMovement:stockMovement])
+
+    }
+
+    def documents = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "documents", model: [stockMovement:stockMovement])
+
+    }
 
     def packingList = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)

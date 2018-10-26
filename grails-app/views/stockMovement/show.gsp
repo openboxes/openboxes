@@ -266,11 +266,14 @@
 
         <div class="tabs">
             <ul>
-                <li>
-                    <a href="#details-tab">
-                        <warehouse:message code="requisition.label"/>
-                    </a>
-                </li>
+
+                <g:if test="${!stockMovement?.origin?.isSupplier()}">
+                    <li>
+                        <a href="${request.contextPath}/stockMovement/requisition/${stockMovement?.id}">
+                            <warehouse:message code="requisition.label"/>
+                        </a>
+                    </li>
+                </g:if>
                 <li>
                     <a href="${request.contextPath}/stockMovement/packingList/${stockMovement?.id}">
                         <warehouse:message code="shipping.packingList.label" />
@@ -282,163 +285,11 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#documents-tab">
+                    <a href="${request.contextPath}/stockMovement/documents/${stockMovement?.id}">
                         <warehouse:message code="documents.label" default="Documents"/>
                     </a>
                 </li>
-                <%--
-                <li>
-                    <a href="#comments-tab">
-                        <warehouse:message code="comments.label" default="Comments"/>
-                    </a>
-                </li>
-                <li>
-                    <a href="#events-tab">
-                        <warehouse:message code="events.label" default="Comments"/>
-                    </a>
-                </li>
-                <li>
-                    <a href="${request.contextPath}/stockMovement/transactions/${stockMovement?.id}">
-                        <warehouse:message code="transactions.label" default="Transactions"/>
-                    </a>
-                </li>
-                --%>
-                </ul>
-                <div id="details-tab">
-                    <div class="box">
-                        <h2><warehouse:message code="requisition.label"/></h2>
-
-                        <div>
-                            <table>
-
-                                <thead>
-                                <tr class="odd">
-                                    <th></th>
-                                    <th></th>
-                                    <th><warehouse:message code="requisition.status.label"/></th>
-                                    <th><warehouse:message code="product.label" /></th>
-                                    <th class="center"><warehouse:message code="product.uom.label" /></th>
-                                    <th class="center"><warehouse:message code="requisitionItem.quantityRequested.label" default="Requested" /></th>
-                                    <th class="center"><warehouse:message code="requisitionItem.quantityApproved.label" /></th>
-                                    <th class="center"><warehouse:message code="requisitionItem.quantityPicked.label" default="Picked"/></th>
-                                    <th class="center"><warehouse:message code="requisitionItem.quantityRemaining.label" /></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    <g:each var="requisitionItem" in="${stockMovement?.requisition?.originalRequisitionItems.sort()}" status="i">
-                                        <g:render template="../requisition/showRequisitionItem" model="[i:i,requisitionItem:requisitionItem]"/>
-
-                                    </g:each>
-                                </tbody>
-
-
-                                <%--
-                                <g:each var="stockMovementItem" in="${stockMovement.lineItems}" status="i">
-                                <g:set var="requisitionItem" value="${stockMovementItem?.requisitionItem}"/>
-                                <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                                    <td class="center">
-                                        ${i+1}
-                                    </td>
-                                    <td class="">
-                                        <div class="tag tag-success">
-                                            <g:if test="${requisitionItem?.isSubstituted()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"/>
-                                            </g:if>
-                                            <g:elseif test="${requisitionItem?.isSubstitution()}">
-                                                <img src="${resource(dir:'images/icons',file:'indent.gif')}"/>
-                                            </g:elseif>
-                                            <g:elseif test="${requisitionItem?.isChanged()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}"/>
-                                            </g:elseif>
-                                            <g:elseif test="${requisitionItem?.isCanceled()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"/>
-                                            </g:elseif>
-                                            <g:elseif test="${requisitionItem?.isApproved()||requisitionItem?.isCompleted()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"/>
-                                            </g:elseif>
-                                            <g:elseif test="${requisitionItem?.isPending()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}"/>
-                                            </g:elseif>
-                                            <format:metadata obj="${requisitionItem?.status}"/>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <g:link controller="inventoryItem" action="showStockCard" id=${stockMovementItem?.product?.id}">
-                                            ${stockMovementItem?.product?.productCode}
-                                        </g:link>
-                                    </td>
-                                    <td>
-                                        <g:link controller="inventoryItem" action="showStockCard" id="${stockMovementItem?.product?.id}">
-                                            ${stockMovementItem?.product?.name}
-                                        </g:link>
-                                    </td>
-                                    <td class="center">
-                                        ${stockMovementItem?.quantityRequested?:0}
-                                        ${stockMovementItem.product?.unitOfMeasure?:g.message(code:'default.each.label')}
-                                    </td>
-
-                                </tr>
-                                </g:each>
-                                --%>
-
-
-                            </table>
-
-                        </div>
-                    </div>
-                </div>
-                <div id="documents-tab">
-
-                    <div class="box">
-                        <h2><warehouse:message code="documents.label"/></h2>
-                        <table>
-                            <tr>
-                                <th></th>
-                                <th><g:message code="document.name.label"/></th>
-                                <th><g:message code="documentType.label"/></th>
-                                <th><g:message code="document.contentType.label"/></th>
-                                <th></th>
-                            </tr>
-                            <g:each var="document" in="${stockMovement.documents}" status="i">
-                                <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                                    <td>
-                                        <g:set var="f" value="${document?.contentType}"/>
-                                        <g:if test="${f?.endsWith('jpg')||f?.endsWith('png')||f?.endsWith('gif') }">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'picture.png')}"/>
-                                        </g:if>
-                                        <g:elseif test="${f?.endsWith('pdf') }">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_acrobat.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${f?.endsWith('document')||f?.endsWith('msword') }">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${f?.endsWith('excel')||f?.endsWith('sheet')||f?.endsWith('csv') }">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${f?.endsWith('html')}">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'html.png')}"/>
-                                        </g:elseif>
-                                        <g:elseif test="${f?.endsWith('gzip')||f?.endsWith('jar')||f?.endsWith('zip')||f?.endsWith('tar') }">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_compressed.png')}"/>
-                                        </g:elseif>
-                                        <g:else>
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white.png')}"/>
-                                        </g:else>
-                                    </td>
-                                    <td>${document.name}</td>
-                                    <td>${document.documentType}</td>
-                                    <td>${document.contentType}</td>
-                                    <td>
-                                        <g:link url="${document.uri}" target="_blank" class="button">
-                                            <warehouse:message code="default.button.download.label"/>
-                                        </g:link>
-                                    </td>
-                                </tr>
-                            </g:each>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            </ul>
         </div>
     </div>
 </div>

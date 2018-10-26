@@ -22,15 +22,15 @@
     </span>
     <div style="float: right;">
 
-        <a href="" id="print-button" onclick="window.print()" class="button">
-            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-            &nbsp; ${warehouse.message(code: "default.button.print.label", default:"Print")}
-        </a>
+        <div class="button-group">
+            <a href="" id="print-button" onclick="window.print()" class="button">
+                ${warehouse.message(code: "default.button.print.label", default:"Print")}
+            </a>
 
-        <a href="javascript:window.close();" class="button">
-            <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" />
-            &nbsp; ${warehouse.message(code: "default.button.close.label")}
-        </a>
+            <a href="javascript:window.close();" class="button">
+                ${warehouse.message(code: "default.button.close.label")}
+            </a>
+        </div>
     </div>
     <hr/>
 </div>

@@ -132,7 +132,7 @@
             </td>
             <td class="center" width="1%">
                 <div class="tag tag-alert">
-                    <format:metadata obj="${requisition?.status }"/>
+                    <format:metadata obj="${shipmentInstance?.status?:requisition?.status }"/>
                 </div>
             </td>
 

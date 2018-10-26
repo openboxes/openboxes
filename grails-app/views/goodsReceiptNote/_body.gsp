@@ -1,4 +1,4 @@
-<div class="page" style="page-break-after: ${pageBreakAfter};">
+<div class="page dialog" style="page-break-after: ${pageBreakAfter};">
     <table>
         <thead>
             <tr>
@@ -23,7 +23,7 @@
             </g:unless>
             <g:each in="${shipment.shipmentItems}" status="i" var="shipmentItem">
 
-                <tr>
+                <tr class="prop">
                     <td>
                         ${i+1}
                     </td>
@@ -37,14 +37,14 @@
                         ${shipmentItem?.inventoryItem?.lotNumber}
                     </td>
                     <td>
-                        ${shipmentItem?.inventoryItem?.expirationDate}
+                        <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
                     </td>
                     <td>
-                        ${shipmentItem?.totalQuantityShipped()}
+                        ${shipmentItem?.quantity}
                         ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:"default.each.label")}
                     </td>
                     <td>
-                        ${shipmentItem?.totalQuantityReceived()}
+                        ${shipmentItem?.quantityReceived()}
                         ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:"default.each.label")}
                     </td>
 
