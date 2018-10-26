@@ -31,4 +31,5 @@
     <include file="0.8.x/changelog-2018-10-04-1438-alter-table-receipt-add-column-status-and-identifier.xml"/>
     <include file="0.8.x/changelog-2018-10-17-1003-add-foreign-key-constraint-requisition-item-recipient.xml"/>
     <include file="0.8.x/changelog-2018-10-17-1001-alter-table-receipt-add-column-is-split-item.xml"/>
+    <include file="0.8.x/changelog-2018-10-25-1318-configure-shipping-templates.xml"/>
 </databaseChangeLog>

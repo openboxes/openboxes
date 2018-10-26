@@ -345,7 +345,7 @@ class DocumentController {
             // FIXME create a new method in the shipment controller to handle shipment-specific downloads
             if (documentInstance?.documentType?.documentCode == DocumentCode.SHIPPING_TEMPLATE) {
                 Shipment shipmentInstance = Shipment.get(params.shipmentId)
-                // Move this into the service layer and try to pass back a BAOS
+                // FIXME Move this into the service layer and try to pass back a BAOS
                 File tempFile = fileService.renderShippingTemplate(documentInstance, shipmentInstance)
                 def filename = "${documentInstance.name}-${shipmentInstance?.name?.trim()}.docx"
                 response.setHeader("Content-disposition", "attachment; filename='${filename}'");

@@ -27,6 +27,7 @@ import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
@@ -46,6 +47,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
+import org.pih.warehouse.shipping.ShipmentWorkflow
 
 class StockMovementService {
 
@@ -1125,28 +1127,47 @@ class StockMovementService {
 
     List<Map> getDocuments(StockMovement stockMovement) {
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-        def documentList = [
-                [
-                        name        : g.message(code: "export.items.label", default: "Export Items"),
-                        documentType: DocumentGroupCode.EXPORT.name(),
-                        contentType : "text/csv",
-                        stepNumber  : 2,
-                        uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true)
-                ],
-                [
-                        name        : g.message(code: "picklist.button.print.label"),
-                        documentType: DocumentGroupCode.PICKLIST.name(),
-                        contentType : "text/html",
-                        stepNumber  : 4,
-                        uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true)
-                ],
-                [
-                        name        : g.message(code: "picklist.button.download.label"),
-                        documentType: DocumentGroupCode.PICKLIST.name(),
-                        contentType : "application/pdf",
-                        stepNumber  : 4,
-                        uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true)
-                ],
+        def documentList = []
+
+        if (stockMovement?.requisition) {
+            documentList.addAll([
+                    [
+                            name        : g.message(code: "export.items.label", default: "Export Items"),
+                            documentType: DocumentGroupCode.EXPORT.name(),
+                            contentType : "text/csv",
+                            stepNumber  : 2,
+                            uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "picklist.label"),
+                            documentType: DocumentGroupCode.PICKLIST.name(),
+                            contentType : "text/html",
+                            stepNumber  : 4,
+                            uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "picklist.label"),
+                            documentType: DocumentGroupCode.PICKLIST.name(),
+                            contentType : "application/pdf",
+                            stepNumber  : 4,
+                            uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
+                            documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
+                            contentType : "text/html",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "goodsReceiptNote.label"),
+                            documentType: DocumentGroupCode.GOODS_RECEIPT_NOTE.name(),
+                            contentType : "text/html",
+                            stepNumber  : null,
+                            uri         : g.createLink(controller: 'goodsReceiptNote', action: "print", id: stockMovement?.shipment?.id, absolute: true)
+                    ]
+            ])
+        }
 //                [
 //                        name        : g.message(code: "shipping.printPickList.label"),
 //                        documentType: DocumentGroupCode.PICKLIST.name(),
@@ -1168,42 +1189,64 @@ class StockMovementService {
 //                        stepNumber  : 5,
 //                        uri         : g.createLink(controller: 'report', action: "printPaginatedPackingListReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
 //                ],
-                [
-                        name        : g.message(code: "shipping.exportPackingList.label"),
-                        documentType: DocumentGroupCode.PACKING_LIST.name(),
-                        contentType : "application/vnd.ms-excel",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'shipment', action: "exportPackingList", id: stockMovement?.shipment?.id, absolute: true)
-                ],
-                [
-                        name        : g.message(code: "shipping.downloadPackingList.label"),
-                        documentType: DocumentGroupCode.PACKING_LIST.name(),
-                        contentType : "application/vnd.ms-excel",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'doc4j', action: "downloadPackingList", id: stockMovement?.shipment?.id, absolute: true)
-                ],
-                [
-                        name        : g.message(code: "shipping.downloadLetter.label"),
-                        documentType: DocumentGroupCode.CERTIFICATE_OF_DONATION.name(),
-                        contentType : "text/html",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'doc4j', action: "downloadLetter", id: stockMovement?.shipment?.id, absolute: true)
-                ],
-                [
-                        name        : g.message(code: "deliveryNote.button.print.label"),
-                        documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
-                        contentType : "text/html",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
-                ],
-                [
-                        name        : g.message(code: "goodsReceiptNote.label"),
-                        documentType: DocumentGroupCode.GOODS_RECEIPT_NOTE.name(),
-                        contentType : "text/html",
+
+        if (stockMovement?.shipment) {
+            documentList.addAll([
+                    [
+                            name        : g.message(code: "shipping.packingList.label"),
+                            documentType: DocumentGroupCode.PACKING_LIST.name(),
+                            contentType : "application/vnd.ms-excel",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'shipment', action: "exportPackingList", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "shipping.packingList.label"),
+                            documentType: DocumentGroupCode.PACKING_LIST.name(),
+                            contentType : "application/vnd.ms-excel",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'doc4j', action: "downloadPackingList", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "shipping.downloadLetter.label"),
+                            documentType: DocumentGroupCode.CERTIFICATE_OF_DONATION.name(),
+                            contentType : "text/html",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'doc4j', action: "downloadLetter", id: stockMovement?.shipment?.id, absolute: true)
+                    ]
+            ])
+        }
+
+        if (stockMovement?.shipment) {
+            ShipmentWorkflow shipmentWorkflow = shipmentService.getShipmentWorkflow(stockMovement?.shipment)
+            log.info "Shipment workflow " + shipmentWorkflow
+            if (shipmentWorkflow) {
+                shipmentWorkflow.documentTemplates.each { Document documentTemplate ->
+                    documentList << [
+                            name        : documentTemplate?.name,
+                            documentType: documentTemplate?.documentType?.name,
+                            contentType : documentTemplate?.contentType,
+                            stepNumber  : null,
+                            uri         : g.createLink(controller: 'document', action: "download",
+                                    id: documentTemplate?.id, params: [shipmentId: stockMovement?.shipment?.id],
+                                    absolute: true, title: documentTemplate?.filename)
+                    ]
+                }
+            }
+
+            stockMovement?.shipment?.documents.each { Document document ->
+                documentList << [
+                        name        : document?.name,
+                        documentType: document?.documentType?.name,
+                        contentType : document?.contentType,
                         stepNumber  : null,
-                        uri         : g.createLink(controller: 'goodsReceiptNote', action: "print", id: stockMovement?.shipment?.id, absolute: true)
+                        uri         : g.createLink(controller: 'document', action: "download",
+                                id: document?.id, params: [shipmentId: stockMovement?.shipment?.id],
+                                absolute: true, title: document?.filename)
                 ]
-        ]
+            }
+
+        }
+
         return documentList
     }
 }

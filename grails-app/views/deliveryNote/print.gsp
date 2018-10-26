@@ -141,7 +141,7 @@
     </g:if>
     <g:if test="${requisitionItemsOther}">
         <h2>
-            <img src="${resource(dir: 'images/icons/silk', file: 'box.png')}" title="General Goods"/>
+            <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}" title="General Goods"/>&nbsp;
             ${warehouse.message(code:'product.generalGoods.label', default:'General Goods')}
         </h2>
         <g:render template="printPage" model="[requisitionItems:requisitionItemsOther,
