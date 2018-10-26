@@ -17,7 +17,7 @@
 
     <div class="summary">
         <div class="tag tag-alert right">
-            <format:metadata obj="${stockMovement?.requisition?.status }"/>
+            <format:metadata obj="${stockMovement?.shipment?.status?:stockMovement?.requisition?.status }"/>
         </div>
 
         <div class="title">
@@ -84,7 +84,7 @@
 <div class="yui-gf">
     <div class="yui-u first">
         <div class="box">
-            <h2><g:message code="default.header.label" default="Header"/></h2>
+            <h2><g:message code="stockMovement.label" /></h2>
             <div>
 
                 <table>
@@ -101,7 +101,7 @@
                             <g:message code="stockMovement.status.label"/>
                         </td>
                         <td class="value">
-                            <format:metadata obj="${stockMovement?.status}"/>
+                            <format:metadata obj="${stockMovement?.shipment?.status?:stockMovement?.requisition?.status }"/>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -230,7 +230,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${request.contextPath}/stockMovement/shipments/${stockMovement?.id}">
+                    <a href="${request.contextPath}/stockMovement/packingList/${stockMovement?.id}">
                         <warehouse:message code="shipping.packingList.label" />
                     </a>
                 </li>
