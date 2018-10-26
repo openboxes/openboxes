@@ -92,17 +92,17 @@ const FIELDS = {
       // eslint-disable-next-line react/prop-types
       autofillLines, onSave, saveDisabled, shipmentReceived,
     }) => (
-      <div className="mb-3 text-center">
-        <button type="button" className="btn btn-outline-success margin-bottom-lg mr-3" disabled={shipmentReceived} onClick={() => autofillLines()}>
+      <div className="mb-1 text-center">
+        <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
           Autofill quantities
         </button>
-        <button type="button" className="btn btn-outline-success margin-bottom-lg" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>Save</button>
-        <button type="submit" className="btn btn-outline-primary float-right btn-form" disabled={saveDisabled || shipmentReceived}>Next</button>
+        <button type="button" className="btn btn-outline-success btn-xs" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>Save</button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}>Next</button>
       </div>),
   },
   containers: {
     type: ArrayField,
-    maxTableHeight: 'calc(100vh - 650px)',
+    maxTableHeight: 'calc(100vh - 450px)',
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
     getDynamicRowAttr: ({ rowValues, subfield }) => {
@@ -207,6 +207,7 @@ const FIELDS = {
               options={params.bins}
               onChange={value => params.setLocation(params.rowIndex, value)}
               objectValue
+              className="select-xs"
             />),
         fieldKey: '',
         label: 'Bin Location',
@@ -255,12 +256,12 @@ const FIELDS = {
       // eslint-disable-next-line react/prop-types
       autofillLines, onSave, saveDisabled, shipmentReceived,
     }) => (
-      <div className="my-3 text-center">
-        <button type="button" className="btn btn-outline-success margin-bottom-lg mr-3" disabled={shipmentReceived} onClick={() => autofillLines()}>
+      <div className="my-1 text-center">
+        <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
           Autofill quantities
         </button>
-        <button type="button" className="btn btn-outline-success margin-bottom-lg" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>Save</button>
-        <button type="submit" className="btn btn-outline-primary float-right btn-form mt-4 mb-4" disabled={saveDisabled || shipmentReceived}>Next</button>
+        <button type="button" className="btn btn-outline-success btn-xs" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>Save</button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}>Next</button>
       </div>),
   },
 };

@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Input = (props) => {
-  const onChange = (event) => {
+const Input = ({ onChange, className = '', ...props }) => {
+  const handleChange = (event) => {
     const { value } = event.target;
 
-    if (props.onChange) {
-      props.onChange(value);
+    if (onChange) {
+      onChange(value);
     }
   };
 
@@ -18,8 +18,9 @@ const Input = (props) => {
           event.preventDefault();
         }
       }}
+      className={`form-control form-control-xs ${className}`}
       {...props}
-      onChange={onChange}
+      onChange={handleChange}
     />
   );
 };
@@ -28,8 +29,10 @@ export default Input;
 
 Input.propTypes = {
   onChange: PropTypes.func,
+  className: PropTypes.string,
 };
 
 Input.defaultProps = {
   onChange: null,
+  className: '',
 };

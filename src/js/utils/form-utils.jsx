@@ -27,7 +27,7 @@ export const renderField = ({
   meta: { touched, error },
 }) => {
   const attr = { id: input.name, ...otherAttributes };
-  const className = `form-group my-0 ${required ? 'required' : ''} ${hidden ? 'd-none' : ''} ${(touched || fieldTouched) && error ? 'has-error' : ''}`;
+  const className = `form-group mb-0 ${required ? 'required' : ''} ${hidden ? 'd-none' : ''} ${(touched || fieldTouched) && error ? 'has-error' : ''}`;
 
   if (arrayField) {
     return (
@@ -48,11 +48,11 @@ export const renderField = ({
   }
 
   return (
-    <div className={`padding-left-md padding-right-md ${className}`}>
+    <div className={`mt-2 ${className}`}>
       <div className="row">
         {
           typeof FieldLabel === 'string' ?
-            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label text-center text-md-right">{ FieldLabel }</label> :
+            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right">{ FieldLabel }</label> :
             <FieldLabel />
         }
         <div className="col-md-4 col-7">

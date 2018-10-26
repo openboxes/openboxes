@@ -8,10 +8,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
     className="text-center border"
   >
     <div
-      className="d-flex flex-row border-bottom font-weight-bold py-2"
+      className="d-flex flex-row border-bottom font-weight-bold py-1"
     >
       <div
-        className="mx-1 text-truncate"
+        className="mx-1 text-truncate font-size-xs"
         style={
           Object {
             "flex": "12 1 0",
@@ -22,7 +22,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
         Name
       </div>
       <div
-        className="mx-1 text-truncate"
+        className="mx-1 text-truncate font-size-xs"
         style={
           Object {
             "flex": "12 1 0",
@@ -33,7 +33,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
         Name
       </div>
       <div
-        className="mx-1 text-truncate"
+        className="mx-1 text-truncate font-size-xs"
         style={
           Object {
             "flex": "12 1 0",
@@ -44,10 +44,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
     </div>
   </div>
   <div
-    className="text-center border mb-2 flex-grow-1"
+    className="text-center border mb-1 flex-grow-1"
     style={
       Object {
-        "maxHeight": "calc(100vh - 450px)",
+        "maxHeight": "calc(100vh - 400px)",
         "overflowY": "scroll",
       }
     }
@@ -78,10 +78,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             title={undefined}
           >
             <div
-              className="form-group my-0   "
+              className="form-group mb-0   "
             >
               <input
-                className="form-control"
+                className="form-control form-control-xs "
                 id="test-field[0].textField"
                 onBlur={[Function]}
                 onChange={[Function]}
@@ -112,10 +112,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             title={undefined}
           >
             <div
-              className="form-group my-0   "
+              className="form-group mb-0   "
             >
               <input
-                className="form-control"
+                className="form-control form-control-xs "
                 id="test-field[0].textField2"
                 onBlur={[Function]}
                 onChange={[Function]}
@@ -136,7 +136,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
           }
         >
           <button
-            className="btn btn-outline-danger"
+            className="btn btn-xs btn btn-outline-danger"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -172,10 +172,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             title={undefined}
           >
             <div
-              className="form-group my-0   "
+              className="form-group mb-0   "
             >
               <input
-                className="form-control"
+                className="form-control form-control-xs "
                 id="test-field[1].textField"
                 onBlur={[Function]}
                 onChange={[Function]}
@@ -206,10 +206,10 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
             title={undefined}
           >
             <div
-              className="form-group my-0   "
+              className="form-group mb-0   "
             >
               <input
-                className="form-control"
+                className="form-control form-control-xs "
                 id="test-field[1].textField2"
                 onBlur={[Function]}
                 onChange={[Function]}
@@ -230,7 +230,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
           }
         >
           <button
-            className="btn btn-outline-danger"
+            className="btn btn-xs btn btn-outline-danger"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -245,7 +245,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
     className="text-center"
   >
     <button
-      className="btn btn-outline-success margin-bottom-lg"
+      className="btn btn-outline-success btn-xs"
       onClick={[Function]}
       type="button"
     >
@@ -263,10 +263,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
     className="text-center border"
   >
     <div
-      className="d-flex flex-row border-bottom font-weight-bold py-2"
+      className="d-flex flex-row border-bottom font-weight-bold py-1"
     >
       <div
-        className="mx-1 text-truncate"
+        className="mx-1 text-truncate font-size-xs"
         style={
           Object {
             "flex": "12 1 0",
@@ -277,7 +277,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
         Name
       </div>
       <div
-        className="mx-1 text-truncate"
+        className="mx-1 text-truncate font-size-xs"
         style={
           Object {
             "flex": "12 1 0",
@@ -288,7 +288,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
         Name
       </div>
       <div
-        className="mx-1 text-truncate"
+        className="mx-1 text-truncate font-size-xs"
         style={
           Object {
             "flex": "12 1 0",
@@ -299,10 +299,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
     </div>
   </div>
   <div
-    className="text-center border mb-2 flex-grow-1"
+    className="text-center border mb-1 flex-grow-1"
     style={
       Object {
-        "maxHeight": "calc(100vh - 450px)",
+        "maxHeight": "calc(100vh - 400px)",
         "overflowY": "scroll",
       }
     }
@@ -333,10 +333,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             title={undefined}
           >
             <div
-              className="form-group my-0   "
+              className="form-group mb-0   "
             >
               <input
-                className="form-control"
+                className="form-control form-control-xs "
                 id="test-field[0].textField"
                 onBlur={[Function]}
                 onChange={[Function]}
@@ -367,10 +367,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             title={undefined}
           >
             <div
-              className="form-group my-0   "
+              className="form-group mb-0   "
             >
               <input
-                className="form-control"
+                className="form-control form-control-xs "
                 id="test-field[0].textField2"
                 onBlur={[Function]}
                 onChange={[Function]}
@@ -391,7 +391,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
           }
         >
           <button
-            className="btn btn-outline-danger"
+            className="btn btn-xs btn btn-outline-danger"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -427,10 +427,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             title={undefined}
           >
             <div
-              className="form-group my-0   "
+              className="form-group mb-0   "
             >
               <input
-                className="form-control"
+                className="form-control form-control-xs "
                 id="test-field[1].textField"
                 onBlur={[Function]}
                 onChange={[Function]}
@@ -461,10 +461,10 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
             title={undefined}
           >
             <div
-              className="form-group my-0   "
+              className="form-group mb-0   "
             >
               <input
-                className="form-control"
+                className="form-control form-control-xs "
                 id="test-field[1].textField2"
                 onBlur={[Function]}
                 onChange={[Function]}
@@ -485,7 +485,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
           }
         >
           <button
-            className="btn btn-outline-danger"
+            className="btn btn-xs btn btn-outline-danger"
             disabled={false}
             onClick={[Function]}
             type="button"
