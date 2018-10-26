@@ -157,12 +157,16 @@ class CreateStockMovement extends Component {
   }
 
   checkStockMovementChange(newValues) {
-    const checkOrigin = newValues.origin && this.props.initialValues.origin ?
-      newValues.origin.id !== this.props.initialValues.origin.id : false;
-    const checkDest = newValues.destination && this.props.initialValues.destination ?
-      newValues.destination.id !== this.props.initialValues.destination.id : false;
-    const checkStockList = newValues.stockMovementId ?
-      newValues.stockList !== this.props.initialValues.stockList : false;
+    const { origin, destination, stockList } = this.props.initialValues;
+
+    const isOldSupplier = origin && origin.type === 'SUPPLIER';
+    const isNewSupplier = newValues.origin && newValues.type === 'SUPPLIER';
+    const checkOrigin = (!isOldSupplier && newValues.origin) || (isOldSupplier && !isNewSupplier) ?
+      newValues.origin.id !== origin.id : false;
+
+    const checkDest = stockList && newValues.destination && destination ?
+      newValues.destination.id !== destination.id : false;
+    const checkStockList = newValues.stockMovementId ? newValues.stockList !== stockList : false;
 
     return (checkOrigin || checkDest || checkStockList);
   }
@@ -205,7 +209,7 @@ class CreateStockMovement extends Component {
               stockMovementId: resp.id,
               lineItems: resp.lineItems,
               movementNumber: resp.identifier,
-              shipmentName: resp.name,
+              name: resp.name,
             });
           }
         })
