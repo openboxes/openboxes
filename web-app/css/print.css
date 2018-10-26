@@ -10,6 +10,7 @@ h5 { font-size: 17px; }
 h6 { font-size: 14px; }
 */
 h1 { font-size: 17px;font-weight: bold; }
+h2 { border-top: 1px solid lightgrey; }
 h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
 
 .header{

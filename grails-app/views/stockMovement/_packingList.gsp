@@ -31,13 +31,13 @@
             <th class="left"><warehouse:message code="default.comment.label"/></th>
             <th><warehouse:message code="shipmentItem.isFullyReceived.label" default="Received?"/></th>
         </tr>
-        <g:if test="${shipmentInstance.shipmentItems}">
+        <g:if test="${shipmentInstance?.shipmentItems}">
             <g:set var="count" value="${0 }"/>
             <g:set var="previousContainer"/>
             <g:each var="shipmentItem" in="${shipmentInstance.sortShipmentItems()}" status="i">
                 <g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
                 <g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
-                <tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} shipmentItem">
+                <tr class="prop ${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} shipmentItem">
                     <g:if test="${newContainer }">
                         <td class="top left packing-unit" rowspan="${rowspan}">
                             <g:set var="container" value="${shipmentItem?.container}"/>
@@ -145,7 +145,7 @@
         </g:if>
         <g:else>
             <tr>
-                <td colspan="9" class="middle center fade empty">
+                <td colspan="11" class="middle center fade empty">
                     <warehouse:message code="shipment.noShipmentItems.message"/>
                 </td>
             </tr>

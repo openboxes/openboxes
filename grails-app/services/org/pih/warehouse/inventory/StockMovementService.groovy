@@ -1139,21 +1139,21 @@ class StockMovementService {
                             uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true)
                     ],
                     [
-                            name        : g.message(code: "picklist.button.print.label"),
+                            name        : g.message(code: "picklist.label"),
                             documentType: DocumentGroupCode.PICKLIST.name(),
                             contentType : "text/html",
                             stepNumber  : 4,
                             uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true)
                     ],
                     [
-                            name        : g.message(code: "picklist.button.download.label"),
+                            name        : g.message(code: "picklist.label"),
                             documentType: DocumentGroupCode.PICKLIST.name(),
                             contentType : "application/pdf",
                             stepNumber  : 4,
                             uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true)
                     ],
                     [
-                            name        : g.message(code: "deliveryNote.button.print.label"),
+                            name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
                             documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
                             contentType : "text/html",
                             stepNumber  : 5,
@@ -1193,14 +1193,14 @@ class StockMovementService {
         if (stockMovement?.shipment) {
             documentList.addAll([
                     [
-                            name        : g.message(code: "shipping.exportPackingList.label"),
+                            name        : g.message(code: "shipping.packingList.label"),
                             documentType: DocumentGroupCode.PACKING_LIST.name(),
                             contentType : "application/vnd.ms-excel",
                             stepNumber  : 5,
                             uri         : g.createLink(controller: 'shipment', action: "exportPackingList", id: stockMovement?.shipment?.id, absolute: true)
                     ],
                     [
-                            name        : g.message(code: "shipping.downloadPackingList.label"),
+                            name        : g.message(code: "shipping.packingList.label"),
                             documentType: DocumentGroupCode.PACKING_LIST.name(),
                             contentType : "application/vnd.ms-excel",
                             stepNumber  : 5,
