@@ -96,7 +96,7 @@ class StockMovementService {
         Requisition requisition = updateRequisition(stockMovement, forceUpdate)
 
         log.info "Date shipped: " + stockMovement.dateShipped
-        if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status) {
+        if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status || RequisitionStatus.ISSUED == requisition.status) {
             log.info "Creating shipment for stock movement ${stockMovement}"
             createOrUpdateShipment(stockMovement)
         }
@@ -892,6 +892,9 @@ class StockMovementService {
         // Last step will be to update the generated name
         shipment.name = stockMovement.generateName()
 
+        if(stockMovement.requisition.status == RequisitionStatus.ISSUED) {
+            return shipment
+        }
 
         if (stockMovement.comments) {
             shipment.additionalInformation = stockMovement.comments
