@@ -18,11 +18,11 @@ function validate(values) {
   if (!values.dateDelivered) {
     errors.dateDelivered = 'This field is required';
   } else {
-    const dateDelivered = moment(values.dateDelivered, 'MM/DD/YYYY HH:mm');
+    const dateDelivered = moment(values.dateDelivered, 'MM/DD/YYYY HH:mm Z');
     if (moment().diff(dateDelivered) < 0) {
       errors.dateDelivered = 'The date cannot be in the future';
     }
-    const dateShipped = values.dateShipped ? moment(values.dateShipped, 'MM/DD/YYYY HH:mm') : null;
+    const dateShipped = values.dateShipped ? moment(values.dateShipped, 'MM/DD/YYYY HH:mm Z') : null;
     if (dateShipped && dateDelivered < dateShipped) {
       errors.dateDelivered = 'The date cannot be before shipment date';
     }
