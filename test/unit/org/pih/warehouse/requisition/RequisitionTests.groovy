@@ -96,7 +96,7 @@ class RequisitionTests extends GrailsUnitTestCase {
        //tomorrow.clearTime()
        def today = new Date()
 	   today.clearTime()
-	   
+
 	   assert requisition.requestedDeliveryDate >= today
     }
 
@@ -218,7 +218,7 @@ class RequisitionTests extends GrailsUnitTestCase {
       assert json.requestedById == peter.id
       assert json.requestedByName == peter.getName()
       assert json.dateRequested == today.format("MM/dd/yyyy")
-      assert json.requestedDeliveryDate == tomorrow.format("MM/dd/yyyy HH:mm")
+      assert json.requestedDeliveryDate == tomorrow.format("MM/dd/yyyy HH:mm XXX")
       assert json.name == requisition.name
       assert json.version == requisition.version
       assert json.lastUpdated == requisition.lastUpdated.format("dd/MMM/yyyy hh:mm a")

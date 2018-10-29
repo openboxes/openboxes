@@ -76,7 +76,7 @@ const FIELDS = {
     type: DateField,
     label: 'Ship Date',
     attributes: {
-      dateFormat: 'MM/DD/YYYY HH:mm',
+      dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
       showTimeSelect: true,
     },

@@ -54,8 +54,8 @@ class PartialReceipt {
                 "origin.name": shipment?.origin?.name,
                 "destination.id": shipment?.destination?.id,
                 "destination.name": shipment?.destination?.name,
-                dateShipped: shipment.actualShippingDate?.format("MM/dd/yyyy HH:mm"),
-                dateDelivered: dateDelivered?.format("MM/dd/yyyy HH:mm"),
+                dateShipped: shipment.actualShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
+                dateDelivered: dateDelivered?.format("MM/dd/yyyy HH:mm XXX"),
                 containers: partialReceiptContainers,
                 requisition: shipment?.requisition?.id
         ]
