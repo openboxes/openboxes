@@ -327,9 +327,9 @@ class FileService {
             else {
                 addTc(tr, "")
             }
-            addTc(tr, shipmentItem.inventoryItem?.product?.name?:"")
+            addTc(tr, shipmentItem?.inventoryItem?.product?.name?:"")
             addTc(tr, shipmentItem?.inventoryItem?.lotNumber?:"")
-            addTc(tr, shipmentItem?.inventoryItem?.expirationDate.toString()?:"")
+            addTc(tr, shipmentItem?.inventoryItem?.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT)?:"")
             addTc(tr, String.valueOf(shipmentItem?.quantity))
             addTc(tr, shipmentItem?.inventoryItem?.product?.unitOfMeasure?:"")
             previousContainer = shipmentItem?.container;
