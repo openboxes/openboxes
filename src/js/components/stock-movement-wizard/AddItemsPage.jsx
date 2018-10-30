@@ -200,7 +200,7 @@ const VENDOR_FIELDS = {
       product: {
         type: SelectField,
         label: 'Item',
-        flexWidth: '6',
+        flexWidth: '4',
         attributes: {
           className: 'text-left',
           async: true,
@@ -223,7 +223,7 @@ const VENDOR_FIELDS = {
       expirationDate: {
         type: DateField,
         label: 'Expiry',
-        flexWidth: '1',
+        flexWidth: '1.5',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
         },
