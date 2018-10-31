@@ -151,7 +151,7 @@
                             <g:message code="shipping.shipmentType.label"/>
                         </td>
                         <td class="value">
-                            ${stockMovement?.shipmentType?.name}
+                            <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -253,8 +253,10 @@
                             <span title="${g.formatDate(date:stockMovement?.requisition?.lastUpdated)}">
                                 <g:prettyDateFormat date="${stockMovement?.requisition?.lastUpdated}"/>
                             </span>
-                            <g:message code="default.by.label"/>
-                            ${stockMovement?.requisition?.updatedBy.name}
+                            <g:if test="${stockMovement?.requisition?.updatedBy}">
+                                <g:message code="default.by.label"/>
+                                ${stockMovement?.requisition?.updatedBy?.name}
+                            </g:if>
                         </td>
                     </tr>
                 </table>
