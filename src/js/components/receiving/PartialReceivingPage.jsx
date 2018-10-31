@@ -18,7 +18,8 @@ import EditLineModal from './modals/EditLineModal';
 
 const isReceived = (subfield, fieldValue) => {
   if (subfield) {
-    return _.toInteger(fieldValue.quantityReceived) >= _.toInteger(fieldValue.quantityShipped);
+    return (_.toInteger(fieldValue.quantityReceived) + _.toInteger(fieldValue.quantityCanceled)) >=
+      _.toInteger(fieldValue.quantityShipped);
   }
 
   if (!fieldValue.shipmentItems) {
