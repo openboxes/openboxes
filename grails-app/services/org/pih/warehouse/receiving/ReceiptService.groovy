@@ -192,7 +192,11 @@ class ReceiptService {
         receiptItem.isSplitItem = partialReceiptItem.isSplitItem
 
         if (partialReceiptItem.cancelRemaining) {
-            receiptItem.quantityCanceled = shipmentItem.quantityRemaining - partialReceiptItem.quantityReceiving
+            //when completing the pending receipt status was already changed to received and the item quantity will in quantityReceived,
+            // so there is no need to subtract quantityReceiving, unless it's split item (which will always have quantity received = 0)
+            Integer qtyCanceled = partialReceiptItem.quantityShipped - (partialReceiptItem.quantityReceived +
+                    partialReceiptItem.quantityCanceled + (partialReceiptItem.isSplitItem ? partialReceiptItem.quantityReceiving : 0))
+            receiptItem.quantityCanceled = qtyCanceled
         }
 
         partialReceiptItem.receiptItem = receiptItem
