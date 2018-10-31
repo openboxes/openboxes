@@ -1,7 +1,10 @@
 <div id="documents-tab">
 
     <div class="box">
-        <h2><warehouse:message code="documents.label"/></h2>
+        <h2>
+            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_stack.png')}" />
+            <warehouse:message code="documents.label"/>
+        </h2>
         <table>
             <tr>
                 <th></th>

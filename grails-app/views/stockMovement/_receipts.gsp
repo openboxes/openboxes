@@ -1,4 +1,4 @@
-<div id="receipt" class="box">
+<div id="receipt" class="dialog box">
     <h2>
         <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" />
         <label><warehouse:message code="shipping.receipt.label"/></label>
@@ -28,10 +28,15 @@
                     <format:metadata obj="${receiptItem?.receipt.receiptStatusCode}"/>
                 </td>
                 <td>
-                    ${receiptItem?.product.productCode}
+                    <g:link controller="inventoryItem" action="showStockCard" id="${receiptItem?.product?.id}">
+                        ${receiptItem?.product.productCode}
+                    </g:link>
+
                 </td>
                 <td>
-                    <format:product product="${receiptItem?.product}"/>
+                    <g:link controller="inventoryItem" action="showStockCard" id="${receiptItem?.product?.id}">
+                        <format:product product="${receiptItem?.product}"/>
+                    </g:link>
                 </td>
                 <td>
                     ${receiptItem?.inventoryItem?.lotNumber?:"Default"}
