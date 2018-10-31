@@ -269,7 +269,6 @@ class ReceiptService {
     void saveInboundTransaction(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt.shipment
         if (shipment) {
-            rollbackInboundTransactions(shipment)
             createInboundTransaction(partialReceipt)
         }
     }
