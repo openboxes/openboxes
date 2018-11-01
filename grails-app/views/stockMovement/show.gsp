@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -57,12 +58,21 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
-            <g:if test="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}">
-                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                    <warehouse:message code="default.button.receive.label" />
-                </g:link>
+
+            <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
+            <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
+            <g:set var="disableReceivingButton" value="${!hasBeenIssued || hasBeenReceived}"/>
+            <g:if test="${!hasBeenIssued}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
             </g:if>
+            <g:if test="${hasBeenReceived}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasAlreadyBeenReceived.message', args: [stockMovement?.identifier])}"/>
+            </g:if>
+            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button"
+                    disabled="${disableReceivingButton}" disabledMessage="${disabledMessage}">
+                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                <warehouse:message code="default.button.receive.label" />
+            </g:link>
 
             <g:isSuperuser>
                 <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
