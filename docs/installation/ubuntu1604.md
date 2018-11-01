@@ -23,11 +23,20 @@ size and perm generation memory allocated to Tomcat to something minimal (see st
 
 ### 3. Install dependencies
 
-#### Required
-* Ubuntu 14.04 LTS (your cloud provider should allow you to choose this as the base image for your server)
-* Tomcat 7 (`sudo apt-get install tomcat7`)
-* MySQL 5.5+ (`sudo apt-get install mysql-server`)
+* Ubuntu 16.04 LTS 
+* Tomcat 7
+* MySQL 5.7+ 
+* Java 7 
+
+#### MySQL 
+```sudo apt-get install mysql-server```
+
+#### Tomcat 7 
+* MySQL 5.5+ ()
 * Java 7 (`sudo apt-get install openjdk-7-jre`)
+
+
+(`sudo apt-get install tomcat7`)
 
 **IMPORTANT:** For the time being, you **MUST** use Java 7! The version of Grails that we're using does not support Java 8. We are working on upgrading to the latest version of Grails, but we're still several months away from completing that migration. 
 
