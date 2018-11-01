@@ -84,6 +84,7 @@ class PartialReceiptItem {
                 "recipient.name": recipient?.name,
                 quantityShipped: quantityShipped,
                 quantityReceived: quantityReceived,
+                quantityCanceled: quantityCanceled,
                 quantityReceiving: quantityReceiving,
                 quantityRemaining: quantityRemaining,
                 cancelRemaining: cancelRemaining
