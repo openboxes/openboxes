@@ -53,7 +53,10 @@
                 <warehouse:message code="default.button.create.label" />
             </g:link>
 
-            <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button">
+        </div>
+        <div class="button-group">
+
+                <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="default.button.edit.label" />
             </g:link>

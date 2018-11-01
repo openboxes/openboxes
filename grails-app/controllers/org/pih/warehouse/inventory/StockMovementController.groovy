@@ -139,17 +139,16 @@ class StockMovementController {
     def uploadDocument = { DocumentCommand command ->
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
-        //Shipment shipment = stockMovement.shipment
+        Shipment shipment = stockMovement.shipment
         Document document = new Document()
         document.fileContents = command.fileContents.bytes
         document.contentType = command.fileContents.fileItem.contentType
         document.name = command.fileContents.fileItem.name
         document.filename = command.fileContents.fileItem.name
         document.documentType = DocumentType.get(9)
-        document.save(flush:true)
 
-        //shipment.addToDocuments(document)
-        //shipment.save(flush:true)
+        shipment.addToDocuments(document)
+        shipment.save()
 
         render ([data: "Document was uploaded successfully"] as JSON)
     }
