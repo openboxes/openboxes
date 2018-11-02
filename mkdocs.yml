@@ -15,29 +15,25 @@ pages:
 - 'Benefits': 'benefits.md'
 - 'Considerations': 'considerations.md'
 - 'Release Notes': 'release-notes.md'
-- Users:
-    - Installation Guide:
-        - 'Installation': 'installation/index.md'
-        - 'Install on Ubuntu': 'installation/ubuntu.md'
-        - 'Install on Mac OS': 'installation/macos.md'
-        - 'Install on Windows': 'installation/windows.md'
-        - 'Upgrading': 'upgrading/index.md'
-
-    - Configuration Guide:
-        - 'General': 'configuration/configuration.md'
-        - 'Database': 'configuration/database.md'
-        - 'Email': 'configuration/email.md'
-        - 'Application': 'configuration/application.md'
-        - 'Example': 'configuration/example.md'
-
-    - User Guide: 'user-guide/index.md'
-- Developers:
-    - Developer Guide:
-        - 'Introduction': 'developer-guide/index.md'
-        - 'Getting Started': 'developer-guide/getting-started.md'
-        - 'Contributing': 'developer-guide/contributing.md'
-        - 'Syncing a Fork': 'developer-guide/syncing-a-fork.md'
-        - 'Tagging a Release': 'developer-guide/tagging.md'
+- Installation Guide:
+    - 'Installation': 'installation/index.md'
+    - 'Install on Ubuntu': 'installation/ubuntu.md'
+    - 'Install on Mac OS': 'installation/macos.md'
+    - 'Install on Windows': 'installation/windows.md'
+    - 'Upgrading': 'upgrading/index.md'
+- Configuration Guide:
+    - 'General': 'configuration/configuration.md'
+    - 'Database': 'configuration/database.md'
+    - 'Email': 'configuration/email.md'
+    - 'Application': 'configuration/application.md'
+    - 'Example': 'configuration/example.md'
+- User Guide: 'user-guide/index.md'
+- Developer Guide:
+    - 'Introduction': 'developer-guide/index.md'
+    - 'Getting Started': 'developer-guide/getting-started.md'
+    - 'Contributing': 'developer-guide/contributing.md'
+    - 'Syncing a Fork': 'developer-guide/syncing-a-fork.md'
+    - 'Tagging a Release': 'developer-guide/tagging.md'
 
 #    - REST API Guide:
 #        - 'Overview': 'api-guide/index.md'
