@@ -22,7 +22,7 @@
 
 		<div class="summary">
 			<div class="title">
-				<g:message code="errors.notFound.label" default="Resource Not Found"/> (404)
+				<g:message code="errors.resourceNotFound.message" default="Resource Not Found"/> (404)
 			</div>
 		</div>
 		<div style="width: 25%;">
