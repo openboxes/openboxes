@@ -151,6 +151,15 @@
                                         </div>
                                     </g:link>
                                 </g:elseif>
+                                <g:elseif test="${stockHistoryEntry?.transaction?.order }">
+                                    <g:link controller="order" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
+                                        <div title="${stockHistoryEntry?.transaction?.order?.name }">
+                                            <format:metadata obj="${stockHistoryEntry?.transaction?.order?.orderTypeCode }"/>
+                                            &rsaquo;
+                                            ${stockHistoryEntry?.transaction?.order?.orderNumber }
+                                        </div>
+                                    </g:link>
+                                </g:elseif>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.localTransfer?.sourceTransaction?.requisition}">
                                     <g:set var="requisition" value="${stockHistoryEntry?.transaction?.localTransfer?.sourceTransaction?.requisition}"/>
                                     <g:link controller="requisition" action="show" id="${stockHistoryEntry?.requisition?.id }">
