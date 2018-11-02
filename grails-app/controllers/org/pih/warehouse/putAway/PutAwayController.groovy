@@ -15,6 +15,10 @@ class PutAwayController {
 		redirect(action: "create")
 	}
 
+	def list = {
+		redirect(action: "create")
+	}
+
 	def create = {
 		render(template: "/putAway/create")
 	}

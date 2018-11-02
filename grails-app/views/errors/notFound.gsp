@@ -27,13 +27,12 @@
 		</div>
 		<div style="width: 25%;">
 			<div class="triangle-isosceles">
-				<g:if test="${request.exception.message && false}">
-					${request.exception.message}
+				<g:if test="${request?.exception?.message}">
+					${request?.exception?.message}
 				</g:if>
 				<g:elseif test="${params.id}">
 					<warehouse:message code="errors.resourceWithIdNotFound.message"
-									   default="Sorry, a resource with ID {0} could not be found." args="[params.id]"
-					/>
+									   default="Sorry, a resource with ID {0} could not be found." args="[params.id]"/>
 				</g:elseif>
 				<g:else>
 					<warehouse:message code="errors.resourceNotFound.message" default="Sorry, that resource could not be found."/>
