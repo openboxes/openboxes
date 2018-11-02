@@ -20,6 +20,9 @@
                 <th>
                     ${warehouse.message(code: 'transaction.label')}
                 </th>
+                <th>
+                    ${warehouse.message(code: 'default.originOrDestination.label', default: "Origin / Destination")}
+                </th>
                 <th class="border-right">
                     ${warehouse.message(code: 'default.reference.label')}
                 </th>
@@ -97,14 +100,6 @@
                         <g:if test="${stockHistoryEntry?.showDetails}">
                             <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.transaction?.id }">
                                 <format:metadata obj="${stockHistoryEntry?.transaction?.transactionType}"/>
-                                <g:if test="${stockHistoryEntry?.transaction?.source }">
-                                    &rsaquo;
-                                    ${stockHistoryEntry?.transaction?.source?.name }
-                                </g:if>
-                                <g:elseif test="${stockHistoryEntry?.transaction?.destination }">
-                                    &rsaquo;
-                                    ${stockHistoryEntry?.transaction?.destination?.name }
-                                </g:elseif>
                                 <g:if test="${stockHistoryEntry?.transaction?.transactionNumber}">
                                     &rsaquo;
                                     ${stockHistoryEntry?.transaction?.transactionNumber }
@@ -114,6 +109,15 @@
                                 <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${stockHistoryEntry?.transaction?.comment}"/>
                             </g:if>
                         </g:if>
+                    </td>
+                    <td class="middle">
+                        <g:if test="${stockHistoryEntry?.transaction?.source }">
+                            ${stockHistoryEntry?.transaction?.source?.name }
+                        </g:if>
+                        <g:elseif test="${stockHistoryEntry?.transaction?.destination }">
+                            ${stockHistoryEntry?.transaction?.destination?.name }
+                        </g:elseif>
+
                     </td>
 
                     <td class="border-right middle">
@@ -247,6 +251,7 @@
                 <th class="center border-right">
 
                 </th>
+                <th></th>
                 <th class="center border-right">
                     <g:formatNumber number="${totalCount?:0}" format="#,###"/>
                 </th>
