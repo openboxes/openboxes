@@ -58,12 +58,12 @@
         </div>
 
         <div class="button-group">
-            <g:link controller="stockMovement" action="list" class="button icon arrowleft">
+            <g:link controller="stockMovement" action="list" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'text_list_bullets.png')}" />&nbsp;
                 <warehouse:message code="default.button.list.label" />
             </g:link>
-        </div>
-        <div class="button-group">
-            <g:link controller="stockMovement" action="index" class="button icon add">
+            <g:link controller="stockMovement" action="index" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                 <warehouse:message code="default.button.create.label" />
             </g:link>
         </div>

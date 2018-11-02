@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.putaway
 
+import grails.validation.ValidationException
 import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Putaway
@@ -16,8 +17,12 @@ import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
@@ -28,9 +33,8 @@ import org.pih.warehouse.order.OrderTypeCode
 
 class PutawayService {
 
-    def locationService
-    def inventoryService
-    def stockMovementService
+    LocationService locationService
+    InventoryService inventoryService
 
     boolean transactional = true
 
@@ -95,24 +99,25 @@ class PutawayService {
     def completePutaway(Putaway putaway) {
 
 
-        // Save the putaway as a transfer order
-        Order order = savePutaway(putaway)
+        if (validatePutaway(putaway)) {
 
-        putaway.putawayItems.each { PutawayItem putawayItem ->
-            TransferStockCommand command = new TransferStockCommand()
-            command.location = putawayItem.currentFacility
-            command.binLocation = putawayItem.currentLocation
-            command.inventoryItem = putawayItem.inventoryItem
-            command.quantity = putawayItem.quantity
-            command.otherLocation = putawayItem.putawayFacility
-            command.otherBinLocation = putawayItem.putawayLocation
-            command.transferOut = Boolean.TRUE
+            // Save the putaway as a transfer order
+            Order order = savePutaway(putaway)
 
-            // Save
-            Transaction transaction = inventoryService.transferStock(command)
-            transaction.order = order
-            transaction.save(failOnError: true)
+            putaway.putawayItems.each { PutawayItem putawayItem ->
+                TransferStockCommand command = new TransferStockCommand()
+                command.location = putawayItem.currentFacility
+                command.binLocation = putawayItem.currentLocation
+                command.inventoryItem = putawayItem.inventoryItem
+                command.quantity = putawayItem.quantity
+                command.otherLocation = putawayItem.putawayFacility
+                command.otherBinLocation = putawayItem.putawayLocation
+                command.order = order
+                command.transferOut = Boolean.TRUE
 
+                Transaction transaction = inventoryService.transferStock(command)
+                transaction.save(failOnError: true)
+            }
         }
 
     }
@@ -160,6 +165,45 @@ class PutawayService {
         orderItem.originBinLocation = putawayItem.currentLocation
         orderItem.destinationBinLocation = putawayItem.putawayLocation
         return orderItem
+    }
+
+    Boolean validatePutaway(Putaway putaway) {
+        putaway.putawayItems.toArray().each { PutawayItem putawayItem ->
+            if (putawayItem.splitItems) {
+                putawayItem.splitItems.each { PutawayItem splitItem ->
+                    validatePutawayItem(splitItem)
+                }
+            }
+            else {
+                validatePutawayItem(putawayItem)
+            }
+        }
+        return true
+    }
+
+
+    Boolean validatePutawayItem(PutawayItem putawayItem) {
+        return validateQuantityAvailable(putawayItem.currentFacility, putawayItem.currentLocation, putawayItem.inventoryItem, putawayItem.quantity)
+    }
+
+
+    Boolean validateQuantityAvailable(Location facility, Location internalLocation, InventoryItem inventoryItem, BigDecimal quantity) {
+
+        if (!facility) {
+            throw new IllegalArgumentException("Facility is required")
+        }
+
+        Integer quantityAvailable = inventoryService.getQuantity(facility?.inventory, internalLocation, inventoryItem)
+        log.info "Quantity: ${quantity} vs ${quantityAvailable}"
+
+        if (quantityAvailable < 0) {
+            throw new IllegalStateException("The inventory item is no longer available at the specified facility ${facility} and bin ${internalLocation} ")
+        }
+
+        if (quantity > quantityAvailable) {
+            throw new IllegalStateException("Quantity available ${quantityAvailable} is less than quantity to putaway ${quantity}")
+        }
+
     }
 
 }

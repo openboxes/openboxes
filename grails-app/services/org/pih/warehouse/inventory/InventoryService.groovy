@@ -2583,6 +2583,7 @@ class InventoryService implements ApplicationContextAware {
             // Create transaction to handle transfer in / out
 			transaction.transactionDate = new Date();
             transaction.inventory = inventory;
+			transaction.order = command.order
             transaction.transactionNumber = generateTransactionNumber()
             transaction.destination = (transferOut) ? otherLocation : null
             transaction.source = (transferOut) ? null : otherLocation
@@ -2779,23 +2780,12 @@ class InventoryService implements ApplicationContextAware {
 			throw new RuntimeException("Invalid transaction type for mirrored transaction")
 		}
 
+		mirroredTransaction.order = baseTransaction.order
         mirroredTransaction.requisition = baseTransaction.requisition
 		mirroredTransaction.transactionDate = baseTransaction.transactionDate
 
 		// create the transaction entries based on the base transaction
 		baseTransaction.transactionEntries.each {
-			/*
-			 def inventoryItem =
-			 findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
-			 // If the inventory item doesn't exist, we create a new one
-			 if (!inventoryItem) {
-			 inventoryItem = new InventoryItem(lotNumber: it.lotNumber, product:it.product)
-			 if (inventoryItem.hasErrors() && !inventoryItem.save()) {
-			 throw new RuntimeException("Unable to create inventory item $inventoryItem while creating local transfer")
-			 }
-			 }*/
-
-			// Create a new transaction entry
 			def transactionEntry = new TransactionEntry();
 			transactionEntry.quantity = it.quantity;
 			transactionEntry.inventoryItem = it.inventoryItem;

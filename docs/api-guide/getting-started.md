@@ -21,15 +21,15 @@ of the basic CRUD operations through the Generic API.
 
 In general, you have access to the following operations against the Generic API.
 
-* List = GET https://openboxes.ngrok.io/openboxes/api/generic/<domain> 
-* Read = GET https://openboxes.ngrok.io/openboxes/api/generic/<domain>/<id>
-* Create = POST https://openboxes.ngrok.io/openboxes/api/generic/<domain> 
-* Update = PUT (or POST) https://openboxes.ngrok.io/openboxes/api/generic/<domain>/<id>
-* Delete = DELETE https://openboxes.ngrok.io/openboxes/api/generic/<domain>/<id>
+* List = GET https://openboxes.ngrok.io/openboxes/api/generic/**resource**
+* Read = GET https://openboxes.ngrok.io/openboxes/api/generic/**resource**/:id
+* Create = POST https://openboxes.ngrok.io/openboxes/api/generic/**resource**
+* Update = PUT (or POST) https://openboxes.ngrok.io/openboxes/api/generic/**resource**/:id
+* Delete = DELETE https://openboxes.ngrok.io/openboxes/api/generic/**resource**/:id
 
 where <domain> is any of the domain classes in the system and <id> is the primary key.
 
-Here are some example domain classes available from the 
+Here are some example **resources**:
 
 * Shipment = shipment
 * Shipment Item = shipmentItem
