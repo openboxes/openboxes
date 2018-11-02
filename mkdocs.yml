@@ -3,54 +3,60 @@ site_description:
 site_author: Justin Miranda
 theme: readthedocs
 repo_url: https://github.com/openboxes/openboxes
-include_search: true
+#include_search: true
 #use_absolute_urls: true
 use_directory_urls: true
-copyright: Copyright &copy; 2017, OpenBoxes
+copyright: Copyright &copy; 2018, OpenBoxes
 google_analytics: ['UA-37396941-2', 'OpenBoxes']
 
 pages:
 
-# About:
-- ['index.md', 'About', 'Introduction']
-- ['benefits.md', 'About', 'Benefits']
-- ['considerations.md', 'About', 'Considerations']
+- Home: 'index.md'
+- 'Benefits': 'benefits.md'
+- 'Considerations': 'considerations.md'
+- 'Release Notes': 'release-notes.md'
+- Users:
+    - Installation Guide:
+        - 'Installation': 'installation/index.md'
+        - 'Install on Ubuntu': 'installation/ubuntu.md'
+        - 'Install on Mac OS': 'installation/macos.md'
+        - 'Install on Windows': 'installation/windows.md'
+        - 'Upgrading': 'upgrading/index.md'
 
-# Deployment
-- ['installation/index.md', 'Deployment Guide',  'Installation']
-- ['installation/ubuntu.md', 'Deployment Guide', 'Install on Ubuntu 14.04']
-- ['installation/macos.md', 'Deployment Guide', 'Install on Mac OS']
-- ['installation/windows.md', 'Deployment Guide', 'Install on Windows']
+    - Configuration Guide:
+        - 'General': 'configuration/configuration.md'
+        - 'Database': 'configuration/database.md'
+        - 'Email': 'configuration/email.md'
+        - 'Application': 'configuration/application.md'
+        - 'Example': 'configuration/example.md'
 
-# Upgrade
-- ['upgrading/index.md', 'Deployment Guide', 'Upgrading']
+    - User Guide: 'user-guide/index.md'
+- Developers:
+    - Developer Guide:
+        - 'Introduction': 'developer-guide/index.md'
+        - 'Getting Started': 'developer-guide/getting-started.md'
+        - 'Contributing': 'developer-guide/contributing.md'
+        - 'Syncing a Fork': 'developer-guide/syncing-a-fork.md'
+        - 'Tagging a Release': 'developer-guide/tagging.md'
 
-# Configuration
-- ['configuration/configuration.md', 'Configuration Guide', 'General']
-- ['configuration/database.md', 'Configuration Guide', 'Database']
-- ['configuration/email.md', 'Configuration Guide', 'Email']
-- ['configuration/application.md', 'Configuration Guide', 'Application']
-- ['configuration/example.md', 'Configuration Guide', 'Example']
+#    - REST API Guide:
+#        - 'Overview': 'api-guide/index.md'
+#        - 'Getting Started': 'api-guide/getting-started.md'
+#        - 'Generic API': 'api-guide/generic.md'
+#        - 'Custom API':
+#            - 'Categories': 'api-guide/category.md'
+#            - 'Identifiers': 'api-guide/identifier.md'
+#            - 'Internal Locations': 'api-guide/internalLocation.md'
+#            - 'Locations': 'api-guide/location.md'
+#            - 'Lookup': 'api-guide/lookup.md'
+#            - 'Products': 'api-guide/product.md'
+#            - 'Putaway': 'api-guide/putaway.md'
+#            - 'Receiving': 'api-guide/receiving.md'
+#            - 'Stock Movements':
+#                - 'Stock Movement': 'api-guide/stockMovement.md'
+#                - 'Stock Movement Item': 'api-guide/stockMovementItem.md'
+#                - 'Stock Movement Status': 'api-guide/stockMovementStatus.md'
 
-# Developer Guide
-- ['developer-guide/index.md', 'Developer Guide', 'Introduction']
-- ['developer-guide/getting-started.md', 'Developer Guide', 'Getting Started']
-- ['developer-guide/contributing.md', 'Developer Guide', 'Contributing']
-- ['developer-guide/syncing-a-fork.md', 'Developer Guide', 'Syncing a Fork']
-- ['developer-guide/tagging.md', 'Developer Guide', 'Tagging a Release']
-
-# Support - add a page like https://readthedocs.org/support/
-- ['support/index.md', 'Support', 'Introduction']
-
-# User Guide
-- ['user-guide/index.md', 'User Guide', 'Introduction']
-
-# Continuous Integration
-# User Guide
-# HowTo
-# Cloud
-
-# Releases:
-- ['release-notes.md', 'Releases', 'Release Notes']
+- Support: 'support/index.md'
 
 
