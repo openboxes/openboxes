@@ -37,22 +37,6 @@ class ConsumptionController {
     InventoryService inventoryService
 
     def show = { ShowConsumptionCommand command ->
-        log.info "Consumption " + params
-
-        log.info "toLocations" + command.toLocations
-
-        def jsonObject = new JSONObject(params)
-
-        log.info "Base64: " + jsonObject?.toString()
-
-        String encoded = jsonObject.toString().bytes.encodeBase64().toString()
-
-        log.info "encoded: " + encoded
-
-        def decoded = new String(encoded.decodeBase64())
-
-        log.info "decoded: " + decoded
-
 
         if (command.hasErrors()) {
             render(view: "show", model: [command:command])
@@ -63,7 +47,6 @@ class ConsumptionController {
         params.each {
             if (it.key.contains("selectedLocation_")){
                 if (it.value.contains("on")){
-                    //InvoiceItem invoiceItem = invoiceList.get((it.key - "invoiceItem_") as Integer)
                     Location location = Location.get((it.key - "selectedLocation_"))
                     if (location) {
                         selectedLocations << location
@@ -73,10 +56,8 @@ class ConsumptionController {
         }
 
         // Hack to fix PIMS-2728
-        println "selectedProperties: " + command.selectedProperties
         if (command.selectedProperties) {
             if (command.selectedProperties instanceof java.lang.String) {
-                println "instance of string"
                 command.selectedProperties = [command.selectedProperties]
             }
         }
@@ -86,7 +67,6 @@ class ConsumptionController {
 
         if (!command.fromLocations && !command.toLocations) {
             flash.message = "${g.message(code: 'consumption.selectAtLeastOneLocation.message', default: 'It is recommended that you choose at least one source or destination')}"
-            //command.fromLocations << Location.load(session.warehouse.id)
         }
 
         def fromLocations = []
@@ -138,6 +118,7 @@ class ConsumptionController {
                 def currentRow = command.rows[product]
                 if (!currentRow) {
                     command.rows[product] = new ShowConsumptionRowCommand()
+                    command.rows[product].includeIssuedOnly = command.includeIssuedOnly
                     command.rows[product].command = command
                     command.rows[product].product = product
                 }
@@ -177,6 +158,10 @@ class ConsumptionController {
                     // Add to the total transfer out per location
                     command.rows[product].transferInMap[transaction.source] += transactionEntry.quantity
                 }
+                else {
+                    command.rows[product].otherQuantity += transactionEntry.quantity
+                    command.rows[product].otherTransactions << transaction
+                }
 
 
                 String dateKey = transaction.transactionDate.format("yyyy-MM")
@@ -202,12 +187,6 @@ class ConsumptionController {
 
                 // All transactions
                 command.rows[product].transactions << transaction
-
-                //def currentProductQuantity = command.productMap[transactionEntry.inventoryItem.product]
-                //if (!currentProductQuantity) {
-                //    command.productMap[transactionEntry.inventoryItem.product] = 0
-                //}
-                //command.productMap[transactionEntry.inventoryItem.product] += transactionEntry.quantity
             }
         }
 
@@ -278,20 +257,6 @@ class ConsumptionController {
         // Export as CSV
         if (params.format == "csv") {
 
-            /*
-            def csvWriter = new CSVWriter(sw, {
-                "Product code" { it.productCode }
-                "Name" { it.name }
-                "Category" { it.category }
-                "Unit of Measure" { it.unitOfMeasure }
-                "Total" { it.transferOutQuantity }
-                "Monthly" { it.monthlyQuantity }
-                "Weekly" { it.weeklyQuantity }
-                "Daily" { it.dailyQuantity }
-                "On hand quantity" { it.onHandQuantity }
-                "Months left" { it.numberOfMonthsRemaining }
-            })
-            */
             def csvrows = []
             command.rows.each { key, row ->
                 def csvrow =  [
@@ -340,8 +305,6 @@ class ConsumptionController {
 
                 csvrows << csvrow
 
-                //println csvRow
-                //csvWriter << csvRow
             }
 
             def csv = dataService.generateCsv(csvrows)
@@ -352,8 +315,14 @@ class ConsumptionController {
         else {
             println "Render as HTML " + params
 
-            [command:command, encoded: encoded, decoded: decoded]
+            [command:command]
         }
+    }
+
+
+    def product = {
+        Product product = Product.get(params.id)
+        render (template: "product", model: [product:product])
     }
 
 }
@@ -382,6 +351,7 @@ class ShowConsumptionCommand {
     Boolean includeLocationBreakdown = false
     Boolean includeMonthlyBreakdown = false
     Boolean includeQuantityOnHand = false
+    Boolean includeIssuedOnly = true
 
     def productDomain = new DefaultGrailsDomainClass( Product.class )
 
@@ -431,6 +401,7 @@ class ShowConsumptionRowCommand {
     Integer transferOutQuantity = 0
     Integer expiredQuantity = 0
     Integer damagedQuantity = 0
+    Integer otherQuantity = 0
     Integer debitQuantity = 0;
 
     Set<Transaction> transferOutTransactions = []
@@ -438,7 +409,7 @@ class ShowConsumptionRowCommand {
     Set<Transaction> damagedTransactions = []
     Set<Transaction> transactions = []
     Set<Transaction> transferInTransactions = []
-
+    Set<Transaction> otherTransactions = []
 
     // Location breakdown
     Map<Location, Integer> transferInMap = new TreeMap<Location, Integer>();
@@ -448,12 +419,14 @@ class ShowConsumptionRowCommand {
     Map<String, Integer> transferInMonthlyMap = new TreeMap<String, Integer>();
     Map<String, Integer> transferOutMonthlyMap = new TreeMap<String, Integer>();
 
+    Boolean includeIssuedOnly = true
+
     static constraints = {
 
     }
 
     Integer getTransferBalance() {
-        transferOutQuantity
+        return includeIssuedOnly ? transferOutQuantity : transferOutQuantity + expiredQuantity + damagedQuantity + otherQuantity
     }
 
     Float getMonthlyQuantity() {

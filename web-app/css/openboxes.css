@@ -615,7 +615,7 @@ th.desc a {
 
 
 label       { font-weight: normal; white-space: nowrap; }
-fieldset    { padding:0em; margin: 0 0 .2em 0; border: 2px solid lightgrey; }
+fieldset    { padding:0em; margin: 0 0 .2em 0; border-top: 1px solid lightgrey; }
 legend      { font-weight: normal; font-size:1.2em;  margin-left: 10px; margin-right: 10px; }
 /*
 legend span {
@@ -1945,6 +1945,7 @@ div#dashboard li {
 .inactive { color: red; }
 
 label { display: inline; text-decoration: none;}
+label.none { display: block; text-decoration: none; }
 label.block { display: block;}
 fieldset .prop { margin: 10px; }
 .radio { padding-left: 10px; }
@@ -2051,7 +2052,7 @@ select{ padding: 3px; }
     background-color: #FFCC66;
 }
 .checkbox {
-    border: 1px solid black;
+    margin: 5px;
 }
 .scrollTable {
     border-collapse:collapse;
@@ -2550,7 +2551,7 @@ table.requisition td, table.requisition th { padding: 10px; border-right: 1px so
     -webkit-box-sizing:border-box;
     -moz-box-sizing: border-box;
 }
-fieldset { padding: 5px; }
+fieldset { padding: 0px; margin: 0px; }
 
 
 tr.canceled, tr.canceled a {

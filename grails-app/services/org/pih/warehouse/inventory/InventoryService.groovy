@@ -3360,11 +3360,11 @@ class InventoryService implements ApplicationContextAware {
 	/**
 	 * @return	a unique identifier to be assigned to a transaction
 	 */
-	public String generateTransactionNumber() {
+	String generateTransactionNumber() {
 		return identifierService.generateTransactionIdentifier()
 	}
 
-    public List<Transaction> getCreditsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+    List<Transaction> getCreditsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
         def transactions = Transaction.createCriteria().list() {
             transactionType {
                 eq("transactionCode", TransactionCode.CREDIT)
@@ -3380,15 +3380,17 @@ class InventoryService implements ApplicationContextAware {
         return transactions
     }
 
-    public List<Transaction> getDebitsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+    List<Transaction> getDebitsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
         def transactions = Transaction.createCriteria().list() {
             transactionType {
                 eq("transactionCode", TransactionCode.DEBIT)
             }
-            if (toLocations) {
-                'in'("destination", toLocations)
-            }
-            //eq("inventory", fromLocation.inventory)
+			if (toLocations) {
+				or {
+					'in'("destination", toLocations)
+					isNull("destination")
+				}
+			}
             if (fromLocations) {
                 'in'("inventory", fromLocations.collect { it.inventory })
             }

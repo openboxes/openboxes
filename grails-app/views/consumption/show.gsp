@@ -196,21 +196,12 @@
                                     <th></th>
                                     <th><warehouse:message code="product.productCode.label"/></th>
                                     <th><warehouse:message code="product.label"/></th>
-
-                                    <%--
-                                    <th class="border-right"><warehouse:message code="category.label"/></th>
-                                    <th class="border-right"><warehouse:message code="product.genericProduct.label"/></th>
-
-                                    <th class="center border-right"><warehouse:message code="product.unitOfMeasure.label"/></th>
-                                    <th class="center border-right"><warehouse:message code="inventoryLevel.binLocation.label"/></th>
-                                    <th class="center" colspan="2"><warehouse:message code="consumption.expired.label" default="Expired"/></th>
-                                    <th class="centert" colspan="2"><warehouse:message code="consumption.damaged.label" default="Damaged"/></th>
-                                    <th class="center border-right" colspan="2"><warehouse:message code="consumption.issued.label" default="Issued"/></th>
-                                    --%>
-
+                                    <th></th>
                                     <th class="border-right center"><warehouse:message code="consumption.issued.label" default="Issued"/></th>
                                     <th class="border-right center"><warehouse:message code="consumption.expired.label" default="Expired"/></th>
                                     <th class="border-right center"><warehouse:message code="consumption.damaged.label" default="Damaged"/></th>
+                                    <th class="border-right center"><warehouse:message code="consumption.other.label" default="Other"/></th>
+
                                     <th class="border-right center"><warehouse:message code="consumption.returns.label" default="Returns"/></th>
                                     <%--
                                     <th class="center border-right" colspan="2"><warehouse:message code="consumption.returns.label" default="Returns"/></th>
@@ -248,91 +239,23 @@
                                         --%>
                                         <td>${i+1}</td>
                                         <td>
-                                            <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
+                                            <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'product.label')}"
+                                               data-url="${request.contextPath}/consumption/product?id=${product?.id}">
                                                 ${product?.productCode}
-                                            </g:link>
+                                            </a>
                                         </td>
                                         <td>
-                                            <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
+                                            <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'product.label')}"
+                                               data-url="${request.contextPath}/consumption/product?id=${product?.id}">
                                                 ${product?.name}
-                                            </g:link>
-
-                                            &nbsp;
-                                            <a href="javascript:void(-1);" data-id="${product.id}" class="product-details-toggle-btn">more info</a>
-                                            <div id="product-details-box-${product?.id}" class="box product-details-box" style="display:none">
-                                                <table >
-                                                    <tr>
-                                                        <td>
-                                                            <label><warehouse:message code="category.label"/></label>
-                                                        </td>
-                                                        <td>
-                                                            ${product?.category?.name?:""}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <label><warehouse:message code="product.genericProduct.label"/></label>
-                                                        </td>
-                                                        <td>
-                                                            ${product?.genericProduct?.description?:""}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <label><warehouse:message code="product.unitOfMeasure.label"/></label>
-                                                        </td>
-                                                        <td>
-                                                            ${product?.unitOfMeasure?:""}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <label><warehouse:message code="inventoryLevel.binLocation.label"/></label>
-                                                        </td>
-                                                        <td>
-                                                            ${product?.getInventoryLevel(session.warehouse.id)?.binLocation}
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-
-
-                                        </td>
-
-                                        <%--
-                                        <td class="border-right">
-                                            <span class="fade"><format:metadata obj="${product.category}"/></span>
+                                            </a>
                                         </td>
                                         <td class="center border-right">
-                                            ${product?.unitOfMeasure}
+                                            <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'product.label')}"
+                                               data-url="${request.contextPath}/consumption/product?id=${product?.id}">
+                                                ${g.message(code:'default.details.label')}
+                                            </a>
                                         </td>
-                                        <td class="center border-right">
-                                            ${product?.getInventoryLevel(session.warehouse.id)?.binLocation}
-                                        </td>
-                                        --%>
-
-                                        <%--
-                                        <td class="center">
-                                            ${row.expiredQuantity}
-                                        </td>
-                                        <td class="center">
-                                            <span class="fade">(${row.expiredTransactions?.size()})</span>
-
-                                        </td>
-                                        <td class="center">
-                                            ${row.damagedQuantity}
-                                        </td>
-                                        <td class="center">
-                                            <span class="fade">(${row.damagedTransactions?.size()})</span>
-                                        </td>
-                                        <td class="center">
-                                            ${row.transferOutQuantity}
-                                        </td>
-                                        <td class="center border-right">
-                                            <span class="fade">(${row.transferOutTransactions?.size()})</span>
-                                        </td>
-                                        --%>
-
                                         <td class="center border-right">
                                             <div class="debit">${row.transferOutQuantity}</div>
                                         </td>
@@ -343,14 +266,14 @@
                                             <div class="debit">${row.damagedQuantity}</div>
                                         </td>
                                         <td class="center border-right">
+                                            <div class="debit">${row.otherQuantity}</div>
+                                        </td>
+                                        <td class="center border-right">
                                             N/A
                                         </td>
-
-
                                         <td class="center border-right">
                                             ${row.transferBalance}
                                         </td>
-
                                         <td class="center">
                                             <g:formatNumber number="${row.monthlyQuantity}" format="###,###.#" maxFractionDigits="1"/>
                                         </td>
@@ -367,11 +290,6 @@
                                         <td class="center border-right">
                                             <g:formatNumber number="${row.numberOfMonthsRemaining}" format="###,###.#" maxFractionDigits="1"/>
                                         </td>
-                                        <%--
-                                        <g:each var="property" in="${params.selectedProperties}">
-                                            <td>${row.product."$property"}</td>
-                                        </g:each>
-                                        --%>
                                     </tr>
                                 </g:each>
                                 <g:unless test="${command?.rows}">
@@ -381,44 +299,52 @@
                                         </td>
                                     </tr>
                                 </g:unless>
-
                             </tbody>
                         </table>
                     </div>
                 </div>
-
-            <%--
-                <div class="right">
-                    <table style="width:auto;" class="box">
-                        <tr>
-                            <th>Key</th>
-                        </tr>
-                        <tr class="notice">
-                            <td>Negative consumption rate due to mismatch between tranfer out and transfer in</td>
-                        </tr>
-                        <tr class="error">
-                            <td>Low stock alert</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="clear"></div>
-                --%>
             </div>
         </div>
      </div>
+    <%-- FIXME Need to move this into a javascript library that can be used on any page --%>
+    <div id="dlgShowDialog" style="display: none;">
+        <div id="dlgShowDialogContent">
+            <!-- dynamically generated content -->
+        </div>
+    </div>
     <script type="text/javascript">
         $(document).ready(function() {
 
-            $("#parameters-toggle").click(function() {
-                $("#parameters-box").toggle();
+            $(".btn-close-dialog").live("click", function () {
+                console.log("Close dialog");
+                $("#dlgShowDialog").dialog( "close" );
             });
-            $(".product-details-toggle-btn").click(function(event) {
-                var productId = $(this).attr("data-id");
-                console.log(productId);
-                $("#product-details-box-" + productId).toggle();
+
+            $(".btn-show-dialog").click(function(event) {
+                var url = $(this).data("url");
+                var title = $(this).data("title");
+                $("#dlgShowDialog").attr("title", title);
+                $("#dlgShowDialog").dialog({
+                    autoOpen: true,
+                    modal: true,
+                    width: 800,
+                    open: function(event, ui) {
+                        $("#dlgShowDialogContent").html("Loading...")
+                        $('#dlgShowDialogContent').load(url, function(response, status, xhr) {
+                            if (xhr.status != 200) {
+                                $(this).text("")
+                                $("<p/>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
+                                var error = JSON.parse(response);
+                                var stack = $("<div/>").addClass("stack empty").appendTo($(this));
+                                $("<code/>").text(error.errorMessage).appendTo(stack)
+
+                            }
+                        });
+                    }
+                });
             });
+
         });
     </script>
-
 </body>
 </html>

@@ -53,12 +53,13 @@
                     <label>
                         <warehouse:message code="consumption.fromLocations.label" default="Source(s)"/>
                     </label>
-                    <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id}" multiple="true" class="chzn-select-deselect"
+                    <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id?:session?.warehouse?.id}"
+                                      multiple="true" class="chzn-select-deselect"
                                       data-placeholder="${warehouse.message(code:'consumption.fromLocations.label', default:'Source(s)')}"/>
                 </td>
             </tr>
 
-            <g:if test="${!command?.toLocations || command?.toLocations?.size() < 25}">
+            <g:if test="${!command?.toLocations}">
                 <tr class="prop">
                     <td colspan="2">
                         <label>
@@ -78,52 +79,45 @@
                         </label>
                         <g:unless test="${!command.toLocations}">
                             <div class="right">
-                                <a id="selectAllLocations">Select All</a>&nbsp;|&nbsp;
-                                <a id="selectNoLocations">Select None</a>
+                                <a id="selectAllLocations">All</a>
+                                or
+                                <a id="selectNoLocations">None</a>
                             </div>
                         </g:unless>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <div> <!-- style="max-height: 300px; overflow: auto; border: 1px lightgrey solid"-->
-                            <div id="toLocation-accordion">
-                                <g:set var="count" value="${0}"/>
-                                <g:unless test="${command.toLocations}">
-                                    <div class="empty fade center">
-                                        <warehouse:message code="consumption.chooseFromLocation.message" default="You must choose at least one source"/>
-                                    </div>
-                                </g:unless>
-                                <g:each var="entry" in="${command.toLocations.groupBy {it.locationGroup}}" >
-                                    <g:each var="locationTypeEntry" in="${entry.value.groupBy{it.locationType}}">
-                                        <fieldset>
-                                            <legend>
-                                                ${entry.key?:warehouse.message(code:'default.other.label', default: 'Other')} &rsaquo;
-                                                <format:metadata obj="${locationTypeEntry}"/>
-                                            </legend>
-                                            <div style="max-height: 150px; overflow: auto;">
-                                                <table style="width: auto;">
-                                                    <tbody>
-                                                        <g:each var="toLocation" in="${locationTypeEntry.value}">
-                                                            <tr>
-                                                                <td class="middle center" width="1%">
-                                                                    <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
 
-                                                                    <g:checkBox name="selectedLocation_${toLocation?.id}" checked="${selected}" class="toLocation"/>
-                                                                    <g:hiddenField name="toLocations[${count++}].id" value="${toLocation?.id}"/>
-                                                                </td>
-                                                                <td class="middle">
-                                                                    <label for="selectedLocation_${toLocation?.id}" style="white-space: pre-wrap;"><format:metadata obj="${toLocation}"/></label>
-                                                                </td>
-                                                            </tr>
-                                                        </g:each>
-                                                    </tbody>
-                                                </table>
+                        <div id="toLocation-accordion">
+                            <g:set var="count" value="${0}"/>
+                            <g:unless test="${command.toLocations}">
+                                <div class="empty fade center">
+                                    <warehouse:message code="consumption.chooseFromLocation.message" default="You must choose at least one source"/>
+                                </div>
+                            </g:unless>
+                            <g:each var="entry" in="${command.toLocations.groupBy {it.locationGroup}}" >
+
+                                <g:each var="locationTypeEntry" in="${entry.value.groupBy{it.locationType}}">
+
+                                    <div class="summary">
+                                        <label>
+                                            ${entry.key?:warehouse.message(code:'default.other.label', default: 'Other')} &rsaquo;
+                                            <format:metadata obj="${locationTypeEntry}"/>
+                                        </label>
+                                    </div>
+                                    <div style="max-height: 200px; overflow: auto;">
+                                        <g:each var="toLocation" in="${locationTypeEntry.value}">
+                                            <div style="margin-left: 5px;">
+                                                <g:set var="selected" value="${command.selectedLocations.contains(toLocation)}"/>
+                                                <g:hiddenField name="toLocations[${count++}].id" value="${toLocation?.id}"/>
+                                                <label for="selectedLocation_${toLocation?.id}" style="font-weight: normal;">
+                                                    <g:checkBox name="selectedLocation_${toLocation?.id}"
+                                                                checked="${selected}" class="toLocation"/>
+                                                    <format:metadata obj="${toLocation}"/>
+                                                </label>
                                             </div>
-                                        </fieldset>
-                                    </g:each>
+
+                                        </g:each>
+                                    </div>
                                 </g:each>
-                            </div>
+                            </g:each>
                         </div>
                         <g:unless test="${command.toLocations}">
                             <div class="center">
@@ -160,31 +154,35 @@
             </tr>
             <tr class="prop">
                 <td colspan="2">
-                    <g:checkBox name="includeQuantityOnHand" value="${command.includeQuantityOnHand}"/>
-                    <label for="includeQuantityOnHand">
-                        <warehouse:message code="consumption.includeQuantityOnHand.label" default="Include Quantity on Hand (slow)"/>
+                    <label>
+                        <warehouse:message code="consumption.options.label" default="Options"/>
                     </label>
+                    <div class="checkbox">
+                        <g:checkBox name="includeIssuedOnly" value="${command.includeIssuedOnly}"/>
+                        <label for="includeIssuedOnly">
+                            <warehouse:message code="consumption.includeIssuedOnly.label" default="Include only issued in balance"/>
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <g:checkBox name="includeQuantityOnHand" value="${command.includeQuantityOnHand}"/>
+                        <label for="includeQuantityOnHand">
+                            <warehouse:message code="consumption.includeQuantityOnHand.label" default="Include quantity on hand"/>
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
+                        <label for="includeLocationBreakdown">
+                            <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown in CSV"/>
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <g:checkBox name="includeMonthlyBreakdown" value="${command.includeMonthlyBreakdown}"/>
+                        <label for="includeMonthlyBreakdown">
+                            <warehouse:message code="consumption.includeMonthlyBreakdown.label" default="Include monthly breakdown in CSV"/>
+                        </label>
+                    </div>
                 </td>
             </tr>
-            <tr>
-                <td colspan="2">
-                    <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
-                    <label for="includeLocationBreakdown">
-                        <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown in CSV"/>
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <g:checkBox name="includeMonthlyBreakdown" value="${command.includeMonthlyBreakdown}"/>
-                    <label for="includeMonthlyBreakdown">
-                        <warehouse:message code="consumption.includeMonthlyBreakdown.label" default="Include monthly breakdown in CSV"/>
-                    </label>
-
-
-                </td>
-            </tr>
-
 
             <tr class="prop">
                 <td class="center" colspan="2">
@@ -194,15 +192,7 @@
                         </button>
                         &nbsp;
                         <g:link controller="consumption" action="show">${warehouse.message(code:'default.button.reset.label', default: 'Reset')}</g:link>
-                        <%--
-                        <a href="#" id="parameters-toggle" class="button icon settings">
-                            <warehouse:message code="consumption.parameters.view.label" default="View parameters"/></a>
-                            --%>
                     </div>
-
-                    <%--
-                    <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon file">Download .csv</g:link>
-                    --%>
                 </td>
             </tr>
         </table>
@@ -232,12 +222,9 @@
         //    $(".checkbox").attr("checked", checked);
         //});
 
-//        $("#toLocation-accordion").accordion({
-//            collapsible: true,
-//            active: 'none',
-//            autoHeight: false,
-//            navigation: true
-//        });
+
+        $
+
 
     });
 </script>
