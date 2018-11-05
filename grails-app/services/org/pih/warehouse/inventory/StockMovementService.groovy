@@ -882,6 +882,8 @@ class StockMovementService {
         shipment.destination = stockMovement.destination
         shipment.requisition = stockMovement.requisition
         shipment.shipmentNumber = stockMovement.identifier
+        shipment.additionalInformation = stockMovement.comments
+        shipment.driverName = stockMovement.driverName
 
         // These values need defaults since they are not set until step 6
         shipment.expectedShippingDate = stockMovement.dateShipped?:new Date()
@@ -896,11 +898,8 @@ class StockMovementService {
             return shipment
         }
 
-        if (stockMovement.comments) {
-            shipment.additionalInformation = stockMovement.comments
-        }
-
         if (stockMovement.trackingNumber) {
+            shipment.referenceNumbers.clear()
             ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
             if (!trackingNumberType) {
                 throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
@@ -916,9 +915,8 @@ class StockMovementService {
             }
             referenceNumber.identifier = stockMovement.trackingNumber
         }
-
-        if (stockMovement.driverName) {
-            shipment.driverName = stockMovement.driverName
+        else {
+            shipment.referenceNumbers.clear()
         }
 
         if (stockMovement.origin.isSupplier()) {
