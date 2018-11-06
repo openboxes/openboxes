@@ -33,3 +33,6 @@ npm-debug.log
 /web-app/js/bundle*
 /web-app/css/bundle*
 /web-app/js/fonts/*
+grails-app/views/partialReceiving/_create.gsp
+grails-app/views/putAway/_create.gsp
+grails-app/views/stockMovement/_create.gsp
