@@ -1095,7 +1095,7 @@ class StockMovementService {
         shipmentService.sendShipment(shipments[0], null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
 
         // Create temporary receiving area for the Partial Receipt process
-        if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled) {
+        if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && stockMovement.destination.hasBinLocationSupport()) {
             LocationType locationType = LocationType.findByName("Receiving")
             if (!locationType) {
                 throw new IllegalArgumentException("Unable to find location type 'Receiving'")
