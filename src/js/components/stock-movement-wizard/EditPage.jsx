@@ -97,8 +97,9 @@ const FIELDS = {
           title: 'Substitutes',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, stockMovementId, onResponse,
+          fieldValue, rowIndex, stockMovementId, onResponse, reviseRequisitionItems, values,
         }) => ({
+          onOpen: () => reviseRequisitionItems(values),
           productCode: fieldValue.productCode,
           btnOpenText: fieldValue.substitutionStatus,
           btnOpenDisabled: fieldValue.substitutionStatus === 'NO' || fieldValue.statusCode === 'SUBSTITUTED',
@@ -195,6 +196,7 @@ class EditItemsPage extends Component {
 
     this.revertItem = this.revertItem.bind(this);
     this.saveNewItems = this.saveNewItems.bind(this);
+    this.reviseRequisitionItems = this.reviseRequisitionItems.bind(this);
     this.props.showSpinner();
   }
 
@@ -462,6 +464,8 @@ class EditItemsPage extends Component {
                 reasonCodes: this.props.reasonCodes,
                 onResponse: this.saveNewItems,
                 revertItem: this.revertItem,
+                reviseRequisitionItems: this.reviseRequisitionItems,
+                values,
               }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
