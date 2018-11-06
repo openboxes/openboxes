@@ -134,6 +134,7 @@ class SubstitutionsModal extends Component {
    * @public
    */
   onOpen() {
+    this.state.attr.onOpen();
     let substitutions = this.state.attr.lineItem.availableSubstitutions;
     let originalItem = null;
 
