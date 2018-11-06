@@ -42,7 +42,7 @@ export function flattenRequest(data) {
     return obj;
   }
 
-  return data === null ? '' : data;
+  return data === null || data === undefined ? '' : data;
 }
 
 const handleSuccess = response => response;
