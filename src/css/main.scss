@@ -386,7 +386,7 @@ body {
 ----------------------------*/
 
 .ReactModalPortal .ReactModal__Overlay--after-open {
-  z-index: 4 !important;
+  z-index: 100 !important;
 }
 
 .modal-content-custom {
@@ -457,7 +457,7 @@ tr.crossed-out td:before {
   height: 100%;
   width: 100%;
   background-color: rgba(255,255,255, 0.8);
-  z-index: 100;
+  z-index: 110;
 }
 
 .spinner-container > div > div {
@@ -488,7 +488,7 @@ div.crossed-out .table-inner-row:before {
   left: 0;
   border-bottom: 2px solid $red-beta;
   width: 100%;
-  z-index: 999 !important;
+  z-index: 99 !important;
 }
 
 .force-on-top {
