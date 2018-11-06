@@ -37,6 +37,8 @@ const GlobalSearch = () => (
       cache={false}
       options={[]}
       showValueTooltip
+      menuContainerStyle={{ maxHeight: '500px' }}
+      menuStyle={{ maxHeight: '500px' }}
       filterOptions={options => options}
       onChange={(value) => { window.location = value.url; }}
     />
