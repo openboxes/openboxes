@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.picklist
 
 import org.pih.warehouse.core.Location
@@ -14,30 +14,31 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.requisition.RequisitionItem
 
 class PicklistItem implements Serializable {
-	
-	String id	
+
+	String id
 	RequisitionItem requisitionItem
 	InventoryItem inventoryItem
 	Location binLocation
 
 	Integer quantity
-	
+
 	String status
 	String reasonCode
 	String comment
-	
+
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
 
-	
+	Integer sortOrder = 0
+
 	static belongsTo = [ picklist : Picklist ]
 
 	static mapping = {
 		id generator: 'uuid'
 	}
-		
-    static constraints = {    	
+
+    static constraints = {
 		inventoryItem(nullable:true)
 		binLocation(nullable:true)
         requisitionItem(nullable:true)
@@ -45,7 +46,7 @@ class PicklistItem implements Serializable {
 		status(nullable:true)
 		reasonCode(nullable:true)
 		comment(nullable:true)
-		
+		sortOrder(nullable:true)
 	}
 
     Map toJson() { [
@@ -60,5 +61,4 @@ class PicklistItem implements Serializable {
             comment: comment
         ]
     }
-		
 }

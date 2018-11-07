@@ -382,6 +382,7 @@ class StockMovementService {
             picklistItem.quantity = quantity
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
+            picklistItem.sortOrder = stockMovementItem.sortOrder
         }
         picklist.save(flush: true)
     }
@@ -518,7 +519,9 @@ class StockMovementService {
 
         StockMovement stockMovement = getStockMovement(id)
         Set<PackPageItem> packPageItems = new LinkedHashSet<PackPageItem>()
-        stockMovement.requisition?.picklist?.picklistItems?.each { PicklistItem picklistItem ->
+        stockMovement.requisition?.picklist?.picklistItems?.sort { a, b ->
+            a.sortOrder <=> b.sortOrder ?: a.id <=> b.id
+        }?.each { PicklistItem picklistItem ->
             packPageItems.addAll(getPackPageItems(picklistItem))
         }
 
