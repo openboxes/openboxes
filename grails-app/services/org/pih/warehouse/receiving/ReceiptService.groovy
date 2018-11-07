@@ -231,7 +231,7 @@ class ReceiptService {
         partialReceipt.partialReceiptItems.each { partialReceiptItem ->
 
             log.info "Saving partial receipt item " + partialReceiptItem
-            if (partialReceiptItem.quantityReceiving != null) {
+            if (partialReceiptItem.shouldSave) {
                 ReceiptItem receiptItem = createOrUpdateReceiptItem(partialReceiptItem)
                 receipt.addToReceiptItems(receiptItem)
                 ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
