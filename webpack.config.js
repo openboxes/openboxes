@@ -2,7 +2,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, 'src');
 const SRC = path.resolve(ROOT, 'js');
-const DEST = path.resolve(__dirname, 'web-app/js');
+const DEST = path.resolve(__dirname, 'web-app');
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -13,15 +13,17 @@ module.exports = {
   },
   output: {
     path: DEST,
-    filename: 'bundle.js',
-    publicPath: '/js/',
+    filename: 'js/bundle.js',
+    chunkFilename: 'js/bundle.[name].js',
+    publicPath: '/openboxes/',
   },
   stats: {
     colors: true,
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: '../css/bundle.css',
+      filename: 'css/bundle.css',
+      chunkFilename: 'css/bundle.[name].css',
     }),
     new OptimizeCSSAssetsPlugin({}),
   ],
