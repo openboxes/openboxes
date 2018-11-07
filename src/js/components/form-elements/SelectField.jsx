@@ -1,7 +1,5 @@
 import React from 'react';
 
-import 'react-select-plus/dist/react-select-plus.css';
-
 import BaseField from './BaseField';
 import Select from '../../utils/Select';
 

@@ -9,8 +9,8 @@
     "test": "test"
   },
   "scripts": {
-    "watch": "webpack --watch --colors --progress",
-    "bundle": "webpack",
+    "watch": "webpack --watch --colors --progress --mode=development",
+    "bundle": "webpack --mode=production",
     "test": "jest",
     "styleguide": "styleguidist server",
     "styleguide:build": "styleguidist build"
@@ -57,6 +57,7 @@
     "react-dropzone": "4.3.0",
     "react-final-form": "3.6.5",
     "react-final-form-arrays": "1.0.6",
+    "react-loadable": "5.5.0",
     "react-localize-redux": "2.17.5",
     "react-modal": "3.5.1",
     "react-overlays": "0.8.3",
@@ -98,13 +99,16 @@
     "html-webpack-plugin": "^3.2.0",
     "jest": "22.4.4",
     "jquery": "3.3.1",
+    "mini-css-extract-plugin": "0.4.4",
     "node-sass": "4.9.2",
+    "optimize-css-assets-webpack-plugin": "5.0.1",
     "react-styleguidist": "7.2.1",
     "react-test-renderer": "16.4.2",
     "regenerator-runtime": "0.11.1",
     "sass-loader": "7.1.0",
     "style-loader": "0.21.0",
     "url-loader": "1.0.1",
-    "webpack": "3.12.0"
+    "webpack": "4.25.0",
+    "webpack-cli": "3.1.2"
   }
 }
