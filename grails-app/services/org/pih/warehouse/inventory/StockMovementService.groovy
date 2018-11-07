@@ -882,6 +882,8 @@ class StockMovementService {
         shipment.destination = stockMovement.destination
         shipment.requisition = stockMovement.requisition
         shipment.shipmentNumber = stockMovement.identifier
+        shipment.additionalInformation = stockMovement.comments
+        shipment.driverName = stockMovement.driverName
 
         // These values need defaults since they are not set until step 6
         shipment.expectedShippingDate = stockMovement.dateShipped?:new Date()
@@ -896,29 +898,29 @@ class StockMovementService {
             return shipment
         }
 
-        if (stockMovement.comments) {
-            shipment.additionalInformation = stockMovement.comments
-        }
-
         if (stockMovement.trackingNumber) {
             ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
             if (!trackingNumberType) {
                 throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
             }
+
+            // Needed to use ID since reference numbers is lazy loaded and equality operation was not working
             ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
-                refNum.referenceNumberType == trackingNumberType
+                trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
             }
 
+            // Create a new reference number
             if (!referenceNumber) {
                 referenceNumber = new ReferenceNumber()
+                referenceNumber.identifier = stockMovement.trackingNumber
                 referenceNumber.referenceNumberType = trackingNumberType
                 shipment.addToReferenceNumbers(referenceNumber)
             }
-            referenceNumber.identifier = stockMovement.trackingNumber
-        }
-
-        if (stockMovement.driverName) {
-            shipment.driverName = stockMovement.driverName
+            // Update the existing reference number
+            else {
+                referenceNumber.identifier = stockMovement.trackingNumber
+            }
+            shipment.save(failOnError: true)
         }
 
         if (stockMovement.origin.isSupplier()) {
