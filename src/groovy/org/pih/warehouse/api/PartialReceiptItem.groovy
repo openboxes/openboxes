@@ -19,6 +19,7 @@ class PartialReceiptItem {
     Boolean cancelRemaining = Boolean.FALSE
 
     Boolean isSplitItem = Boolean.FALSE
+    Boolean shouldSave = Boolean.FALSE
 
     String lotNumber
     Date expirationDate

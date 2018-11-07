@@ -71,8 +71,19 @@ class ReceivingPage extends Component {
     if (this.state.page === 0) {
       const containers = _.map(formValues.containers, container => ({
         ...container,
-        shipmentItems: _.filter(container.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''),
+        shipmentItems: _.chain(container.shipmentItems)
+          .map((item) => {
+            if (item.receiptItemId) {
+              return {
+                ...item, quantityReceiving: item.quantityReceiving ? item.quantityReceiving : 0,
+              };
+            }
+
+            return item;
+          })
+          .filter(item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '').value(),
       }));
+
       const payload = {
         ...formValues, receiptStatus: 'CHECKING', containers: _.filter(containers, container => container.shipmentItems.length),
       };
