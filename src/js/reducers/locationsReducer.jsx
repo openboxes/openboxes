@@ -4,14 +4,14 @@ import { FETCH_CURRENT_LOCATION, CHANGE_CURRENT_LOCATION } from '../actions/type
 
 const initialState = {
   currentLocation: {
-    id: '', name: '', hasBinLocationSupport: true, locationType: { description: '', locationTypeCode: '' },
+    id: '', name: '', hasBinLocationSupport: true, locationType: { description: '', locationTypeCode: '' }, isSuperuser: false,
   },
 };
 
 export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_CURRENT_LOCATION:
-      return { ...state, currentLocation: _.get(action, 'payload.data.data.location') };
+      return { ...state, currentLocation: _.get(action, 'payload.data.data.location'), isSuperuser: _.get(action, 'payload.data.data.isSuperuser') };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload };
     default:
