@@ -494,6 +494,7 @@ class StockMovementService {
         EditPage editPage = new EditPage()
         StockMovement stockMovement = getStockMovement(id)
         stockMovement.lineItems.each { stockMovementItem ->
+            stockMovementItem.stockMovement = stockMovement
             EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
             editPage.editPageItems.addAll(editPageItem)
         }
@@ -557,10 +558,23 @@ class StockMovementService {
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
         List<SubstitutionItem> availableSubstitutions = getAvailableSubstitutions(location, requisitionItem.product)
         List<SubstitutionItem> substitutionItems = getSubstitutionItems(location, requisitionItem)
+
+
+        // Calculate total monthly quantity
+        Integer totalMonthlyQuantity
+        StockMovement stockMovement = stockMovementItem.stockMovement
+
+        Requisition stocklist = requisitionService.getRequisitionTemplate(stockMovement.origin, stockMovement.destination)
+        if (stocklist) {
+            totalMonthlyQuantity =
+                    stocklist.requisitionItems.findAll { it?.product?.id == requisitionItem?.product?.id }.sum { it.quantity }
+        }
+
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
+        editPageItem.totalMonthlyQuantity = totalMonthlyQuantity
         editPageItem.quantityRequested = requisitionItem.quantity
         editPageItem.quantityConsumed = null
         editPageItem.availableSubstitutions = availableSubstitutions

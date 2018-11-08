@@ -153,6 +153,22 @@ class RequisitionService {
     }
 
     /**
+     * Get a single published stock list for the given origin and destination.
+     *
+     * @param origin
+     * @param destination
+     * @return
+     */
+    def getRequisitionTemplate(Location origin, Location destination) {
+        return Requisition.createCriteria().get {
+            eq("isTemplate", Boolean.TRUE)
+            eq("isPublished", Boolean.TRUE)
+            eq("origin", origin)
+            eq("destination", destination)
+        }
+    }
+
+    /**
      * Get requisition template
      */
     def getAllRequisitionTemplates(Requisition requisition, Map params) {
