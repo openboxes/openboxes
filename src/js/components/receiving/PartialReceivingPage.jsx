@@ -191,6 +191,14 @@ const FIELDS = {
           formatValue: value => (value ? value.toLocaleString('en-US') : '0'),
         },
       },
+      quantityRemaining: {
+        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        label: 'Remaining',
+        fixedWidth: '75px',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
       quantityReceiving: {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',

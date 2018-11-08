@@ -123,6 +123,7 @@ body {
 }
 
 .form-group {
+  font-size: .885rem;
   &.required {
     .col-form-label:after {
       content: "*";

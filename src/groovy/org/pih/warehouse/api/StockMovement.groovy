@@ -11,6 +11,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
 enum StockMovementType {
@@ -115,7 +116,7 @@ class StockMovement {
     }
 
     /**
-     * Return the status of the associated requisition.
+     * Return the requisition status of the stock movement.
      *
      * @return
      */
@@ -123,6 +124,15 @@ class StockMovement {
         return requisition?.status
     }
 
+    /**
+     * Return the receipt status of the associated stock movement.
+     *
+     * @return
+     */
+    ShipmentStatusCode getShipmentStatusCode() {
+        return shipment?.status?.code?:ShipmentStatusCode.PENDING
+
+    }
 
     /**
      * “FROM.TO.DATEREQUESTED.STOCKLIST.TRACKING#.DESCRIPTION”

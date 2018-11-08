@@ -300,19 +300,18 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Sends data with shipment details.
+   * Saves data with shipment details.
    * @param {object} values
    * @public
    */
-  sendShipment(values) {
+  saveShipment(values) {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
     const payload = {
-      id: this.state.values.stockMovementId,
       dateShipped: values.dateShipped,
       'shipmentType.id': values.shipmentType,
-      trackingNumber: values.trackingNumber,
-      driverName: values.driverName,
-      comments: values.comments,
+      trackingNumber: values.trackingNumber || '',
+      driverName: values.driverName || '',
+      comments: values.comments || '',
     };
 
     return apiClient.post(url, payload);
@@ -343,7 +342,7 @@ class SendMovementPage extends Component {
           .catch(() => Alert.error('Error occured during file upload!'));
       });
     }
-    this.sendShipment(values)
+    this.saveShipment(values)
       .then(() => {
         this.stateTransitionToIssued()
           .then(() => {
@@ -413,6 +412,14 @@ class SendMovementPage extends Component {
                 </div>
               </div>
               <hr />
+              <button
+                type="button"
+                onClick={() => this.saveShipment(values)}
+                className="btn btn-outline-secondary float-right btn-form btn-xs"
+                disabled={invalid || values.statusCode === 'ISSUED'}
+              >
+                <span><i className="fa fa-save pr-2" />Save</span>
+              </button>
               <div className="col-md-9 pl-0">
                 {_.map(FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {

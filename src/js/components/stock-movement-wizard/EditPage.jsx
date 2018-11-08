@@ -47,7 +47,7 @@ const FIELDS = {
       },
       productName: {
         type: LabelField,
-        flexWidth: '6',
+        flexWidth: '4.5',
         label: 'Product Name',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
@@ -78,6 +78,14 @@ const FIELDS = {
         },
         attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
+        },
+      },
+      totalMonthlyQuantity: {
+        type: LabelField,
+        label: 'Total monthly quantity',
+        flexWidth: '1.35',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
       quantityConsumed: {
@@ -274,7 +282,8 @@ class EditItemsPage extends Component {
             revision => revision.requisitionItemId === item.requisitionItemId,
           );
           return _.isEmpty(oldRevision) ? true :
-            (oldRevision.quantityRevised !== item.quantityRevised);
+            ((oldRevision.quantityRevised !== item.quantityRevised) ||
+             (oldRevision.reasonCode !== item.reasonCode));
         }
         return false;
       },
@@ -439,7 +448,7 @@ class EditItemsPage extends Component {
         validate={validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
             <span>
               <button
@@ -451,7 +460,6 @@ class EditItemsPage extends Component {
               </button>
               <button
                 type="button"
-                disabled={invalid}
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >

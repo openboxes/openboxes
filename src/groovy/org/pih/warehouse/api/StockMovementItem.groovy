@@ -353,6 +353,7 @@ class EditPageItem {
     Integer quantityRequested
     //Integer quantityAvailable
     Integer quantityConsumed
+    Integer totalMonthlyQuantity
     Integer sortOrder
 
     List<AvailableItem> availableItems
@@ -402,22 +403,23 @@ class EditPageItem {
 
     Map toJson() {
         return [
-                requisitionItemId: requisitionItem.id,
-                statusCode       : requisitionItem.status.name(),
-                reasonCode       : requisitionItem?.cancelReasonCode,
-                comments         : requisitionItem?.cancelComments,
-                productId        : productId,
-                productCode      : productCode,
-                productName      : productName,
-                minExpirationDate: minExpirationDate?.format("MM/dd/yyyy"),
-                quantityRequested: quantityRequested,
-                quantityRevised  : quantityRevised,
-                quantityConsumed : quantityConsumed,
-                quantityAvailable: quantityAvailable,
+                requisitionItemId     : requisitionItem.id,
+                statusCode            : requisitionItem.status.name(),
+                reasonCode            : requisitionItem?.cancelReasonCode,
+                comments              : requisitionItem?.cancelComments,
+                productId             : productId,
+                productCode           : productCode,
+                productName           : productName,
+                minExpirationDate     : minExpirationDate?.format("MM/dd/yyyy"),
+                quantityRequested     : quantityRequested,
+                quantityRevised       : quantityRevised,
+                quantityConsumed      : quantityConsumed,
+                quantityAvailable     : quantityAvailable,
+                totalMonthlyQuantity  : totalMonthlyQuantity,
                 substitutionStatus    : substitutionStatusCode,
                 availableSubstitutions: availableSubstitutions,
                 substitutionItems     : substitutionItems,
-                sortOrder        : sortOrder
+                sortOrder             : sortOrder
         ]
     }
 }

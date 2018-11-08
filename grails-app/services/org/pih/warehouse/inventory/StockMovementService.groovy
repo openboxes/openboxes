@@ -382,6 +382,7 @@ class StockMovementService {
             picklistItem.quantity = quantity
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
+            picklistItem.sortOrder = stockMovementItem.sortOrder
         }
         picklist.save(flush: true)
     }
@@ -494,6 +495,7 @@ class StockMovementService {
         EditPage editPage = new EditPage()
         StockMovement stockMovement = getStockMovement(id)
         stockMovement.lineItems.each { stockMovementItem ->
+            stockMovementItem.stockMovement = stockMovement
             EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
             editPage.editPageItems.addAll(editPageItem)
         }
@@ -518,7 +520,9 @@ class StockMovementService {
 
         StockMovement stockMovement = getStockMovement(id)
         Set<PackPageItem> packPageItems = new LinkedHashSet<PackPageItem>()
-        stockMovement.requisition?.picklist?.picklistItems?.each { PicklistItem picklistItem ->
+        stockMovement.requisition?.picklist?.picklistItems?.sort { a, b ->
+            a.sortOrder <=> b.sortOrder ?: a.id <=> b.id
+        }?.each { PicklistItem picklistItem ->
             packPageItems.addAll(getPackPageItems(picklistItem))
         }
 
@@ -557,10 +561,23 @@ class StockMovementService {
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
         List<SubstitutionItem> availableSubstitutions = getAvailableSubstitutions(location, requisitionItem.product)
         List<SubstitutionItem> substitutionItems = getSubstitutionItems(location, requisitionItem)
+
+
+        // Calculate total monthly quantity
+        Integer totalMonthlyQuantity
+        StockMovement stockMovement = stockMovementItem.stockMovement
+
+        Requisition stocklist = requisitionService.getRequisitionTemplate(stockMovement.origin, stockMovement.destination)
+        if (stocklist) {
+            totalMonthlyQuantity =
+                    stocklist.requisitionItems.findAll { it?.product?.id == requisitionItem?.product?.id }.sum { it.quantity }
+        }
+
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
+        editPageItem.totalMonthlyQuantity = totalMonthlyQuantity
         editPageItem.quantityRequested = requisitionItem.quantity
         editPageItem.quantityConsumed = null
         editPageItem.availableSubstitutions = availableSubstitutions
@@ -882,6 +899,8 @@ class StockMovementService {
         shipment.destination = stockMovement.destination
         shipment.requisition = stockMovement.requisition
         shipment.shipmentNumber = stockMovement.identifier
+        shipment.additionalInformation = stockMovement.comments
+        shipment.driverName = stockMovement.driverName
 
         // These values need defaults since they are not set until step 6
         shipment.expectedShippingDate = stockMovement.dateShipped?:new Date()
@@ -896,29 +915,29 @@ class StockMovementService {
             return shipment
         }
 
-        if (stockMovement.comments) {
-            shipment.additionalInformation = stockMovement.comments
-        }
-
         if (stockMovement.trackingNumber) {
             ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
             if (!trackingNumberType) {
                 throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
             }
+
+            // Needed to use ID since reference numbers is lazy loaded and equality operation was not working
             ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
-                refNum.referenceNumberType == trackingNumberType
+                trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
             }
 
+            // Create a new reference number
             if (!referenceNumber) {
                 referenceNumber = new ReferenceNumber()
+                referenceNumber.identifier = stockMovement.trackingNumber
                 referenceNumber.referenceNumberType = trackingNumberType
                 shipment.addToReferenceNumbers(referenceNumber)
             }
-            referenceNumber.identifier = stockMovement.trackingNumber
-        }
-
-        if (stockMovement.driverName) {
-            shipment.driverName = stockMovement.driverName
+            // Update the existing reference number
+            else {
+                referenceNumber.identifier = stockMovement.trackingNumber
+            }
+            shipment.save(failOnError: true)
         }
 
         if (stockMovement.origin.isSupplier()) {
