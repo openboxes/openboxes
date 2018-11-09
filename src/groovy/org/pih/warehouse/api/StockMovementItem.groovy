@@ -156,10 +156,17 @@ class StockMovementItem {
 
     static StockMovementItem createFromRequisitionItem(RequisitionItem requisitionItem) {
 
-        List<StockMovementItem> substitutionItems = requisitionItem?.substitutionItems ?
-                requisitionItem.substitutionItems.collect {
-            return StockMovementItem.createFromRequisitionItem(it)
-        } : []
+        List<StockMovementItem> substitutionItems = []
+
+        if (requisitionItem.substitutionItem) {
+            substitutionItems.push(StockMovementItem.createFromRequisitionItem(requisitionItem.substitutionItem))
+        }
+        else if (requisitionItem.substitutionItems) {
+            substitutionItems = requisitionItem?.substitutionItems ?
+                    requisitionItem.substitutionItems.collect {
+                return StockMovementItem.createFromRequisitionItem(it)
+            } : []
+        }
 
         return new StockMovementItem(
                 id: requisitionItem.id,
