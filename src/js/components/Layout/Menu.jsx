@@ -61,7 +61,7 @@ const Menu = ({ hasBinLocationSupport }) => {
 };
 
 const mapStateToProps = state => ({
-  hasBinLocationSupport: state.location.currentLocation.hasBinLocationSupport,
+  hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
 });
 
 export default connect(mapStateToProps)(Menu);

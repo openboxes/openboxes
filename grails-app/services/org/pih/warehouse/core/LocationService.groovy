@@ -59,7 +59,7 @@ class LocationService {
 		return getLocations(null, [:])
 	}
 
-	def getLocations(String [] fields, Map params, Boolean isSuperuser, direction, currentLocation) {
+	def getLocations(String [] fields, Map params) {
 
 		LocationTypeCode locationTypeCode = params.locationTypeCode?:null
 
@@ -85,6 +85,13 @@ class LocationService {
 			eq("active", Boolean.TRUE)
 			isNull("parentLocation")
 		}
+		return locations
+	}
+
+	def getLocations(String [] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation) {
+
+		def locations = new HashSet()
+		locations += getLocations(null, [:])
 
 		if (!isSuperuser) {
 			if (direction == "INBOUND") {

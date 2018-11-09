@@ -332,8 +332,8 @@ class CreateStockMovement extends Component {
 }
 
 const mapStateToProps = state => ({
-  location: state.location.currentLocation,
-  isSuperuser: state.location.isSuperuser,
+  location: state.session.currentLocation,
+  isSuperuser: state.session.isSuperuser,
 });
 
 export default withRouter(connect(mapStateToProps, {

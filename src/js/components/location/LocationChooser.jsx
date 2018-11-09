@@ -99,7 +99,7 @@ class LocationChooser extends Component {
 }
 
 const mapStateToProps = state => ({
-  currentLocationName: state.location.currentLocation.name,
+  currentLocationName: state.session.currentLocation.name,
 });
 
 export default connect(mapStateToProps, {
