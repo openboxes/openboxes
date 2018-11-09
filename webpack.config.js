@@ -1,8 +1,8 @@
-const webpack = require('webpack');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, 'src');
 const SRC = path.resolve(ROOT, 'js');
+const DEST = path.resolve(__dirname, 'web-app');
 const ASSETS = path.resolve(ROOT, 'assets');
 const JS_DEST = path.resolve(__dirname, 'web-app/js');
 const CSS_DEST = path.resolve(__dirname, 'web-app/css');
@@ -11,32 +11,30 @@ const STOCK_MOVEMENT_VIEW = path.resolve(GRAILS_VIEWS, 'stockMovement');
 const PUT_AWAY_VIEW = path.resolve(GRAILS_VIEWS, 'putAway');
 const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
 
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  devtool: 'cheap-module-source-map',
   entry: {
     app: `${SRC}/index.jsx`,
   },
   output: {
-    path: JS_DEST,
-    filename: 'bundle.[hash].js',
-    publicPath: '/js/',
+    path: DEST,
+    filename: 'js/bundle.[hash].js',
+    chunkFilename: 'js/bundle.[hash].[name].js',
+    publicPath: '/openboxes/',
   },
   stats: {
     colors: true,
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery',
+    new MiniCssExtractPlugin({
+      filename: 'css/bundle.[hash].css',
+      chunkFilename: 'css/bundle.[hash].[name].css',
     }),
-    new ExtractTextPlugin({
-      filename: '../css/bundle.[hash].css',
-      allChunks: true,
-    }),
+    new OptimizeCSSAssetsPlugin({}),
     new CleanWebpackPlugin([`${JS_DEST}/bundle.*`, `${CSS_DEST}/bundle.*`]),
     new HtmlWebpackPlugin({
       filename: `${STOCK_MOVEMENT_VIEW}/_create.gsp`,
@@ -74,31 +72,39 @@ module.exports = {
     }),
   ],
   module: {
-    loaders: [
+    rules: [
       {
         enforce: 'pre',
         test: /\.jsx$/,
         exclude: /node_modules/,
-        loaders: ['eslint-loader'],
+        loader: 'eslint-loader',
       },
       {
         test: /\.jsx$/,
-        loaders: ['babel-loader?presets[]=es2015&presets[]=react&presets[]=stage-1'],
+        loader: 'babel-loader?presets[]=es2015&presets[]=react&presets[]=stage-1',
         include: SRC,
         exclude: /node_modules/,
       },
       {
-        test: /\.scss$/,
-        use: ExtractTextPlugin.extract('css-loader!sass-loader'),
+        test: /\.(sa|sc|c)ss$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
       {
-        test: /\.css$/,
-        use: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader'] }),
+        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'file-loader?name=./fonts/[hash].[ext]',
       },
-      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, use: 'file-loader?name=./fonts/[hash].[ext]' },
-      { test: /\.(woff|woff2)$/, use: 'url-loader?prefix=font/&limit=5000&name=./fonts/[hash].[ext]' },
-      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=application/octet-stream&name=./fonts/[hash].[ext]' },
-      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, use: 'url-loader?limit=10000&mimetype=image/svg+xml&name=./fonts/[hash].[ext]' },
+      {
+        test: /\.(woff|woff2)$/,
+        loader: 'url-loader?prefix=font/&limit=5000&name=./fonts/[hash].[ext]',
+      },
+      {
+        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url-loader?limit=10000&mimetype=application/octet-stream&name=./fonts/[hash].[ext]',
+      },
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url-loader?limit=10000&mimetype=image/svg+xml&name=./fonts/[hash].[ext]',
+      },
     ],
   },
   resolve: {

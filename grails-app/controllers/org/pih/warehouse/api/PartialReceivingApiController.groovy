@@ -90,6 +90,7 @@ class PartialReceivingApiController {
                 String shipmentItemId = shipmentItemMap.get("shipmentItemId")
                 String receiptItemId = shipmentItemMap.get("receiptItemId")
                 boolean newLine = Boolean.valueOf(shipmentItemMap.newLine ?: "false")
+                boolean originalLine = Boolean.valueOf(shipmentItemMap.originalLine ?: "false")
                 PartialReceiptItem partialReceiptItem = partialReceiptContainer.partialReceiptItems.find {
                     receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId
                 }
@@ -102,6 +103,8 @@ class PartialReceivingApiController {
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
                 bindData(partialReceiptItem, shipmentItemMap)
+
+                partialReceiptItem.shouldSave = newLine || originalLine || partialReceiptItem.quantityReceiving != null || partialReceiptItem.receiptItem
             }
         }
     }

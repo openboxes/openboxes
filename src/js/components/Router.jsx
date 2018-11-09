@@ -4,22 +4,36 @@ import PropTypes from 'prop-types';
 import { BrowserRouter, Switch } from 'react-router-dom';
 import { ClimbingBoxLoader } from 'react-spinners';
 import Alert from 'react-s-alert';
+import Loadable from 'react-loadable';
 
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
 
-import StockMovement from './stock-movement-wizard/StockMovement';
-import ReceivingPage from './receiving/ReceivingPage';
 import MainLayoutRoute from './Layout/MainLayoutRoute';
-import PutAwayMainPage from './put-away/PutAwayMainPage';
+import Loading from './Loading';
+
+const AsyncStockMovement = Loadable({
+  loader: () => import('./stock-movement-wizard/StockMovement'),
+  loading: Loading,
+});
+
+const AsyncReceivingPage = Loadable({
+  loader: () => import('./receiving/ReceivingPage'),
+  loading: Loading,
+});
+
+const AsyncPutAwayMainPage = Loadable({
+  loader: () => import('./put-away/PutAwayMainPage'),
+  loading: Loading,
+});
 
 const Router = props => (
   <div>
     <BrowserRouter>
       <Switch>
-        <MainLayoutRoute path="/**/putAway" component={PutAwayMainPage} />
-        <MainLayoutRoute path="/**/stockMovement/index/:stockMovementId?" component={StockMovement} />
-        <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={ReceivingPage} />
+        <MainLayoutRoute path="/**/putAway" component={AsyncPutAwayMainPage} />
+        <MainLayoutRoute path="/**/stockMovement/index/:stockMovementId?" component={AsyncStockMovement} />
+        <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
       </Switch>
     </BrowserRouter>
     <div className="spinner-container">
