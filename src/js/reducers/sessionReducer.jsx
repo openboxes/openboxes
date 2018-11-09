@@ -8,8 +8,8 @@ const initialState = {
     name: '',
     hasBinLocationSupport: true,
     locationType: { description: '', locationTypeCode: '' },
-    isSuperuser: false,
   },
+  isSuperuser: false,
 };
 
 export default function (state = initialState, action) {

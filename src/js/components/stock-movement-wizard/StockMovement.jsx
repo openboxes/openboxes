@@ -11,7 +11,7 @@ import PackingPage from './PackingPage';
 import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
 import apiClient from '../../utils/apiClient';
-import { fetchCurrentLocation, showSpinner, hideSpinner } from '../../actions';
+import { fetchSessionInfo, showSpinner, hideSpinner } from '../../actions';
 
 /** Main stock movement form's wizard component. */
 class StockMovements extends Component {
@@ -31,7 +31,7 @@ class StockMovements extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchCurrentLocation();
+    this.props.fetchSessionInfo();
     this.fetchInitialValues();
   }
 
@@ -230,7 +230,7 @@ class StockMovements extends Component {
   }
 }
 
-export default connect(null, { fetchCurrentLocation, showSpinner, hideSpinner })(StockMovements);
+export default connect(null, { fetchSessionInfo, showSpinner, hideSpinner })(StockMovements);
 
 StockMovements.propTypes = {
   /** React router's object which contains information about url varaiables and params */
@@ -244,7 +244,7 @@ StockMovements.propTypes = {
   /** Initial components' data */
   initialValues: PropTypes.shape({}),
   /** Function called to get the currently selected location */
-  fetchCurrentLocation: PropTypes.func.isRequired,
+  fetchSessionInfo: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {

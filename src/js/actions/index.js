@@ -42,7 +42,7 @@ export function fetchUsers() {
   };
 }
 
-export function fetchCurrentLocation() {
+export function fetchSessionInfo() {
   const url = '/openboxes/api/getSession';
   const request = apiClient.get(url);
 
