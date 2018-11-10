@@ -95,6 +95,10 @@ class StockMovementService {
 
         Requisition requisition = updateRequisition(stockMovement, forceUpdate)
 
+        if (stockMovement.origin.isSupplier()) {
+            stockMovement = StockMovement.createFromRequisition(requisition)
+        }
+
         log.info "Date shipped: " + stockMovement.dateShipped
         if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status || RequisitionStatus.ISSUED == requisition.status) {
             log.info "Creating shipment for stock movement ${stockMovement}"
@@ -952,25 +956,11 @@ class StockMovementService {
 
         if (stockMovement.origin.isSupplier()) {
             stockMovement.lineItems.collect { StockMovementItem stockMovementItem ->
-                log.info "Process stock movement item " + (new JSONObject(stockMovementItem.toJson())).toString(4)
-
-                if (stockMovementItem.delete) {
-                    log.info "Delete item ${stockMovementItem}"
-                    ShipmentItem shipmentItem = ShipmentItem.get(stockMovementItem?.id)
-                    if (shipmentItem) {
-                        Shipment s = shipmentItem.shipment
-                        s.removeFromShipmentItems(shipmentItem)
-                        s.save()
-                        shipmentItem.delete()
-                    }
-                }
-                else {
-                    log.info "Create or update item ${stockMovementItem.toJson()}"
-                    Container container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
-                    ShipmentItem shipmentItem = createOrUpdateShipmentItem(stockMovementItem)
-                    shipmentItem.container = container
-                    shipment.addToShipmentItems(shipmentItem)
-                }
+                log.info "Create or update item ${stockMovementItem.toJson()}"
+                Container container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
+                ShipmentItem shipmentItem = createOrUpdateShipmentItem(stockMovementItem)
+                shipmentItem.container = container
+                shipment.addToShipmentItems(shipmentItem)
             }
         } else if (stockMovement.packPage?.packPageItems) {
             stockMovement.packPage.packPageItems.each { PackPageItem packPageItem ->
