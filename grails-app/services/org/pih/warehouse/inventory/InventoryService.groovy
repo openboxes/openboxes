@@ -1010,7 +1010,7 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	List<Product> getProductsByTermsAndCategories(terms, categories, showHidden, currentInventory, maxResults, offset) {
 		def startTime = System.currentTimeMillis()
-        def products = Product.createCriteria().list(max: maxResults, offset: offset) {
+        def products = Product.createCriteria().listDistinct {
             createAlias('productSuppliers', 'ps', CriteriaSpecification.LEFT_JOIN)
             createAlias('inventoryItems', 'ii', CriteriaSpecification.LEFT_JOIN)
 
@@ -1022,10 +1022,6 @@ class InventoryService implements ApplicationContextAware {
                 and {
                     terms.each { term ->
                         or {
-                            //inventoryItems {
-                            //    ilike('lotNumber', "%" + term + "%")
-                            //}
-                            //ilike('inventoryLevels.binLocation', "%" + term + "%")
                             ilike("name", "%" + term + "%")
                             ilike("description", "%" + term + "%")
                             ilike("brandName", "%" +term + "%")
@@ -1054,8 +1050,6 @@ class InventoryService implements ApplicationContextAware {
             order("name", "asc")
         }
         log.info "Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        products = products.unique()
 
 		return products;
 	}

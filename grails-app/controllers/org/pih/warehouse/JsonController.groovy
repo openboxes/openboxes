@@ -1177,17 +1177,17 @@ class JsonController {
         items.addAll(products)
 
 		items.unique{ it.id }
-		def json = items.collect{
-            def quantity = quantityMap[it]?:0
-            def manufuacturerInfo = it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}" + "," + it.manufacturerCode
-
-			def type = it.class.simpleName.toLowerCase()
-			[   id: it.id,
-                type: it.class,
-                url: request.contextPath + "/" + type  + "/redirect/" + it.id,
-				value: it.name,
-                label: it.productCode + " " + it.name + " (" + manufuacturerInfo + ") x " + quantity + " " + (it?.unitOfMeasure?:"EA") ]
-		}
+		def json = items.collect {
+            def quantity = quantityMap[it] ?: 0
+            def type = it.class.simpleName.toLowerCase()
+            [
+                    id   : it.id,
+                    type : it.class,
+                    url  : request.contextPath + "/" + type + "/redirect/" + it.id,
+                    value: it.name,
+                    label: it.productCode + " " + it.name + " x " + quantity + " " + (it?.unitOfMeasure ?: "EA")
+            ]
+        }
 		render json as JSON
 	}
 
