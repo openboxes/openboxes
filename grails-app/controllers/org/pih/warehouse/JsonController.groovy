@@ -1165,29 +1165,29 @@ class JsonController {
 		def items = []
         def quantityMap = [:]
 		def terms = params.term?.split(" ")
-        def location = Location.get(session.warehouse.id)
+
         // Get all products that match terms
-        def products = inventoryService.getProductsByTermsAndCategories(terms, [], true, location.inventory, 25, 0)
+        def products = inventoryService.searchProducts(terms, [])
 
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
         if (products) {
+            def location = Location.get(session.warehouse.id)
             quantityMap = getQuantityByProductMapCached(location, products);
             log.info "Quantity map: " + quantityMap?.size()
         }
         items.addAll(products)
-
 		items.unique{ it.id }
-		def json = items.collect{
-            def quantity = quantityMap[it]?:0
-            def manufuacturerInfo = it.manufacturer?it.manufacturer.trim():"${warehouse.message(code:'default.none.label')}" + "," + it.manufacturerCode
-
-			def type = it.class.simpleName.toLowerCase()
-			[   id: it.id,
-                type: it.class,
-                url: request.contextPath + "/" + type  + "/redirect/" + it.id,
-				value: it.name,
-                label: it.productCode + " " + it.name + " (" + manufuacturerInfo + ") x " + quantity + " " + (it?.unitOfMeasure?:"EA") ]
-		}
+		def json = items.collect {
+            def quantity = quantityMap[it] ?: 0
+            def type = it.class.simpleName.toLowerCase()
+            [
+                    id   : it.id,
+                    type : it.class,
+                    url  : request.contextPath + "/" + type + "/redirect/" + it.id,
+                    value: it.name,
+                    label: it.productCode + " " + it.name + " x " + quantity + " " + (it?.unitOfMeasure ?: "EA")
+            ]
+        }
 		render json as JSON
 	}
 
