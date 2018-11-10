@@ -1001,6 +1001,61 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
+
+    /**
+     * Get all products matching the given terms and categories.
+     *
+     * @param terms
+     * @param categories
+     * @return
+     */
+    List<Product> searchProducts(String[] terms, List<Category> categories) {
+        def startTime = System.currentTimeMillis()
+        def products = Product.createCriteria().listDistinct {
+            createAlias('productSuppliers', 'ps', CriteriaSpecification.LEFT_JOIN)
+            createAlias('inventoryItems', 'ii', CriteriaSpecification.LEFT_JOIN)
+
+            eq("active", true)
+            if(categories) {
+                inList("category", categories)
+            }
+            if (terms) {
+                and {
+                    terms.each { term ->
+                        or {
+                            ilike("name", "%" + term + "%")
+                            ilike("description", "%" + term + "%")
+                            ilike("brandName", "%" +term + "%")
+                            ilike("manufacturer", "%" +term + "%")
+                            ilike("manufacturerCode", "%" +term + "%")
+                            ilike("manufacturerName", "%" + term + "%")
+                            ilike("vendor", "%" + term + "%")
+                            ilike("vendorCode", "%" + term + "%")
+                            ilike("vendorName", "%" + term + "%")
+                            ilike("upc", "%" + term + "%")
+                            ilike("ndc", "%" + term + "%")
+                            ilike("unitOfMeasure", "%" + term + "%")
+                            ilike("productCode", "%" + term + "%")
+                            ilike("ps.name", "%" + term + "%")
+                            ilike("ps.code", "%" + term + "%")
+                            ilike("ps.productCode", "%" + term + "%")
+                            ilike("ps.manufacturerCode", "%" + term + "%")
+                            ilike("ps.manufacturerName", "%" + term + "%")
+                            ilike("ps.supplierCode", "%" + term + "%")
+                            ilike("ps.supplierName", "%" + term + "%")
+                            ilike("ii.lotNumber", "%" + term + "%")
+                        }
+                    }
+                }
+            }
+            order("name", "asc")
+        }
+        log.info "Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
+
+        return products;
+    }
+
+
 	/**
 	 * Get all products matching the given terms and categories.
 	 * 
@@ -1010,7 +1065,7 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	List<Product> getProductsByTermsAndCategories(terms, categories, showHidden, currentInventory, maxResults, offset) {
 		def startTime = System.currentTimeMillis()
-        def products = Product.createCriteria().listDistinct {
+        def products = Product.createCriteria().list(max: maxResults, offset: offset) {
             createAlias('productSuppliers', 'ps', CriteriaSpecification.LEFT_JOIN)
             createAlias('inventoryItems', 'ii', CriteriaSpecification.LEFT_JOIN)
 
@@ -1050,6 +1105,8 @@ class InventoryService implements ApplicationContextAware {
             order("name", "asc")
         }
         log.info "Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
+
+        products = products.unique()
 
 		return products;
 	}
