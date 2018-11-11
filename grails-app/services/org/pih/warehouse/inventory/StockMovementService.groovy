@@ -553,6 +553,23 @@ class StockMovementService {
         return pickPageItems
     }
 
+    Integer calculateTotalMonthlyQuantity(StockMovementItem stockMovementItem) {
+        Integer totalMonthlyQuantity = 0
+        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
+        StockMovement stockMovement = stockMovementItem.stockMovement
+        List<Requisition> stocklists = requisitionService.getRequisitionTemplates(stockMovement.origin, stockMovement.destination)
+        if (stocklists) {
+            stocklists.each { stocklist ->
+                // Find matching stocklist items and sum them up
+                def stocklistItems = stocklist.requisitionItems.findAll { it?.product?.id == requisitionItem?.product?.id }
+                if (stocklistItems) {
+                    totalMonthlyQuantity += stocklistItems.sum { it.quantity }
+                }
+            }
+        }
+        return totalMonthlyQuantity
+    }
+
 
     EditPageItem buildEditPageItem(StockMovementItem stockMovementItem) {
         EditPageItem editPageItem = new EditPageItem()
@@ -564,14 +581,7 @@ class StockMovementService {
 
 
         // Calculate total monthly quantity
-        Integer totalMonthlyQuantity
-        StockMovement stockMovement = stockMovementItem.stockMovement
-
-        Requisition stocklist = requisitionService.getRequisitionTemplate(stockMovement.origin, stockMovement.destination)
-        if (stocklist) {
-            totalMonthlyQuantity =
-                    stocklist.requisitionItems.findAll { it?.product?.id == requisitionItem?.product?.id }.sum { it.quantity }
-        }
+        Integer totalMonthlyQuantity = calculateTotalMonthlyQuantity(stockMovementItem)
 
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id

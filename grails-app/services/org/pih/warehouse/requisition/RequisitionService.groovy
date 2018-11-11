@@ -159,8 +159,8 @@ class RequisitionService {
      * @param destination
      * @return
      */
-    def getRequisitionTemplate(Location origin, Location destination) {
-        return Requisition.createCriteria().get {
+    List<Requisition> getRequisitionTemplates(Location origin, Location destination) {
+        return Requisition.createCriteria().list {
             eq("isTemplate", Boolean.TRUE)
             eq("isPublished", Boolean.TRUE)
             eq("origin", origin)

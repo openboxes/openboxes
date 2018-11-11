@@ -36,7 +36,8 @@
         <div class="right">
 
             <div class="button-group">
-                <g:link controller="stockMovement" action="list" params="['requestedBy.id':session?.user?.id]" class="button icon user">
+                <g:link controller="stockMovement" action="list" params="['requestedBy.id':session?.user?.id]" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}" />&nbsp;
                     ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}
                     (${statistics["MINE"]?:0 })
                 </g:link>
@@ -60,7 +61,7 @@
 
         <div class="button-group">
             <g:link controller="stockMovement" action="list" class="button">
-                <img src="${resource(dir: 'images/icons/silk', file: 'text_list_bullets.png')}" />&nbsp;
+                <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                 <warehouse:message code="default.button.list.label" />
             </g:link>
             <g:link controller="stockMovement" action="index" class="button">
