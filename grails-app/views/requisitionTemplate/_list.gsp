@@ -58,7 +58,7 @@
 	<tbody>
         <g:unless test="${requisitions}">
            	<tr class="prop odd">
-           		<td colspan="12" class="center">
+           		<td colspan="13" class="center">
                     <div class="empty">
            			    <warehouse:message code="requisition.noRequisitionsMatchingCriteria.message"/>
                     </div>
