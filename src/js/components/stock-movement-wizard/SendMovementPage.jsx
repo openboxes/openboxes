@@ -8,6 +8,8 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { confirmAlert } from 'react-confirm-alert';
 
+import 'react-confirm-alert/src/react-confirm-alert.css';
+
 import { renderFormField } from '../../utils/form-utils';
 import { showSpinner, hideSpinner } from '../../actions';
 import apiClient from '../../utils/apiClient';
