@@ -84,14 +84,11 @@ const FIELDS = {
           title: 'Edit Pick',
         },
         getDynamicAttr: ({
-          fieldValue, selectedValue, subfield, stockMovementId,
-          checkForInitialPicksChanges, onResponse,
+          fieldValue, subfield, stockMovementId, onResponse,
         }) => ({
-          productCode: selectedValue,
           fieldValue,
           subfield,
           stockMovementId,
-          checkForInitialPicksChanges,
           btnOpenText: fieldValue.hasChangedPick ? '' : 'Edit',
           btnOpenClassName: fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse,
@@ -106,17 +103,13 @@ const FIELDS = {
           title: 'Adjust Inventory',
         },
         getDynamicAttr: ({
-          fieldValue, selectedValue, subfield, stockMovementId,
-          checkForInitialPicksChanges, onResponse, bins, locationId,
+          fieldValue, subfield, stockMovementId, onResponse, bins, locationId,
         }) => ({
-          product: selectedValue,
           fieldValue,
           subfield,
           stockMovementId,
-          checkForInitialPicksChanges,
           btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
-          btnOpenDisabled: true,
           onResponse,
           bins,
           locationId,
@@ -384,7 +377,6 @@ class PickPage extends Component {
             </span>
             <form onSubmit={handleSubmit} className="print-mt">
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                  checkForInitialPicksChanges: this.checkForInitialPicksChanges,
                   stockMovementId: values.stockMovementId,
                   onResponse: this.saveNewItems,
                   revertUserPick: this.revertUserPick,

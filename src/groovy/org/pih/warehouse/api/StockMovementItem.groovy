@@ -448,6 +448,7 @@ class PickPageItem {
                 "requisitionItem.id": requisitionItem?.id,
                 "product.name"      : requisitionItem?.product?.name,
                 productCode         : requisitionItem?.product?.productCode,
+                productId           : requisitionItem?.product?.id,
                 reasonCode          : requisitionItem?.cancelReasonCode,
                 comments            : requisitionItem?.cancelComments,
                 quantityRequested   : requisitionItem.quantity,
