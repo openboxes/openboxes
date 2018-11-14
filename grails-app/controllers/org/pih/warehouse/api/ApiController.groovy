@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
@@ -19,6 +19,7 @@ class ApiController {
 
     def dataSource
     def userService
+    def grailsApplication
 
     def login = {
         def username = request.JSON.username
@@ -46,7 +47,19 @@ class ApiController {
     def getSession = {
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
-        render ([data:[user:user, location:location]] as JSON)
+        boolean isSuperuser = userService.isSuperuser(session?.user)
+        boolean isUserAdmin = userService.isUserAdmin(session?.user)
+        def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
+        def menuConfig = grailsApplication.config.openboxes.megamenu
+        render ([
+            data:[
+                user:user,
+                location:location,
+                isSuperuser: isSuperuser,
+                isUserAdmin: isUserAdmin,
+                supportedActivities: supportedActivities,
+                menuConfig: menuConfig]
+        ] as JSON)
     }
 
 
@@ -68,5 +81,5 @@ class ApiController {
         }
 		render ([status: "OK", database: [status: databaseStatus, message: databaseStatusMessage?:""] ] as JSON)
 	}
-	
+
 }
