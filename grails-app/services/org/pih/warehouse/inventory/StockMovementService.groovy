@@ -704,9 +704,11 @@ class StockMovementService {
                     } else if (stockMovementItem.revert) {
                         log.info "Item reverted " + requisitionItem.id
                         requisitionItem.undoChanges()
+                        requisitionItem.quantityApproved = requisitionItem.quantity
                     } else if (stockMovementItem.cancel) {
                         log.info "Item canceled " + requisitionItem.id
                         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
+                        requisitionItem.quantityApproved = 0
                     } else if (stockMovementItem.substitute) {
                         log.info "Item substituted " + requisitionItem.id
                         log.info "Substitutions: " + requisitionItem.product.substitutions
@@ -737,6 +739,7 @@ class StockMovementService {
                                         stockMovementItem?.quantityRevised?.intValueExact(),
                                         stockMovementItem.reasonCode,
                                         stockMovementItem.comments)
+                                newItem.quantityApproved = 0
                             }
 
                             requisition.addToRequisitionItems(newItem)
@@ -751,6 +754,7 @@ class StockMovementService {
                                     stockMovementItem.newQuantity?.intValueExact(),
                                     stockMovementItem.reasonCode,
                                     stockMovementItem.comments)
+                            requisitionItem.quantityApproved = 0
                         }
                     } else {
                         log.info "Item updated " + requisitionItem.id
@@ -774,6 +778,7 @@ class StockMovementService {
                                         stockMovementItem?.quantityRevised?.intValueExact(),
                                         stockMovementItem.reasonCode,
                                         stockMovementItem.comments)
+                                requisitionItem.quantityApproved = 0
                             }
                         }
                     }
