@@ -19,6 +19,7 @@ class ApiController {
 
     def dataSource
     def userService
+    def grailsApplication
 
     def login = {
         def username = request.JSON.username
@@ -47,7 +48,18 @@ class ApiController {
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
         boolean isSuperuser = userService.isSuperuser(session?.user)
-        render ([data:[user:user, location:location, isSuperuser:isSuperuser]] as JSON)
+        boolean isUserAdmin = userService.isUserAdmin(session?.user)
+        def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
+        def menuConfig = grailsApplication.config.openboxes.megamenu
+        render ([
+            data:[
+                user:user,
+                location:location,
+                isSuperuser: isSuperuser,
+                isUserAdmin: isUserAdmin,
+                supportedActivities: supportedActivities,
+                menuConfig: menuConfig]
+        ] as JSON)
     }
 
 
@@ -69,5 +81,4 @@ class ApiController {
         }
 		render ([status: "OK", database: [status: databaseStatus, message: databaseStatusMessage?:""] ] as JSON)
 	}
-    
 }

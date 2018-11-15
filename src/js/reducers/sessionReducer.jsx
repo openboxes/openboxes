@@ -10,6 +10,9 @@ const initialState = {
     locationType: { description: '', locationTypeCode: '' },
   },
   isSuperuser: false,
+  isUserAdmin: false,
+  supportedActivities: [],
+  menuConfig: {},
 };
 
 export default function (state = initialState, action) {
@@ -19,6 +22,9 @@ export default function (state = initialState, action) {
         ...state,
         currentLocation: _.get(action, 'payload.data.data.location'),
         isSuperuser: _.get(action, 'payload.data.data.isSuperuser'),
+        isUserAdmin: _.get(action, 'payload.data.data.isUserAdmin'),
+        supportedActivities: _.get(action, 'payload.data.data.supportedActivities'),
+        menuConfig: _.get(action, 'payload.data.data.menuConfig'),
       };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload };
