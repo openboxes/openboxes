@@ -6,6 +6,8 @@ import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 
+import 'react-confirm-alert/src/react-confirm-alert.css';
+
 import ArrayField from '../form-elements/ArrayField';
 import LabelField from '../form-elements/LabelField';
 import { renderFormField } from '../../utils/form-utils';
