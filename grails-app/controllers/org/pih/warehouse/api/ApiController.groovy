@@ -81,5 +81,4 @@ class ApiController {
         }
 		render ([status: "OK", database: [status: databaseStatus, message: databaseStatusMessage?:""] ] as JSON)
 	}
-
 }
