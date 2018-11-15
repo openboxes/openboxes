@@ -704,9 +704,11 @@ class StockMovementService {
                     } else if (stockMovementItem.revert) {
                         log.info "Item reverted " + requisitionItem.id
                         requisitionItem.undoChanges()
+                        requisitionItem.quantityApproved = requisitionItem.quantity
                     } else if (stockMovementItem.cancel) {
                         log.info "Item canceled " + requisitionItem.id
                         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
+                        requisitionItem.quantityApproved = 0
                     } else if (stockMovementItem.substitute) {
                         log.info "Item substituted " + requisitionItem.id
                         log.info "Substitutions: " + requisitionItem.product.substitutions
@@ -719,6 +721,7 @@ class StockMovementService {
                             RequisitionItem newItem = new RequisitionItem()
                             newItem.product = stockMovementItem.newProduct
                             newItem.quantity = stockMovementItem.newQuantity?.intValueExact() > 0 ? stockMovementItem.newQuantity?.intValueExact() : 0
+                            newItem.quantityApproved = stockMovementItem.newQuantity?.intValueExact() > 0 ? stockMovementItem.newQuantity?.intValueExact() : 0
                             newItem.orderIndex = stockMovementItem.sortOrder
                             newItem.recipient = requisitionItem.recipient
                             newItem.palletName = requisitionItem.palletName
@@ -736,6 +739,7 @@ class StockMovementService {
                                         stockMovementItem?.quantityRevised?.intValueExact(),
                                         stockMovementItem.reasonCode,
                                         stockMovementItem.comments)
+                                newItem.quantityApproved = 0
                             }
 
                             requisition.addToRequisitionItems(newItem)
@@ -750,11 +754,15 @@ class StockMovementService {
                                     stockMovementItem.newQuantity?.intValueExact(),
                                     stockMovementItem.reasonCode,
                                     stockMovementItem.comments)
+                            requisitionItem.quantityApproved = 0
                         }
                     } else {
                         log.info "Item updated " + requisitionItem.id
                         if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
-                        if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
+                        if (stockMovementItem.quantityRequested) {
+                            requisitionItem.quantity = stockMovementItem.quantityRequested
+                            requisitionItem.quantityApproved = stockMovementItem.quantityRequested
+                        }
                         if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
@@ -770,6 +778,7 @@ class StockMovementService {
                                         stockMovementItem?.quantityRevised?.intValueExact(),
                                         stockMovementItem.reasonCode,
                                         stockMovementItem.comments)
+                                requisitionItem.quantityApproved = 0
                             }
                         }
                     }
@@ -784,6 +793,7 @@ class StockMovementService {
                     requisitionItem.product = stockMovementItem.product
                     requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                     requisitionItem.quantity = stockMovementItem.quantityRequested
+                    requisitionItem.quantityApproved = stockMovementItem.quantityRequested
                     requisitionItem.recipient = stockMovementItem.recipient
                     requisitionItem.palletName = stockMovementItem.palletName
                     requisitionItem.boxName = stockMovementItem.boxName
