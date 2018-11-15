@@ -4,57 +4,484 @@ const en = {
       label: 'Dashboard',
       link: '/openboxes/dashboard/index',
     },
-    stockMovement: {
-      label: 'Stock Movement',
+    analytics: {
+      label: 'Analytics',
       link: '#',
+      adminOnly: true,
       subsections: {
-        listStockMovements: {
-          label: 'List Stock Movements',
-          link: '/openboxes/stockMovement/list',
+        inventoryBrowser: {
+          label: 'Browse Inventory',
+          link: '/openboxes/inventoryBrowser/index',
         },
-        creteStockMovement: {
-          label: 'Create Stock Movement',
-          link: '/openboxes/stockMovement/index',
+        snapshot: {
+          label: 'Inventory Snapshots',
+          link: '/openboxes/snapshot/list',
         },
       },
     },
-    receiving: {
-      label: 'Receiving',
+    inventory: {
+      label: 'Inventory',
       link: '#',
+      activity: ['MANAGE_INVENTORY'],
       subsections: {
-        receiveStockMovement: {
-          label: 'Receive Stock Movement',
-          link: '/openboxes/stockMovement/list?status=ISSUED&direction=INBOUND',
+        browse: {
+          label: 'Browse Inventory',
+          link: '/openboxes/inventory/browse?resetSearch=true',
         },
-        listPutAways: {
-          label: 'List Put Aways',
-          link: '/openboxes/putAway/list',
+        manage: {
+          label: 'Manage Inventory',
+          link: '/openboxes/inventory/manage',
+        },
+        browseByCategory: {
+          label: 'Browse by Category',
+          link: '/openboxes/inventory/browse?resetSearch=true',
+        },
+        chemicals: {
+          label: 'Chemicals',
+          link: '/openboxes/inventory/browse?subcategoryId=C0000&resetSearch=true&searchPerformed=true&showOutOfStockProducts=on',
+        },
+        drugs: {
+          label: 'Drugs',
+          link: '/openboxes/inventory/browse?subcategoryId=D0000&resetSearch=true&searchPerformed=true&showOutOfStockProducts=on',
+        },
+        facilities: {
+          label: 'Facilities',
+          link: '/openboxes/inventory/browse?subcategoryId=F0000&resetSearch=true&searchPerformed=true&showOutOfStockProducts=on',
+        },
+        itAndCommunicationsEq: {
+          label: 'IT & Communications Equipment',
+          link: '/openboxes/inventory/browse?subcategoryId=I0000&resetSearch=true&searchPerformed=true&showOutOfStockProducts=on',
+        },
+        lab: {
+          label: 'Lab',
+          link: '/openboxes/inventory/browse?subcategoryId=L0000&resetSearch=true&searchPerformed=true&showOutOfStockProducts=on',
+        },
+        medEquipSupply: {
+          label: 'MedEquipSupply',
+          link: '/openboxes/inventory/browse?subcategoryId=M0000&resetSearch=true&searchPerformed=true&showOutOfStockProducts=on',
+        },
+        vehiclesAndParts: {
+          label: 'Vehicles and Parts',
+          link: '/openboxes/inventory/browse?subcategoryId=V0000&resetSearch=true&searchPerformed=true&showOutOfStockProducts=on',
+        },
+      },
+    },
+    orders: {
+      label: 'Orders',
+      link: '#',
+      activity: ['PLACE_ORDER', 'FULFILL_ORDER'],
+      subsections: {
+        purchaseOrdersWorkflow: {
+          label: 'Create order',
+          link: '/openboxes/purchaseOrderWorkflow/index',
+        },
+        orders: {
+          label: 'Order',
+          link: '/openboxes/order/list?orderTypeCode=PURCHASE_ORDER',
+        },
+        completed: {
+          label: 'Completed',
+          link: '/openboxes/order/list?status=COMPLETED',
+        },
+        placed: {
+          label: 'Placed',
+          link: '/openboxes/order/list?status=PLACED',
+        },
+      },
+    },
+    requisitions: {
+      label: 'Requisitions',
+      link: '#',
+      activity: ['PLACE_REQUEST', 'FULFILL_REQUEST'],
+      subsections: {
+        stockRequisition: {
+          label: 'Create stock requisition',
+          link: '/openboxes/requisition/chooseTemplate?type=STOCK',
+        },
+        nonStockRequisition: {
+          label: 'Create non-stock requisition',
+          link: '/openboxes/requisition/create?type=NON_STOCK',
+        },
+        adHocRequisition: {
+          label: 'Create adhoc stock requisition',
+          link: '/openboxes/requisition/create?type=ADHOC',
+        },
+        requisitionList: {
+          label: 'Requisitions',
+          link: '/openboxes/requisition/list',
+        },
+        requisitionsAll: {
+          label: 'All',
+          link: '/openboxes/requisition/list',
+        },
+        requisitionsCreated: {
+          label: 'Created',
+          link: '/openboxes/requisition/list?status=CREATED',
+        },
+        requisitionsChecking: {
+          label: 'Checking',
+          link: '/openboxes/requisition/list?status=CHECKING',
+        },
+        requisitionsIssued: {
+          label: 'Issued',
+          link: '/openboxes/requisition/list?status=ISSUED',
+        },
+      },
+    },
+    inbound: {
+      label: 'Inbound',
+      link: '#',
+      activity: ['RECEIVE_STOCK'],
+      subsections: {
+        create: {
+          label: 'Create Inbound Stock Movement',
+          link: '/openboxes/stockMovement/create',
+        },
+        list: {
+          label: 'List Inbound Stock Movements',
+          link: '/openboxes/stockMovement/list?direction=INBOUND',
         },
         createPutAway: {
           label: 'Create Put Away',
           link: '/openboxes/putAway/index',
+        },
+        listPutAways: {
+          label: 'List Put Aways',
+          link: '/openboxes/order/list?orderTypeCode=TRANSFER_ORDER',
+        },
+        createShipment: {
+          label: 'Create Inbound Shipment',
+          link: '/openboxes/createShipmentWorkflow/createShipment?type=INCOMING',
+        },
+        listShipments: {
+          label: 'Inbound Shipments',
+          link: '/openboxes/shipment/list?type=incoming',
+        },
+        all: {
+          label: 'All',
+          link: '/openboxes/shipment/list?type=incoming',
+        },
+        receiving: {
+          label: 'Receiving',
+          link: '/openboxes/shipment/list?type=incoming&status=PARTIALLY_RECEIVED',
+        },
+        pending: {
+          label: 'Pending',
+          link: '/openboxes/shipment/list?type=incoming&status=PENDING',
+        },
+        received: {
+          label: 'Received',
+          link: '/openboxes/shipment/list?type=incoming&status=RECEIVED',
+        },
+        shipped: {
+          label: 'Shipped',
+          link: '/openboxes/shipment/list?type=incoming&status=SHIPPED',
+        },
+      },
+    },
+    outbound: {
+      label: 'Outbound',
+      link: '#',
+      activity: ['SEND_STOCK'],
+      subsections: {
+        create: {
+          label: 'Create Outbound Stock Movement',
+          link: '/openboxes/stockMovement/create',
+        },
+        list: {
+          label: 'List Outbound Stock Movements',
+          link: '/openboxes/stockMovement/list?direction=OUTBOUND',
+        },
+        createShipment: {
+          label: 'Create Outbound Shipment',
+          link: '/openboxes/createShipmentWorkflow/createShipment?type=OUTGOING',
+        },
+        listShipments: {
+          label: 'Outbound Shipments',
+          link: '/openboxes/shipment/list?type=outgoing',
+        },
+        all: {
+          label: 'All',
+          link: '/openboxes/shipment/list?type=outgoing',
+        },
+        pending: {
+          label: 'Pending',
+          link: '/openboxes/shipment/list?status=PENDING',
+        },
+        received: {
+          label: 'Received',
+          link: '/openboxes/shipment/list?status=RECEIVED',
+        },
+        shipped: {
+          label: 'Shipped',
+          link: '/openboxes/shipment/list?status=SHIPPED',
+        },
+      },
+    },
+    reporting: {
+      label: 'Reporting',
+      link: '#',
+      subsections: {
+        cycleCountReport: {
+          label: 'Cycle Count Report',
+          link: '/openboxes/cycleCount/exportAsCsv',
+        },
+        showBinLocationReport: {
+          label: 'Bin Location Report',
+          link: '/openboxes/report/showBinLocationReport',
+        },
+        inventory: {
+          label: 'Baseline QoH Report',
+          link: '/openboxes/inventory/show',
+        },
+        showTransactionReport: {
+          label: 'Transcription Report',
+          link: '/openboxes/report/showTransactionReport',
+        },
+        consumption: {
+          label: 'Consumption Report',
+          link: '/openboxes/consumption/show',
+        },
+        listDailyTransactions: {
+          label: 'Daily Transactions Report',
+          link: '/openboxes/inventory/listDailyTransactions',
+        },
+        showShippingReport: {
+          label: 'Shipping Report',
+          link: '/openboxes/report/showShippingReport',
+        },
+        showInventorySamplingReport: {
+          label: 'Inventory Sampling Report',
+          link: '/openboxes/report/showInventorySamplingReport',
+        },
+        listExpiredStock: {
+          label: 'Expired stock',
+          link: '/openboxes/inventory/listExpiredStock',
+        },
+        listExpiringStock: {
+          label: 'Expiring stock',
+          link: '/openboxes/inventory/listExpiringStock',
+        },
+        listLowStock: {
+          label: 'Low stock',
+          link: '/openboxes/inventory/listLowStock',
+        },
+        listReorderStock: {
+          label: 'Reorder stock',
+          link: '/openboxes/inventory/listReorderStock',
+        },
+        exportBinLocation: {
+          label: 'Export bin locations',
+          link: '/openboxes/report/exportBinLocation?downloadFormat=csv',
+        },
+        exportAsCsv: {
+          label: 'Export products',
+          link: '/openboxes/product/exportAsCsv',
+        },
+        exportLatestInventoryDate: {
+          label: 'Export latest inventory date',
+          link: '/openboxes/inventory/exportLatestInventoryDate',
+        },
+        inventoryLevelExport: {
+          label: 'Export inventory levels',
+          link: '/openboxes/inventoryLevel/export',
+        },
+        requisitionExport: {
+          label: 'Export requisitions',
+          link: '/openboxes/requisition/export',
+        },
+        requisitionItem: {
+          label: 'Export requisition intems',
+          link: '/openboxes/requisitionItem/listCanceled',
         },
       },
     },
     products: {
       label: 'Products',
       link: '#',
+      activity: ['MANAGE_INVENTORY'],
       subsections: {
         product: {
           label: 'Products',
           link: '/openboxes/product/list',
+        },
+        productGroup: {
+          label: 'Generic Products',
+          link: '/openboxes/productGroup/list',
+        },
+        productSupplier: {
+          label: 'Products Suppliers',
+          link: '/openboxes/productSupplier/list',
+        },
+        productAssociation: {
+          label: 'Associations',
+          link: '/openboxes/productAssociation/list',
+        },
+        productCatalog: {
+          label: 'Catalogs',
+          link: '/openboxes/productCatalog/list',
+        },
+        productComponent: {
+          label: 'Components',
+          link: '/openboxes/productComponent/list',
+        },
+        attribute: {
+          label: 'Attributes',
+          link: '/openboxes/attribute/list',
+        },
+        category: {
+          label: 'Categories',
+          link: '/openboxes/category/tree',
+        },
+        tag: {
+          label: 'Tags',
+          link: '/openboxes/tag/list',
+        },
+        unitOfMeasure: {
+          label: 'Unit of Measure',
+          link: '/openboxes/unitOfMeasure/list',
+        },
+        unitOfMeasureClass: {
+          label: 'UoM Class',
+          link: '/openboxes/unitOfMeasureClass/list',
+        },
+        inventoryLevel: {
+          label: 'Inventory Levels',
+          link: '/openboxes/inventoryLevel/list',
+        },
+        productCreate: {
+          label: 'Create new product',
+          link: '/openboxes/product/create',
+          adminOnly: true,
+        },
+        productBatchEdit: {
+          label: 'Batch edit product',
+          link: '/openboxes/product/batchEdit',
+          adminOnly: true,
+        },
+        productImportAsCsv: {
+          label: 'import products',
+          link: '/openboxes/product/importAsCsv',
+          adminOnly: true,
+        },
+        productExportAsCsv: {
+          label: 'Export products',
+          link: '/openboxes/product/exportAsCsv',
+          adminOnly: true,
         },
       },
     },
     configuration: {
       label: 'Configuration',
       link: '#',
+      adminOnly: true,
       subsections: {
+        showSettings: {
+          label: 'Settings',
+          link: '/openboxes/admin/showSettings',
+        },
+        migration: {
+          label: 'Migrate Data',
+          link: '/openboxes/migration/index',
+        },
+        console: {
+          label: 'Console',
+          link: '/openboxes/console/index',
+        },
+        cache: {
+          label: 'Cache',
+          link: '/openboxes/admin/cache',
+        },
+        clickstream: {
+          label: 'Clickstream',
+          link: '/openboxes/admin/clickstream',
+        },
+        sendMail: {
+          label: 'Email',
+          link: '/openboxes/admin/sendMail',
+        },
+        localization: {
+          label: 'Localization',
+          link: '/openboxes/localization/list',
+        },
+        documentType: {
+          label: 'Document Types',
+          link: '/openboxes/documentType/list',
+        },
+        eventType: {
+          label: 'Event Types',
+          link: '/openboxes/eventType/list',
+        },
+        locationGroup: {
+          label: 'Location groups',
+          link: '/openboxes/locationGroup/list',
+        },
+        locationType: {
+          label: 'Location types',
+          link: '/openboxes/locationType/list',
+        },
+        partyType: {
+          label: 'Party types',
+          link: '/openboxes/partyType/list',
+        },
+        partyRole: {
+          label: 'Party roles',
+          link: '/openboxes/partyRole/list',
+        },
+        location: {
+          label: 'Locations',
+          link: '/openboxes/location/list',
+        },
+        shipper: {
+          label: 'Shippers',
+          link: '/openboxes/shipper/list',
+        },
+        organization: {
+          label: 'Organizations',
+          link: '/openboxes/organization/list',
+        },
+        shipmentWorkflow: {
+          label: 'Shipment Workflows',
+          link: '/openboxes/shipmentWorkflow/list',
+        },
+        document: {
+          label: 'Documents',
+          link: '/openboxes/document/list',
+        },
         person: {
           label: 'People',
           link: '/openboxes/person/list',
         },
+        requisitionTemplate: {
+          label: 'Stock lists',
+          link: '/openboxes/requisitionTemplate/list',
+        },
+        listAllTransactions: {
+          label: 'Transactions',
+          link: '/openboxes/inventory/listAllTransactions',
+        },
+        user: {
+          label: 'Users',
+          link: '/openboxes/user/list',
+        },
+        editTransaction: {
+          label: 'Add transaction',
+          link: '/openboxes/inventory/editTransaction',
+        },
+        importInventory: {
+          label: 'Import Inventory',
+          link: '/openboxes/batch/importData?type=inventory',
+        },
+        importInventoryLevel: {
+          label: 'Import Inventory Level',
+          link: '/openboxes/batch/importData?type=inventoryLevel',
+        },
       },
+    },
+    customLinks: {
+      label: 'Custom Links',
+      link: '#',
+      renderedFromConfig: true,
     },
   },
 };

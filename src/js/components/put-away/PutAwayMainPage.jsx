@@ -90,7 +90,7 @@ class PutAwayMainPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  locationId: state.location.currentLocation.id,
+  locationId: state.session.currentLocation.id,
 });
 
 export default connect(mapStateToProps, {})(PutAwayMainPage);
