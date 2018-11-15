@@ -27,6 +27,11 @@ const AsyncPutAwayMainPage = Loadable({
   loading: Loading,
 });
 
+const AsyncManagement = Loadable({
+  loader: () => import('./stock-list-management/StocklistManagement'),
+  loading: Loading,
+});
+
 const Router = props => (
   <div>
     <BrowserRouter>
@@ -34,6 +39,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/putAway" component={AsyncPutAwayMainPage} />
         <MainLayoutRoute path="/**/stockMovement/index/:stockMovementId?" component={AsyncStockMovement} />
         <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
+        <MainLayoutRoute path="/**/stocklistManagement/index" component={AsyncManagement} />
       </Switch>
     </BrowserRouter>
     <div className="spinner-container">
