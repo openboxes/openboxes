@@ -478,6 +478,11 @@ const en = {
         },
       },
     },
+    customLinks: {
+      label: 'Custom Links',
+      link: '#',
+      renderedFromConfig: true,
+    },
   },
 };
 

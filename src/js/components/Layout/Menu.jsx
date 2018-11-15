@@ -22,12 +22,13 @@ const Menu = ({
   const isDisplayed = ({ adminOnly }) => (adminOnly ? isUserAdmin : true);
   const canBeRendered = (key, section) =>
     isEnabled(key) && isSupported(section) && isDisplayed(section);
+  const sectionContent = sectionKey => _.get(menuConfig, sectionKey, {}).content;
 
   return (
     <div className="collapse navbar-collapse w-100 menu-container" id="navbarSupportedContent">
       <ul className="navbar-nav mr-auto flex-wrap">
         { _.map(navbar, (section, key) => {
-        if (!section.subsections && canBeRendered(key, section)) {
+        if (!section.subsections && !section.renderedFromConfig && canBeRendered(key, section)) {
           return (
             <li className="nav-item" key={key}>
               <a className="nav-link" href={section.link}>
@@ -50,19 +51,31 @@ const Menu = ({
                   hideTracksWhenNotNeeded
                   autoHide
                 >
-                  {
-                    _.map(section.subsections, (subsection, subKey) => {
-                      if (isDisplayed(subsection)) {
+                  {sectionContent(key) &&
+                    _.map(sectionContent(key), (link, idx) => {
+                      if (isDisplayed(link)) {
                         return (
-                          <a
-                            className={`dropdown-item ${isPutAwayDisabled(subKey) ? 'disabled' : ''}`}
-                            key={subKey}
-                            href={isPutAwayDisabled(subKey) ? '#' : subsection.link}
-                          >
-                            <Translate id={`navbar.${key}.subsections.${subKey}.label`} />
+                          <a className="dropdown-item" key={idx} href={link.href} target={link.target}>
+                            <span>{link.label}</span>
                           </a>
                         );
                       }
+                      return null;
+                    })
+                  }
+                  {!sectionContent(key) &&
+                    _.map(section.subsections, (subsection, subKey) => {
+                      if (isDisplayed(subsection) && !subsection.renderedFromConfig) {
+                      return (
+                        <a
+                          className={`dropdown-item ${isPutAwayDisabled(subKey) ? 'disabled' : ''}`}
+                          key={subKey}
+                          href={isPutAwayDisabled(subKey) ? '#' : subsection.link}
+                        >
+                          <Translate id={`navbar.${key}.subsections.${subKey}.label`} />
+                        </a>
+                      );
+                    }
                       return null;
                     })
                   }
