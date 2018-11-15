@@ -56,6 +56,10 @@ const en = {
         },
       },
     },
+    stocklistManagement: {
+      label: 'Stock List Management',
+      link: '/openboxes/stocklistManagement/index',
+    },
   },
 };
 

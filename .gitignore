@@ -35,5 +35,4 @@ npm-debug.log
 /web-app/fonts/*
 /web-app/js/fonts/*
 grails-app/views/partialReceiving/_create.gsp
-grails-app/views/putAway/_create.gsp
-grails-app/views/stockMovement/_create.gsp
+grails-app/views/common/_react.gsp
