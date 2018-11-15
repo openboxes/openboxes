@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
+import queryString from 'query-string';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -64,6 +65,7 @@ const FIELDS = {
           props.fetchStockLists(value, props.destination);
         }
       },
+      disabled: queryString.parse(window.location.search).direction === 'OUTBOUND' && !props.isSuperuser,
     }),
   },
   destination: {
@@ -85,6 +87,7 @@ const FIELDS = {
           props.fetchStockLists(props.origin, value);
         }
       },
+      disabled: queryString.parse(window.location.search).direction === 'INBOUND' && !props.isSuperuser,
     }),
   },
   stockList: {
@@ -127,6 +130,7 @@ class CreateStockMovement extends Component {
     super(props);
     this.state = {
       stockLists: [],
+      setInitialLocations: true,
       values: this.props.initialValues,
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
@@ -136,6 +140,59 @@ class CreateStockMovement extends Component {
     if (this.state.values.origin && this.state.values.destination) {
       this.fetchStockLists(this.state.values.origin, this.state.values.destination);
     }
+  }
+
+  componentWillReceiveProps() {
+    if (!this.props.match.params.stockMovementId && this.state.setInitialLocations
+      && this.props.location.id) {
+      this.setInitialLocations();
+    }
+  }
+
+  setInitialLocations() {
+    const { id } = this.props.location;
+    const { locationType } = this.props.location;
+    const { name } = this.props.location;
+
+    if (queryString.parse(window.location.search).direction === 'INBOUND') {
+      const values = {
+        destination: {
+          id,
+          type: locationType ? locationType.locationTypeCode : null,
+          name,
+          label: `${name} [${locationType ? locationType.description : null}]`,
+        },
+      };
+      this.setState({ values, setInitialLocations: false });
+    }
+
+    if (queryString.parse(window.location.search).direction === 'OUTBOUND') {
+      const values = {
+        origin: {
+          id,
+          type: locationType ? locationType.locationTypeCode : null,
+          name,
+          label: `${name} [${locationType ? locationType.description : null}]`,
+        },
+      };
+      this.setState({ values, setInitialLocations: false });
+    }
+  }
+
+  checkStockMovementChange(newValues) {
+    const { origin, destination, stockList } = this.props.initialValues;
+
+    const originLocs = newValues.origin && origin;
+    const isOldSupplier = origin && origin.type === 'SUPPLIER';
+    const isNewSupplier = newValues.origin && newValues.type === 'SUPPLIER';
+    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier)) ?
+      newValues.origin.id !== origin.id : false;
+
+    const checkDest = stockList && newValues.destination && destination ?
+      newValues.destination.id !== destination.id : false;
+    const checkStockList = newValues.stockMovementId ? newValues.stockList !== stockList : false;
+
+    return (checkOrigin || checkDest || checkStockList);
   }
 
   /**
@@ -158,21 +215,6 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  checkStockMovementChange(newValues) {
-    const { origin, destination, stockList } = this.props.initialValues;
-
-    const originLocs = newValues.origin && origin;
-    const isOldSupplier = origin && origin.type === 'SUPPLIER';
-    const isNewSupplier = newValues.origin && newValues.type === 'SUPPLIER';
-    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier)) ?
-      newValues.origin.id !== origin.id : false;
-
-    const checkDest = stockList && newValues.destination && destination ?
-      newValues.destination.id !== destination.id : false;
-    const checkStockList = newValues.stockMovementId ? newValues.stockList !== stockList : false;
-
-    return (checkOrigin || checkDest || checkStockList);
-  }
 
   /**
    * Creates or updates stock movement with given data
@@ -278,6 +320,7 @@ class CreateStockMovement extends Component {
                 fetchStockLists: this.fetchStockLists,
                 origin: values.origin,
                 destination: values.destination,
+                isSuperuser: this.props.isSuperuser,
               }),
             )}
             <div>
@@ -290,11 +333,20 @@ class CreateStockMovement extends Component {
   }
 }
 
-export default withRouter(connect(null, {
+const mapStateToProps = state => ({
+  location: state.session.currentLocation,
+  isSuperuser: state.session.isSuperuser,
+});
+
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner,
 })(CreateStockMovement));
 
 CreateStockMovement.propTypes = {
+  /** React router's object which contains information about url varaiables and params */
+  match: PropTypes.shape({
+    params: PropTypes.shape({ stockMovementId: PropTypes.string }),
+  }).isRequired,
   /** Initial component's data */
   initialValues: PropTypes.shape({
     origin: PropTypes.shape({
@@ -318,4 +370,15 @@ CreateStockMovement.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+  /** Current location */
+  location: PropTypes.shape({
+    name: PropTypes.string,
+    id: PropTypes.string,
+    locationType: PropTypes.shape({
+      description: PropTypes.string,
+      locationTypeCode: PropTypes.string,
+    }),
+  }).isRequired,
+  /** Return true if current user is superuser */
+  isSuperuser: PropTypes.bool.isRequired,
 };

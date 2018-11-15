@@ -6,23 +6,28 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.User
 
 class LocationApiController extends BaseDomainApiController {
 
     def locationService
+    def userService
 
     def list = {
+        Location currentLocation = Location.get(session?.warehouse?.id)
+        boolean isSuperuser = userService.isSuperuser(session?.user)
+        String direction = params?.direction
         def fields = params.fields ? params.fields.split(",") : null
-        def locations = locationService.getLocations(fields, params)
+        def locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation)
         render ([data:locations] as JSON)
-	}
+     }
 
 
 }
