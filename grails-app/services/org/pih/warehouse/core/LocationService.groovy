@@ -95,7 +95,7 @@ class LocationService {
 
 		if (!isSuperuser) {
 			if (direction == "INBOUND") {
-				return locations.findAll { it.locationType.description == "Supplier" }
+				return locations.findAll { it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER }
 			}
 			if (direction == "OUTBOUND") {
 				return locations.findAll { (it.locationGroup == currentLocation.locationGroup) ||
