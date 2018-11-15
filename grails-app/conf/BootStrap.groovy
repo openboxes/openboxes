@@ -8,8 +8,11 @@
  * You must not remove this notice, or any other, from this software.
  **/
 
+
 import grails.converters.JSON
 import grails.util.Environment
+import liquibase.Liquibase
+import liquibase.database.DatabaseFactory
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
@@ -23,12 +26,14 @@ import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockAdjustment
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.Stocklist
+import org.pih.warehouse.api.StocklistLocation
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationGroup
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
@@ -41,22 +46,18 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductGroup
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
-import org.pih.warehouse.shipping.Container
-import org.pih.warehouse.shipping.ContainerType
-
+import util.LiquibaseUtil
 
 import javax.sql.DataSource
-
-import liquibase.Liquibase
-import liquibase.database.DatabaseFactory
-import util.LiquibaseUtil
 
 class BootStrap {
 
@@ -376,6 +377,13 @@ class BootStrap {
             return suggestedItem.toJson()
         }
 
+        JSON.registerObjectMarshaller(Stocklist) { Stocklist stocklist ->
+            return stocklist.toJson()
+        }
+
+        JSON.registerObjectMarshaller(StocklistLocation) { StocklistLocation stocklistLocation ->
+            return stocklistLocation.toJson()
+        }
 
 
         // ================================    Static Data    ============================================

@@ -209,11 +209,11 @@ class RequisitionService {
     def getRequisitions(Requisition requisition, Map params) {
         println "Get requisitions: " + params
 
-        def isRelatedToMe = Boolean.parseBoolean(params.isRelatedToMe)
-        def commodityClassIsNull = Boolean.parseBoolean(params.commodityClassIsNull)
+        def isRelatedToMe = Boolean.parseBoolean(params?.isRelatedToMe)
+        def commodityClassIsNull = Boolean.parseBoolean(params?.commodityClassIsNull)
 
-        def issuedDateRange = DateUtil.parseDateRange(params.issuedDateRange, "d/MMM/yyyy", "-")
-        def requestedDateRange = DateUtil.parseDateRange(params.requestedDateRange, "d/MMM/yyyy", "-")
+        def issuedDateRange = DateUtil.parseDateRange(params?.issuedDateRange, "d/MMM/yyyy", "-")
+        def requestedDateRange = DateUtil.parseDateRange(params?.requestedDateRange, "d/MMM/yyyy", "-")
 
         def criteria = Requisition.createCriteria()
         def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
@@ -239,7 +239,7 @@ class RequisitionService {
                 if (requisition.isPublished) {
                     eq("isPublished", requisition.isPublished)
                 }
-                if (params.commodityClassIsNull) {
+                if (params?.commodityClassIsNull) {
                     isNull("commodityClass")
                 }
 
@@ -249,7 +249,7 @@ class RequisitionService {
                 if (requisition.status) {
                     eq("status", requisition.status)
                 }
-                if (params.relatedToMe) {
+                if (params?.relatedToMe) {
                     def currentUser = AuthService.getCurrentUser().get()
                     or {
                         eq("createdBy.id", currentUser.id)
