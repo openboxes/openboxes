@@ -8,6 +8,8 @@ import arrayMutators from 'final-form-arrays';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 
+import 'react-confirm-alert/src/react-confirm-alert.css';
+
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import ArrayField from '../form-elements/ArrayField';
@@ -270,8 +272,7 @@ function validate(values) {
   errors.lineItems = [];
 
   _.forEach(values.lineItems, (item, key) => {
-    if (!_.isNil(item.product) && (item.quantityRequested <= 0
-      || _.isNil(item.quantityRequested))) {
+    if (!_.isNil(item.product) && item.quantityRequested < 0) {
       errors.lineItems[key] = { quantityRequested: 'Enter proper quantity' };
     }
   });
@@ -284,6 +285,27 @@ function validate(values) {
  * when movement is from a depot and when movement is from a vendor.
  */
 class AddItemsPage extends Component {
+  /**
+   * Shows save confirmation dialog.
+   * @param {function} onConfirm
+   * @public
+   */
+  static confirmSave(onConfirm) {
+    confirmAlert({
+      title: 'Confirm save',
+      message: 'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: onConfirm,
+        },
+        {
+          label: 'No',
+        },
+      ],
+    });
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -324,7 +346,8 @@ class AddItemsPage extends Component {
    * @public
    */
   getLineItemsToBeSaved(lineItems) {
-    const lineItemsToBeAdded = _.filter(lineItems, item => !item.statusCode);
+    const lineItemsToBeAdded = _.filter(lineItems, item =>
+      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0');
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -380,6 +403,7 @@ class AddItemsPage extends Component {
           expirationDate: item.expirationDate,
           'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
           sortOrder: item.sortOrder,
+          delete: item.quantityRequested && item.quantityRequested !== '0' ? 'false' : 'true',
         })),
       );
     }
@@ -398,6 +422,7 @@ class AddItemsPage extends Component {
         quantityRequested: item.quantityRequested,
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
         sortOrder: item.sortOrder,
+        delete: item.quantityRequested && item.quantityRequested !== '0' ? 'false' : 'true',
       })),
     );
   }
@@ -517,11 +542,24 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(formValues) {
-    const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val) &&
-      !_.isNil(val.quantityRequested));
+    const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val));
+    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+      AddItemsPage.confirmSave(() => this.saveAndTransitionToNextStep(formValues, lineItems));
+    } else {
+      this.saveAndTransitionToNextStep(formValues, lineItems);
+    }
+  }
+
+  /**
+   * Saves current stock movement progress (line items) and goes to the next stock movement step.
+   * @param {object} formValues
+   * @param {object} lineItems
+   * @public
+   */
+  saveAndTransitionToNextStep(formValues, lineItems) {
+    this.props.showSpinner();
 
     if (formValues.origin.type === 'SUPPLIER') {
-      this.props.showSpinner();
       this.saveRequisitionItems(lineItems)
         .then((resp) => {
           let values = formValues;
@@ -536,7 +574,6 @@ class AddItemsPage extends Component {
         })
         .catch(() => this.props.hideSpinner());
     } else {
-      this.props.showSpinner();
       this.saveRequisitionItems(lineItems)
         .then((resp) => {
           let values = formValues;
@@ -621,12 +658,24 @@ class AddItemsPage extends Component {
    * @public
    */
   save(formValues) {
+    const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
+
+    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+      AddItemsPage.confirmSave(() => this.saveItems(lineItems));
+    } else {
+      this.saveItems(lineItems);
+    }
+  }
+
+  /**
+   * Saves list of requisition items in current step (without step change).
+   * @param {object} lineItems
+   * @public
+   */
+  saveItems(lineItems) {
     this.props.showSpinner();
 
-    const lineItems = _.filter(formValues.lineItems, item =>
-      !_.isEmpty(item) && !_.isNil(item.quantityRequested));
-
-    return this.saveRequisitionItemsInCurrentStep(lineItems)
+    this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.props.hideSpinner();
         Alert.success('Changes saved successfully!');
@@ -718,14 +767,27 @@ class AddItemsPage extends Component {
    * @public
    */
   exportTemplate(formValues) {
-    this.props.showSpinner();
+    const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
 
-    const lineItems = _.filter(formValues.lineItems, item =>
-      !_.isEmpty(item) && !_.isNil(item.quantityRequested));
+    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+      AddItemsPage.confirmSave(() => this.saveItemsAndExportTemplate(formValues, lineItems));
+    } else {
+      this.saveItemsAndExportTemplate(formValues, lineItems);
+    }
+  }
+
+  /**
+   * Exports current state of stock movement's to csv file.
+   * @param {object} formValues
+   * @param {object} lineItems
+   * @public
+   */
+  saveItemsAndExportTemplate(formValues, lineItems) {
+    this.props.showSpinner();
 
     const { movementNumber, stockMovementId } = formValues;
     const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
-    return this.saveRequisitionItemsInCurrentStep(lineItems)
+    this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {

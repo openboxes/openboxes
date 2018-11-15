@@ -7,6 +7,8 @@ import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 
+import 'react-confirm-alert/src/react-confirm-alert.css';
+
 import ArrayField from '../form-elements/ArrayField';
 import TextField from '../form-elements/TextField';
 import { renderFormField } from '../../utils/form-utils';
