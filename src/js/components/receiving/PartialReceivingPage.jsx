@@ -450,7 +450,7 @@ class PartialReceivingPage extends Component {
 const mapStateToProps = state => ({
   usersFetched: state.users.fetched,
   users: state.users.data,
-  hasBinLocationSupport: state.location.currentLocation.hasBinLocationSupport,
+  hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
 });
 
 export default connect(mapStateToProps, {

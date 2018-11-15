@@ -204,7 +204,7 @@ class AdjustInventoryModal extends Component {
 }
 
 const mapStateToProps = state => ({
-  hasBinLocationSupport: state.location.currentLocation.hasBinLocationSupport,
+  hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(AdjustInventoryModal);
