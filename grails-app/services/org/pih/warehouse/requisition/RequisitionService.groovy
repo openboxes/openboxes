@@ -16,7 +16,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.LocalTransfer
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
@@ -324,6 +323,21 @@ class RequisitionService {
             return requisition
         }
 
+    }
+
+    /**
+     * Save the requisition
+     *
+     * @param requisition
+     * @return
+     */
+    Requisition saveTemplateRequisition(Requisition requisition) {
+
+        if (requisition.hasErrors() || !requisition.save(flush: true)) {
+            throw new ValidationException("Invalid requisition", requisition.errors)
+        }
+
+        return requisition
     }
 
     /**
