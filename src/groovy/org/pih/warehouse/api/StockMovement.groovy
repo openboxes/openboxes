@@ -11,6 +11,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
 enum StockMovementType {
@@ -46,6 +47,7 @@ class StockMovement {
     String trackingNumber
     String driverName
     String comments
+    String currentStatus
 
     StockMovementType stockMovementType
 
@@ -93,8 +95,9 @@ class StockMovement {
                 destination: destination,
                 stocklist: [id: stocklist?.id, name: stocklist?.name],
                 dateRequested: dateRequested?.format("MM/dd/yyyy"),
-                dateShipped: dateShipped?.format("MM/dd/yyyy HH:mm"),
+                dateShipped: dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
                 shipmentType: shipmentType,
+                shipmentStatus: currentStatus,
                 trackingNumber: trackingNumber,
                 driverName: driverName,
                 comments: comments,
@@ -113,7 +116,7 @@ class StockMovement {
     }
 
     /**
-     * Return the status of the associated requisition.
+     * Return the requisition status of the stock movement.
      *
      * @return
      */
@@ -121,6 +124,15 @@ class StockMovement {
         return requisition?.status
     }
 
+    /**
+     * Return the receipt status of the associated stock movement.
+     *
+     * @return
+     */
+    ShipmentStatusCode getShipmentStatusCode() {
+        return shipment?.status?.code?:ShipmentStatusCode.PENDING
+
+    }
 
     /**
      * “FROM.TO.DATEREQUESTED.STOCKLIST.TRACKING#.DESCRIPTION”
@@ -165,7 +177,8 @@ class StockMovement {
                 shipmentType: shipment?.shipmentType,
                 dateShipped: shipment?.expectedShippingDate,
                 driverName: shipment?.driverName,
-                trackingNumber: trackingNumber?.identifier
+                trackingNumber: trackingNumber?.identifier,
+                currentStatus: shipment?.currentStatus,
         )
 
         // Include all requisition items except those that are substitutions or modifications because the

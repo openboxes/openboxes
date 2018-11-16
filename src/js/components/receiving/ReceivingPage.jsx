@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import moment from 'moment';
-import Alert from 'react-s-alert';
 
 import PartialReceivingPage from './PartialReceivingPage';
 import ReceivingCheckScreen from './ReceivingCheckScreen';
@@ -19,11 +18,11 @@ function validate(values) {
   if (!values.dateDelivered) {
     errors.dateDelivered = 'This field is required';
   } else {
-    const dateDelivered = moment(values.dateDelivered, 'MM/DD/YYYY HH:mm');
+    const dateDelivered = moment(values.dateDelivered, 'MM/DD/YYYY HH:mm Z');
     if (moment().diff(dateDelivered) < 0) {
       errors.dateDelivered = 'The date cannot be in the future';
     }
-    const dateShipped = values.dateShipped ? moment(values.dateShipped, 'MM/DD/YYYY HH:mm') : null;
+    const dateShipped = values.dateShipped ? moment(values.dateShipped, 'MM/DD/YYYY HH:mm Z') : null;
     if (dateShipped && dateDelivered < dateShipped) {
       errors.dateDelivered = 'The date cannot be before shipment date';
     }
@@ -72,8 +71,19 @@ class ReceivingPage extends Component {
     if (this.state.page === 0) {
       const containers = _.map(formValues.containers, container => ({
         ...container,
-        shipmentItems: _.filter(container.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''),
+        shipmentItems: _.chain(container.shipmentItems)
+          .map((item) => {
+            if (item.receiptItemId) {
+              return {
+                ...item, quantityReceiving: item.quantityReceiving ? item.quantityReceiving : 0,
+              };
+            }
+
+            return item;
+          })
+          .filter(item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '').value(),
       }));
+
       const payload = {
         ...formValues, receiptStatus: 'CHECKING', containers: _.filter(containers, container => container.shipmentItems.length),
       };
@@ -82,7 +92,8 @@ class ReceivingPage extends Component {
     } else {
       this.save({ ...formValues, receiptStatus: 'COMPLETED' }, () => {
         this.setState({ completed: true });
-        Alert.success('Shipment was received successfully!');
+        const { requisition } = formValues;
+        window.location = `/openboxes/stockMovement/show/${requisition}`;
       });
     }
   }

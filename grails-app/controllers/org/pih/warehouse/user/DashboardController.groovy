@@ -483,8 +483,7 @@ class DashboardController {
 			redirect(controller:'dashboard', action:'index')
 		}
 		else {	
-			List warehouses = Location.findAllWhere("active":true)
-			render(view: "chooseLocation", model: [warehouses: warehouses])
+			render(view: "chooseLocation")
 		}
 		
 	}

@@ -22,13 +22,22 @@
 
 		<div class="summary">
 			<div class="title">
-				<g:message code="errors.notFound.label" default="Resource Not Found"/> (404)
+				<g:message code="errors.resourceNotFound.message" default="Resource Not Found"/> (404)
 			</div>
 		</div>
 		<div style="width: 25%;">
 			<div class="triangle-isosceles">
-				<warehouse:message code="errors.accessDenied.message" default="Apologies, but I can't find that page."/>
-				 
+				<g:if test="${request?.exception?.message}">
+					${request?.exception?.message}
+				</g:if>
+				<g:elseif test="${params.id}">
+					<warehouse:message code="errors.resourceWithIdNotFound.message"
+									   default="Sorry, a resource with ID {0} could not be found." args="[params.id]"/>
+				</g:elseif>
+				<g:else>
+					<warehouse:message code="errors.resourceNotFound.message" default="Sorry, that resource could not be found."/>
+				</g:else>
+
 			</div>
 			<div style="padding-left: 45px;" >
 				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>

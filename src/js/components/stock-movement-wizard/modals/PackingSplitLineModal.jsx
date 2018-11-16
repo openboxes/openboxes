@@ -17,18 +17,18 @@ const FIELDS = {
     addButton: ({ addRow, lineItem }) => (
       <button
         type="button"
-        className="btn btn-outline-success margin-bottom-lg"
+        className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           productName: lineItem.productName,
           lotNumber: lineItem.lotNumber,
           expirationDate: lineItem.expirationDate,
           binLocationName: lineItem.binLocationName,
+          recipient: lineItem.recipient,
         })}
       >Add line
       </button>
     ),
     type: ArrayField,
-    disableVirtualization: true,
     fields: {
       productName: {
         type: LabelField,

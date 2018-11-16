@@ -167,8 +167,12 @@ class StockMovementApiController {
      * @param jsonObject
      * @param dateField
      */
-    Date parseDate(String date) {
+    Date parseDateRequested(String date) {
         return date ? Constants.EXPIRATION_DATE_FORMATTER.parse(date) : null
+    }
+
+    Date parseDateShipped(String date) {
+        return date ? Constants.DELIVERY_DATE_FORMATTER.parse(date) : null
     }
 
     void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
@@ -178,11 +182,11 @@ class StockMovementApiController {
 
         // Dates aren't bound properly using default JSON binding
         if (jsonObject.containsKey("dateShipped")) {
-            stockMovement.dateShipped = parseDate(jsonObject.remove("dateShipped"))
+            stockMovement.dateShipped = parseDateShipped(jsonObject.remove("dateShipped"))
         }
 
         if (jsonObject.containsKey("dateRequested")) {
-            stockMovement.dateRequested = parseDate(jsonObject.remove("dateRequested"))
+            stockMovement.dateRequested = parseDateRequested(jsonObject.remove("dateRequested"))
         }
 
         // Bind the rest of the JSON attributes to the stock movement object
@@ -221,8 +225,8 @@ class StockMovementApiController {
         stockMovement.lineItems.addAll(stockMovementItems)
     }
 
-    Boolean isNull(String stringValue) {
-        return stringValue == JSONObject.NULL || stringValue == null || stringValue?.equals("")
+    Boolean isNull(Object objectValue) {
+        return objectValue == JSONObject.NULL || objectValue == null || objectValue?.equals("")
     }
 
     List<StockMovementItem> createLineItemsFromJson(StockMovement stockMovement, List lineItems) {

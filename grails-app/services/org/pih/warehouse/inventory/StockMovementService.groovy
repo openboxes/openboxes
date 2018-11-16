@@ -27,6 +27,7 @@ import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
@@ -46,6 +47,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
+import org.pih.warehouse.shipping.ShipmentWorkflow
 
 class StockMovementService {
 
@@ -94,7 +96,7 @@ class StockMovementService {
         Requisition requisition = updateRequisition(stockMovement, forceUpdate)
 
         log.info "Date shipped: " + stockMovement.dateShipped
-        if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status) {
+        if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status || RequisitionStatus.ISSUED == requisition.status) {
             log.info "Creating shipment for stock movement ${stockMovement}"
             createOrUpdateShipment(stockMovement)
         }
@@ -380,6 +382,7 @@ class StockMovementService {
             picklistItem.quantity = quantity
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
+            picklistItem.sortOrder = stockMovementItem.sortOrder
         }
         picklist.save(flush: true)
     }
@@ -492,6 +495,7 @@ class StockMovementService {
         EditPage editPage = new EditPage()
         StockMovement stockMovement = getStockMovement(id)
         stockMovement.lineItems.each { stockMovementItem ->
+            stockMovementItem.stockMovement = stockMovement
             EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
             editPage.editPageItems.addAll(editPageItem)
         }
@@ -516,7 +520,9 @@ class StockMovementService {
 
         StockMovement stockMovement = getStockMovement(id)
         Set<PackPageItem> packPageItems = new LinkedHashSet<PackPageItem>()
-        stockMovement.requisition?.picklist?.picklistItems?.each { PicklistItem picklistItem ->
+        stockMovement.requisition?.picklist?.picklistItems?.sort { a, b ->
+            a.sortOrder <=> b.sortOrder ?: a.id <=> b.id
+        }?.each { PicklistItem picklistItem ->
             packPageItems.addAll(getPackPageItems(picklistItem))
         }
 
@@ -547,6 +553,23 @@ class StockMovementService {
         return pickPageItems
     }
 
+    Integer calculateTotalMonthlyQuantity(StockMovementItem stockMovementItem) {
+        Integer totalMonthlyQuantity = 0
+        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
+        StockMovement stockMovement = stockMovementItem.stockMovement
+        List<Requisition> stocklists = requisitionService.getRequisitionTemplates(stockMovement.origin, stockMovement.destination)
+        if (stocklists) {
+            stocklists.each { stocklist ->
+                // Find matching stocklist items and sum them up
+                def stocklistItems = stocklist.requisitionItems.findAll { it?.product?.id == requisitionItem?.product?.id }
+                if (stocklistItems) {
+                    totalMonthlyQuantity += stocklistItems.sum { it.quantity }
+                }
+            }
+        }
+        return totalMonthlyQuantity
+    }
+
 
     EditPageItem buildEditPageItem(StockMovementItem stockMovementItem) {
         EditPageItem editPageItem = new EditPageItem()
@@ -555,10 +578,16 @@ class StockMovementService {
         List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
         List<SubstitutionItem> availableSubstitutions = getAvailableSubstitutions(location, requisitionItem.product)
         List<SubstitutionItem> substitutionItems = getSubstitutionItems(location, requisitionItem)
+
+
+        // Calculate total monthly quantity
+        Integer totalMonthlyQuantity = calculateTotalMonthlyQuantity(stockMovementItem)
+
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
+        editPageItem.totalMonthlyQuantity = totalMonthlyQuantity
         editPageItem.quantityRequested = requisitionItem.quantity
         editPageItem.quantityConsumed = null
         editPageItem.availableSubstitutions = availableSubstitutions
@@ -880,6 +909,8 @@ class StockMovementService {
         shipment.destination = stockMovement.destination
         shipment.requisition = stockMovement.requisition
         shipment.shipmentNumber = stockMovement.identifier
+        shipment.additionalInformation = stockMovement.comments
+        shipment.driverName = stockMovement.driverName
 
         // These values need defaults since they are not set until step 6
         shipment.expectedShippingDate = stockMovement.dateShipped?:new Date()
@@ -890,9 +921,8 @@ class StockMovementService {
         // Last step will be to update the generated name
         shipment.name = stockMovement.generateName()
 
-
-        if (stockMovement.comments) {
-            shipment.additionalInformation = stockMovement.comments
+        if(stockMovement.requisition.status == RequisitionStatus.ISSUED) {
+            return shipment
         }
 
         if (stockMovement.trackingNumber) {
@@ -900,20 +930,24 @@ class StockMovementService {
             if (!trackingNumberType) {
                 throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
             }
+
+            // Needed to use ID since reference numbers is lazy loaded and equality operation was not working
             ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
-                refNum.referenceNumberType == trackingNumberType
+                trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
             }
 
+            // Create a new reference number
             if (!referenceNumber) {
                 referenceNumber = new ReferenceNumber()
+                referenceNumber.identifier = stockMovement.trackingNumber
                 referenceNumber.referenceNumberType = trackingNumberType
                 shipment.addToReferenceNumbers(referenceNumber)
             }
-            referenceNumber.identifier = stockMovement.trackingNumber
-        }
-
-        if (stockMovement.driverName) {
-            shipment.driverName = stockMovement.driverName
+            // Update the existing reference number
+            else {
+                referenceNumber.identifier = stockMovement.trackingNumber
+            }
+            shipment.save(failOnError: true)
         }
 
         if (stockMovement.origin.isSupplier()) {
@@ -1087,10 +1121,10 @@ class StockMovementService {
             throw new IllegalStateException("There are too many shipments associated with stock movement ${requisition.requestNumber}")
         }
 
-        shipmentService.sendShipment(shipments[0], null, user, requisition.origin, new Date())
+        shipmentService.sendShipment(shipments[0], null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
 
         // Create temporary receiving area for the Partial Receipt process
-        if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled) {
+        if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && stockMovement.destination.hasBinLocationSupport()) {
             LocationType locationType = LocationType.findByName("Receiving")
             if (!locationType) {
                 throw new IllegalArgumentException("Unable to find location type 'Receiving'")
@@ -1125,28 +1159,47 @@ class StockMovementService {
 
     List<Map> getDocuments(StockMovement stockMovement) {
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-        def documentList = [
-                [
-                        name        : g.message(code: "export.items.label", default: "Export Items"),
-                        documentType: DocumentGroupCode.EXPORT.name(),
-                        contentType : "text/csv",
-                        stepNumber  : 2,
-                        uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true)
-                ],
-                [
+        def documentList = []
+
+        if (stockMovement?.requisition) {
+            documentList.addAll([
+                    [
+                            name        : g.message(code: "export.items.label", default: "Export Items"),
+                            documentType: DocumentGroupCode.EXPORT.name(),
+                            contentType : "text/csv",
+                            stepNumber  : 2,
+                            uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true)
+                    ],
+                    [
                         name        : g.message(code: "picklist.button.print.label"),
-                        documentType: DocumentGroupCode.PICKLIST.name(),
-                        contentType : "text/html",
-                        stepNumber  : 4,
-                        uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true)
-                ],
-                [
+                            documentType: DocumentGroupCode.PICKLIST.name(),
+                            contentType : "text/html",
+                            stepNumber  : 4,
+                            uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                    ],
+                    [
                         name        : g.message(code: "picklist.button.download.label"),
-                        documentType: DocumentGroupCode.PICKLIST.name(),
-                        contentType : "application/pdf",
-                        stepNumber  : 4,
-                        uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true)
-                ],
+                            documentType: DocumentGroupCode.PICKLIST.name(),
+                            contentType : "application/pdf",
+                            stepNumber  : 4,
+                            uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
+                            documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
+                            contentType : "text/html",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "goodsReceiptNote.label"),
+                            documentType: DocumentGroupCode.GOODS_RECEIPT_NOTE.name(),
+                            contentType : "text/html",
+                            stepNumber  : null,
+                            uri         : g.createLink(controller: 'goodsReceiptNote', action: "print", id: stockMovement?.shipment?.id, absolute: true)
+                    ]
+            ])
+        }
 //                [
 //                        name        : g.message(code: "shipping.printPickList.label"),
 //                        documentType: DocumentGroupCode.PICKLIST.name(),
@@ -1168,35 +1221,57 @@ class StockMovementService {
 //                        stepNumber  : 5,
 //                        uri         : g.createLink(controller: 'report', action: "printPaginatedPackingListReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
 //                ],
-                [
-                        name        : g.message(code: "shipping.exportPackingList.label"),
-                        documentType: DocumentGroupCode.PACKING_LIST.name(),
-                        contentType : "application/vnd.ms-excel",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'shipment', action: "exportPackingList", id: stockMovement?.shipment?.id, absolute: true)
-                ],
-                [
-                        name        : g.message(code: "shipping.downloadPackingList.label"),
-                        documentType: DocumentGroupCode.PACKING_LIST.name(),
-                        contentType : "application/vnd.ms-excel",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'doc4j', action: "downloadPackingList", id: stockMovement?.shipment?.id, absolute: true)
-                ],
-                [
-                        name        : g.message(code: "shipping.downloadLetter.label"),
-                        documentType: DocumentGroupCode.CERTIFICATE_OF_DONATION.name(),
-                        contentType : "text/html",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'doc4j', action: "downloadLetter", id: stockMovement?.shipment?.id, absolute: true)
-                ],
-                [
-                        name        : g.message(code: "deliveryNote.button.print.label"),
-                        documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
-                        contentType : "text/html",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+
+        if (stockMovement?.shipment) {
+            documentList.addAll([
+                    [
+                            name        : g.message(code: "shipping.exportPackingList.label"),
+                            documentType: DocumentGroupCode.PACKING_LIST.name(),
+                            contentType : "application/vnd.ms-excel",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'shipment', action: "exportPackingList", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "shipping.downloadPackingList.label"),
+                            documentType: DocumentGroupCode.PACKING_LIST.name(),
+                            contentType : "application/vnd.ms-excel",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'doc4j', action: "downloadPackingList", id: stockMovement?.shipment?.id, absolute: true)
+                    ]
+            ])
+        }
+
+        if (stockMovement?.shipment) {
+            ShipmentWorkflow shipmentWorkflow = shipmentService.getShipmentWorkflow(stockMovement?.shipment)
+            log.info "Shipment workflow " + shipmentWorkflow
+            if (shipmentWorkflow) {
+                shipmentWorkflow.documentTemplates.each { Document documentTemplate ->
+                    documentList << [
+                            name        : documentTemplate?.name,
+                            documentType: documentTemplate?.documentType?.name,
+                            contentType : documentTemplate?.contentType,
+                            stepNumber  : null,
+                            uri         : g.createLink(controller: 'document', action: "download",
+                                    id: documentTemplate?.id, params: [shipmentId: stockMovement?.shipment?.id],
+                                    absolute: true, title: documentTemplate?.filename)
+                    ]
+                }
+            }
+
+            stockMovement?.shipment?.documents.each { Document document ->
+                documentList << [
+                        name        : document?.name,
+                        documentType: document?.documentType?.name,
+                        contentType : document?.contentType,
+                        stepNumber  : null,
+                        uri         : g.createLink(controller: 'document', action: "download",
+                                id: document?.id, params: [shipmentId: stockMovement?.shipment?.id],
+                                absolute: true, title: document?.filename)
                 ]
-        ]
+            }
+
+        }
+
         return documentList
     }
 }

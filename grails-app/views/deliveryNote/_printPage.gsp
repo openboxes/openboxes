@@ -1,4 +1,4 @@
-<div class="page" style="page-break-after: ${pageBreakAfter};">
+<div class="page dialog" style="page-break-after: ${pageBreakAfter};">
     <table id="requisition-items">
         <thead>
             <tr class="theader">

@@ -19,6 +19,7 @@ import ButtonField from '../form-elements/ButtonField';
 const FIELDS = {
   pickPageItems: {
     type: ArrayField,
+    virtualized: true,
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'picklistItems',
     getDynamicRowAttr: ({ rowValues, subfield }) => {
@@ -55,13 +56,13 @@ const FIELDS = {
       },
       'binLocation.name': {
         type: LabelField,
-        flexWidth: '0.7',
+        flexWidth: '1.2',
         label: 'Bin',
       },
       quantityRequired: {
         type: LabelField,
         label: 'Qty required',
-        flexWidth: '0.9',
+        flexWidth: '0.8',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
@@ -69,7 +70,7 @@ const FIELDS = {
       quantityPicked: {
         type: LabelField,
         label: 'Qty picked',
-        flexWidth: '0.9',
+        flexWidth: '0.7',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
@@ -115,6 +116,7 @@ const FIELDS = {
           checkForInitialPicksChanges,
           btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
+          btnOpenDisabled: true,
           onResponse,
           bins,
           locationId,
@@ -123,7 +125,7 @@ const FIELDS = {
       revert: {
         type: ButtonField,
         label: 'Undo',
-        flexWidth: '1',
+        flexWidth: '0.7',
         fieldKey: '',
         buttonLabel: 'Undo',
         getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
@@ -173,9 +175,12 @@ class PickPage extends Component {
         const { associations } = resp.data.data;
         const { pickPageItems } = resp.data.data.pickPage;
 
-        const printPicks = _.find(associations.documents, doc => doc.name === 'Print Picklist');
+        const printPicks = _.find(
+          associations.documents,
+          doc => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
+        );
         this.setState({
-          printPicksUrl: printPicks.uri,
+          printPicksUrl: printPicks ? printPicks.uri : '/',
           values: { ...this.state.values, pickPageItems: [] },
         }, () => this.setState({
           values: {
@@ -363,7 +368,7 @@ class PickPage extends Component {
             <span>
               <a
                 href={this.state.printPicksUrl}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -372,7 +377,7 @@ class PickPage extends Component {
               <button
                 type="button"
                 onClick={() => this.refresh()}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+                className="float-right  mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
                 <span><i className="fa fa-refresh pr-2" />Refresh</span>
               </button>
@@ -387,10 +392,10 @@ class PickPage extends Component {
                   locationId: this.state.values.origin.id,
                 }))}
               <div className="d-print-none">
-                <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>
+                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
                     Previous
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right">Next</button>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">Next</button>
               </div>
             </form>
           </div>

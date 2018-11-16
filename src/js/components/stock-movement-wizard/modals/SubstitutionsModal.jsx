@@ -25,7 +25,6 @@ const FIELDS = {
   },
   substitutions: {
     type: ArrayField,
-    disableVirtualization: true,
     getDynamicRowAttr: ({ rowValues }) => ({
       className: rowValues.originalItem ? 'font-weight-bold' : '',
     }),
@@ -135,6 +134,7 @@ class SubstitutionsModal extends Component {
    * @public
    */
   onOpen() {
+    this.state.attr.onOpen();
     let substitutions = this.state.attr.lineItem.availableSubstitutions;
     let originalItem = null;
 

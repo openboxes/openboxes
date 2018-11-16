@@ -226,7 +226,7 @@ class BootStrap {
                 dateReviewed: requisition.dateReviewed?.format("MM/dd/yyyy"),
                 dateVerified: requisition.dateVerified?.format("MM/dd/yyyy"),
                 dateChecked: requisition.dateChecked?.format("MM/dd/yyyy"),
-                dateDelivered: requisition.dateDelivered?.format("MM/dd/yyyy HH:mm"),
+                dateDelivered: requisition.dateDelivered?.format("MM/dd/yyyy HH:mm XXX"),
                 dateIssued: requisition.dateIssued?.format("MM/dd/yyyy"),
                 dateReceived: requisition.dateReceived?.format("MM/dd/yyyy"),
                 origin: requisition.origin,
@@ -283,10 +283,10 @@ class BootStrap {
                             type: shipment?.destination?.locationType?.locationTypeCode?.name()
 
                     ],
-                    expectedShippingDate: shipment.expectedShippingDate?.format("MM/dd/yyyy HH:mm"),
-                    actualShippingDate: shipment.actualShippingDate?.format("MM/dd/yyyy HH:mm"),
-                    expectedDeliveryDate: shipment.expectedDeliveryDate?.format("MM/dd/yyyy HH:mm"),
-                    actualDeliveryDate: shipment.actualDeliveryDate?.format("MM/dd/yyyy HH:mm"),
+                    expectedShippingDate: shipment.expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
+                    actualShippingDate: shipment.actualShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
+                    expectedDeliveryDate: shipment.expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+                    actualDeliveryDate: shipment.actualDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
                     shipmentItems: shipment.shipmentItems,
                     containers: containerList
         ]}

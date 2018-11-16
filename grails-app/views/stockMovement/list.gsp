@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -35,7 +36,8 @@
         <div class="right">
 
             <div class="button-group">
-                <g:link controller="stockMovement" action="list" params="['requestedBy.id':session?.user?.id]" class="button icon user">
+                <g:link controller="stockMovement" action="list" params="['requestedBy.id':session?.user?.id]" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}" />&nbsp;
                     ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}
                     (${statistics["MINE"]?:0 })
                 </g:link>
@@ -58,12 +60,12 @@
         </div>
 
         <div class="button-group">
-            <g:link controller="stockMovement" action="list" class="button icon arrowleft">
+            <g:link controller="stockMovement" action="list" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                 <warehouse:message code="default.button.list.label" />
             </g:link>
-        </div>
-        <div class="button-group">
-            <g:link controller="stockMovement" action="index" class="button icon add">
+            <g:link controller="stockMovement" action="index" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                 <warehouse:message code="default.button.create.label" />
             </g:link>
         </div>
@@ -144,107 +146,40 @@
             </div>
         </div>
         <div class="yui-u">
-            <div class="box">
-                <h2>
-                    ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
-                    (${stockMovements?.totalCount?:0})
-                </h2>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>
-                            <warehouse:message code="default.actions.label"/>
-                        </th>
-                        <th>
-                            <warehouse:message code="default.numItems.label"/>
-                        </th>
-                        <g:sortableColumn property="status" params="${pageParams}"
-                                          title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
-
-                        <th>
-                            <warehouse:message code="receiving.status.label"/>
-                        </th>
-
-                        <g:sortableColumn property="requestNumber" params="${pageParams}"
-                                          title="${warehouse.message(code: 'stockMovement.identifier.label', default: 'Stock movement number')}" />
-
-                        <th><g:message code="default.name.label"/></th>
-                        <th><g:message code="stockMovement.origin.label"/></th>
-                        <th><g:message code="stockMovement.destination.label"/></th>
-                        <th><g:message code="stockMovement.stocklist.label"/></th>
-
-
-                        <g:sortableColumn property="requestedBy" params="${pageParams}"
-                                          title="${warehouse.message(code: 'stockMovement.requestedBy.label', default: 'Requested by')}" />
-
-                        <g:sortableColumn property="dateRequested" params="${pageParams}"
-                                          title="${warehouse.message(code: 'stockMovement.dateRequested.label', default: 'Date requested')}" />
-
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <g:unless test="${stockMovements}">
-                        <tr class="prop odd">
-                            <td colspan="11" class="center">
-                                <div class="empty">
-                                    <warehouse:message code="default.noItems.label"/>
-                                </div>
-                            </td>
-                        </tr>
-                    </g:unless>
-                    <g:each in="${stockMovements}" status="i" var="stockMovement">
-                        <g:set var="requisition" value="${stockMovement.requisition}"/>
-                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                            <td class="middle center">
-                                <g:render template="/stockMovement/actions" model="[stockMovement:stockMovement]"/>
-                            </td>
-                            <td>
-                                <div class="count">${stockMovement?.lineItems?.size()?:0}</div>
-                            </td>
-                            <td>
-                                <label class="status"><format:metadata obj="${stockMovement?.status}"/></label>
-                            </td>
-                            <td>
-                                <label class="status"><format:metadata obj="${stockMovement?.shipment?.status}"/></label>
-                            </td>
-
-                            <td>
-                                <g:link controller="stockMovement" action="show" id="${stockMovement.id}">
-                                    <strong>${stockMovement.identifier }</strong>
-                                </g:link>
-                            </td>
-                            <td>
-                                <g:link controller="stockMovement" action="show" id="${stockMovement.id}">
-                                    <div title="${stockMovement.name}">${stockMovement.description}</div>
-                                </g:link>
-                            </td>
-                            <td>
-                                ${stockMovement?.origin?.name}
-                            </td>
-                            <td>
-                                ${stockMovement?.destination?.name}
-                            </td>
-                            <td>
-                                ${stockMovement?.stocklist?.name?:"N/A"}
-                            </td>
-                            <td>
-                                ${stockMovement.requestedBy?:warehouse.message(code:'default.noone.label')}
-                            </td>
-                            <td>
-                                <div title="<g:formatDate date="${stockMovement.dateRequested }"/>">
-                                    <g:prettyDateFormat date="${stockMovement.dateRequested}"/>
-                                </div>
-                            </td>
-                        </tr>
+            <g:set var="stockMovements" value="${stockMovements.sort { it?.shipmentStatusCode }}"/>
+            <g:set var="stockMovementsMap" value="${stockMovements.groupBy { it?.shipmentStatusCode }}"/>
+            <g:if test="${stockMovements.size()}">
+                <div class="tabs">
+                    <ul>
+                        <g:each var="shipmentStatusCode" in="${stockMovementsMap.keySet() }">
+                            <li>
+                                <a href="#shipment-status-${shipmentStatusCode}">
+                                    <format:metadata obj="${shipmentStatusCode }"/>
+                                    (${stockMovementsMap[shipmentStatusCode]?.size() })
+                                </a>
+                            </li>
+                        </g:each>
+                    </ul>
+                    <g:each var="shipmentStatusCode" in="${stockMovementsMap.keySet() }">
+                        <div id="shipment-status-${shipmentStatusCode}">
+                            <g:render template="list" model="[stockMovements:stockMovementsMap[shipmentStatusCode],
+                                                              entityName:entityName,
+                                                              totalCount:stockMovements.totalCount,
+                                                              shipmentStatusCode:shipmentStatusCode,
+                                                              pageParams:pageParams]"/>
+                        </div>
                     </g:each>
-                    </tbody>
-                </table>
-                <div class="paginateButtons">
-                    <g:paginate total="${stockMovements.totalCount}" controller="stockMovement" action="list" max="${params.max}"
-                                params="${pageParams.findAll {it.value}}"/>
-
                 </div>
-            </div>
+            </g:if>
+            <g:else>
+                <div class="box">
+                    <h2>${warehouse.message(code:'stockMovements.label')}</h2>
+                    <div class="center empty">
+                        <warehouse:message code="default.noResultsFound.label" default="No results found" />
+                    </div>
+                </div>
+            </g:else>
+
         </div>
     </div>
 </div>

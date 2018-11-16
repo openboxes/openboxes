@@ -28,20 +28,20 @@ const FIELDS = {
   buttonsTop: {
     // eslint-disable-next-line react/prop-types
     type: ({ prevPage, onSave, saveDisabled }) => (
-      <div className="mb-3 text-center">
-        <button type="button" className="btn btn-outline-primary float-left btn-form" onClick={prevPage}>
+      <div className="mb-1 text-center">
+        <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
           Back to Edit
         </button>
         <button
           type="button"
-          className="btn btn-outline-success margin-bottom-lg btn-form"
+          className="btn btn-outline-success btn-form btn-xs"
           onClick={onSave}
           disabled={saveDisabled}
         >Save
         </button>
         <button
           type="submit"
-          className="btn btn-outline-primary float-right btn-form"
+          className="btn btn-outline-primary float-right btn-form btn-xs"
           disabled={saveDisabled}
         >Receive shipment
         </button>
@@ -49,6 +49,7 @@ const FIELDS = {
   },
   containers: {
     type: ArrayField,
+    maxTableHeight: 'calc(100vh - 450px)',
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
     fields: {
@@ -56,6 +57,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'Pallet',
+        flexWidth: '8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
         },
@@ -64,6 +66,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'Box',
+        flexWidth: '6',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
         },
@@ -75,7 +78,7 @@ const FIELDS = {
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Product',
-        flexWidth: '18',
+        flexWidth: '24',
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
@@ -131,20 +134,20 @@ const FIELDS = {
   buttonsBottom: {
     // eslint-disable-next-line react/prop-types
     type: ({ prevPage, onSave, saveDisabled }) => (
-      <div className="my-3 text-center">
-        <button type="button" className="btn btn-outline-primary float-left btn-form mt-4" onClick={prevPage}>
+      <div className="my-1 text-center">
+        <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
           Back to Edit
         </button>
         <button
           type="button"
-          className="btn btn-outline-success margin-bottom-lg"
+          className="btn btn-outline-success btn-xs"
           onClick={onSave}
           disabled={saveDisabled}
         >Save
         </button>
         <button
           type="submit"
-          className="btn btn-outline-primary float-right btn-form mt-4 mb-4"
+          className="btn btn-outline-primary float-right btn-form btn-xs"
           disabled={saveDisabled}
         >Receive shipment
         </button>

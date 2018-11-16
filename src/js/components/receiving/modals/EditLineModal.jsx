@@ -15,17 +15,15 @@ import apiClient from '../../../utils/apiClient';
 const FIELDS = {
   lines: {
     type: ArrayField,
-    disableVirtualization: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, shipmentItemId }) => (
       <button
         type="button"
-        className="btn btn-outline-success margin-bottom-lg"
+        className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           shipmentItemId,
           receiptItemId: null,
           newLine: true,
-          quantityReceiving: 0,
         })}
       >Add line
       </button>
@@ -145,7 +143,7 @@ class EditLineModal extends Component {
             label: `${_.get(value, 'product.productCode')} - ${_.get(value, 'product.name')}`,
           },
           disabled: true,
-          quantityReceiving: 0,
+          originalLine: true,
         })),
       },
     });

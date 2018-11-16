@@ -1,8 +1,20 @@
-# Introduction
+# Support
 
+## Community Support
 If you have questions, concerns, or issues with the software, documentation, or anything else 
-(excluding complaints about [POTUS](https://twitter.com/potus)) 
-contact our [Support Team](https://openboxes.com/support) through the various support channels. 
-Or safe yourself the extra click and just email us at [support@openboxes.com](support@openboxes.com).
+please consider using the discussion forum or issue tracking software.
 
-[!Oliver](../img/oliver.png)
+* Ask questions, find answers on our [discussion forum](https://discuss.openboxes.com)
+* File a [bug report](https://github.com/openboxes/openboxes/labels/bug)
+* Request a [new feature](https://github.com/openboxes/openboxes/labels/feature)
+* Suggest an [improvement](https://github.com/openboxes/openboxes/labels/improvement) to existing features
+
+
+## Professional Support
+If you need help installing, configuring, or implementing the software we provide professional
+services 
+
+* Find out about [professional services](https://openboxes.com/services) that we offer
+* Send inquiries to [support@openboxes.com](mailto:support@openboxes.com)
+
+

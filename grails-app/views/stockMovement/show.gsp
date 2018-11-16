@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -15,72 +16,82 @@
         <div class="message">${flash.message}</div>
     </g:if>
 
-    <div class="summary">
-        <div class="tag tag-alert right">
-            <format:metadata obj="${stockMovement?.requisition?.status }"/>
-        </div>
-
-        <div class="title">
-            <small>${stockMovement?.identifier}</small> ${stockMovement?.name}
-        </div>
-
-    </div>
+    <g:render template="summary" model="[shipmentInstance:stockMovement?.shipment, requisition: stockMovement?.requisition]"/>
 
     <div class="button-bar ">
+        <g:if test="${stockMovement.documents}">
+            <div class="right">
+                <span class="action-menu">
+                    <button class="action-btn button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle" />
+                        &nbsp; <g:message code="default.download.label"/>
+                    </button>
+                    <div class="actions">
+                        <g:each var="document" in="${stockMovement.documents}">
+                            <div class="action-menu-item">
+                                <g:link url="${document.uri}" target="_blank">
 
-        <%--
-            <g:if test="${stockMovement.id}">
-                <div class="right">
-                    <div class="button-group">
-                        <g:link controller="picklist" action="renderPdf" id="${stockMovement?.id}" target="_blank" class="button">
-                            <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
-                            ${warehouse.message(code: 'picklist.button.print.label', default: 'Download pick list')}
-                        </g:link>
-                        <g:link controller="picklist" action="print" id="${stockMovement?.id}" target="_blank" class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-                            ${warehouse.message(code: 'picklist.button.print.label', default: 'Print pick list')}
-                        </g:link>
-                        <g:link controller="deliveryNote" action="print" id="${stockMovement?.id}" target="_blank" class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-                            ${warehouse.message(code: 'deliveryNote.button.print.label', default: 'Print delivery note')}
-                        </g:link>
+                                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                    ${document.name}
+                                </g:link>
+                            </div>
+                        </g:each>
                     </div>
-                </div>
-            </g:if>
-        --%>
+                </span>
 
-            <g:link controller="stockMovement" action="list" class="button icon arrowleft">
+            </div>
+        </g:if>
+
+        <div class="button-group">
+
+            <g:link controller="stockMovement" action="list" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'text_list_bullets.png')}" />&nbsp;
                 <warehouse:message code="default.button.list.label" />
             </g:link>
 
-            <g:link controller="stockMovement" action="index" class="button icon add">
+            <g:link controller="stockMovement" action="index" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                 <warehouse:message code="default.button.create.label" />
             </g:link>
 
-            <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button icon edit">
+        </div>
+        <div class="button-group">
+
+                <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
-            <g:if test="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}">
-                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button icon approve">
-                        <warehouse:message code="default.button.receive.label" />
-                    </g:link>
+
+            <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
+            <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
+            <g:set var="disableReceivingButton" value="${!hasBeenIssued || hasBeenReceived}"/>
+            <g:if test="${!hasBeenIssued}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
             </g:if>
+            <g:if test="${hasBeenReceived}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasAlreadyBeenReceived.message', args: [stockMovement?.identifier])}"/>
+            </g:if>
+            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button"
+                    disabled="${disableReceivingButton}" disabledMessage="${disabledMessage}">
+                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                <warehouse:message code="default.button.receive.label" />
+            </g:link>
 
             <g:isSuperuser>
-                <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button icon remove"
+                <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
                         onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
                     <warehouse:message code="default.button.delete.label" />
                 </g:link>
             </g:isSuperuser>
         </div>
-
     </div>
 
 
 <div class="yui-gf">
     <div class="yui-u first">
         <div class="box">
-            <h2><g:message code="default.header.label" default="Header"/></h2>
+            <h2><g:message code="stockMovement.label" /></h2>
             <div>
 
                 <table>
@@ -97,7 +108,7 @@
                             <g:message code="stockMovement.status.label"/>
                         </td>
                         <td class="value">
-                            <format:metadata obj="${stockMovement?.status}"/>
+                            <format:metadata obj="${stockMovement?.shipment?.status?:stockMovement?.requisition?.status }"/>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -153,36 +164,52 @@
                             <g:message code="shipping.shipmentType.label"/>
                         </td>
                         <td class="value">
-                            ${stockMovement?.shipmentType?.name}
+                            <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
                         </td>
                     </tr>
                     <tr class="prop">
                         <td class="name">
-                            <g:message code="shipping.shipment.label"/>
+                            <warehouse:message code="shipping.totalValue.label"/>
                         </td>
                         <td class="value">
-                            <g:link controller="shipment" action="showDetails" id="${stockMovement?.shipment?.id}" params="[override:true]">
-                                ${g.message(code:'default.view.label', args: [g.message(code: 'shipment.label')])}
-                            </g:link>
+                            <g:formatNumber format="###,###,##0.00" number="${shipmentInstance?.totalValue ?: 0.00 }" />
+                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </td>
                     </tr>
-                    <tr class="prop">
-                        <td class="name">
-                            <g:message code="requisition.label"/>
-                        </td>
-                        <td class="value">
-                            <g:link controller="requisition" action="show" id="${stockMovement?.id}" params="[override:true]">
-                                ${g.message(code:'default.view.label', args: [g.message(code: 'requisition.label')])}
-                            </g:link>
-                        </td>
-                    </tr>
+                    <g:isSuperuser>
+                        <tr class="prop">
+                            <td class="name">
+                                <g:message code="shipping.shipment.label"/>
+                            </td>
+                            <td class="value">
+                                <g:link controller="shipment" action="showDetails" id="${stockMovement?.shipment?.id}" params="[override:true]">
+                                    ${g.message(code:'default.view.label', args: [g.message(code: 'shipment.label')])}
+                                </g:link>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <g:message code="requisition.label"/>
+                            </td>
+                            <td class="value">
+                                <g:link controller="requisition" action="show" id="${stockMovement?.id}" params="[override:true]">
+                                    ${g.message(code:'default.view.label', args: [g.message(code: 'requisition.label')])}
+                                </g:link>
+                            </td>
+                        </tr>
+                    </g:isSuperuser>
                     <tr class="prop">
                         <td class="name">
                             <g:message code="stockMovement.dateRequested.label"/>
                         </td>
                         <td class="value">
-                            <g:formatDate date="${stockMovement.dateRequested}"/>
-
+                            <span title="${g.formatDate(date:stockMovement?.dateRequested)}">
+                                <g:prettyDateFormat date="${stockMovement.dateRequested}"/>
+                            </span>
+                            <g:if test="${stockMovement?.requisition?.requestedBy}">
+                                <g:message code="default.by.label"/>
+                                ${stockMovement?.requisition?.requestedBy?.name}
+                            </g:if>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -190,7 +217,30 @@
                             <g:message code="stockMovement.dateShipped.label"/>
                         </td>
                         <td class="value">
-                            <g:formatDate date="${stockMovement.dateShipped}"/>
+                            <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
+                                <g:prettyDateFormat date="${stockMovement.dateShipped}"/>
+                            </span>
+                            <g:if test="${stockMovement?.shipment?.createdBy}">
+                                <g:message code="default.by.label"/>
+                                ${stockMovement?.shipment?.createdBy?.name}
+                            </g:if>
+
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td class="name">
+                            <g:message code="stockMovement.dateReceived.label"/>
+                        </td>
+                        <td class="value">
+                            <g:each var="receipt" in="${stockMovement?.shipment?.receipts}">
+                                <span title="${g.formatDate(date:receipt?.actualDeliveryDate)}">
+                                    <g:prettyDateFormat date="${receipt?.actualDeliveryDate}"/>
+                                </span>
+                                <g:if test="${receipt.recipient}">
+                                    <g:message code="default.by.label"/>
+                                    ${receipt.recipient?.name}
+                                </g:if>
+                            </g:each>
 
                         </td>
                     </tr>
@@ -199,8 +249,13 @@
                             <g:message code="default.dateCreated.label"/>
                         </td>
                         <td class="value">
-                            <g:formatDate date="${stockMovement?.requisition?.dateCreated}"/>
-
+                            <span title="${g.formatDate(date:stockMovement?.requisition?.dateCreated)}">
+                                <g:prettyDateFormat date="${stockMovement?.requisition?.dateCreated}"/>
+                            </span>
+                            <g:if test="${stockMovement?.requisition?.createdBy}">
+                                <g:message code="default.by.label"/>
+                                ${stockMovement?.requisition?.createdBy?.name}
+                            </g:if>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -208,7 +263,13 @@
                             <g:message code="default.lastUpdated.label"/>
                         </td>
                         <td class="value">
-                            <g:formatDate date="${stockMovement?.requisition?.lastUpdated}"/>
+                            <span title="${g.formatDate(date:stockMovement?.requisition?.lastUpdated)}">
+                                <g:prettyDateFormat date="${stockMovement?.requisition?.lastUpdated}"/>
+                            </span>
+                            <g:if test="${stockMovement?.requisition?.updatedBy}">
+                                <g:message code="default.by.label"/>
+                                ${stockMovement?.requisition?.updatedBy?.name}
+                            </g:if>
                         </td>
                     </tr>
                 </table>
@@ -220,14 +281,17 @@
 
         <div class="tabs">
             <ul>
+
+                <g:if test="${!stockMovement?.origin?.isSupplier()}">
+                    <li>
+                        <a href="${request.contextPath}/stockMovement/requisition/${stockMovement?.id}">
+                            <warehouse:message code="requisition.label"/>
+                        </a>
+                    </li>
+                </g:if>
                 <li>
-                    <a href="#details-tab">
-                        <warehouse:message code="requisition.label"/>
-                    </a>
-                </li>
-                <li>
-                    <a href="${request.contextPath}/stockMovement/shipments/${stockMovement?.id}">
-                        <warehouse:message code="shipments.label" default="Shipments"/>
+                    <a href="${request.contextPath}/stockMovement/packingList/${stockMovement?.id}">
+                        <warehouse:message code="shipping.packingList.label" />
                     </a>
                 </li>
                 <li>
@@ -236,111 +300,11 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#documents-tab">
+                    <a href="${request.contextPath}/stockMovement/documents/${stockMovement?.id}">
                         <warehouse:message code="documents.label" default="Documents"/>
                     </a>
                 </li>
-                <%--
-                <li>
-                    <a href="#comments-tab">
-                        <warehouse:message code="comments.label" default="Comments"/>
-                    </a>
-                </li>
-                <li>
-                    <a href="#events-tab">
-                        <warehouse:message code="events.label" default="Comments"/>
-                    </a>
-                </li>
-                <li>
-                    <a href="${request.contextPath}/stockMovement/transactions/${stockMovement?.id}">
-                        <warehouse:message code="transactions.label" default="Transactions"/>
-                    </a>
-                </li>
-                --%>
-                </ul>
-                <div id="details-tab">
-                    <div class="box">
-                        <h2><warehouse:message code="requisition.label"/></h2>
-
-                        <div>
-                            <table>
-
-                                <tr>
-                                    <th></th>
-                                    <th><g:message code="default.status.label"/></th>
-                                    <th><g:message code="product.productCode.label"/></th>
-                                    <th><g:message code="product.label"/></th>
-                                    <th width="1%"><g:message code="stockMovement.quantityRequested.label"/></th>
-                                </tr>
-
-                                <g:each var="stockMovementItem" in="${stockMovement.lineItems}" status="i">
-                                <g:set var="requisitionItem" value="${stockMovementItem?.requisitionItem}"/>
-                                <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                                    <td class="center">
-                                        ${i+1}
-                                    </td>
-                                    <td class="">
-                                        <div class="tag tag-success">
-                                            <g:if test="${requisitionItem?.isSubstituted()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"/>
-                                            </g:if>
-                                            <g:elseif test="${requisitionItem?.isSubstitution()}">
-                                                <img src="${resource(dir:'images/icons',file:'indent.gif')}"/>
-                                            </g:elseif>
-                                            <g:elseif test="${requisitionItem?.isChanged()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}"/>
-                                            </g:elseif>
-                                            <g:elseif test="${requisitionItem?.isCanceled()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"/>
-                                            </g:elseif>
-                                            <g:elseif test="${requisitionItem?.isApproved()||requisitionItem?.isCompleted()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"/>
-                                            </g:elseif>
-                                            <g:elseif test="${requisitionItem?.isPending()}">
-                                                <img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}"/>
-                                            </g:elseif>
-                                            <format:metadata obj="${requisitionItem?.status}"/>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <g:link controller="inventoryItem" action="showStockCard" id=${stockMovementItem?.product?.id}">
-                                            ${stockMovementItem?.product?.productCode}
-                                        </g:link>
-                                    </td>
-                                    <td>
-                                        <g:link controller="inventoryItem" action="showStockCard" id="${stockMovementItem?.product?.id}">
-                                            ${stockMovementItem?.product?.name}
-                                        </g:link>
-                                    </td>
-                                    <td class="center">
-                                        ${stockMovementItem?.quantityRequested?:0}
-                                        ${stockMovementItem.product?.unitOfMeasure?:g.message(code:'default.each.label')}
-                                    </td>
-
-                                </tr>
-                                </g:each>
-
-
-                            </table>
-
-                        </div>
-                    </div>
-                </div>
-                <div id="documents-tab">
-                    <div class="box">
-                        <table>
-                            <tr>
-                                <th><g:message code="document.label"/></th>
-                            </tr>
-                            <g:each var="document" in="${stockMovement.documents}" status="i">
-                                <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                                    <td><g:link url="${document.uri}" target="_blank">${document.name}</g:link></td>
-                                </tr>
-                            </g:each>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            </ul>
         </div>
     </div>
 </div>

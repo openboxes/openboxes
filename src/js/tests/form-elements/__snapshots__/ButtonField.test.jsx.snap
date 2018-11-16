@@ -2,7 +2,7 @@
 
 exports[`ButtonField component is correctly rendering component label 1`] = `
 <button
-  className="btn btn-outline-primary"
+  className="btn btn-xs btn-outline-primary"
   disabled={false}
   type="button"
 >
@@ -14,7 +14,7 @@ exports[`ButtonField component is correctly rendering component label 1`] = `
 
 exports[`ButtonField component is correctly rendering string label 1`] = `
 <button
-  className="btn btn-outline-primary"
+  className="btn btn-xs btn-outline-primary"
   disabled={false}
   type="button"
 >

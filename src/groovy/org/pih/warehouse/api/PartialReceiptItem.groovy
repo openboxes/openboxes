@@ -19,6 +19,7 @@ class PartialReceiptItem {
     Boolean cancelRemaining = Boolean.FALSE
 
     Boolean isSplitItem = Boolean.FALSE
+    Boolean shouldSave = Boolean.FALSE
 
     String lotNumber
     Date expirationDate
@@ -84,6 +85,7 @@ class PartialReceiptItem {
                 "recipient.name": recipient?.name,
                 quantityShipped: quantityShipped,
                 quantityReceived: quantityReceived,
+                quantityCanceled: quantityCanceled,
                 quantityReceiving: quantityReceiving,
                 quantityRemaining: quantityRemaining,
                 cancelRemaining: cancelRemaining

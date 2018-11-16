@@ -14,7 +14,6 @@ import ArrayField from '../form-elements/ArrayField';
 import ButtonField from '../form-elements/ButtonField';
 import LabelField from '../form-elements/LabelField';
 import DateField from '../form-elements/DateField';
-import ValueSelectorField from '../form-elements/ValueSelectorField';
 import { renderFormField } from '../../utils/form-utils';
 import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
 import apiClient from '../../utils/apiClient';
@@ -37,11 +36,12 @@ const DELETE_BUTTON_FIELD = {
 const NO_STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
+    virtualized: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
       <button
         type="button"
-        className="btn btn-outline-success margin-bottom-lg"
+        className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
@@ -58,15 +58,17 @@ const NO_STOCKLIST_FIELDS = {
           async: true,
           openOnClick: false,
           autoload: false,
-          autoFocus: true,
           filterOptions: options => options,
           cache: false,
           options: [],
           showValueTooltip: true,
         },
-        getDynamicAttr: ({ fieldValue, productsFetch }) => ({
+        getDynamicAttr: ({
+          fieldValue, productsFetch, rowIndex, rowCount,
+        }) => ({
           disabled: !!fieldValue,
           loadOptions: _.debounce(productsFetch, 500),
+          autoFocus: rowIndex === rowCount - 1,
         }),
       },
       quantityRequested: {
@@ -110,11 +112,12 @@ const NO_STOCKLIST_FIELDS = {
 const STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
+    virtualized: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
       <button
         type="button"
-        className="btn btn-outline-success margin-bottom-lg"
+        className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
@@ -123,32 +126,26 @@ const STOCKLIST_FIELDS = {
     ),
     fields: {
       product: {
-        type: ValueSelectorField,
+        fieldKey: 'disabled',
+        type: SelectField,
         label: 'Requisition items',
         flexWidth: '9',
         attributes: {
-          formName: 'stock-movement-wizard',
+          async: true,
+          openOnClick: false,
+          autoload: false,
+          filterOptions: options => options,
+          cache: false,
+          options: [],
+          showValueTooltip: true,
         },
-        getDynamicAttr: ({ rowIndex }) => ({
-          field: `lineItems[${rowIndex}].disabled`,
+        getDynamicAttr: ({
+          fieldValue, productsFetch, rowIndex, rowCount,
+        }) => ({
+          disabled: !!fieldValue,
+          loadOptions: _.debounce(productsFetch, 500),
+          autoFocus: rowIndex === rowCount - 1,
         }),
-        component: SelectField,
-        componentConfig: {
-          attributes: {
-            async: true,
-            openOnClick: false,
-            autoload: false,
-            autoFocus: true,
-            filterOptions: options => options,
-            cache: false,
-            options: [],
-            showValueTooltip: true,
-          },
-          getDynamicAttr: ({ selectedValue, productsFetch }) => ({
-            disabled: !!selectedValue,
-            loadOptions: _.debounce(productsFetch, 500),
-          }),
-        },
       },
       quantityAllowed: {
         type: LabelField,
@@ -181,11 +178,12 @@ const STOCKLIST_FIELDS = {
 const VENDOR_FIELDS = {
   lineItems: {
     type: ArrayField,
+    virtualized: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
       <button
         type="button"
-        className="btn btn-outline-success margin-bottom-lg"
+        className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
@@ -197,9 +195,9 @@ const VENDOR_FIELDS = {
         type: TextField,
         label: 'Pallet',
         flexWidth: '1',
-        attributes: {
-          autoFocus: true,
-        },
+        getDynamicAttr: ({ rowIndex, rowCount }) => ({
+          autoFocus: rowIndex === rowCount - 1,
+        }),
       },
       boxName: {
         type: TextField,
@@ -209,7 +207,7 @@ const VENDOR_FIELDS = {
       product: {
         type: SelectField,
         label: 'Item',
-        flexWidth: '6',
+        flexWidth: '4',
         attributes: {
           className: 'text-left',
           async: true,
@@ -232,7 +230,7 @@ const VENDOR_FIELDS = {
       expirationDate: {
         type: DateField,
         label: 'Expiry',
-        flexWidth: '1',
+        flexWidth: '1.5',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
         },
@@ -520,7 +518,7 @@ class AddItemsPage extends Component {
    */
   nextPage(formValues) {
     const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val) &&
-        !_.isNil(val.quantityRequested));
+      !_.isNil(val.quantityRequested));
 
     if (formValues.origin.type === 'SUPPLIER') {
       this.props.showSpinner();
@@ -781,7 +779,7 @@ class AddItemsPage extends Component {
             <span>
               <label
                 htmlFor="csvInput"
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-download pr-2" />Import Template</span>
                 <input
@@ -795,14 +793,14 @@ class AddItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => this.exportTemplate(values)}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-upload pr-2" />Export Template</span>
               </button>
               <button
                 type="button"
                 onClick={() => this.refresh()}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-refresh pr-2" />Refresh</span>
               </button>
@@ -810,7 +808,7 @@ class AddItemsPage extends Component {
                 type="button"
                 disabled={invalid}
                 onClick={() => this.save(values)}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-save pr-2" />Save</span>
               </button>
@@ -818,7 +816,7 @@ class AddItemsPage extends Component {
                 type="button"
                 disabled={invalid}
                 onClick={() => this.removeAll().then(() => this.fetchAndSetLineItems())}
-                className="float-right py-1 mb-1 btn btn-outline-danger align-self-end"
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
               >
                 <span><i className="fa fa-remove pr-2" />Delete all</span>
               </button>
@@ -833,12 +831,12 @@ class AddItemsPage extends Component {
                   getSortOrder: this.getSortOrder,
                 }))}
               <div>
-                <button type="button" className="btn btn-outline-primary btn-form" onClick={() => previousPage(values)}>
+                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => previousPage(values)}>
                   Previous
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-outline-primary btn-form float-right"
+                  className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
                 >Next
                 </button>

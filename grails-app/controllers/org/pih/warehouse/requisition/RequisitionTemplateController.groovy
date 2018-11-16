@@ -37,7 +37,7 @@ class RequisitionTemplateController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         def requisitionCriteria = new Requisition()
         requisitionCriteria.name = "%" + params.q + "%"
-        requisitionCriteria.origin = Location.get(session.warehouse.id)
+        requisitionCriteria.origin = params?.origin?.id ? Location.get(params?.origin?.id): null
         requisitionCriteria.destination = params?.destination?.id ? Location.get(params?.destination?.id): null
         requisitionCriteria.commodityClass = params.commodityClass?:null
         requisitionCriteria.type = params.requisitionType?:null
@@ -53,7 +53,7 @@ class RequisitionTemplateController {
 		def requisition = new Requisition(status: RequisitionStatus.CREATED)
         requisition.type = params.type as RequisitionType
         requisition.isTemplate = true
-		
+		requisition.origin = Location.get(session?.warehouse?.id)
         [requisition:requisition]
     }
 

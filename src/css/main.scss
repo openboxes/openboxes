@@ -123,6 +123,7 @@ body {
 }
 
 .form-group {
+  font-size: .885rem;
   &.required {
     .col-form-label:after {
       content: "*";
@@ -160,9 +161,64 @@ body {
   margin-right: 10px;
 }
 
+.font-size-xs {
+  font-size: .875rem;
+}
+
+.btn-xs {
+  padding: 0 .5rem;
+  font-size: .875rem;
+  border-radius: .2rem;
+}
+
+.form-control-xs {
+  height: calc(1.5rem + 2px);
+  padding: .0rem .5rem;
+  font-size: .875rem;
+  border-radius: .2rem;
+}
+
+.col-form-label-xs {
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.select-xs {
+  font-size: .875rem;
+  border-radius: .2rem;
+
+  .Select-control {
+    height: 26px;
+
+    .Select-value {
+      line-height: 26px !important;
+    }
+
+    .Select-placeholder {
+      line-height: 26px;
+    }
+
+    .Select-input {
+      height: 24px;
+
+      input {
+        padding: 0;
+        line-height: 26px;
+      }
+    }
+  }
+}
+
+.table-xs th, .table-xs td {
+  padding: 0.3rem;
+  font-size: 0.875rem;
+}
+
 .movement-number {
   height: auto;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   line-height: 36px;
   list-style: none;
   font-size: 25px;
@@ -174,8 +230,6 @@ body {
 
 .help-block {
   display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
   color: $gray-epsilon;
 }
 
@@ -195,10 +249,6 @@ body {
   border-color: $red-alpha;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px $red-gamma;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px $red-gamma;
-}
-
-.wrap-text {
-  overflow-wrap: break-word;
 }
 
 .text-disabled {
@@ -336,7 +386,7 @@ body {
 ----------------------------*/
 
 .ReactModalPortal .ReactModal__Overlay--after-open {
-  z-index: 4 !important;
+  z-index: 100 !important;
 }
 
 .modal-content-custom {
@@ -407,7 +457,7 @@ tr.crossed-out td:before {
   height: 100%;
   width: 100%;
   background-color: rgba(255,255,255, 0.8);
-  z-index: 100;
+  z-index: 110;
 }
 
 .spinner-container > div > div {
@@ -423,12 +473,12 @@ tr.crossed-out td:before {
 }
 
 .table-row {
-  height: 50px;
+  height: 28px;
 }
 
 .table-inner-row {
   position: relative;
-  height: 50px;
+  height: 28px;
 }
 
 div.crossed-out .table-inner-row:before {
@@ -438,7 +488,7 @@ div.crossed-out .table-inner-row:before {
   left: 0;
   border-bottom: 2px solid $red-beta;
   width: 100%;
-  z-index: 999 !important;
+  z-index: 99 !important;
 }
 
 .force-on-top {

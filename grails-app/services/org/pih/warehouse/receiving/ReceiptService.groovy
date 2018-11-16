@@ -70,7 +70,7 @@ class ReceiptService {
         partialReceipt.dateShipped = shipment.actualShippingDate
         partialReceipt.dateDelivered = shipment.actualDeliveryDate ?: new Date()
 
-        Location defaultBinLocation =
+        Location defaultBinLocation = !shipment.destination.hasBinLocationSupport() ? null :
                 locationService.findInternalLocation(shipment.destination, "Receiving ${shipment.shipmentNumber}")
 
         def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
@@ -101,7 +101,7 @@ class ReceiptService {
         partialReceipt.dateShipped = receipt?.shipment?.actualShippingDate
         partialReceipt.dateDelivered = receipt.actualDeliveryDate
 
-        Location defaultBinLocation =
+        Location defaultBinLocation = !receipt.shipment.destination.hasBinLocationSupport() ? null :
                 locationService.findInternalLocation(receipt.shipment.destination, "Receiving ${receipt.shipment.shipmentNumber}")
 
         def shipmentItemsByContainer = receipt.shipment.shipmentItems.groupBy { it.container }
@@ -160,7 +160,6 @@ class ReceiptService {
     }
 
     ReceiptItem createOrUpdateReceiptItem(PartialReceiptItem partialReceiptItem) {
-        ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
         if (!partialReceiptItem.shipmentItem) {
             throw new IllegalArgumentException("Cannot receive item without valid shipment item")
         }
@@ -192,7 +191,11 @@ class ReceiptService {
         receiptItem.isSplitItem = partialReceiptItem.isSplitItem
 
         if (partialReceiptItem.cancelRemaining) {
-            receiptItem.quantityCanceled = shipmentItem.quantityRemaining - partialReceiptItem.quantityReceiving
+            //when completing the pending receipt status was already changed to received and the item quantity will in quantityReceived,
+            // so there is no need to subtract quantityReceiving, unless it's split item (which will always have quantity received = 0)
+            Integer qtyCanceled = partialReceiptItem.quantityShipped - (partialReceiptItem.quantityReceived +
+                    partialReceiptItem.quantityCanceled + (partialReceiptItem.isSplitItem ? partialReceiptItem.quantityReceiving : 0))
+            receiptItem.quantityCanceled = qtyCanceled
         }
 
         partialReceiptItem.receiptItem = receiptItem
@@ -228,7 +231,7 @@ class ReceiptService {
         partialReceipt.partialReceiptItems.each { partialReceiptItem ->
 
             log.info "Saving partial receipt item " + partialReceiptItem
-            if (partialReceiptItem.quantityReceiving != null) {
+            if (partialReceiptItem.shouldSave) {
                 ReceiptItem receiptItem = createOrUpdateReceiptItem(partialReceiptItem)
                 receipt.addToReceiptItems(receiptItem)
                 ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
@@ -269,7 +272,6 @@ class ReceiptService {
     void saveInboundTransaction(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt.shipment
         if (shipment) {
-            rollbackInboundTransactions(shipment)
             createInboundTransaction(partialReceipt)
         }
     }

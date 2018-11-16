@@ -28,6 +28,7 @@ const BTN_CLASS_MAPPER = {
 const FIELDS = {
   editPageItems: {
     type: ArrayField,
+    virtualized: true,
     rowComponent: TableRowWithSubfields,
     getDynamicRowAttr: ({ rowValues, subfield }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
@@ -46,7 +47,7 @@ const FIELDS = {
       },
       productName: {
         type: LabelField,
-        flexWidth: '6',
+        flexWidth: '4.5',
         label: 'Product Name',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
@@ -79,6 +80,14 @@ const FIELDS = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
+      totalMonthlyQuantity: {
+        type: LabelField,
+        label: 'Total monthly quantity',
+        flexWidth: '1.35',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
       quantityConsumed: {
         type: LabelField,
         label: 'Monthly consumption',
@@ -96,8 +105,9 @@ const FIELDS = {
           title: 'Substitutes',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, stockMovementId, onResponse,
+          fieldValue, rowIndex, stockMovementId, onResponse, reviseRequisitionItems, values,
         }) => ({
+          onOpen: () => reviseRequisitionItems(values),
           productCode: fieldValue.productCode,
           btnOpenText: fieldValue.substitutionStatus,
           btnOpenDisabled: fieldValue.substitutionStatus === 'NO' || fieldValue.statusCode === 'SUBSTITUTED',
@@ -194,6 +204,7 @@ class EditItemsPage extends Component {
 
     this.revertItem = this.revertItem.bind(this);
     this.saveNewItems = this.saveNewItems.bind(this);
+    this.reviseRequisitionItems = this.reviseRequisitionItems.bind(this);
     this.props.showSpinner();
   }
 
@@ -271,7 +282,8 @@ class EditItemsPage extends Component {
             revision => revision.requisitionItemId === item.requisitionItemId,
           );
           return _.isEmpty(oldRevision) ? true :
-            (oldRevision.quantityRevised !== item.quantityRevised);
+            ((oldRevision.quantityRevised !== item.quantityRevised) ||
+             (oldRevision.reasonCode !== item.reasonCode));
         }
         return false;
       },
@@ -436,21 +448,20 @@ class EditItemsPage extends Component {
         validate={validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
             <span>
               <button
                 type="button"
                 onClick={() => this.refresh()}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end ml-1"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-refresh pr-2" />Refresh</span>
               </button>
               <button
                 type="button"
-                disabled={invalid}
                 onClick={() => this.save(values)}
-                className="float-right py-1 mb-1 btn btn-outline-secondary align-self-end"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
                 <span><i className="fa fa-save pr-2" />Save</span>
               </button>
@@ -461,12 +472,14 @@ class EditItemsPage extends Component {
                 reasonCodes: this.props.reasonCodes,
                 onResponse: this.saveNewItems,
                 revertItem: this.revertItem,
+                reviseRequisitionItems: this.reviseRequisitionItems,
+                values,
               }))}
               <div>
-                <button type="button" className="btn btn-outline-primary btn-form" onClick={() => this.props.previousPage(values)}>
+                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
                   Previous
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right">Next</button>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">Next</button>
               </div>
             </form>
           </div>

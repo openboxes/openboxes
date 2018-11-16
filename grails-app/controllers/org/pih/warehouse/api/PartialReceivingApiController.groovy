@@ -6,11 +6,12 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -56,8 +57,16 @@ class PartialReceivingApiController {
         render([data:partialReceipt] as JSON)
     }
 
+    Date parseDate(String date) {
+        return date ? Constants.DELIVERY_DATE_FORMATTER.parse(date) : null
+    }
 
     void bindPartialReceiptData(PartialReceipt partialReceipt, JSONObject jsonObject) {
+
+        // Date is not bound properly using default JSON binding
+        if (jsonObject.containsKey("dateDelivered")) {
+            partialReceipt.dateDelivered = parseDate(jsonObject.remove("dateDelivered"))
+        }
 
         // Bind the partial receipt
         bindData(partialReceipt, jsonObject)
@@ -81,6 +90,7 @@ class PartialReceivingApiController {
                 String shipmentItemId = shipmentItemMap.get("shipmentItemId")
                 String receiptItemId = shipmentItemMap.get("receiptItemId")
                 boolean newLine = Boolean.valueOf(shipmentItemMap.newLine ?: "false")
+                boolean originalLine = Boolean.valueOf(shipmentItemMap.originalLine ?: "false")
                 PartialReceiptItem partialReceiptItem = partialReceiptContainer.partialReceiptItems.find {
                     receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId
                 }
@@ -93,6 +103,8 @@ class PartialReceivingApiController {
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
                 bindData(partialReceiptItem, shipmentItemMap)
+
+                partialReceiptItem.shouldSave = newLine || originalLine || partialReceiptItem.quantityReceiving != null || partialReceiptItem.receiptItem
             }
         }
     }

@@ -2,13 +2,13 @@
 
 exports[`TextField component is correctly rendering renders correctly 1`] = `
 <div
-  className="padding-left-md padding-right-md form-group my-0   "
+  className="mt-2 form-group mb-0   "
 >
   <div
     className="row"
   >
     <label
-      className="col-md-2 col-7 col-form-label text-center text-md-right"
+      className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right"
       htmlFor="test-field"
     >
       test label
@@ -17,10 +17,11 @@ exports[`TextField component is correctly rendering renders correctly 1`] = `
       className="col-md-4 col-7"
     >
       <input
-        className="form-control"
+        className="form-control form-control-xs "
         id="test-field"
         onBlur={[Function]}
         onChange={[Function]}
+        onKeyPress={[Function]}
         type="text"
         value={undefined}
       />

@@ -16,7 +16,6 @@ const FIELDS = {
   adjustInventory: {
     addButton: 'Add new lot number',
     type: ArrayField,
-    disableVirtualization: true,
     fields: {
       binLocation: {
         type: SelectField,

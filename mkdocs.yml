@@ -1,27 +1,24 @@
 site_name: OpenBoxes
 site_description: 
 site_author: Justin Miranda
-theme: readthedocs
+theme: 'readthedocs'
 repo_url: https://github.com/openboxes/openboxes
-include_search: true
+#include_search: true
 #use_absolute_urls: true
 use_directory_urls: true
-copyright: Copyright &copy; 2017, OpenBoxes
-google_analytics: ['UA-37396941-2', 'OpenBoxes']
+copyright: Copyright &copy; 2010-2018, OpenBoxes
+google_analytics: ['UA-37396941-2', 'openboxes.com']
 markdown_extensions:
   - admonition
   - footnotes
   - tables
 
 pages:
-
 - Home: 'index.md'
-
 - About:
     - 'Benefits': 'about/benefits.md'
     - 'Considerations': 'about/considerations.md'
     - 'Release Notes': 'about/release-notes.md'
-
 - Installation Guide:
     - 'Installation': 'installation/index.md'
     - 'Install on Ubuntu': 'installation/ubuntu.md'
@@ -37,7 +34,6 @@ pages:
     - 'Example': 'configuration/example.md'
 
 - User Guide: 'user-guide/index.md'
-
 - Developer Guide:
     - 'Introduction': 'developer-guide/index.md'
     - 'Getting Started': 'developer-guide/getting-started.md'
@@ -50,18 +46,20 @@ pages:
     - 'Getting Started': 'api-guide/getting-started.md'
     - 'Generic API': 'api-guide/generic.md'
     - 'Custom API':
-        - 'Categories': 'api-guide/category.md'
-        - 'Identifiers': 'api-guide/identifier.md'
-        - 'Internal Locations': 'api-guide/internalLocation.md'
-        - 'Locations': 'api-guide/location.md'
-        - 'Lookup': 'api-guide/lookup.md'
-        - 'Products': 'api-guide/product.md'
-        - 'Putaway': 'api-guide/putaway.md'
-        - 'Receiving': 'api-guide/receiving.md'
+        - 'Core':
+            - 'Identifiers': 'api-guide/identifier.md'
+            - 'Internal Locations': 'api-guide/internalLocation.md'
+            - 'Locations': 'api-guide/location.md'
+            - 'Lookup': 'api-guide/lookup.md'
+        - 'Products':
+            - 'Categories': 'api-guide/category.md'
+            - 'Products': 'api-guide/product.md'
         - 'Stock Movements':
             - 'Stock Movement': 'api-guide/stockMovement.md'
             - 'Stock Movement Item': 'api-guide/stockMovementItem.md'
             - 'Stock Movement Status': 'api-guide/stockMovementStatus.md'
+            - 'Putaway': 'api-guide/putaway.md'
+            - 'Receiving': 'api-guide/receiving.md'
 
 - Support: 'support/index.md'
 

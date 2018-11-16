@@ -299,7 +299,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 requestedByName: requestedBy?.name,
                 description: description,
                 dateRequested: dateRequested.format("MM/dd/yyyy"),
-                requestedDeliveryDate: requestedDeliveryDate.format("MM/dd/yyyy HH:mm"),
+                requestedDeliveryDate: requestedDeliveryDate.format("MM/dd/yyyy HH:mm XXX"),
                 lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
                 status: status?.name(),
                 type: type?.name(),

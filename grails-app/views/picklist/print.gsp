@@ -129,16 +129,16 @@
 
 
 
-<table class="signature-table" border="0">
+<table class="signature-table" style="border: 1px solid lightgrey;">
     <tr class="theader">
-        <td width="15%"></td>
-        <td width="20%"><warehouse:message code="default.name.label"/></td>
-        <td width="40%"><warehouse:message code="default.signature.label"/></td>
-        <td width="15%" class="center"><warehouse:message code="default.date.label"/></td>
-        <td width="10%" class="center"><warehouse:message code="default.time.label"/></td>
+        <th width="15%"></th>
+        <th width="20%"><warehouse:message code="default.name.label"/></th>
+        <th width="40%"><warehouse:message code="default.signature.label"/></th>
+        <th width="15%" class="center"><warehouse:message code="default.date.label"/></th>
+        <th width="10%" class="center"><warehouse:message code="default.time.label"/></th>
     </tr>
     <tr>
-        <td class="right">
+        <td class="middle">
             <label><warehouse:message code="requisition.requestedBy.label"/></label>
         </td>
         <td class="middle">
@@ -155,11 +155,11 @@
         </td>
     </tr>
     <tr>
-        <td class="right middle">
+        <td class="middle">
             <label><warehouse:message code="requisition.createdBy.label"/></label>
         </td>
         <td class="middle">
-            ${requisition?.createdBy?.name?:warehouse.message(code:'default.none.label')}
+            ${requisition?.createdBy?.name}
         </td>
         <td>
 
@@ -172,11 +172,11 @@
         </td>
     </tr>
     <tr>
-        <td class="right">
+        <td class="middle">
             <label><warehouse:message code="requisition.verifiedBy.label"/></label>
         </td>
         <td class="middle">
-            ${requisition?.verifiedBy?.name?:warehouse.message(code:'default.none.label')}
+            ${requisition?.verifiedBy?.name}
         </td>
         <td>
 
@@ -189,11 +189,11 @@
         </td>
     </tr>
     <tr>
-        <td class="right">
+        <td class="middle">
             <label><warehouse:message code="requisition.pickedBy.label"/></label>
         </td>
         <td class="middle">
-            ${picklist?.picker?.name?:warehouse.message(code:'default.none.label')}
+            ${picklist?.picker?.name}
         </td>
         <td>
 
@@ -206,11 +206,11 @@
         </td>
     </tr>
     <tr>
-        <td class="middle right">
+        <td class="middle">
             <label><warehouse:message code="requisition.reviewedBy.label" default="Checked by"/></label>
         </td>
         <td class="middle">
-            ${requisition?.checkedBy?.name?:warehouse.message(code:'default.none.label')}
+            ${requisition?.checkedBy?.name}
         </td>
         <td>
 

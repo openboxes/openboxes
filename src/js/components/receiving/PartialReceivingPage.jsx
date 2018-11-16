@@ -18,7 +18,8 @@ import EditLineModal from './modals/EditLineModal';
 
 const isReceived = (subfield, fieldValue) => {
   if (subfield) {
-    return _.toInteger(fieldValue.quantityReceived) >= _.toInteger(fieldValue.quantityShipped);
+    return (_.toInteger(fieldValue.quantityReceived) + _.toInteger(fieldValue.quantityCanceled)) >=
+      _.toInteger(fieldValue.quantityShipped);
   }
 
   if (!fieldValue.shipmentItems) {
@@ -81,7 +82,7 @@ const FIELDS = {
     label: 'Delivered On',
     attributes: {
       showTimeSelect: true,
-      dateFormat: 'MM/DD/YYYY HH:mm',
+      dateFormat: 'MM/DD/YYYY HH:mm Z',
     },
     getDynamicAttr: ({ shipmentReceived }) => ({
       disabled: shipmentReceived,
@@ -92,16 +93,17 @@ const FIELDS = {
       // eslint-disable-next-line react/prop-types
       autofillLines, onSave, saveDisabled, shipmentReceived,
     }) => (
-      <div className="mb-3 text-center">
-        <button type="button" className="btn btn-outline-success margin-bottom-lg mr-3" disabled={shipmentReceived} onClick={() => autofillLines()}>
+      <div className="mb-1 text-center">
+        <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
           Autofill quantities
         </button>
-        <button type="button" className="btn btn-outline-success margin-bottom-lg" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>Save</button>
-        <button type="submit" className="btn btn-outline-primary float-right btn-form" disabled={saveDisabled || shipmentReceived}>Next</button>
+        <button type="button" className="btn btn-outline-success btn-xs" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>Save</button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}>Next</button>
       </div>),
   },
   containers: {
     type: ArrayField,
+    maxTableHeight: 'calc(100vh - 450px)',
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
     getDynamicRowAttr: ({ rowValues, subfield }) => {
@@ -137,6 +139,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'Pallet',
+        flexWidth: '8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
         },
@@ -145,6 +148,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'Box',
+        flexWidth: '6',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
         },
@@ -156,7 +160,7 @@ const FIELDS = {
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Product',
-        flexWidth: '18',
+        flexWidth: '24',
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
@@ -187,6 +191,14 @@ const FIELDS = {
           formatValue: value => (value ? value.toLocaleString('en-US') : '0'),
         },
       },
+      quantityRemaining: {
+        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        label: 'Remaining',
+        fixedWidth: '75px',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
       quantityReceiving: {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
@@ -206,6 +218,7 @@ const FIELDS = {
               options={params.bins}
               onChange={value => params.setLocation(params.rowIndex, value)}
               objectValue
+              className="select-xs"
             />),
         fieldKey: '',
         label: 'Bin Location',
@@ -254,12 +267,12 @@ const FIELDS = {
       // eslint-disable-next-line react/prop-types
       autofillLines, onSave, saveDisabled, shipmentReceived,
     }) => (
-      <div className="my-3 text-center">
-        <button type="button" className="btn btn-outline-success margin-bottom-lg mr-3" disabled={shipmentReceived} onClick={() => autofillLines()}>
+      <div className="my-1 text-center">
+        <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
           Autofill quantities
         </button>
-        <button type="button" className="btn btn-outline-success margin-bottom-lg" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>Save</button>
-        <button type="submit" className="btn btn-outline-primary float-right btn-form mt-4 mb-4" disabled={saveDisabled || shipmentReceived}>Next</button>
+        <button type="button" className="btn btn-outline-success btn-xs" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>Save</button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}>Next</button>
       </div>),
   },
 };
