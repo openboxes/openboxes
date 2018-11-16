@@ -8,6 +8,10 @@ include_search: true
 use_directory_urls: true
 copyright: Copyright &copy; 2017, OpenBoxes
 google_analytics: ['UA-37396941-2', 'OpenBoxes']
+markdown_extensions:
+  - admonition
+  - footnotes
+  - tables
 
 pages:
 
@@ -20,7 +24,7 @@ pages:
 
 - Installation Guide:
     - 'Installation': 'installation/index.md'
-    - 'Install on Ubuntu 14.04': 'installation/ubuntu.md'
+    - 'Install on Ubuntu': 'installation/ubuntu.md'
     - 'Install on Mac OS': 'installation/macos.md'
     - 'Install on Windows': 'installation/windows.md'
     - 'Upgrading': 'upgrading/index.md'
