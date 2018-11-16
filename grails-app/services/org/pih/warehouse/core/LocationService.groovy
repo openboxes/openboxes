@@ -102,6 +102,11 @@ class LocationService {
 						(it.locationGroup != currentLocation.locationGroup && it.supports(ActivityCode.MANAGE_INVENTORY) && it.supports(ActivityCode.RECEIVE_STOCK)) }
 			}
 		}
+
+		if (params.locationTypeCode) {
+			return locations.findAll { it.locationType.locationTypeCode == LocationTypeCode.DEPOT }
+		}
+
 		return locations
 	}
 
