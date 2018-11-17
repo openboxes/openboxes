@@ -1,3 +1,5 @@
+<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionItemStatus" %>
 <g:set var="quantityRemaining" value="${(requisitionItem?.quantity?:0)-(requisitionItem?.calculateQuantityPicked()?:0)}" />
 <tr class="${(i % 2) == 0 ? 'odd' : 'even'} ${(requisitionItem?.isCanceled())?'canceled':''}">
 
@@ -40,7 +42,12 @@
     --%>
     <td class="middle">
         <div class="tag tag-alert">
-            <format:metadata obj="${requisitionItem?.status}"/>
+            <g:if test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
+                <format:metadata obj="${requisitionItem?.requisition?.status}"/>
+            </g:if>
+            <g:else>
+                <format:metadata obj="${requisitionItem?.status}"/>
+            </g:else>
         </div>
     </td>
     <td class="middle">
