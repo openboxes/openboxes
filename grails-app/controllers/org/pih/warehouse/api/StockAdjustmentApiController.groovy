@@ -12,8 +12,10 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.AdjustStockCommand
+import org.pih.warehouse.product.Product
 
 class StockAdjustmentApiController {
 
@@ -58,6 +60,14 @@ class StockAdjustmentApiController {
 
     StockAdjustment bindStockAdjustmentData(StockAdjustment stockAdjustment, JSONObject jsonObject) {
         bindData(stockAdjustment, jsonObject)
+
+        if (!stockAdjustment.inventoryItem) {
+            Product product = Product.get(jsonObject.productId)
+            Date expirationDate = jsonObject.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(jsonObject.expirationDate) : null
+            stockAdjustment.inventoryItem = inventoryService.findOrCreateInventoryItem(product, jsonObject.lotNumber, expirationDate)
+        }
+
+        return stockAdjustment
     }
 
 }

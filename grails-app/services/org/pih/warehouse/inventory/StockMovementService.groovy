@@ -95,6 +95,10 @@ class StockMovementService {
 
         Requisition requisition = updateRequisition(stockMovement, forceUpdate)
 
+        if (stockMovement.origin.isSupplier()) {
+            stockMovement = StockMovement.createFromRequisition(requisition)
+        }
+
         log.info "Date shipped: " + stockMovement.dateShipped
         if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status || RequisitionStatus.ISSUED == requisition.status) {
             log.info "Creating shipment for stock movement ${stockMovement}"
@@ -727,9 +731,11 @@ class StockMovementService {
                     } else if (stockMovementItem.revert) {
                         log.info "Item reverted " + requisitionItem.id
                         requisitionItem.undoChanges()
+                        requisitionItem.quantityApproved = requisitionItem.quantity
                     } else if (stockMovementItem.cancel) {
                         log.info "Item canceled " + requisitionItem.id
                         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
+                        requisitionItem.quantityApproved = 0
                     } else if (stockMovementItem.substitute) {
                         log.info "Item substituted " + requisitionItem.id
                         log.info "Substitutions: " + requisitionItem.product.substitutions
@@ -742,6 +748,7 @@ class StockMovementService {
                             RequisitionItem newItem = new RequisitionItem()
                             newItem.product = stockMovementItem.newProduct
                             newItem.quantity = stockMovementItem.newQuantity?.intValueExact() > 0 ? stockMovementItem.newQuantity?.intValueExact() : 0
+                            newItem.quantityApproved = stockMovementItem.newQuantity?.intValueExact() > 0 ? stockMovementItem.newQuantity?.intValueExact() : 0
                             newItem.orderIndex = stockMovementItem.sortOrder
                             newItem.recipient = requisitionItem.recipient
                             newItem.palletName = requisitionItem.palletName
@@ -759,6 +766,7 @@ class StockMovementService {
                                         stockMovementItem?.quantityRevised?.intValueExact(),
                                         stockMovementItem.reasonCode,
                                         stockMovementItem.comments)
+                                newItem.quantityApproved = 0
                             }
 
                             requisition.addToRequisitionItems(newItem)
@@ -773,11 +781,15 @@ class StockMovementService {
                                     stockMovementItem.newQuantity?.intValueExact(),
                                     stockMovementItem.reasonCode,
                                     stockMovementItem.comments)
+                            requisitionItem.quantityApproved = 0
                         }
                     } else {
                         log.info "Item updated " + requisitionItem.id
                         if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
-                        if (stockMovementItem.quantityRequested) requisitionItem.quantity = stockMovementItem.quantityRequested
+                        if (stockMovementItem.quantityRequested) {
+                            requisitionItem.quantity = stockMovementItem.quantityRequested
+                            requisitionItem.quantityApproved = stockMovementItem.quantityRequested
+                        }
                         if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
@@ -793,6 +805,7 @@ class StockMovementService {
                                         stockMovementItem?.quantityRevised?.intValueExact(),
                                         stockMovementItem.reasonCode,
                                         stockMovementItem.comments)
+                                requisitionItem.quantityApproved = 0
                             }
                         }
                     }
@@ -807,6 +820,7 @@ class StockMovementService {
                     requisitionItem.product = stockMovementItem.product
                     requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                     requisitionItem.quantity = stockMovementItem.quantityRequested
+                    requisitionItem.quantityApproved = stockMovementItem.quantityRequested
                     requisitionItem.recipient = stockMovementItem.recipient
                     requisitionItem.palletName = stockMovementItem.palletName
                     requisitionItem.boxName = stockMovementItem.boxName
@@ -952,25 +966,11 @@ class StockMovementService {
 
         if (stockMovement.origin.isSupplier()) {
             stockMovement.lineItems.collect { StockMovementItem stockMovementItem ->
-                log.info "Process stock movement item " + (new JSONObject(stockMovementItem.toJson())).toString(4)
-
-                if (stockMovementItem.delete) {
-                    log.info "Delete item ${stockMovementItem}"
-                    ShipmentItem shipmentItem = ShipmentItem.get(stockMovementItem?.id)
-                    if (shipmentItem) {
-                        Shipment s = shipmentItem.shipment
-                        s.removeFromShipmentItems(shipmentItem)
-                        s.save()
-                        shipmentItem.delete()
-                    }
-                }
-                else {
-                    log.info "Create or update item ${stockMovementItem.toJson()}"
-                    Container container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
-                    ShipmentItem shipmentItem = createOrUpdateShipmentItem(stockMovementItem)
-                    shipmentItem.container = container
-                    shipment.addToShipmentItems(shipmentItem)
-                }
+                log.info "Create or update item ${stockMovementItem.toJson()}"
+                Container container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
+                ShipmentItem shipmentItem = createOrUpdateShipmentItem(stockMovementItem)
+                shipmentItem.container = container
+                shipment.addToShipmentItems(shipmentItem)
             }
         } else if (stockMovement.packPage?.packPageItems) {
             stockMovement.packPage.packPageItems.each { PackPageItem packPageItem ->

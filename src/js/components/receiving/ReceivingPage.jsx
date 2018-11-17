@@ -50,6 +50,7 @@ class ReceivingPage extends Component {
       formData: {},
       completed: false,
       locationId: '',
+      stockMovementIdentifier: '',
     };
 
     this.nextPage = this.nextPage.bind(this);
@@ -170,7 +171,11 @@ class ReceivingPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         const formData = parseResponse(response.data.data);
-        this.setState({ formData: {}, locationId: formData.destination.id }, () => {
+        this.setState({
+          formData: {},
+          locationId: formData.destination.id,
+          stockMovementIdentifier: formData.shipment.shipmentNumber,
+        }, () => {
           this.fetchBins();
           this.setState({ formData });
         });
@@ -183,7 +188,7 @@ class ReceivingPage extends Component {
    * @public
    */
   fetchBins() {
-    const url = `/openboxes/api/internalLocations?location.id=${this.state.locationId}`;
+    const url = `/openboxes/api/internalLocations/receiving?location.id=${this.state.locationId}&stockMovementIdentifier=${this.state.stockMovementIdentifier}`;
 
     return apiClient.get(url)
       .then((response) => {
