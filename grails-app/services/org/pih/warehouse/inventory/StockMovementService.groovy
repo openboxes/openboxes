@@ -585,7 +585,7 @@ class StockMovementService {
 
 
         // Calculate total monthly quantity
-        Integer totalMonthlyQuantity = calculateTotalMonthlyQuantity(stockMovementItem)
+        Integer totalMonthlyQuantity = null //calculateTotalMonthlyQuantity(stockMovementItem)
 
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id
