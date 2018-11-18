@@ -20,8 +20,10 @@ pages:
     - 'Considerations': 'about/considerations.md'
     - 'Release Notes': 'about/release-notes.md'
 - Installation Guide:
-    - 'Installation': 'installation/index.md'
-    - 'Install on Ubuntu': 'installation/ubuntu.md'
+    - 'Overview': 'installation/index.md'
+    - 'Install on Ubuntu':
+      - 'Install on Ubuntu 14.04': 'installation/ubuntu1404.md'
+      - 'Install on Ubuntu 16.04': 'installation/ubuntu1604.md'
     - 'Install on Mac OS': 'installation/macos.md'
     - 'Install on Windows': 'installation/windows.md'
     - 'Upgrading': 'upgrading/index.md'
