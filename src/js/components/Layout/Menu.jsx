@@ -20,9 +20,15 @@ const Menu = ({
     activity && supportedActivities ? !!_.intersection(supportedActivities, activity).length : true
   );
   const isDisplayed = ({ adminOnly }) => (adminOnly ? isUserAdmin : true);
+
+  const sectionContent = sectionKey => _.get(menuConfig, sectionKey, {}).content;
+
   const canBeRendered = (key, section) =>
     isEnabled(key) && isSupported(section) && isDisplayed(section);
-  const sectionContent = sectionKey => _.get(menuConfig, sectionKey, {}).content;
+  const canSubsectionBeRendered = (subsection) => {
+    const enabled = subsection.configName ? isEnabled(subsection.configName) : true;
+    return isDisplayed(subsection) && !subsection.renderedFromConfig && enabled;
+  };
 
   return (
     <div className="collapse navbar-collapse w-100 menu-container" id="navbarSupportedContent">
@@ -65,7 +71,7 @@ const Menu = ({
                   }
                   {!sectionContent(key) &&
                     _.map(section.subsections, (subsection, subKey) => {
-                      if (isDisplayed(subsection) && !subsection.renderedFromConfig) {
+                      if (canSubsectionBeRendered(subsection)) {
                       return (
                         <a
                           className={`dropdown-item ${isPutAwayDisabled(subKey) ? 'disabled' : ''}`}

@@ -134,46 +134,57 @@ const en = {
       activity: ['RECEIVE_STOCK'],
       subsections: {
         create: {
+          configName: 'stockMovement',
           label: 'Create Inbound Stock Movement',
           link: '/openboxes/stockMovement/create',
         },
         list: {
+          configName: 'stockMovement',
           label: 'List Inbound Stock Movements',
           link: '/openboxes/stockMovement/list?direction=INBOUND',
         },
         createPutAway: {
+          configName: 'stockMovement',
           label: 'Create Put Away',
           link: '/openboxes/putAway/index',
         },
         listPutAways: {
+          configName: 'stockMovement',
           label: 'List Put Aways',
           link: '/openboxes/order/list?orderTypeCode=TRANSFER_ORDER',
         },
         createShipment: {
+          configName: 'receiving',
           label: 'Create Inbound Shipment',
           link: '/openboxes/createShipmentWorkflow/createShipment?type=INCOMING',
         },
         listShipments: {
+          configName: 'receiving',
           label: 'Inbound Shipments',
           link: '/openboxes/shipment/list?type=incoming',
         },
         all: {
+          configName: 'receiving',
           label: 'All',
           link: '/openboxes/shipment/list?type=incoming',
         },
         receiving: {
+          configName: 'receiving',
           label: 'Receiving',
           link: '/openboxes/shipment/list?type=incoming&status=PARTIALLY_RECEIVED',
         },
         pending: {
+          configName: 'receiving',
           label: 'Pending',
           link: '/openboxes/shipment/list?type=incoming&status=PENDING',
         },
         received: {
+          configName: 'receiving',
           label: 'Received',
           link: '/openboxes/shipment/list?type=incoming&status=RECEIVED',
         },
         shipped: {
+          configName: 'receiving',
           label: 'Shipped',
           link: '/openboxes/shipment/list?type=incoming&status=SHIPPED',
         },
@@ -185,34 +196,42 @@ const en = {
       activity: ['SEND_STOCK'],
       subsections: {
         create: {
+          configName: 'stockMovement',
           label: 'Create Outbound Stock Movement',
           link: '/openboxes/stockMovement/create',
         },
         list: {
+          configName: 'stockMovement',
           label: 'List Outbound Stock Movements',
           link: '/openboxes/stockMovement/list?direction=OUTBOUND',
         },
         createShipment: {
+          configName: 'shipping',
           label: 'Create Outbound Shipment',
           link: '/openboxes/createShipmentWorkflow/createShipment?type=OUTGOING',
         },
         listShipments: {
+          configName: 'shipping',
           label: 'Outbound Shipments',
           link: '/openboxes/shipment/list?type=outgoing',
         },
         all: {
+          configName: 'shipping',
           label: 'All',
           link: '/openboxes/shipment/list?type=outgoing',
         },
         pending: {
+          configName: 'shipping',
           label: 'Pending',
           link: '/openboxes/shipment/list?status=PENDING',
         },
         received: {
+          configName: 'shipping',
           label: 'Received',
           link: '/openboxes/shipment/list?status=RECEIVED',
         },
         shipped: {
+          configName: 'shipping',
           label: 'Shipped',
           link: '/openboxes/shipment/list?status=SHIPPED',
         },
