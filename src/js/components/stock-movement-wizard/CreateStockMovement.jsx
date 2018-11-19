@@ -248,7 +248,7 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(`/openboxes/stockMovement/index/${resp.id}`);
+            this.props.history.push(`/openboxes/stockMovement/create/${resp.id}`);
             this.props.onSubmit({
               ...values,
               stockMovementId: resp.id,
