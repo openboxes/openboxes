@@ -35,7 +35,7 @@ class StockMovementController {
 	}
 
     def create = {
-        render(template: "/stockMovement/create", params:params)
+        render(template: "/common/react", params:params)
     }
 
     def show = {
