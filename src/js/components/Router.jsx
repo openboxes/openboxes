@@ -32,7 +32,7 @@ const Router = props => (
     <BrowserRouter>
       <Switch>
         <MainLayoutRoute path="/**/putAway" component={AsyncPutAwayMainPage} />
-        <MainLayoutRoute path="/**/stockMovement/index/:stockMovementId?" component={AsyncStockMovement} />
+        <MainLayoutRoute path="/**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
         <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
       </Switch>
     </BrowserRouter>
