@@ -104,7 +104,8 @@ class LocationService {
 		}
 
 		if (params.locationTypeCode) {
-			return locations.findAll { it.locationType.locationTypeCode == LocationTypeCode.DEPOT }
+			LocationTypeCode locationTypeCode = params.locationTypeCode as LocationTypeCode
+			return locations.findAll { it.locationType.locationTypeCode == locationTypeCode }
 		}
 
 		return locations
