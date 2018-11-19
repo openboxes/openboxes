@@ -30,11 +30,11 @@ class StockMovementController {
     def shipmentService
 
 	def index = {
-		render(template: "/stockMovement/create")
+        redirect(action: "create", params:params)
 	}
 
     def create = {
-        redirect(action: "index", params:params)
+        render(template: "/stockMovement/create", params:params)
     }
 
     def show = {
