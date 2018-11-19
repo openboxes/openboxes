@@ -135,7 +135,7 @@ const en = {
       subsections: {
         create: {
           label: 'Create Inbound Stock Movement',
-          link: '/openboxes/stockMovement/create',
+          link: '/openboxes/stockMovement/create?direction=INBOUND',
         },
         list: {
           label: 'List Inbound Stock Movements',
@@ -186,7 +186,7 @@ const en = {
       subsections: {
         create: {
           label: 'Create Outbound Stock Movement',
-          link: '/openboxes/stockMovement/create',
+          link: '/openboxes/stockMovement/create?direction=OUTBOUND',
         },
         list: {
           label: 'List Outbound Stock Movements',
