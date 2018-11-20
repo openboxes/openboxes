@@ -120,6 +120,7 @@ const FIELDS = {
     attributes: {
       required: true,
       dateFormat: 'MM/DD/YYYY',
+      autoComplete: 'off',
     },
   },
 };
