@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.orm.PagedResultList
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.sql.Sql
@@ -1105,6 +1106,8 @@ class InventoryService implements ApplicationContextAware {
         }
         log.info "Query for products: " + (System.currentTimeMillis() - startTime) + " ms"
 
+        def totalCount = products.totalCount
+
         products = products.unique()
 
 		if (terms) {
@@ -1116,7 +1119,7 @@ class InventoryService implements ApplicationContextAware {
 			products = products.reverse()
 		}
 
-		return products;
+		return new PagedResultList(products, totalCount);
 	}
 
 
