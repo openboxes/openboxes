@@ -179,6 +179,10 @@ class StockMovement {
                 driverName: shipment?.driverName,
                 trackingNumber: trackingNumber?.identifier,
                 currentStatus: shipment?.currentStatus,
+                stocklist: requisition?.requisitionTemplate ? [
+                        id: requisition?.requisitionTemplate?.id,
+                        name: requisition?.requisitionTemplate?.name
+                ] : null
         )
 
         // Include all requisition items except those that are substitutions or modifications because the

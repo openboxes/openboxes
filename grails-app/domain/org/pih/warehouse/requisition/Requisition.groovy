@@ -56,6 +56,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     RequisitionType type;
     RequisitionStatus status;
     CommodityClass commodityClass
+    Requisition requisitionTemplate
 
     // where the requisition came from
     Location origin
@@ -177,6 +178,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         isTemplate(nullable: true)
         isPublished(nullable: true)
         datePublished(nullable: true)
+        requisitionTemplate(nullable:true)
     }
 
     List<Shipment> getShipments() {
@@ -308,6 +310,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 destinationId: destination?.id,
                 destinationName: destination?.name,
                 recipientProgram: recipientProgram,
+                requisitionTemplate: requisitionTemplate?.toJson(),
                 requisitionItems: requisitionItems?.sort()?.collect { it?.toJson() }
         ]
     }
