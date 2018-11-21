@@ -620,3 +620,8 @@ div.crossed-out .table-inner-row:before {
   padding: 6px 12px;
   flex: 1 1 auto;
 }
+
+.stocklist-table {
+  height: calc(100vh - 108px - 65px - 40px); // 108 = header + menu + breadcrumbs; 65 = footer; 40 = marginY
+  margin: 20px 10px;
+}
