@@ -10,9 +10,8 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.validation.ValidationException
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 
 /**
@@ -21,21 +20,59 @@ import org.pih.warehouse.requisition.Requisition
 class StocklistApiController {
 
     def requisitionService
+    def stocklistService
 
-    def list = {
+    def search = {
         Requisition requisition = new Requisition(params)
         requisition.isTemplate = true
         List<Requisition> requisitions = requisitionService.getAllRequisitionTemplates(requisition, params)
-		render ([data:requisitions] as JSON)
-	}
-
-    def read = {
-        Requisition requisition = Requisition.findByIdAndIsTemplate(params.id, true)
-        if (!requisition) {
-            throw new ObjectNotFoundException(params.id, Requisition.class.toString())
-        }
-        render ([data:requisition] as JSON)
+        render ([data:requisitions] as JSON)
     }
 
+    def list = {
+        List<StocklistLocation> stocklistLocations = stocklistService.getStocklistLocations()
+        render ([data:stocklistLocations] as JSON)
+    }
 
+    def read = {
+        Stocklist stocklist = stocklistService.getStocklist(params.id)
+
+        if (!stocklist) {
+            throw new ObjectNotFoundException(params.id, Stocklist.class.toString())
+        }
+
+        render ([data:stocklist] as JSON)
+    }
+
+    def create = { Stocklist stocklist ->
+
+        JSONObject jsonObject = request.JSON
+        log.info "create " + jsonObject.toString(4)
+
+        stocklist = stocklistService.createStocklist(stocklist)
+
+        response.status = 201
+        render ([data:stocklist] as JSON)
+    }
+
+    def update = {
+        JSONObject jsonObject = request.JSON
+        log.info "update: " + jsonObject.toString(4)
+
+        Stocklist stocklist = stocklistService.getStocklist(params.id)
+        if (!stocklist) {
+            stocklist = new Stocklist()
+        }
+
+        bindData(stocklist, jsonObject)
+        stocklist = stocklistService.updateStocklist(stocklist)
+
+        render ([data:stocklist] as JSON)
+    }
+
+    def delete = {
+        stocklistService.deleteStocklist(params.id)
+
+        render status: 204
+    }
 }

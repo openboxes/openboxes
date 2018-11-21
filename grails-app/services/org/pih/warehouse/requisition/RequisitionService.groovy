@@ -16,7 +16,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.LocalTransfer
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
@@ -210,11 +209,11 @@ class RequisitionService {
     def getRequisitions(Requisition requisition, Map params) {
         println "Get requisitions: " + params
 
-        def isRelatedToMe = Boolean.parseBoolean(params.isRelatedToMe)
-        def commodityClassIsNull = Boolean.parseBoolean(params.commodityClassIsNull)
+        def isRelatedToMe = Boolean.parseBoolean(params?.isRelatedToMe)
+        def commodityClassIsNull = Boolean.parseBoolean(params?.commodityClassIsNull)
 
-        def issuedDateRange = DateUtil.parseDateRange(params.issuedDateRange, "d/MMM/yyyy", "-")
-        def requestedDateRange = DateUtil.parseDateRange(params.requestedDateRange, "d/MMM/yyyy", "-")
+        def issuedDateRange = DateUtil.parseDateRange(params?.issuedDateRange, "d/MMM/yyyy", "-")
+        def requestedDateRange = DateUtil.parseDateRange(params?.requestedDateRange, "d/MMM/yyyy", "-")
 
         def criteria = Requisition.createCriteria()
         def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
@@ -240,7 +239,7 @@ class RequisitionService {
                 if (requisition.isPublished) {
                     eq("isPublished", requisition.isPublished)
                 }
-                if (params.commodityClassIsNull) {
+                if (params?.commodityClassIsNull) {
                     isNull("commodityClass")
                 }
 
@@ -250,7 +249,7 @@ class RequisitionService {
                 if (requisition.status) {
                     eq("status", requisition.status)
                 }
-                if (params.relatedToMe) {
+                if (params?.relatedToMe) {
                     def currentUser = AuthService.getCurrentUser().get()
                     or {
                         eq("createdBy.id", currentUser.id)
@@ -324,6 +323,21 @@ class RequisitionService {
             return requisition
         }
 
+    }
+
+    /**
+     * Save the requisition
+     *
+     * @param requisition
+     * @return
+     */
+    Requisition saveTemplateRequisition(Requisition requisition) {
+
+        if (requisition.hasErrors() || !requisition.save(flush: true)) {
+            throw new ValidationException("Invalid requisition", requisition.errors)
+        }
+
+        return requisition
     }
 
     /**
