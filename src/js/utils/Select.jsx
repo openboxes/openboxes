@@ -108,6 +108,7 @@ class Select extends Component {
             name={this.state.id}
             {...attributes}
             options={options}
+            multi={multi}
             delimiter={delimiter}
             value={multi ? _.join(value, delimiter) : value}
             onChange={this.handleChange}
