@@ -49,7 +49,7 @@ const FIELDS = {
   },
   containers: {
     type: ArrayField,
-    maxTableHeight: 'calc(100vh - 450px)',
+    maxTableHeight: window.innerWidth > 1440 ? 'calc(100vh - 450px)' : 'calc(100vh - 250px)',
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
     fields: {
