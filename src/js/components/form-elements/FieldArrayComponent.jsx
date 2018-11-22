@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 
 import 'react-tippy/dist/tippy.css';
+import { Translate } from 'react-localize-redux';
 
 import TableBody from './TableBody';
 import TableBodyVirtualized from './TableBodyVirtualized';
@@ -51,7 +52,7 @@ class FieldArrayComponent extends Component {
                 <div
                   key={name}
                   className="mx-1 text-truncate font-size-xs"
-                >{config.label}
+                ><Translate id={config.label} />
                 </div>
               </Tooltip>))}
           </div>
@@ -81,7 +82,7 @@ class FieldArrayComponent extends Component {
             {
               typeof AddButton === 'string' ?
                 <button type="button" className="btn btn-outline-success btn-xs" onClick={() => addRow()}>
-                  {AddButton}
+                  <Translate id={AddButton} />
                 </button>
                 : <AddButton {...properties} addRow={addRow} />
             }

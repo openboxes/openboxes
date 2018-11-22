@@ -7,6 +7,7 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
+import { Translate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -22,7 +23,7 @@ import apiClient from '../../utils/apiClient';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
-  label: 'Delete',
+  label: 'default.button.delete.label',
   flexWidth: '1',
   fieldKey: '',
   buttonLabel: 'Delete',
@@ -48,14 +49,14 @@ const NO_STOCKLIST_FIELDS = {
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
-      >Add line
+      ><Translate id="default.button.addLine.label" />
       </button>
     ),
     fields: {
       product: {
         fieldKey: 'disabled',
         type: SelectField,
-        label: 'Requisition items',
+        label: 'stockMovement.requisitionItems.label',
         flexWidth: '9.5',
         attributes: {
           async: true,
@@ -76,7 +77,7 @@ const NO_STOCKLIST_FIELDS = {
       },
       quantityRequested: {
         type: TextField,
-        label: 'Quantity',
+        label: 'stockMovement.quantity.label',
         flexWidth: '2.5',
         attributes: {
           type: 'number',
@@ -90,7 +91,7 @@ const NO_STOCKLIST_FIELDS = {
       },
       recipient: {
         type: SelectField,
-        label: 'Recipient',
+        label: 'stockMovement.recipient.label',
         flexWidth: '2.5',
         fieldKey: '',
         getDynamicAttr: ({
@@ -131,14 +132,14 @@ const STOCKLIST_FIELDS = {
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
-      >Add line
+      ><Translate id="default.button.addLine.label" />
       </button>
     ),
     fields: {
       product: {
         fieldKey: 'disabled',
         type: SelectField,
-        label: 'Requisition items',
+        label: 'stockMovement.requisitionItems.label',
         flexWidth: '9',
         attributes: {
           async: true,
@@ -159,7 +160,7 @@ const STOCKLIST_FIELDS = {
       },
       quantityAllowed: {
         type: LabelField,
-        label: 'Max QTY',
+        label: 'stockMovement.maxQuantity.label',
         flexWidth: '1.7',
         attributes: {
           type: 'number',
@@ -167,7 +168,7 @@ const STOCKLIST_FIELDS = {
       },
       quantityRequested: {
         type: TextField,
-        label: 'Needed QTY',
+        label: 'stockMovement.neededQuantity.label',
         flexWidth: '1.7',
         attributes: {
           type: 'number',
@@ -204,13 +205,13 @@ const VENDOR_FIELDS = {
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
-      >Add line
+      ><Translate id="default.button.addLine.label" />
       </button>
     ),
     fields: {
       palletName: {
         type: TextField,
-        label: 'Pallet',
+        label: 'stockMovement.pallet.label',
         flexWidth: '1',
         getDynamicAttr: ({ rowIndex, rowCount }) => ({
           autoFocus: rowIndex === rowCount - 1,
@@ -218,12 +219,12 @@ const VENDOR_FIELDS = {
       },
       boxName: {
         type: TextField,
-        label: 'Box',
+        label: 'stockMovement.box.label',
         flexWidth: '1',
       },
       product: {
         type: SelectField,
-        label: 'Item',
+        label: 'stockMovement.item.label',
         flexWidth: '4',
         attributes: {
           className: 'text-left',
@@ -241,12 +242,12 @@ const VENDOR_FIELDS = {
       },
       lotNumber: {
         type: TextField,
-        label: 'Lot',
+        label: 'stockMovement.lot.label',
         flexWidth: '1',
       },
       expirationDate: {
         type: DateField,
-        label: 'Expiry',
+        label: 'stockMovement.expiry.label',
         flexWidth: '1.5',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
@@ -255,7 +256,7 @@ const VENDOR_FIELDS = {
       },
       quantityRequested: {
         type: TextField,
-        label: 'QTY',
+        label: 'stockMovement.quantity.label',
         flexWidth: '1',
         attributes: {
           type: 'number',
@@ -263,7 +264,7 @@ const VENDOR_FIELDS = {
       },
       recipient: {
         type: SelectField,
-        label: 'Recipient',
+        label: 'stockMovement.recipient.label',
         flexWidth: '1.5',
         getDynamicAttr: ({
           recipients, addRow, rowCount, rowIndex, getSortOrder,
@@ -295,7 +296,7 @@ function validate(values) {
 
   _.forEach(values.lineItems, (item, key) => {
     if (!_.isNil(item.product) && item.quantityRequested < 0) {
-      errors.lineItems[key] = { quantityRequested: 'Enter proper quantity' };
+      errors.lineItems[key] = { quantityRequested: 'error.enterQuantity.label' };
     }
   });
   return errors;
@@ -314,15 +315,15 @@ class AddItemsPage extends Component {
    */
   static confirmSave(onConfirm) {
     confirmAlert({
-      title: 'Confirm save',
-      message: 'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+      title: 'message.confirmSave.label',
+      message: 'confirmSave.message',
       buttons: [
         {
-          label: 'Yes',
+          label: 'default.yes.label',
           onClick: onConfirm,
         },
         {
-          label: 'No',
+          label: 'default.no.label',
         },
       ],
     });
@@ -627,7 +628,7 @@ class AddItemsPage extends Component {
 
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
-        .catch(() => Promise.reject(new Error('Could not save requisition items')));
+        .catch(() => Promise.reject(new Error('error.saveRequisitionItems.label')));
     }
 
     return Promise.resolve();
@@ -700,7 +701,7 @@ class AddItemsPage extends Component {
     this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success('Changes saved successfully!');
+        Alert.success('alert.saveSuccess.label');
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -711,15 +712,15 @@ class AddItemsPage extends Component {
    */
   refresh() {
     confirmAlert({
-      title: 'Confirm refresh',
-      message: 'Are you sure you want to refresh? Your progress since last save will be lost.',
+      title: 'message.confirmRefresh.label',
+      message: 'confirmRefresh.message',
       buttons: [
         {
-          label: 'Yes',
+          label: 'default.yes.label',
           onClick: () => this.fetchAllData(true),
         },
         {
-          label: 'No',
+          label: 'default.no.label',
         },
       ],
     });
@@ -743,7 +744,7 @@ class AddItemsPage extends Component {
     return apiClient.post(removeItemsUrl, payload)
       .catch(() => {
         this.props.hideSpinner();
-        return Promise.reject(new Error('Could not delete requisition item'));
+        return Promise.reject(new Error('error.deleteRequisitionItem.label'));
       });
   }
 
@@ -765,7 +766,7 @@ class AddItemsPage extends Component {
       .catch(() => {
         this.fetchAndSetLineItems();
         this.props.hideSpinner();
-        return Promise.reject(new Error('Could not delete requisition items'));
+        return Promise.reject(new Error('error.deleteRequisitionItem.label'));
       });
   }
 
@@ -861,7 +862,7 @@ class AddItemsPage extends Component {
                 htmlFor="csvInput"
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-download pr-2" />Import Template</span>
+                <span><i className="fa fa-download pr-2" /><Translate id="default.button.importTemplate.label" />e</span>
                 <input
                   id="csvInput"
                   type="file"
@@ -879,14 +880,14 @@ class AddItemsPage extends Component {
                 onClick={() => this.exportTemplate(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-upload pr-2" />Export Template</span>
+                <span><i className="fa fa-upload pr-2" /><Translate id="default.button.exportTemplate.label" /></span>
               </button>
               <button
                 type="button"
                 onClick={() => this.refresh()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-refresh pr-2" />Refresh</span>
+                <span><i className="fa fa-refresh pr-2" /><Translate id="default.button.refresh.label" /></span>
               </button>
               <button
                 type="button"
@@ -894,7 +895,7 @@ class AddItemsPage extends Component {
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-save pr-2" />Save</span>
+                <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" /></span>
               </button>
               <button
                 type="button"
@@ -902,7 +903,7 @@ class AddItemsPage extends Component {
                 onClick={() => this.removeAll().then(() => this.fetchAndSetLineItems())}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
               >
-                <span><i className="fa fa-remove pr-2" />Delete all</span>
+                <span><i className="fa fa-remove pr-2" /><Translate id="default.button.deleteAll.label" /></span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -916,13 +917,13 @@ class AddItemsPage extends Component {
                 }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => previousPage(values)}>
-                  Previous
+                  <Translate id="default.button.previous.label" />
                 </button>
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
-                >Next
+                ><Translate id="default.button.next.label" />
                 </button>
               </div>
             </form>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import TextField from '../../form-elements/TextField';
@@ -20,14 +21,14 @@ const FIELDS = {
         type="button"
         className="btn btn-outline-success btn-xs"
         onClick={() => addRow({ productId })}
-      >Add new lot number
+      ><Translate id="stockMovement.addLot.label" />
       </button>
     ),
     type: ArrayField,
     fields: {
       binLocation: {
         type: SelectField,
-        label: 'Bin',
+        label: 'stockMovement.bin.label',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue, bins, hasBinLocationSupport }) => ({
           disabled: !!fieldValue || !hasBinLocationSupport,
@@ -37,7 +38,7 @@ const FIELDS = {
       },
       lotNumber: {
         type: TextField,
-        label: 'Lot #',
+        label: 'stockMovement.lot.label',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue }) => ({
           disabled: !!fieldValue,
@@ -45,7 +46,7 @@ const FIELDS = {
       },
       expirationDate: {
         type: DateField,
-        label: 'Expiry Date',
+        label: 'stockMovement.expiry.label',
         fieldKey: 'inventoryItem.id',
         attributes: {
           autoComplete: 'off',
@@ -57,7 +58,7 @@ const FIELDS = {
       },
       quantityAvailable: {
         type: LabelField,
-        label: 'Previous Qty',
+        label: 'stockMovement.previousQuantity.label',
         fixedWidth: '150px',
         attributes: {
           formatValue: value => (value ? value.toLocaleString('en-US') : null),
@@ -65,7 +66,7 @@ const FIELDS = {
       },
       quantityAdjusted: {
         type: TextField,
-        label: 'Current Qty',
+        label: 'stockMovement.currentQuantity.label',
         fixedWidth: '140px',
         attributes: {
           type: 'number',
@@ -73,7 +74,7 @@ const FIELDS = {
       },
       comments: {
         type: TextField,
-        label: 'Comments',
+        label: 'stockMovement.comments.label',
       },
     },
   },
@@ -85,10 +86,10 @@ function validate(values) {
 
   _.forEach(values.adjustInventory, (item, key) => {
     if (item.quantityAdjusted < 0) {
-      errors.adjustInventory[key] = { quantityAdjusted: 'Adjusted quantity can\'t be negative' };
+      errors.adjustInventory[key] = { quantityAdjusted: 'errors.adjustedQty.label' };
     }
     if (!_.isNil(item.quantityAdjusted) && item.quantityAdjusted !== '' && !item.comments) {
-      errors.adjustInventory[key] = { comments: 'This field cannot be empty' };
+      errors.adjustInventory[key] = { comments: 'errors.emptyField.label' };
     }
   });
   return errors;

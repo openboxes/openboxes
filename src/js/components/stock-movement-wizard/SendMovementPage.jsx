@@ -6,6 +6,7 @@ import Dropzone from 'react-dropzone';
 import Alert from 'react-s-alert';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
+import { Translate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -21,15 +22,15 @@ import { debouncedLocationsFetch } from '../../utils/option-utils';
 
 const SHIPMENT_FIELDS = {
   description: {
-    label: 'Description',
+    label: 'stockMovement.description.label',
     type: LabelField,
   },
   'origin.name': {
-    label: 'Origin',
+    label: 'stockMovement.origin.label',
     type: LabelField,
   },
   destination: {
-    label: 'Destination',
+    label: 'stockMovement.destination.label',
     fieldKey: '',
     type: (params) => {
       if (params.canBeEdited && !params.hasStockList) {
@@ -54,20 +55,20 @@ const SHIPMENT_FIELDS = {
       return { formatValue: fieldValue => _.get(fieldValue, 'name') };
     },
   },
-  'stocklist.name': {
-    label: 'Stock List',
+  'stockList.name': {
+    label: 'stockMovement.stocklist.label',
     type: LabelField,
   },
   'requestedBy.name': {
-    label: 'Requested By',
+    label: 'stockMovement.requestedBy.label',
     type: LabelField,
   },
   dateRequested: {
-    label: 'Date Requested',
+    label: 'stockMovement.dateRequested.label',
     type: LabelField,
   },
   name: {
-    label: 'Shipment Name',
+    label: 'stockMovement.shipmentName.label',
     type: (params) => {
       if (params.issued) {
         return <TextField {...params} />;
@@ -81,7 +82,7 @@ const SHIPMENT_FIELDS = {
 const FIELDS = {
   dateShipped: {
     type: DateField,
-    label: 'Ship Date',
+    label: 'stockMovement.shipDate.label',
     attributes: {
       dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
@@ -94,7 +95,7 @@ const FIELDS = {
   },
   shipmentType: {
     type: SelectField,
-    label: 'Shipment Type',
+    label: 'stockMovement.shipmentType.label',
     attributes: {
       required: true,
       showValueTooltip: true,
@@ -105,21 +106,21 @@ const FIELDS = {
   },
   trackingNumber: {
     type: TextField,
-    label: 'Tracking #',
+    label: 'stockMovement.trackingNumber.label',
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
     }),
   },
   driverName: {
     type: TextField,
-    label: 'Driver',
+    label: 'stockMovement.driverName.label',
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
     }),
   },
   comments: {
     type: TextField,
-    label: 'Comment',
+    label: 'stockMovement.comments.label',
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
     }),
@@ -130,10 +131,10 @@ function validate(values) {
   const errors = {};
 
   if (!values.dateShipped) {
-    errors.dateShipped = 'This field is required';
+    errors.dateShipped = 'error.requiredField.label';
   }
   if (!values.shipmentType) {
-    errors.shipmentType = 'This field is required';
+    errors.shipmentType = 'error.requiredField.label';
   }
 
   return errors;
@@ -276,7 +277,7 @@ class SendMovementPage extends Component {
               id: stockMovementData.destination.id,
               type: destinationType ? destinationType.locationTypeCode : null,
               name: stockMovementData.destination.name,
-              label: `${stockMovementData.destination.name} 
+              label: `${stockMovementData.destination.name}
                 [${destinationType ? destinationType.description : null}]`,
             },
           },
@@ -334,8 +335,8 @@ class SendMovementPage extends Component {
     if (this.state.files.length) {
       _.forEach(this.state.files, (file) => {
         this.sendFile(file)
-          .then(() => Alert.success('File uploaded successfuly!'))
-          .catch(() => Alert.error('Error occured during file upload!'));
+          .then(() => Alert.success('alert.fileSuccess.label'))
+          .catch(() => Alert.error('alert.fileError.label'));
       });
     }
 
@@ -426,7 +427,7 @@ class SendMovementPage extends Component {
                 className="btn btn-outline-secondary float-right btn-form btn-xs"
                 disabled={invalid}
               >
-                <span><i className="fa fa-save pr-2" />Save</span>
+                <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" /></span>
               </button>
               <div className="col-md-9 pl-0">
                 {_.map(FIELDS, (fieldConfig, fieldName) =>
@@ -441,28 +442,30 @@ class SendMovementPage extends Component {
                   className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
                   onClick={() => previousPage(values)}
-                >Previous
+                >
+                  <Translate id="default.button.previous.label" />
                 </button>
                 <button
                   type="submit"
                   className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={invalid || values.statusCode === 'ISSUED'}
-                >Send Shipment
+                >
+                  <Translate id="stockMovement.sendShipment.label" />
                 </button>
                 <table className="table table-striped text-center border my-2 table-xs">
                   <thead>
                     <tr>
-                      <th>Pallet</th>
-                      <th>Box</th>
-                      <th>Code</th>
-                      <th>Product Name</th>
-                      <th>Lot number</th>
-                      <th>Expiry Date</th>
-                      <th style={{ width: '150px' }}>Quantity Picked</th>
+                      <th><Translate id="stockMovement.pallet.label" /> </th>
+                      <th><Translate id="stockMovement.box.label" /> </th>
+                      <th><Translate id="stockMovement.code.label" /> </th>
+                      <th><Translate id="stockMovement.productName.label" /> </th>
+                      <th><Translate id="stockMovement.lot.label" /> </th>
+                      <th><Translate id="stockMovement.expiry.label" /> </th>
+                      <th style={{ width: '150px' }}><Translate id="stockMovement.quantityPicked.label" /> </th>
                       {!(this.state.supplier) &&
-                        <th>Bin</th>
+                        <th><Translate id="stockMovement.binLocation.label" /> </th>
                       }
-                      <th>Recipient</th>
+                      <th><Translate id="stockMovement.recipient.label" /> </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -503,13 +506,13 @@ class SendMovementPage extends Component {
                   className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
                   onClick={() => previousPage(values)}
-                >Previous
+                > <Translate id="default.button.previous.label" />
                 </button>
                 <button
                   type="submit"
                   className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={invalid || values.statusCode === 'ISSUED'}
-                >Send Shipment
+                ><Translate id="stockMovement.sendShipment.label" />
                 </button>
               </div>
             </form>

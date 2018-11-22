@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { connect } from 'react-redux';
+import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
@@ -14,7 +15,7 @@ import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
 const FIELDS = {
   reasonCode: {
     type: SelectField,
-    label: 'Reason for not fulfilling full qty',
+    label: 'stockMovement.reasonFor.label',
     attributes: {
       required: true,
     },
@@ -39,19 +40,19 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
-        label: 'Code',
+        label: 'stockMovement.code.label',
       },
       productName: {
         type: LabelField,
-        label: 'Product',
+        label: 'stockMovement.productName.label',
       },
       minExpirationDate: {
         type: LabelField,
-        label: 'Expiry Date',
+        label: 'stockMovement.expiry.label',
       },
       quantityAvailable: {
         type: LabelField,
-        label: 'Qty Available',
+        label: 'stockMovement.quantityAvailable.label',
         fixedWidth: '150px',
         attributes: {
           formatValue: value => (value ? value.toLocaleString('en-US') : null),
@@ -59,7 +60,7 @@ const FIELDS = {
       },
       quantitySelected: {
         type: TextField,
-        label: 'Qty Selected',
+        label: 'stockMovement.quantitySelected.label',
         fixedWidth: '140px',
         attributes: {
           type: 'number',
@@ -84,16 +85,16 @@ function validate(values) {
     }
 
     if (item.quantitySelected > item.quantityAvailable) {
-      errors.substitutions[key] = { quantitySelected: 'Selected quantity is higher than available' };
+      errors.substitutions[key] = { quantitySelected: 'errors.higherQtySelected' };
     }
     if (item.quantitySelected < 0) {
-      errors.substitutions[key] = { quantitySelected: 'Selected quantity can\'t be negative' };
+      errors.substitutions[key] = { quantitySelected: 'errors.negativeQtySelected.label' };
     }
   });
 
   if (originalItem && originalItem.quantitySelected && subQty < originalItem.quantityRequested
     && !values.reasonCode) {
-    errors.reasonCode = 'This field is required';
+    errors.reasonCode = 'error.requiredField.label';
   }
   return errors;
 }
@@ -211,7 +212,7 @@ class SubstitutionsModal extends Component {
   calculateSelected(values) {
     return (
       <div>
-        <div className="font-weight-bold pb-2">Quantity Selected: {_.reduce(values.substitutions, (sum, val) =>
+        <div className="font-weight-bold pb-2"><Translate id="stockMovement.quantitySelected.label" />: {_.reduce(values.substitutions, (sum, val) =>
           (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)
         }
         </div>
@@ -236,9 +237,9 @@ class SubstitutionsModal extends Component {
         renderBodyWithValues={this.calculateSelected}
       >
         <div>
-          <div className="font-weight-bold">Product Code: {this.state.attr.lineItem.productCode}</div>
-          <div className="font-weight-bold">Product Name: {this.state.attr.lineItem.productName}</div>
-          <div className="font-weight-bold">Quantity Requested: {this.state.attr.lineItem.quantityRequested}</div>
+          <div className="font-weight-bold"><Translate id="stockMovement.productCode.label" />: {this.state.attr.lineItem.productCode}</div>
+          <div className="font-weight-bold"><Translate id="stockMovement.productName.label" />: {this.state.attr.lineItem.productName}</div>
+          <div className="font-weight-bold"><Translate id="stockMovement.quantityRequested.label" />: {this.state.attr.lineItem.quantityRequested}</div>
         </div>
       </ModalWrapper>
     );

@@ -6,6 +6,7 @@ import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import queryString from 'query-string';
+import { Translate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -20,19 +21,19 @@ import { debouncedUsersFetch, debouncedLocationsFetch } from '../../utils/option
 function validate(values) {
   const errors = {};
   if (!values.description) {
-    errors.description = 'This field is required';
+    errors.description = 'error.requiredField.label';
   }
   if (!values.origin) {
-    errors.origin = 'This field is required';
+    errors.origin = 'error.requiredField.label';
   }
   if (!values.destination) {
-    errors.destination = 'This field is required';
+    errors.destination = 'error.requiredField.label';
   }
   if (!values.requestedBy) {
-    errors.requestedBy = 'This field is required';
+    errors.requestedBy = 'error.requiredField.label';
   }
   if (!values.dateRequested) {
-    errors.dateRequested = 'This field is required';
+    errors.dateRequested = 'error.requiredField.label';
   }
   return errors;
 }
@@ -40,7 +41,7 @@ function validate(values) {
 const FIELDS = {
   description: {
     type: TextField,
-    label: 'Description',
+    label: 'stockMovement.description.label',
     attributes: {
       required: true,
       autoFocus: true,
@@ -48,7 +49,7 @@ const FIELDS = {
   },
   origin: {
     type: SelectField,
-    label: 'Origin',
+    label: 'stockMovement.origin.label',
     attributes: {
       required: true,
       async: true,
@@ -71,7 +72,7 @@ const FIELDS = {
   },
   destination: {
     type: SelectField,
-    label: 'Destination',
+    label: 'stockMovement.destination.label',
     attributes: {
       required: true,
       async: true,
@@ -92,8 +93,8 @@ const FIELDS = {
       disabled: queryString.parse(window.location.search).direction === 'INBOUND' && !props.isSuperuser,
     }),
   },
-  stocklist: {
-    label: 'Stock list',
+  stockList: {
+    label: 'stockMovement.stocklist.label',
     type: SelectField,
     getDynamicAttr: ({ origin, destination, stocklists }) => ({
       disabled: !(origin && destination && origin.id && destination.id),
@@ -104,7 +105,7 @@ const FIELDS = {
   },
   requestedBy: {
     type: SelectField,
-    label: 'Requested-by',
+    label: 'stockMovement.requestedBy.label',
     attributes: {
       async: true,
       required: true,
@@ -120,7 +121,7 @@ const FIELDS = {
   },
   dateRequested: {
     type: DateField,
-    label: 'Date requested',
+    label: 'stockMovement.dateRequested.label',
     attributes: {
       required: true,
       dateFormat: 'MM/DD/YYYY',
@@ -294,16 +295,15 @@ class CreateStockMovement extends Component {
       this.saveStockMovement(values);
     } else {
       confirmAlert({
-        title: 'Confirm change',
-        message: 'Do you want to change stock movement data? ' +
-          'Changing origin, destination or stock list can cause loss of your current work.',
+        title: 'message.confirmChange.label',
+        message: 'confirmChange.message',
         buttons: [
           {
-            label: 'No',
+            label: 'default.no.label',
             onClick: () => this.resetToInitialValues(),
           },
           {
-            label: 'Yes',
+            label: 'default.yes.label',
             onClick: () => this.saveStockMovement({ ...values, forceUpdate: 'true' }),
           },
         ],
@@ -330,7 +330,7 @@ class CreateStockMovement extends Component {
               }),
             )}
             <div>
-              <button type="submit" className="btn btn-outline-primary float-right btn-xs">Next</button>
+              <button type="submit" className="btn btn-outline-primary float-right btn-xs"><Translate id="default.button.next.label" /></button>
             </div>
           </form>
         )}

@@ -4,6 +4,7 @@ import Modal from 'react-modal';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
+import { Translate } from 'react-localize-redux';
 
 import { renderFormField } from '../../utils/form-utils';
 
@@ -47,7 +48,7 @@ class ModalWrapper extends Component {
           disabled={this.props.btnOpenDisabled}
           onClick={() => this.openModal()}
         >
-          {this.props.btnOpenText}
+          <Translate id={this.props.btnOpenText} />
         </button>
         <Modal
           isOpen={this.state.showModal}
@@ -58,7 +59,7 @@ class ModalWrapper extends Component {
           <div className={this.props.bodyContainerClassName} style={this.props.bodyContainerStyle}>
             {
             typeof Title === 'string' ?
-              <h5 className="text-center">{Title}</h5> :
+              <h5 className="text-center"> <Translate id={Title} /></h5> :
               <Title />
           }
             <hr />
@@ -93,7 +94,7 @@ class ModalWrapper extends Component {
                         style={this.props.btnSaveStyle}
                         disabled={this.props.btnSaveDisabled}
                       >
-                        {this.props.btnSaveText}
+                        <Translate id={this.props.btnSaveText} />
                       </button>
                       <button
                         type="button"
@@ -101,7 +102,7 @@ class ModalWrapper extends Component {
                         style={this.props.btnCancelStyle}
                         onClick={() => this.closeModal()}
                       >
-                        {this.props.btnCancelText}
+                        <Translate id={this.props.btnCancelText} />
                       </button>
                     </div>
                   </form>
@@ -167,7 +168,7 @@ ModalWrapper.propTypes = {
 };
 
 ModalWrapper.defaultProps = {
-  btnOpenText: 'Open',
+  btnOpenText: 'default.button.open.label',
   btnOpenClassName: 'btn btn-outline-primary',
   btnOpenStyle: {},
   btnOpenDisabled: false,
@@ -179,12 +180,12 @@ ModalWrapper.defaultProps = {
   btnContainerClassName: 'btn-group float-right',
   btnContainerStyle: {},
 
-  btnSaveText: 'Save',
+  btnSaveText: 'default.button.save.label',
   btnSaveClassName: 'btn btn-outline-success',
   btnSaveStyle: {},
   btnSaveDisabled: false,
 
-  btnCancelText: 'Cancel',
+  btnCancelText: 'default.button.cancel.label',
   btnCancelClassName: 'btn btn-outline-secondary',
   btnCancelStyle: {},
 
