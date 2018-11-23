@@ -22,16 +22,11 @@ class StocklistApiController {
     def requisitionService
     def stocklistService
 
-    def search = {
+    def list = {
         Requisition requisition = new Requisition(params)
         requisition.isTemplate = true
         List<Requisition> requisitions = requisitionService.getAllRequisitionTemplates(requisition, params)
         render ([data:requisitions] as JSON)
-    }
-
-    def list = {
-        List<StocklistLocation> stocklistLocations = stocklistService.getStocklistLocations()
-        render ([data:stocklistLocations] as JSON)
     }
 
     def read = {

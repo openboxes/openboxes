@@ -204,7 +204,7 @@ class CreateStockMovement extends Component {
    */
   fetchStockLists(origin, destination) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stocklists/search?origin.id=${origin.id}&destination.id=${destination.id}`;
+    const url = `/openboxes/api/stocklists?origin.id=${origin.id}&destination.id=${destination.id}`;
 
     return apiClient.get(url)
       .then((response) => {

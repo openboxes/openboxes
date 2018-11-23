@@ -71,13 +71,6 @@ class UrlMappings {
             action = [GET:"listReceiving"]
         }
 
-        // Stocklist API
-
-        "/api/stocklists/search"(parseRequest: true) {
-            controller = "stocklistApi"
-            action = [GET:"search"]
-        }
-
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
