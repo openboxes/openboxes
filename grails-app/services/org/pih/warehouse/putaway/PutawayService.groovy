@@ -9,7 +9,6 @@
 **/ 
 package org.pih.warehouse.putaway
 
-import grails.validation.ValidationException
 import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Putaway
@@ -18,11 +17,8 @@ import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
-import org.pih.warehouse.core.LocationTypeCode
-import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
@@ -96,36 +92,41 @@ class PutawayService {
     }
 
 
-    def completePutaway(Putaway putaway) {
+    Order completePutaway(Putaway putaway) {
+        validatePutaway(putaway)
 
+        // Save the putaway as a transfer order
+        Order order = savePutaway(putaway)
 
-        if (validatePutaway(putaway)) {
+        // Need to process the split items
+        processSplitItems(putaway)
 
-            // Save the putaway as a transfer order
-            Order order = savePutaway(putaway)
+        putaway.putawayItems.each { PutawayItem putawayItem ->
+            TransferStockCommand command = new TransferStockCommand()
+            command.location = putawayItem.currentFacility
+            command.binLocation = putawayItem.currentLocation
+            command.inventoryItem = putawayItem.inventoryItem
+            command.quantity = putawayItem.quantity
+            command.otherLocation = putawayItem.putawayFacility
+            command.otherBinLocation = putawayItem.putawayLocation
+            command.order = order
+            command.transferOut = Boolean.TRUE
 
-            putaway.putawayItems.each { PutawayItem putawayItem ->
-                TransferStockCommand command = new TransferStockCommand()
-                command.location = putawayItem.currentFacility
-                command.binLocation = putawayItem.currentLocation
-                command.inventoryItem = putawayItem.inventoryItem
-                command.quantity = putawayItem.quantity
-                command.otherLocation = putawayItem.putawayFacility
-                command.otherBinLocation = putawayItem.putawayLocation
-                command.order = order
-                command.transferOut = Boolean.TRUE
-
-                Transaction transaction = inventoryService.transferStock(command)
-                transaction.save(failOnError: true)
-            }
+            Transaction transaction = inventoryService.transferStock(command)
+            transaction.save(failOnError: true)
         }
 
+        return order
     }
 
 
     Order savePutaway(Putaway putaway) {
 
-        Order order = new Order()
+        Order order = Order.get(putaway.id)
+        if (!order) {
+            order = new Order()
+        }
+
         order.orderTypeCode = OrderTypeCode.TRANSFER_ORDER
         order.description = "Putaway ${putaway.putawayNumber}"
         order.orderNumber = putaway.putawayNumber
@@ -138,12 +139,38 @@ class PutawayService {
 
         putaway.putawayItems.toArray().each { PutawayItem putawayItem ->
 
-            OrderItem orderItem = createOrderItem(putawayItem)
-            order.addToOrderItems(orderItem)
+            OrderItem orderItem = null
+            if (putawayItem.id) {
+                orderItem = order.orderItems?.find { it.id == putawayItem.id }
+            }
+
+            if (!orderItem) {
+                orderItem = new OrderItem()
+                order.addToOrderItems(orderItem)
+            }
+
+            orderItem = updateOrderItem(putawayItem, orderItem)
+
             putawayItem.splitItems.each { PutawayItem splitItem ->
-                OrderItem childOrderItem = createOrderItem(splitItem)
-                childOrderItem.parentOrderItem = orderItem
-                order.addToOrderItems(childOrderItem)
+                OrderItem childOrderItem = null
+                if (splitItem.id) {
+                    childOrderItem = order.orderItems?.find { it.id == splitItem.id }
+                }
+
+                if (!childOrderItem && !splitItem.delete) {
+                    childOrderItem = new OrderItem()
+                    order.addToOrderItems(childOrderItem)
+                }
+
+                if (childOrderItem && splitItem.delete) {
+                    orderItem.removeFromOrderItems(childOrderItem)
+                    order.removeFromOrderItems(childOrderItem)
+
+                    childOrderItem.delete()
+                } else if (childOrderItem) {
+                    childOrderItem = updateOrderItem(splitItem, childOrderItem)
+                    childOrderItem.parentOrderItem = orderItem
+                }
             }
         }
 
@@ -152,11 +179,11 @@ class PutawayService {
     }
 
 
-    OrderItem createOrderItem(PutawayItem putawayItem) {
+    OrderItem updateOrderItem(PutawayItem putawayItem, OrderItem orderItem) {
         OrderItemStatusCode orderItemStatusCode =
-                !putawayItem?.splitItems?.empty ? OrderItemStatusCode.CANCELED : OrderItemStatusCode.COMPLETED
+                !putawayItem?.splitItems?.empty ? OrderItemStatusCode.CANCELED :
+                        putawayItem.putawayStatus == PutawayStatus.COMPLETED ? OrderItemStatusCode.COMPLETED : OrderItemStatusCode.PENDING
 
-        OrderItem orderItem = new OrderItem()
         orderItem.orderItemStatusCode = orderItemStatusCode
         orderItem.product = putawayItem.product
         orderItem.inventoryItem = putawayItem.inventoryItem
@@ -167,7 +194,7 @@ class PutawayService {
         return orderItem
     }
 
-    Boolean validatePutaway(Putaway putaway) {
+    void validatePutaway(Putaway putaway) {
         putaway.putawayItems.toArray().each { PutawayItem putawayItem ->
             if (putawayItem.splitItems) {
                 putawayItem.splitItems.each { PutawayItem splitItem ->
@@ -178,16 +205,15 @@ class PutawayService {
                 validatePutawayItem(putawayItem)
             }
         }
-        return true
     }
 
 
-    Boolean validatePutawayItem(PutawayItem putawayItem) {
-        return validateQuantityAvailable(putawayItem.currentFacility, putawayItem.currentLocation, putawayItem.inventoryItem, putawayItem.quantity)
+    void validatePutawayItem(PutawayItem putawayItem) {
+        validateQuantityAvailable(putawayItem.currentFacility, putawayItem.currentLocation, putawayItem.inventoryItem, putawayItem.quantity)
     }
 
 
-    Boolean validateQuantityAvailable(Location facility, Location internalLocation, InventoryItem inventoryItem, BigDecimal quantity) {
+    void validateQuantityAvailable(Location facility, Location internalLocation, InventoryItem inventoryItem, BigDecimal quantity) {
 
         if (!facility) {
             throw new IllegalArgumentException("Facility is required")

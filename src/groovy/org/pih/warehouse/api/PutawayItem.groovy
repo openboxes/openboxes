@@ -29,6 +29,7 @@ class PutawayItem {
     PutawayStatus putawayStatus
     Transaction transaction
 
+    Boolean delete = Boolean.FALSE
     List<PutawayItem> splitItems = []
 
     String getCurrentBins() {
@@ -56,17 +57,22 @@ class PutawayItem {
         putawayItem.putawayFacility = orderItem.order.destination
         putawayItem.putawayLocation = orderItem.destinationBinLocation
         putawayItem.recipient = orderItem.recipient?:orderItem.order.recipient
+
+        orderItem.orderItems?.each { item ->
+            putawayItem.splitItems.add(PutawayItem.createFromOrderItem(item))
+        }
+
         return putawayItem
     }
 
     static PutawayStatus getPutawayItemStatus(OrderItemStatusCode orderItemStatusCode) {
         switch (orderItemStatusCode) {
             case OrderItemStatusCode.PENDING:
-                return PutawayStatus.PENDING;
+                return PutawayStatus.PENDING
             case OrderItemStatusCode.COMPLETED:
                 return PutawayStatus.COMPLETED
             case OrderItemStatusCode.CANCELED:
-                return PutawayStatus.COMPLETED
+                return PutawayStatus.CANCELED
             default:
                 return null
         }

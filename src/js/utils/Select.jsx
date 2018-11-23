@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 
 import 'react-select-plus/dist/react-select-plus.css';
+import 'react-tippy/dist/tippy.css';
 
 // eslint-disable-next-line react/prop-types
 const Dropdown = ({ children, style, width }) => (

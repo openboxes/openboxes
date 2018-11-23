@@ -55,17 +55,23 @@ class Putaway {
 
         // Add all order items to putaway
         order.orderItems.each { orderItem ->
-            putaway.putawayItems.add(PutawayItem.createFromOrderItem(orderItem))
+            if (!orderItem.parentOrderItem) {
+                putaway.putawayItems.add(PutawayItem.createFromOrderItem(orderItem))
+            }
         }
 
-        return putaway;
+        return putaway
     }
 
 
     static PutawayStatus getPutawayStatus(OrderStatus orderStatus) {
         switch(orderStatus) {
             case OrderStatus.PENDING:
-                return PutawayStatus.READY
+                return PutawayStatus.PENDING
+            case OrderStatus.COMPLETED:
+                return PutawayStatus.COMPLETED
+            case OrderStatus.CANCELED:
+                return PutawayStatus.CANCELED
             default:
                 return null
         }
