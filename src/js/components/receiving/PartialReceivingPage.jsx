@@ -235,7 +235,7 @@ const FIELDS = {
       edit: {
         type: params => (params.subfield ? <EditLineModal {...params} /> : null),
         fieldKey: '',
-        fixedWidth: '100px',
+        fixedWidth: '85px',
         attributes: {
           btnOpenText: 'Edit Line',
           title: 'Edit Line',
@@ -259,6 +259,12 @@ const FIELDS = {
           options: users,
           disabled: shipmentReceived || isReceived(true, fieldValue),
         }),
+      },
+      comment: {
+        type: params => (params.subfield ? <TextField {...params} /> : null),
+        fieldKey: '',
+        label: 'Comment',
+        fixedWidth: '110px',
       },
     },
   },

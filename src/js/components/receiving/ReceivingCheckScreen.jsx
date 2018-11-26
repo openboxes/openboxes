@@ -129,6 +129,11 @@ const FIELDS = {
           disabled: saveDisabled,
         }),
       },
+      comment: {
+        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        label: 'Comment',
+        fixedWidth: '110px',
+      },
     },
   },
   buttonsBottom: {
