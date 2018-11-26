@@ -769,11 +769,7 @@ class AddItemsPage extends Component {
   exportTemplate(formValues) {
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
 
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
-      AddItemsPage.confirmSave(() => this.saveItemsAndExportTemplate(formValues, lineItems));
-    } else {
-      this.saveItemsAndExportTemplate(formValues, lineItems);
-    }
+    this.saveItemsAndExportTemplate(formValues, lineItems);
   }
 
   /**
