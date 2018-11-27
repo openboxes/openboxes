@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import DatePicker from 'react-datepicker';
 import { Portal } from 'react-overlays';
@@ -7,7 +8,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import BaseField from './BaseField';
 
-// eslint-disable-next-line react/prop-types
 const CalendarContainer = ({ children }) => {
   const el = document.getElementById('root');
 
@@ -20,8 +20,8 @@ const CalendarContainer = ({ children }) => {
 
 const DateField = (props) => {
   const renderInput = ({
-    // eslint-disable-next-line react/prop-types
-    value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', className = '', ...attributes
+    value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', className = '',
+    arrowLeft, arrowUp, arrowRight, arrowDown, ...attributes
   }) => {
     const onChange = (date) => {
       const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
@@ -44,6 +44,35 @@ const DateField = (props) => {
           onKeyPress={(event) => {
             if (event.which === 13 /* Enter */) {
               event.preventDefault();
+            }
+          }}
+          onKeyDown={(event) => {
+            switch (event.keyCode) {
+              case 37: /* arrow left */
+                if (arrowLeft) {
+                  arrowLeft();
+                  event.preventDefault();
+                }
+                break;
+              case 38: /* arrow up */
+                if (arrowUp) {
+                  arrowUp();
+                  event.preventDefault();
+                }
+                break;
+              case 39: /* arrow right */
+                if (arrowRight) {
+                  arrowRight();
+                  event.preventDefault();
+                }
+                break;
+              case 40: /* arrow down */
+                if (arrowDown) {
+                  arrowDown();
+                  event.preventDefault();
+                }
+                break;
+              default:
             }
           }}
           popperClassName="force-on-top"

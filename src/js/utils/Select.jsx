@@ -50,7 +50,7 @@ class Select extends Component {
     const {
       options: selectOptions, value: selectValue = this.state.value,
       objectValue = false, multi = false, delimiter = ';', async = false, showValueTooltip,
-      ...attributes
+      arrowLeft, arrowUp, arrowRight, arrowDown, ...attributes
     } = this.props;
 
     const options = _.map(selectOptions, (value) => {
@@ -113,6 +113,37 @@ class Select extends Component {
             value={multi ? _.join(value, delimiter) : value}
             onChange={this.handleChange}
             dropdownComponent={dropdownComponent}
+            inputProps={{
+              onKeyDown: (event) => {
+                switch (event.keyCode) {
+                  case 37: /* arrow left */
+                    if (arrowLeft) {
+                      arrowLeft();
+                      event.preventDefault();
+                    }
+                    break;
+                  case 38: /* arrow up */
+                    if (arrowUp) {
+                      arrowUp();
+                      event.preventDefault();
+                    }
+                    break;
+                  case 39: /* arrow right */
+                    if (arrowRight) {
+                      arrowRight();
+                      event.preventDefault();
+                    }
+                    break;
+                  case 40: /* arrow down */
+                    if (arrowDown) {
+                      arrowDown();
+                      event.preventDefault();
+                    }
+                    break;
+                  default:
+                }
+              },
+            }}
           />
         </Tooltip>
       </div>
@@ -135,6 +166,10 @@ Select.propTypes = {
   showValueTooltip: PropTypes.bool,
   initialValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
+  arrowLeft: PropTypes.func,
+  arrowUp: PropTypes.func,
+  arrowRight: PropTypes.func,
+  arrowDown: PropTypes.func,
 };
 
 Select.defaultProps = {
@@ -146,4 +181,8 @@ Select.defaultProps = {
   delimiter: ';',
   initialValue: null,
   showValueTooltip: false,
+  arrowLeft: null,
+  arrowUp: null,
+  arrowRight: null,
+  arrowDown: null,
 };
