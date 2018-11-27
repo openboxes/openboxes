@@ -50,7 +50,7 @@ class Select extends Component {
     const {
       options: selectOptions, value: selectValue = this.state.value,
       objectValue = false, multi = false, delimiter = ';', async = false, showValueTooltip,
-      arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, ...attributes
+      arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, ...attributes
     } = this.props;
 
     const options = _.map(selectOptions, (value) => {
@@ -145,6 +145,11 @@ class Select extends Component {
                       event.stopPropagation();
                     }
                     break;
+                  case 9: /* Tab key */
+                    if (onTabPress) {
+                      onTabPress(event);
+                    }
+                    break;
                   default:
                 }
               },
@@ -176,6 +181,7 @@ Select.propTypes = {
   arrowRight: PropTypes.func,
   arrowDown: PropTypes.func,
   fieldRef: PropTypes.func,
+  onTabPress: PropTypes.func,
 };
 
 Select.defaultProps = {
@@ -192,4 +198,5 @@ Select.defaultProps = {
   arrowRight: null,
   arrowDown: null,
   fieldRef: null,
+  onTabPress: null,
 };

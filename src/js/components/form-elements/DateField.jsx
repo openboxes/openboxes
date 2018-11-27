@@ -28,7 +28,7 @@ class DateField extends Component {
 
   renderInput({
     value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', className = '',
-    arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, ...attributes
+    arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, ...attributes
   }) {
     const onChange = (date) => {
       const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
@@ -81,6 +81,11 @@ class DateField extends Component {
                   event.preventDefault();
                   this.dateInput.cancelFocusInput();
                   this.dateInput.setOpen(false);
+                }
+                break;
+              case 9: /* Tab key */
+                if (onTabPress) {
+                  onTabPress(event);
                 }
                 break;
               default:

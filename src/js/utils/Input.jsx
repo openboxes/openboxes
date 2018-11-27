@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Input = ({
-  fieldRef, onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, ...props
+  fieldRef, onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, onTabPress, ...props
 }) => {
   const handleChange = (event) => {
     const { value } = event.target;
@@ -47,6 +47,11 @@ const Input = ({
               event.preventDefault();
             }
             break;
+          case 9: /* Tab key */
+            if (onTabPress) {
+              onTabPress(event);
+            }
+            break;
           default:
         }
       }}
@@ -67,6 +72,7 @@ Input.propTypes = {
   arrowRight: PropTypes.func,
   arrowDown: PropTypes.func,
   fieldRef: PropTypes.func,
+  onTabPress: PropTypes.func,
 };
 
 Input.defaultProps = {
@@ -77,4 +83,5 @@ Input.defaultProps = {
   arrowRight: null,
   arrowDown: null,
   fieldRef: null,
+  onTabPress: null,
 };

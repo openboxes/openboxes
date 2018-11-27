@@ -71,28 +71,28 @@ class BaseField extends Component {
       const focusLeft = attr.focusLeft || otherProps.focusLeft;
       const focusRight = attr.focusRight || otherProps.focusRight;
 
-      const arrowLeft = () => {
+      const arrowLeft = attr.arrowLeft ? attr.arrowLeft : () => {
         if (focusLeft) {
           otherProps.focusField(otherProps.rowIndex, focusLeft);
           return true;
         }
         return false;
       };
-      const arrowRight = () => {
+      const arrowRight = attr.arrowRight ? attr.arrowRight : () => {
         if (focusRight) {
           otherProps.focusField(otherProps.rowIndex, focusRight);
           return true;
         }
         return false;
       };
-      const arrowUp = () => {
+      const arrowUp = attr.arrowUp ? attr.arrowUp : () => {
         if (otherProps.rowIndex > 0) {
           otherProps.focusField(otherProps.rowIndex - 1, focusThis);
           return true;
         }
         return false;
       };
-      const arrowDown = () => {
+      const arrowDown = attr.arrowDown ? attr.arrowDown : () => {
         if (otherProps.rowIndex < otherProps.rowCount - 1) {
           otherProps.focusField(otherProps.rowIndex + 1, focusThis);
           return true;
@@ -101,7 +101,7 @@ class BaseField extends Component {
       };
 
       attr = {
-        arrowLeft, arrowRight, arrowUp, arrowDown, ...attr,
+        ...attr, arrowLeft, arrowRight, arrowUp, arrowDown,
       };
     }
 
