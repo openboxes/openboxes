@@ -39,7 +39,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/putAway" component={AsyncPutAwayMainPage} />
         <MainLayoutRoute path="/**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
         <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
-        <MainLayoutRoute path="/**/stocklistManagement/index" component={AsyncManagement} />
+        <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
       </Switch>
     </BrowserRouter>
     <div className="spinner-container">

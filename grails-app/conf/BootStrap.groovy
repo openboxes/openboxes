@@ -27,6 +27,7 @@ import org.pih.warehouse.api.StockAdjustment
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.Stocklist
+import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.StocklistLocation
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
@@ -383,6 +384,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(StocklistLocation) { StocklistLocation stocklistLocation ->
             return stocklistLocation.toJson()
+        }
+
+        JSON.registerObjectMarshaller(StocklistItem) { StocklistItem stocklistItem ->
+            return stocklistItem.toJson()
         }
 
 
