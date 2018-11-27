@@ -39,6 +39,7 @@ const NO_STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
     virtualized: true,
+    arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
       <button
@@ -115,6 +116,7 @@ const STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
     virtualized: true,
+    arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
       <button
@@ -181,6 +183,7 @@ const VENDOR_FIELDS = {
   lineItems: {
     type: ArrayField,
     virtualized: true,
+    arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
       <button

@@ -121,24 +121,28 @@ class Select extends Component {
                     if (arrowLeft) {
                       arrowLeft();
                       event.preventDefault();
+                      event.stopPropagation();
                     }
                     break;
                   case 38: /* arrow up */
                     if (arrowUp) {
                       arrowUp();
                       event.preventDefault();
+                      event.stopPropagation();
                     }
                     break;
                   case 39: /* arrow right */
                     if (arrowRight) {
                       arrowRight();
                       event.preventDefault();
+                      event.stopPropagation();
                     }
                     break;
                   case 40: /* arrow down */
                     if (arrowDown) {
                       arrowDown();
                       event.preventDefault();
+                      event.stopPropagation();
                     }
                     break;
                   default:

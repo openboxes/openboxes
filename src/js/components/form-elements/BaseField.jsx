@@ -61,23 +61,56 @@ class BaseField extends Component {
     const {
       fieldName,
       fieldConfig: { label, getDynamicAttr, attributes = {} },
-      arrayField,
-      fieldValue,
-      fieldRef,
+      arrayField, fieldValue, fieldRef, focusThis, arrowsNavigation,
       ...otherProps
     } = this.props;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr({ ...otherProps, fieldValue }) : {};
+    let attr = { ...attributes, ...dynamicAttr, fieldRef };
+
+    if (arrowsNavigation) {
+      const focusLeft = attr.focusLeft || otherProps.focusLeft;
+      const focusRight = attr.focusRight || otherProps.focusRight;
+
+      const arrowLeft = () => {
+        if (focusLeft) {
+          otherProps.focusField(otherProps.rowIndex, focusLeft);
+          return true;
+        }
+        return false;
+      };
+      const arrowRight = () => {
+        if (focusRight) {
+          otherProps.focusField(otherProps.rowIndex, focusRight);
+          return true;
+        }
+        return false;
+      };
+      const arrowUp = () => {
+        if (otherProps.rowIndex > 0) {
+          otherProps.focusField(otherProps.rowIndex - 1, focusThis);
+          return true;
+        }
+        return false;
+      };
+      const arrowDown = () => {
+        if (otherProps.rowIndex < otherProps.rowCount - 1) {
+          otherProps.focusField(otherProps.rowIndex + 1, focusThis);
+          return true;
+        }
+        return false;
+      };
+
+      attr = {
+        arrowLeft, arrowRight, arrowUp, arrowDown, ...attr,
+      };
+    }
 
     return (
       <Field
         name={fieldName}
         component={renderField}
         renderInput={this.renderInput}
-        attributes={{
-          ...attributes,
-          ...dynamicAttr,
-          fieldRef,
-        }}
+        attributes={attr}
         label={label}
         touched={this.state.touched}
         arrayField={arrayField}
@@ -98,10 +131,14 @@ BaseField.propTypes = {
   fieldValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
   fieldRef: PropTypes.func,
+  focusThis: PropTypes.string,
+  arrowsNavigation: PropTypes.bool,
 };
 
 BaseField.defaultProps = {
   arrayField: false,
   fieldValue: undefined,
   fieldRef: null,
+  focusThis: null,
+  arrowsNavigation: false,
 };

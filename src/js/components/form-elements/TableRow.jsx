@@ -18,6 +18,14 @@ class TableRow extends Component {
     const {
       fieldsConfig, index, field, addRow, properties, removeRow, rowValues = {}, rowRef,
     } = this.props;
+    const fieldNames = _.keys(fieldsConfig.fields);
+    const focusFieldMap = {};
+    _.forEach(fieldNames, (name, ind) => {
+      focusFieldMap[name] = {
+        left: ind > 0 ? fieldNames[ind - 1] : null,
+        right: ind < fieldNames.length - 1 ? fieldNames[ind + 1] : null,
+      };
+    });
 
     const dynamicAttr = fieldsConfig.getDynamicRowAttr ?
       fieldsConfig.getDynamicRowAttr({ ...properties, index, rowValues }) : {};
@@ -36,6 +44,10 @@ class TableRow extends Component {
               {renderFormField(config, `${field}.${name}`, {
                 ...properties,
                 arrayField: true,
+                arrowsNavigation: fieldsConfig.arrowsNavigation,
+                focusLeft: focusFieldMap[name].left,
+                focusRight: focusFieldMap[name].right,
+                focusThis: name,
                 addRow,
                 removeRow,
                 rowIndex: index,

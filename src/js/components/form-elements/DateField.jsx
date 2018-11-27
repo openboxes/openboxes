@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { Component } from 'react';
 import DatePicker from 'react-datepicker';
 import { Portal } from 'react-overlays';
 import moment from 'moment';
@@ -18,11 +18,18 @@ const CalendarContainer = ({ children }) => {
   );
 };
 
-const DateField = (props) => {
-  const renderInput = ({
+class DateField extends Component {
+  constructor(props) {
+    super(props);
+
+    this.dateInput = null;
+    this.renderInput = this.renderInput.bind(this);
+  }
+
+  renderInput({
     value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', className = '',
     arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, ...attributes
-  }) => {
+  }) {
     const onChange = (date) => {
       const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
       attributes.onChange(val);
@@ -49,32 +56,37 @@ const DateField = (props) => {
           onKeyDown={(event) => {
             switch (event.keyCode) {
               case 37: /* arrow left */
-                if (arrowLeft) {
-                  arrowLeft();
+                if (arrowLeft && arrowLeft()) {
                   event.preventDefault();
+                  this.dateInput.cancelFocusInput();
+                  this.dateInput.setOpen(false);
                 }
                 break;
               case 38: /* arrow up */
-                if (arrowUp) {
-                  arrowUp();
+                if (arrowUp && arrowUp()) {
                   event.preventDefault();
+                  this.dateInput.cancelFocusInput();
+                  this.dateInput.setOpen(false);
                 }
                 break;
               case 39: /* arrow right */
-                if (arrowRight) {
-                  arrowRight();
+                if (arrowRight && arrowRight()) {
                   event.preventDefault();
+                  this.dateInput.cancelFocusInput();
+                  this.dateInput.setOpen(false);
                 }
                 break;
               case 40: /* arrow down */
-                if (arrowDown) {
-                  arrowDown();
+                if (arrowDown && arrowDown()) {
                   event.preventDefault();
+                  this.dateInput.cancelFocusInput();
+                  this.dateInput.setOpen(false);
                 }
                 break;
               default:
             }
           }}
+          disabledKeyboardNavigation
           popperClassName="force-on-top"
           showYearDropdown
           scrollableYearDropdown
@@ -84,6 +96,7 @@ const DateField = (props) => {
           yearDropdownItemNumber={3}
           utcOffset={0}
           ref={(el) => {
+            this.dateInput = el;
             if (el && fieldRef) {
               fieldRef(el.input);
             }
@@ -91,14 +104,16 @@ const DateField = (props) => {
         />
       </div>
     );
-  };
+  }
 
-  return (
-    <BaseField
-      {...props}
-      renderInput={renderInput}
-    />
-  );
-};
+  render() {
+    return (
+      <BaseField
+        {...this.props}
+        renderInput={this.renderInput}
+      />
+    );
+  }
+}
 
 export default DateField;
