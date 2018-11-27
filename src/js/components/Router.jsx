@@ -50,7 +50,7 @@ const Router = props => (
       />
     </div>
     <Alert
-      timeout={5000}
+      timeout="none"
       stack={{ limit: 3 }}
       offset={20}
       html
