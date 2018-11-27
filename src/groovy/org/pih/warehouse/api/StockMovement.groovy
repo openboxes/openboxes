@@ -179,10 +179,7 @@ class StockMovement {
                 driverName: shipment?.driverName,
                 trackingNumber: trackingNumber?.identifier,
                 currentStatus: shipment?.currentStatus,
-                stocklist: requisition?.requisitionTemplate ? [
-                        id: requisition?.requisitionTemplate?.id,
-                        name: requisition?.requisitionTemplate?.name
-                ] : null
+                stocklist: requisition?.requisitionTemplate
         )
 
         // Include all requisition items except those that are substitutions or modifications because the
@@ -197,30 +194,7 @@ class StockMovement {
             }
         }
         return stockMovement
-
     }
-
-//    static StockMovement createFromShipment(Shipment shipment) {
-//        StockMovement stockMovement = new StockMovement(
-//                id: shipment?.id,
-//                name: shipment?.name,
-//                identifier: shipment?.shipmentNumber,
-//                description: shipment.description,
-//                statusCode: shipment?.status?.code?.name(),
-//                origin: shipment?.origin,
-//                destination: shipment?.destination,
-//                dateRequested: shipment?.dateCreated,
-//                requestedBy: shipment?.recipient,
-//                requisition: null,
-//                shipment: shipment
-//        )
-//
-//        shipment.shipmentItems.each { shipmentItem ->
-//            StockMovementItem stockMovementItem = StockMovementItem.createFromShipmentItem(shipmentItem)
-//            stockMovement.lineItems.add(stockMovementItem)
-//        }
-//        return stockMovement
-//    }
 }
 
 enum DocumentGroupCode {
