@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Input = ({
-  onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, ...props
+  fieldRef, onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, ...props
 }) => {
   const handleChange = (event) => {
     const { value } = event.target;
@@ -15,6 +15,7 @@ const Input = ({
   return (
     <input
       type="text"
+      ref={fieldRef}
       onKeyPress={(event) => {
         if (event.which === 13 /* Enter */) {
           event.preventDefault();
@@ -65,6 +66,7 @@ Input.propTypes = {
   arrowUp: PropTypes.func,
   arrowRight: PropTypes.func,
   arrowDown: PropTypes.func,
+  fieldRef: PropTypes.func,
 };
 
 Input.defaultProps = {
@@ -74,4 +76,5 @@ Input.defaultProps = {
   arrowUp: null,
   arrowRight: null,
   arrowDown: null,
+  fieldRef: null,
 };

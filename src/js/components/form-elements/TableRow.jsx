@@ -16,7 +16,7 @@ class TableRow extends Component {
 
   render() {
     const {
-      fieldsConfig, index, field, addRow, properties, removeRow, rowValues = {},
+      fieldsConfig, index, field, addRow, properties, removeRow, rowValues = {}, rowRef,
     } = this.props;
 
     const dynamicAttr = fieldsConfig.getDynamicRowAttr ?
@@ -40,6 +40,7 @@ class TableRow extends Component {
                 removeRow,
                 rowIndex: index,
                 fieldValue: config.fieldKey === '' ? rowValues : _.get(rowValues, config.fieldKey || name),
+                fieldRef: el => rowRef(el, name),
               })}
             </div>
           ))}
@@ -60,8 +61,10 @@ TableRow.propTypes = {
   removeRow: PropTypes.func.isRequired,
   properties: PropTypes.shape({}).isRequired,
   rowValues: PropTypes.shape({}),
+  rowRef: PropTypes.func,
 };
 
 TableRow.defaultProps = {
   rowValues: {},
+  rowRef: null,
 };

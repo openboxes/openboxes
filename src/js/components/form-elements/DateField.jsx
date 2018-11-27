@@ -21,7 +21,7 @@ const CalendarContainer = ({ children }) => {
 const DateField = (props) => {
   const renderInput = ({
     value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', className = '',
-    arrowLeft, arrowUp, arrowRight, arrowDown, ...attributes
+    arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, ...attributes
   }) => {
     const onChange = (date) => {
       const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
@@ -83,6 +83,11 @@ const DateField = (props) => {
           timeIntervals={15}
           yearDropdownItemNumber={3}
           utcOffset={0}
+          ref={(el) => {
+            if (el && fieldRef) {
+              fieldRef(el.input);
+            }
+          }}
         />
       </div>
     );

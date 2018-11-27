@@ -63,6 +63,7 @@ class BaseField extends Component {
       fieldConfig: { label, getDynamicAttr, attributes = {} },
       arrayField,
       fieldValue,
+      fieldRef,
       ...otherProps
     } = this.props;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr({ ...otherProps, fieldValue }) : {};
@@ -75,6 +76,7 @@ class BaseField extends Component {
         attributes={{
           ...attributes,
           ...dynamicAttr,
+          fieldRef,
         }}
         label={label}
         touched={this.state.touched}
@@ -95,9 +97,11 @@ BaseField.propTypes = {
   arrayField: PropTypes.bool,
   fieldValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
+  fieldRef: PropTypes.func,
 };
 
 BaseField.defaultProps = {
   arrayField: false,
   fieldValue: undefined,
+  fieldRef: null,
 };

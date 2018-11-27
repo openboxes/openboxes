@@ -50,7 +50,7 @@ class Select extends Component {
     const {
       options: selectOptions, value: selectValue = this.state.value,
       objectValue = false, multi = false, delimiter = ';', async = false, showValueTooltip,
-      arrowLeft, arrowUp, arrowRight, arrowDown, ...attributes
+      arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, ...attributes
     } = this.props;
 
     const options = _.map(selectOptions, (value) => {
@@ -113,6 +113,7 @@ class Select extends Component {
             value={multi ? _.join(value, delimiter) : value}
             onChange={this.handleChange}
             dropdownComponent={dropdownComponent}
+            ref={fieldRef}
             inputProps={{
               onKeyDown: (event) => {
                 switch (event.keyCode) {
@@ -170,6 +171,7 @@ Select.propTypes = {
   arrowUp: PropTypes.func,
   arrowRight: PropTypes.func,
   arrowDown: PropTypes.func,
+  fieldRef: PropTypes.func,
 };
 
 Select.defaultProps = {
@@ -185,4 +187,5 @@ Select.defaultProps = {
   arrowUp: null,
   arrowRight: null,
   arrowDown: null,
+  fieldRef: null,
 };
