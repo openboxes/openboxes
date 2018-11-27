@@ -155,6 +155,7 @@ class ReceiptService {
         partialReceiptItem.expirationDate = receiptItem.inventoryItem?.expirationDate
         partialReceiptItem.quantityShipped = receiptItem?.quantityShipped?:0
         partialReceiptItem.isSplitItem = receiptItem.isSplitItem
+        partialReceiptItem.comment = receiptItem.comment
 
         return partialReceiptItem
     }
@@ -189,6 +190,7 @@ class ReceiptService {
         receiptItem.inventoryItem = inventoryItem
         receiptItem.shipmentItem = partialReceiptItem.shipmentItem
         receiptItem.isSplitItem = partialReceiptItem.isSplitItem
+        receiptItem.comment = partialReceiptItem.comment
 
         if (partialReceiptItem.cancelRemaining) {
             //when completing the pending receipt status was already changed to received and the item quantity will in quantityReceived,

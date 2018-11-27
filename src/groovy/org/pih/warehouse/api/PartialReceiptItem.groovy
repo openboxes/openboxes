@@ -26,6 +26,8 @@ class PartialReceiptItem {
     Integer quantityShipped
     Product product
 
+    String comment
+
     Integer getQuantityReceived() {
         if (isSplitItem) {
             return 0
@@ -88,7 +90,8 @@ class PartialReceiptItem {
                 quantityCanceled: quantityCanceled,
                 quantityReceiving: quantityReceiving,
                 quantityRemaining: quantityRemaining,
-                cancelRemaining: cancelRemaining
+                cancelRemaining: cancelRemaining,
+                comment: comment
         ]
     }
 
