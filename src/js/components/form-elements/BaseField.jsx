@@ -61,23 +61,11 @@ class BaseField extends Component {
     const {
       fieldName,
       fieldConfig: { label, getDynamicAttr, attributes = {} },
-      renderInput,
       arrayField,
       fieldValue,
-      fieldPreview,
       ...otherProps
     } = this.props;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr({ ...otherProps, fieldValue }) : {};
-
-    if (fieldPreview) {
-      return (
-        <div className="form-group my-0 ">
-          {renderInput({
-            ...attributes, ...dynamicAttr, value: fieldValue, disabled: true,
-          })}
-        </div>
-      );
-    }
 
     return (
       <Field
@@ -105,13 +93,11 @@ BaseField.propTypes = {
   }).isRequired,
   renderInput: PropTypes.func.isRequired,
   arrayField: PropTypes.bool,
-  fieldPreview: PropTypes.bool,
   fieldValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
 };
 
 BaseField.defaultProps = {
   arrayField: false,
-  fieldPreview: false,
   fieldValue: undefined,
 };

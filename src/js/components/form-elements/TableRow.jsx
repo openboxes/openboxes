@@ -4,26 +4,8 @@ import PropTypes from 'prop-types';
 import { renderFormField } from '../../utils/form-utils';
 
 class TableRow extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      fieldPreview: _.isNil(props.fieldPreview) ? false : props.fieldPreview,
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (!nextProps.fieldPreview && this.state.fieldPreview) {
-      this.setState({ fieldPreview: nextProps.fieldPreview });
-    }
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.fieldPreview !== nextState.fieldPreview) {
-      return true;
-    }
-
-    return !_.isEqualWith(_.omit(this.props, 'fieldPreview'), _.omit(nextProps, 'fieldPreview'), (objValue, othValue) => {
+  shouldComponentUpdate(nextProps) {
+    return !_.isEqualWith(this.props, nextProps, (objValue, othValue) => {
       if (typeof objValue === 'function' || typeof othValue === 'function') {
         return true;
       }
@@ -38,9 +20,7 @@ class TableRow extends Component {
     } = this.props;
 
     const dynamicAttr = fieldsConfig.getDynamicRowAttr ?
-      fieldsConfig.getDynamicRowAttr({
-        ...properties, index, rowValues, fieldPreview: this.state.fieldPreview,
-      }) : {};
+      fieldsConfig.getDynamicRowAttr({ ...properties, index, rowValues }) : {};
     const rowIndex = !_.isNil(properties.parentIndex) ? properties.parentIndex : index;
     const className = `table-row ${rowIndex % 2 === 0 ? 'even-row' : ''} ${dynamicAttr.className ? dynamicAttr.className : ''}`;
 
@@ -55,7 +35,6 @@ class TableRow extends Component {
             >
               {renderFormField(config, `${field}.${name}`, {
                 ...properties,
-                fieldPreview: this.state.fieldPreview,
                 arrayField: true,
                 addRow,
                 removeRow,
@@ -81,10 +60,8 @@ TableRow.propTypes = {
   removeRow: PropTypes.func.isRequired,
   properties: PropTypes.shape({}).isRequired,
   rowValues: PropTypes.shape({}),
-  fieldPreview: PropTypes.bool,
 };
 
 TableRow.defaultProps = {
   rowValues: {},
-  fieldPreview: false,
 };
