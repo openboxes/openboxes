@@ -72,6 +72,7 @@ exports[`SelectField component is correctly rendering renders correctly 1`] = `
                     onBlur={[Function]}
                     onChange={[Function]}
                     onFocus={[Function]}
+                    onKeyDown={[Function]}
                     required={false}
                     role="combobox"
                     style={

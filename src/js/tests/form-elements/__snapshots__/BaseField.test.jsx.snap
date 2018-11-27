@@ -18,6 +18,7 @@ exports[`BaseField component is correctly rendering attributes 1`] = `
     >
       <input
         dynamicAttr="dynamic property"
+        fieldRef={null}
         id="test"
         onBlur={[Function]}
         onChange={[Function]}
