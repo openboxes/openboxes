@@ -19,7 +19,11 @@ const Loading = ({ error, pastDelay, retry }) => {
 export default Loading;
 
 Loading.propTypes = {
-  error: PropTypes.bool.isRequired,
   pastDelay: PropTypes.bool.isRequired,
   retry: PropTypes.func.isRequired,
+  error: PropTypes.bool,
+};
+
+Loading.defaultProps = {
+  error: false,
 };
