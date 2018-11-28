@@ -57,7 +57,7 @@
         </div>
         <div class="button-group">
 
-                <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button">
+            <g:link controller="stockMovement" action="index" id="${stockMovement.id}" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
@@ -78,6 +78,10 @@
             </g:link>
 
             <g:isSuperuser>
+                <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                    <warehouse:message code="default.button.rollback.label" />
+                </g:link>
                 <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
                         onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                     <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;

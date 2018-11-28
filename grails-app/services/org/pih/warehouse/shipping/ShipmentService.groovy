@@ -1885,6 +1885,7 @@ class ShipmentService {
 		def transactions = Transaction.findAllByIncomingShipment(shipmentInstance)
 		transactions.each { transactionInstance ->
 			if (transactionInstance) {
+				transactionInstance.receipt = null
 				shipmentInstance.removeFromIncomingTransactions(transactionInstance)
 				transactionInstance?.delete();
 			}
@@ -1896,6 +1897,7 @@ class ShipmentService {
 		def transactions = Transaction.findAllByOutgoingShipment(shipmentInstance)
 		transactions.each { transactionInstance ->
 			if (transactionInstance) {
+				transactionInstance?.receipt = null
 				shipmentInstance.removeFromOutgoingTransactions(transactionInstance)
 				transactionInstance?.delete();
 			}
@@ -1929,7 +1931,7 @@ class ShipmentService {
 
 		try {
 			
-			if (eventInstance?.eventType?.eventCode == EventCode.RECEIVED) {
+			if (eventInstance?.eventType?.eventCode in [EventCode.RECEIVED, EventCode.PARTIALLY_RECEIVED]) {
 				deleteReceipts(shipmentInstance)
 				deleteInboundTransactions(shipmentInstance)
 				deleteEvent(shipmentInstance, eventInstance)
@@ -1945,7 +1947,7 @@ class ShipmentService {
 			
 		} catch (Exception e) {
 			log.error("Error rolling back most recent event", e)
-			throw new RuntimeException("Error rolling back most recent event", e)
+			throw new IllegalStateException("Error rolling back most recent event", e)
 		}
 	}
 

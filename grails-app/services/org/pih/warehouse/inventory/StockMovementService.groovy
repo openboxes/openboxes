@@ -1143,21 +1143,15 @@ class StockMovementService {
 
     void rollbackStockMovement(String id) {
         StockMovement stockMovement = getStockMovement(id)
-        Requisition requisition = stockMovement?.requisition
-        if (requisition) requisitionService.rollbackRequisition(requisition)
 
         // If the shipment has been shipped we can roll it back
+        Requisition requisition = stockMovement?.requisition
         Shipment shipment = stockMovement?.requisition?.shipments[0]
-        if (shipment) {
-            if (shipment.currentStatus == ShipmentStatusCode.SHIPPED) {
-                shipmentService.rollbackLastEvent(shipment)
-            }
-            // If shipment status is any other status except pending then we should throw an error since rolling it
-            // back would cause issues
-            else if (shipment.currentStatus != ShipmentStatusCode.PENDING) {
-                throw new IllegalStateException("Cannot rollback status for shipment ${shipment.shipmentNumber} from ${shipment.currentStatus}")
-            }
-
+        if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
+            shipmentService.rollbackLastEvent(shipment)
+        }
+        else if (requisition) {
+            requisitionService.rollbackRequisition(requisition)
         }
     }
 

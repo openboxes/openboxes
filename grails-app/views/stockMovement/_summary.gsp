@@ -1,5 +1,6 @@
+<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <div class="summary">
-
     <table id="stockMovement-summary">
         <tbody>
         <tr>
@@ -132,10 +133,14 @@
             </td>
             <td class="center" width="1%">
                 <div class="tag tag-alert">
-                    <format:metadata obj="${shipmentInstance?.status?:requisition?.status }"/>
+                    <g:if test="${shipmentInstance?.currentStatus>ShipmentStatusCode.PENDING}">
+                        <format:metadata obj="${shipmentInstance?.currentStatus }"/>
+                    </g:if>
+                    <g:else>
+                        <format:metadata obj="${requisition?.status }"/>
+                    </g:else>
                 </div>
             </td>
-
         </tr>
         </tbody>
     </table>
