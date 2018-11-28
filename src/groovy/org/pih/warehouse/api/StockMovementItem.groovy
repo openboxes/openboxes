@@ -202,8 +202,12 @@ class StockMovementItem {
         String boxName = tokens[4] ?: null
         String lotNumber = tokens[5] ?: null
         Date expirationDate = tokens[6] ? Constants.EXPIRATION_DATE_FORMATTER.parse(tokens[6]) : null
-        Integer quantityRequested = tokens[7].toInteger() ?: null
+        Integer quantityRequested = tokens[7] ? tokens[7].toInteger() : null
         String recipientId = tokens[8]
+
+        if (!productCode && !quantityRequested) {
+            throw new IllegalArgumentException("Product code and quantity requested are required")
+        }
 
         Person recipient = recipientId ? Person.get(recipientId) : null
         if (!recipient && recipientId) {
@@ -219,6 +223,11 @@ class StockMovementItem {
             }
         }
 
+        Product product = productCode ? Product.findByProductCode(productCode) : null
+        if (!product) {
+            throw new IllegalArgumentException("Product '${productCode} ${productName}' could not be found")
+        }
+
         StockMovementItem stockMovementItem = new StockMovementItem()
         stockMovementItem.id = requisitionItemId
 
@@ -226,11 +235,6 @@ class StockMovementItem {
             stockMovementItem.delete = true
         }
 
-        // Required properties
-        Product product = Product.findByProductCode(productCode)
-        if (!product) {
-            throw new IllegalArgumentException("Product '${productCode} ${productName}' could not be found")
-        }
         stockMovementItem.product = product
         stockMovementItem.quantityRequested = quantityRequested
         stockMovementItem.palletName = palletName
