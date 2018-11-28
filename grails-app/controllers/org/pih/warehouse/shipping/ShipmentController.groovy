@@ -710,7 +710,7 @@ class ShipmentController {
 
 			//writer.writeAll(resultSet, false);
 			log.info "results: " + sw.toString();
-			response.setHeader("Content-disposition", "attachment; filename='PackingList.csv'");
+			response.setHeader("Content-disposition", "attachment; filename=\"PackingList.csv\"");
 			render(contentType: "text/csv", text: sw.toString());
 			sql.close();
 			//resultSet.close();

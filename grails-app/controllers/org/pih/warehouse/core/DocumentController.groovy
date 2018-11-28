@@ -348,13 +348,13 @@ class DocumentController {
                 // FIXME Move this into the service layer and try to pass back a BAOS
                 File tempFile = fileService.renderShippingTemplate(documentInstance, shipmentInstance)
                 def filename = "${documentInstance.name}-${shipmentInstance?.name?.trim()}.docx"
-                response.setHeader("Content-disposition", "attachment; filename='${filename}'");
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"");
                 response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                 response.outputStream << tempFile.readBytes()
                 response.outputStream.flush()
             }
             else {
-                response.setHeader "Content-disposition", "attachment;filename=${documentInstance.filename}"
+                response.setHeader "Content-disposition", "attachment;filename=\"${documentInstance.filename}\""
                 response.contentType = documentInstance.contentType
                 response.outputStream << documentInstance.fileContents
                 response.outputStream.flush()

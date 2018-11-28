@@ -524,7 +524,7 @@ class DashboardController {
                 sw.append("\n")
             }
         }
-        response.setHeader("Content-disposition", "attachment; filename='GenericProductSummary-${params.status}-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv'")
+        response.setHeader("Content-disposition", "attachment; filename=\"GenericProductSummary-${params.status}-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv\"")
         render(contentType: "text/csv", text:sw.toString())
         return;
     }
@@ -567,7 +567,7 @@ class DashboardController {
         else {
             sw.append("${warehouse.message(code:'fastMovers.empty.message')}")
         }
-        response.setHeader("Content-disposition", "attachment; filename='FastMovers-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv'")
+        response.setHeader("Content-disposition", "attachment; filename=\"FastMovers-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv\"")
         render(contentType: "text/csv", text:sw.toString())
         return;
     }

@@ -51,7 +51,7 @@ class CycleCountController {
         }
 
         String csv = dataService.generateCsv(rows)
-        response.setHeader("Content-disposition", "attachment; filename='CycleCountReport-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}.csv'")
+        response.setHeader("Content-disposition", "attachment; filename=\"CycleCountReport-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}.csv\"")
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
         return
     }

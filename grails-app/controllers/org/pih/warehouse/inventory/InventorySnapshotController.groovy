@@ -127,8 +127,8 @@ class InventorySnapshotController {
 
         def csv = dataService.generateCsv(data)
         println "CSV: " + csv
-
-        response.setHeader("Content-disposition", "attachment; filename='Stock-${location?.name}-${date.format("dd MMM yyyy")}.csv'")
+        def filename = "Stock-${location?.name}-${date.format("dd MMM yyyy")}.csv"
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
         //response.outputStream.flush()
 

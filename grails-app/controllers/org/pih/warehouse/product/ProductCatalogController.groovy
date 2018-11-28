@@ -219,7 +219,7 @@ class ProductCatalogController {
         if (productCatalog) {
             def date = new Date();
             response.setHeader("Content-disposition",
-                    "attachment; filename='ProductCatalog-${date.format("yyyyMMdd-hhmmss")}.csv'")
+                    "attachment; filename=\"ProductCatalog-${date.format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
             String csv = "Catalog Code,Product Code,Product Name\n"
             productCatalog.productCatalogItems.each {
