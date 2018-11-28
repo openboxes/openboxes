@@ -845,6 +845,10 @@ class AddItemsPage extends Component {
                   type="file"
                   style={{ display: 'none' }}
                   onChange={this.importTemplate}
+                  onClick={(event) => {
+                    // eslint-disable-next-line no-param-reassign
+                    event.target.value = null;
+                  }}
                   accept=".csv"
                 />
               </label>
