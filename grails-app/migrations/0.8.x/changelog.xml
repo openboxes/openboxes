@@ -34,5 +34,6 @@
     <include file="0.8.x/changelog-2018-10-25-1318-configure-shipping-templates.xml"/>
     <include file="0.8.x/changelog-2018-11-06-1434-modify-column-receipt-item-quantity-received.xml"/>
     <include file="0.8.x/changelog-2018-11-07-1501-alter-table-picklist-item-add-column-sort-order.xml"/>
+    <include file="0.8.x/changelog-2018-11-21-1552-alter-table-requisition-add-column-requisition-template.xml"/>
 
 </databaseChangeLog>

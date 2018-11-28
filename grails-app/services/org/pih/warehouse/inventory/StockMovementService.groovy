@@ -661,6 +661,7 @@ class StockMovementService {
             requisition.requestNumber = identifierService.generateRequisitionIdentifier()
         }
         requisition.type = RequisitionType.DEFAULT
+        requisition.requisitionTemplate = stockMovement.stocklist
         requisition.description = stockMovement.description
         requisition.destination = stockMovement.destination
         requisition.origin = stockMovement.origin
