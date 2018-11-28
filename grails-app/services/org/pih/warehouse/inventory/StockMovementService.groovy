@@ -1122,8 +1122,12 @@ class StockMovementService {
             throw new IllegalStateException("There are too many shipments associated with stock movement ${requisition.requestNumber}")
         }
 
-        shipmentService.sendShipment(shipments[0], null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
+        try {
+            shipmentService.sendShipment(shipments[0], null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
 
+        } catch (ValidationException e) {
+            throw new IllegalStateException(e.message)
+        }
         // Create temporary receiving area for the Partial Receipt process
         if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && stockMovement.destination.hasBinLocationSupport()) {
             LocationType locationType = LocationType.findByName("Receiving")
