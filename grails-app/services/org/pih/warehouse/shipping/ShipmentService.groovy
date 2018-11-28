@@ -1646,6 +1646,9 @@ class ShipmentService {
                     }
                 }
 
+				// Validate quantity available
+				validateShipmentItem(it)
+
                 // Create a new transaction entry for each shipment item
                 def transactionEntry = new TransactionEntry();
                 transactionEntry.quantity = it.quantity;
