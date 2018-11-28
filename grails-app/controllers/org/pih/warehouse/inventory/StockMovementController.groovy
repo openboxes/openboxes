@@ -176,7 +176,7 @@ class StockMovementController {
             ]
         }
         String csv = dataService.generateCsv(lineItems)
-        response.setHeader("Content-disposition", "attachment; filename='StockMovementItems-${params.id}.csv'")
+        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
         render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
 	}
 

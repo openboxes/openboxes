@@ -92,8 +92,8 @@ class ReportController {
         if (params.downloadFormat == "csv") {
             String csv = ReportUtil.getCsvForListOfMapEntries(binLocations)
             String binLocationName = binLocation ? binLocation?.name : "All Bins"
-            def filename = "Bin location report - " + location.name + " - " + binLocationName + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+            def filename = "bin-location-report-" + location.name + "-" + binLocationName + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: csv)
             return
         }
@@ -116,7 +116,7 @@ class ReportController {
         }
 
         def filename = "Stock report - " + location.name + ".csv"
-        response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         render(contentType: "text/csv", text: ReportUtil.getCsv(map))
         return;
     }
@@ -171,7 +171,7 @@ class ReportController {
 
         //render sw.toString()
 
-        response.setHeader("Content-disposition", "attachment; filename='Inventory-sampling-${new Date().format("yyyyMMdd-hhmmss")}.csv'")
+        response.setHeader("Content-disposition", "attachment; filename=\"Inventory-sampling-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
         render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
 
     }
@@ -361,7 +361,7 @@ class ReportController {
 
                 String csv = ReportUtil.getCsvForListOfMapEntries(binLocations, binLocationCsvHeader, binLocationCsvRow)
                 def filename = "Bin Location Report - ${location?.name} - ${params.status?:'All'}.csv"
-                response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
                 render(contentType: "text/csv", text: csv)
                 return
             }

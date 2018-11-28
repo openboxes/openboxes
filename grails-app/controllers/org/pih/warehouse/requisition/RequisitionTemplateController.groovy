@@ -336,7 +336,7 @@ class RequisitionTemplateController {
             }
 
             response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename='Stock List - ${requisition?.destination?.name} - ${date.format("yyyyMMdd-hhmmss")}.csv'")
+            response.setHeader("Content-disposition", "attachment; filename=\"Stock List - ${requisition?.destination?.name} - ${date.format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType:"text/csv", text: csv.writer.toString())
             return;
         }

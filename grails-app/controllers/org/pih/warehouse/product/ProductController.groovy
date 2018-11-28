@@ -808,7 +808,7 @@ class ProductController {
         log.info "viewImage: " + params
         def documentInstance = Document.get(params.id);
         if (documentInstance) {
-            response.setHeader "Content-disposition", "attachment;filename=${documentInstance.filename}"
+            response.setHeader "Content-disposition", "attachment;filename=\"${documentInstance.filename}\""
             response.contentType = documentInstance.contentType
             response.outputStream << documentInstance.fileContents
             response.outputStream.flush()
@@ -898,7 +898,7 @@ class ProductController {
 		if (products) { 
 			def date = new Date();
 			response.setHeader("Content-disposition",
-					"attachment; filename='Products-${date.format("yyyyMMdd-hhmmss")}.csv'")
+					"attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
 			response.contentType = "text/csv"
 			def csv = productService.exportProducts(products)
 			println "export products: " + csv
@@ -925,7 +925,7 @@ class ProductController {
         if (products) {
 			def date = new Date();
 			response.setHeader("Content-disposition",
-					"attachment; filename='Products-${date.format("yyyyMMdd-hhmmss")}.csv'")
+					"attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
 			response.contentType = "text/csv"
 			def csv = productService.exportProducts(products)
 			//println "export products: " + csv

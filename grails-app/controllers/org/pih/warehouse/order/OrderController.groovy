@@ -432,7 +432,7 @@ class OrderController {
 		else {
 
 			def date = new Date();
-			response.setHeader("Content-disposition", "attachment; filename='PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv'")
+			response.setHeader("Content-disposition", "attachment; filename=\"PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv\"")
 			response.contentType = "text/csv"
 			def csv = "PO Number,${orderInstance?.orderNumber}\n" +
 					"Description,${StringEscapeUtils.escapeCsv(orderInstance?.description)}\n" +
@@ -487,7 +487,7 @@ class OrderController {
 		else {
 
 			def date = new Date();
-			response.setHeader("Content-disposition", "attachment; filename='PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv'")
+			response.setHeader("Content-disposition", "attachment; filename='\"PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv\"")
 			response.contentType = "text/csv"
 			def csv = ""
 

@@ -255,7 +255,7 @@ class InventoryLevelController {
             }
             println csv.writer.toString()
             response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename='${filename}.csv'")
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}.csv\"")
             render(contentType:"text/csv", text: csv.writer.toString())
             return;
         }
