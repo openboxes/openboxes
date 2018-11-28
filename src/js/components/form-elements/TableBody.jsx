@@ -5,7 +5,7 @@ import TableRow from './TableRow';
 
 const TableBody = (props) => {
   const {
-    fieldsConfig, properties, fields,
+    fieldsConfig, properties, fields, tableRef,
     addRow = (row = {}) => fields.push(row),
   } = props;
   const RowComponent = properties.subfield ? TableRow : fieldsConfig.rowComponent || TableRow;
@@ -21,6 +21,7 @@ const TableBody = (props) => {
         fieldsConfig={fieldsConfig}
         removeRow={() => fields.remove(index)}
         rowValues={fields.value[index]}
+        rowRef={(el, fieldName) => tableRef(el, fieldName, index)}
       />))
   );
 };
@@ -38,8 +39,10 @@ TableBody.propTypes = {
   ]).isRequired,
   properties: PropTypes.shape({}).isRequired,
   addRow: PropTypes.func,
+  tableRef: PropTypes.func,
 };
 
 TableBody.defaultProps = {
   addRow: undefined,
+  tableRef: null,
 };

@@ -39,6 +39,7 @@ const NO_STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
     virtualized: true,
+    arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
       <button
@@ -97,7 +98,13 @@ const NO_STOCKLIST_FIELDS = {
         }) => ({
           options: recipients,
           disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
-          onBlur: rowCount === rowIndex + 1 ? () => addRow({
+          onTabPress: rowCount === rowIndex + 1 ? () => addRow({
+            sortOrder: getSortOrder(),
+          }) : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => addRow({
+            sortOrder: getSortOrder(),
+          }) : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => addRow({
             sortOrder: getSortOrder(),
           }) : null,
         }),
@@ -115,6 +122,7 @@ const STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
     virtualized: true,
+    arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
       <button
@@ -167,7 +175,13 @@ const STOCKLIST_FIELDS = {
         getDynamicAttr: ({
           addRow, rowCount, rowIndex, getSortOrder,
         }) => ({
-          onBlur: rowCount === rowIndex + 1 ? () => addRow({
+          onTabPress: rowCount === rowIndex + 1 ? () => addRow({
+            sortOrder: getSortOrder(),
+          }) : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => addRow({
+            sortOrder: getSortOrder(),
+          }) : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => addRow({
             sortOrder: getSortOrder(),
           }) : null,
         }),
@@ -181,6 +195,7 @@ const VENDOR_FIELDS = {
   lineItems: {
     type: ArrayField,
     virtualized: true,
+    arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
       <button
@@ -253,7 +268,13 @@ const VENDOR_FIELDS = {
           recipients, addRow, rowCount, rowIndex, getSortOrder,
         }) => ({
           options: recipients,
-          onBlur: rowCount === rowIndex + 1 ? () => addRow({
+          onTabPress: rowCount === rowIndex + 1 ? () => addRow({
+            sortOrder: getSortOrder(),
+          }) : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => addRow({
+            sortOrder: getSortOrder(),
+          }) : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => addRow({
             sortOrder: getSortOrder(),
           }) : null,
         }),

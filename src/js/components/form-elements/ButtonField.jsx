@@ -5,10 +5,9 @@ const ButtonField = (props) => {
   const {
     fieldName,
     fieldConfig: { buttonLabel: ButtonLabel, getDynamicAttr, attributes = { className: 'btn-outline-primary' } },
-    fieldPreview,
   } = props;
   const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
-  const attr = { disabled: fieldPreview, ...attributes, ...dynamicAttr };
+  const attr = { ...attributes, ...dynamicAttr };
 
   return (
     <button type="button" key={fieldName} {...attr} className={`btn btn-xs ${attr.className}`} >
@@ -26,9 +25,4 @@ ButtonField.propTypes = {
   fieldConfig: PropTypes.shape({
     getDynamicAttr: PropTypes.func,
   }).isRequired,
-  fieldPreview: PropTypes.bool,
-};
-
-ButtonField.defaultProps = {
-  fieldPreview: false,
 };
