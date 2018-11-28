@@ -1603,7 +1603,7 @@ class ShipmentService {
         log.debug "create send shipment transaction"
 
         if (!shipmentInstance.origin.isWarehouse()) {
-            throw new RuntimeException("Can't create send shipment transaction for origin that is not a depot")
+            throw new IllegalStateException("Can't create send shipment transaction for origin that is not a depot")
         }
 
 		if (!shipmentInstance?.origin?.inventory) {
