@@ -467,7 +467,7 @@ class StockMovementService {
                 return substitutionItem
             }
         }
-        return availableSubstitutions
+        return availableSubstitutions.findAll { availableItems -> availableItems.quantityAvailable > 0 }
     }
 
     List<SubstitutionItem> getSubstitutionItems(Location location, RequisitionItem requisitionItem) {
