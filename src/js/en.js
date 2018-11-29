@@ -502,10 +502,6 @@ const en = {
       link: '#',
       renderedFromConfig: true,
     },
-    stocklistManagement: {
-      label: 'Stock List Management',
-      link: '/openboxes/stocklistManagement/index',
-    },
   },
 };
 
