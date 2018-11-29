@@ -32,6 +32,7 @@ import org.pih.warehouse.api.StocklistLocation
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.FileService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -64,6 +65,7 @@ class BootStrap {
 
     def identifierService
     def grailsApplication
+    FileService fileService
     DataSource dataSource;
 
     def init = { servletContext ->
@@ -471,14 +473,7 @@ class BootStrap {
         }
 
         // Create uploads directory if it doesn't already exist
-        def folder = new File("uploads")
-        if (!folder.exists()) {
-            log.info("Creating uploads directory if it doesn't already exist")
-            folder.mkdirs()
-        }
-        else {
-            log.info("Uploads directory already exists")
-        }
+        fileService.createDirectory("uploads")
     }
 
 
