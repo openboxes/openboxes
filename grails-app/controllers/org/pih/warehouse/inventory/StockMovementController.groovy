@@ -213,7 +213,6 @@ class StockMovementController {
             def settings = [separatorChar: ',', skipLines: 1]
             csv.toCsvReader(settings).eachLine { tokens ->
 
-                log.info "Tokens " + tokens.class
                 StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens)
                 stockMovementItem.stockMovement = stockMovement
                 stockMovement.lineItems.add(stockMovementItem)
