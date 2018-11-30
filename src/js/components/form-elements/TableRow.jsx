@@ -16,7 +16,7 @@ class TableRow extends Component {
 
   render() {
     const {
-      fieldsConfig, index, field, addRow, properties, removeRow, rowValues = {}, rowRef,
+      fieldsConfig, index, field, addRow, properties, removeRow, rowValues = {}, rowRef = () => {},
     } = this.props;
     const fieldNames = _.keys(fieldsConfig.fields);
     const focusFieldMap = {};
@@ -78,5 +78,5 @@ TableRow.propTypes = {
 
 TableRow.defaultProps = {
   rowValues: {},
-  rowRef: null,
+  rowRef: undefined,
 };
