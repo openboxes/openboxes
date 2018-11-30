@@ -5,7 +5,7 @@ import TableRow from './TableRow';
 
 const TableBody = (props) => {
   const {
-    fieldsConfig, properties, fields, tableRef,
+    fieldsConfig, properties, fields, tableRef = () => {},
     addRow = (row = {}) => fields.push(row),
   } = props;
   const RowComponent = properties.subfield ? TableRow : fieldsConfig.rowComponent || TableRow;
@@ -44,5 +44,5 @@ TableBody.propTypes = {
 
 TableBody.defaultProps = {
   addRow: undefined,
-  tableRef: null,
+  tableRef: undefined,
 };
