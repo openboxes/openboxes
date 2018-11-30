@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import grails.validation.ValidationException
+import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -218,17 +219,21 @@ class InventoryItemController {
 
 
 
-	def showPendingOutbound = { StockCardCommand cmd ->
-        def startTime = System.currentTimeMillis()
-        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
-        // add the current warehouse to the command object
-        cmd.warehouse = Location.get(session?.warehouse?.id)
+	def showPending = {
 
-        // now populate the rest of the commmand object
-        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
+		Product product = Product.get(params.id)
+        Location location = Location.get(session?.warehouse?.id)
+        StockMovementType stockMovementType = params.type as StockMovementType
+
+        if (!stockMovementType) {
+            throw new IllegalArgumentException("Stock movement type is required")
+        }
+
+		Location origin = stockMovementType == StockMovementType.INBOUND ? null : location
+		Location destination = stockMovementType == StockMovementType.OUTBOUND ? null : location
 
         def requisitionItems =
-            requisitionService.getPendingRequisitionItems(commandInstance.warehouse, commandInstance?.product)
+            requisitionService.getPendingRequisitionItems(origin, destination, product)
         def requisitionMap = requisitionItems.groupBy { it.requisition }
 
 		log.info "requisitionmap: " + requisitionMap
@@ -238,38 +243,8 @@ class InventoryItemController {
                 requisitionMap.put(it, quantity)
             }
         }
-        commandInstance.requisitionMap = requisitionMap;
 
-        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
-
-
-        render(template: "showPendingOutbound", model: [commandInstance:commandInstance, requisitionItems:requisitionItems])
-    }
-
-    def showPendingInbound = { StockCardCommand cmd ->
-        long startTime = System.currentTimeMillis()
-        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
-        // add the current warehouse to the command object
-        cmd.warehouse = Location.get(session?.warehouse?.id)
-
-        // now populate the rest of the commmand object
-        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-
-        def shipmentItems =
-            shipmentService.getPendingShipmentItemsWithProduct(commandInstance.warehouse, commandInstance?.product)
-
-        def shipmentMap = shipmentItems.groupBy { it.shipment }
-        if (shipmentMap) {
-            shipmentMap.keySet().each {
-                def quantity = shipmentMap[it].sum() { it.quantity }
-                shipmentMap.put(it, quantity)
-            }
-        }
-        commandInstance.shipmentMap = shipmentMap;
-
-        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        render(template: "showPendingInbound", model: [commandInstance:commandInstance])
+        render(template: "showPendingStock", model: [product: product, requisitionMap:requisitionMap])
     }
 
     def showConsumption = { StockCardCommand cmd ->
