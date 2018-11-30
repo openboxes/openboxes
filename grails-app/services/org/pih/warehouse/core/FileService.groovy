@@ -77,6 +77,26 @@ class FileService {
 		}
 		return file
 	}
+
+	File createDirectory(String directoryName) {
+		File folder = new File(directoryName)
+		log.info("Attempting to create directory ${folder?.absolutePath}")
+		if (!folder.exists()) {
+			folder.mkdirs()
+			log.info("- Directory ${directoryName} has been created")
+			if (!folder.canWrite()) {
+				log.error("- Directory ${folder?.absolutePath} is not writable")
+			}
+			else {
+				log.info("- Directory ${folder?.absolutePath} is writable")
+			}
+		}
+		else {
+			log.info("- Directory ${folder?.absolutePath} already exists")
+		}
+        return folder
+
+	}
 	
 
     def uploadDocument(File file) {
