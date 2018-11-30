@@ -91,7 +91,7 @@ class LocationService {
 	def getLocations(String [] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation) {
 
 		def locations = new HashSet()
-		locations += getLocations(null, [:])
+		locations += getLocations(fields, [:])
 
 		if (!isSuperuser) {
 			if (direction == "INBOUND") {
