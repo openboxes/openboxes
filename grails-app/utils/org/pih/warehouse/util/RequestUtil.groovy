@@ -12,8 +12,12 @@ package org.pih.warehouse.util
 class RequestUtil {
 
 	static boolean isAjax(request) {
+		// If incoming request is in JSON or Accept is JSON, then we should
+		def accept = request.getHeader("Accept")
 		def contentType = request.getHeader("Content-Type")
-		return request.isXhr() || (contentType && contentType?.contains("application/json"))
+		return request.isXhr() ||
+				(contentType && contentType?.contains("application/json") ||
+						(accept && accept?.contains("application/json")))
 	}
 
 }
