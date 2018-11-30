@@ -268,7 +268,7 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(Shipment) { Shipment shipment ->
             def containerList = []
-            def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
+            def shipmentItemsByContainer = shipment?.shipmentItems?.groupBy { it.container }
             shipmentItemsByContainer.each { container, shipmentItems ->
                 containerList << [id: container?.id, name: container?.name, type: container?.containerType?.name, shipmentItems: shipmentItems]
             }
