@@ -50,7 +50,6 @@ $ curl -b cookies.txt -X GET -H "Content-Type: application/json" "https://openbo
 $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizations/dashboard.greeting.label?args=Justin&args=Boston&lang=en" |jsonlint
 {
   "code": "dashboard.greeting.label",
-  "message": "Welcome, <b>Justin<\\/b>!<\\/span> You are logged into the <b>Boston<\\/b> warehouse.",
   "currentLocale": "en"
 }
 ```
@@ -68,8 +67,8 @@ $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizat
 
 #### Read localized message with arguments (Spanish)
 
-
-```$ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizations/dashboard.greeting.label?args=Justin&args=Boston&lang=es"
+```
+$ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizations/dashboard.greeting.label?args=Justin&args=Boston&lang=es"
 {
   "code": "dashboard.greeting.label",
   "message": "Bienvenido, <b>Justin<\\/b>!<\\/span> Se inicia la sesión en el <b>Boston<\\/b> del almacén",
