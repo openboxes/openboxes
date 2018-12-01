@@ -21,15 +21,20 @@ class LocalizationApiController {
     def localizationService
     def grailsApplication
 
-
     def list = {
-        def props = new Properties()
-        def messages = grailsApplication.classLoader.getResource("messages.properties")
-        props.load(messages)
-        //messageSource.getAllProperties(locale)
-
-
-
-        render ([props:props] as JSON)
+        String languageCode = params.lang
+        Locale locale = localizationService.getLocale(languageCode)
+        Properties messagesProperties = localizationService.getMessagesProperties(locale)
+        String [] supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales
+        render ([messages:messagesProperties?.sort(), supportedLocales: supportedLocales, currentLocale: locale] as JSON)
 	}
+
+    def read = {
+        String languageCode = params.lang
+        Locale locale = localizationService.getLocale(languageCode)
+        String message = messageSource.getMessage(params.id, params.list("args").toArray(), locale)
+        render ([code: params.id, message:message, currentLocale: locale] as JSON)
+
+    }
+
 }
