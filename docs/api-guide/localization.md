@@ -1,7 +1,5 @@
 ## Localization API
 
-[TOC]
-
 ### List 
 Return all localized messages for a given locale (language code only).
 ```
@@ -47,6 +45,7 @@ $ curl -b cookies.txt -X GET -H "Content-Type: application/json" "https://openbo
 ### Read
 
 #### Read localized message with arguments (English)
+
 ```
 $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizations/dashboard.greeting.label?args=Justin&args=Boston&lang=en" |jsonlint
 {
@@ -57,6 +56,7 @@ $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizat
 ```
 
 #### Read localized message with arguments (French)
+
 ```
 $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizations/dashboard.greeting.label?args=Justin&args=Boston&lang=fr"
 {
@@ -67,6 +67,7 @@ $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizat
 ```
 
 #### Read localized message with arguments (Spanish)
+
 
 ```$ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizations/dashboard.greeting.label?args=Justin&args=Boston&lang=es"
 {
