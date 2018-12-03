@@ -90,13 +90,14 @@ const FIELDS = {
       disabled: queryString.parse(window.location.search).direction === 'INBOUND' && !props.isSuperuser,
     }),
   },
-  stockList: {
+  stocklist: {
     label: 'Stock list',
     type: SelectField,
-    getDynamicAttr: ({ origin, destination, stockLists }) => ({
+    getDynamicAttr: ({ origin, destination, stocklists }) => ({
       disabled: !(origin && destination && origin.id && destination.id),
-      options: stockLists,
+      options: stocklists,
       showValueTooltip: true,
+      objectValue: true,
     }),
   },
   requestedBy: {
@@ -130,7 +131,7 @@ class CreateStockMovement extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      stockLists: [],
+      stocklists: [],
       setInitialLocations: true,
       values: this.props.initialValues,
     };
@@ -181,7 +182,7 @@ class CreateStockMovement extends Component {
   }
 
   checkStockMovementChange(newValues) {
-    const { origin, destination, stockList } = this.props.initialValues;
+    const { origin, destination, stocklist } = this.props.initialValues;
 
     const originLocs = newValues.origin && origin;
     const isOldSupplier = origin && origin.type === 'SUPPLIER';
@@ -189,9 +190,9 @@ class CreateStockMovement extends Component {
     const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier)) ?
       newValues.origin.id !== origin.id : false;
 
-    const checkDest = stockList && newValues.destination && destination ?
+    const checkDest = stocklist && newValues.destination && destination ?
       newValues.destination.id !== destination.id : false;
-    const checkStockList = newValues.stockMovementId ? newValues.stockList !== stockList : false;
+    const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id') !== _.get(stocklist, 'id') : false;
 
     return (checkOrigin || checkDest || checkStockList);
   }
@@ -208,10 +209,10 @@ class CreateStockMovement extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const stockLists = _.map(response.data.data, stockList => (
-          { value: stockList.id, label: stockList.name }
+        const stocklists = _.map(response.data.data, stocklist => (
+          { value: { id: stocklist.id, name: stocklist.name }, label: stocklist.name }
         ));
-        this.setState({ stockLists }, () => this.props.hideSpinner());
+        this.setState({ stocklists }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -241,7 +242,7 @@ class CreateStockMovement extends Component {
         'origin.id': values.origin.id,
         'destination.id': values.destination.id,
         'requestedBy.id': values.requestedBy.id,
-        'stocklist.id': values.stockList || '',
+        'stocklist.id': _.get(values.stocklist, 'id') || '',
         forceUpdate: values.forceUpdate || '',
       };
 
@@ -256,6 +257,7 @@ class CreateStockMovement extends Component {
               lineItems: resp.lineItems,
               movementNumber: resp.identifier,
               name: resp.name,
+              stocklist: resp.stocklist,
             });
           }
         })
@@ -317,7 +319,7 @@ class CreateStockMovement extends Component {
             {_.map(
               FIELDS,
               (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                stockLists: this.state.stockLists,
+                stocklists: this.state.stocklists,
                 fetchStockLists: this.fetchStockLists,
                 origin: values.origin,
                 destination: values.destination,
@@ -356,7 +358,7 @@ CreateStockMovement.propTypes = {
     destination: PropTypes.shape({
       id: PropTypes.string,
     }),
-    stockList: PropTypes.shape({}),
+    stocklist: PropTypes.shape({}),
   }).isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,

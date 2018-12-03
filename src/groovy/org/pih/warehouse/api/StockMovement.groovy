@@ -93,7 +93,7 @@ class StockMovement {
                 identifier: requisition?.requestNumber,
                 origin: origin,
                 destination: destination,
-                stockList: [id: stocklist?.id, name: stocklist?.name],
+                stocklist: [id: stocklist?.id, name: stocklist?.name],
                 dateRequested: dateRequested?.format("MM/dd/yyyy"),
                 dateShipped: dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
                 shipmentType: shipmentType,

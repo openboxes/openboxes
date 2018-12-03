@@ -94,9 +94,9 @@ class StockMovements extends Component {
   getShipmentName() {
     if (this.state.values.trackingNumber) {
       const {
-        origin, destination, dateRequested, stockList, trackingNumber, description,
+        origin, destination, dateRequested, stocklist, trackingNumber, description,
       } = this.state.values;
-      const stocklistPart = stockList && stockList.name ? `${stockList.name}.` : '';
+      const stocklistPart = stocklist && stocklist.name ? `${stocklist.name}.` : '';
       const dateReq = moment(dateRequested, 'MM/DD/YYYY').format('DDMMMYYYY');
       const newName = `${origin.name}.${destination.name}.${dateReq}.${stocklistPart}${trackingNumber}.${description}`;
       return newName.replace(/ /gi, '');
