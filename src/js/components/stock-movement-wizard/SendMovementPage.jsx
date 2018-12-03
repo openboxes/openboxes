@@ -55,7 +55,7 @@ const SHIPMENT_FIELDS = {
       return { formatValue: fieldValue => _.get(fieldValue, 'name') };
     },
   },
-  'stockList.name': {
+  'stocklist.name': {
     label: 'Stock List',
     type: LabelField,
   },
@@ -374,7 +374,7 @@ class SendMovementPage extends Component {
                   {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
                       canBeEdited: values.statusCode === 'ISSUED' && values.shipmentStatus !== 'PARTIALLY_RECEIVED',
-                      hasStockList: values.stockList,
+                      hasStockList: !!values.stocklist,
                       onDestinationChange: this.onDestinationChange,
                     }))}
                 </div>

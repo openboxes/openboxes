@@ -707,6 +707,7 @@ class StockMovementService {
         if (forceUpdate) {
             removeRequisitionItems(requisition)
             addStockListItemsToRequisition(stockMovement, requisition)
+            requisition.requisitionTemplate = stockMovement.stocklist
         } else if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 RequisitionItem requisitionItem

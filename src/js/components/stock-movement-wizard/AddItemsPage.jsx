@@ -353,7 +353,7 @@ class AddItemsPage extends Component {
   getFields() {
     if (this.state.values.origin.type === 'SUPPLIER') {
       return VENDOR_FIELDS;
-    } else if (this.state.values.stockList) {
+    } else if (this.state.values.stocklist) {
       return STOCKLIST_FIELDS;
     }
 
@@ -907,7 +907,7 @@ class AddItemsPage extends Component {
             <form onSubmit={handleSubmit}>
               {_.map(this.getFields(), (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
-                  stockList: values.stockList,
+                  stocklist: values.stocklist,
                   recipients: this.props.recipients,
                   removeItem: this.removeItem,
                   productsFetch: this.productsFetch,
