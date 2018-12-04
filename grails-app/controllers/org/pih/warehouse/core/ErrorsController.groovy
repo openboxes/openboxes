@@ -27,7 +27,10 @@ class ErrorsController {
 
 	def handleException = {
         if (RequestUtil.isAjax(request)) {
-            render([errorCode: 500, errorMessage: request?.exception?.message?:""] as JSON)
+            def cause = request?.exception?.cause?:request?.exception
+            def message = cause?.message?:""
+
+            render([errorCode: 500, cause: cause?.class, errorMessage: message] as JSON)
         }
         else {
             render(view: "/error")
