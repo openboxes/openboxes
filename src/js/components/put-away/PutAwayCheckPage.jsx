@@ -184,21 +184,39 @@ class PutAwayCheckPage extends Component {
    * Sends all changes made by user in this step of put-away to API and updates data.
    * @public
    */
-  savePutAways() {
+  completePutAway() {
     this.props.showSpinner();
     const url = `/openboxes/api/putaways?location.id=${this.props.locationId}`;
-    const payload = { ...this.state.putAway, putawayStatus: 'COMPLETED' };
+    const payload = {
+      ...this.props.putAway,
+      putawayStatus: 'COMPLETED',
+      putawayItems: _.map(this.props.putAway.putawayItems, item => ({
+        ...item,
+        putawayStatus: 'COMPLETED',
+        splitItems: _.map(item.splitItems, splitItem => ({ ...splitItem, putawayStatus: 'COMPLETED' })),
+      })),
+    };
 
     return apiClient.post(url, flattenRequest(payload))
       .then((response) => {
         const putAway = parseResponse(response.data.data);
-        putAway.putawayItems = _.map(putAway.putawayItems, item => ({ _id: _.uniqueId('item_'), ...item }));
+        putAway.putawayItems = _.map(putAway.putawayItems, item => ({
+          _id: _.uniqueId('item_'),
+          ...item,
+          splitItems: _.map(item.splitItems, splitItem => ({ _id: _.uniqueId('item_'), ...splitItem })),
+        }));
 
         this.props.hideSpinner();
 
         Alert.success('Put-Away was successfully completed!');
 
-        this.setState({ putAway, completed: true });
+        this.setState({
+          putAway: {
+            ...putAway,
+            putawayItems: PutAwayCheckPage.processSplitLines(putAway.putawayItems),
+          },
+          completed: true,
+        });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -266,7 +284,7 @@ class PutAwayCheckPage extends Component {
                 </button>
                 <button
                   type="button"
-                  onClick={() => this.savePutAways()}
+                  onClick={() => this.completePutAway()}
                   className="btn btn-outline-primary float-right mb-2 btn-xs"
                 >Complete Put Away
                 </button>
@@ -278,6 +296,7 @@ class PutAwayCheckPage extends Component {
             <SelectTreeTable
               data={putAway.putawayItems}
               columns={columns}
+              ref={(r) => { this.selectTable = r; }}
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
@@ -304,7 +323,7 @@ class PutAwayCheckPage extends Component {
             <div>
               <button
                 type="button"
-                onClick={() => this.savePutAways()}
+                onClick={() => this.completePutAway()}
                 className="btn btn-outline-primary float-right my-2 btn-xs"
               >Complete Put Away
               </button>

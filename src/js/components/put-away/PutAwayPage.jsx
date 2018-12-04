@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 
 import 'react-table/react-table.css';
 
@@ -174,16 +175,17 @@ class PutAwayPage extends Component {
    * Sends all changes made by user in this step of put-away to API and updates data.
    * @public
    */
-  savePutAways() {
+  createPutAway() {
     this.props.showSpinner();
     const url = `/openboxes/api/putaways?location.id=${this.props.locationId}`;
+    const items = _.filter(this.state.putawayItems, item =>
+      _.includes([...this.state.selection], item._id));
     const payload = {
       putawayNumber: '',
       'putawayAssignee.id': '',
-      putawayStatus: '',
+      putawayStatus: 'PENDING',
       putawayDate: '',
-      putawayItems: _.filter(this.state.putawayItems, item =>
-        _.includes([...this.state.selection], item._id)),
+      putawayItems: _.map(items, item => ({ ...item, putawayStatus: 'PENDING' })),
     };
 
     return apiClient.post(url, flattenRequest(payload))
@@ -197,6 +199,8 @@ class PutAwayPage extends Component {
         if (this.state.pivotBy.length) {
           _.forEach(this.state.putawayItems, (item, index) => expanded[index] = true);
         }
+
+        this.props.history.push(`/openboxes/putAway/create/${putAway.id}`);
 
         this.props.nextPage({
           putAway,
@@ -381,24 +385,26 @@ class PutAwayPage extends Component {
               {pivotBy && pivotBy.length ? 'Stock Movement' : 'Product'}
             </button>
           </div>
-          <div className="d-flex bd-highlight mb-2 align-items-center">
-            <div>Lines in pending put-aways:</div>
-            <div className="form-control-xs mb-2" style={{ width: '150px', marginRight: '33vw' }}>
+          <div className="row bd-highlight">
+            <div className="mr-1">Lines in pending put-aways:</div>
+            <div style={{ width: '150px' }}>
               <Select
                 options={[{ value: false, label: 'Exclude' }, { value: true, label: 'Include' }]}
                 onChange={val => this.filterPutAways(val)}
                 objectValue
                 initialValue={false}
                 clearable={false}
+                className="select-xs"
               />
             </div>
-            <button
-              type="button"
-              onClick={() => this.savePutAways()}
-              className="btn btn-outline-primary ml-auto btn-xs"
-            >Start Put-Away
-            </button>
           </div>
+          <button
+            type="button"
+            disabled={this.state.selection.size < 1}
+            onClick={() => this.createPutAway()}
+            className="btn btn-outline-primary btn-xs"
+          >Start Put-Away
+          </button>
         </div>
         {
           putawayItems ?
@@ -409,11 +415,8 @@ class PutAwayPage extends Component {
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={pivotBy && pivotBy.length ?
-              10 - this.state.expandedRowsCount : 10}
-              style={{
-                height: '500px',
-              }}
+              minRows={pivotBy && pivotBy.length ? 10 - this.state.expandedRowsCount : 10}
+              style={{ height: '500px' }}
               showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
@@ -455,7 +458,7 @@ class PutAwayPage extends Component {
           <button
             type="button"
             disabled={this.state.selection.size < 1}
-            onClick={() => this.savePutAways()}
+            onClick={() => this.createPutAway()}
             className="btn btn-outline-primary float-right my-2 btn-xs"
           >Start Put-Away
           </button>
@@ -465,7 +468,7 @@ class PutAwayPage extends Component {
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(PutAwayPage);
+export default withRouter(connect(null, { showSpinner, hideSpinner })(PutAwayPage));
 
 PutAwayPage.propTypes = {
   /** Function called when data is loading */
@@ -476,5 +479,7 @@ PutAwayPage.propTypes = {
   nextPage: PropTypes.func.isRequired,
   /** Location ID (currently chosen). To be used in putaways requests. */
   locationId: PropTypes.string.isRequired,
+  /** React router's object used to manage session history */
+  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
 };
 

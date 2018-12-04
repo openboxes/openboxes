@@ -389,6 +389,10 @@ body {
   z-index: 100 !important;
 }
 
+.react-confirm-alert-overlay {
+  z-index: 110 !important;
+}
+
 .modal-content-custom {
   position: absolute;
   top: 50%;

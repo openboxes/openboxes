@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { Field } from 'react-final-form';
 import { Tooltip } from 'react-tippy';
 
+import 'react-tippy/dist/tippy.css';
+
 const LabelField = (props) => {
   const {
     fieldName, arrayField, fieldValue,

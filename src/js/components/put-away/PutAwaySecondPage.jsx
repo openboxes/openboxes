@@ -55,6 +55,10 @@ class PutAwaySecondPage extends Component {
     this.fetchBins();
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({ putAway: nextProps.putAway });
+  }
+
   /**
    * Called when an expander is clicked. Checks expanded rows and counts their number.
    * @param {object} expanded
@@ -148,6 +152,7 @@ class PutAwaySecondPage extends Component {
               putawayItems: { [cellInfo.index]: { putawayLocation: { $set: value } } },
             }),
           })}
+          className="select-xs"
         />);
       },
       Filter,
@@ -158,11 +163,9 @@ class PutAwaySecondPage extends Component {
         <SplitLineModal
           putawayItem={this.state.putAway.putawayItems[cellInfo.index]}
           splitItems={_.get(this.state.putAway.putawayItems, `[${cellInfo.index}].${cellInfo.column.id}`)}
-          saveSplitItems={splitItems => this.setState({
-            putAway: update(this.state.putAway, {
-              putawayItems: { [cellInfo.index]: { [cellInfo.column.id]: { $set: splitItems } } },
-            }),
-          })}
+          saveSplitItems={(splitItems) => {
+            this.saveSplitItems(splitItems, cellInfo.index);
+          }}
           bins={this.state.bins}
         />),
       filterable: false,
@@ -215,11 +218,11 @@ class PutAwaySecondPage extends Component {
   * Sends all changes made by user in this step of put-away to API and updates data.
   * @public
   */
-  savePutAways() {
+  savePutAways(putAwayToSave, callback) {
     this.props.showSpinner();
     const url = `/openboxes/api/putaways?location.id=${this.props.locationId}`;
 
-    return apiClient.post(url, flattenRequest(this.state.putAway))
+    return apiClient.post(url, flattenRequest(putAwayToSave))
       .then((response) => {
         const putAway = parseResponse(response.data.data);
         putAway.putawayItems = _.map(putAway.putawayItems, item => ({
@@ -228,15 +231,41 @@ class PutAwaySecondPage extends Component {
           splitItems: _.map(item.splitItems, splitItem => ({ _id: _.uniqueId('item_'), ...splitItem })),
         }));
 
-        this.props.hideSpinner();
+        this.setState({ putAway }, () => {
+          this.props.hideSpinner();
 
-        this.props.nextPage({
-          putAway,
-          pivotBy: this.state.pivotBy,
-          expanded: this.state.expanded,
+          if (callback) {
+            callback(putAway);
+          }
         });
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  /**
+   * Save put-away with new split items.
+   * @public
+   */
+  saveSplitItems(splitItems, itemIndex) {
+    const putAway = update(this.state.putAway, {
+      putawayItems: { [itemIndex]: { splitItems: { $set: splitItems } } },
+    });
+
+    this.savePutAways(putAway);
+  }
+
+  /**
+   * Save put-away and go to next page.
+   * @public
+   */
+  nextPage() {
+    this.savePutAways(this.state.putAway, (putAway) => {
+      this.props.nextPage({
+        putAway,
+        pivotBy: this.state.pivotBy,
+        expanded: this.state.expanded,
+      });
+    });
   }
 
   /**
@@ -294,7 +323,7 @@ class PutAwaySecondPage extends Component {
           </button>
           <button
             type="button"
-            onClick={() => this.savePutAways()}
+            onClick={() => this.nextPage()}
             className="float-right btn btn-outline-primary align-self-end btn-xs"
           >Next
           </button>
@@ -304,6 +333,7 @@ class PutAwaySecondPage extends Component {
             <SelectTreeTable
               data={putAway.putawayItems}
               columns={columns}
+              ref={(r) => { this.selectTable = r; }}
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
@@ -321,7 +351,7 @@ class PutAwaySecondPage extends Component {
         }
         <button
           type="button"
-          onClick={() => this.savePutAways()}
+          onClick={() => this.nextPage()}
           className="btn btn-outline-primary float-right my-2 btn-xs"
         >Next
         </button>

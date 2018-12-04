@@ -61,15 +61,16 @@ class PutawayApiController {
         User currentUser = User.get(session.user.id)
 
         bindPutawayData(putaway, currentUser, currentLocation, jsonObject)
+        Order order
 
         // Putaway stock
         if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETED)) {
-            // Need to process the split items
-            putawayService.processSplitItems(putaway)
-            putawayService.completePutaway(putaway)
+            order = putawayService.completePutaway(putaway)
+        } else {
+            order = putawayService.savePutaway(putaway)
         }
 
-        render ([data:putaway?.toJson()] as JSON)
+        render ([data:Putaway.createFromOrder(order)?.toJson()] as JSON)
     }
 
 

@@ -7,6 +7,7 @@ import Modal from 'react-modal';
 import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'react-tippy/dist/tippy.css';
 
 import Input from '../../utils/Input';
 import Select from '../../utils/Select';
@@ -62,7 +63,14 @@ class SplitLineModal extends Component {
    * @public
    */
   save() {
-    this.props.saveSplitItems(_.filter(this.state.splitItems, item => item.quantity && item.quantity !== '0'));
+    this.props.saveSplitItems(_.map(this.state.splitItems, (item) => {
+      if (!item.quantity || item.quantity === '0') {
+        return { ...item, delete: true };
+      }
+
+      return item;
+    }));
+
     this.closeModal();
   }
 
@@ -86,6 +94,8 @@ class SplitLineModal extends Component {
           id: this.props.putawayItem.putawayLocation
             ? this.props.putawayItem.putawayLocation.id : null,
         },
+        product: { id: this.props.putawayItem.product.id },
+        inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
       });
     }
 
@@ -107,8 +117,7 @@ class SplitLineModal extends Component {
    * @public
    */
   isValid() {
-    const qtySum = _.reduce(this.state.splitItems, (sum, val) =>
-      (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0);
+    const qtySum = this.calculatePutAwayQty();
 
     return qtySum <= _.toInteger(this.props.putawayItem.quantity);
   }
@@ -119,7 +128,7 @@ class SplitLineModal extends Component {
    */
   calculatePutAwayQty() {
     return _.reduce(this.state.splitItems, (sum, val) =>
-      (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0);
+      (sum + (!val.delete && val.quantity ? _.toInteger(val.quantity) : 0)), 0);
   }
 
   /**
@@ -137,7 +146,7 @@ class SplitLineModal extends Component {
       <div>
         <button
           type="button"
-          className="btn btn-outline-success"
+          className="btn btn-outline-success btn-xs"
           onClick={() => this.openModal()}
         >Split line
         </button>
@@ -159,18 +168,19 @@ class SplitLineModal extends Component {
             <table className="table table-striped text-center border">
               <thead>
                 <tr>
-                  <th>Put Away Bin</th>
-                  <th>Quantity</th>
-                  <th>Delete</th>
+                  <th className="py-1">Put Away Bin</th>
+                  <th className="py-1">Quantity</th>
+                  <th className="py-1">Delete</th>
                 </tr>
               </thead>
               <tbody>
                 { _.map(this.state.splitItems, (item, index) => (
+                  !item.delete &&
                   <tr
                     // eslint-disable-next-line react/no-array-index-key
                     key={index}
                   >
-                    <td className={_.isEmpty(item.putawayLocation.id) ? 'has-error align-middle' : 'align-middle'}>
+                    <td className={`py-1 ${_.isEmpty(item.putawayLocation.id) ? 'has-error align-middle' : 'align-middle'}`}>
                       <Select
                         options={this.props.bins}
                         objectValue
@@ -182,9 +192,10 @@ class SplitLineModal extends Component {
                             },
                           }),
                         })}
+                        className="select-xs"
                       />
                     </td>
-                    <td className="align-middle">
+                    <td className="py-1 align-middle">
                       <Tooltip
                         // eslint-disable-next-line max-len
                         html={(<div>Sum of all split items quantities cannot be higher than original put-away item quantity</div>)}
@@ -208,16 +219,26 @@ class SplitLineModal extends Component {
                         </div>
                       </Tooltip>
                     </td>
-                    <td width="120px">
+                    <td width="120px" className="py-1">
                       <button
-                        className="btn btn-outline-danger"
-                        onClick={() => this.setState({
-                          splitItems: update(this.state.splitItems, {
-                            $splice: [
-                                [index, 1],
-                            ],
-                          }),
-                        })}
+                        className="btn btn-outline-danger btn-xs"
+                        onClick={() => {
+                          if (this.state.splitItems[index].id) {
+                            this.setState({
+                              splitItems: update(this.state.splitItems, {
+                                [index]: { delete: { $set: true } },
+                              }),
+                            });
+                          } else {
+                            this.setState({
+                              splitItems: update(this.state.splitItems, {
+                                $splice: [
+                                  [index, 1],
+                                ],
+                              }),
+                            });
+                          }
+                        }}
                       >Delete
                       </button>
                     </td>
@@ -226,7 +247,7 @@ class SplitLineModal extends Component {
               </tbody>
             </table>
             <button
-              className="btn btn-outline-success"
+              className="btn btn-outline-success btn-xs"
               onClick={() => this.setState({
                   splitItems: update(this.state.splitItems, {
                     $push: [{
@@ -236,6 +257,8 @@ class SplitLineModal extends Component {
                           ? this.props.putawayItem.putawayFacility.id : null,
                       },
                       putawayLocation: { id: null },
+                      product: { id: this.props.putawayItem.product.id },
+                      inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
                     }],
                   }),
                 })}
@@ -247,14 +270,14 @@ class SplitLineModal extends Component {
           <div className="btn-group float-right" role="group">
             <button
               type="button"
-              className="btn btn-outline-success"
+              className="btn btn-outline-success btn-sm"
               disabled={!this.isValid() || !this.isBinSelected()}
               onClick={() => this.onSave()}
             >Save
             </button>
             <button
               type="button"
-              className="btn btn-outline-secondary"
+              className="btn btn-outline-secondary btn-sm"
               onClick={() => this.closeModal()}
             >Cancel
             </button>
@@ -274,11 +297,13 @@ SplitLineModal.propTypes = {
   putawayItem: PropTypes.shape({
     /** Product's data */
     product: PropTypes.shape({
+      id: PropTypes.string,
       productCode: PropTypes.string,
       name: PropTypes.string,
     }),
     /** Inventory's data */
     inventoryItem: PropTypes.shape({
+      id: PropTypes.string,
       expirationDate: PropTypes.string,
     }),
     /** Item's quantity to put away. Can be either string or number. */
