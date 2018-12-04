@@ -25,7 +25,7 @@ class StocklistItemService {
     boolean transactional = true
 
     List<StocklistLocation> getStocklistItemsGroupByLocation(String productId) {
-        List<Requisition> templates = requisitionService.getAllRequisitionTemplates(new Requisition(isTemplate: true), null)
+        List<Requisition> templates = requisitionService.getRequisitionTemplates()
         Map<Location, List<Requisition>> stocklistMap = templates?.groupBy { it.destination }
 
         List<StocklistLocation> stocklistLocations = []

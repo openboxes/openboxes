@@ -24,12 +24,14 @@ const StocklistTable = ({
         }
 
         return (
-          <Select
-            value={original.stocklistId}
-            onChange={value => updateItemField(parentIndex, index, 'stocklistId', value)}
-            options={_.map(availableStocklists, val => ({ value: val.id, label: val.name }))}
-            className="select-xs"
-          />
+          <div className={!original.stocklistId ? 'has-error' : ''}>
+            <Select
+              value={original.stocklistId}
+              onChange={value => updateItemField(parentIndex, index, 'stocklistId', value)}
+              options={_.map(availableStocklists, val => ({ value: val.id, label: val.name }))}
+              className="select-xs"
+            />
+          </div>
         );
       },
     },
@@ -86,10 +88,12 @@ const StocklistTable = ({
         }
 
         return (
-          <Input
-            value={original.maxQuantity || ''}
-            onChange={value => updateItemField(parentIndex, index, 'maxQuantity', value)}
-          />
+          <div className={_.isNil(original.maxQuantity) || original.maxQuantity === '' ? 'has-error' : ''}>
+            <Input
+              value={original.maxQuantity || ''}
+              onChange={value => updateItemField(parentIndex, index, 'maxQuantity', value)}
+            />
+          </div>
         );
       },
       className: 'text-center',
