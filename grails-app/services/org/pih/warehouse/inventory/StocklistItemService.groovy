@@ -11,8 +11,6 @@ package org.pih.warehouse.inventory
 
 import grails.validation.ValidationException
 import org.pih.warehouse.api.StocklistItem
-import org.pih.warehouse.api.StocklistLocation
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -24,23 +22,15 @@ class StocklistItemService {
 
     boolean transactional = true
 
-    List<StocklistLocation> getStocklistItemsGroupByLocation(String productId) {
+    List<StocklistItem> getStocklistItems(String productId) {
         List<Requisition> templates = requisitionService.getRequisitionTemplates()
-        Map<Location, List<Requisition>> stocklistMap = templates?.groupBy { it.destination }
+        List<StocklistItem> stocklistItems = []
 
-        List<StocklistLocation> stocklistLocations = []
-
-        stocklistMap.each { Location location, List<Requisition> requisitions ->
-            List<StocklistItem> stocklistItems = []
-
-            requisitions.each { Requisition requisition ->
-                stocklistItems.addAll(requisition.requisitionItems?.findAll { it.product.id == productId }?.collect { StocklistItem.createFromRequisitionItem(it) } ?: [])
-            }
-
-            stocklistLocations.add(new StocklistLocation(location: location, stocklistItems: stocklistItems, availableStocklists: requisitions))
+        templates.each { Requisition requisition ->
+            stocklistItems.addAll(requisition.requisitionItems?.findAll { it.product.id == productId }?.collect { StocklistItem.createFromRequisitionItem(it) } ?: [])
         }
 
-        return stocklistLocations
+        return stocklistItems
     }
 
     StocklistItem getStocklistItem(String id) {
@@ -88,5 +78,18 @@ class StocklistItemService {
 
         requisitionItem.requisition.removeFromRequisitionItems(requisitionItem)
         requisitionItem.delete()
+    }
+
+    def getAvailableStocklists() {
+        List<Requisition> templates = requisitionService.getRequisitionTemplates()
+
+        return templates?.collect { [
+                id: it.id,
+                name: it.name,
+                "location.id": it.destination?.id,
+                "location.name": it.destination?.name,
+                "locationGroup.id": it?.destination?.locationGroup?.id,
+                "locationGroup.name": it?.destination?.locationGroup?.name,
+        ] }
     }
 }
