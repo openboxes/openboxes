@@ -34,7 +34,7 @@ const FIELDS = {
       },
       'binLocation.name': {
         type: LabelField,
-        label: 'stockMovement.bin.label',
+        label: 'stockMovement.binLocation.label',
       },
       quantityAvailable: {
         type: LabelField,

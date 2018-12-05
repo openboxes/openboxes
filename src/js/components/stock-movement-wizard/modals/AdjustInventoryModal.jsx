@@ -28,7 +28,7 @@ const FIELDS = {
     fields: {
       binLocation: {
         type: SelectField,
-        label: 'stockMovement.bin.label',
+        label: 'stockMovement.binLocation.label',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue, bins, hasBinLocationSupport }) => ({
           disabled: !!fieldValue || !hasBinLocationSupport,

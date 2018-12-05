@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.min.css';
 import '../css/main.scss';
 
+import { fetchTranslations } from './actions';
 import Router from './components/Router';
 import rootReducer from './reducers';
 import en from './en';
@@ -27,6 +28,8 @@ store.dispatch(initialize(languages));
 
 store.dispatch(addTranslationForLanguage(en, 'en'));
 store.dispatch(addTranslationForLanguage(fr, 'fr'));
+
+store.dispatch(fetchTranslations('en'));
 
 ReactDOM.render(
   <Provider store={store}>

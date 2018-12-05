@@ -66,7 +66,7 @@ const FIELDS = {
       },
       recipient: {
         type: SelectField,
-        label: 'stockMovement.recipient.label ',
+        label: 'stockMovement.recipient.label',
         flexWidth: '2.5',
         fieldKey: '',
         attributes: {

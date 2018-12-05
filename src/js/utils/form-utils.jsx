@@ -63,7 +63,7 @@ export const renderField = ({
       <div className="row">
         <div className="col-md-2" />
         <div className="help-block col-md-4" style={{ float: 'left' }}>
-          { touched || fieldTouched ? <Translate id={error} /> : '' }
+          { (error && touched) || (error && fieldTouched) ? <Translate id={error} /> : '' }
         </div>
       </div>
     </div>

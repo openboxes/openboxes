@@ -93,7 +93,7 @@ const FIELDS = {
       disabled: queryString.parse(window.location.search).direction === 'INBOUND' && !props.isSuperuser,
     }),
   },
-  stockList: {
+  stocklist: {
     label: 'stockMovement.stocklist.label',
     type: SelectField,
     getDynamicAttr: ({ origin, destination, stocklists }) => ({

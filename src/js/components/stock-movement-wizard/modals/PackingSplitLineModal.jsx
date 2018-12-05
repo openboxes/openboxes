@@ -26,7 +26,7 @@ const FIELDS = {
           binLocationName: lineItem.binLocationName,
           recipient: lineItem.recipient,
         })}
-      > <Translate id="default.button.addLine.label " />
+      > <Translate id="default.button.addLine.label" />
       </button>
     ),
     type: ArrayField,
@@ -57,7 +57,7 @@ const FIELDS = {
       },
       recipient: {
         type: SelectField,
-        label: 'stockMovement.recipient.label ',
+        label: 'stockMovement.recipient.label',
         fieldKey: '',
         attributes: {
           async: true,

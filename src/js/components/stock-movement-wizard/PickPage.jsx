@@ -60,7 +60,7 @@ const FIELDS = {
       'binLocation.name': {
         type: LabelField,
         flexWidth: '1.2',
-        label: 'stockMovement.bin.label',
+        label: 'stockMovement.binLocation.label',
       },
       quantityRequired: {
         type: LabelField,
@@ -420,7 +420,7 @@ class PickPage extends Component {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span><i className="fa fa-print pr-2" /><Translate id="default.button.printPicklist.label" /></span>
+                <span><i className="fa fa-print pr-2" /><Translate id="stockMovement.printPicklist.label" /></span>
               </a>
               <button
                 type="button"

@@ -26,7 +26,7 @@ const DELETE_BUTTON_FIELD = {
   label: 'default.button.delete.label',
   flexWidth: '1',
   fieldKey: '',
-  buttonLabel: 'Delete',
+  buttonLabel: 'default.button.delete.label',
   getDynamicAttr: ({ fieldValue, removeItem, removeRow }) => ({
     onClick: fieldValue.id ? () => removeItem(fieldValue.id).then(() => removeRow()) : removeRow,
     disabled: fieldValue.statusCode === 'SUBSTITUTED',
