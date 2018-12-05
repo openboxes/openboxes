@@ -33,7 +33,7 @@ export const renderField = ({
   if (arrayField) {
     return (
       <Tooltip
-        title={error}
+        title={<Translate id={error} />}
         disabled={!error || !(touched || fieldTouched)}
         theme="transparent"
         arrow="true"
@@ -63,7 +63,7 @@ export const renderField = ({
       <div className="row">
         <div className="col-md-2" />
         <div className="help-block col-md-4" style={{ float: 'left' }}>
-          { touched || fieldTouched ? error : '' }
+          { touched || fieldTouched ? <Translate id={error} /> : '' }
         </div>
       </div>
     </div>

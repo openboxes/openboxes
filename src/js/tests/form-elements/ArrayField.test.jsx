@@ -28,6 +28,14 @@ jest.mock('react-final-form-arrays', () => ({
   formValueSelector: () => {},
 }));
 
+jest.mock('react-localize-redux', () => ({
+  Translate: (props) => {
+    const { id } = props;
+
+    return `${id}`;
+  },
+}));
+
 jest.mock('react-virtualized', () => ({
   List: (props) => {
     const { rowCount, rowRenderer } = props;

@@ -9,7 +9,45 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
   >
     <div
       className="d-flex flex-row border-bottom font-weight-bold py-1"
+<<<<<<< 49c2a247524fee233bef76472217177df25971f9
     />
+=======
+    >
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        Name
+      </div>
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        Name
+      </div>
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        undefined
+      </div>
+    </div>
+>>>>>>> OBPIH-882 Update snapshots
   </div>
   <div
     className="text-center border mb-1 flex-grow-1"
@@ -130,7 +168,45 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
   >
     <div
       className="d-flex flex-row border-bottom font-weight-bold py-1"
+<<<<<<< 49c2a247524fee233bef76472217177df25971f9
     />
+=======
+    >
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        Name
+      </div>
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        Name
+      </div>
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        undefined
+      </div>
+    </div>
+>>>>>>> OBPIH-882 Update snapshots
   </div>
   <div
     className="text-center border mb-1 flex-grow-1"

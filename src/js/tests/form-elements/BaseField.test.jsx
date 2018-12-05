@@ -11,6 +11,14 @@ jest.mock('react-final-form', () => ({
   },
 }));
 
+jest.mock('react-localize-redux', () => ({
+  Translate: (props) => {
+    const { id } = props;
+
+    return `${id}`;
+  },
+}));
+
 describe('BaseField component is correctly rendering', () => {
   it('text label', () => {
     const props = {

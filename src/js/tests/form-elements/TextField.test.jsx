@@ -12,6 +12,14 @@ jest.mock('react-final-form', () => ({
   },
 }));
 
+jest.mock('react-localize-redux', () => ({
+  Translate: (props) => {
+    const { id } = props;
+
+    return `${id}`;
+  },
+}));
+
 describe('TextField component is correctly rendering', () => {
   it('renders correctly', () => {
     const fieldConfig = {
