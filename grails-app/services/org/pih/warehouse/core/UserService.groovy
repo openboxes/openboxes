@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import com.unboundid.ldap.sdk.BindRequest
@@ -169,9 +169,9 @@ class UserService {
         def criteria = Person.createCriteria()
         def results = criteria.list (params) {
             or {
-                like("firstName", query)
-                like("lastName", query)
-                like("email", query)
+                ilike("firstName", query)
+                ilike("lastName", query)
+                ilike("email", query)
             }
             order("lastName", "desc")
         }
@@ -247,7 +247,7 @@ class UserService {
 
         return user.getEffectiveRoles(currentLocation)
     }
-	
+
 
     def getAllAdminUsers() {
         def recipients = []

@@ -4,7 +4,7 @@ import apiClient from './apiClient';
 
 export const debouncedUsersFetch = _.debounce((searchTerm, callback) => {
   if (searchTerm) {
-    apiClient.get(`/openboxes/api/generic/person?name=${searchTerm}`)
+    apiClient.get(`/openboxes/api/persons?name=${searchTerm}`)
       .then(result => callback(
         null,
         {

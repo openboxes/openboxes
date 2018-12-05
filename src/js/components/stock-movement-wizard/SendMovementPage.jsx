@@ -49,6 +49,7 @@ const SHIPMENT_FIELDS = {
           loadOptions: debouncedLocationsFetch,
           cache: false,
           options: [],
+          filterOptions: options => options,
           onChange: value => (value ? onDestinationChange(value) : null),
         };
       }

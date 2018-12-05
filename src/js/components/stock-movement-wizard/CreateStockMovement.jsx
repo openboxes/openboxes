@@ -58,6 +58,7 @@ const FIELDS = {
       loadOptions: debouncedLocationsFetch,
       cache: false,
       options: [],
+      filterOptions: options => options,
     },
     getDynamicAttr: props => ({
       onChange: (value) => {
@@ -80,6 +81,7 @@ const FIELDS = {
       loadOptions: debouncedLocationsFetch,
       cache: false,
       options: [],
+      filterOptions: options => options,
     },
     getDynamicAttr: props => ({
       onChange: (value) => {
@@ -113,6 +115,7 @@ const FIELDS = {
       cache: false,
       options: [],
       labelKey: 'name',
+      filterOptions: options => options,
     },
   },
   dateRequested: {
