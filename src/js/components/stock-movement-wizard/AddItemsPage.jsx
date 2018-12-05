@@ -353,7 +353,7 @@ class AddItemsPage extends Component {
   getFields() {
     if (this.state.values.origin.type === 'SUPPLIER') {
       return VENDOR_FIELDS;
-    } else if (this.state.values.stocklist) {
+    } else if (_.get(this.state.values.stocklist, 'id')) {
       return STOCKLIST_FIELDS;
     }
 
