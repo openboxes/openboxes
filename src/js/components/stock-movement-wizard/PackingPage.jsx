@@ -78,6 +78,7 @@ const FIELDS = {
           cache: false,
           options: [],
           labelKey: 'name',
+          filterOptions: options => options,
         },
       },
       palletName: {
