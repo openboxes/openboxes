@@ -368,7 +368,7 @@ class AddItemsPage extends Component {
    */
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, item =>
-      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0');
+      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
