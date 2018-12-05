@@ -69,9 +69,10 @@
             </g:if>
             <g:else>
                 <g:if test="${tags}">
+
                     <div id="tagcloud">
                         <g:each in="${tags }" var="tag">
-                            <g:if test="${tag.value > 1}">
+                            <g:if test="${tag.value > 0}">
                                 <g:link controller="inventory" action="browse" params="['tag':tag.key]" rel="${tag.value }">
                                     ${tag.key.tag?:"Empty tag" } (${tag?.value })</g:link>
                             </g:if>

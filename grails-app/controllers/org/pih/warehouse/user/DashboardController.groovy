@@ -135,7 +135,7 @@ class DashboardController {
 
         def startTime = System.currentTimeMillis()
 		if (!session.warehouse) {
-			log.info "Location not selected, redirect to chooseLocation"	
+			log.info "Location not selected, redirect to chooseLocation"
 			redirect(action: "chooseLocation")			
 		}
 		
@@ -186,7 +186,7 @@ class DashboardController {
 			activityType = "${warehouse.message(code: activityType)}"	
 			activityList << new DashboardActivityCommand(
 				type: "lorry",
-				label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}", 
+				label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}",
 				url: link,
 				dateCreated: it.dateCreated, 
 				lastUpdated: it.lastUpdated, 
@@ -271,7 +271,7 @@ class DashboardController {
 			
 			activityList << new DashboardActivityCommand(
 				type: "user",
-				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it.username, activityType])}",				
+				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it.username, activityType])}",
 				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
@@ -299,6 +299,7 @@ class DashboardController {
 
 		def newsItems = ConfigurationHolder.config.openboxes.dashboard.newsSummary.newsItems
 
+		def popularTags = productService?.getPopularTags(50)
 
 		[
 				newsItems                : newsItems,
@@ -312,7 +313,7 @@ class DashboardController {
 				startIndex               : startIndex,
 				endIndex                 : endIndex,
 				daysToInclude            : daysToInclude,
-				tags                     : productService?.getPopularTags(50)
+				tags                     : popularTags
 		]
 	}
 
