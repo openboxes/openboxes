@@ -688,6 +688,7 @@ class StockMovementService {
                 RequisitionItem requisitionItem = new RequisitionItem()
                 requisitionItem.product = stocklistItem.product
                 requisitionItem.quantity = stocklistItem.quantity
+                requisitionItem.quantityApproved = stocklistItem.quantity
                 requisitionItem.orderIndex = stocklistItem.orderIndex
                 requisition.addToRequisitionItems(requisitionItem)
             }
