@@ -270,6 +270,10 @@ class StockMovementService {
                     for (StockMovementItem subStockMovementItem : stockMovementItem.substitutionItems) {
                         createMissingPicklistItems(subStockMovementItem)
                     }
+                } else if (stockMovementItem.statusCode == 'CHANGED') {
+                    if (!stockMovementItem.requisitionItem?.modificationItem?.picklistItems) {
+                        createMissingPicklistItems(stockMovementItem)
+                    }
                 }
                 else {
                     createMissingPicklistItems(stockMovementItem)
