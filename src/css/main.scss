@@ -629,3 +629,7 @@ div.crossed-out .table-inner-row:before {
   height: calc(100vh - 108px - 65px - 40px); // 108 = header + menu + breadcrumbs; 65 = footer; 40 = marginY
   margin: 20px 10px;
 }
+
+.stocklist-select {
+  width: 300px;
+}

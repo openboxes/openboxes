@@ -3,37 +3,20 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ReactTable from 'react-table';
-import treeTableHOC from 'react-table/lib/hoc/treeTable';
 import update from 'immutability-helper';
 
 import 'react-table/react-table.css';
 
 import apiClient, { parseResponse, flattenRequest } from './../../utils/apiClient';
 import { hideSpinner, showSpinner } from '../../actions';
-import StocklistTable from './StocklistTable';
-
-const TreeTable = treeTableHOC(ReactTable);
-
-const COLUMNS = [
-  {
-    accessor: 'locationGroup.name',
-  },
-  {
-    accessor: 'location.name',
-  },
-  {
-    Header: 'Monthly demand',
-    accessor: 'monthlyDemand',
-    aggregate: vals => _.sum(vals),
-    className: 'text-center',
-  },
-];
+import Select from '../../utils/Select';
+import Input from '../../utils/Input';
 
 class StocklistManagement extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { data: [] };
+    this.state = { data: [], selectedStocklist: null, availableStocklists: [] };
 
     this.addItem = this.addItem.bind(this);
     this.editItem = this.editItem.bind(this);
@@ -46,70 +29,82 @@ class StocklistManagement extends Component {
 
   componentWillMount() {
     this.fetchData();
+    this.fetchAvailableStocklists();
   }
 
   fetchData() {
     this.props.showSpinner();
     const url = `/openboxes/api/stocklistItems?product.id=${this.props.match.params.productId || ''}`;
 
-    return apiClient.get(url)
+    apiClient.get(url)
       .then((response) => {
         this.setState({ data: parseResponse(response.data.data) });
       })
       .catch(this.props.hideSpinner());
   }
 
-  addItem(locationIndex) {
-    const location = this.state.data[locationIndex];
+  fetchAvailableStocklists() {
+    this.props.showSpinner();
+    const url = '/openboxes/api/stocklistItems/availableStocklists';
 
+    apiClient.get(url)
+      .then((response) => {
+        this.setState({
+          availableStocklists: _.map(parseResponse(response.data.data), val =>
+            ({ value: val, label: val.name })),
+        });
+      })
+      .catch(this.props.hideSpinner());
+  }
+
+  addItem(stocklist) {
+    this.setState({
+      selectedStocklist: null,
+      data: update(this.state.data, {
+        $push: [{
+          stocklistId: stocklist.id,
+          name: stocklist.name,
+          location: {
+            id: stocklist.location.id,
+            name: stocklist.location.name,
+          },
+          locationGroup: {
+            id: stocklist.locationGroup.id,
+            name: stocklist.locationGroup.name,
+          },
+          manager: {
+            id: stocklist.manager.id,
+            name: stocklist.manager.name,
+          },
+          replenishmentPeriod: stocklist.replenishmentPeriod,
+          maxQuantity: null,
+          new: true,
+        }],
+      }),
+    });
+  }
+
+  editItem(index) {
     this.setState({
       data: update(this.state.data, {
-        [locationIndex]: {
-          stocklistItems: {
-            $push: [{
-              name: '',
-              location: {
-                id: location.location.id,
-              },
-              replenishmentPeriod: null,
-              maxQuantity: null,
-              new: true,
-            }],
-          },
+        [index]: {
+          edit: { $set: true },
         },
       }),
     });
   }
 
-  editItem(locationIndex, itemIndex) {
+  updateItemField(index, itemField, fieldValue) {
     this.setState({
       data: update(this.state.data, {
-        [locationIndex]: {
-          stocklistItems: {
-            [itemIndex]: {
-              edit: { $set: true },
-            },
-          },
+        [index]: {
+          [itemField]: { $set: fieldValue },
         },
       }),
     });
   }
 
-  updateItemField(locationIndex, itemIndex, itemField, fieldValue) {
-    this.setState({
-      data: update(this.state.data, {
-        [locationIndex]: {
-          stocklistItems: {
-            [itemIndex]: {
-              [itemField]: { $set: fieldValue },
-            },
-          },
-        },
-      }),
-    });
-  }
-
-  saveItem(locationIndex, itemIndex, item) {
+  saveItem(index, item) {
     let url = `/openboxes/api/stocklistItems?product.id=${this.props.match.params.productId || ''}`;
 
     if (!item.new) {
@@ -120,12 +115,8 @@ class StocklistManagement extends Component {
       .then((response) => {
         this.setState({
           data: update(this.state.data, {
-            [locationIndex]: {
-              stocklistItems: {
-                [itemIndex]: {
-                  $set: parseResponse(response.data.data),
-                },
-              },
+            [index]: {
+              $set: parseResponse(response.data.data),
             },
           }),
         });
@@ -133,43 +124,39 @@ class StocklistManagement extends Component {
       .catch(this.props.hideSpinner());
   }
 
-  deleteItem(locationIndex, itemIndex) {
-    const item = this.state.data[locationIndex].stocklistItems[itemIndex];
+  deleteItem(index) {
+    const item = this.state.data[index];
 
     if (item.new) {
-      this.removeItem(locationIndex, itemIndex);
+      this.removeItem(index);
     } else {
       this.props.showSpinner();
       const url = `/openboxes/api/stocklistItems/${item.requisitionItem.id}`;
 
       apiClient.delete(url)
         .then(() => {
-          this.removeItem(locationIndex, itemIndex);
+          this.removeItem(index);
         })
         .catch(this.props.hideSpinner());
     }
   }
 
   // eslint-disable-next-line no-unused-vars,class-methods-use-this
-  printItem(locationIndex, itemIndex) {
+  printItem(index) {
     // TODO add proper implementation
   }
 
   // eslint-disable-next-line no-unused-vars,class-methods-use-this
-  mailItem(locationIndex, itemIndex) {
+  mailItem(index) {
     // TODO add proper implementation
   }
 
-  removeItem(locationIndex, itemIndex) {
+  removeItem(index) {
     this.setState({
       data: update(this.state.data, {
-        [locationIndex]: {
-          stocklistItems: {
-            $splice: [
-              [itemIndex, 1],
-            ],
-          },
-        },
+        $splice: [
+          [index, 1],
+        ],
       }),
     });
   }
@@ -177,35 +164,151 @@ class StocklistManagement extends Component {
   render() {
     const { data } = this.state;
     return (
-      <TreeTable
-        className="stocklist-table"
-        data={data}
-        pivotBy={['locationGroup.name']}
-        columns={COLUMNS}
-        defaultPageSize={20}
-        sortable={false}
-        collapseOnDataChange={false}
-        resolveData={values => values.map((row) => {
-          if (!_.get(row, 'locationGroup.name')) {
-            return { ...row, locationGroup: { name: 'No location group' } };
-          }
+      <div className="stocklist-table">
+        <ReactTable
+          data={data}
+          pivotBy={['locationGroup.name', 'location.name']}
+          showPagination={false}
+          minRows={0}
+          sortable={false}
+          collapseOnDataChange={false}
+          resolveData={values => values.map((row) => {
+            if (!_.get(row, 'locationGroup.name')) {
+              return { ...row, locationGroup: { name: 'No location group' } };
+            }
 
-          return row;
-        })}
-        SubComponent={({ original, index }) => (
-          <StocklistTable
-            data={original.stocklistItems}
-            availableStocklists={original.availableStocklists}
-            parentIndex={index}
-            addItem={this.addItem}
-            editItem={this.editItem}
-            updateItemField={this.updateItemField}
-            saveItem={this.saveItem}
-            deleteItem={this.deleteItem}
-            printItem={this.printItem}
-            mailItem={this.mailItem}
-          />)}
-      />
+            return row;
+          })}
+          columns={[
+            {
+              Header: 'Location Group Name',
+              accessor: 'locationGroup.name',
+            },
+            {
+              Header: 'Location Name',
+              accessor: 'location.name',
+              aggregate: () => '',
+            },
+            {
+              Header: 'Stocklist Name',
+              accessor: 'name',
+              aggregate: () => '',
+            },
+            {
+              Header: 'Monthly demand',
+              accessor: 'monthlyDemand',
+              aggregate: vals => _.sum(vals),
+              className: 'text-center',
+            },
+            {
+              Header: 'Manager',
+              accessor: 'manager.name',
+              aggregate: () => '',
+            },
+            {
+              Header: 'Replenishment period',
+              accessor: 'replenishmentPeriod',
+              aggregate: () => '',
+              className: 'text-center',
+            },
+            {
+              Header: 'Maximum  Quantity',
+              accessor: 'maxQuantity',
+              aggregate: vals => _.sum(vals),
+              className: 'text-center',
+              // eslint-disable-next-line react/prop-types
+              Cell: ({ aggregated, index, original }) => {
+                if (aggregated) {
+                  return '';
+                }
+
+                if (!original.new && !original.edit) {
+                  return _.isNil(original.maxQuantity) ? '' : original.maxQuantity;
+                }
+
+                return (
+                  <div className={_.isNil(original.maxQuantity) || original.maxQuantity === '' ? 'has-error' : ''}>
+                    <Input
+                      value={original.maxQuantity || ''}
+                      onChange={value => this.updateItemField(index, 'maxQuantity', value)}
+                    />
+                  </div>
+                );
+              },
+            },
+            {
+              Header: 'Unit of measure',
+              accessor: 'uom',
+              aggregate: () => '',
+              className: 'text-center',
+            },
+            {
+              Header: 'Actions',
+              accessor: 'edit',
+              minWidth: 110,
+              aggregate: () => '',
+              // eslint-disable-next-line react/prop-types
+              Cell: ({ aggregated, index, original }) => {
+                if (aggregated) {
+                  return '';
+                }
+
+                return (
+                  <div>
+                    <button
+                      className="btn btn-outline-primary btn-xs mx-1"
+                      disabled={original.edit || original.new}
+                      onClick={() => this.editItem(index)}
+                    >Edit
+                    </button>
+                    <button
+                      className="btn btn-outline-primary btn-xs mx-1"
+                      disabled={(!original.edit && !original.new) || !original.stocklistId
+                      || _.isNil(original.maxQuantity) || original.maxQuantity === ''}
+                      onClick={() => this.saveItem(index, original)}
+                    >Save
+                    </button>
+                    <button
+                      className="btn btn-outline-danger btn-xs mx-1"
+                      onClick={() => this.deleteItem(index)}
+                    >Delete
+                    </button>
+                    <button
+                      className="btn btn-outline-secondary btn-xs mx-1"
+                      disabled={original.edit || original.new}
+                      onClick={() => this.printItem(index)}
+                    >Print
+                    </button>
+                    <button
+                      className="btn btn-outline-secondary btn-xs mx-1"
+                      disabled={original.edit || original.new}
+                      onClick={() => this.mailItem(index)}
+                    >Email
+                    </button>
+                  </div>
+                );
+              },
+            },
+          ]}
+        />
+        <div className="d-flex flex-row my-1">
+          <Select
+            value={this.state.selectedStocklist}
+            onChange={value => this.setState({ selectedStocklist: value })}
+            options={this.state.availableStocklists}
+            objectValue
+            className="select-xs stocklist-select"
+          />
+          <button
+            className="btn btn-outline-success btn-xs ml-1"
+            disabled={!this.state.selectedStocklist}
+            onClick={() => {
+              this.addItem(this.state.selectedStocklist);
+            }}
+          >Add Stocklist
+          </button>
+        </div>
+      </div>
     );
   }
 }
