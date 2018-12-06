@@ -103,7 +103,7 @@ const FIELDS = {
   },
   containers: {
     type: ArrayField,
-    maxTableHeight: window.innerWidth > 1440 ? 'calc(100vh - 450px)' : 'calc(100vh - 250px)',
+    maxTableHeight: 'none',
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
     getDynamicRowAttr: ({ rowValues, subfield }) => {
