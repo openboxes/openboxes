@@ -1,5 +1,6 @@
 package org.pih.warehouse.api
 
+import org.apache.commons.lang.math.NumberUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -207,6 +208,10 @@ class StockMovementItem {
 
         if (!productCode && !quantityRequested) {
             throw new IllegalArgumentException("Product code and quantity requested are required")
+        }
+
+        if (lotNumber.contains("E") && NumberUtils.isNumber(lotNumber)) {
+            throw new IllegalArgumentException("Lot numbers must not be specified in scientific notation")
         }
 
         Person recipient = recipientId ? Person.get(recipientId) : null
