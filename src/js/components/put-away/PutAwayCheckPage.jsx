@@ -300,8 +300,7 @@ class PutAwayCheckPage extends Component {
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={pivotBy && pivotBy.length ?
-                10 - this.state.expandedRowsCount : 10}
+              minRows={pivotBy && pivotBy.length ? this.state.expandedRowsCount : 0}
               style={{
                 height: '500px',
               }}
