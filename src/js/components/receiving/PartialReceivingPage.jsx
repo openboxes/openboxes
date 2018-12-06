@@ -159,7 +159,7 @@ const FIELDS = {
       },
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Product',
+        label: 'Name',
         flexWidth: '24',
         attributes: {
           className: 'text-left ml-1',
@@ -168,12 +168,45 @@ const FIELDS = {
       },
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Lot/Serial No',
+        label: 'Lot/Serial No.',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'Expiration Date',
         fixedWidth: '130px',
+      },
+      binLocation: {
+        type: params => (
+          params.subfield ?
+            <SelectField {...params} /> :
+            <Select
+              disabled={!params.hasBinLocationSupport ||
+              params.shipmentReceived || isReceived(false, params.fieldValue)}
+              options={params.bins}
+              onChange={value => params.setLocation(params.rowIndex, value)}
+              objectValue
+              className="select-xs"
+            />),
+        fieldKey: '',
+        label: 'Bin Location',
+        getDynamicAttr: ({
+          bins, hasBinLocationSupport, shipmentReceived, fieldValue,
+        }) => ({
+          options: bins,
+          disabled: !hasBinLocationSupport || shipmentReceived || isReceived(true, fieldValue),
+        }),
+        attributes: {
+          objectValue: true,
+        },
+      },
+      'recipient.id': {
+        type: params => (params.subfield ? <SelectField {...params} /> : null),
+        fieldKey: '',
+        label: 'Recipient',
+        getDynamicAttr: ({ users, shipmentReceived, fieldValue }) => ({
+          options: users,
+          disabled: shipmentReceived || isReceived(true, fieldValue),
+        }),
       },
       quantityShipped: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -193,7 +226,7 @@ const FIELDS = {
       },
       quantityRemaining: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Remaining',
+        label: 'To receive',
         fixedWidth: '75px',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -202,35 +235,11 @@ const FIELDS = {
       quantityReceiving: {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
-        label: 'To Receive',
+        label: 'Receiving Now',
         fixedWidth: '85px',
         getDynamicAttr: ({ shipmentReceived, fieldValue }) => ({
           disabled: shipmentReceived || isReceived(true, fieldValue),
         }),
-      },
-      binLocation: {
-        type: params => (
-          params.subfield ?
-            <SelectField {...params} /> :
-            <Select
-              disabled={!params.hasBinLocationSupport ||
-                params.shipmentReceived || isReceived(false, params.fieldValue)}
-              options={params.bins}
-              onChange={value => params.setLocation(params.rowIndex, value)}
-              objectValue
-              className="select-xs"
-            />),
-        fieldKey: '',
-        label: 'Bin Location',
-        getDynamicAttr: ({
-          bins, hasBinLocationSupport, shipmentReceived, fieldValue,
-        }) => ({
-          options: bins,
-          disabled: !hasBinLocationSupport || shipmentReceived || isReceived(true, fieldValue),
-        }),
-        attributes: {
-          objectValue: true,
-        },
       },
       edit: {
         type: params => (params.subfield ? <EditLineModal {...params} /> : null),
@@ -249,15 +258,6 @@ const FIELDS = {
           parentIndex,
           rowIndex,
           btnOpenDisabled: shipmentReceived || isReceived(true, fieldValue),
-        }),
-      },
-      'recipient.id': {
-        type: params => (params.subfield ? <SelectField {...params} /> : null),
-        fieldKey: '',
-        label: 'Recipient',
-        getDynamicAttr: ({ users, shipmentReceived, fieldValue }) => ({
-          options: users,
-          disabled: shipmentReceived || isReceived(true, fieldValue),
         }),
       },
       comment: {
