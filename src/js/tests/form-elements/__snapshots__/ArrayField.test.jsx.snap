@@ -72,7 +72,41 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               "minWidth": 0,
             }
           }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
         />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[0].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
         <div
           className="align-self-center mx-1"
           style={
@@ -81,7 +115,41 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               "minWidth": 0,
             }
           }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
         />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[0].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
         <div
           className="align-self-center mx-1"
           style={
@@ -115,7 +183,41 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               "minWidth": 0,
             }
           }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
         />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[1].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
         <div
           className="align-self-center mx-1"
           style={
@@ -124,7 +226,41 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               "minWidth": 0,
             }
           }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
         />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[1].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
         <div
           className="align-self-center mx-1"
           style={
@@ -231,7 +367,41 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               "minWidth": 0,
             }
           }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
         />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[0].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
         <div
           className="align-self-center mx-1"
           style={
@@ -240,7 +410,41 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               "minWidth": 0,
             }
           }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
         />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[0].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
         <div
           className="align-self-center mx-1"
           style={
@@ -274,7 +478,41 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               "minWidth": 0,
             }
           }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
         />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[1].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
         <div
           className="align-self-center mx-1"
           style={
@@ -283,7 +521,41 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               "minWidth": 0,
             }
           }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
         />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[1].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
         <div
           className="align-self-center mx-1"
           style={
