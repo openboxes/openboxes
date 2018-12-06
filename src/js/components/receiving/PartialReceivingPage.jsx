@@ -188,6 +188,7 @@ const FIELDS = {
               className="select-xs"
             />),
         fieldKey: '',
+        fixedWidth: '150px',
         label: 'Bin Location',
         getDynamicAttr: ({
           bins, hasBinLocationSupport, shipmentReceived, fieldValue,
