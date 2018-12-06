@@ -114,6 +114,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
     String monthRequested
     //String yearRequested
 
+    Integer replenishmentPeriod
+
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
     static hasOne = [picklist: Picklist]
