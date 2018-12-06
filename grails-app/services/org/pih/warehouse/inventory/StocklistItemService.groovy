@@ -84,10 +84,10 @@ class StocklistItemService {
         return templates?.collect { [
                 id: it.id,
                 name: it.name,
-                "location.id": it.destination?.id,
-                "location.name": it.destination?.name,
-                "locationGroup.id": it.destination?.locationGroup?.id,
-                "locationGroup.name": it.destination?.locationGroup?.name,
+                "location.id": it.origin?.id,
+                "location.name": it.origin?.name,
+                "locationGroup.id": it.origin?.locationGroup?.id,
+                "locationGroup.name": it.origin?.locationGroup?.name,
                 "manager.id": it.requestedBy?.id,
                 "manager.name": it.requestedBy?.name,
         ] }
