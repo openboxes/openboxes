@@ -48,7 +48,6 @@ class StocklistItemService {
 
         RequisitionItem requisitionItem = new RequisitionItem()
         requisitionItem.quantity = stocklistItem.maxQuantity
-        requisitionItem.requestedBy = stocklistItem.manager
         requisitionItem.product = Product.get(productId)
 
         requisition.addToRequisitionItems(requisitionItem)
@@ -61,7 +60,6 @@ class StocklistItemService {
     StocklistItem updateStocklistItem(StocklistItem stocklistItem) {
         RequisitionItem requisitionItem = stocklistItem.requisitionItem
         requisitionItem.quantity = stocklistItem.maxQuantity
-        requisitionItem.requestedBy = stocklistItem.manager
 
         if (requisitionItem.hasErrors() || !requisitionItem.save(flush: true)) {
             throw new ValidationException("Invalid requisitionItem", requisitionItem.errors)
@@ -88,8 +86,10 @@ class StocklistItemService {
                 name: it.name,
                 "location.id": it.destination?.id,
                 "location.name": it.destination?.name,
-                "locationGroup.id": it?.destination?.locationGroup?.id,
-                "locationGroup.name": it?.destination?.locationGroup?.name,
+                "locationGroup.id": it.destination?.locationGroup?.id,
+                "locationGroup.name": it.destination?.locationGroup?.name,
+                "manager.id": it.requestedBy?.id,
+                "manager.name": it.requestedBy?.name,
         ] }
     }
 }

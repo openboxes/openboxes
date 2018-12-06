@@ -11,7 +11,6 @@ import apiClient, { parseResponse, flattenRequest } from './../../utils/apiClien
 import { hideSpinner, showSpinner } from '../../actions';
 import Select from '../../utils/Select';
 import Input from '../../utils/Input';
-import { debouncedUsersFetch } from '../../utils/option-utils';
 
 class StocklistManagement extends Component {
   constructor(props) {
@@ -72,6 +71,10 @@ class StocklistManagement extends Component {
           locationGroup: {
             id: stocklist.locationGroup.id,
             name: stocklist.locationGroup.name,
+          },
+          manager: {
+            id: stocklist.manager.id,
+            name: stocklist.manager.name,
           },
           replenishmentPeriod: stocklist.replenishmentPeriod,
           maxQuantity: null,
@@ -201,54 +204,12 @@ class StocklistManagement extends Component {
               Header: 'Manager',
               accessor: 'manager.name',
               aggregate: () => '',
-              // eslint-disable-next-line react/prop-types
-              Cell: ({ aggregated, index, original }) => {
-                if (aggregated) {
-                  return '';
-                }
-
-                if (!original.new && !original.edit) {
-                  return _.get(original, 'manager.name') || '';
-                }
-
-                return (
-                  <Select
-                    value={original.manager}
-                    onChange={value => this.updateItemField(index, 'manager', value)}
-                    async
-                    openOnClick={false}
-                    autoload={false}
-                    loadOptions={debouncedUsersFetch}
-                    cache={false}
-                    options={[]}
-                    labelKey="name"
-                    className="select-xs"
-                  />
-                );
-              },
             },
             {
               Header: 'Replenishment period',
               accessor: 'replenishmentPeriod',
               aggregate: () => '',
               className: 'text-center',
-              // eslint-disable-next-line react/prop-types
-              Cell: ({ aggregated, index, original }) => {
-                if (aggregated) {
-                  return '';
-                }
-
-                if (!original.new && !original.edit) {
-                  return _.isNil(original.replenishmentPeriod) ? '' : original.replenishmentPeriod;
-                }
-
-                return (
-                  <Input
-                    value={original.replenishmentPeriod || ''}
-                    onChange={value => this.updateItemField(index, 'replenishmentPeriod', value)}
-                  />
-                );
-              },
             },
             {
               Header: 'Maximum  Quantity',
