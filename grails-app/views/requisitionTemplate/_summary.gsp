@@ -3,47 +3,46 @@
 		<table>
 			<tbody>			
 				<tr>
-                    <td class="top" width="1%">
+                    <td class="middle" width="1%">
                         <g:render template="actions" model="[requisition:requisition]" />
                     </td>
 					<td class="left">
 						<div class="title" id="description">
                             ${requisition.name}
 						</div> 						
-						<div class="clear"></div>
-						<div class="fade">
+						<div>
 							<span id="origin">
 								<warehouse:message code="requisition.origin.label"/>:
-								<b>${requisition?.origin?.name?.encodeAsHTML()?:warehouse.message(code: 'default.none.label')}</b>
-							</span>							
-							<span class="fade">&nbsp;|&nbsp;</span>
+								<label>${requisition?.origin?.name?.encodeAsHTML()?:warehouse.message(code: 'default.none.label')}</label>
+							</span>
 							<span id="destination">
 								<warehouse:message code="requisition.destination.label"/>:
-	                            <b>${requisition?.destination?.name?.encodeAsHTML()?:session?.warehouse?.name}</b>
+	                            <label>${requisition?.destination?.name?.encodeAsHTML()?:session?.warehouse?.name}</label>
 							</span>							
-							<span class="fade">&nbsp;|&nbsp;</span>
 							<span class="request-items">
 								<warehouse:message code="requisition.requisitionItems.label"/>:
-								<b>${requisition?.requisitionItems?.size()?:0}</b>
+								<label>${requisition?.requisitionItems?.size()?:0}</label>
 							</span>
-							<span class="fade">&nbsp;|&nbsp;</span>
 							<span id="recipientProgram">
-								<warehouse:message code="requisition.recipientProgram.label"/>:
-	                            <b>${requisition?.recipientProgram?:warehouse.message(code: 'default.none.label') }</b>
+								<warehouse:message code="requisition.commodityClass.label"/>:
+	                            <label><format:metadata obj="${requisition?.commodityClass?:warehouse.message(code: 'default.none.label') }"/></label>
 							</span>							
 						</div>
 					</td>
-					<td class="right">
-                        <g:if test="${requisition.isPublished}">
-                            <div class="tag tag-success">
-                                <warehouse:message code="default.published.label" default="Published"/>
-                            </div>
-                        </g:if>
-                        <g:else>
-                            <div class="tag tag-warning">
-                                <warehouse:message code="default.unpublished.label" default="Unpublished"/>
-                            </div>
-                        </g:else>
+					<td>
+						<div class="right">
+
+							<g:if test="${requisition.isPublished}">
+								<div class="tag tag-alert">
+									<warehouse:message code="default.published.label" default="Published"/>
+								</div>
+							</g:if>
+							<g:else>
+								<div class="tag tag-danger">
+									<warehouse:message code="default.draft.label" default="Draft"/>
+								</div>
+							</g:else>
+						</div>
 					</td>
 				</tr>
 			</tbody>
@@ -62,4 +61,26 @@
             </tbody>
         </table>
 	</g:else>
+</div>
+
+<div class="buttonBar">
+	<g:link class="button" controller="requisitionTemplate" action="list">
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" />&nbsp;
+		<warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/>
+	</g:link>
+	<g:isUserAdmin>
+		<g:link class="button" controller="requisitionTemplate" action="create" params="[type:'STOCK']">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />&nbsp;
+			<warehouse:message code="default.create.label" args="[warehouse.message(code:'requisitionTemplate.label').toLowerCase()]"/>
+		</g:link>
+	</g:isUserAdmin>
+	<g:link controller="requisitionTemplate" action="editHeader" id="${requisition?.id}" class="button">
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />&nbsp;
+		${warehouse.message(code: 'requisitionTemplate.editHeader.label', default: 'Edit stock list')}
+	</g:link>
+	<g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}" class="button">
+		<img src="${createLinkTo(dir:'images/icons/silk',file:'application_add.png')}" />&nbsp;
+		${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit stock list items')}
+	</g:link>
+
 </div>
