@@ -16,7 +16,12 @@ class StocklistManagement extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { data: [], selectedStocklist: null, availableStocklists: [] };
+    this.state = {
+      data: [],
+      selectedStocklist: null,
+      availableStocklists: [],
+      productInfo: null,
+    };
 
     this.addItem = this.addItem.bind(this);
     this.editItem = this.editItem.bind(this);
@@ -30,6 +35,7 @@ class StocklistManagement extends Component {
   componentWillMount() {
     this.fetchData();
     this.fetchAvailableStocklists();
+    this.fetchProductInfo();
   }
 
   fetchData() {
@@ -53,6 +59,17 @@ class StocklistManagement extends Component {
           availableStocklists: _.map(parseResponse(response.data.data), val =>
             ({ value: val, label: val.name })),
         });
+      })
+      .catch(this.props.hideSpinner());
+  }
+
+  fetchProductInfo() {
+    this.props.showSpinner();
+    const url = `/openboxes/api/products/${this.props.match.params.productId}/withCatalogs`;
+
+    apiClient.get(url)
+      .then((response) => {
+        this.setState({ productInfo: response.data.data });
       })
       .catch(this.props.hideSpinner());
   }
@@ -165,6 +182,26 @@ class StocklistManagement extends Component {
     const { data } = this.state;
     return (
       <div className="stocklist-table">
+        { this.state.productInfo &&
+          <div className="mb-2">
+            <div className="d-flex flex-row justify-content-between">
+              <div className="d-flex flex-row align-items-end">
+                <h6 className="mb-0 mr-1">{this.state.productInfo.productCode}</h6>
+                <h5 className="mb-0">{this.state.productInfo.name}</h5>
+              </div>
+              <div className="align-self-center">
+                <button
+                  className="btn btn-outline-primary btn-xs"
+                  onClick={() => { window.location = `/openboxes/inventoryItem/showStockCard/${this.state.productInfo.id}`; }}
+                >Return to stock card
+                </button>
+              </div>
+            </div>
+            <div className="d-flex flex-row">
+              { _.map(this.state.productInfo.catalogs, catalog => (<div className="stocklist-category px-1 mr-1">{catalog.name}</div>)) }
+            </div>
+          </div>
+        }
         <ReactTable
           data={data}
           pivotBy={['locationGroup.name', 'location.name']}

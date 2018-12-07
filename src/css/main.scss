@@ -626,10 +626,15 @@ div.crossed-out .table-inner-row:before {
 }
 
 .stocklist-table {
-  height: calc(100vh - 108px - 65px - 40px); // 108 = header + menu + breadcrumbs; 65 = footer; 40 = marginY
-  margin: 20px 10px;
+  height: calc(100vh - 110px - 65px - 20px); // 108 = header + menu + breadcrumbs; 65 = footer; 40 = marginY
+  margin: 10px 10px;
 }
 
 .stocklist-select {
   width: 300px;
+}
+
+.stocklist-category {
+  background-color: $blue-epsilon;
+  color: $blue-beta;
 }
