@@ -16,22 +16,22 @@ function validate(values) {
   errors.containers = [];
 
   if (!values.dateDelivered) {
-    errors.dateDelivered = 'This field is required';
+    errors.dateDelivered = 'error.requiredField.label';
   } else {
     const dateDelivered = moment(values.dateDelivered, 'MM/DD/YYYY HH:mm Z');
     if (moment().diff(dateDelivered) < 0) {
-      errors.dateDelivered = 'The date cannot be in the future';
+      errors.dateDelivered = 'error.futureDate.label';
     }
     const dateShipped = values.dateShipped ? moment(values.dateShipped, 'MM/DD/YYYY HH:mm Z') : null;
     if (dateShipped && dateDelivered < dateShipped) {
-      errors.dateDelivered = 'The date cannot be before shipment date';
+      errors.dateDelivered = 'error.dateBeforeShipment.label';
     }
   }
   _.forEach(values.containers, (container, key) => {
     errors.containers[key] = { shipmentItems: [] };
     _.forEach(container.shipmentItems, (item, key2) => {
       if (item.quantityReceiving < 0) {
-        errors.containers[key].shipmentItems[key2] = { quantityReceiving: 'Quantity to receive can\'t be negative' };
+        errors.containers[key].shipmentItems[key2] = { quantityReceiving: 'error.quantityToReceiveNegative.label' };
       }
     });
   });

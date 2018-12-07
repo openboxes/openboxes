@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Translate } from 'react-localize-redux';
 
 import ArrayField from '../form-elements/ArrayField';
 import CheckboxField from '../form-elements/CheckboxField';
@@ -11,39 +12,39 @@ import { renderFormField } from '../../utils/form-utils';
 const FIELDS = {
   'origin.name': {
     type: LabelField,
-    label: 'Origin',
+    label: 'stockMovement.origin.label',
   },
   'destination.name': {
     type: LabelField,
-    label: 'Destination',
+    label: 'stockMovement.destination.label',
   },
   dateShipped: {
     type: LabelField,
-    label: 'Shipped On',
+    label: 'partialReceiving.shippedOn.label',
   },
   dateDelivered: {
     type: LabelField,
-    label: 'Delivered On',
+    label: 'partialReceiving.deliveredOn.label',
   },
   buttonsTop: {
     // eslint-disable-next-line react/prop-types
     type: ({ prevPage, onSave, saveDisabled }) => (
       <div className="mb-1 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
-          Back to Edit
+          <Translate id="partialReceiving.backToEdit.label" />
         </button>
         <button
           type="button"
           className="btn btn-outline-success btn-form btn-xs"
           onClick={onSave}
           disabled={saveDisabled}
-        >Save
+        ><Translate id="default.button.save.label" />
         </button>
         <button
           type="submit"
           className="btn btn-outline-primary float-right btn-form btn-xs"
           disabled={saveDisabled}
-        >Receive shipment
+        ><Translate id="partialReceiving.receiveShipment.label" />
         </button>
       </div>),
   },
@@ -56,7 +57,7 @@ const FIELDS = {
       'parentContainer.name': {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
-        label: 'Pallet',
+        label: 'stockMovement.pallet.label',
         flexWidth: '8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
@@ -65,7 +66,7 @@ const FIELDS = {
       'container.name': {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
-        label: 'Box',
+        label: 'stockMovement.box.label',
         flexWidth: '6',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
@@ -73,11 +74,11 @@ const FIELDS = {
       },
       'product.productCode': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Code',
+        label: 'stockMovement.code.label',
       },
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Name',
+        label: 'stockMovement.name.label',
         flexWidth: '24',
         attributes: {
           className: 'text-left ml-1',
@@ -86,24 +87,24 @@ const FIELDS = {
       },
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Lot/Serial No.',
+        label: 'stockMovement.lotSerialNo.label',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Expiration Date',
+        label: 'stockMovement.expirationDate.label',
         fixedWidth: '130px',
       },
       'binLocation.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Bin Location',
+        label: 'stockMovement.binLocation.label',
       },
       'recipient.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Recipient',
+        label: 'stockMovement.recipient.label',
       },
       quantityReceiving: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Receiving Now',
+        label: 'partialReceiving.receivingNow.label',
         fixedWidth: '115px',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -111,7 +112,7 @@ const FIELDS = {
       },
       quantityRemaining: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Remaining',
+        label: 'partialReceiving.remaining.label',
         fixedWidth: '95px',
         fieldKey: '',
         attributes: {
@@ -123,7 +124,7 @@ const FIELDS = {
       },
       cancelRemaining: {
         type: params => (params.subfield ? <CheckboxField {...params} /> : null),
-        label: 'Cancel Remaining',
+        label: 'partialReceiving.cancelRemaining.label',
         fixedWidth: '140px',
         getDynamicAttr: ({ saveDisabled }) => ({
           disabled: saveDisabled,
@@ -131,7 +132,7 @@ const FIELDS = {
       },
       comment: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Comment',
+        label: 'partialReceiving.comment.label',
         fixedWidth: '110px',
       },
     },
@@ -141,20 +142,20 @@ const FIELDS = {
     type: ({ prevPage, onSave, saveDisabled }) => (
       <div className="my-1 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
-          Back to Edit
+          <Translate id="partialReceiving.backToEdit.label" />
         </button>
         <button
           type="button"
           className="btn btn-outline-success btn-xs"
           onClick={onSave}
           disabled={saveDisabled}
-        >Save
+        ><Translate id="default.button.save.label" />
         </button>
         <button
           type="submit"
           className="btn btn-outline-primary float-right btn-form btn-xs"
           disabled={saveDisabled}
-        >Receive shipment
+        ><Translate id="partialReceiving.receiveShipment.label" />
         </button>
       </div>),
   },
