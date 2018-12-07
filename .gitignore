@@ -2,7 +2,7 @@
 .settings
 *.iml
 *.iws
-*.sql
+/*.sql
 *Db.properties
 *Db.script
 /plugins
@@ -15,7 +15,6 @@ target
 target-eclipse/
 web-app/WEB-INF/
 .classpath
-.settings
 .project
 .DS_Store
 openboxes.ipr
@@ -28,3 +27,4 @@ tags
 /uploads
 site/
 .slcache
+build/
