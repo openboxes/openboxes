@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Checkbox = ({
-  value, indeterminate, custom, ...props
+  value, indeterminate, custom, fieldRef, ...props
 }) => {
   const onChange = (event) => {
     const { checked } = event.target;
@@ -17,6 +17,7 @@ const Checkbox = ({
       <div className="custom-checkbox">
         <input
           type="checkbox"
+          ref={fieldRef}
           checked={value}
           {...props}
           onChange={onChange}
@@ -29,8 +30,15 @@ const Checkbox = ({
   return (
     <input
       type="checkbox"
-      // eslint-disable-next-line no-param-reassign,no-return-assign
-      ref={elem => elem && (elem.indeterminate = indeterminate)}
+      ref={(elem) => {
+        if (elem) {
+          // eslint-disable-next-line no-param-reassign
+          elem.indeterminate = indeterminate;
+        }
+        if (fieldRef) {
+          fieldRef(elem);
+        }
+      }}
       checked={value}
       {...props}
       onChange={onChange}
@@ -45,6 +53,7 @@ Checkbox.propTypes = {
   indeterminate: PropTypes.bool,
   custom: PropTypes.bool,
   id: PropTypes.string,
+  fieldRef: PropTypes.func,
 };
 
 Checkbox.defaultProps = {
@@ -53,4 +62,5 @@ Checkbox.defaultProps = {
   indeterminate: false,
   custom: false,
   id: '',
+  fieldRef: undefined,
 };
