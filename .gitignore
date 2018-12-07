@@ -2,7 +2,7 @@
 .settings
 *.iml
 *.iws
-*.sql
+/*.sql
 *Db.properties
 *Db.script
 /plugins
@@ -28,6 +28,7 @@ tags
 /uploads
 site/
 .slcache
+build/
 node_modules
 npm-debug.log
 /web-app/js/*bundle*

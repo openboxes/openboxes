@@ -21,7 +21,8 @@ class LocationController {
 	
 	def inventoryService
 	def locationService
-	
+	def dataService
+
 	/**
 	 * Controllers for managing other locations (besides warehouses)
 	 */
@@ -319,6 +320,38 @@ class LocationController {
 		}
 		redirect(action: "edit", id: params.id);
 	}
+
+
+	def exportBinLocations = {
+
+		Location location = Location.get(params.id)
+
+		if (!location) {
+			throw new IllegalArgumentException("Must specify location")
+		}
+
+		if (location.locations) {
+			def date = new Date();
+			response.setHeader("Content-disposition",
+					"attachment; filename='BinLocations-${location?.name}-${date.format("yyyyMMdd-hhmmss")}.csv'")
+			response.contentType = "text/csv"
+    		def csvrows = location.locations.collect { binLocation ->
+				return [
+						"id":binLocation.id?:"",
+						"locationType": binLocation?.locationType?.locationTypeCode?:"",
+						"locationNumber": binLocation?.locationNumber?:"",
+						"locationName": binLocation?.name?:""
+				]
+			}
+
+			render dataService.generateCsv(csvrows)
+		}
+		else {
+			flash.message = "No bin locations for location ${location.name}"
+			redirect(action: "edit", id: params.id)
+		}
+	}
+
 
 
 }
