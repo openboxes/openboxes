@@ -52,8 +52,8 @@
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
-                        &nbsp;${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Add stock list items')}
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_add.png')}" />
+                        &nbsp;${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit stock list items')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
@@ -90,11 +90,18 @@
                         </g:link>
                     </div>
                 </g:else>
+                <hr/>
                 <div class="action-menu-item">
-                    <hr/>
+                    <g:link controller="requisitionTemplate" action="changeSortOrderAlpha" id="${requisition.id}">
+                        <warehouse:message code="requisitionTemplate.button.sortAlphabetically.label" default="Sort alphabetically"/>
+                    </g:link>
                 </div>
-
-
+                <div class="action-menu-item">
+                    <g:link controller="requisitionTemplate" action="changeSortOrderChrono" id="${requisition.id}">
+                        <warehouse:message code="requisitionTemplate.button.sortChronologically.label" default="Sort chronologically"/>
+                    </g:link>
+                </div>
+                <hr/>
                 <div class="action-menu-item">
                     <g:link controller="requisitionTemplate" action="clear" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                         <img src="${resource(dir: 'images/icons/silk', file: 'erase.png')}" />

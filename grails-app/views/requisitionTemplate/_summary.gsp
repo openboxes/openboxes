@@ -31,7 +31,6 @@
 					</td>
 					<td>
 						<div class="right">
-
 							<g:if test="${requisition.isPublished}">
 								<div class="tag tag-alert">
 									<warehouse:message code="default.published.label" default="Published"/>
@@ -74,13 +73,28 @@
 			<warehouse:message code="default.create.label" args="[warehouse.message(code:'requisitionTemplate.label').toLowerCase()]"/>
 		</g:link>
 	</g:isUserAdmin>
-	<g:link controller="requisitionTemplate" action="editHeader" id="${requisition?.id}" class="button">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />&nbsp;
-		${warehouse.message(code: 'requisitionTemplate.editHeader.label', default: 'Edit stock list')}
-	</g:link>
-	<g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}" class="button">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'application_add.png')}" />&nbsp;
-		${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit stock list items')}
-	</g:link>
 
+	<div class="right">
+
+		<g:link controller="requisitionTemplate" action="show" id="${requisition?.id}" class="button">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" />&nbsp;
+			${warehouse.message(code: 'default.show.label', args: [warehouse.message(code:'requisitionTemplate.label')])}
+		</g:link>
+		<g:link controller="requisitionTemplate" action="editHeader" id="${requisition?.id}" class="button">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />&nbsp;
+			${warehouse.message(code: 'requisitionTemplate.editHeader.label', default: 'Edit stock list')}
+		</g:link>
+		<g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}" class="button">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'application_add.png')}" />&nbsp;
+			${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit stock list items')}
+		</g:link>
+		<g:link controller="requisitionTemplate" action="batch" id="${requisition?.id}" class="button">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_go.png')}" />
+			&nbsp;${warehouse.message(code: 'requisitionTemplate.import.label', default: 'Import stock list items')}
+		</g:link>
+		<g:link controller="requisitionTemplate" action="export" id="${requisition?.id}" class="button">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+			&nbsp;${warehouse.message(code: 'requisitionTemplate.export.label', default: 'Export stock list items')}
+		</g:link>
+	</div>
 </div>
