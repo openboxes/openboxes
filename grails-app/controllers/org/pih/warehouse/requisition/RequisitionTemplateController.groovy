@@ -12,13 +12,6 @@ package org.pih.warehouse.requisition
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem;
-
-import grails.converters.JSON
-import grails.validation.ValidationException;
-
-import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product;
 
 class RequisitionTemplateController {
@@ -326,13 +319,18 @@ class RequisitionTemplateController {
                 "UOM" {it.unitOfMeasure}
             })
 
-            requisition.requisitionItems.each { requisitionItem ->
-                csv << [
-                        productCode: requisitionItem.product.productCode,
-                        productName:  StringEscapeUtils.escapeCsv(requisitionItem.product.name),
-                        quantity: requisitionItem.quantity,
-                        unitOfMeasure: "EA/1"
+            if (requisition.requisitionItems) {
+                requisition.requisitionItems.each { requisitionItem ->
+                    csv << [
+                            productCode  : requisitionItem.product.productCode,
+                            productName  : StringEscapeUtils.escapeCsv(requisitionItem.product.name),
+                            quantity     : requisitionItem.quantity,
+                            unitOfMeasure: "EA/1"
                     ]
+                }
+            }
+            else {
+                csv << [productCode:"", productName: "", quantity: "", unitOfMeasure: ""]
             }
 
             response.contentType = "text/csv"
