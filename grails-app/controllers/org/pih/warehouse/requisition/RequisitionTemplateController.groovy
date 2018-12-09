@@ -382,15 +382,32 @@ class RequisitionTemplateController {
     }
 
     def importAsFile = {
-        def requisition = Requisition.get(params.id)
 
+        def skipLines = params.skipLines?:0
+        def delimiter = params.delimiter?:","
+        def requisition = Requisition.get(params.id)
+        def data = []
         if (requisition) {
             def file = request.getFile('file')
-            def lines = file.inputStream.toCsvReader().readAll()
 
-            println lines
-            render lines
+            if (!file) {
+                throw new IllegalArgumentException("Must specify a file")
+            }
+
+            file.inputStream.toCsvReader('separatorChar':delimiter,'skipLines':skipLines).eachLine { tokens ->
+                println "line: " + tokens + " delimiter=" + delimiter
+                println "ROW " + tokens
+                if (tokens) {
+                    data << tokens
+                }
+            }
+
+            log.info "Data: " + data
+
         }
+        session.data = data
+        render (view: "batch", model: [requisition:requisition,data:data])
+
     }
 
     def doImport = {
