@@ -10,11 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.validation.ValidationException
-import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
@@ -124,7 +120,19 @@ class ProductApiController extends BaseDomainApiController {
         ] as JSON)
     }
 
+    def withCatalogs = {
+        Product product = Product.get(params.id)
 
+        render ([data: [
+                id: product.id,
+                name: product.name,
+                productCode: product.productCode,
+                catalogs: product.getProductCatalogs()?.collect { [
+                        id: it.id,
+                        name: it.name
+                ] }
+        ]] as JSON)
+    }
 
 
 }
