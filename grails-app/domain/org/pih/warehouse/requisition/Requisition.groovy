@@ -116,6 +116,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
+    static transients = ["sortedStocklistItems"]
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction]
     static mapping = {
@@ -289,8 +290,26 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     Boolean isRelatedToMe(Integer userId) {
-        return (createdBy?.id == userId || updatedBy?.id == userId || requestedBy?.id == userId)
+        return (createdBy?.id == userId || updatedBy?.id == userId)
     }
+
+    /**
+     * Returns stocklist items in sorted order. Should only be used in stocklist-related operations.
+     * @return
+     */
+    def getSortedStocklistItems() {
+
+        if (!isTemplate) {
+            throw new IllegalStateException("Must only be used with a stocklist")
+        }
+
+        return requisitionItems.sort { a,b ->
+            a.product?.category?.name <=> b.product?.category?.name ?:
+                    a.product?.name <=> b.product?.name ?:
+                            a.orderIndex <=> b.orderIndex
+        }
+    }
+
 
     Map toJson() {
         [

@@ -26,15 +26,6 @@
 
     <g:render template="summary" model="[requisition:requisition]"/>
 
-    <div class="buttonBar">
-        <g:link class="button icon log" controller="requisitionTemplate" action="list">
-            <warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/>
-        </g:link>
-        <g:link class="button icon add" controller="requisitionTemplate" action="create" params="[type:'STOCK']">
-            <warehouse:message code="default.add.label" args="[g.message(code:'requisitionTemplate.label')]"/>
-        </g:link>
-    </div>
-
     <div class="yui-gf">
 		<div class="yui-u first">
             <g:render template="header" model="[requisition:requisition]"/>
@@ -53,6 +44,21 @@
                     <table id="requisition-template-table">
 
                         <tbody>
+
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="type">
+                                        <warehouse:message code="requisition.isPublished.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:checkBox name="isPublished" value="${requisition.isPublished}"/>
+                                    <g:if test="${requisition?.isPublished}">
+                                        ${requisition.datePublished}
+                                    </g:if>
+                                </td>
+                            </tr>
+
                             <tr class="prop">
                                 <td class="name">
                                     <label for="type">
@@ -61,7 +67,7 @@
                                 </td>
                                 <td class="value">
                                     <g:hiddenField name="type" value="${requisition.type}"/>
-                                    ${requisition.type}
+                                    <format:metadata obj="${requisition.type}"/>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -72,19 +78,6 @@
                                 </td>
                                 <td class="value ${hasErrors(bean: requisition, field: 'name', 'errors')}">
                                     <g:textField name="name" value="${requisition.name}" class="text large" size="80"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="description">
-                                        <warehouse:message code="default.description.label" />
-                                    </label>
-                                </td>
-
-                                <td class="value">
-                                    <g:textArea name="description" rows="5" style="width: 100%"
-                                                placeholder="${warehouse.message(code:'requisition.description.message')}"
-                                                class="text">${requisition.description }</g:textArea>
                                 </td>
                             </tr>
 
@@ -121,11 +114,34 @@
                                     <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['null':'']" class="chzn-select-deselect"/>
                                 </td>
                             </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="description">
+                                        <warehouse:message code="default.description.label" />
+                                    </label>
+                                </td>
 
+                                <td class="value">
+                                    <g:textArea name="description" rows="5" style="width: 100%"
+                                                placeholder="${warehouse.message(code:'requisition.description.message')}"
+                                                class="text">${requisition.description }</g:textArea>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message
-                                            code="requisition.createdBy.label" /></label>
+                                            code="requisitionTemplate.requestedBy.label" /></label>
+                                </td>
+                                <td class="value">
+                                    <g:autoSuggest id="requestedBy" name="requestedBy" jsonUrl="${request.contextPath }/json/findPersonByName"
+                                                   valueId="${requisition?.requestedBy?.id}"
+                                                   valueName="${requisition?.requestedBy?.name}"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message
+                                            code="default.createdBy.label" /></label>
                                 </td>
                                 <td class="value">
                                     <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
@@ -135,36 +151,11 @@
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message
-                                            code="requisition.requestedBy.label" /></label>
+                                            code="default.updatedBy.label" /></label>
                                 </td>
                                 <td class="value">
-                                    <g:hiddenField name="requestedBy.id" value="${requisition?.requestedBy?.id?:session?.user?.id }"/>
-                                    ${requisition?.requestedBy?.name?:session?.user?.name }
-                                </td>
-                            </tr>
-
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="type">
-                                        <warehouse:message code="requisition.isTemplate.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-                                    <g:hiddenField name="isTemplate" value="${requisition.isTemplate}"/>
-                                    ${requisition.isTemplate}
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="type">
-                                        <warehouse:message code="requisition.isPublished.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-                                    <g:checkBox name="isPublished" value="${requisition.isPublished}"/>
-                                    <g:if test="${requisition?.isPublished}">
-                                        ${requisition.datePublished}
-                                    </g:if>
+                                    <g:hiddenField name="updatedBy" value="${requisition?.updatedBy?.id?:session?.user?.id }"/>
+                                    ${requisition?.updatedBy?.name?:session?.user?.name }
                                 </td>
                             </tr>
                         </tbody>
