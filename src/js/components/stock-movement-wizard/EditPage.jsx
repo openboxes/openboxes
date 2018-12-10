@@ -314,6 +314,20 @@ class EditItemsPage extends Component {
   save(formValues) {
     this.props.showSpinner();
 
+    const errors = validate(formValues).editPageItems;
+
+    if (errors.length) {
+      const errorMessage = _.reduce(errors, (message, value, key) => {
+        const error = _.map(value, val => `${val}</br>`);
+        return `${message}Error occurred in line ${key + 1}:</br>${error}`;
+      }, '');
+
+      Alert.error(errorMessage);
+
+      this.props.hideSpinner();
+      return null;
+    }
+
     return this.reviseRequisitionItems(formValues)
       .then(() => {
         this.props.hideSpinner();
