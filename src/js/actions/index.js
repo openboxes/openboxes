@@ -1,4 +1,3 @@
-import { addTranslationForLanguage } from 'react-localize-redux';
 import {
   SHOW_SPINNER,
   HIDE_SPINNER,
@@ -67,15 +66,3 @@ export function changeCurrentLocation(location) {
       });
   };
 }
-
-export function fetchTranslations(language) {
-  return (dispatch) => {
-    const url = `/openboxes/api/localizations?lang=${language}`;
-    apiClient.get(url)
-      .then((response) => {
-        console.log(response.data.messages);
-        dispatch(addTranslationForLanguage(response.data.messages, language));
-      });
-  };
-}
-

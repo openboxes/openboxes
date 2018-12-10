@@ -2,9 +2,10 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
+import { connect } from 'react-redux';
 
 import 'react-tippy/dist/tippy.css';
-import { Translate } from 'react-localize-redux';
+import { getTranslate, Translate } from 'react-localize-redux';
 
 import TableBody from './TableBody';
 import TableBodyVirtualized from './TableBodyVirtualized';
@@ -38,7 +39,7 @@ class FieldArrayComponent extends Component {
           <div className="d-flex flex-row border-bottom font-weight-bold py-1">
             {_.map(fieldsConfig.fields, (config, name) => (
               <Tooltip
-                html={(<div>{config.label}</div>)}
+                html={(<div>{this.props.translate(config.label)}</div>)}
                 theme="transparent"
                 arrow="true"
                 delay="150"
@@ -93,6 +94,10 @@ class FieldArrayComponent extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
 FieldArrayComponent.propTypes = {
   fieldsConfig: PropTypes.shape({}).isRequired,
   fields: PropTypes.oneOfType([
@@ -100,10 +105,11 @@ FieldArrayComponent.propTypes = {
     PropTypes.arrayOf(PropTypes.shape({})),
   ]).isRequired,
   properties: PropTypes.shape({}),
+  translate: PropTypes.func.isRequired,
 };
 
 FieldArrayComponent.defaultProps = {
   properties: {},
 };
 
-export default FieldArrayComponent;
+export default connect(mapStateToProps)(FieldArrayComponent);

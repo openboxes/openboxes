@@ -204,8 +204,8 @@ class AdjustInventoryModal extends Component {
         }}
       >
         <div>
-          <div className="font-weight-bold">Product Code: {this.state.attr.fieldValue.productCode}</div>
-          <div className="font-weight-bold">Product Name: {this.state.attr.fieldValue['product.name']} <hr /></div>
+          <div className="font-weight-bold"><Translate id="stockMovement.productCode.label" />: {this.state.attr.fieldValue.productCode}</div>
+          <div className="font-weight-bold"><Translate id="stockMovement.productName.label" />: {this.state.attr.fieldValue['product.name']} <hr /></div>
         </div>
       </ModalWrapper>
     );

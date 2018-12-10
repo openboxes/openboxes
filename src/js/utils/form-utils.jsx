@@ -1,9 +1,10 @@
 import React from 'react';
 import { Tooltip } from 'react-tippy';
 import PropTypes from 'prop-types';
-import { Translate } from 'react-localize-redux';
+import { getTranslate, Translate } from 'react-localize-redux';
 
 import 'react-tippy/dist/tippy.css';
+import connect from 'react-redux/es/connect/connect';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
@@ -18,13 +19,14 @@ export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   );
 };
 
-export const renderField = ({
+const renderField2 = ({
   renderInput,
   attributes: { required, hidden, ...otherAttributes },
   label: FieldLabel,
   touched: fieldTouched,
   arrayField,
   input,
+  translate,
   meta: { touched, error },
 }) => {
   const attr = { id: input.name, ...otherAttributes };
@@ -33,7 +35,7 @@ export const renderField = ({
   if (arrayField) {
     return (
       <Tooltip
-        title={<Translate id={error} />}
+        title={translate(`${error}`)}
         disabled={!error || !(touched || fieldTouched)}
         theme="transparent"
         arrow="true"
@@ -63,14 +65,20 @@ export const renderField = ({
       <div className="row">
         <div className="col-md-2" />
         <div className="help-block col-md-4" style={{ float: 'left' }}>
-          { (error && touched) || (error && fieldTouched) ? <Translate id={error} /> : '' }
+          { (error && touched) || (error && fieldTouched) ? translate(`${error}`) : '' }
         </div>
       </div>
     </div>
   );
 };
 
-renderField.propTypes = {
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
+export const renderField = connect(mapStateToProps)(renderField2);
+
+renderField2.propTypes = {
   renderInput: PropTypes.func.isRequired,
   attributes: PropTypes.shape({}).isRequired,
   label: PropTypes.oneOfType([
@@ -81,9 +89,10 @@ renderField.propTypes = {
   arrayField: PropTypes.bool,
   input: PropTypes.shape({}).isRequired,
   meta: PropTypes.shape({}).isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
-renderField.defaultProps = {
+renderField2.defaultProps = {
   touched: false,
   arrayField: false,
   label: '',

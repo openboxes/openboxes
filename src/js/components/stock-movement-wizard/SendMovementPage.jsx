@@ -6,7 +6,7 @@ import Dropzone from 'react-dropzone';
 import Alert from 'react-s-alert';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
-import { Translate } from 'react-localize-redux';
+import { getTranslate, Translate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -335,8 +335,8 @@ class SendMovementPage extends Component {
     if (this.state.files.length) {
       _.forEach(this.state.files, (file) => {
         this.sendFile(file)
-          .then(() => Alert.success('alert.fileSuccess.label'))
-          .catch(() => Alert.error('alert.fileError.label'));
+          .then(() => Alert.success(this.props.translate('alert.fileSuccess.label')))
+          .catch(() => Alert.error(this.props.translate('alert.fileError.label')));
       });
     }
 
@@ -463,8 +463,8 @@ class SendMovementPage extends Component {
                       <th><Translate id="stockMovement.expiry.label" /> </th>
                       <th style={{ width: '150px' }}><Translate id="stockMovement.quantityPicked.label" /> </th>
                       {!(this.state.supplier) &&
-                        <th><Translate id="stockMovement.binLocation.label" /> </th>
-                      }
+                      <th><Translate id="stockMovement.binLocation.label" /> </th>
+                    }
                       <th><Translate id="stockMovement.recipient.label" /> </th>
                     </tr>
                   </thead>
@@ -490,7 +490,7 @@ class SendMovementPage extends Component {
                               (item.quantityRequested ? item.quantityRequested.toLocaleString('en-US') : item.quantityRequested)}
                             </td>
                             {!(this.state.supplier) &&
-                              <td>{item.binLocationName}</td>
+                            <td>{item.binLocationName}</td>
                             }
                             <td>
                               {item.recipient ? item.recipient.name : null}
@@ -523,7 +523,11 @@ class SendMovementPage extends Component {
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(SendMovementPage);
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
 
 SendMovementPage.propTypes = {
   /** Initial component's data */
@@ -535,4 +539,5 @@ SendMovementPage.propTypes = {
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
   setValues: PropTypes.func.isRequired,
+  translate: PropTypes.func.isRequired,
 };

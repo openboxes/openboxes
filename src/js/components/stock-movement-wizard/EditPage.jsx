@@ -6,7 +6,7 @@ import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
-import { Translate } from 'react-localize-redux';
+import { Translate, getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -112,7 +112,7 @@ const FIELDS = {
         }) => ({
           onOpen: () => reviseRequisitionItems(values),
           productCode: fieldValue.productCode,
-          btnOpenText: fieldValue.substitutionStatus,
+          btnOpenText: `default.${fieldValue.substitutionStatus}.label`,
           btnOpenDisabled: fieldValue.substitutionStatus === 'NO' || fieldValue.statusCode === 'SUBSTITUTED',
           btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus || 'HIDDEN'],
           rowIndex,
@@ -149,7 +149,7 @@ const FIELDS = {
         label: 'default.button.undo.label',
         flexWidth: '0.9',
         fieldKey: '',
-        buttonLabel: 'default.button.undo.label  ',
+        buttonLabel: 'default.button.undo.label',
         getDynamicAttr: ({ fieldValue, revertItem }) => ({
           onClick: fieldValue.requisitionItemId ?
             () => revertItem(fieldValue.requisitionItemId) : () => null,
@@ -286,7 +286,7 @@ class EditItemsPage extends Component {
           );
           return _.isEmpty(oldRevision) ? true :
             ((oldRevision.quantityRevised !== item.quantityRevised) ||
-             (oldRevision.reasonCode !== item.reasonCode));
+              (oldRevision.reasonCode !== item.reasonCode));
         }
         return false;
       },
@@ -323,7 +323,7 @@ class EditItemsPage extends Component {
         return `${message}Error occurred in line ${key + 1}:</br>${error}`;
       }, '');
 
-      Alert.error(errorMessage);
+      Alert.error(this.props.translate(errorMessage));
 
       this.props.hideSpinner();
       return null;
@@ -332,7 +332,7 @@ class EditItemsPage extends Component {
     return this.reviseRequisitionItems(formValues)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success('alert.saveSuccess.label!');
+        Alert.success(this.props.translate('alert.saveSuccess.label'));
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -343,11 +343,11 @@ class EditItemsPage extends Component {
    */
   refresh() {
     confirmAlert({
-      title: 'message.confirmRefresh.label',
-      message: 'confirmRefresh.message',
+      title: this.props.translate('message.confirmRefresh.label'),
+      message: this.props.translate('confirmRefresh.message'),
       buttons: [
         {
-          label: 'default.yes.label',
+          label: this.props.translate('default.yes.label'),
           onClick: () => {
             this.setState({
               revisedItems: [],
@@ -357,7 +357,7 @@ class EditItemsPage extends Component {
           },
         },
         {
-          label: 'default.no.label',
+          label: this.props.translate('default.no.label'),
         },
       ],
     });
@@ -455,7 +455,7 @@ class EditItemsPage extends Component {
       })
       .catch(() => {
         this.props.hideSpinner();
-        return Promise.reject(new Error('error.revertRequisitionItem.label'));
+        return Promise.reject(new Error(this.props.translate('error.revertRequisitionItem.label')));
       });
   }
 
@@ -512,6 +512,7 @@ class EditItemsPage extends Component {
 const mapStateToProps = state => ({
   reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
+  translate: getTranslate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -538,4 +539,5 @@ EditItemsPage.propTypes = {
   reasonCodesFetched: PropTypes.bool.isRequired,
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  translate: PropTypes.func.isRequired,
 };

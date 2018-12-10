@@ -5,7 +5,7 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
-import { Translate } from 'react-localize-redux';
+import { getTranslate, Translate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -200,15 +200,15 @@ class PickPage extends Component {
    */
   refresh() {
     confirmAlert({
-      title: 'message.confirmRefresh.label ',
-      message: 'confirmRefresh.message',
+      title: this.props.translate('message.confirmRefresh.label '),
+      message: this.props.translate('confirmRefresh.message'),
       buttons: [
         {
-          label: 'default.yes.label',
+          label: this.props.translate('default.yes.label'),
           onClick: () => this.fetchAllData(),
         },
         {
-          label: 'default.no.label',
+          label: this.props.translate('default.no.label'),
         },
       ],
     });
@@ -434,17 +434,17 @@ class PickPage extends Component {
                 onClick={() => this.sortByBins()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                <span>Sort by bins{this.state.sorted && <i className={`fa ${this.state.orderIcon} pl-2`} />}</span>
+                <span><Translate id="stockMovement.sortByBins.label" />{this.state.sorted && <i className={`fa ${this.state.orderIcon} pl-2`} />}</span>
               </button>
             </span>
             <form onSubmit={handleSubmit} className="print-mt">
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                  stockMovementId: values.stockMovementId,
-                  onResponse: this.saveNewItems,
-                  revertUserPick: this.revertUserPick,
-                  bins: this.state.bins,
-                  locationId: this.state.values.origin.id,
-                }))}
+                stockMovementId: values.stockMovementId,
+                onResponse: this.saveNewItems,
+                revertUserPick: this.revertUserPick,
+                bins: this.state.bins,
+                locationId: this.state.values.origin.id,
+              }))}
               <div className="d-print-none">
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
                   <Translate id="default.button.previous.label" />
@@ -455,21 +455,25 @@ class PickPage extends Component {
               </div>
             </form>
           </div>
-          )}
+        )}
       />
     );
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(PickPage);
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(PickPage);
 
 PickPage.propTypes = {
   /** Initial component's data */
   initialValues: PropTypes.shape({}).isRequired,
   /**
-  * Function called with the form data when the handleSubmit()
-  * is fired from within the form component.
-  */
+   * Function called with the form data when the handleSubmit()
+   * is fired from within the form component.
+   */
   onSubmit: PropTypes.func.isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
@@ -477,4 +481,5 @@ PickPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  translate: PropTypes.func.isRequired,
 };

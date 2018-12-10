@@ -6,7 +6,7 @@ import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import queryString from 'query-string';
-import { Translate } from 'react-localize-redux';
+import { Translate, getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -130,7 +130,7 @@ const FIELDS = {
   },
 };
 
-  /** The first step of stock movement where user can add all the basic information. */
+/** The first step of stock movement where user can add all the basic information. */
 class CreateStockMovement extends Component {
   constructor(props) {
     super(props);
@@ -267,12 +267,12 @@ class CreateStockMovement extends Component {
         })
         .catch(() => {
           this.props.hideSpinner();
-          return Promise.reject(new Error('Could not create stock movement'));
+          return Promise.reject(new Error(this.props.translate('error.createStockMovement.label')));
         });
     }
 
     return new Promise(((resolve, reject) => {
-      reject(new Error('Missing required parameters'));
+      reject(new Error(this.props.translate('error.missingParameters.label')));
     }));
   }
 
@@ -295,15 +295,15 @@ class CreateStockMovement extends Component {
       this.saveStockMovement(values);
     } else {
       confirmAlert({
-        title: 'message.confirmChange.label',
-        message: 'confirmChange.message',
+        title: this.props.translate('message.confirmChange.label'),
+        message: this.props.translate('confirmChange.message'),
         buttons: [
           {
-            label: 'default.no.label',
+            label: this.props.translate('default.no.label'),
             onClick: () => this.resetToInitialValues(),
           },
           {
-            label: 'default.yes.label',
+            label: this.props.translate('default.yes.label'),
             onClick: () => this.saveStockMovement({ ...values, forceUpdate: 'true' }),
           },
         ],
@@ -342,6 +342,7 @@ class CreateStockMovement extends Component {
 const mapStateToProps = state => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
+  translate: getTranslate(state.localize),
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -387,4 +388,5 @@ CreateStockMovement.propTypes = {
   }).isRequired,
   /** Return true if current user is superuser */
   isSuperuser: PropTypes.bool.isRequired,
+  translate: PropTypes.func.isRequired,
 };

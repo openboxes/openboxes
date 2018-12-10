@@ -85,7 +85,7 @@ function validate(values) {
     }
 
     if (item.quantitySelected > item.quantityAvailable) {
-      errors.substitutions[key] = { quantitySelected: 'errors.higherQtySelected' };
+      errors.substitutions[key] = { quantitySelected: 'errors.higherQtySelected.label' };
     }
     if (item.quantitySelected < 0) {
       errors.substitutions[key] = { quantitySelected: 'errors.negativeQtySelected.label' };

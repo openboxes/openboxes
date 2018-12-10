@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
 import update from 'immutability-helper';
 import { confirmAlert } from 'react-confirm-alert';
-import { Translate } from 'react-localize-redux';
+import { getTranslate, Translate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -61,7 +61,7 @@ const FIELDS = {
       },
       uom: {
         type: LabelField,
-        label: 'UOM',
+        label: 'default.uom.label',
         flexWidth: '0.8',
       },
       recipient: {
@@ -160,7 +160,7 @@ class PackingPage extends Component {
         const { packPageItems } = resp.data.data.packPage;
         this.setState({ values: { ...this.state.values, packPageItems } });
         this.props.hideSpinner();
-        Alert.success('alert.saveSuccess.label');
+        Alert.success(this.props.translate('alert.saveSuccess.label'));
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -171,15 +171,15 @@ class PackingPage extends Component {
    */
   refresh() {
     confirmAlert({
-      title: 'message.confirmRefresh.label',
-      message: 'confirmRefresh.message',
+      title: this.props.translate('message.confirmRefresh.label'),
+      message: this.props.translate('confirmRefresh.message'),
       buttons: [
         {
-          label: 'default.yes.label',
+          label: this.props.translate('default.yes.label'),
           onClick: () => this.fetchAllData(),
         },
         {
-          label: 'default.no.label',
+          label: this.props.translate('default.no.label'),
         },
       ],
     });
@@ -323,6 +323,7 @@ class PackingPage extends Component {
 const mapStateToProps = state => ({
   recipients: state.users.data,
   recipientsFetched: state.users.fetched,
+  translate: getTranslate(state.localize),
 });
 
 export default (connect(mapStateToProps, {
@@ -343,4 +344,5 @@ PackingPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  translate: PropTypes.func.isRequired,
 };
