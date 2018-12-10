@@ -83,6 +83,7 @@ const FIELDS = {
     attributes: {
       showTimeSelect: true,
       dateFormat: 'MM/DD/YYYY HH:mm Z',
+      autoComplete: 'off',
     },
     getDynamicAttr: ({ shipmentReceived }) => ({
       disabled: shipmentReceived,

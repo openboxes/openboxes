@@ -250,6 +250,7 @@ const VENDOR_FIELDS = {
         flexWidth: '1.5',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
+          autoComplete: 'off',
         },
       },
       quantityRequested: {
