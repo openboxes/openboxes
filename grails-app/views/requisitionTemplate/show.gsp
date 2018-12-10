@@ -27,7 +27,7 @@
 </g:hasErrors>
 
 <g:render template="summary" model="[requisition:requisition]"/>
-<div class="yui-gd">
+<div class="yui-gf">
     <div class="yui-u first">
         <g:render template="header" model="[requisition:requisition]"/>
 
@@ -48,21 +48,17 @@
                         <thead>
                         <tr>
                             <th><warehouse:message code="product.productCode.label" default="#"/></th>
-                            <th><warehouse:message code="category.label"/></th>
                             <th><warehouse:message code="product.label"/></th>
+                            <th><warehouse:message code="category.label"/></th>
                             <th><warehouse:message code="default.quantity.label"/></th>
                             <th><warehouse:message code="unitOfMeasure.label"/></th>
-                            <th width="1%"><warehouse:message code="requisitionItem.orderIndex.label" default="Sort order"/></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
+                        <g:each var="requisitionItem" in="${requisition?.sortedStocklistItems}" status="i">
                             <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
                                 <td>
                                     ${requisitionItem?.product?.productCode}
-                                </td>
-                                <td>
-                                    ${requisitionItem?.product?.category?.name}
                                 </td>
                                 <td>
                                     <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
@@ -70,13 +66,13 @@
                                     </g:link>
                                 </td>
                                 <td>
+                                    <format:metadata obj="${requisitionItem?.product?.category}"/>
+                                </td>
+                                <td>
                                     ${requisitionItem?.quantity}
                                 </td>
                                 <td>
                                     EA/1
-                                </td>
-                                <td>
-                                    ${requisitionItem?.orderIndex}
                                 </td>
                             </tr>
                         </g:each>

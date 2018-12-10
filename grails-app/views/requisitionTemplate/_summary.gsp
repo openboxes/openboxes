@@ -96,5 +96,19 @@
 			<img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
 			&nbsp;${warehouse.message(code: 'requisitionTemplate.export.label', default: 'Export stock list items')}
 		</g:link>
+
+		<g:if test="${!requisition.isPublished}">
+			<g:link controller="requisitionTemplate" action="publish" id="${requisition?.id}" class="button">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_world.png')}" />
+				&nbsp;${warehouse.message(code: 'requisitionTemplate.publish.label', default: 'Publish stock list')}
+			</g:link>
+		</g:if>
+		<g:else>
+			<g:link controller="requisitionTemplate" action="unpublish" id="${requisition?.id}" class="button">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_world.png')}" />
+				&nbsp;${warehouse.message(code: 'requisitionTemplate.unpublish.label', default: 'Unpublish stock list')}
+			</g:link>
+		</g:else>
+
 	</div>
 </div>

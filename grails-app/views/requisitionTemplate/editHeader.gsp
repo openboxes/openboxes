@@ -114,24 +114,34 @@
                                     <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['null':'']" class="chzn-select-deselect"/>
                                 </td>
                             </tr>
-                        <tr class="prop">
-                            <td class="name">
-                                <label for="description">
-                                    <warehouse:message code="default.description.label" />
-                                </label>
-                            </td>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="description">
+                                        <warehouse:message code="default.description.label" />
+                                    </label>
+                                </td>
 
-                            <td class="value">
-                                <g:textArea name="description" rows="5" style="width: 100%"
-                                            placeholder="${warehouse.message(code:'requisition.description.message')}"
-                                            class="text">${requisition.description }</g:textArea>
-                            </td>
-                        </tr>
-
+                                <td class="value">
+                                    <g:textArea name="description" rows="5" style="width: 100%"
+                                                placeholder="${warehouse.message(code:'requisition.description.message')}"
+                                                class="text">${requisition.description }</g:textArea>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message
-                                            code="requisition.createdBy.label" /></label>
+                                            code="requisitionTemplate.requestedBy.label" /></label>
+                                </td>
+                                <td class="value">
+                                    <g:autoSuggest id="requestedBy" name="requestedBy" jsonUrl="${request.contextPath }/json/findPersonByName"
+                                                   valueId="${requisition?.requestedBy?.id}"
+                                                   valueName="${requisition?.requestedBy?.name}"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message
+                                            code="default.createdBy.label" /></label>
                                 </td>
                                 <td class="value">
                                     <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
@@ -141,11 +151,11 @@
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message
-                                            code="requisition.requestedBy.label" /></label>
+                                            code="default.updatedBy.label" /></label>
                                 </td>
                                 <td class="value">
-                                    <g:hiddenField name="requestedBy.id" value="${requisition?.requestedBy?.id?:session?.user?.id }"/>
-                                    ${requisition?.requestedBy?.name?:session?.user?.name }
+                                    <g:hiddenField name="updatedBy" value="${requisition?.updatedBy?.id?:session?.user?.id }"/>
+                                    ${requisition?.updatedBy?.name?:session?.user?.name }
                                 </td>
                             </tr>
                         </tbody>
