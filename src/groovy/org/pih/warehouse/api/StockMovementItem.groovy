@@ -210,7 +210,7 @@ class StockMovementItem {
             throw new IllegalArgumentException("Product code and quantity requested are required")
         }
 
-        if (lotNumber.contains("E") && NumberUtils.isNumber(lotNumber)) {
+        if (lotNumber?.contains("E") && NumberUtils.isNumber(lotNumber)) {
             throw new IllegalArgumentException("Lot numbers must not be specified in scientific notation")
         }
 
