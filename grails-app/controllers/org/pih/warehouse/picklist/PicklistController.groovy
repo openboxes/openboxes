@@ -17,7 +17,7 @@ import org.xml.sax.SAXParseException
 class PicklistController {
 
 	def scaffold = true
-	
+
 	def picklistService
     def pdfRenderingService
 
@@ -33,12 +33,16 @@ class PicklistController {
 		}
 		render jsonResponse as JSON
 	}
-	
-	
+
 	def print = {
 		def requisition = Requisition.get(params.id)
 		def picklist = Picklist.findByRequisition(requisition)
 		def location = Location.get(session.warehouse.id)
+		if (params.order == 'asc') {
+			picklist.picklistItems = picklist.picklistItems.sort { it?.binLocation?.name }
+		} else if (params.order == 'desc') {
+			picklist.picklistItems = picklist.picklistItems.sort { it?.binLocation?.name }.reverse()
+		}
 		[requisition:requisition, picklist: picklist, location:location]
     }
 

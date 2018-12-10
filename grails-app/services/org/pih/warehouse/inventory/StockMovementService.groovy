@@ -549,13 +549,13 @@ class StockMovementService {
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         if (requisitionItem.isSubstituted()) {
             pickPageItems = requisitionItem.substitutionItems.collect {
-                return buildPickPageItem(it)
+                return buildPickPageItem(it, stockMovementItem.sortOrder)
             }
         } else if (requisitionItem.modificationItem) {
-            pickPageItems << buildPickPageItem(requisitionItem.modificationItem)
+            pickPageItems << buildPickPageItem(requisitionItem.modificationItem, stockMovementItem.sortOrder)
         } else {
             if (!requisitionItem.isCanceled()) {
-                pickPageItems << buildPickPageItem(requisitionItem)
+                pickPageItems << buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
             }
         }
         return pickPageItems
@@ -609,7 +609,7 @@ class StockMovementService {
      * @param requisitionItem
      * @return
      */
-    PickPageItem buildPickPageItem(RequisitionItem requisitionItem) {
+    PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
 
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
@@ -620,6 +620,7 @@ class StockMovementService {
         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         pickPageItem.availableItems = availableItems
         pickPageItem.suggestedItems = suggestedItems
+        pickPageItem.sortOrder = sortOrder
 
         return pickPageItem
     }
