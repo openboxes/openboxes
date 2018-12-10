@@ -1053,21 +1053,6 @@ button.action-btn, button.previous, button.next {
     text-decoration: none;
 }
 
-.megaButton a,
-.megaButton a:visited {
-    text-decoration: none;
-    padding: 10px;
-    display: block;
-    color: #333;
-}
-
-.megaButton:hover {
-    background-color: lightgrey;
-}
-
-
-.mm-content-base { padding: 0px; margin: 0px; }
-
 /* Flow Header */
 .currentState { font-weight: bold; background-color: #eee; color: blue; }
 .circle {
@@ -1813,7 +1798,27 @@ ul.megamenu {
     margin: 0;
 }
 
+.mm-item-content {
+    min-width: 300px;
+}
 
+.mm-content-section {
+    float: left;
+    min-width: 100px;
+    padding: 10px;
+}
+
+.mm-content-base { padding: 0px; margin: 0px; }
+.mm-menu-item a,
+.mm-menu-item a:visited {
+    text-decoration: none;
+    padding: 7px;
+    display: block;
+    color: #333;
+}
+.mm-menu-item:hover {
+    background-color: lightgrey;
+}
 
 
 
