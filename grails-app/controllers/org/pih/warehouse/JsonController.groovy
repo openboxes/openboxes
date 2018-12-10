@@ -1179,10 +1179,10 @@ class JsonController {
         if (terms) {
             products = products.sort() {
                 a, b ->
-                    (terms.any { a.productCode.contains(it) } ? a.productCode : null) <=> (terms.any { b.productCode.contains(it) } ? b.productCode : null) ?:
-                            (terms.any { a.name.contains(it) } ? a.name : null) <=> (terms.any { b.name.contains(it) } ? b.name : null) ?:
-                                    (terms.any { a.manufacturerCode.contains(it) } ? a.manufacturerCode : null) <=> (terms.any { b.manufacturerCode.contains(it) } ? b.manufacturerCode : null) ?:
-                                            (terms.any { a?.vendorCode?.contains(it) } ? a.vendorCode : null) <=> (terms.any { b?.vendorCode?.contains(it) } ? b.vendorCode : null)
+                    (terms.any { a?.productCode?.contains(it) } ? a?.productCode : null) <=> (terms.any { b?.productCode.contains(it) } ? b?.productCode : null) ?:
+                            (terms.any { a?.name.contains(it) } ? a?.name : null) <=> (terms.any { b?.name.contains(it) } ? b?.name : null) ?:
+                                    (terms.any { a?.manufacturerCode?.contains(it) } ? a?.manufacturerCode : null) <=> (terms.any { b?.manufacturerCode?.contains(it) } ? b?.manufacturerCode : null) ?:
+                                            (terms.any { a?.vendorCode?.contains(it) } ? a?.vendorCode : null) <=> (terms.any { b?.vendorCode?.contains(it) } ? b?.vendorCode : null)
             }
             products = products.reverse()
         }
