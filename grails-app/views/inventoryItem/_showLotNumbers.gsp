@@ -31,18 +31,11 @@
 								<div class="actions left">
 
 									<div class="action-menu-item">
-
 										<a href="javascript:void(0);" class="btn-show-dialog"
 										   data-title="${g.message(code:'inventory.editItem.label')}"
 										   data-url="${request.contextPath}/inventoryItem/showDialog?id=${inventoryItem?.id}&template=editItemDialog">
 											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
 											<g:message code="inventory.editItem.label"/>
-										</a>
-									</div>
-									<div class="action-menu-item">
-										<a href="javascript:void(0);" id="btnEditItem-${inventoryItem?.id}">
-											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-										<warehouse:message code="inventory.editItem.label"/>
 										</a>
 									</div>
 									<div class="action-menu-item">
