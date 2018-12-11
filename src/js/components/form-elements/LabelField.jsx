@@ -23,7 +23,7 @@ const LabelField = (props) => {
               <label htmlFor={attr.id} className="col-md-2 col-form-label col-form-label-xs text-right">{ FieldLabel }</label> :
               <FieldLabel />
           }
-        <div className="col-md-4 align-self-center">
+        <div className="col-md-4 align-self-center font-size-xs">
           <span {...otherAttr}>{formatValue ? formatValue(value) : value}</span>
         </div>
       </div>
@@ -47,7 +47,7 @@ const LabelField = (props) => {
           duration="250"
           hideDelay="50"
         >
-          <div {...otherAttr} className={className}>
+          <div {...otherAttr} className={`font-size-xs ${className}`}>
             {formattedValue}
           </div>
         </Tooltip>

@@ -41,7 +41,7 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
-        flexWidth: '0.7',
+        flexWidth: '0.6',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
@@ -58,7 +58,7 @@ const FIELDS = {
       quantityRequested: {
         type: LabelField,
         label: 'Qty requested',
-        flexWidth: '0.8',
+        flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
@@ -66,7 +66,7 @@ const FIELDS = {
       quantityAvailable: {
         type: LabelField,
         label: 'Qty available',
-        flexWidth: '0.8',
+        flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = '';
@@ -84,7 +84,7 @@ const FIELDS = {
       },
       totalMonthlyQuantity: {
         type: LabelField,
-        label: 'Total monthly quantity',
+        label: 'Total monthly qty',
         flexWidth: '1.35',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -92,8 +92,8 @@ const FIELDS = {
       },
       quantityConsumed: {
         type: LabelField,
-        label: 'Monthly stock list quantity',
-        flexWidth: '1.35',
+        label: 'Monthly stock list qty',
+        flexWidth: '1.45',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
@@ -146,7 +146,7 @@ const FIELDS = {
       revert: {
         type: ButtonField,
         label: 'Undo',
-        flexWidth: '1',
+        flexWidth: '0.9',
         fieldKey: '',
         buttonLabel: 'Undo',
         getDynamicAttr: ({ fieldValue, revertItem }) => ({
