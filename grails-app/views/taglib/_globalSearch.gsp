@@ -13,7 +13,7 @@
 <script>
     $(document).ready(function() {
         $("#${attrs.id}").autocomplete( {
-            //minLength: 0,
+            minLength: 3,
             source: function(req, resp) {
                 $.getJSON('${attrs.jsonUrl}', req, function(data) {
                     var suggestions = [];
