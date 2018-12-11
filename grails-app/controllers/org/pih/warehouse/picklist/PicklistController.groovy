@@ -38,12 +38,7 @@ class PicklistController {
 		def requisition = Requisition.get(params.id)
 		def picklist = Picklist.findByRequisition(requisition)
 		def location = Location.get(session.warehouse.id)
-		if (params.order == 'asc') {
-			picklist.picklistItems = picklist.picklistItems.sort { it?.binLocation?.name }
-		} else if (params.order == 'desc') {
-			picklist.picklistItems = picklist.picklistItems.sort { it?.binLocation?.name }.reverse()
-		}
-		[requisition:requisition, picklist: picklist, location:location]
+		[requisition:requisition, picklist: picklist, location:location, order:params.order]
     }
 
     def renderPdf = {
@@ -77,7 +72,7 @@ class PicklistController {
         renderPdf(
                 template: "/picklist/print",
                 //locale:locale,
-                model: [requisition:requisition, picklist: picklist, location:location],
+                model: [requisition:requisition, picklist: picklist, location:location, order:params.order],
                 filename: "Picklist - ${requisition.requestNumber}"
         )
 
@@ -94,7 +89,7 @@ class PicklistController {
         //[requisition:requisition, picklist: picklist, location:location]
 
         println location
-        render(template: "/picklist/print", model: [requisition:requisition, picklist: picklist, location:location])
+        render(template: "/picklist/print", model: [requisition:requisition, picklist: picklist, location:location, order:params.order])
 
     }
 
