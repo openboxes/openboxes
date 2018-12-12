@@ -406,6 +406,7 @@ class EditItemsPage extends Component {
         ...this.state.values,
         editPageItems: _.map(editPageItems, item => ({
           ...item,
+          quantityAvailable: item.quantityAvailable || 0,
           substitutionItems: _.map(item.substitutionItems, sub => ({
             ...sub,
             requisitionItemId: item.requisitionItemId,
