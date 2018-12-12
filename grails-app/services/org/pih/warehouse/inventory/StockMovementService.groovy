@@ -1235,7 +1235,8 @@ class StockMovementService {
                             documentType: DocumentGroupCode.PACKING_LIST.name(),
                             contentType : "application/vnd.ms-excel",
                             stepNumber  : 5,
-                            uri         : g.createLink(controller: 'shipment', action: "exportPackingList", id: stockMovement?.shipment?.id, absolute: true)
+                            uri         : g.createLink(controller: 'shipment', action: "exportPackingList", id: stockMovement?.shipment?.id, absolute: true),
+                            hidden      : true
                     ],
                     [
                             name        : g.message(code: "shipping.downloadPackingList.label"),
