@@ -229,9 +229,23 @@ const FIELDS = {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'To receive',
         fixedWidth: '75px',
-        attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
-        },
+        fieldKey: '',
+        getDynamicAttr: ({ fieldValue, shipmentReceived }) => ({
+          className: _.toInteger(fieldValue.quantityRemaining) < 0 && !shipmentReceived
+            && !isReceived(true, fieldValue) ? 'text-danger' : '',
+          formatValue: (val) => {
+            if (!val.quantityRemaining) {
+              return val.quantityRemaining;
+            }
+
+            if (_.toInteger(fieldValue.quantityRemaining) < 0
+              && (shipmentReceived || isReceived(true, fieldValue))) {
+              return '0';
+            }
+
+            return val.quantityRemaining.toLocaleString('en-US');
+          },
+        }),
       },
       quantityReceiving: {
         type: params => (params.subfield ? <TextField {...params} /> : null),

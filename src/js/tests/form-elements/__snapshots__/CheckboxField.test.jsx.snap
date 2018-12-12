@@ -18,7 +18,6 @@ exports[`CheckboxField component is correctly rendering renders correctly 1`] = 
     >
       <input
         checked={false}
-        fieldRef={null}
         id="test-field"
         onBlur={[Function]}
         onChange={[Function]}

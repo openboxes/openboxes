@@ -49,7 +49,7 @@ class PartialReceiptItem {
         Integer quantityReceiving = quantityReceiving?:0
         Integer quantityReceived = quantityReceived?:0
         Integer quantityRemaining = (quantityShipped?:0) - (quantityReceiving + quantityReceived + quantityCanceled)
-        return !cancelRemaining ? (quantityRemaining > 0) ? quantityRemaining : 0 : 0
+        return !cancelRemaining ? quantityRemaining : 0
     }
 
     Set<ReceiptItem> getReceiptItemsByStatus(ReceiptStatusCode[] receiptStatusCodes) {
