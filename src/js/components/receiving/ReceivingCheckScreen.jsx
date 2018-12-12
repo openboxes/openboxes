@@ -49,7 +49,7 @@ const FIELDS = {
   },
   containers: {
     type: ArrayField,
-    maxTableHeight: window.innerWidth > 1440 ? 'calc(100vh - 450px)' : 'calc(100vh - 250px)',
+    maxTableHeight: 'none',
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
     fields: {
@@ -77,7 +77,7 @@ const FIELDS = {
       },
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Product',
+        label: 'Name',
         flexWidth: '24',
         attributes: {
           className: 'text-left ml-1',
@@ -86,7 +86,7 @@ const FIELDS = {
       },
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'Lot/Serial No',
+        label: 'Lot/Serial No.',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),

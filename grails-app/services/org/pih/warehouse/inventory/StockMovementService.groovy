@@ -270,6 +270,10 @@ class StockMovementService {
                     for (StockMovementItem subStockMovementItem : stockMovementItem.substitutionItems) {
                         createMissingPicklistItems(subStockMovementItem)
                     }
+                } else if (stockMovementItem.statusCode == 'CHANGED') {
+                    if (!stockMovementItem.requisitionItem?.modificationItem?.picklistItems) {
+                        createMissingPicklistItems(stockMovementItem)
+                    }
                 }
                 else {
                     createMissingPicklistItems(stockMovementItem)
@@ -545,13 +549,13 @@ class StockMovementService {
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         if (requisitionItem.isSubstituted()) {
             pickPageItems = requisitionItem.substitutionItems.collect {
-                return buildPickPageItem(it)
+                return buildPickPageItem(it, stockMovementItem.sortOrder)
             }
         } else if (requisitionItem.modificationItem) {
-            pickPageItems << buildPickPageItem(requisitionItem.modificationItem)
+            pickPageItems << buildPickPageItem(requisitionItem.modificationItem, stockMovementItem.sortOrder)
         } else {
             if (!requisitionItem.isCanceled()) {
-                pickPageItems << buildPickPageItem(requisitionItem)
+                pickPageItems << buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
             }
         }
         return pickPageItems
@@ -605,7 +609,7 @@ class StockMovementService {
      * @param requisitionItem
      * @return
      */
-    PickPageItem buildPickPageItem(RequisitionItem requisitionItem) {
+    PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
 
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
@@ -616,6 +620,7 @@ class StockMovementService {
         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         pickPageItem.availableItems = availableItems
         pickPageItem.suggestedItems = suggestedItems
+        pickPageItem.sortOrder = sortOrder
 
         return pickPageItem
     }
@@ -667,7 +672,7 @@ class StockMovementService {
         requisition.origin = stockMovement.origin
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
-        requisition.name = stockMovement.generateName();
+        requisition.name = stockMovement.generateName()
 
         addStockListItemsToRequisition(stockMovement, requisition)
         if (requisition.hasErrors() || !requisition.save(flush: true)) {
@@ -684,6 +689,7 @@ class StockMovementService {
                 RequisitionItem requisitionItem = new RequisitionItem()
                 requisitionItem.product = stocklistItem.product
                 requisitionItem.quantity = stocklistItem.quantity
+                requisitionItem.quantityApproved = stocklistItem.quantity
                 requisitionItem.orderIndex = stocklistItem.orderIndex
                 requisition.addToRequisitionItems(requisitionItem)
             }
@@ -702,7 +708,7 @@ class StockMovementService {
         if (stockMovement.description) requisition.description = stockMovement.description
         if (stockMovement.requestedBy) requisition.requestedBy = stockMovement.requestedBy
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
-        requisition.name = stockMovement.generateName()
+        requisition.name = RequisitionStatus.ISSUED == requisition.status ? stockMovement.name : stockMovement.generateName()
 
         if (forceUpdate) {
             removeRequisitionItems(requisition)
@@ -935,7 +941,7 @@ class StockMovementService {
         shipment.shipmentType = stockMovement.shipmentType?:ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         // Last step will be to update the generated name
-        shipment.name = stockMovement.generateName()
+        shipment.name = stockMovement.requisition.status == RequisitionStatus.ISSUED ? stockMovement.name : stockMovement.generateName()
 
         if(stockMovement.requisition.status == RequisitionStatus.ISSUED) {
             return shipment

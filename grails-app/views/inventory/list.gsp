@@ -21,15 +21,51 @@
                     <div class="button-container button-bar">
 
                         <div class="right">
-                            <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button icon arrowdown">Download as CSV</g:link>
+                            <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" style="vertical-align: middle"/>
+                                Download as CSV
+                            </g:link>
+
+
+                            <div class="button-group">
+                                <div id="columnChooser" class="action-menu">
+                                    <button class="action-btn button">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'text_columns.png')}" style="vertical-align: middle"/>
+                                        Toggle Columns
+                                    </button>
+                                    <div class="actions left" style="padding: 5px;">
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="0" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.status.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="1" class="toggle-visibility" checked="true"><warehouse:message code="product.productCode.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="2" class="toggle-visibility" checked="true"><warehouse:message code="product.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="3" class="toggle-visibility" checked="true"><warehouse:message code="product.genericProduct.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="4" class="toggle-visibility" checked="true"><warehouse:message code="category.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="5" class="toggle-visibility" checked="true"><warehouse:message code="product.manufacturer.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="6" class="toggle-visibility" checked="true"><warehouse:message code="product.vendor.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="7" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.binLocation.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="8" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="9" class="toggle-visibility" checked="true"><warehouse:message code="product.unitOfMeasure.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="10" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="11" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="12" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="13" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="14" class="toggle-visibility" checked="true"><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></label></div>
+                                        <div class="action-menu-item"><label><input type="checkbox" data-column="15" class="toggle-visibility" checked="true"><warehouse:message code="product.totalValue.label" default="Total Value"/></label></div>
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="button-group">
-                            <g:link class="button icon arrowleft" controller="dashboard"><warehouse:message code="inventory.backToDashboard.label"/></g:link>
+                            <g:link class="button" controller="dashboard">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'application.png')}" style="vertical-align: middle"/>
+                                <warehouse:message code="inventory.backToDashboard.label"/>
+                            </g:link>
                         </div>
                         <div class="button-group">
                             <div class="action-menu">
-                                <button class="action-btn button icon settings">
+                                <button class="action-btn button">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
                                     <warehouse:message code="inventory.${actionName}.label"/>
                                 </button>
                                 <div class="actions">
@@ -76,32 +112,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="button-group">
-                            <div id="columnChooser" class="action-menu">
-                                <button class="action-btn button icon add">
-                                    Toggle Columns
-                                </button>
-                                <div class="actions" style="padding: 5px;">
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="0" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.status.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="1" class="toggle-visibility" checked="true"><warehouse:message code="product.productCode.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="2" class="toggle-visibility" checked="true"><warehouse:message code="product.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="3" class="toggle-visibility" checked="true"><warehouse:message code="product.genericProduct.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="4" class="toggle-visibility" checked="true"><warehouse:message code="category.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="5" class="toggle-visibility" checked="true"><warehouse:message code="product.manufacturer.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="6" class="toggle-visibility" checked="true"><warehouse:message code="product.vendor.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="7" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.binLocation.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="8" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="9" class="toggle-visibility" checked="true"><warehouse:message code="product.unitOfMeasure.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="10" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="11" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="12" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="13" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="14" class="toggle-visibility" checked="true"><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></label></div>
-                                    <div class="action-menu-item"><label><input type="checkbox" data-column="15" class="toggle-visibility" checked="true"><warehouse:message code="product.totalValue.label" default="Total Value"/></label></div>
 
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <g:set var="totalStockValue" value="${0.00}"/>

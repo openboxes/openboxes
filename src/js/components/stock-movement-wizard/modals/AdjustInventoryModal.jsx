@@ -47,6 +47,9 @@ const FIELDS = {
         type: DateField,
         label: 'Expiry Date',
         fieldKey: 'inventoryItem.id',
+        attributes: {
+          autoComplete: 'off',
+        },
         getDynamicAttr: ({ fieldValue }) => ({
           dateFormat: 'MM/DD/YYYY',
           disabled: !!fieldValue,

@@ -6,7 +6,6 @@ import Dropzone from 'react-dropzone';
 import Alert from 'react-s-alert';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
-import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -38,7 +37,7 @@ const SHIPMENT_FIELDS = {
       }
       return <LabelField {...params} />;
     },
-    getDynamicAttr: ({ canBeEdited, hasStockList, onDestinationChange }) => {
+    getDynamicAttr: ({ canBeEdited, hasStockList }) => {
       if (canBeEdited && !hasStockList) {
         return {
           required: true,
@@ -49,7 +48,7 @@ const SHIPMENT_FIELDS = {
           loadOptions: debouncedLocationsFetch,
           cache: false,
           options: [],
-          onChange: value => (value ? onDestinationChange(value) : null),
+          filterOptions: options => options,
         };
       }
       return { formatValue: fieldValue => _.get(fieldValue, 'name') };
@@ -69,7 +68,13 @@ const SHIPMENT_FIELDS = {
   },
   name: {
     label: 'Shipment Name',
-    type: LabelField,
+    type: (params) => {
+      if (params.issued) {
+        return <TextField {...params} />;
+      }
+
+      return <LabelField {...params} />;
+    },
   },
 };
 
@@ -81,6 +86,7 @@ const FIELDS = {
       dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
       showTimeSelect: true,
+      autoComplete: 'off',
     },
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
@@ -93,9 +99,8 @@ const FIELDS = {
       required: true,
       showValueTooltip: true,
     },
-    getDynamicAttr: ({ shipmentTypes, issued }) => ({
+    getDynamicAttr: ({ shipmentTypes }) => ({
       options: shipmentTypes,
-      disabled: issued,
     }),
   },
   trackingNumber: {
@@ -151,33 +156,12 @@ class SendMovementPage extends Component {
     };
     this.props.showSpinner();
     this.onDrop = this.onDrop.bind(this);
-    this.onDestinationChange = this.onDestinationChange.bind(this);
-    this.saveNewDestination = this.saveNewDestination.bind(this);
   }
 
   componentDidMount() {
     this.props.showSpinner();
     this.fetchShipmentTypes();
     this.fetchStockMovementData();
-  }
-
-  onDestinationChange(value) {
-    if (this.state && value.id !== this.state.stockMovementData.destination.id) {
-      confirmAlert({
-        title: 'Confirm change',
-        message: 'Do you want to change destination?',
-        buttons: [
-          {
-            label: 'No',
-            onClick: () => this.fetchStockMovementData(),
-          },
-          {
-            label: 'Yes',
-            onClick: () => this.saveNewDestination(value),
-          },
-        ],
-      });
-    }
   }
 
   /**
@@ -193,16 +177,34 @@ class SendMovementPage extends Component {
     });
   }
 
-  saveNewDestination(value) {
+  onSave(values) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockMovements/${this.state.stockMovementData.id}`;
-    const payload = {
-      'destination.id': value.id,
+
+    let payload = {
+      dateShipped: values.dateShipped,
+      'shipmentType.id': values.shipmentType,
+      trackingNumber: values.trackingNumber || '',
+      driverName: values.driverName || '',
+      comments: values.comments || '',
     };
 
-    apiClient.post(url, payload)
-      .then(() => this.fetchStockMovementData())
-      .catch(this.props.hideSpinner());
+    if (values.statusCode === 'ISSUED') {
+      payload = {
+        'destination.id': values.destination.id,
+        name: values.name,
+        'shipmentType.id': values.shipmentType,
+      };
+    }
+
+    this.saveShipment(payload)
+      .then(() => {
+        this.props.hideSpinner();
+
+        if (values.statusCode === 'ISSUED') {
+          this.fetchStockMovementData();
+        }
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -258,7 +260,6 @@ class SendMovementPage extends Component {
         const documents = _.filter(associations.documents, doc => doc.stepNumber === 5);
         const destinationType = stockMovementData.destination.locationType;
         this.setState({
-          stockMovementData,
           tableItems,
           supplier,
           documents,
@@ -303,18 +304,11 @@ class SendMovementPage extends Component {
 
   /**
    * Saves data with shipment details.
-   * @param {object} values
+   * @param {object} payload
    * @public
    */
-  saveShipment(values) {
+  saveShipment(payload) {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
-    const payload = {
-      dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType,
-      trackingNumber: values.trackingNumber || '',
-      driverName: values.driverName || '',
-      comments: values.comments || '',
-    };
 
     return apiClient.post(url, payload);
   }
@@ -344,7 +338,16 @@ class SendMovementPage extends Component {
           .catch(() => Alert.error('Error occured during file upload!'));
       });
     }
-    this.saveShipment(values)
+
+    const payload = {
+      dateShipped: values.dateShipped,
+      'shipmentType.id': values.shipmentType,
+      trackingNumber: values.trackingNumber || '',
+      driverName: values.driverName || '',
+      comments: values.comments || '',
+    };
+
+    this.saveShipment(payload)
       .then(() => {
         this.stateTransitionToIssued()
           .then(() => {
@@ -374,8 +377,8 @@ class SendMovementPage extends Component {
                   {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
                       canBeEdited: values.statusCode === 'ISSUED' && values.shipmentStatus !== 'PARTIALLY_RECEIVED',
-                      hasStockList: !!values.stocklist,
-                      onDestinationChange: this.onDestinationChange,
+                      issued: values.statusCode === 'ISSUED',
+                      hasStockList: !!_.get(values.stocklist, 'id'),
                     }))}
                 </div>
                 <div className="print-buttons-container col-md-3 flex-grow-1">
@@ -416,9 +419,9 @@ class SendMovementPage extends Component {
               <hr />
               <button
                 type="button"
-                onClick={() => this.saveShipment(values)}
+                onClick={() => this.onSave(values)}
                 className="btn btn-outline-secondary float-right btn-form btn-xs"
-                disabled={invalid || values.statusCode === 'ISSUED'}
+                disabled={invalid}
               >
                 <span><i className="fa fa-save pr-2" />Save</span>
               </button>

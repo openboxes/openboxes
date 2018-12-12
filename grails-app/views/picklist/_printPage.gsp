@@ -26,7 +26,20 @@
                 </tr>
 
             </g:unless>
-            <g:each in="${requisitionItems.sort()}" status="i" var="requisitionItem">
+
+            <g:if test="${order == 'desc'}">
+                <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort() { a,b ->
+                    a.retrievePicklistItems()[0]?.binLocation?.name <=> b.retrievePicklistItems()[0]?.binLocation?.name }}"/>
+            </g:if>
+            <g:elseif test="${order == 'asc'}">
+                <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort() { a,b ->
+                    b.retrievePicklistItems()[0]?.binLocation?.name <=> a.retrievePicklistItems()[0]?.binLocation?.name }}"/>
+            </g:elseif>
+            <g:else>
+                <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort()}"/>
+            </g:else>
+
+            <g:each in="${sortedRequisitionItems}" status="i" var="requisitionItem">
 
                 <g:if test="${picklist}">
                     <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>

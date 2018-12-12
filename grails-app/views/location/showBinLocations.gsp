@@ -1,10 +1,16 @@
+
 <div class="buttonBar">
-    <button class="btnAddBinLocation button">
-        <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>
-    </button>
-    <button class="btnImportBinLocations button">
-        <g:message code="default.import.label" args="[g.message(code:'location.binLocations.label')]"/>
-    </button>
+    <div class="button-container">
+        <button id="btnAddBinLocation" class="button">
+            <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>
+        </button>
+        <button id="btnImportBinLocations" class="button">
+            <g:message code="default.import.label" args="[g.message(code:'location.binLocations.label')]"/>
+        </button>
+        <button id="btnExportBinLocations" class="button" data-href="${g.createLink(controller: 'location', action: 'exportBinLocations', id: params.id)}">
+            <g:message code="default.export.label" args="[g.message(code:'location.binLocations.label')]"/>
+        </button>
+    </div>
 </div>
 
 <div class="box">

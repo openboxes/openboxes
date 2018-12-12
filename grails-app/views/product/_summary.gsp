@@ -83,6 +83,10 @@
 							<img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
 							<warehouse:message code="inventory.showLotNumbers.label"/>
 						</g:link>
+						<g:link controller="stocklistManagement" action="index" id="${productInstance?.id}" class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}"/>&nbsp;
+							${warehouse.message(code: 'button.edit.label', default: 'Edit stock list', args:[warehouse.message(code:'requisitionTemplate.label')])}
+						</g:link>
 					</div>
                 </div>
             </td>

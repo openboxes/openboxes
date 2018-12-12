@@ -12,13 +12,6 @@ package org.pih.warehouse.requisition
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem;
-
-import grails.converters.JSON
-import grails.validation.ValidationException;
-
-import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product;
 
 class RequisitionTemplateController {
@@ -99,7 +92,7 @@ class RequisitionTemplateController {
             requisition.isPublished = true
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action:"list")
+                redirect(action: "edit", id: requisition.id)
             }
             else {
                 render(view: "edit", model: [requisition: requisition])
@@ -117,7 +110,7 @@ class RequisitionTemplateController {
             requisition.isPublished = false
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action:"list")
+                redirect(action: "edit", id: requisition.id)
             }
             else {
                 render(view: "edit", model: [requisition: requisition])
@@ -326,13 +319,18 @@ class RequisitionTemplateController {
                 "UOM" {it.unitOfMeasure}
             })
 
-            requisition.requisitionItems.each { requisitionItem ->
-                csv << [
-                        productCode: requisitionItem.product.productCode,
-                        productName:  StringEscapeUtils.escapeCsv(requisitionItem.product.name),
-                        quantity: requisitionItem.quantity,
-                        unitOfMeasure: "EA/1"
+            if (requisition.requisitionItems) {
+                requisition.requisitionItems.each { requisitionItem ->
+                    csv << [
+                            productCode  : requisitionItem.product.productCode,
+                            productName  : StringEscapeUtils.escapeCsv(requisitionItem.product.name),
+                            quantity     : requisitionItem.quantity,
+                            unitOfMeasure: "EA/1"
                     ]
+                }
+            }
+            else {
+                csv << [productCode:"", productName: "", quantity: "", unitOfMeasure: ""]
             }
 
             response.contentType = "text/csv"
@@ -384,15 +382,32 @@ class RequisitionTemplateController {
     }
 
     def importAsFile = {
-        def requisition = Requisition.get(params.id)
 
+        def skipLines = params.skipLines?:0
+        def delimiter = params.delimiter?:","
+        def requisition = Requisition.get(params.id)
+        def data = []
         if (requisition) {
             def file = request.getFile('file')
-            def lines = file.inputStream.toCsvReader().readAll()
 
-            println lines
-            render lines
+            if (!file) {
+                throw new IllegalArgumentException("Must specify a file")
+            }
+
+            file.inputStream.toCsvReader('separatorChar':delimiter,'skipLines':skipLines).eachLine { tokens ->
+                println "line: " + tokens + " delimiter=" + delimiter
+                println "ROW " + tokens
+                if (tokens) {
+                    data << tokens
+                }
+            }
+
+            log.info "Data: " + data
+
         }
+        session.data = data
+        render (view: "batch", model: [requisition:requisition,data:data])
+
     }
 
     def doImport = {

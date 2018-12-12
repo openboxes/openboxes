@@ -15,7 +15,7 @@ import AdjustInventoryModal from './modals/AdjustInventoryModal';
 import EditPickModal from './modals/EditPickModal';
 import { showSpinner, hideSpinner } from '../../actions';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
-import apiClient from '../../utils/apiClient';
+import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import ButtonField from '../form-elements/ButtonField';
 
 const FIELDS = {
@@ -88,7 +88,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, onResponse,
         }) => ({
-          fieldValue,
+          fieldValue: flattenRequest(fieldValue),
           subfield,
           stockMovementId,
           btnOpenText: fieldValue.hasChangedPick ? '' : 'Edit',
@@ -107,7 +107,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, onResponse, bins, locationId,
         }) => ({
-          fieldValue,
+          fieldValue: flattenRequest(fieldValue),
           subfield,
           stockMovementId,
           btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
@@ -124,7 +124,7 @@ const FIELDS = {
         fieldKey: '',
         buttonLabel: 'Undo',
         getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
-          onClick: fieldValue['requisitionItem.id'] ? () => revertUserPick(fieldValue['requisitionItem.id']) : () => null,
+          onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
           hidden: subfield || fieldValue.pickStatusCode === 'NOT_PICKED',
         }),
         attributes: {
@@ -146,12 +146,16 @@ class PickPage extends Component {
 
     this.state = {
       bins: [],
+      sorted: false,
+      order: '',
+      orderIcon: '',
       printPicksUrl: '',
       values: this.props.initialValues,
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
     this.saveNewItems = this.saveNewItems.bind(this);
+    this.sortByBins = this.sortByBins.bind(this);
     this.props.showSpinner();
   }
 
@@ -180,8 +184,10 @@ class PickPage extends Component {
         }, () => this.setState({
           values: {
             ...this.state.values,
-            pickPageItems: this.checkForInitialPicksChanges(pickPageItems),
+            pickPageItems: this.checkForInitialPicksChanges(parseResponse(pickPageItems)),
           },
+          sorted: false,
+          order: '',
         }, () => this.fetchBins()));
       })
       .catch(() => this.props.hideSpinner());
@@ -304,7 +310,7 @@ class PickPage extends Component {
     }, () => this.setState({
       values: {
         ...this.state.values,
-        pickPageItems: this.checkForInitialPicksChanges(pickPageItems),
+        pickPageItems: this.checkForInitialPicksChanges(parseResponse(pickPageItems)),
       },
     }));
   }
@@ -320,7 +326,7 @@ class PickPage extends Component {
     const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}`;
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
     const pickPageItemData = _.find(
-      this.state.values.pickPageItems,
+      flattenRequest(this.state.values.pickPageItems),
       item => item['requisitionItem.id'] === itemId,
     );
 
@@ -352,6 +358,52 @@ class PickPage extends Component {
     }).catch(() => { this.props.hideSpinner(); });
   }
 
+  sortByBins() {
+    let { sorted, order, orderIcon } = this.state;
+    let sortedValues;
+
+    switch (order) {
+      case '':
+        sorted = true;
+        order = 'desc';
+        orderIcon = 'fa-angle-up';
+        break;
+      case 'desc':
+        sorted = true;
+        order = 'asc';
+        orderIcon = 'fa-angle-down';
+        break;
+      case 'asc':
+        sorted = false;
+        order = '';
+        orderIcon = '';
+        break;
+      default:
+        break;
+    }
+
+    if (sorted) {
+      sortedValues = _.orderBy(this.state.values.pickPageItems, ['picklistItems[0].binLocation.name'], [order]);
+    } else {
+      sortedValues = _.orderBy(this.state.values.pickPageItems, ['sortOrder'], ['asc']);
+    }
+
+    this.setState({
+      values: {
+        ...this.state.values,
+        pickPageItems: [],
+      },
+    }, () => this.setState({
+      values: {
+        ...this.state.values,
+        pickPageItems: sortedValues,
+      },
+      sorted,
+      order,
+      orderIcon,
+    }));
+  }
+
   render() {
     return (
       <Form
@@ -362,7 +414,7 @@ class PickPage extends Component {
           <div className="d-flex flex-column">
             <span>
               <a
-                href={this.state.printPicksUrl}
+                href={`${this.state.printPicksUrl}${this.state.sorted ? `?order=${this.state.order}` : ''}`}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -372,9 +424,16 @@ class PickPage extends Component {
               <button
                 type="button"
                 onClick={() => this.refresh()}
-                className="float-right  mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
               >
                 <span><i className="fa fa-refresh pr-2" />Refresh</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.sortByBins()}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+              >
+                <span>Sort by bins{this.state.sorted && <i className={`fa ${this.state.orderIcon} pl-2`} />}</span>
               </button>
             </span>
             <form onSubmit={handleSubmit} className="print-mt">

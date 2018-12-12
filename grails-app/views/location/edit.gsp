@@ -492,7 +492,7 @@
             });
 
             // Add event handlers for buttons
-            $(".btnAddBinLocation").livequery("click", function(event) {
+            $("#btnAddBinLocation").livequery("click", function(event) {
                 event.preventDefault();
                 $("#dlgAddBinLocation").dialog('open');
             });
@@ -503,10 +503,16 @@
             });
 
             // Import Bin Locations
-            $(".btnImportBinLocations").livequery("click", function(event){
+            $("#btnImportBinLocations").livequery("click", function(event){
                 event.preventDefault();
                 $("#dlgImportBinLocations").dialog('open');
             });
+            $("#btnExportBinLocations").livequery("click", function(event){
+                var href = $(this).data("href");
+                window.location.href = href;
+                event.preventDefault();
+            });
+
 
             /*
             $('#bgColor').colorpicker({

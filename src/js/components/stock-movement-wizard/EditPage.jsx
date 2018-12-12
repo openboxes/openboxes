@@ -92,7 +92,7 @@ const FIELDS = {
       },
       quantityConsumed: {
         type: LabelField,
-        label: 'Monthly consumption',
+        label: 'Monthly stock list quantity',
         flexWidth: '1.35',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -314,6 +314,20 @@ class EditItemsPage extends Component {
   save(formValues) {
     this.props.showSpinner();
 
+    const errors = validate(formValues).editPageItems;
+
+    if (errors.length) {
+      const errorMessage = _.reduce(errors, (message, value, key) => {
+        const error = _.map(value, val => `${val}</br>`);
+        return `${message}Error occurred in line ${key + 1}:</br>${error}`;
+      }, '');
+
+      Alert.error(errorMessage);
+
+      this.props.hideSpinner();
+      return null;
+    }
+
     return this.reviseRequisitionItems(formValues)
       .then(() => {
         this.props.hideSpinner();
@@ -406,6 +420,7 @@ class EditItemsPage extends Component {
         ...this.state.values,
         editPageItems: _.map(editPageItems, item => ({
           ...item,
+          quantityAvailable: item.quantityAvailable || 0,
           substitutionItems: _.map(item.substitutionItems, sub => ({
             ...sub,
             requisitionItemId: item.requisitionItemId,

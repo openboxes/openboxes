@@ -20,13 +20,13 @@
             <th>
                 <warehouse:message code="requisition.isPublished.label"/>
             </th>
+            <th>
+                <warehouse:message code="default.name.label"/>
+            </th>
 			<g:sortableColumn property="type"
 				title="${warehouse.message(code: 'default.type.label', default: 'Type')}" />
             <g:sortableColumn property="type"
                 title="${warehouse.message(code: 'commodityClass.label', default: 'Commodity Class')}" />
-            <th>
-                <warehouse:message code="default.name.label"/>
-            </th>
             <th>
                 <warehouse:message code="requisition.origin.label"/>
             </th>
@@ -70,32 +70,28 @@
 				<td>			
 					<g:render template="/requisitionTemplate/actions" model="[requisition:requisition]"/>
 				</td>
-                <%--
-				<td>
-					<label class="status"><format:metadata obj="${requisition?.status}"/></label>
-				</td>
-				<td>
-					${requisition.requestNumber }
-				</td>
-				<td>
-					<g:link action="show" id="${requisition.id}">						
-						${fieldValue(bean: requisition, field: "name")}
-					</g:link>
-				</td>
-				--%>
                 <td>
-                    <span class="${(requisition?.isPublished)?'active':'inactive'}">
-                        <format:metadata obj="${requisition?.isPublished}"/>
-                    </span>
+                    <g:if test="${requisition.isPublished}">
+                        <div class="tag tag-alert">
+                            <warehouse:message code="default.published.label" default="Published"/>
+                        </div>
+                    </g:if>
+                    <g:else>
+                        <div class="tag tag-danger">
+                            <warehouse:message code="default.draft.label" default="Draft"/>
+                        </div>
+                    </g:else>
+                </td>
+                <td>
+                    <g:link action="edit" id="${requisition?.id}">
+                        <format:metadata obj="${requisition?.name}"/>
+                    </g:link>
                 </td>
 				<td>
 					<format:metadata obj="${requisition?.type}"/>
 				</td>
                 <td>
                     <format:metadata obj="${requisition?.commodityClass}"/>
-                </td>
-                <td>
-                    <format:metadata obj="${requisition?.name}"/>
                 </td>
                 <td>
                     <format:metadata obj="${requisition?.origin?.name}"/>

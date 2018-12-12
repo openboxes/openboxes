@@ -26,8 +26,8 @@ class StocklistItemApiController {
             throw new IllegalArgumentException("Must provide product.id as request parameter")
         }
 
-        List<StocklistLocation> stocklistLocations = stocklistItemService.getStocklistItemsGroupByLocation(productId)
-        render ([data:stocklistLocations] as JSON)
+        List<StocklistItem> stocklistItems = stocklistItemService.getStocklistItems(productId)
+        render ([data:stocklistItems] as JSON)
     }
 
     def read = {
@@ -74,5 +74,10 @@ class StocklistItemApiController {
         stocklistItemService.deleteStocklistItem(params.id)
 
         render status: 204
+    }
+
+    def availableStocklists = {
+        def availableStocklists = stocklistItemService.getAvailableStocklists()
+        render ([data:availableStocklists] as JSON)
     }
 }
