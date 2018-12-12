@@ -23,7 +23,7 @@ const LabelField = (props) => {
               <label htmlFor={attr.id} className="col-md-2 col-form-label col-form-label-xs text-right">{ FieldLabel }</label> :
               <FieldLabel />
           }
-        <div className="col-md-4 align-self-center font-size-xs">
+        <div className="col-md-4 align-self-center">
           <span {...otherAttr}>{formatValue ? formatValue(value) : value}</span>
         </div>
       </div>
