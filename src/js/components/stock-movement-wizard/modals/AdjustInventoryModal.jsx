@@ -201,7 +201,12 @@ class AdjustInventoryModal extends Component {
           hasBinLocationSupport: this.props.hasBinLocationSupport,
           productId: this.state.attr.fieldValue.productId,
         }}
-      />
+      >
+        <div>
+          <div className="font-weight-bold">Product Code: {this.state.attr.fieldValue.productCode}</div>
+          <div className="font-weight-bold">Product Name: {this.state.attr.fieldValue['product.name']} <hr /></div>
+        </div>
+      </ModalWrapper>
     );
   }
 }
