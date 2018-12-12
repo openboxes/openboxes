@@ -85,7 +85,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     User updatedBy
 
 
-    static transients = [ "type", "substitutionItems" ]
+    static transients = [ "type", "substitutionItems", "monthlyDemand"]
 	
 	static belongsTo = [ requisition: Requisition ]	
 	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
@@ -569,6 +569,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     def calculatePercentageRemaining() {
         return totalQuantity()?(totalQuantityRemaining()/totalQuantity())*100:0
     }
+
+    Integer getMonthlyDemand() {
+        return requisition?.replenishmentPeriod ? Math.ceil(((Double) quantity) / requisition.replenishmentPeriod * 30) : null
+    }
+
 
     def next() {
         def requisitionItems = requisition.requisitionItems as List

@@ -80,7 +80,17 @@
                                     <g:textField name="name" value="${requisition.name}" class="text large" size="80"/>
                                 </td>
                             </tr>
-
+                            <tr class="prop">
+                                <td class="name">
+                                    <label><warehouse:message
+                                            code="requisitionTemplate.requestedBy.label" /></label>
+                                </td>
+                                <td class="value">
+                                    <g:autoSuggest id="requestedBy" name="requestedBy" jsonUrl="${request.contextPath }/json/findPersonByName"
+                                                   valueId="${requisition?.requestedBy?.id}"
+                                                   valueName="${requisition?.requestedBy?.name}"/>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="origin.id">
@@ -106,6 +116,17 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name">
+                                    <label for="replenishmentPeriod">
+                                        <warehouse:message code="requisition.replenishmentPeriod.label" />
+                                        <small>(${warehouse.message(code:'requisitionTemplate.replenishmentPeriodUnit.label')})</small>
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:textField name="replenishmentPeriod" value="${requisition.replenishmentPeriod}" class="text large" size="80"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
                                     <label for="commodityClass">
                                         <warehouse:message code="requisition.commodityClass.label" />
                                     </label>
@@ -125,17 +146,6 @@
                                     <g:textArea name="description" rows="5" style="width: 100%"
                                                 placeholder="${warehouse.message(code:'requisition.description.message')}"
                                                 class="text">${requisition.description }</g:textArea>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message
-                                            code="requisitionTemplate.requestedBy.label" /></label>
-                                </td>
-                                <td class="value">
-                                    <g:autoSuggest id="requestedBy" name="requestedBy" jsonUrl="${request.contextPath }/json/findPersonByName"
-                                                   valueId="${requisition?.requestedBy?.id}"
-                                                   valueName="${requisition?.requestedBy?.name}"/>
                                 </td>
                             </tr>
                             <tr class="prop">

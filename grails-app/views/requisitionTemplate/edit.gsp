@@ -51,8 +51,9 @@
                             <th class="center"><warehouse:message code="product.productCode.label" default="#"/></th>
                             <th><warehouse:message code="product.label"/></th>
                             <th><warehouse:message code="category.label"/></th>
-                            <th class="center"><warehouse:message code="default.quantity.label"/></th>
+                            <th class="center"><warehouse:message code="requisitionTemplate.maxQuantity.label"/></th>
                             <th class="center"><warehouse:message code="unitOfMeasure.label"/></th>
+                            <th class="center"><warehouse:message code="requisitionTemplate.monthlyQuantity.label"/></th>
                             <th><warehouse:message code="default.actions.label"/></th>
                         </tr>
                         </thead>
@@ -62,16 +63,16 @@
                                 <td>
                                     <span class="sorthandle"></span>
                                 </td>
-                                <td class="center">
+                                <td class="center middle">
                                     ${requisitionItem?.product?.productCode}
                                 </td>
-                                <td>
+                                <td class="middle">
                                     <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
                                     <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
                                         ${requisitionItem?.product?.name}
                                     </g:link>
                                 </td>
-                                <td>
+                                <td class="middle">
                                     <format:metadata obj="${requisitionItem?.product?.category}"/>
                                 </td>
                                 <td class="center">
@@ -82,6 +83,16 @@
                                                            product="${requisitionItem?.product}"
                                                            class="chzn-select-deselect"
                                                            value="${requisitionItem?.productPackage?.id}"/>
+                                </td>
+                                <td class="center middle">
+                                    <g:if test="${requisitionItem?.requisition?.replenishmentPeriod}">
+                                        ${requisitionItem?.monthlyDemand}
+                                        ${requisitionItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+
+                                    </g:if>
+                                    <g:else>
+                                        <g:message code="requisitionTemplate.noReplenishmentPeriod.message"/>
+                                    </g:else>
                                 </td>
                                 <td>
                                     <g:link controller="requisitionTemplate" action="removeFromRequisitionItems" id="${requisition?.id}"
@@ -119,6 +130,7 @@
                                                    class="chzn-select-deselect"
                                                        from="['EA/1']"/>
                             </td>
+                            <td></td>
                             <td>
                                 <button class="button icon add" id="add-requisition-item">
                                     <warehouse:message code="default.button.add.label"/>
@@ -129,7 +141,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="7">
+                                <td colspan="8">
                                     <div class="buttons">
                                         <button class="button" name="save">
                                             ${warehouse.message(code:'default.button.save.label', default: 'Save') }

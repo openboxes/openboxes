@@ -53,7 +53,22 @@
                     <span id="requestedBy.id"> ${requisition?.requestedBy?.name }</span>
                 </td>
             </tr>
-
+            <tr class="prop">
+                <td class="name">
+                    <label><warehouse:message code="requisition.replenishmentPeriod.label" /></label>
+                </td>
+                <td class="value">
+                    <g:if test="${requisition?.replenishmentPeriod}">
+                        ${requisition?.replenishmentPeriod }
+                        ${warehouse.message(code:'requisitionTemplate.replenishmentPeriodUnit.label')}
+                    </g:if>
+                    <g:else>
+                        <span class="fade">
+                            ${warehouse.message(code:'default.none.label')}
+                        </span>
+                    </g:else>
+                </td>
+            </tr>
             <tr class="prop">
                 <td class="name"><label><warehouse:message
                         code="requisition.commodityClass.label" /></label></td>
