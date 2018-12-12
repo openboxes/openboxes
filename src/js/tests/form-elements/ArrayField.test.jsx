@@ -42,6 +42,8 @@ jest.mock('react-virtualized', () => ({
   formValueSelector: () => {},
 }));
 
+jest.mock('react-tippy');
+
 describe('ArrayField component is correctly rendering', () => {
   it('with Add button', () => {
     const fieldConfig = {

@@ -9,39 +9,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
   >
     <div
       className="d-flex flex-row border-bottom font-weight-bold py-1"
-    >
-      <div
-        className="mx-1 text-truncate font-size-xs"
-        style={
-          Object {
-            "flex": "12 1 0",
-            "minWidth": 0,
-          }
-        }
-      >
-        Name
-      </div>
-      <div
-        className="mx-1 text-truncate font-size-xs"
-        style={
-          Object {
-            "flex": "12 1 0",
-            "minWidth": 0,
-          }
-        }
-      >
-        Name
-      </div>
-      <div
-        className="mx-1 text-truncate font-size-xs"
-        style={
-          Object {
-            "flex": "12 1 0",
-            "minWidth": 0,
-          }
-        }
-      />
-    </div>
+    />
   </div>
   <div
     className="text-center border mb-1 flex-grow-1"
@@ -66,33 +34,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               "minWidth": 0,
             }
           }
-        >
-          <div
-            className=""
-            style={
-              Object {
-                "display": "inline",
-              }
-            }
-            tabIndex={undefined}
-            title={undefined}
-          >
-            <div
-              className="form-group mb-0   "
-            >
-              <input
-                className="form-control form-control-xs "
-                id="test-field[0].textField"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                type="text"
-                value={undefined}
-              />
-            </div>
-          </div>
-        </div>
+        />
         <div
           className="align-self-center mx-1"
           style={
@@ -101,33 +43,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               "minWidth": 0,
             }
           }
-        >
-          <div
-            className=""
-            style={
-              Object {
-                "display": "inline",
-              }
-            }
-            tabIndex={undefined}
-            title={undefined}
-          >
-            <div
-              className="form-group mb-0   "
-            >
-              <input
-                className="form-control form-control-xs "
-                id="test-field[0].textField2"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                type="text"
-                value={undefined}
-              />
-            </div>
-          </div>
-        </div>
+        />
         <div
           className="align-self-center mx-1"
           style={
@@ -161,33 +77,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               "minWidth": 0,
             }
           }
-        >
-          <div
-            className=""
-            style={
-              Object {
-                "display": "inline",
-              }
-            }
-            tabIndex={undefined}
-            title={undefined}
-          >
-            <div
-              className="form-group mb-0   "
-            >
-              <input
-                className="form-control form-control-xs "
-                id="test-field[1].textField"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                type="text"
-                value={undefined}
-              />
-            </div>
-          </div>
-        </div>
+        />
         <div
           className="align-self-center mx-1"
           style={
@@ -196,33 +86,7 @@ exports[`ArrayField component is correctly rendering with Add button 1`] = `
               "minWidth": 0,
             }
           }
-        >
-          <div
-            className=""
-            style={
-              Object {
-                "display": "inline",
-              }
-            }
-            tabIndex={undefined}
-            title={undefined}
-          >
-            <div
-              className="form-group mb-0   "
-            >
-              <input
-                className="form-control form-control-xs "
-                id="test-field[1].textField2"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                type="text"
-                value={undefined}
-              />
-            </div>
-          </div>
-        </div>
+        />
         <div
           className="align-self-center mx-1"
           style={
@@ -266,39 +130,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
   >
     <div
       className="d-flex flex-row border-bottom font-weight-bold py-1"
-    >
-      <div
-        className="mx-1 text-truncate font-size-xs"
-        style={
-          Object {
-            "flex": "12 1 0",
-            "minWidth": 0,
-          }
-        }
-      >
-        Name
-      </div>
-      <div
-        className="mx-1 text-truncate font-size-xs"
-        style={
-          Object {
-            "flex": "12 1 0",
-            "minWidth": 0,
-          }
-        }
-      >
-        Name
-      </div>
-      <div
-        className="mx-1 text-truncate font-size-xs"
-        style={
-          Object {
-            "flex": "12 1 0",
-            "minWidth": 0,
-          }
-        }
-      />
-    </div>
+    />
   </div>
   <div
     className="text-center border mb-1 flex-grow-1"
@@ -323,33 +155,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               "minWidth": 0,
             }
           }
-        >
-          <div
-            className=""
-            style={
-              Object {
-                "display": "inline",
-              }
-            }
-            tabIndex={undefined}
-            title={undefined}
-          >
-            <div
-              className="form-group mb-0   "
-            >
-              <input
-                className="form-control form-control-xs "
-                id="test-field[0].textField"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                type="text"
-                value={undefined}
-              />
-            </div>
-          </div>
-        </div>
+        />
         <div
           className="align-self-center mx-1"
           style={
@@ -358,33 +164,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               "minWidth": 0,
             }
           }
-        >
-          <div
-            className=""
-            style={
-              Object {
-                "display": "inline",
-              }
-            }
-            tabIndex={undefined}
-            title={undefined}
-          >
-            <div
-              className="form-group mb-0   "
-            >
-              <input
-                className="form-control form-control-xs "
-                id="test-field[0].textField2"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                type="text"
-                value={undefined}
-              />
-            </div>
-          </div>
-        </div>
+        />
         <div
           className="align-self-center mx-1"
           style={
@@ -418,33 +198,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               "minWidth": 0,
             }
           }
-        >
-          <div
-            className=""
-            style={
-              Object {
-                "display": "inline",
-              }
-            }
-            tabIndex={undefined}
-            title={undefined}
-          >
-            <div
-              className="form-group mb-0   "
-            >
-              <input
-                className="form-control form-control-xs "
-                id="test-field[1].textField"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                type="text"
-                value={undefined}
-              />
-            </div>
-          </div>
-        </div>
+        />
         <div
           className="align-self-center mx-1"
           style={
@@ -453,33 +207,7 @@ exports[`ArrayField component is correctly rendering with no Add button 1`] = `
               "minWidth": 0,
             }
           }
-        >
-          <div
-            className=""
-            style={
-              Object {
-                "display": "inline",
-              }
-            }
-            tabIndex={undefined}
-            title={undefined}
-          >
-            <div
-              className="form-group mb-0   "
-            >
-              <input
-                className="form-control form-control-xs "
-                id="test-field[1].textField2"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                type="text"
-                value={undefined}
-              />
-            </div>
-          </div>
-        </div>
+        />
         <div
           className="align-self-center mx-1"
           style={
