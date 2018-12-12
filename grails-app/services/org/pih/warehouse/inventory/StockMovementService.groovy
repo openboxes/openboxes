@@ -671,7 +671,7 @@ class StockMovementService {
         requisition.origin = stockMovement.origin
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
-        requisition.name = stockMovement.generateName();
+        requisition.name = stockMovement.generateName()
 
         addStockListItemsToRequisition(stockMovement, requisition)
         if (requisition.hasErrors() || !requisition.save(flush: true)) {
@@ -707,7 +707,7 @@ class StockMovementService {
         if (stockMovement.description) requisition.description = stockMovement.description
         if (stockMovement.requestedBy) requisition.requestedBy = stockMovement.requestedBy
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
-        requisition.name = stockMovement.generateName()
+        requisition.name = RequisitionStatus.ISSUED == requisition.status ? stockMovement.name : stockMovement.generateName()
 
         if (forceUpdate) {
             removeRequisitionItems(requisition)
@@ -940,7 +940,7 @@ class StockMovementService {
         shipment.shipmentType = stockMovement.shipmentType?:ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         // Last step will be to update the generated name
-        shipment.name = stockMovement.generateName()
+        shipment.name = stockMovement.requisition.status == RequisitionStatus.ISSUED ? stockMovement.name : stockMovement.generateName()
 
         if(stockMovement.requisition.status == RequisitionStatus.ISSUED) {
             return shipment
