@@ -67,6 +67,7 @@ const FIELDS = {
         label: 'Expiry',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
+          autoComplete: 'off',
         },
       },
       quantityShipped: {

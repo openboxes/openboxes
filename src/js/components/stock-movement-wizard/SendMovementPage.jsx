@@ -86,6 +86,7 @@ const FIELDS = {
       dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
       showTimeSelect: true,
+      autoComplete: 'off',
     },
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
