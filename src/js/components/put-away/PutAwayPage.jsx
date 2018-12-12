@@ -5,6 +5,7 @@ import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
+import { Translate } from 'react-localize-redux';
 
 import 'react-table/react-table.css';
 
@@ -86,38 +87,38 @@ class PutAwayPage extends Component {
    */
   getColumns = () => [
     {
-      Header: 'Code',
+      Header: <Translate id="stockMovement.code.label" />,
       accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Name',
+      Header: <Translate id="stockMovement.name.label" />,
       accessor: 'product.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Lot/Serial No.',
+      Header: <Translate id="stockMovement.lotSerialNo.label" />,
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Expiry',
+      Header: <Translate id="stockMovement.expiry.label" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Recipient',
+      Header: <Translate id="stockMovement.recipient.label" />,
       accessor: 'recipient.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Qty in receiving',
+      Header: <Translate id="putAway.qtyReceiving.label" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
       Filter,
     }, {
-      Header: 'Stock Movement',
+      Header: <Translate id="stockMovement.label" />,
       accessor: 'stockMovement.name',
       style: { whiteSpace: 'normal' },
       Expander: ({ row, isExpanded }) => (
@@ -375,21 +376,21 @@ class PutAwayPage extends Component {
         <h1>Put Away </h1>
         <div className="d-flex justify-content-between mb-2">
           <div>
-            Show by:
+            <Translate id="putAway.showBy.label" />:
             <button
               className="btn btn-primary ml-2 btn-xs"
               data-toggle="button"
               aria-pressed="false"
               onClick={toggleTree}
             >
-              {pivotBy && pivotBy.length ? 'Stock Movement' : 'Product'}
+              {pivotBy && pivotBy.length ? <Translate id="stockMovement.label" /> : <Translate id="product.label" /> }
             </button>
           </div>
           <div className="row bd-highlight">
-            <div className="mr-1">Lines in pending put-aways:</div>
+            <div className="mr-1"><Translate id="putAway.lines.label" />:</div>
             <div style={{ width: '150px' }}>
               <Select
-                options={[{ value: false, label: 'Exclude' }, { value: true, label: 'Include' }]}
+                options={[{ value: false, label: <Translate id="putAway.exclude.label" /> }, { value: true, label: <Translate id="putAway.include.label" /> }]}
                 onChange={val => this.filterPutAways(val)}
                 objectValue
                 initialValue={false}
@@ -403,7 +404,7 @@ class PutAwayPage extends Component {
             disabled={this.state.selection.size < 1}
             onClick={() => this.createPutAway()}
             className="btn btn-outline-primary btn-xs"
-          >Start Put-Away
+          ><Translate id="putAway.startPutAway.label" />
           </button>
         </div>
         {
@@ -457,10 +458,10 @@ class PutAwayPage extends Component {
         <div>
           <button
             type="button"
-            disabled={this.state.selection.size < 1}
+            // disabled={this.state.selection.size < 1}
             onClick={() => this.createPutAway()}
             className="btn btn-outline-primary float-right my-2 btn-xs"
-          >Start Put-Away
+          ><Translate id="putAway.startPutAway.label" />
           </button>
         </div>
       </div>

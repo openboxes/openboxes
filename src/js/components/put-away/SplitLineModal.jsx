@@ -5,6 +5,7 @@ import update from 'immutability-helper';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 import { confirmAlert } from 'react-confirm-alert';
+import { Translate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-tippy/dist/tippy.css';
@@ -41,14 +42,14 @@ class SplitLineModal extends Component {
 
     if (putAwayQty < this.props.putawayItem.quantity) {
       confirmAlert({
-        title: 'Confirm split line',
-        message: 'There is still stock in the receiving bin. Do you want to put away the rest of this line?',
+        title: 'message.confirmSplitLine.label',
+        message: 'confirmSplitLine.label',
         buttons: [
           {
-            label: 'Yes',
+            label: 'default.button.yes.label',
           },
           {
-            label: 'No',
+            label: 'default.button.no.label',
             onClick: () => this.save(),
           },
         ],
@@ -148,7 +149,7 @@ class SplitLineModal extends Component {
           type="button"
           className="btn btn-outline-success btn-xs"
           onClick={() => this.openModal()}
-        >Split line
+        ><Translate id="stockMovement.splitLine.label" />:
         </button>
         <Modal
           isOpen={this.state.showModal}
@@ -158,9 +159,9 @@ class SplitLineModal extends Component {
         >
           <div>
             <h3 className="font-weight-bold">{`${this.props.putawayItem.product.productCode} ${this.props.putawayItem.product.name}`}</h3>
-            <div className="font-weight-bold">Expiry: {this.props.putawayItem.inventoryItem.expirationDate}</div>
-            <div className="font-weight-bold">Total QTY: {this.props.putawayItem.quantity}</div>
-            <div className="font-weight-bold">Put away QTY: {this.calculatePutAwayQty()}</div>
+            <div className="font-weight-bold"><Translate id="stockMovement.expiry.label" />: {this.props.putawayItem.inventoryItem.expirationDate}</div>
+            <div className="font-weight-bold"><Translate id="putAway.totalQty.label" />: {this.props.putawayItem.quantity}</div>
+            <div className="font-weight-bold"><Translate id="putAway.putAwayQty.label" />: {this.calculatePutAwayQty()}</div>
           </div>
           <hr />
 
@@ -168,9 +169,9 @@ class SplitLineModal extends Component {
             <table className="table table-striped text-center border">
               <thead>
                 <tr>
-                  <th className="py-1">Put Away Bin</th>
-                  <th className="py-1">Quantity</th>
-                  <th className="py-1">Delete</th>
+                  <th className="py-1"><Translate id="putAway.putAwayBin.label" />:</th>
+                  <th className="py-1"><Translate id="stockMovement.quantity.label" />:</th>
+                  <th className="py-1"><Translate id="default.button.delete.label" />:</th>
                 </tr>
               </thead>
               <tbody>
@@ -198,7 +199,7 @@ class SplitLineModal extends Component {
                     <td className="py-1 align-middle">
                       <Tooltip
                         // eslint-disable-next-line max-len
-                        html={(<div>Sum of all split items quantities cannot be higher than original put-away item quantity</div>)}
+                        html={(<div><Translate id="putAway.sumOfAll.label" /></div>)}
                         disabled={this.isValid()}
                         theme="transparent"
                         arrow="true"
@@ -239,7 +240,7 @@ class SplitLineModal extends Component {
                             });
                           }
                         }}
-                      >Delete
+                      ><Translate id="default.button.delete.label" />
                       </button>
                     </td>
                   </tr>
@@ -262,7 +263,7 @@ class SplitLineModal extends Component {
                     }],
                   }),
                 })}
-            >Add Line
+            ><Translate id="default.button.addLine.label" />
             </button>
           </div>
 
@@ -273,13 +274,13 @@ class SplitLineModal extends Component {
               className="btn btn-outline-success btn-sm"
               disabled={!this.isValid() || !this.isBinSelected()}
               onClick={() => this.onSave()}
-            >Save
+            ><Translate id="default.button.save.label" />
             </button>
             <button
               type="button"
               className="btn btn-outline-secondary btn-sm"
               onClick={() => this.closeModal()}
-            >Cancel
+            ><Translate id="default.button.cancel.label" />
             </button>
           </div>
         </Modal>
