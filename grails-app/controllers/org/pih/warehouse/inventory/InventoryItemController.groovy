@@ -26,7 +26,7 @@ class InventoryItemController {
 	def shipmentService;
 	def requisitionService;
 	def orderService;
-	
+
 	
 	def index = { 
 		redirect(controller: "inventory", action: "browse")
@@ -330,10 +330,7 @@ class InventoryItemController {
 		// now populate the rest of the commmand object
 		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
 
-		def inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
-		def transactionEntries = inventoryItem ? TransactionEntry.findAllByInventoryItem(inventoryItem) : []
-
-		[ commandInstance: commandInstance, inventoryItem: inventoryItem, transactionEntries : transactionEntries  ]
+		[ commandInstance: commandInstance ]
 	}
 
 	/**

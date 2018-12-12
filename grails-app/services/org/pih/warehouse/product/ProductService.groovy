@@ -1205,4 +1205,60 @@ class ProductService {
 	}
 
 
+	/**
+	 * Get all products matching the given terms and categories.
+	 *
+	 * @param terms
+	 * @param categories
+	 * @return
+	 */
+	List<Product> searchProducts(String[] terms, List<Category> categories) {
+		def results = Product.createCriteria().list {
+
+			eq("active", true)
+			if (categories) {
+				inList("category", categories)
+			}
+
+			if (terms) {
+				terms.each { term ->
+					or {
+						ilike("name", "%" + term + "%")
+						ilike("productCode", "%" + term + "%")
+						ilike("description", "%" + term + "%")
+						ilike("brandName", "%" + term + "%")
+						ilike("manufacturer", "%" + term + "%")
+						ilike("manufacturerCode", "%" + term + "%")
+						ilike("manufacturerName", "%" + term + "%")
+						ilike("vendor", "%" + term + "%")
+						ilike("vendorCode", "%" + term + "%")
+						ilike("vendorName", "%" + term + "%")
+						ilike("upc", "%" + term + "%")
+						ilike("ndc", "%" + term + "%")
+						ilike("unitOfMeasure", "%" + term + "%")
+
+						productSuppliers {
+                            or {
+                                ilike("name", "%" + term + "%")
+                                ilike("code", "%" + term + "%")
+                                ilike("productCode", "%" + term + "%")
+                                ilike("manufacturerCode", "%" + term + "%")
+                                ilike("manufacturerName", "%" + term + "%")
+                                ilike("supplierCode", "%" + term + "%")
+                                ilike("supplierName", "%" + term + "%")
+                            }
+						}
+
+						inventoryItems {
+							ilike("lotNumber", "%" + term + "%")
+						}
+					}
+				}
+			}
+		}
+
+		return results;
+	}
+
+
 }
