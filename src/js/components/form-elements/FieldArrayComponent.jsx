@@ -1,6 +1,9 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Tooltip } from 'react-tippy';
+
+import 'react-tippy/dist/tippy.css';
 
 import TableBody from './TableBody';
 import TableBodyVirtualized from './TableBodyVirtualized';
@@ -33,15 +36,24 @@ class FieldArrayComponent extends Component {
         <div className="text-center border">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1">
             {_.map(fieldsConfig.fields, (config, name) => (
-              <div
-                key={name}
-                className="mx-1 text-truncate font-size-xs"
+              <Tooltip
+                html={(<div>{config.label}</div>)}
+                theme="transparent"
+                arrow="true"
+                delay="150"
                 style={{
                   flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
                   minWidth: 0,
                 }}
-              >{config.label}
-              </div>))}
+                duration="250"
+                hideDelay="50"
+              >
+                <div
+                  key={name}
+                  className="mx-1 text-truncate font-size-xs"
+                >{config.label}
+                </div>
+              </Tooltip>))}
           </div>
         </div>
         <div

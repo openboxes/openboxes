@@ -41,7 +41,7 @@ const FIELDS = {
       'product.name': {
         type: LabelField,
         label: 'Product Name',
-        flexWidth: '6',
+        flexWidth: '4.7',
         attributes: {
           className: 'text-left ml-1',
         },
@@ -100,7 +100,7 @@ const FIELDS = {
         label: 'Adjust Inventory',
         type: AdjustInventoryModal,
         fieldKey: '',
-        flexWidth: '1',
+        flexWidth: '1.3',
         attributes: {
           title: 'Adjust Inventory',
         },

@@ -47,7 +47,7 @@ const LabelField = (props) => {
           duration="250"
           hideDelay="50"
         >
-          <div {...otherAttr} className={className}>
+          <div {...otherAttr} className={`font-size-xs ${className}`}>
             {formattedValue}
           </div>
         </Tooltip>
