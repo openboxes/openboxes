@@ -5,12 +5,16 @@ import org.pih.warehouse.requisition.RequisitionItem
 class StocklistItem {
 
     RequisitionItem requisitionItem
+    Integer monthlyDemand
 
     String stocklistId
     Integer maxQuantity
 
     static StocklistItem createFromRequisitionItem(RequisitionItem requisitionItem) {
-        return new StocklistItem(requisitionItem: requisitionItem)
+        Integer replenishmentPeriod = requisitionItem?.requisition?.replenishmentPeriod
+        Integer monthlyDemand = replenishmentPeriod ? Math.ceil(((Double) requisitionItem.quantity) / replenishmentPeriod * 30) : null
+
+        return new StocklistItem(requisitionItem: requisitionItem, monthlyDemand: monthlyDemand)
     }
 
     Map toJson() {
@@ -26,7 +30,8 @@ class StocklistItem {
                 "manager.name": requisitionItem?.requisition?.requestedBy?.name,
                 uom: requisitionItem?.product?.unitOfMeasure,
                 maxQuantity: requisitionItem?.quantity,
-                replenishmentPeriod: null,
+                replenishmentPeriod: requisitionItem?.requisition?.replenishmentPeriod,
+                monthlyDemand: monthlyDemand,
         ]
     }
 }

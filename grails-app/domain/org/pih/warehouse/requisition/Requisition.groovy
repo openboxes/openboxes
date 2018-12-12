@@ -114,6 +114,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
     String monthRequested
     //String yearRequested
 
+    Integer replenishmentPeriod = 0
+
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
     static transients = ["sortedStocklistItems"]
@@ -180,6 +182,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         isPublished(nullable: true)
         datePublished(nullable: true)
         requisitionTemplate(nullable:true)
+        replenishmentPeriod(nullable:true)
     }
 
     List<Shipment> getShipments() {
