@@ -382,14 +382,17 @@ class SendMovementPage extends Component {
                     }))}
                 </div>
                 <div className="print-buttons-container col-md-3 flex-grow-1">
-                  {this.state.documents.length && _.map(this.state.documents, (document, idx) => (
-                    <DocumentButton
+                  {this.state.documents.length && _.map(this.state.documents, (document, idx) => {
+                    if (document.hidden) {
+                      return null;
+                    }
+                    return (<DocumentButton
                       link={document.uri}
                       buttonTitle={document.name}
                       {...document}
                       key={idx}
-                    />
-                  ))}
+                    />);
+                  })}
                   <div className="dropzone btn btn-outline-secondary">
                     <Dropzone
                       disabled={values.statusCode === 'ISSUED'}
