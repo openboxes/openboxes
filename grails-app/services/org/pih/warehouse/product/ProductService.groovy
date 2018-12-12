@@ -1213,7 +1213,6 @@ class ProductService {
 	 * @return
 	 */
 	List<Product> searchProducts(String[] terms, List<Category> categories) {
-		def startTime = System.currentTimeMillis()
 		def results = Product.createCriteria().list {
 
 			eq("active", true)
@@ -1239,13 +1238,15 @@ class ProductService {
 						ilike("unitOfMeasure", "%" + term + "%")
 
 						productSuppliers {
-							ilike("name", "%" + term + "%")
-							ilike("code", "%" + term + "%")
-							ilike("productCode", "%" + term + "%")
-							ilike("manufacturerCode", "%" + term + "%")
-							ilike("manufacturerName", "%" + term + "%")
-							ilike("supplierCode", "%" + term + "%")
-							ilike("supplierName", "%" + term + "%")
+                            or {
+                                ilike("name", "%" + term + "%")
+                                ilike("code", "%" + term + "%")
+                                ilike("productCode", "%" + term + "%")
+                                ilike("manufacturerCode", "%" + term + "%")
+                                ilike("manufacturerName", "%" + term + "%")
+                                ilike("supplierCode", "%" + term + "%")
+                                ilike("supplierName", "%" + term + "%")
+                            }
 						}
 
 						inventoryItems {
@@ -1254,11 +1255,7 @@ class ProductService {
 					}
 				}
 			}
-
-			//order("name", "asc")
 		}
-		log.info "Results: " + results
-		log.info "Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 
 		return results;
 	}

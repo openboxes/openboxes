@@ -1169,18 +1169,21 @@ class JsonController {
         // Get all products that match terms
         def products = productService.searchProducts(terms, [])
 
+        products = products.unique()
+
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
         def quantityMap = products ? getQuantityByProductMapCached(location, products) : [:]
 
 //        if (terms) {
 //            products = products.sort() {
 //                a, b ->
-//                    (terms.any { a?.productCode?.contains(it) } ? a?.productCode : null) <=> (terms.any { b?.productCode.contains(it) } ? b?.productCode : null) ?:
-//                            (terms.any { a?.name.contains(it) } ? a?.name : null) <=> (terms.any { b?.name.contains(it) } ? b?.name : null) ?:
-//                                    (terms.any { a?.manufacturerCode?.contains(it) } ? a?.manufacturerCode : null) <=> (terms.any { b?.manufacturerCode?.contains(it) } ? b?.manufacturerCode : null) ?:
-//                                            (terms.any { a?.vendorCode?.contains(it) } ? a?.vendorCode : null) <=> (terms.any { b?.vendorCode?.contains(it) } ? b?.vendorCode : null)
+//                    (terms.any { a?.name.contains(it) ? a.name : null }) <=> (terms.any { b?.name.contains(it) ? b.name : null }) ?:
+//                        (terms.any { a?.productCode?.contains(it) ? a.productCode : null }) <=> (terms.any { b?.productCode.contains(it) ? b.productCode : null }) ?:
+//                            (terms.any { a?.manufacturerCode?.contains(it) }) <=> (terms.any { b?.manufacturerCode?.contains(it) }) ?:
+//                                (terms.any { a?.vendorCode?.contains(it) }) <=> (terms.any { b?.vendorCode?.contains(it) }) ?:
+//                                    (terms.any { a?.productSuppliers*.manufacturerCode?.contains(it) }) <=> (terms.any { b?.productSuppliers*.manufacturerCode?.contains(it) })
 //            }
-//            products = products.reverse()
+//            //products = products.reverse()
 //        }
 
         def items = []
