@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.order
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.*
 
 class Order implements Serializable {
@@ -133,5 +134,17 @@ class Order implements Serializable {
 		def totalPrice = orderItems.collect { it.totalPrice() }.sum();
 		return totalPrice ?: 0
 	}
-	
+
+
+	String generateName() {
+		final String separator =
+				ConfigurationHolder.config.openboxes.generateName.separator?: Constants.DEFAULT_NAME_SEPARATOR
+
+		String name = "${orderNumber}"
+		if (dateCompleted) name += "${separator}${dateCompleted?.format("MMMMM d, yyyy")}"
+		if (completedBy) name += "${separator}${completedBy.name}"
+		return name
+	}
+
+
 }

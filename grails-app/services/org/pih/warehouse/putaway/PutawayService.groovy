@@ -128,18 +128,25 @@ class PutawayService {
         }
 
         order.orderTypeCode = OrderTypeCode.TRANSFER_ORDER
-        order.description = "Putaway ${putaway.putawayNumber}"
-        order.orderNumber = putaway.putawayNumber
-        order.orderedBy = putaway.putawayAssignee
-        order.completedBy = putaway.putawayAssignee
-        order.dateOrdered = putaway.putawayDate?:new Date()
         order.status = OrderStatus.valueOf(putaway.putawayStatus.toString())
+        order.orderNumber = "P-${putaway.putawayNumber}"
+        order.orderedBy = putaway.putawayAssignee
+        order.dateOrdered = new Date()
         order.origin = putaway.origin
         order.destination = putaway.destination
 
+        // Set auditing data on completion
+        if (putaway.putawayStatus == PutawayStatus.COMPLETED) {
+            order.completedBy = putaway.putawayAssignee
+            order.dateCompleted = new Date()
+        }
+
+        // Generate name
+        order.name = order.generateName()
+
         putaway.putawayItems.toArray().each { PutawayItem putawayItem ->
 
-            OrderItem orderItem = null
+            OrderItem orderItem
             if (putawayItem.id) {
                 orderItem = order.orderItems?.find { it.id == putawayItem.id }
             }
@@ -152,7 +159,7 @@ class PutawayService {
             orderItem = updateOrderItem(putawayItem, orderItem)
 
             putawayItem.splitItems.each { PutawayItem splitItem ->
-                OrderItem childOrderItem = null
+                OrderItem childOrderItem
                 if (splitItem.id) {
                     childOrderItem = order.orderItems?.find { it.id == splitItem.id }
                 }
