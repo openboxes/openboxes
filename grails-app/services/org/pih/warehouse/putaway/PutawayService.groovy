@@ -64,6 +64,26 @@ class PutawayService {
                 putawayItems.addAll(putawayItemsTemp)
             }
         }
+
+        List<PutawayItem> pendingPutawayItems = getPendingItems(location)
+
+        putawayItems.removeAll { PutawayItem item -> pendingPutawayItems.find {
+            item.currentLocation?.id == it.currentLocation?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
+                    item.product?.id == it.product?.id
+        }}
+
+        putawayItems.addAll(pendingPutawayItems)
+
+        return putawayItems
+    }
+
+    List<PutawayItem> getPendingItems(Location location) {
+        List<Order> orders = Order.findAllByOriginAndOrderTypeCode(location, OrderTypeCode.TRANSFER_ORDER)
+        List<Putaway> putaways = orders.collect { Putaway.createFromOrder(it) }
+        List<PutawayItem> putawayItems = []
+
+        putaways.each { putawayItems.addAll(it.putawayItems.findAll { it.putawayStatus == PutawayStatus.PENDING }) }
+
         return putawayItems
     }
 
