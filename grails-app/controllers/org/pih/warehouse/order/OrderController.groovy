@@ -160,7 +160,7 @@ class OrderController {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             try {
-                orderInstance.delete(flush: true)
+				orderService.deleteOrder(orderInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
                 redirect(action: "list")
             }

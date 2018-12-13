@@ -2739,11 +2739,22 @@ class InventoryService implements ApplicationContextAware {
 		LocalTransfer transfer = getLocalTransfer(transaction)
 		if (transfer) {
 			transfer.delete(flush: true)
+
+		}
+	}
+
+	void deleteTransaction(Transaction transactionInstance) {
+		if (isLocalTransfer(transactionInstance)) {
+			deleteLocalTransfer(transactionInstance)
+		}
+		else {
+			transactionInstance.delete(flush: true)
 		}
 	}
 
 
-    Boolean saveLocalTransfer(Transaction baseTransaction) {
+
+	Boolean saveLocalTransfer(Transaction baseTransaction) {
         return saveLocalTransfer(baseTransaction, null)
     }
 

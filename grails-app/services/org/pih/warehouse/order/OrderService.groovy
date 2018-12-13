@@ -353,7 +353,7 @@ class OrderService {
      *
      * @param orderInstance
      */
-    public void rollbackOrderStatus(String orderId) {
+    void rollbackOrderStatus(String orderId) {
 
 		Order orderInstance = Order.get(orderId)
 		if (!orderInstance) {
@@ -363,7 +363,7 @@ class OrderService {
 		try {
 
             if (orderInstance.status == OrderStatus.RECEIVED || orderInstance.status == OrderStatus.PARTIALLY_RECEIVED) {
-                orderInstance?.listShipments().each { shipmentInstance ->
+                orderInstance?.listShipments().each { Shipment shipmentInstance ->
                     if (shipmentInstance) {
 
                         def transactions = Transaction.findAllByIncomingShipment(shipmentInstance)
@@ -406,6 +406,10 @@ class OrderService {
                 }
                 orderInstance.status = OrderStatus.PLACED
             }
+			else if (orderInstance?.status == OrderStatus.COMPLETED) {
+				deleteTransactions(orderInstance)
+				orderInstance.status = OrderStatus.PENDING
+			}
             else if (orderInstance.status == OrderStatus.PLACED) {
                 orderInstance?.status = OrderStatus.PENDING
             }
@@ -416,6 +420,22 @@ class OrderService {
             throw new RuntimeException("Failed to rollback order status for order ${orderId}" + e.message, e)
         }
     }
+
+
+	void deleteOrder(Order orderInstance) {
+		deleteTransactions(orderInstance)
+		orderInstance.delete(flush: true)
+	}
+
+	void deleteTransactions(Order orderInstance) {
+		Set<Transaction> transactions = Transaction.findAllByOrder(orderInstance)
+		if (transactions) {
+			transactions.toArray().each { Transaction transaction ->
+				inventoryService.deleteLocalTransfer(transaction)
+			}
+		}
+	}
+
 
     /**
      * Import the order items into the order represented by the given order ID.
