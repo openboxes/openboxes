@@ -116,7 +116,7 @@
                                 </g:link>
                             </div>
                             <g:if test="${incomingOrders}">
-                                <h3><warehouse:message code="default.list.label" args="[warehouse.message(code: 'purchaseOrders.label')]" /></h3>
+                                <h3><warehouse:message code="order.listByStatus.label" default="List Order by Status" /></h3>
                                 <g:each in="${incomingOrders}" var="orderStatusRow">
                                     <div class="mm-menu-item">
                                         <g:link controller="order" action="list" params="[status:orderStatusRow[0]]" class="order-status-${orderStatusRow[0] }">
@@ -125,7 +125,7 @@
                                     </div>
                                 </g:each>
                             </g:if>
-                            <h3><warehouse:message code="default.list.label" args="[warehouse.message(code: 'orders.label')]" /></h3>
+                            <h3><warehouse:message code="order.listByType.label" default="List Orders by Type" /></h3>
                             <g:each var="orderTypeCode" in="${OrderTypeCode?.list()}">
                                 <div class="mm-menu-item">
                                     <div class="indent">
