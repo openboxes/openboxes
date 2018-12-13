@@ -137,11 +137,14 @@
 
     </g:if>
     <g:elseif test="${orderInstance?.orderTypeCode==OrderTypeCode.TRANSFER_ORDER}">
-        <div class="button-group">
-            <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
-                <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
-                <warehouse:message code="order.generatePdf.label" default="Generate PDF"/>
-            </g:link>
+        <div class="right">
+
+            <div class="button-group">
+                <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
+                    <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
+                    <warehouse:message code="putaway.generatePutawayList.label" default="Generate Putaway List"/>
+                </g:link>
+            </div>
         </div>
     </g:elseif>
 

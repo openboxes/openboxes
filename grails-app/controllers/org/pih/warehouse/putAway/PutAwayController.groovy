@@ -43,7 +43,7 @@ class PutAwayController {
 		renderPdf(
 				template: "/putAway/print",
 				model: [jsonObject:jsonObject],
-				filename: "Putaway Order ${putaway?.putawayNumber}"
+				filename: "Putaway ${putaway?.putawayNumber}"
 		)
 	}
 }
