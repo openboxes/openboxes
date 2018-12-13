@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.order.OrderStatus" %>
 
 <div id="order-summary" class="summary">
 	<g:if test="${orderInstance?.id}">
@@ -63,7 +64,7 @@
                 <warehouse:message code="order.wizard.createOrder.label" default="Create purchase order"/>
             </g:else>
         </g:link>
-        <g:if test="${orderInstance?.orderTypeCode == org.pih.warehouse.order.OrderTypeCode.PURCHASE_ORDER}">
+        <g:if test="${orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
             <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="enterOrderDetails" params="[skipTo:'details']" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                 <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
@@ -73,6 +74,13 @@
                 <warehouse:message code="order.wizard.addItems.label" default="Add line items"/>
             </g:link>
         </g:if>
+        <g:elseif test="${orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
+            <g:set var="disabled" value="${orderInstance?.status in [OrderStatus.COMPLETED, OrderStatus.CANCELED]}"/>
+            <g:link controller="putAway" action="create" id="${orderInstance?.id}" class="button" disabled="${disabled}" disabledMessage="This feature is not available for completed and canceled putaways">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="default.edit.label" args="[warehouse.message(code:'putawayOrder.label')]"/>
+            </g:link>
+        </g:elseif>
     </div>
     <div class="button-group">
         <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
