@@ -1,4 +1,6 @@
-<%@page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.core.ActivityCode"%>
+<%@page import="org.pih.warehouse.core.ActivityCode"%>
+<%@page import="org.pih.warehouse.order.OrderTypeCode"%>
+<%@page import="org.pih.warehouse.requisition.RequisitionStatus"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
 <ul class="megamenu">
 
@@ -103,24 +105,38 @@
                     <warehouse:message code="orders.label"/>
                 </a>
                 <div class="mm-item-content">
-                    <div class="mm-menu-item">
-                        <g:link controller="purchaseOrderWorkflow" action="index" class="create">
-                            <warehouse:message code="order.create.label"/>
-                        </g:link>
-                    </div>
-                    <hr/>
-                    <div class="mm-menu-item">
-                        <g:link controller="order" action="list" params="[orderTypeCode:'PURCHASE_ORDER']" class="list">
-                            <warehouse:message code="orders.label"/>
-                        </g:link>
-                    </div>
-                    <g:each in="${incomingOrders}" var="orderStatusRow">
-                        <div class="mm-menu-item">
-                            <g:link controller="order" action="list" params="[status:orderStatusRow[0]]" class="order-status-${orderStatusRow[0] }">
-                                <format:metadata obj="${orderStatusRow[0]}"/> (${orderStatusRow[1]})
-                            </g:link>
+                    <div class="mm-content-base">
+
+                        <div class="mm-content-section">
+
+                            <h3><warehouse:message code="default.create.label" args="[warehouse.message(code: 'purchaseOrder.label')]" /></h3>
+                            <div class="mm-menu-item">
+                                <g:link controller="purchaseOrderWorkflow" action="index" class="create">
+                                    <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
+                                </g:link>
+                            </div>
+                            <g:if test="${incomingOrders}">
+                                <h3><warehouse:message code="order.listByStatus.label" default="List Order by Status" /></h3>
+                                <g:each in="${incomingOrders}" var="orderStatusRow">
+                                    <div class="mm-menu-item">
+                                        <g:link controller="order" action="list" params="[status:orderStatusRow[0]]" class="order-status-${orderStatusRow[0] }">
+                                            <format:metadata obj="${orderStatusRow[0]}"/> (${orderStatusRow[1]})
+                                        </g:link>
+                                    </div>
+                                </g:each>
+                            </g:if>
+                            <h3><warehouse:message code="order.listByType.label" default="List Orders by Type" /></h3>
+                            <g:each var="orderTypeCode" in="${OrderTypeCode?.list()}">
+                                <div class="mm-menu-item">
+                                    <div class="indent">
+                                        <g:link controller="order" action="list" params="[orderTypeCode:orderTypeCode]" class="list">
+                                            <format:metadata obj="${orderTypeCode}"/>
+                                        </g:link>
+                                    </div>
+                                </div>
+                            </g:each>
                         </div>
-                    </g:each>
+                    </div>
                 </div>
             </li>
         </g:authorize>
@@ -430,7 +446,7 @@
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="products.label" />
                 </a>
-                <div class="mm_dropdown mm-item-content" style="min-width: 200px;">
+                <div class="mm-item-content" style="min-width: 200px;">
 
                     <div class="mm-content-section">
                         <%--
@@ -560,7 +576,7 @@
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="configuration.label" default="Configuration" />
                 </a>
-                <div class="mm_dropdown mm-item-content" style="min-width: 200px;">
+                <div class="mm-item-content" style="min-width: 200px;">
                     <div class="mm-content-base">
                         <div class="mm-content-section">
                             <h3><warehouse:message code="admin.label" default="Admin" /></h3>

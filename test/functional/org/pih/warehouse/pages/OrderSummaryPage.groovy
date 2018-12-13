@@ -12,7 +12,7 @@ class OrderSummaryPage extends Page {
         placeOrderButton(to: OrderSummaryPage) { $("button", name:"placeOrder")}
         orderActionButton { $("button", class:"action-btn") }
         receiverOrderActionButton { $("[name='receiveOrderLink']") }
-        description { $("#order-description").text()}
+        name { $("#order-name").text()}
         origin { $("#order-origin").text()}
         destination { $("#order-destination").text()}
         productInfirstItem { $("tr.order-item").first().find("td.order-item-product").text()}

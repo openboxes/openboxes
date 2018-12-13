@@ -1231,12 +1231,8 @@ class InventoryController {
 		
 		if (transactionInstance) {
 			try {
-				if (inventoryService.isLocalTransfer(transactionInstance)) {
-					inventoryService.deleteLocalTransfer(transactionInstance)
-				}
-				else {
-					transactionInstance.delete(flush: true)
-				}
+
+                inventoryService.deleteTransaction(transactionInstance)
 				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'transaction.label', default: 'Transaction'), params.id])}"
 				redirect(action: "listTransactions")
 			}

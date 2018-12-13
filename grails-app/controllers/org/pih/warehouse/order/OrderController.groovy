@@ -160,7 +160,7 @@ class OrderController {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             try {
-                orderInstance.delete(flush: true)
+				orderService.deleteOrder(orderInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
                 redirect(action: "list")
             }
@@ -432,10 +432,10 @@ class OrderController {
 		else {
 
 			def date = new Date();
-			response.setHeader("Content-disposition", "attachment; filename=\"PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv\"")
+			response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance?.orderNumber?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv\"")
 			response.contentType = "text/csv"
 			def csv = "PO Number,${orderInstance?.orderNumber}\n" +
-					"Description,${StringEscapeUtils.escapeCsv(orderInstance?.description)}\n" +
+					"Description,${StringEscapeUtils.escapeCsv(orderInstance?.name)}\n" +
 					"Vendor,${StringEscapeUtils.escapeCsv(orderInstance?.origin.name)}\n" +
 					"Ship to,${orderInstance?.destination?.name}\n" +
 					"Ordered by,${orderInstance?.orderedBy?.name} ${orderInstance?.orderedBy?.email}\n" +
@@ -487,7 +487,7 @@ class OrderController {
 		else {
 
 			def date = new Date();
-			response.setHeader("Content-disposition", "attachment; filename='\"PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv\"")
+			response.setHeader("Content-disposition", "attachment; filename='\"${orderInstance.orderNumber}-${date.format("MM-dd-yyyy")}.csv\"")
 			response.contentType = "text/csv"
 			def csv = ""
 

@@ -29,7 +29,7 @@
 									<th>${warehouse.message(code: 'default.actions.label')}</th>
 									<th>${warehouse.message(code: 'default.status.label')}</th>
 									<th>${warehouse.message(code: 'order.orderNumber.label')}</th>
-									<th>${warehouse.message(code: 'default.description.label')}</th>
+									<th>${warehouse.message(code: 'default.name.label')}</th>
 									<th>${warehouse.message(code: 'order.origin.label')}</th>
 									<th>${warehouse.message(code: 'order.destination.label')}</th>
                                     <th>${warehouse.message(code: 'order.orderedBy.label')}</th>
@@ -68,7 +68,7 @@
 										</td>
 										<td class="middle">
 											<g:link action="show" id="${orderInstance.id}">
-												${fieldValue(bean: orderInstance, field: "description")}
+												${fieldValue(bean: orderInstance, field: "name")}
 											</g:link>
 										</td>
 										<td class="middle">

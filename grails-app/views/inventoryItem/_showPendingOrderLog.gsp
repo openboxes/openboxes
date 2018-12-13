@@ -45,7 +45,7 @@
 									</td>
 									<td>
 										<g:link controller="order" action="show" id="${order?.id }">
-											${order?.description }
+											${order?.name }
 										</g:link>
 									</td>
 									<td>	

@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.order.OrderStatus" %>
 
 <div id="order-summary" class="summary">
 	<g:if test="${orderInstance?.id}">
@@ -14,7 +15,7 @@
                         <div class="title">
                             <small>${orderInstance?.orderNumber}</small>
                             <g:link controller="order" action="show" id="${orderInstance?.id}">
-                                ${orderInstance?.description}</g:link>
+                                ${orderInstance?.name}</g:link>
 						</div>
                     </td>
                     <td class="top right" width="1%">
@@ -33,8 +34,8 @@
 				<tr>
 					<td>
 						<div class="title">
-                            <g:if test="${orderInstance?.description}">
-                                ${orderInstance?.description }
+                            <g:if test="${orderInstance?.name}">
+                                ${orderInstance?.name }
                             </g:if>
                             <g:else>
                                 <warehouse:message code="order.untitled.label"/>
@@ -63,28 +64,36 @@
                 <warehouse:message code="order.wizard.createOrder.label" default="Create purchase order"/>
             </g:else>
         </g:link>
-
-        <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="enterOrderDetails" params="[skipTo:'details']" class="button">
-            <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
-            <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
-        </g:link>
-
-        <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
-            <img src="${resource(dir: 'images/icons/silk', file: 'cart_put.png')}" />&nbsp;
-            <warehouse:message code="order.wizard.addItems.label" default="Add line items"/>
-        </g:link>
+        <g:if test="${orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+            <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="enterOrderDetails" params="[skipTo:'details']" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
+            </g:link>
+            <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_put.png')}" />&nbsp;
+                <warehouse:message code="order.wizard.addItems.label" default="Add line items"/>
+            </g:link>
+        </g:if>
+        <g:elseif test="${orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
+            <g:set var="disabled" value="${orderInstance?.status in [OrderStatus.COMPLETED, OrderStatus.CANCELED]}"/>
+            <g:link controller="putAway" action="create" id="${orderInstance?.id}" class="button" disabled="${disabled}" disabledMessage="This feature is not available for completed and canceled putaways">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="default.edit.label" args="[warehouse.message(code:'putawayOrder.label')]"/>
+            </g:link>
+        </g:elseif>
+    </div>
+    <div class="button-group">
         <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
             <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
         </g:link>
-
         <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
             <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
         </g:link>
     </div>
 
-    <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}"
+    <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
         <div class="button-group">
 
             <g:if test="${!orderInstance?.isPlaced()}">
@@ -128,11 +137,14 @@
 
     </g:if>
     <g:elseif test="${orderInstance?.orderTypeCode==OrderTypeCode.TRANSFER_ORDER}">
-        <div class="button-group">
-            <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
-                <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" />&nbsp;
-                <warehouse:message code="order.generatePdf.label" default="Generate PDF"/>
-            </g:link>
+        <div class="right">
+
+            <div class="button-group">
+                <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
+                    <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
+                    <warehouse:message code="putaway.generatePutawayList.label" default="Generate Putaway List"/>
+                </g:link>
+            </div>
         </div>
     </g:elseif>
 

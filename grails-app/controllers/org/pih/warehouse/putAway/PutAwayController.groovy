@@ -28,23 +28,22 @@ class PutAwayController {
 	def generatePdf = {
         log.info "Params " + params
 
-        JSONObject jsonObject = null
+        Putaway putaway
+        JSONObject jsonObject
 
         if (request.method == "POST") {
             jsonObject = request.JSON
         }
-
 		else if (params.id) {
 			Order order = Order.get(params.id)
-			Putaway putaway = Putaway.createFromOrder(order)
+			putaway = Putaway.createFromOrder(order)
 			jsonObject = new JSONObject(putaway.toJson())
 		}
-
 
 		renderPdf(
 				template: "/putAway/print",
 				model: [jsonObject:jsonObject],
-				filename: "Putaway"
+				filename: "Putaway ${putaway?.putawayNumber}"
 		)
 	}
 }

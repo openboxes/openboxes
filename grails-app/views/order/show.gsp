@@ -110,7 +110,9 @@
                         <div class="tabs tabs-ui">
                             <ul>
                                 <li><a href="#tabs-items"><warehouse:message code="order.orderItems.label"/></a></li>
-                                <li><a href="#tabs-shipments"><warehouse:message code="shipments.label"/></a></li>
+                                <g:if test="${orderInstance.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+                                    <li><a href="#tabs-shipments"><warehouse:message code="shipments.label"/></a></li>
+                                </g:if>
                                 <li><a href="#tabs-documents"><warehouse:message code="documents.label"/></a></li>
                                 <li><a href="#tabs-comments"><warehouse:message code="comments.label" default="Comments"/></a></li>
 
@@ -219,38 +221,41 @@
                                     </g:else>
                                 </div>
                             </div>
-                            <div id="tabs-shipments" class="ui-tabs-hide">
+                            <g:if test="${orderInstance.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
 
-                                <div class="box">
-                                    <h2><warehouse:message code="shipments.label"/></h2>
+                                <div id="tabs-shipments" class="ui-tabs-hide">
 
-                                    <g:if test="${orderInstance?.listShipments() }">
-                                        <table>
-                                            <thead>
-                                            <tr class="odd">
-                                                <th><warehouse:message code="default.type.label"/></th>
-                                                <th><warehouse:message code="default.name.label"/></th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <g:each var="shipmentInstance" in="${orderInstance?.listShipments()}" status="i">
-                                                <tr>
-                                                    <td>
-                                                        <format:metadata obj="${shipmentInstance?.shipmentType}"/>
-                                                    </td>
-                                                    <td>
-                                                        <g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">${shipmentInstance?.name }</g:link>
-                                                    </td>
+                                    <div class="box">
+                                        <h2><warehouse:message code="shipments.label"/></h2>
+
+                                        <g:if test="${orderInstance?.listShipments() }">
+                                            <table>
+                                                <thead>
+                                                <tr class="odd">
+                                                    <th><warehouse:message code="default.type.label"/></th>
+                                                    <th><warehouse:message code="default.name.label"/></th>
                                                 </tr>
-                                            </g:each>
-                                            </tbody>
-                                        </table>
-                                    </g:if>
-                                    <g:else>
-                                        <div class="fade center empty"><warehouse:message code="order.noShipments.label"/></div>
-                                    </g:else>
+                                                </thead>
+                                                <tbody>
+                                                <g:each var="shipmentInstance" in="${orderInstance?.listShipments()}" status="i">
+                                                    <tr>
+                                                        <td>
+                                                            <format:metadata obj="${shipmentInstance?.shipmentType}"/>
+                                                        </td>
+                                                        <td>
+                                                            <g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">${shipmentInstance?.name }</g:link>
+                                                        </td>
+                                                    </tr>
+                                                </g:each>
+                                                </tbody>
+                                            </table>
+                                        </g:if>
+                                        <g:else>
+                                            <div class="fade center empty"><warehouse:message code="order.noShipments.label"/></div>
+                                        </g:else>
+                                    </div>
                                 </div>
-                            </div>
+                            </g:if>
                             <div id="tabs-documents" class="ui-tabs-hide">
                                 <div class="box">
                                     <h2><warehouse:message code="documents.label"/></h2>
