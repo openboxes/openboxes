@@ -374,7 +374,7 @@ class SendMovementPage extends Component {
                   {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
                       canBeEdited: values.statusCode === 'ISSUED' && values.shipmentStatus !== 'PARTIALLY_RECEIVED',
-                      hasStockList: !!values.stocklist,
+                      hasStockList: !!_.get(values.stocklist, 'id'),
                       onDestinationChange: this.onDestinationChange,
                     }))}
                 </div>
