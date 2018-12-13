@@ -37,7 +37,7 @@
                     <table>
                         <tbody>
                             <tr class='prop'>
-                                <td class='name top'><label for='description'>
+                                <td class='name top'><label for='name'>
                                     <warehouse:message code="default.name.label"/></label>
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'name','errors')}'>
