@@ -132,7 +132,7 @@ class OrderService {
 		def shipments = orderCommand?.order?.listShipments();
 		def numberOfShipments = (shipments) ? shipments?.size() + 1 : 1;
 		
-		shipmentInstance.name = orderCommand?.order?.description + " - " + "Shipment #"  + numberOfShipments 
+		shipmentInstance.name = orderCommand?.order?.name + " - " + "Shipment #"  + numberOfShipments
 		shipmentInstance.shipmentType = orderCommand?.shipmentType;
 		shipmentInstance.origin = orderCommand?.order?.origin;
 		shipmentInstance.destination = orderCommand?.order?.destination;		

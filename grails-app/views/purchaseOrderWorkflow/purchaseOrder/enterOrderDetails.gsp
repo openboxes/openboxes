@@ -40,8 +40,8 @@
                                 <td class='name top'><label for='description'>
                                     <warehouse:message code="default.name.label"/></label>
                                 </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
-                                    <g:textField type="text" id="description" name='description'
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'name','errors')}'>
+                                    <g:textField type="text" id="name" name='name'
                                                  placeholder="${warehouse.message(code:'order.description.placeholder')}" size="100" class="text large" value="${order?.description?.encodeAsHTML()}"/>
 
                                 </td>

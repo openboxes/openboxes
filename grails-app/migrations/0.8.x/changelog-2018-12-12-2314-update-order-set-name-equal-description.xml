@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1544678172343-1">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <columnExists tableName="order" columnName="name"/>
+                <columnExists tableName="order" columnName="description"/>
+            </and>
+        </preConditions>
+        <comment>Migrate description value to name column </comment>
+        <sql>
+            UPDATE `order` SET name = description
+            WHERE name IS NULL
+            AND description IS NOT NULL;
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1544678172343-2">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <columnExists tableName="order" columnName="name"/>
+                <columnExists tableName="order" columnName="order_number"/>
+            </and>
+        </preConditions>
+        <comment>Fallback if there are somehow some orders without descriptions (should not be possible)</comment>
+        <sql>
+            UPDATE `order` SET name = order_number WHERE name IS NULL;
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1544678172343-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="order" columnName="name"/>
+        </preConditions>
+        <addNotNullConstraint tableName="order" columnName="name" columnDataType="VARCHAR(255)"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1544678172343-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="order" columnName="description"/>
+        </preConditions>
+        <dropNotNullConstraint tableName="order" columnName="description" columnDataType="VARCHAR(255)"/>
+    </changeSet>
+</databaseChangeLog>
+
+

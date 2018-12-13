@@ -45,8 +45,8 @@ class Order implements Serializable {
 	static constraints = { 
 		status(nullable:true)
 		orderTypeCode(nullable:false)
-		name(nullable:true)
-		description(nullable:false, blank: false, maxSize: 255)
+		name(nullable:false)
+		description(nullable:true, maxSize: 255)
 		orderNumber(nullable:true, maxSize: 255)
 		origin(nullable:false)
 		destination(nullable:false)

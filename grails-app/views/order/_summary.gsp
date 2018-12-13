@@ -14,7 +14,7 @@
                         <div class="title">
                             <small>${orderInstance?.orderNumber}</small>
                             <g:link controller="order" action="show" id="${orderInstance?.id}">
-                                ${orderInstance?.description}</g:link>
+                                ${orderInstance?.name}</g:link>
 						</div>
                     </td>
                     <td class="top right" width="1%">
@@ -33,8 +33,8 @@
 				<tr>
 					<td>
 						<div class="title">
-                            <g:if test="${orderInstance?.description}">
-                                ${orderInstance?.description }
+                            <g:if test="${orderInstance?.name}">
+                                ${orderInstance?.name }
                             </g:if>
                             <g:else>
                                 <warehouse:message code="order.untitled.label"/>

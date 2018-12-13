@@ -216,7 +216,7 @@ class DocumentController {
                 }
                 else if (orderInstance) {
                     orderInstance.addToDocuments(documentInstance).save(flush:true)
-                    flash.message = "${warehouse.message(code: 'document.successfullySavedToOrder.message', args: [orderInstance?.description])}"
+                    flash.message = "${warehouse.message(code: 'document.successfullySavedToOrder.message', args: [orderInstance?.name])}"
                 }
                 else if (requestInstance) {
                     requestInstance.addToDocuments(documentInstance).save(flush:true)
