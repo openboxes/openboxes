@@ -63,21 +63,22 @@
                 <warehouse:message code="order.wizard.createOrder.label" default="Create purchase order"/>
             </g:else>
         </g:link>
-
-        <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="enterOrderDetails" params="[skipTo:'details']" class="button">
-            <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
-            <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
-        </g:link>
-
-        <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
-            <img src="${resource(dir: 'images/icons/silk', file: 'cart_put.png')}" />&nbsp;
-            <warehouse:message code="order.wizard.addItems.label" default="Add line items"/>
-        </g:link>
+        <g:if test="${orderInstance?.orderTypeCode == org.pih.warehouse.order.OrderTypeCode.PURCHASE_ORDER}">
+            <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="enterOrderDetails" params="[skipTo:'details']" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
+            </g:link>
+            <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_put.png')}" />&nbsp;
+                <warehouse:message code="order.wizard.addItems.label" default="Add line items"/>
+            </g:link>
+        </g:if>
+    </div>
+    <div class="button-group">
         <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
             <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
         </g:link>
-
         <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
             <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
