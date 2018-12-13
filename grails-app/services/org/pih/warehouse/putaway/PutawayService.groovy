@@ -129,7 +129,9 @@ class PutawayService {
 
         order.orderTypeCode = OrderTypeCode.TRANSFER_ORDER
         order.status = OrderStatus.valueOf(putaway.putawayStatus.toString())
-        order.orderNumber = "P-${putaway.putawayNumber}"
+        if (!order.orderNumber) {
+            order.orderNumber = "P-${putaway.putawayNumber}"
+        }
         order.orderedBy = putaway.putawayAssignee
         order.dateOrdered = new Date()
         order.origin = putaway.origin
