@@ -84,7 +84,7 @@
         </g:link>
     </div>
 
-    <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}"
+    <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
         <div class="button-group">
 
             <g:if test="${!orderInstance?.isPlaced()}">
@@ -130,7 +130,7 @@
     <g:elseif test="${orderInstance?.orderTypeCode==OrderTypeCode.TRANSFER_ORDER}">
         <div class="button-group">
             <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
-                <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" />&nbsp;
+                <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
                 <warehouse:message code="order.generatePdf.label" default="Generate PDF"/>
             </g:link>
         </div>

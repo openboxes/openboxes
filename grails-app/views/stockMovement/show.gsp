@@ -23,7 +23,7 @@
             <div class="right">
                 <span class="action-menu">
                     <button class="action-btn button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" style="vertical-align: middle" />
+                        <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" style="vertical-align: middle" />
                         &nbsp; <g:message code="default.download.label"/>
                     </button>
                     <div class="actions">

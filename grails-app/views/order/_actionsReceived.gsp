@@ -44,13 +44,11 @@
 				&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollack order status" )}
 			</g:link>
 		</div>
-		<g:if test="${!hideDelete}">
-			<div class="action-menu-item">
-				<g:link controller="order" action="delete" id="${orderInstance?.id}" onclick="alert('${warehouse.message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported')}'); return false;">
-					<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
-					&nbsp;${warehouse.message(code: 'order.deleteOrder.label')} 
-				</g:link>				
-			</div>
-		</g:if>
+		<div class="action-menu-item">
+			<g:link controller="order" action="delete" id="${orderInstance?.id}">
+				<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
+				&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
+			</g:link>
+		</div>
 	</div>
 </g:if>
