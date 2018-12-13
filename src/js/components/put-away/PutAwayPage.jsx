@@ -17,12 +17,11 @@ import Filter from '../../utils/Filter';
 const SelectTreeTable = selectTableHOC(customTreeTableHOC(ReactTable));
 
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-return-assign */
 
 function getNodes(data, node = []) {
   data.forEach((item) => {
     if (Object.prototype.hasOwnProperty.call(item, '_subRows') && item._subRows) {
+      // eslint-disable-next-line no-param-reassign
       node = getNodes(item._subRows, node);
     } else {
       node.push(item._original);
@@ -50,7 +49,6 @@ class PutAwayPage extends Component {
       selectType: 'checkbox',
       pivotBy: ['stockMovement.name'],
       expanded: {},
-      expandedRowsCount: 0,
     };
   }
 
@@ -72,12 +70,7 @@ class PutAwayPage extends Component {
       }
     });
 
-    const allCurrentRows = this.selectTable
-      .getWrappedInstance().getResolvedState().sortedData;
-    const expandedRows = _.at(allCurrentRows, expandedRecordsIds);
-    const expandedRowsCount = getNodes(expandedRows).length;
-
-    this.setState({ expanded, expandedRowsCount });
+    this.setState({ expanded });
   };
 
   /**
@@ -127,7 +120,12 @@ class PutAwayPage extends Component {
             name="aggregationCheckbox"
             checked={this.checkSelected(row)}
             value={row._subRows[0]._original.stockMovement.id}
-            ref={elem => elem && (elem.indeterminate = this.checkIndeterminate(row))}
+            ref={(elem) => {
+              if (elem) {
+                // eslint-disable-next-line no-param-reassign
+                (elem.indeterminate = this.checkIndeterminate(row));
+              }
+            }}
             onChange={this.toggleSelectionsByStockMovement}
           />
           <div className={`rt-expander ${isExpanded && '-open'}`}>&bull;</div>
@@ -197,7 +195,7 @@ class PutAwayPage extends Component {
         const expanded = {};
 
         if (this.state.pivotBy.length) {
-          _.forEach(this.state.putawayItems, (item, index) => expanded[index] = true);
+          _.forEach(this.state.putawayItems, (item, index) => { expanded[index] = true; });
         }
 
         this.props.history.push(`/openboxes/putAway/create/${putAway.id}`);
@@ -225,7 +223,7 @@ class PutAwayPage extends Component {
       putawayItems = _.filter(this.state.putawayItems, val => val.putawayStatus !== 'PENDING');
     }
 
-    this.setState({ putawayItems });
+    this.setState({ putawayItems, expanded: {} });
   }
 
   /**
@@ -299,9 +297,9 @@ class PutAwayPage extends Component {
    */
   toggleTree = () => {
     if (this.state.pivotBy.length) {
-      this.setState({ pivotBy: [], expanded: {}, expandedRowsCount: 0 });
+      this.setState({ pivotBy: [], expanded: {} });
     } else {
-      this.setState({ pivotBy: ['stockMovement.name'], expanded: {}, expandedRowsCount: 0 });
+      this.setState({ pivotBy: ['stockMovement.name'], expanded: {} });
     }
   };
 
@@ -371,7 +369,7 @@ class PutAwayPage extends Component {
       };
 
     return (
-      <div className="container-fluid pt-2">
+      <div className="main-container">
         <h1>Put Away </h1>
         <div className="d-flex justify-content-between mb-2">
           <div>
@@ -411,12 +409,11 @@ class PutAwayPage extends Component {
             <SelectTreeTable
               data={putawayItems}
               columns={columns}
-              ref={r => this.selectTable = r}
+              ref={(r) => { this.selectTable = r; }}
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={pivotBy && pivotBy.length ? this.state.expandedRowsCount : 0}
-              style={{ height: '500px' }}
+              minRows={0}
               showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}

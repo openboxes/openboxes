@@ -181,7 +181,7 @@ class StocklistManagement extends Component {
   render() {
     const { data } = this.state;
     return (
-      <div className="stocklist-table">
+      <div className="main-container">
         { this.state.productInfo &&
           <div className="mb-2">
             <div className="d-flex flex-row justify-content-between">

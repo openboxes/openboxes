@@ -14,20 +14,6 @@ import Filter from '../../utils/Filter';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-param-reassign */
-
-function getNodes(data, node = []) {
-  data.forEach((item) => {
-    if (Object.prototype.hasOwnProperty.call(item, '_subRows') && item._subRows) {
-      node = getNodes(item._subRows, node);
-    } else {
-      node.push(item._original);
-    }
-  });
-  return node;
-}
-
 /**
  * The last page of put-away which shows everything that user has chosen to put away.
  * Split lines are shown as seperate lines.
@@ -70,7 +56,6 @@ class PutAwayCheckPage extends Component {
       columns,
       pivotBy,
       expanded,
-      expandedRowsCount: 0,
     };
   }
 
@@ -88,12 +73,7 @@ class PutAwayCheckPage extends Component {
       }
     });
 
-    const allCurrentRows = this.selectTable
-      .getWrappedInstance().getResolvedState().sortedData;
-    const expandedRows = _.at(allCurrentRows, expandedRecordsIds);
-    const expandedRowsCount = getNodes(expandedRows).length;
-
-    this.setState({ expanded, expandedRowsCount });
+    this.setState({ expanded });
   };
 
   /**
@@ -163,9 +143,9 @@ class PutAwayCheckPage extends Component {
    */
   toggleTree = () => {
     if (this.state.pivotBy.length) {
-      this.setState({ pivotBy: [], expanded: {}, expandedRowsCount: 0 });
+      this.setState({ pivotBy: [], expanded: {} });
     } else {
-      this.setState({ pivotBy: ['stockMovement.name'], expanded: {}, expandedRowsCount: 0 });
+      this.setState({ pivotBy: ['stockMovement.name'], expanded: {} });
     }
   };
 
@@ -236,7 +216,7 @@ class PutAwayCheckPage extends Component {
       };
 
     return (
-      <div className="container-fluid pt-2">
+      <div className="main-container">
         <h1>Put Away - {this.state.putAway.putawayNumber}</h1>
         {
           this.state.completed ?
@@ -300,10 +280,7 @@ class PutAwayCheckPage extends Component {
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={pivotBy && pivotBy.length ? this.state.expandedRowsCount : 0}
-              style={{
-                height: '500px',
-              }}
+              minRows={0}
               showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
