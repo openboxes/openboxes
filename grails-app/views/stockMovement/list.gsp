@@ -18,7 +18,7 @@
                commodityClass:params.commodityClass, status:params.status, direction: params?.direction,
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
                'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order, relatedToMe:params.relatedToMe,
-               'requestedBy.id': params?.requestedBy?.id]"/>
+               'requestedBy.id': params?.requestedBy?.id, receiptStatusCode: params.receiptStatusCode]"/>
 
 <div class="body">
     <g:if test="${flash.message}">
@@ -59,14 +59,14 @@
             </div>
         </div>
 
-        <div class="button-group">
+        <div class="button-container">
             <g:link controller="stockMovement" action="list" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
-                <warehouse:message code="default.button.list.label" />
+                <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovement.label')]"/>
             </g:link>
             <g:link controller="stockMovement" action="index" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-                <warehouse:message code="default.button.create.label" />
+                <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.label')]" />
             </g:link>
         </div>
 
@@ -92,6 +92,13 @@
                             <p>
                                 <g:selectRequisitionStatus name="status" value="${params?.status}"
                                                            noSelection="['null':'']" class="chzn-select-deselect"/>
+                            </p>
+                        </div>
+                        <div class="filter-list-item">
+                            <label><warehouse:message code="stockMovement.receiptStatus.label" default="Receipt Status"/></label>
+                            <p>
+                                <g:select name="receiptStatusCode" value="${params?.receiptStatusCode}" from="${ShipmentStatusCode.list()}"
+                                                           noSelection="['':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
                         <div class="filter-list-item">
@@ -132,6 +139,20 @@
                                               noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
+                        <div class="filter-list-item">
+                            <label><warehouse:message code="default.createdBy.label"/></label>
+                            <p>
+                                <g:selectUser name="createdBy.id" value="${params?.requestedBy?.id}"
+                                              noSelection="['null':'']" class="chzn-select-deselect"/>
+                            </p>
+                        </div>
+                        <div class="filter-list-item">
+                            <label><warehouse:message code="default.updatedBy.label"/></label>
+                            <p>
+                                <g:selectUser name="updatedBy.id" value="${params?.updatedBy?.id}"
+                                              noSelection="['null':'']" class="chzn-select-deselect"/>
+                            </p>
+                        </div>
                         <hr/>
                         <div class="filter-list-item">
                             <button class="button icon search" name="search" class="button">
@@ -146,30 +167,11 @@
             </div>
         </div>
         <div class="yui-u">
-            <g:set var="stockMovements" value="${stockMovements.sort { it?.shipmentStatusCode }}"/>
-            <g:set var="stockMovementsMap" value="${stockMovements.groupBy { it?.shipmentStatusCode }}"/>
-            <g:if test="${stockMovements.size()}">
-                <div class="tabs">
-                    <ul>
-                        <g:each var="shipmentStatusCode" in="${stockMovementsMap.keySet() }">
-                            <li>
-                                <a href="#shipment-status-${shipmentStatusCode}">
-                                    <format:metadata obj="${shipmentStatusCode }"/>
-                                    (${stockMovementsMap[shipmentStatusCode]?.size() })
-                                </a>
-                            </li>
-                        </g:each>
-                    </ul>
-                    <g:each var="shipmentStatusCode" in="${stockMovementsMap.keySet() }">
-                        <div id="shipment-status-${shipmentStatusCode}">
-                            <g:render template="list" model="[stockMovements:stockMovementsMap[shipmentStatusCode],
-                                                              entityName:entityName,
-                                                              totalCount:stockMovements.totalCount,
-                                                              shipmentStatusCode:shipmentStatusCode,
-                                                              pageParams:pageParams]"/>
-                        </div>
-                    </g:each>
-                </div>
+            <g:if test="${stockMovements}">
+                <g:render template="list" model="[stockMovements:stockMovements,
+                                                  entityName:entityName,
+                                                  totalCount:stockMovements.totalCount,
+                                                  pageParams:pageParams]"/>
             </g:if>
             <g:else>
                 <div class="box">

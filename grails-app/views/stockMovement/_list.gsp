@@ -1,9 +1,8 @@
 <div class="box">
     <h2>
         ${entityName} &rsaquo;
-        <warehouse:message code="enum.StockMovementDirection.${params.direction}"/> &rsaquo;
-        <format:metadata obj="${shipmentStatusCode }"/>
-        (${stockMovements?.size()?:0})
+        <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
+        (${totalCount?:0})
     </h2>
     <table>
         <thead>

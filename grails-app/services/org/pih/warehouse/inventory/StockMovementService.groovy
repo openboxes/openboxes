@@ -137,8 +137,16 @@ class StockMovementService {
     def getStockMovements(StockMovement stockMovement, Integer maxResults, Integer offset) {
         log.info "Get stock movements: " + stockMovement.toJson()
 
+        log.info "Stock movement: ${stockMovement?.shipmentStatusCode}"
+
         def requisitions = Requisition.createCriteria().list(max: maxResults, offset: offset) {
             eq("isTemplate", Boolean.FALSE)
+
+            if (stockMovement?.receiptStatusCode) {
+                shipments {
+                    eq("currentStatus", stockMovement.receiptStatusCode)
+                }
+            }
 
             if (stockMovement?.identifier || stockMovement.name || stockMovement?.description) {
                 or {
