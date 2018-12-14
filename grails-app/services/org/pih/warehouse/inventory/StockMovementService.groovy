@@ -722,7 +722,8 @@ class StockMovementService {
             removeRequisitionItems(requisition)
             addStockListItemsToRequisition(stockMovement, requisition)
             requisition.requisitionTemplate = stockMovement.stocklist
-        } else if (stockMovement.lineItems) {
+        }
+        else if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 RequisitionItem requisitionItem
                 // Try to find a matching stock movement item

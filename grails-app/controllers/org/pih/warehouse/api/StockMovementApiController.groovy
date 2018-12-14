@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 
 class StockMovementApiController {
@@ -187,6 +188,12 @@ class StockMovementApiController {
 
         if (jsonObject.containsKey("dateRequested")) {
             stockMovement.dateRequested = parseDateRequested(jsonObject.remove("dateRequested"))
+        }
+
+        // If the stocklist.id key is present and empty, then we need to remove the stocklist from the stock movement
+        if (jsonObject.containsKey("stocklist.id")) {
+            String stocklistId = jsonObject.remove("stocklist.id")
+            stockMovement.stocklist = (stocklistId) ? Requisition.get(stocklistId) : null
         }
 
         // Bind the rest of the JSON attributes to the stock movement object
