@@ -9,19 +9,16 @@
 
         <tbody>
             <tr class="prop">
-                <td class="name"><label><warehouse:message
-                        code="requisition.requisitionType.label" /></label></td>
-                <td class="value">
-                    <g:if test="${requisition?.type}">
-                        <format:metadata obj="${requisition?.type }"/>
-                    </g:if>
-                    <g:else>
-                        <span class="fade">
-                            ${warehouse.message(code:'default.none.label')}
-                        </span>
-                    </g:else>
+                <td class="name">
+                    <label for="name">
+                        <warehouse:message code="default.name.label" />
+                    </label>
+                </td>
+                <td class="value ${hasErrors(bean: requisition, field: 'name', 'errors')}">
+                    <span id="name">${requisition?.name }</span>
                 </td>
             </tr>
+
             <tr class="prop">
                 <td class="name">
                     <label for="origin.id">
@@ -66,21 +63,6 @@
                         <span class="fade">
                             ${warehouse.message(code:'default.none.label')}
                         </span>
-                    </g:else>
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="name"><label><warehouse:message
-                        code="requisition.commodityClass.label" /></label></td>
-                <td class="value">
-                    <g:if test="${requisition?.commodityClass}">
-                        <format:metadata obj="${requisition?.commodityClass }"/>
-                    </g:if>
-                    <g:else>
-                        <span class="fade">
-                            ${warehouse.message(code:'default.none.label')}
-                        </span>
-
                     </g:else>
                 </td>
             </tr>

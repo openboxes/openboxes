@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.requisition
 
-public enum CommodityClass {
+enum CommodityClass {
 
 	CONSUMABLES(0),
     MEDICATION(1),
@@ -18,6 +18,7 @@ public enum CommodityClass {
 	CONTROLLED_SUBSTANCE(4),
 	HAZARDOUS_MATERIAL(5),
     DURABLE(6),
+	NONE(7)
 
 	int sortOrder
 
@@ -33,13 +34,14 @@ public enum CommodityClass {
 
 	static list() {
 		[
-			CONSUMABLES,
-            MEDICATION,
-            DURABLE,
-            MIXED,
-            COLD_CHAIN,
-			CONTROLLED_SUBSTANCE,
-			HAZARDOUS_MATERIAL
+				NONE,
+				CONSUMABLES,
+				MEDICATION,
+				DURABLE,
+				MIXED,
+				COLD_CHAIN,
+				CONTROLLED_SUBSTANCE,
+				HAZARDOUS_MATERIAL
 		]
 	}
 

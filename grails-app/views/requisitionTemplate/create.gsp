@@ -35,6 +35,7 @@
 			<g:form name="requisitionForm" method="post" action="save">
                 <g:hiddenField name="isTemplate" value="${requisition.isTemplate}"/>
                 <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
+                <g:hiddenField name="type" value="${requisition?.type}"/>
 
 
 				<g:if test="${requisition?.id }">
@@ -66,21 +67,7 @@
                     <table id="requisition-template-table">
 
                         <tbody>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="type">
-                                        <warehouse:message code="requisition.requisitionType.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-                                    <%--
-                                    <g:selectRequisitionType name="type" value="${requisition.type}"
-                                                             class="chzn-select-deselect"/>
-                                                             --%>
-                                    <g:hiddenField name="type" value="${requisition?.type}"/>
-                                    <format:metadata obj="${requisition?.type}"/>
-                                </td>
-                            </tr>
+
                             <tr class="prop">
                                 <td class="name">
                                     <label for="name">
@@ -89,17 +76,6 @@
                                 </td>
                                 <td class="value ${hasErrors(bean: requisition, field: 'name', 'errors')}">
                                     <g:textField name="name" value="${requisition.name}" class="text" size="80"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message
-                                            code="requisitionTemplate.requestedBy.label" /></label>
-                                </td>
-                                <td class="value">
-                                    <g:autoSuggest id="requestedBy" name="requestedBy" jsonUrl="${request.contextPath }/json/findPersonByName"
-                                                   valueId="${requisition?.requestedBy?.id}"
-                                                   valueName="${requisition?.requestedBy?.name}"/>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -127,24 +103,26 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name">
-                                    <label for="replenishmentPeriod">
-                                        <warehouse:message code="requisition.replenishmentPeriod.label" />
-                                        <small>(${warehouse.message(code:'requisitionTemplate.replenishmentPeriodUnit.label')})</small>
-                                    </label>
+                                    <label><warehouse:message
+                                            code="requisitionTemplate.requestedBy.label" /></label>
                                 </td>
                                 <td class="value">
-                                    <g:textField name="replenishmentPeriod" value="${requisition.replenishmentPeriod}" class="text large" size="80"/>
+
+                                    <g:selectUser id="requestedBy" name="requestedBy" value="${requisition?.requestedBy?.id}"
+                                                  noSelection="['null':'']"
+                                                  class="chzn-select-deselect"/>
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td class="name">
-                                    <label for="commodityClass">
-                                        <warehouse:message code="requisition.commodityClass.label" />
+                                    <label for="replenishmentPeriod">
+                                        <warehouse:message code="requisition.replenishmentPeriod.label" />
+                                        <span>(${warehouse.message(code:'requisitionTemplate.replenishmentPeriodUnit.label')})</span>
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:selectCommodityClass name="commodityClass" class="chzn-select-deselect"
-                                                            value="${requisition?.commodityClass}" noSelection="['':'']"/>
+                                    <g:textField name="replenishmentPeriod" value="${requisition.replenishmentPeriod}"
+                                                 class="text large" size="80"/>
                                 </td>
                             </tr>
                             <tr class="prop">
