@@ -47,7 +47,7 @@
                     <table class="sortable" data-update-url="${createLink(controller:'json', action:'sortRequisitionItems')}">
                         <thead>
                         <tr>
-                            <th></th>
+                            %{--<th></th>--}%
                             <th class="center"><warehouse:message code="product.productCode.label" default="#"/></th>
                             <th><warehouse:message code="product.label"/></th>
                             <th><warehouse:message code="category.label"/></th>
@@ -58,62 +58,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <g:each var="requisitionItem" in="${requisition?.sortedStocklistItems}" status="i">
-                            <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
-                                <td>
-                                    <span class="sorthandle"></span>
-                                </td>
-                                <td class="center middle">
-                                    ${requisitionItem?.product?.productCode}
-                                </td>
-                                <td class="middle">
-                                    <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
-                                    <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                                        ${requisitionItem?.product?.name}
-                                    </g:link>
-                                </td>
-                                <td class="middle">
-                                    <format:metadata obj="${requisitionItem?.product?.category}"/>
-                                </td>
-                                <td class="center">
-                                    <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="text" size="6"/>
-                                </td>
-                                <td class="center middle">
-                                    <g:selectProductPackage name="requisitionItems[${i}].productPackage.id"
-                                                           product="${requisitionItem?.product}"
-                                                           class="chzn-select-deselect"
-                                                           value="${requisitionItem?.productPackage?.id}"/>
-                                </td>
-                                <td class="center middle">
-                                    <g:if test="${requisitionItem?.requisition?.replenishmentPeriod}">
-                                        ${requisitionItem?.monthlyDemand}
-                                        ${requisitionItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
-
-                                    </g:if>
-                                    <g:else>
-                                        <g:message code="requisitionTemplate.noReplenishmentPeriod.message"/>
-                                    </g:else>
-                                </td>
-                                <td>
-                                    <g:link controller="requisitionTemplate" action="removeFromRequisitionItems" id="${requisition?.id}"
-                                            params="['requisitionItem.id':requisitionItem?.id]" class="button icon trash">
-                                        ${warehouse.message(code:'default.button.delete.label')}
-                                    </g:link>
-                                </td>
-                            </tr>
-                        </g:each>
-                        <g:unless test="${requisition?.requisitionItems}">
-                            <tr>
-                                <td colspan="7" class="center">
-                                    <span class="fade empty">${warehouse.message(code: "requisition.noRequisitionItems.message")}</span>
-                                </td>
-
-                            </tr>
-                        </g:unless>
                         <tr class="prop">
-                            <td>
-                                <span class="sorthandle"></span>
-                            </td>
+                            %{--<td>--}%
+                                %{--<span class="sorthandle"></span>--}%
+                            %{--</td>--}%
                             <td></td>
                             <td>
                                 <g:set var="orderIndex" value="${requisition.requisitionItems.size()}"/>
@@ -127,8 +75,8 @@
                             </td>
                             <td class="center">
                                 <g:select name="unitOfMeasure"
-                                                   class="chzn-select-deselect"
-                                                       from="['EA/1']"/>
+                                          class="chzn-select-deselect"
+                                          from="['EA/1']"/>
                             </td>
                             <td></td>
                             <td>
@@ -138,17 +86,79 @@
 
                             </td>
                         </tr>
+
+                        <g:set var="i" value="${0}"/>
+                        <g:set var="requisitionItems" value="${requisition?.sortedStocklistItems}"/>
+                        %{--<g:set var="groupedStocklistItems" value="${requisitionItems?.groupBy { it?.product?.category }}"/>--}%
+
+                        %{--<g:each var="mapEntry" in="${groupedStocklistItems}">--}%
+                            %{--<g:set var="category" value="${mapEntry.key}"/>--}%
+                            %{--<g:set var="requisitionItems" value="${mapEntry.value}"/>--}%
+                            %{--<tr class="prop">--}%
+                                %{--<th colspan="8">--}%
+                                    %{--${category.name} <small class="muted">(${requisitionItems.size()})</small>--}%
+                                %{--</th>--}%
+                            %{--</tr>--}%
+
+                            <g:each var="requisitionItem" in="${requisitionItems}">
+                                <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
+                                    %{--<td>--}%
+                                        %{--<span class="sorthandle"></span>--}%
+                                    %{--</td>--}%
+                                    <td class="center middle">
+                                        ${requisitionItem?.product?.productCode}
+                                    </td>
+                                    <td class="middle">
+                                        <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
+                                        <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
+                                            ${requisitionItem?.product?.name}
+                                        </g:link>
+                                    </td>
+                                    <td class="middle">
+                                        <format:metadata obj="${requisitionItem?.product?.category}"/>
+                                    </td>
+                                    <td class="center">
+                                        <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="text" size="6"/>
+                                    </td>
+                                    <td class="center middle">
+                                        <g:selectProductPackage name="requisitionItems[${i}].productPackage.id"
+                                                                product="${requisitionItem?.product}"
+                                                                class="chzn-select-deselect"
+                                                                value="${requisitionItem?.productPackage?.id}"/>
+                                    </td>
+                                    <td class="center middle">
+                                        <g:if test="${requisitionItem?.requisition?.replenishmentPeriod}">
+                                            ${requisitionItem?.monthlyDemand}
+                                            ${requisitionItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="requisitionTemplate.noReplenishmentPeriod.message"/>
+                                        </g:else>
+                                    </td>
+                                    <td>
+                                        <g:link controller="requisitionTemplate" action="removeFromRequisitionItems" id="${requisition?.id}"
+                                                params="['requisitionItem.id':requisitionItem?.id]" class="button icon trash">
+                                            ${warehouse.message(code:'default.button.delete.label')}
+                                        </g:link>
+                                    </td>
+                                </tr>
+                                <g:set var="i" value="${i+1}"/>
+                            </g:each>
+                        %{--</g:each>--}%
+
                         </tbody>
                         <tfoot>
                             <tr>
                                 <td colspan="8">
                                     <div class="buttons">
                                         <button class="button" name="save">
+                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" />&nbsp;
                                             ${warehouse.message(code:'default.button.save.label', default: 'Save') }
                                         </button>
-                                        <g:link controller="requisitionTemplate" action="show" id="${requisition?.id}" class="button">
-                                            <warehouse:message code="default.button.done.label" default="Done"/>
-                                        </g:link>
+                                        %{--<g:link controller="requisitionTemplate" action="show" id="${requisition?.id}" class="button">--}%
+                                            %{--<warehouse:message code="default.button.done.label" default="Done"/>--}%
+                                        %{--</g:link>--}%
                                     </div>
                                 </td>
                             </tr>

@@ -36,8 +36,13 @@
                 <g:hiddenField name="id" value="${requisition.id}"/>
                 <g:hiddenField name="version" value="${requisition.version}"/>
                 <g:hiddenField name="viewName" value="editHeader"/>
+                <g:hiddenField name="type" value="${requisition.type}"/>
+                <g:hiddenField name="isPublished" value="${requisition.isPublished}"/>
+                <g:hiddenField name="commodityClass" value="${requisition.commodityClass}"/>
+                <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
+                <g:hiddenField name="updatedBy" value="${requisition?.updatedBy?.id?:session?.user?.id }"/>
 
-				<div id="requisition-template-details" class="dialog ui-validation box">
+                <div id="requisition-template-details" class="dialog ui-validation box">
 
                     <h2>${warehouse.message(code:'requisitionTemplate.label', default: 'Stock list')}</h2>
 
@@ -45,31 +50,7 @@
 
                         <tbody>
 
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="type">
-                                        <warehouse:message code="requisition.isPublished.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-                                    <g:checkBox name="isPublished" value="${requisition.isPublished}"/>
-                                    <g:if test="${requisition?.isPublished}">
-                                        ${requisition.datePublished}
-                                    </g:if>
-                                </td>
-                            </tr>
 
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="type">
-                                        <warehouse:message code="requisition.requisitionType.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-                                    <g:hiddenField name="type" value="${requisition.type}"/>
-                                    <format:metadata obj="${requisition.type}"/>
-                                </td>
-                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="name">
@@ -78,17 +59,6 @@
                                 </td>
                                 <td class="value ${hasErrors(bean: requisition, field: 'name', 'errors')}">
                                     <g:textField name="name" value="${requisition.name}" class="text large" size="80"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message
-                                            code="requisitionTemplate.requestedBy.label" /></label>
-                                </td>
-                                <td class="value">
-                                    <g:autoSuggest id="requestedBy" name="requestedBy" jsonUrl="${request.contextPath }/json/findPersonByName"
-                                                   valueId="${requisition?.requestedBy?.id}"
-                                                   valueName="${requisition?.requestedBy?.name}"/>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -116,6 +86,16 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name">
+                                    <label><warehouse:message
+                                            code="requisitionTemplate.requestedBy.label" /></label>
+                                </td>
+                                <td class="value">
+                                    <g:selectPerson id="requestedBy" name="requestedBy" value="${requisition?.requestedBy?.id}"
+                                                    class="chzn-select-deselect"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
                                     <label for="replenishmentPeriod">
                                         <warehouse:message code="requisition.replenishmentPeriod.label" />
                                         <small>(${warehouse.message(code:'requisitionTemplate.replenishmentPeriodUnit.label')})</small>
@@ -123,16 +103,6 @@
                                 </td>
                                 <td class="value">
                                     <g:textField name="replenishmentPeriod" value="${requisition.replenishmentPeriod}" class="text large" size="80"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="commodityClass">
-                                        <warehouse:message code="requisition.commodityClass.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-                                    <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['null':'']" class="chzn-select-deselect"/>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -146,26 +116,6 @@
                                     <g:textArea name="description" rows="5" style="width: 100%"
                                                 placeholder="${warehouse.message(code:'requisition.description.message')}"
                                                 class="text">${requisition.description }</g:textArea>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message
-                                            code="default.createdBy.label" /></label>
-                                </td>
-                                <td class="value">
-                                    <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
-                                    ${requisition?.createdBy?.name?:session?.user?.name }
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message
-                                            code="default.updatedBy.label" /></label>
-                                </td>
-                                <td class="value">
-                                    <g:hiddenField name="updatedBy" value="${requisition?.updatedBy?.id?:session?.user?.id }"/>
-                                    ${requisition?.updatedBy?.name?:session?.user?.name }
                                 </td>
                             </tr>
                         </tbody>

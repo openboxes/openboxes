@@ -100,7 +100,7 @@
                     <format:metadata obj="${requisition?.destination?.name}"/>
                 </td>
 				<td>
-
+                    ${requisition?.requisitionItems?.size()}
 				</td>
 				<td>${requisition.requestedBy}</td>
 

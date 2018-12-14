@@ -240,17 +240,17 @@ class SelectTagLib {
 
 
     def selectUser = { attrs, body ->
-        attrs.from = User.list().sort()
+        attrs.from = User.list().sort { it.firstName }
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name + " (" + it.username + ")"}
         out << g.select(attrs)
     }
 
     def selectPerson = { attrs, body ->
-        attrs.id = attrs.id?:"selectPerson-" + (new Random()).nextInt()
-        def person = Person.get(attrs?.value?.id)
-        attrs.selectedPerson = person
-        out << render(template: "/taglib/selectPerson", model: [attrs:attrs])
+        attrs.from = Person.list().sort { it.firstName }
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.name }
+        out << g.select(attrs)
     }
 
 

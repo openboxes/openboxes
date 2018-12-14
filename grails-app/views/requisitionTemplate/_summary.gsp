@@ -77,7 +77,7 @@
 	<div class="right">
 
 		<g:link controller="requisitionTemplate" action="show" id="${requisition?.id}" class="button">
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" />&nbsp;
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'application_side_boxes.png')}" />&nbsp;
 			${warehouse.message(code: 'default.show.label', args: [warehouse.message(code:'requisitionTemplate.label')])}
 		</g:link>
 		<g:link controller="requisitionTemplate" action="editHeader" id="${requisition?.id}" class="button">
