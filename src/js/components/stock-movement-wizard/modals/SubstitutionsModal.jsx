@@ -28,7 +28,7 @@ const FIELDS = {
     getDynamicRowAttr: ({ rowValues, originalItem }) => {
       let className = '';
       const rowDate = rowValues.minExpirationDate;
-      const origDate = originalItem.minExpirationDate;
+      const origDate = originalItem ? originalItem.minExpirationDate : null;
       if (!rowValues.originalItem) {
         className = (origDate && rowDate && rowDate < origDate) || (!origDate && rowDate) ? 'text-danger' : '';
       } else {
