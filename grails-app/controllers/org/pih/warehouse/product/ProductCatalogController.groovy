@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.product
 
 import org.apache.commons.io.FilenameUtils
@@ -72,7 +72,7 @@ class ProductCatalogController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (productCatalogInstance.version > version) {
-                    
+
                     productCatalogInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog')] as Object[], "Another user has updated this ProductCatalog while you were editing")
                     render(view: "edit", model: [productCatalogInstance: productCatalogInstance])
                     return
@@ -223,7 +223,7 @@ class ProductCatalogController {
             response.contentType = "text/csv"
             String csv = "Catalog Code,Product Code,Product Name\n"
             productCatalog.productCatalogItems.each {
-                csv += "${it.productCatalog.code},${it.product?.productCode},${it.product?.name}\n"
+                csv += "${it.productCatalog.code},${it.product?.productCode},\"${it.product?.name}\"\n"
             }
 
             render csv
