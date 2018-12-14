@@ -25,9 +25,17 @@ const FIELDS = {
   },
   substitutions: {
     type: ArrayField,
-    getDynamicRowAttr: ({ rowValues }) => ({
-      className: rowValues.originalItem ? 'font-weight-bold' : '',
-    }),
+    getDynamicRowAttr: ({ rowValues, originalItem }) => {
+      let className = '';
+      const rowDate = rowValues.minExpirationDate;
+      const origDate = originalItem.minExpirationDate;
+      if (!rowValues.originalItem) {
+        className = (origDate && rowDate && rowDate < origDate) || (!origDate && rowDate) ? 'text-danger' : '';
+      } else {
+        className = 'font-weight-bold';
+      }
+      return { className };
+    },
     fields: {
       productCode: {
         type: LabelField,
