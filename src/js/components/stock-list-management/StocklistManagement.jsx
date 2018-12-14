@@ -220,11 +220,13 @@ class StocklistManagement extends Component {
             {
               Header: 'Location Group Name',
               accessor: 'locationGroup.name',
+              className: 'w-space-normal',
             },
             {
               Header: 'Location Name',
               accessor: 'location.name',
               aggregate: () => '',
+              className: 'w-space-normal',
             },
             {
               Header: 'Stocklist Name',
@@ -282,7 +284,8 @@ class StocklistManagement extends Component {
             {
               Header: 'Actions',
               accessor: 'edit',
-              minWidth: 110,
+              minWidth: 230,
+              className: 'text-center',
               aggregate: () => '',
               // eslint-disable-next-line react/prop-types
               Cell: ({ aggregated, index, original }) => {
