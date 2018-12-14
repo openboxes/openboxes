@@ -120,7 +120,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
     static transients = ["sortedStocklistItems"]
     static hasOne = [picklist: Picklist]
-    static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction]
+    static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
     static mapping = {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
@@ -184,11 +184,6 @@ class Requisition implements Comparable<Requisition>, Serializable {
         requisitionTemplate(nullable:true)
         replenishmentPeriod(nullable:true)
     }
-
-    List<Shipment> getShipments() {
-        return Shipment.findAllByRequisition(this)
-    }
-
 
     def getRequisitionItemCount() {
         return getOriginalRequisitionItems()?.size()

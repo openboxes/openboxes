@@ -21,6 +21,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class StockMovementController {
 
@@ -47,6 +48,9 @@ class StockMovementController {
     }
 
     def list = {
+
+        def max = params.max?params.max as int:10
+        def offset = params.offset?params.offset as int:0
         User currentUser = User.get(session?.user?.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
 
@@ -59,12 +63,26 @@ class StockMovementController {
             params.destination = params.destination?:currentLocation
         }
         else {
-            params.origin = params.origin?:currentLocation
-            params.destination = params.destination?:currentLocation
+            if (params.origin?.id == currentLocation?.id && params.destination?.id == currentLocation?.id) {
+                params.direction = null
+            }
+            else if (params.origin?.id == currentLocation?.id) {
+                params.direction = "OUTBOUND"
+            }
+            else if (params.destination?.id == currentLocation?.id) {
+                params.direction = "INBOUND"
+            }
+            else {
+                params.origin = params.origin ?: currentLocation
+                params.destination = params.destination ?: currentLocation
+            }
         }
 
+        // Discard the requisition so it does not get saved at the end of the request
         Requisition requisition = new Requisition(params)
         requisition.discard()
+
+        // Create stock movement to be used as search criteria
         StockMovement stockMovement = new StockMovement()
         if (params.q) {
             stockMovement.identifier = "%" + params.q + "%"
@@ -75,8 +93,9 @@ class StockMovementController {
         stockMovement.origin = requisition.origin
         stockMovement.destination = requisition.destination
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
+        stockMovement.receiptStatusCode = params?.receiptStatusCode ? params.receiptStatusCode as ShipmentStatusCode : null
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, params.max?params.max as int:10, params.offset?params.offset as int:0)
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, max, offset)
         def statistics = requisitionService.getRequisitionStatistics(requisition.origin, requisition.destination, currentUser)
 
         render(view:"list", params:params, model:[stockMovements: stockMovements, statistics:statistics])

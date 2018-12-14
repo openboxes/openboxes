@@ -44,6 +44,7 @@ class StockMovement {
     // Shipment information
     Date dateShipped
     ShipmentType shipmentType
+    ShipmentStatusCode receiptStatusCode
     String trackingNumber
     String driverName
     String comments
@@ -75,6 +76,7 @@ class StockMovement {
         requestedBy(nullable:false)
         dateRequested(nullable:false)
         stockMovementType(nullable:true)
+        receiptStatusCode(nullable:true)
         shipment(nullable:true)
         dateShipped(nullable:true)
         shipmentType(nullable:true)
