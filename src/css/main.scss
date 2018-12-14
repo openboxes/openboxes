@@ -625,7 +625,7 @@ div.crossed-out .table-inner-row:before {
   flex: 1 1 auto;
 }
 
-.stocklist-table {
+.main-container {
   height: calc(100vh - 110px - 65px - 20px); // 108 = header + menu + breadcrumbs; 65 = footer; 40 = marginY
   margin: 10px 10px;
 }

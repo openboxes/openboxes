@@ -17,20 +17,6 @@ import Filter from '../../utils/Filter';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-param-reassign */
-
-function getNodes(data, node = []) {
-  data.forEach((item) => {
-    if (Object.prototype.hasOwnProperty.call(item, '_subRows') && item._subRows) {
-      node = getNodes(item._subRows, node);
-    } else {
-      node.push(item._original);
-    }
-  });
-  return node;
-}
-
 /**
  * The second page of put-away where user can choose put-away bin, split a line
  * or generate put-away list(pdf). It can be sorted either by shipment or by product.
@@ -47,7 +33,6 @@ class PutAwaySecondPage extends Component {
       pivotBy,
       expanded,
       bins: [],
-      expandedRowsCount: 0,
     };
   }
 
@@ -73,12 +58,7 @@ class PutAwaySecondPage extends Component {
       }
     });
 
-    const allCurrentRows = this.selectTable
-      .getWrappedInstance().getResolvedState().sortedData;
-    const expandedRows = _.at(allCurrentRows, expandedRecordsIds);
-    const expandedRowsCount = getNodes(expandedRows).length;
-
-    this.setState({ expanded, expandedRowsCount });
+    this.setState({ expanded });
   };
 
   /**
@@ -179,9 +159,9 @@ class PutAwaySecondPage extends Component {
    */
   toggleTree = () => {
     if (this.state.pivotBy.length) {
-      this.setState({ pivotBy: [], expanded: {}, expandedRowsCount: 0 });
+      this.setState({ pivotBy: [], expanded: {} });
     } else {
-      this.setState({ pivotBy: ['stockMovement.name'], expanded: {}, expandedRowsCount: 0 });
+      this.setState({ pivotBy: ['stockMovement.name'], expanded: {} });
     }
   };
 
@@ -300,7 +280,7 @@ class PutAwaySecondPage extends Component {
       };
 
     return (
-      <div className="container-fluid pt-2">
+      <div className="main-container">
         <h1>Put Away - {this.state.putAway.putawayNumber}</h1>
         <div className="d-flex justify-content-between mb-2">
           <div>
@@ -337,10 +317,7 @@ class PutAwaySecondPage extends Component {
               className="-striped -highlight"
               {...extraProps}
               defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={pivotBy && pivotBy.length ? this.state.expandedRowsCount : 0}
-              style={{
-                height: '500px',
-              }}
+              minRows={0}
               showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
