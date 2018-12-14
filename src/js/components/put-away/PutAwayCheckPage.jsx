@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
+import { getTranslate, Translate } from 'react-localize-redux';
 
 import 'react-table/react-table.css';
 
@@ -11,6 +12,7 @@ import customTreeTableHOC from '../../utils/CustomTreeTable';
 import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
+
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -82,48 +84,48 @@ class PutAwayCheckPage extends Component {
    */
   getColumns = () => [
     {
-      Header: 'Code',
+      Header: <Translate id="stockMovement.code.label" />,
       accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Name',
+      Header: <Translate id="stockMovement.name.label" />,
       accessor: 'product.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Lot/Serial No.',
+      Header: <Translate id="stockMovement.lotSerialNo.label" />,
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Expiry',
+      Header: <Translate id="stockMovement.expiry.label" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Recipient',
+      Header: <Translate id="stockMovement.recipient.label" />,
       accessor: 'recipient.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'QTY',
+      Header: <Translate id="putAway.qty.label" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
       Filter,
     }, {
-      Header: 'Current bin',
+      Header: <Translate id="putAway.currentBin.label" />,
       accessor: 'currentBins',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Put Away Bin',
+      Header: <Translate id="putAway.putAwayBin.label" />,
       accessor: 'putawayLocation.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Stock Movement',
+      Header: <Translate id="stockMovement.label" />,
       accessor: 'stockMovement.name',
       style: { whiteSpace: 'normal' },
       Expander: ({ isExpanded }) => (
@@ -188,7 +190,7 @@ class PutAwayCheckPage extends Component {
 
         this.props.hideSpinner();
 
-        Alert.success('Put-Away was successfully completed!');
+        Alert.success(this.props.translate('Put-Away was successfully completed!'));
 
         this.setState({
           putAway: {
@@ -222,33 +224,33 @@ class PutAwayCheckPage extends Component {
           this.state.completed ?
             <div className="d-flex justify-content-between mb-2">
               <div>
-                Show by:
+                <Translate id="putAway.showBy.label" />:
                 <button
                   className="btn btn-primary ml-2 btn-xs"
                   data-toggle="button"
                   aria-pressed="false"
                   onClick={toggleTree}
                 >
-                  {pivotBy && pivotBy.length ? 'Stock Movement' : 'Product'}
+                  {pivotBy && pivotBy.length ? <Translate id="stockMovement.label" /> : <Translate id="product.label" /> }
                 </button>
               </div>
               <button
                 type="button"
                 className="btn btn-outline-primary float-right mb-2 btn-xs"
                 onClick={() => this.props.firstPage()}
-              >Go back to put-away list
+              ><Translate id="putAway.goBack.label" />:
               </button>
             </div> :
             <div className="d-flex justify-content-between mb-2">
               <div>
-                Show by:
+                <Translate id="putAway.showBy.label" />:
                 <button
                   className="btn btn-primary ml-2 btn-xs"
                   data-toggle="button"
                   aria-pressed="false"
                   onClick={toggleTree}
                 >
-                  {pivotBy && pivotBy.length ? 'Stock Movement' : 'Product'}
+                  {pivotBy && pivotBy.length ? <Translate id="stockMovement.label" /> : <Translate id="product.label" /> }
                 </button>
               </div>
               <div>
@@ -260,13 +262,13 @@ class PutAwayCheckPage extends Component {
                     expanded: this.state.expanded,
                   })}
                   className="btn btn-outline-primary mb-2 btn-xs mr-2"
-                >Edit
+                ><Translate id="default.button.edit.label" />:
                 </button>
                 <button
                   type="button"
                   onClick={() => this.completePutAway()}
                   className="btn btn-outline-primary float-right mb-2 btn-xs"
-                >Complete Put Away
+                ><Translate id="putAway.completePutAway.label" />:
                 </button>
               </div>
             </div>
@@ -320,7 +322,11 @@ class PutAwayCheckPage extends Component {
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(PutAwayCheckPage);
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(PutAwayCheckPage);
 
 PutAwayCheckPage.propTypes = {
   /** Function called when data is loading */
@@ -342,6 +348,7 @@ PutAwayCheckPage.propTypes = {
   expanded: PropTypes.shape({}),
   /** Location ID (currently chosen). To be used in internalLocations and putaways requests. */
   locationId: PropTypes.string.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 PutAwayCheckPage.defaultProps = {

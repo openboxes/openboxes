@@ -5,6 +5,7 @@ import ReactTable from 'react-table';
 import PropTypes from 'prop-types';
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
+import { Translate } from 'react-localize-redux';
 
 import 'react-table/react-table.css';
 
@@ -67,43 +68,43 @@ class PutAwaySecondPage extends Component {
    */
   getColumns = () => [
     {
-      Header: 'Code',
+      Header: <Translate id="stockMovement.code.label" />,
       accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Name',
+      Header: <Translate id="stockMovement.name.label" />,
       accessor: 'product.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Lot/Serial No.',
+      Header: <Translate id="stockMovement.lotSerialNo.label" />,
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Expiry',
+      Header: <Translate id="stockMovement.expiry.label" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Recipient',
+      Header: <Translate id="stockMovement.recipient.label" />,
       accessor: 'recipient.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'QTY',
+      Header: <Translate id="putAway.qty.label" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
       Filter,
     }, {
-      Header: 'Current bin',
+      Header: <Translate id="putAway.currentBin.label" />,
       accessor: 'currentBins',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: 'Stock Movement',
+      Header: <Translate id="stockMovement.label" />,
       accessor: 'stockMovement.name',
       style: { whiteSpace: 'normal' },
       Expander: ({ isExpanded }) => (
@@ -114,13 +115,13 @@ class PutAwaySecondPage extends Component {
       filterable: true,
       Filter,
     }, {
-      Header: 'Put Away Bin',
+      Header: <Translate id="putAway.putAwayBin.label" />,
       accessor: 'putawayLocation',
       Cell: (cellInfo) => {
         const splitItems = _.get(this.state.putAway.putawayItems, `[${cellInfo.index}].splitItems`);
 
         if (splitItems && splitItems.length > 0) {
-          return 'Split line';
+          return <Translate id="stockMovement.splitLine.label" />;
         }
 
         return (<Select
@@ -284,14 +285,14 @@ class PutAwaySecondPage extends Component {
         <h1>Put Away - {this.state.putAway.putawayNumber}</h1>
         <div className="d-flex justify-content-between mb-2">
           <div>
-          Show by:
+            <Translate id="putAway.showBy.label" />:
             <button
               className="btn btn-primary ml-2 btn-xs"
               data-toggle="button"
               aria-pressed="false"
               onClick={toggleTree}
             >
-              {pivotBy && pivotBy.length ? 'Stock Movement' : 'Product'}
+              {pivotBy && pivotBy.length ? <Translate id="stockMovement.label" /> : <Translate id="product.label" /> }
             </button>
           </div>
           <button
@@ -299,13 +300,13 @@ class PutAwaySecondPage extends Component {
             style={{ marginRight: 170 }}
             onClick={() => this.generatePutAwayList()}
           >
-            <span><i className="fa fa-print pr-2" />Generate Put-Away list</span>
+            <span><i className="fa fa-print pr-2" /><Translate id="putAway.generateList.label" /></span>
           </button>
           <button
             type="button"
             onClick={() => this.nextPage()}
             className="float-right btn btn-outline-primary align-self-end btn-xs"
-          >Next
+          ><Translate id="default.button.next.label" />
           </button>
         </div>
         {
@@ -329,7 +330,7 @@ class PutAwaySecondPage extends Component {
           type="button"
           onClick={() => this.nextPage()}
           className="btn btn-outline-primary float-right my-2 btn-xs"
-        >Next
+        ><Translate id="default.button.next.label" />
         </button>
       </div>
     );
