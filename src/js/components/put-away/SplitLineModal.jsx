@@ -5,7 +5,8 @@ import update from 'immutability-helper';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 import { confirmAlert } from 'react-confirm-alert';
-import { Translate } from 'react-localize-redux';
+import { Translate, getTranslate } from 'react-localize-redux';
+import connect from 'react-redux/es/connect/connect';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-tippy/dist/tippy.css';
@@ -42,14 +43,14 @@ class SplitLineModal extends Component {
 
     if (putAwayQty < this.props.putawayItem.quantity) {
       confirmAlert({
-        title: 'message.confirmSplitLine.label',
-        message: 'confirmSplitLine.label',
+        title: this.props.translate('message.confirmSplitLine.label'),
+        message: this.props.translate('confirmSplitLine.label'),
         buttons: [
           {
-            label: 'default.button.yes.label',
+            label: this.props.translate('default.button.yes.label'),
           },
           {
-            label: 'default.button.no.label',
+            label: this.props.translate('default.button.no.label'),
             onClick: () => this.save(),
           },
         ],
@@ -289,7 +290,11 @@ class SplitLineModal extends Component {
   }
 }
 
-export default SplitLineModal;
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
+export default connect(mapStateToProps)(SplitLineModal);
 
 SplitLineModal.propTypes = {
   /** Function saving split line's items */
@@ -325,6 +330,7 @@ SplitLineModal.propTypes = {
   splitItems: PropTypes.arrayOf(PropTypes.shape({})),
   /** An array of available bin locations */
   bins: PropTypes.arrayOf(PropTypes.shape({})),
+  translate: PropTypes.func.isRequired,
 };
 
 SplitLineModal.defaultProps = {

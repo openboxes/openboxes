@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
-import { Translate } from 'react-localize-redux';
+import { getTranslate, Translate } from 'react-localize-redux';
 
 import 'react-table/react-table.css';
 
@@ -210,7 +210,7 @@ class PutAwayCheckPage extends Component {
 
         this.props.hideSpinner();
 
-        Alert.success('Put-Away was successfully completed!');
+        Alert.success(this.props.translate('Put-Away was successfully completed!'));
 
         this.setState({
           putAway: {
@@ -345,7 +345,11 @@ class PutAwayCheckPage extends Component {
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(PutAwayCheckPage);
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(PutAwayCheckPage);
 
 PutAwayCheckPage.propTypes = {
   /** Function called when data is loading */
@@ -367,6 +371,7 @@ PutAwayCheckPage.propTypes = {
   expanded: PropTypes.shape({}),
   /** Location ID (currently chosen). To be used in internalLocations and putaways requests. */
   locationId: PropTypes.string.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 PutAwayCheckPage.defaultProps = {
