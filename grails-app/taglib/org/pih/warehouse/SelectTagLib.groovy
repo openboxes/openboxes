@@ -360,6 +360,18 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectLocationWithOptGroup = { attrs, body ->
+
+        if (!attrs.from) {
+            attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() };
+        }
+        attrs.groupBy = 'locationType'
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.name }
+
+        out << g.selectWithOptGroup(attrs)
+    }
+
 	
 	def selectLocation = { attrs,body ->
 
@@ -388,7 +400,13 @@ class SelectTagLib {
 	}
 
     def selectTransactionType = { attrs,body ->
-        attrs.from = TransactionType.list()
+        if (attrs.transactionCode) {
+            attrs.from = TransactionType.findAllByTransactionCode(attrs.transactionCode)
+        }
+        else {
+            attrs.from = TransactionType.list()
+
+        }
         attrs.optionKey = 'id'
         attrs.optionValue = { format.metadata(obj: it?.name) }
         out << g.select(attrs)

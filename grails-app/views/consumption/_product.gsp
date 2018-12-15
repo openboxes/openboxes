@@ -40,10 +40,14 @@
 </div>
 
 <div class="buttons">
-    <div class="button-group">
-        <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}" class="button btn-close-dialog" target="_blank">
+    <div class="button-container">
+        <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}" fragment="ui-tabs-1" class="button btn-close-dialog" target="_blank">
             <img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}"/>
             <warehouse:message code="inventory.showStockCard.label"/>
+        </g:link>
+        <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}" fragment="ui-tabs-2" class="button btn-close-dialog" target="_blank">
+            <img src="${resource(dir: 'images/icons/silk', file: 'date.png')}"/>
+            <warehouse:message code="inventory.showTransactionLog.label"/>
         </g:link>
     </div>
 

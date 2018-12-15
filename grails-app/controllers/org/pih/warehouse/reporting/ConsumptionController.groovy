@@ -43,17 +43,6 @@ class ConsumptionController {
             return;
         }
 
-        List selectedLocations = [] //= session.invoiceList
-        params.each {
-            if (it.key.contains("selectedLocation_")){
-                if (it.value.contains("on")){
-                    Location location = Location.get((it.key - "selectedLocation_"))
-                    if (location) {
-                        selectedLocations << location
-                    }
-                }
-            }
-        }
 
         // Hack to fix PIMS-2728
         if (command.selectedProperties) {
@@ -62,34 +51,20 @@ class ConsumptionController {
             }
         }
 
-
-        command.selectedLocations = selectedLocations
-
-        if (!command.fromLocations && !command.toLocations) {
-            flash.message = "${g.message(code: 'consumption.selectAtLeastOneLocation.message', default: 'It is recommended that you choose at least one source or destination')}"
-        }
-
-        def fromLocations = []
-        command.fromLocations.each {
-            fromLocations << it
-        }
-
         def tags = command.selectedTags.collect { it.tag}.asList()
         def products = tags ? inventoryService.getProductsByTags(tags) : null
 
         // Add an entire day to account for the 24 hour period on the end date
-        def endDate
-        if (command.toDate) {
-            endDate = command.toDate + 1
-        }
+        Date endDate = command.toDate ? command.toDate + 1 : null
 
         // Get all transactions
-        command.debits = inventoryService.getDebitsBetweenDates(fromLocations, selectedLocations, command.fromDate, endDate)
-        command.credits = inventoryService.getCreditsBetweenDates(selectedLocations, fromLocations, command.fromDate, endDate)
+        command.debits = inventoryService.getDebitsBetweenDates(command.fromLocations,
+                command.selectedLocations, command.fromDate, endDate,
+                command.selectedTransactionTypes)
 
         def transactions = []
         transactions.addAll(command.debits)
-        transactions.addAll(command.credits)
+        //transactions.addAll(command.credits)
 
         // Sort transaction by date ascending
         transactions = transactions.sort { it.transactionDate }
@@ -98,19 +73,18 @@ class ConsumptionController {
         // which occurs if there are no toLocations selected
         boolean toLocationsEmpty = command.toLocations.empty
         boolean fromLocationsEmpty = command.fromLocations.empty
+        boolean transactionTypesEmpty = command.transactionTypes.empty
+
+        // Some transactions don't have a destination (e.g. expired, consumed, etc)
+        if (toLocationsEmpty) {
+            command.toLocations = transactions.findAll { it.destination != null }.collect { it.destination }
+        }
+
+        // Keep track of all the transaction types (we may want to select a subset of these)
+        command.transactionTypes = transactions*.transactionType
 
         // Iterate over all transactions
         transactions.each { transaction ->
-
-            if (toLocationsEmpty) {
-                // Some transactions don't have a destination (e.g. expired, consumed, etc)
-                if (transaction.destination) {
-                    command.toLocations << transaction.destination
-                }
-            }
-
-            // Keep track of all the transaction types (we may want to select a subset of these)
-            command.transactionTypes << transaction.transactionType
 
             // Iterate over all transaction entries
             transaction.transactionEntries.each { transactionEntry ->
@@ -118,7 +92,6 @@ class ConsumptionController {
                 def currentRow = command.rows[product]
                 if (!currentRow) {
                     command.rows[product] = new ShowConsumptionRowCommand()
-                    command.rows[product].includeIssuedOnly = command.includeIssuedOnly
                     command.rows[product].command = command
                     command.rows[product].product = product
                 }
@@ -254,6 +227,10 @@ class ConsumptionController {
             command.selectedLocations = command.toLocations
         }
 
+        if (!command?.selectedTransactionTypes) {
+            command.selectedTransactionTypes = command.transactionTypes
+        }
+
         // Export as CSV
         if (params.format == "csv") {
 
@@ -343,6 +320,7 @@ class ShowConsumptionCommand {
     List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<TransactionType> transactionTypes = []
+    List<TransactionType> selectedTransactionTypes = []
     List <String> selectedDates = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class));
     List<Location> selectedLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Category> selectedCategories = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class));
@@ -351,7 +329,6 @@ class ShowConsumptionCommand {
     Boolean includeLocationBreakdown = false
     Boolean includeMonthlyBreakdown = false
     Boolean includeQuantityOnHand = false
-    Boolean includeIssuedOnly = true
 
     def productDomain = new DefaultGrailsDomainClass( Product.class )
 
@@ -419,14 +396,12 @@ class ShowConsumptionRowCommand {
     Map<String, Integer> transferInMonthlyMap = new TreeMap<String, Integer>();
     Map<String, Integer> transferOutMonthlyMap = new TreeMap<String, Integer>();
 
-    Boolean includeIssuedOnly = true
-
     static constraints = {
 
     }
 
     Integer getTransferBalance() {
-        return includeIssuedOnly ? transferOutQuantity : transferOutQuantity + expiredQuantity + damagedQuantity + otherQuantity
+        transferOutQuantity
     }
 
     Float getMonthlyQuantity() {
