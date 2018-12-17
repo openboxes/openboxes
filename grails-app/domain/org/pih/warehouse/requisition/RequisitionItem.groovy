@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
@@ -38,8 +38,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     String id
-	String description	
-	
+	String description
+
 	// Requested item or product
     Product product
     Category category
@@ -59,7 +59,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 	String cancelComments
 
 	// Miscellaneous information
-	Float unitPrice	
+	Float unitPrice
 	Person requestedBy	// the person who actually requested the item
 	Boolean substitutable = false
     String comment
@@ -86,10 +86,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
 
     static transients = [ "type", "substitutionItems", "monthlyDemand"]
-	
-	static belongsTo = [ requisition: Requisition ]	
+
+	static belongsTo = [ requisition: Requisition ]
 	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
-	
+
 	static mapping = {
 		id generator: 'uuid'
         picklistItems cascade: "all-delete-orphan", sort: "id"
@@ -547,6 +547,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         long startTime = System.currentTimeMillis()
         def picklistItems = PicklistItem.findAllByRequisitionItem(this)
         println "retrievePicklistItems: " + (System.currentTimeMillis() - startTime) + " ms"
+        return picklistItems
+    }
+
+    def retrievePicklistItemsSortedByBinName() {
+        def picklistItems = PicklistItem.findAllByRequisitionItem(this)
+        picklistItems.sort { a,b ->
+            b.binLocation.name <=> a.binLocation.name
+        }
         return picklistItems
     }
 
