@@ -17,7 +17,7 @@ import org.pih.warehouse.product.ProductGroup
 
 class ConsumptionFact {
 
-    String id
+    Long id
 
     // Dimension Keys
 	Product product
@@ -75,7 +75,7 @@ class ConsumptionFact {
 	Date dateCreated
 
     static mapping = {
-        id generator: 'uuid'
+        id generator: 'increment'
         cache true
     }
 

@@ -11,6 +11,8 @@ package org.pih.warehouse.reporting
 
 class DateDimension {
 
+
+    Long id
     int month
     int dayOfMonth
     int year
@@ -21,6 +23,7 @@ class DateDimension {
     String dayOfWeek
 
     static mapping = {
+        id generator: 'increment'
         date indexColumn:[name:'date_idx', unique:true]
     }
 

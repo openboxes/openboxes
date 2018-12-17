@@ -13,12 +13,14 @@ import org.pih.warehouse.inventory.TransactionType
 
 class TransactionTypeDimension {
 
+    Long id
     String transactionCode
     String transactionTypeName
 
     TransactionType transactionType
 
     static mapping = {
+        id generator: 'increment'
         transactionCode indexColumn:[name:'transaction_code_idx']
     }
 

@@ -13,6 +13,7 @@ import org.pih.warehouse.product.Product
 
 class ProductDimension {
 
+    Long id
     Boolean active = Boolean.TRUE
     String productCode
     String productName
@@ -25,6 +26,7 @@ class ProductDimension {
     Product product
 
     static mapping = {
+        id generator: 'increment'
         productCode indexColumn:[name:'product_code_idx', unique:true]
     }
 

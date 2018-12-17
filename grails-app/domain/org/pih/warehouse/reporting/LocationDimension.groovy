@@ -15,6 +15,7 @@ import org.pih.warehouse.core.LocationType
 
 class LocationDimension {
 
+    Long id
     String locationName
     String locationNumber
     String locationGroupName
@@ -28,6 +29,7 @@ class LocationDimension {
     LocationGroup locationGroup
 
     static mapping = {
+        id generator: 'increment'
         locationTypeCode indexColumn:[name:'location_type_code_idx']
     }
 

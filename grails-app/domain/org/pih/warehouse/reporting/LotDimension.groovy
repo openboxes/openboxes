@@ -13,6 +13,7 @@ import org.pih.warehouse.inventory.InventoryItem
 
 class LotDimension {
 
+    Long id
     String productCode
     String lotNumber
     Date expirationDate
@@ -21,6 +22,7 @@ class LotDimension {
 
 
     static mapping = {
+        id generator: 'increment'
         lotNumber indexColumn:[name:'lot_number_idx']
     }
 

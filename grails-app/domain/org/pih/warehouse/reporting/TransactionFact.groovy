@@ -19,6 +19,8 @@ import org.pih.warehouse.product.ProductGroup
 
 class TransactionFact {
 
+    Long id
+
     // Dimension Keys
     LotDimension lotKey
 	ProductDimension productKey
@@ -50,6 +52,7 @@ class TransactionFact {
     BigDecimal quantityModified = 0
 
     static mapping = {
+        id generator: 'increment'
     }
 
     static constraints = {

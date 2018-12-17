@@ -6,7 +6,7 @@
             </not>
         </preConditions>
         <createTable tableName="consumption_fact">
-            <column name="id" type="VARCHAR(255)">
+            <column name="id" type="BIGINT(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="version" type="BIGINT">
@@ -402,22 +402,6 @@
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="lot_dimension" constraintName="FKD2EAD9F8AA992CED" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_item"/>
-    </changeSet>
-    <changeSet author="jmiranda (generated)" id="1527739158952-18">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="FKED441931C8653BC0"/>
-            </not>
-        </preConditions>
-        <addForeignKeyConstraint baseColumnNames="associated_product_id" baseTableName="product_association" constraintName="FKED441931C8653BC0" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
-    </changeSet>
-    <changeSet author="jmiranda (generated)" id="1527739158952-19">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="FKED441931DED5FAE7"/>
-            </not>
-        </preConditions>
-        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_association" constraintName="FKED441931DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1527739158952-20">
         <preConditions onFail="MARK_RAN">
