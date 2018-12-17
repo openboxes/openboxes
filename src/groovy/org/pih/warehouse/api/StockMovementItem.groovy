@@ -211,7 +211,8 @@ class StockMovementItem {
         }
 
         if (lotNumber?.contains("E") && NumberUtils.isNumber(lotNumber)) {
-            throw new IllegalArgumentException("Lot numbers must not be specified in scientific notation")
+            throw new IllegalArgumentException("Lot numbers must not be specified in scientific notation. " +
+                    "Please reformat field with Lot Number: \"${lotNumber}\" to a number format")
         }
 
         Person recipient = recipientId ? Person.get(recipientId) : null
