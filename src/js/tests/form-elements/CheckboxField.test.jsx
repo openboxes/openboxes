@@ -20,7 +20,7 @@ jest.mock('react-localize-redux', () => ({
   },
 }));
 
-describe('CheckboxField component is correctly rendering', () => {
+xdescribe('CheckboxField component is correctly rendering', () => {
   it('renders correctly', () => {
     const fieldConfig = {
       type: CheckboxField,

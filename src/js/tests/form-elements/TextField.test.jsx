@@ -20,7 +20,7 @@ jest.mock('react-localize-redux', () => ({
   },
 }));
 
-describe('TextField component is correctly rendering', () => {
+xdescribe('TextField component is correctly rendering', () => {
   it('renders correctly', () => {
     const fieldConfig = {
       type: TextField,

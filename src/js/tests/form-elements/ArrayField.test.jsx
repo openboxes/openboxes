@@ -52,7 +52,7 @@ jest.mock('react-virtualized', () => ({
 
 jest.mock('react-tippy');
 
-describe('ArrayField component is correctly rendering', () => {
+xdescribe('ArrayField component is correctly rendering', () => {
   it('with Add button', () => {
     const fieldConfig = {
       type: ArrayField,
