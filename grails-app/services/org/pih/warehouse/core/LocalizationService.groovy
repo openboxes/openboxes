@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.util.Metadata
 import org.apache.commons.io.IOUtils
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.web.context.request.RequestContextHolder
 import org.pih.warehouse.util.LocalizationUtil
@@ -98,7 +99,7 @@ class LocalizationService {
 	 */
 	Properties getMessagesPropertiesFromResource(String messagesPropertiesUrl) {
 		Properties properties = new Properties()
-		def inputStream = servletContext.getResourceAsStream(messagesPropertiesUrl)
+		def inputStream = ServletContextHolder.servletContext.getResourceAsStream(messagesPropertiesUrl)
 		if (inputStream) {
 			String messagesPropertiesString = IOUtils.toString(inputStream)
 			properties.load(new StringReader(messagesPropertiesString))
