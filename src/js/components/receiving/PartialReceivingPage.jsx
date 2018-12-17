@@ -119,6 +119,7 @@ const FIELDS = {
       autofillLine: {
         fieldKey: '',
         fixedWidth: '50px',
+        label: 'react.blank.label',
         type: ({
           // eslint-disable-next-line react/prop-types
           subfield, parentIndex, rowIndex, autofillLines, fieldValue, shipmentReceived,
@@ -261,6 +262,7 @@ const FIELDS = {
       edit: {
         type: params => (params.subfield ? <EditLineModal {...params} /> : null),
         fieldKey: '',
+        label: 'react.blank.label',
         fixedWidth: '85px',
         attributes: {
           btnOpenText: 'partialReceiving.editLine.label',
