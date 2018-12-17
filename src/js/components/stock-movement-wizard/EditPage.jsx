@@ -320,10 +320,10 @@ class EditItemsPage extends Component {
     if (errors.length) {
       const errorMessage = _.reduce(errors, (message, value, key) => {
         const error = _.map(value, val => `${val}</br>`);
-        return `${message}Error occurred in line ${key + 1}:</br>${error}`;
+        return `${message}<Translate id="errors.errorInLine.label" /> ${key + 1}:</br>${error}`;
       }, '');
 
-      Alert.error(this.props.translate(errorMessage));
+      Alert.error(errorMessage);
 
       this.props.hideSpinner();
       return null;
