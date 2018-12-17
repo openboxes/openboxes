@@ -1128,17 +1128,13 @@ class StockMovementService {
         User user = AuthService.currentUser.get()
         StockMovement stockMovement = getStockMovement(id)
         Requisition requisition = stockMovement.requisition
-        def shipments = requisition.shipments
+        def shipment = requisition.shipment
 
-        if (!shipments) {
+        if (!shipment) {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
-        if (shipments.size() > 1) {
-            throw new IllegalStateException("There are too many shipments associated with stock movement ${requisition.requestNumber}")
-        }
-
-        shipmentService.sendShipment(shipments[0], null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
+        shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
 
         // Create temporary receiving area for the Partial Receipt process
         if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && stockMovement.destination.hasBinLocationSupport()) {
@@ -1158,7 +1154,7 @@ class StockMovementService {
 
         // If the shipment has been shipped we can roll it back
         Requisition requisition = stockMovement?.requisition
-        Shipment shipment = stockMovement?.requisition?.shipments[0]
+        Shipment shipment = stockMovement?.requisition?.shipment
         if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
             shipmentService.rollbackLastEvent(shipment)
         }
