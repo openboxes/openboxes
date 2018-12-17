@@ -118,7 +118,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
-    static transients = ["sortedStocklistItems"]
+    static transients = ["sortedStocklistItems", "shipment"]
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
     static mapping = {
@@ -306,6 +306,25 @@ class Requisition implements Comparable<Requisition>, Serializable {
                     a.product?.name <=> b.product?.name ?:
                             a.orderIndex <=> b.orderIndex
         }
+    }
+
+    /**
+     * Return the shipment associated with the requisition.
+     *
+     * @throws IllegalStateException if there are multiple shipments associated with a requisition (might be supported some day)
+     *
+     * @return
+     */
+    Shipment getShipment() {
+        Shipment shipment
+
+        if (shipments) {
+            if (shipments.size() > 1) {
+                throw new IllegalStateException("There are too many shipments associated with requisition ${requestNumber}")
+            }
+            shipment = shipments.iterator().next()
+        }
+        return shipment
     }
 
 

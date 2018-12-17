@@ -154,10 +154,7 @@ class StockMovementController {
 
     def packingList = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        stockMovement.shipment = shipments[0]
-
-
+        stockMovement.shipment = stockMovement?.requisition?.shipment
         render(template: "packingList", model: [stockMovement:stockMovement])
     }
 
