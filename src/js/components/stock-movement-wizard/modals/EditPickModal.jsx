@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
@@ -11,10 +12,11 @@ import SelectField from '../../form-elements/SelectField';
 import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
 
+
 const FIELDS = {
   reasonCode: {
     type: SelectField,
-    label: 'Reason code',
+    label: 'stockMovement.reasonCode.label',
     getDynamicAttr: props => ({
       options: props.reasonCodes,
     }),
@@ -24,19 +26,19 @@ const FIELDS = {
     fields: {
       lotNumber: {
         type: LabelField,
-        label: 'Lot #',
+        label: 'stockMovement.lot.label',
       },
       expirationDate: {
         type: LabelField,
-        label: 'Expiry Date',
+        label: 'stockMovement.expiry.label',
       },
       'binLocation.name': {
         type: LabelField,
-        label: 'Bin',
+        label: 'stockMovement.binLocation.label',
       },
       quantityAvailable: {
         type: LabelField,
-        label: 'Qty available',
+        label: 'stockMovement.quantityAvailable.label',
         fixedWidth: '150px',
         attributes: {
           formatValue: value => (value ? value.toLocaleString('en-US') : null),
@@ -44,7 +46,7 @@ const FIELDS = {
       },
       quantityPicked: {
         type: TextField,
-        label: 'Qty picked',
+        label: 'stockMovement.quantityPicked.label',
         fixedWidth: '140px',
         attributes: {
           type: 'number',
@@ -59,10 +61,10 @@ function validate(values) {
   errors.availableItems = [];
   _.forEach(values.availableItems, (item, key) => {
     if (item.quantityPicked > item.quantityAvailable) {
-      errors.availableItems[key] = { quantityPicked: 'Picked quantity is higher than available' };
+      errors.availableItems[key] = { quantityPicked: 'errors.higherTyPicked.label ' };
     }
     if (item.quantityPicked < 0) {
-      errors.availableItems[key] = { quantityPicked: 'Picked quantity can\'t be negative' };
+      errors.availableItems[key] = { quantityPicked: 'errors.negativeQtyPicked.label' };
     }
   });
 
@@ -75,7 +77,7 @@ function validate(values) {
 
   if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
     !values.reasonCode && pickedSum !== values.quantityRequired) {
-    errors.reasonCode = 'Total quantity picked is different than required! Add reason code!';
+    errors.reasonCode = 'errors.differentTotalQty.label';
   }
 
   return errors;
@@ -198,7 +200,7 @@ class EditPickModal extends Component {
   calculatePicked(values) {
     return (
       <div>
-        <div className="font-weight-bold pb-2">Quantity Picked: {_.reduce(values.availableItems, (sum, val) =>
+        <div className="font-weight-bold pb-2"><Translate id="stockMovement.quantityPicked.label" />: {_.reduce(values.availableItems, (sum, val) =>
           (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
         </div>
         <hr />
@@ -223,9 +225,9 @@ class EditPickModal extends Component {
         renderBodyWithValues={this.calculatePicked}
       >
         <div>
-          <div className="font-weight-bold">Product Code: {this.state.attr.fieldValue.productCode}</div>
-          <div className="font-weight-bold">Product Name: {this.state.attr.fieldValue['product.name']}</div>
-          <div className="font-weight-bold">Quantity Required: {this.state.attr.fieldValue.quantityRequired}</div>
+          <div className="font-weight-bold"><Translate id="stockMovement.productCode.label" />: {this.state.attr.fieldValue.productCode}</div>
+          <div className="font-weight-bold"><Translate id="stockMovement.productName.label" />: </div>
+          <div className="font-weight-bold"><Translate id="stockMovement.quantityRequired.label" />: {this.state.attr.fieldValue.quantityRequired}</div>
         </div>
       </ModalWrapper>
     );

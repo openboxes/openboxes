@@ -6,6 +6,7 @@ import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
+import { Translate, getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -45,19 +46,19 @@ const FIELDS = {
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
-        label: 'Code',
+        label: 'stockMovement.code.label',
       },
       productName: {
         type: LabelField,
         flexWidth: '4.5',
-        label: 'Product Name',
+        label: 'stockMovement.productName.label',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
       },
       quantityRequested: {
         type: LabelField,
-        label: 'Qty requested',
+        label: 'stockMovement.quantityRequested.label',
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -65,7 +66,7 @@ const FIELDS = {
       },
       quantityAvailable: {
         type: LabelField,
-        label: 'Qty available',
+        label: 'stockMovement.quantityAvailable.label',
         flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
@@ -84,7 +85,7 @@ const FIELDS = {
       },
       totalMonthlyQuantity: {
         type: LabelField,
-        label: 'Total monthly qty',
+        label: 'stockMovement.totalMonthlyQty.label',
         flexWidth: '1.35',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -92,26 +93,26 @@ const FIELDS = {
       },
       quantityConsumed: {
         type: LabelField,
-        label: 'Monthly stock list qty',
+        label: 'stockMovement.monthlyQuantity.label',
         flexWidth: '1.45',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
       substituteButton: {
-        label: 'Substitution',
+        label: 'stockMovement.substitution.label',
         type: SubstitutionsModal,
         fieldKey: '',
         flexWidth: '1',
         attributes: {
-          title: 'Substitutes',
+          title: 'stockMovement.substitutes.label',
         },
         getDynamicAttr: ({
           fieldValue, rowIndex, stockMovementId, onResponse, reviseRequisitionItems, values,
         }) => ({
           onOpen: () => reviseRequisitionItems(values),
           productCode: fieldValue.productCode,
-          btnOpenText: fieldValue.substitutionStatus,
+          btnOpenText: `default.${fieldValue.substitutionStatus}.label`,
           btnOpenDisabled: fieldValue.substitutionStatus === 'NO' || fieldValue.statusCode === 'SUBSTITUTED',
           btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus || 'HIDDEN'],
           rowIndex,
@@ -121,7 +122,7 @@ const FIELDS = {
         }),
       },
       quantityRevised: {
-        label: 'Revised Qty',
+        label: 'stockMovement.quantityRevised.label',
         type: TextField,
         fieldKey: 'statusCode',
         flexWidth: '1',
@@ -134,7 +135,7 @@ const FIELDS = {
       },
       reasonCode: {
         type: SelectField,
-        label: 'Reason code',
+        label: 'stockMovement.reasonCode.label',
         flexWidth: '1.4',
         fieldKey: 'quantityRevised',
         getDynamicAttr: ({ fieldValue, subfield, reasonCodes }) => ({
@@ -145,10 +146,10 @@ const FIELDS = {
       },
       revert: {
         type: ButtonField,
-        label: 'Undo',
+        label: 'default.button.undo.label',
         flexWidth: '0.9',
         fieldKey: '',
-        buttonLabel: 'Undo',
+        buttonLabel: 'default.button.undo.label',
         getDynamicAttr: ({ fieldValue, revertItem }) => ({
           onClick: fieldValue.requisitionItemId ?
             () => revertItem(fieldValue.requisitionItemId) : () => null,
@@ -168,23 +169,23 @@ function validate(values) {
 
   _.forEach(values.editPageItems, (item, key) => {
     if (!_.isEmpty(item.quantityRevised) && _.isEmpty(item.reasonCode)) {
-      errors.editPageItems[key] = { reasonCode: 'Reason code required' };
+      errors.editPageItems[key] = { reasonCode: 'errors.reasonCodeRequired.label' };
     } else if (_.isNil(item.quantityRevised) && !_.isEmpty(item.reasonCode) && item.statusCode !== 'SUBSTITUTED') {
-      errors.editPageItems[key] = { quantityRevised: 'Revised quantity required' };
+      errors.editPageItems[key] = { quantityRevised: 'errors.revisedQuantityRequired.label' };
     }
     if (parseInt(item.quantityRevised, 10) === item.quantityRequested) {
       errors.editPageItems[key] = {
-        quantityRevised: 'Revised quantity can\'t be the same as requested quantity',
+        quantityRevised: 'errors.sameRevisedQty.label',
       };
     }
     if (_.isNil(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable) && (item.statusCode !== 'SUBSTITUTED')) {
-      errors.editPageItems[key] = { quantityRevised: 'Revise quantity! Quantity available is lower than requested' };
+      errors.editPageItems[key] = { quantityRevised: 'errors.lowerQty.label' };
     }
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised > item.quantityAvailable)) {
-      errors.editPageItems[key] = { quantityRevised: 'Revised quantity exceeds quantity available' };
+      errors.editPageItems[key] = { quantityRevised: 'errors.higherQty.label' };
     }
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised < 0)) {
-      errors.editPageItems[key] = { quantityRevised: 'Revised quantity can\'t be negative' };
+      errors.editPageItems[key] = { quantityRevised: 'errors.negativeQty.label' };
     }
   });
   return errors;
@@ -285,7 +286,7 @@ class EditItemsPage extends Component {
           );
           return _.isEmpty(oldRevision) ? true :
             ((oldRevision.quantityRevised !== item.quantityRevised) ||
-             (oldRevision.reasonCode !== item.reasonCode));
+              (oldRevision.reasonCode !== item.reasonCode));
         }
         return false;
       },
@@ -319,7 +320,7 @@ class EditItemsPage extends Component {
     if (errors.length) {
       const errorMessage = _.reduce(errors, (message, value, key) => {
         const error = _.map(value, val => `${val}</br>`);
-        return `${message}Error occurred in line ${key + 1}:</br>${error}`;
+        return `${message}<Translate id="errors.errorInLine.label" /> ${key + 1}:</br>${error}`;
       }, '');
 
       Alert.error(errorMessage);
@@ -331,7 +332,7 @@ class EditItemsPage extends Component {
     return this.reviseRequisitionItems(formValues)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success('Changes saved successfully!');
+        Alert.success(this.props.translate('alert.saveSuccess.label'));
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -342,11 +343,11 @@ class EditItemsPage extends Component {
    */
   refresh() {
     confirmAlert({
-      title: 'Confirm refresh',
-      message: 'Are you sure you want to refresh? Your progress since last save will be lost.',
+      title: this.props.translate('message.confirmRefresh.label'),
+      message: this.props.translate('confirmRefresh.message'),
       buttons: [
         {
-          label: 'Yes',
+          label: this.props.translate('default.yes.label'),
           onClick: () => {
             this.setState({
               revisedItems: [],
@@ -356,7 +357,7 @@ class EditItemsPage extends Component {
           },
         },
         {
-          label: 'No',
+          label: this.props.translate('default.no.label'),
         },
       ],
     });
@@ -454,7 +455,7 @@ class EditItemsPage extends Component {
       })
       .catch(() => {
         this.props.hideSpinner();
-        return Promise.reject(new Error('Could not revert requisition items'));
+        return Promise.reject(new Error(this.props.translate('error.revertRequisitionItem.label')));
       });
   }
 
@@ -473,14 +474,14 @@ class EditItemsPage extends Component {
                 onClick={() => this.refresh()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-refresh pr-2" />Refresh</span>
+                <span><i className="fa fa-refresh pr-2" /><Translate id="default.button.refresh.label" /></span>
               </button>
               <button
                 type="button"
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                <span><i className="fa fa-save pr-2" />Save</span>
+                <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" /></span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -494,9 +495,11 @@ class EditItemsPage extends Component {
               }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
-                  Previous
+                  <Translate id="default.button.previous.label" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">Next</button>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">
+                  <Translate id="default.button.next.label" />
+                </button>
               </div>
             </form>
           </div>
@@ -509,6 +512,7 @@ class EditItemsPage extends Component {
 const mapStateToProps = state => ({
   reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
+  translate: getTranslate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -535,4 +539,5 @@ EditItemsPage.propTypes = {
   reasonCodesFetched: PropTypes.bool.isRequired,
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  translate: PropTypes.func.isRequired,
 };

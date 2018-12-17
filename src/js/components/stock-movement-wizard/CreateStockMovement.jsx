@@ -6,6 +6,7 @@ import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import queryString from 'query-string';
+import { Translate, getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -20,19 +21,19 @@ import { debouncedUsersFetch, debouncedLocationsFetch } from '../../utils/option
 function validate(values) {
   const errors = {};
   if (!values.description) {
-    errors.description = 'This field is required';
+    errors.description = 'error.requiredField.label';
   }
   if (!values.origin) {
-    errors.origin = 'This field is required';
+    errors.origin = 'error.requiredField.label';
   }
   if (!values.destination) {
-    errors.destination = 'This field is required';
+    errors.destination = 'error.requiredField.label';
   }
   if (!values.requestedBy) {
-    errors.requestedBy = 'This field is required';
+    errors.requestedBy = 'error.requiredField.label';
   }
   if (!values.dateRequested) {
-    errors.dateRequested = 'This field is required';
+    errors.dateRequested = 'error.requiredField.label';
   }
   return errors;
 }
@@ -40,7 +41,7 @@ function validate(values) {
 const FIELDS = {
   description: {
     type: TextField,
-    label: 'Description',
+    label: 'stockMovement.description.label',
     attributes: {
       required: true,
       autoFocus: true,
@@ -48,7 +49,7 @@ const FIELDS = {
   },
   origin: {
     type: SelectField,
-    label: 'Origin',
+    label: 'stockMovement.origin.label',
     attributes: {
       required: true,
       async: true,
@@ -71,7 +72,7 @@ const FIELDS = {
   },
   destination: {
     type: SelectField,
-    label: 'Destination',
+    label: 'stockMovement.destination.label',
     attributes: {
       required: true,
       async: true,
@@ -93,7 +94,7 @@ const FIELDS = {
     }),
   },
   stocklist: {
-    label: 'Stock list',
+    label: 'stockMovement.stocklist.label',
     type: SelectField,
     getDynamicAttr: ({ origin, destination, stocklists }) => ({
       disabled: !(origin && destination && origin.id && destination.id),
@@ -104,7 +105,7 @@ const FIELDS = {
   },
   requestedBy: {
     type: SelectField,
-    label: 'Requested-by',
+    label: 'stockMovement.requestedBy.label',
     attributes: {
       async: true,
       required: true,
@@ -120,7 +121,7 @@ const FIELDS = {
   },
   dateRequested: {
     type: DateField,
-    label: 'Date requested',
+    label: 'stockMovement.dateRequested.label',
     attributes: {
       required: true,
       dateFormat: 'MM/DD/YYYY',
@@ -129,7 +130,7 @@ const FIELDS = {
   },
 };
 
-  /** The first step of stock movement where user can add all the basic information. */
+/** The first step of stock movement where user can add all the basic information. */
 class CreateStockMovement extends Component {
   constructor(props) {
     super(props);
@@ -266,12 +267,12 @@ class CreateStockMovement extends Component {
         })
         .catch(() => {
           this.props.hideSpinner();
-          return Promise.reject(new Error('Could not create stock movement'));
+          return Promise.reject(new Error(this.props.translate('error.createStockMovement.label')));
         });
     }
 
     return new Promise(((resolve, reject) => {
-      reject(new Error('Missing required parameters'));
+      reject(new Error(this.props.translate('error.missingParameters.label')));
     }));
   }
 
@@ -294,16 +295,15 @@ class CreateStockMovement extends Component {
       this.saveStockMovement(values);
     } else {
       confirmAlert({
-        title: 'Confirm change',
-        message: 'Do you want to change stock movement data? ' +
-          'Changing origin, destination or stock list can cause loss of your current work.',
+        title: this.props.translate('message.confirmChange.label'),
+        message: this.props.translate('confirmChange.message'),
         buttons: [
           {
-            label: 'No',
+            label: this.props.translate('default.no.label'),
             onClick: () => this.resetToInitialValues(),
           },
           {
-            label: 'Yes',
+            label: this.props.translate('default.yes.label'),
             onClick: () => this.saveStockMovement({ ...values, forceUpdate: 'true' }),
           },
         ],
@@ -330,7 +330,7 @@ class CreateStockMovement extends Component {
               }),
             )}
             <div>
-              <button type="submit" className="btn btn-outline-primary float-right btn-xs">Next</button>
+              <button type="submit" className="btn btn-outline-primary float-right btn-xs"><Translate id="default.button.next.label" /></button>
             </div>
           </form>
         )}
@@ -342,6 +342,7 @@ class CreateStockMovement extends Component {
 const mapStateToProps = state => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
+  translate: getTranslate(state.localize),
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -387,4 +388,5 @@ CreateStockMovement.propTypes = {
   }).isRequired,
   /** Return true if current user is superuser */
   isSuperuser: PropTypes.bool.isRequired,
+  translate: PropTypes.func.isRequired,
 };

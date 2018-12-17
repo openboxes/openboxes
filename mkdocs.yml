@@ -51,6 +51,7 @@ pages:
         - 'Core':
             - 'Identifiers': 'api-guide/identifier.md'
             - 'Internal Locations': 'api-guide/internalLocation.md'
+            - 'Localizations': 'api-guide/localization.md'
             - 'Locations': 'api-guide/location.md'
             - 'Lookup': 'api-guide/lookup.md'
         - 'Products':

@@ -5,6 +5,7 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
+import { getTranslate, Translate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -32,7 +33,7 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
-        label: 'Code',
+        label: 'stockMovement.code.label',
         flexWidth: '0.9',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
@@ -40,7 +41,7 @@ const FIELDS = {
       },
       'product.name': {
         type: LabelField,
-        label: 'Product Name',
+        label: 'stockMovement.productName.label',
         flexWidth: '4.7',
         attributes: {
           className: 'text-left ml-1',
@@ -49,21 +50,21 @@ const FIELDS = {
       lotNumber: {
         type: LabelField,
         flexWidth: '1.3',
-        label: 'Lot #',
+        label: 'stockMovement.lot.label',
       },
       expirationDate: {
         type: LabelField,
         flexWidth: '0.9',
-        label: 'Expiry Date',
+        label: 'stockMovement.expiry.label',
       },
       'binLocation.name': {
         type: LabelField,
         flexWidth: '1.2',
-        label: 'Bin',
+        label: 'stockMovement.binLocation.label',
       },
       quantityRequired: {
         type: LabelField,
-        label: 'Qty required',
+        label: 'stockMovement.quantityRequired.label',
         flexWidth: '0.8',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -71,19 +72,19 @@ const FIELDS = {
       },
       quantityPicked: {
         type: LabelField,
-        label: 'Qty picked',
+        label: 'stockMovement.quantityPicked.label',
         flexWidth: '0.7',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
       buttonEditPick: {
-        label: 'Edit Pick',
+        label: 'stockMovement.editPick.label',
         type: EditPickModal,
         fieldKey: '',
         flexWidth: '0.6',
         attributes: {
-          title: 'Edit Pick',
+          title: 'stockMovement.editPick.label',
         },
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, onResponse,
@@ -91,18 +92,18 @@ const FIELDS = {
           fieldValue: flattenRequest(fieldValue),
           subfield,
           stockMovementId,
-          btnOpenText: fieldValue.hasChangedPick ? '' : 'Edit',
+          btnOpenText: fieldValue.hasChangedPick ? '' : 'default.button.edit.label',
           btnOpenClassName: fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse,
         }),
       },
       buttonAdjustInventory: {
-        label: 'Adjust Inventory',
+        label: 'stockMovement.adjustInventory.label',
         type: AdjustInventoryModal,
         fieldKey: '',
         flexWidth: '1.3',
         attributes: {
-          title: 'Adjust Inventory',
+          title: 'stockMovement.adjustInventory.label',
         },
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, onResponse, bins, locationId,
@@ -110,7 +111,7 @@ const FIELDS = {
           fieldValue: flattenRequest(fieldValue),
           subfield,
           stockMovementId,
-          btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
+          btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'stockMovement.adjust.label',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse,
           bins,
@@ -119,10 +120,10 @@ const FIELDS = {
       },
       revert: {
         type: ButtonField,
-        label: 'Undo',
+        label: 'default.button.undo.label',
         flexWidth: '0.7',
         fieldKey: '',
-        buttonLabel: 'Undo',
+        buttonLabel: 'default.button.undo.label',
         getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
           onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
           hidden: subfield || fieldValue.pickStatusCode === 'NOT_PICKED',
@@ -199,15 +200,15 @@ class PickPage extends Component {
    */
   refresh() {
     confirmAlert({
-      title: 'Confirm refresh',
-      message: 'Are you sure you want to refresh? Your progress since last save will be lost.',
+      title: this.props.translate('message.confirmRefresh.label '),
+      message: this.props.translate('confirmRefresh.message'),
       buttons: [
         {
-          label: 'Yes',
+          label: this.props.translate('default.yes.label'),
           onClick: () => this.fetchAllData(),
         },
         {
-          label: 'No',
+          label: this.props.translate('default.no.label'),
         },
       ],
     });
@@ -419,54 +420,60 @@ class PickPage extends Component {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span><i className="fa fa-print pr-2" />Print Picklist</span>
+                <span><i className="fa fa-print pr-2" /><Translate id="stockMovement.printPicklist.label" /></span>
               </a>
               <button
                 type="button"
                 onClick={() => this.refresh()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
               >
-                <span><i className="fa fa-refresh pr-2" />Refresh</span>
+                <span><i className="fa fa-refresh pr-2" /><Translate id="default.button.refresh.label" /></span>
               </button>
               <button
                 type="button"
                 onClick={() => this.sortByBins()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                <span>Sort by bins{this.state.sorted && <i className={`fa ${this.state.orderIcon} pl-2`} />}</span>
+                <span><Translate id="stockMovement.sortByBins.label" />{this.state.sorted && <i className={`fa ${this.state.orderIcon} pl-2`} />}</span>
               </button>
             </span>
             <form onSubmit={handleSubmit} className="print-mt">
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                  stockMovementId: values.stockMovementId,
-                  onResponse: this.saveNewItems,
-                  revertUserPick: this.revertUserPick,
-                  bins: this.state.bins,
-                  locationId: this.state.values.origin.id,
-                }))}
+                stockMovementId: values.stockMovementId,
+                onResponse: this.saveNewItems,
+                revertUserPick: this.revertUserPick,
+                bins: this.state.bins,
+                locationId: this.state.values.origin.id,
+              }))}
               <div className="d-print-none">
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
-                    Previous
+                  <Translate id="default.button.previous.label" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">Next</button>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">
+                  <Translate id="default.button.next.label" />
+                </button>
               </div>
             </form>
           </div>
-          )}
+        )}
       />
     );
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(PickPage);
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(PickPage);
 
 PickPage.propTypes = {
   /** Initial component's data */
   initialValues: PropTypes.shape({}).isRequired,
   /**
-  * Function called with the form data when the handleSubmit()
-  * is fired from within the form component.
-  */
+   * Function called with the form data when the handleSubmit()
+   * is fired from within the form component.
+   */
   onSubmit: PropTypes.func.isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
@@ -474,4 +481,5 @@ PickPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  translate: PropTypes.func.isRequired,
 };

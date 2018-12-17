@@ -1,6 +1,8 @@
 import React from 'react';
 import { Tooltip } from 'react-tippy';
 import PropTypes from 'prop-types';
+import { getTranslate, Translate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
 import 'react-tippy/dist/tippy.css';
 
@@ -17,13 +19,14 @@ export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   );
 };
 
-export const renderField = ({
+export const renderFormFields = ({
   renderInput,
   attributes: { required, hidden, ...otherAttributes },
   label: FieldLabel,
   touched: fieldTouched,
   arrayField,
   input,
+  translate,
   meta: { touched, error },
 }) => {
   const attr = { id: input.name, ...otherAttributes };
@@ -32,7 +35,7 @@ export const renderField = ({
   if (arrayField) {
     return (
       <Tooltip
-        title={error}
+        title={translate(`${error}`)}
         disabled={!error || !(touched || fieldTouched)}
         theme="transparent"
         arrow="true"
@@ -52,7 +55,7 @@ export const renderField = ({
       <div className="row">
         {
           typeof FieldLabel === 'string' ?
-            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right">{ FieldLabel }</label> :
+            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right"><Translate id={FieldLabel} /></label> :
             <FieldLabel />
         }
         <div className="col-md-4 col-7">
@@ -62,14 +65,20 @@ export const renderField = ({
       <div className="row">
         <div className="col-md-2" />
         <div className="help-block col-md-4" style={{ float: 'left' }}>
-          { touched || fieldTouched ? error : '' }
+          { (error && touched) || (error && fieldTouched) ? translate(`${error}`) : '' }
         </div>
       </div>
     </div>
   );
 };
 
-renderField.propTypes = {
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
+export const renderField = connect(mapStateToProps)(renderFormFields);
+
+renderFormFields.propTypes = {
   renderInput: PropTypes.func.isRequired,
   attributes: PropTypes.shape({}).isRequired,
   label: PropTypes.oneOfType([
@@ -80,9 +89,10 @@ renderField.propTypes = {
   arrayField: PropTypes.bool,
   input: PropTypes.shape({}).isRequired,
   meta: PropTypes.shape({}).isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
-renderField.defaultProps = {
+renderFormFields.defaultProps = {
   touched: false,
   arrayField: false,
   label: '',
