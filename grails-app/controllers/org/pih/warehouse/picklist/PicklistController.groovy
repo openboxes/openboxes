@@ -38,7 +38,7 @@ class PicklistController {
 		def requisition = Requisition.get(params.id)
 		def picklist = Picklist.findByRequisition(requisition)
 		def location = Location.get(session.warehouse.id)
-		[requisition:requisition, picklist: picklist, location:location, order:params.order]
+		[requisition:requisition, picklist: picklist, location:location, sorted:params.sorted]
     }
 
     def renderPdf = {
@@ -72,7 +72,7 @@ class PicklistController {
         renderPdf(
                 template: "/picklist/print",
                 //locale:locale,
-                model: [requisition:requisition, picklist: picklist, location:location, order:params.order],
+                model: [requisition:requisition, picklist: picklist, location:location, sorted:params.sorted],
                 filename: "Picklist - ${requisition.requestNumber}"
         )
 
