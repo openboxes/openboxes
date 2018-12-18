@@ -58,7 +58,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.pallet.label',
-        flexWidth: '8',
+        flexWidth: '1',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
         },
@@ -67,7 +67,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.box.label',
-        flexWidth: '6',
+        flexWidth: '1',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
         },
@@ -75,11 +75,12 @@ const FIELDS = {
       'product.productCode': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.code.label',
+        flexWidth: '1',
       },
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.name.label',
-        flexWidth: '24',
+        flexWidth: '4',
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
@@ -88,24 +89,27 @@ const FIELDS = {
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.lotSerialNo.label',
+        flexWidth: '1',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.expirationDate.label',
-        fixedWidth: '130px',
+        flexWidth: '1',
       },
       'binLocation.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.binLocation.label',
+        flexWidth: '1.5',
       },
       'recipient.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.recipient.label',
+        flexWidth: '1.5',
       },
       quantityReceiving: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.receivingNow.label',
-        fixedWidth: '115px',
+        flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
@@ -113,7 +117,7 @@ const FIELDS = {
       quantityRemaining: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.remaining.label',
-        fixedWidth: '95px',
+        flexWidth: '1',
         fieldKey: '',
         attributes: {
           formatValue: fieldValue => (fieldValue.quantityRemaining ? fieldValue.quantityRemaining.toLocaleString('en-US') : fieldValue.quantityRemaining),
@@ -125,7 +129,7 @@ const FIELDS = {
       cancelRemaining: {
         type: params => (params.subfield ? <CheckboxField {...params} /> : null),
         label: 'partialReceiving.cancelRemaining.label',
-        fixedWidth: '140px',
+        flexWidth: '1',
         getDynamicAttr: ({ saveDisabled }) => ({
           disabled: saveDisabled,
         }),
@@ -133,7 +137,7 @@ const FIELDS = {
       comment: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.comment.label',
-        fixedWidth: '110px',
+        flexWidth: '1',
       },
     },
   },

@@ -118,7 +118,8 @@ const FIELDS = {
     fields: {
       autofillLine: {
         fieldKey: '',
-        fixedWidth: '50px',
+        label: 'react.blank.label',
+        flexWidth: '0',
         type: ({
           // eslint-disable-next-line react/prop-types
           subfield, parentIndex, rowIndex, autofillLines, fieldValue, shipmentReceived,
@@ -141,7 +142,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.pallet.label',
-        flexWidth: '8',
+        flexWidth: '0.8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
         },
@@ -150,7 +151,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.box.label',
-        flexWidth: '6',
+        flexWidth: '0.8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
         },
@@ -158,11 +159,12 @@ const FIELDS = {
       'product.productCode': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.code.label',
+        flexWidth: '0.8',
       },
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.name.label',
-        flexWidth: '24',
+        flexWidth: '3.3',
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
@@ -171,11 +173,12 @@ const FIELDS = {
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.lotSerialNo.label',
+        flexWidth: '1',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.expirationDate.label',
-        fixedWidth: '130px',
+        flexWidth: '1.5',
       },
       binLocation: {
         type: params => (
@@ -190,7 +193,8 @@ const FIELDS = {
               className="select-xs"
             />),
         fieldKey: '',
-        fixedWidth: '150px',
+        flexWidth: '1.7',
+        clearable: false,
         label: 'stockMovement.binLocation.label',
         getDynamicAttr: ({
           bins, hasBinLocationSupport, shipmentReceived, fieldValue,
@@ -205,6 +209,7 @@ const FIELDS = {
       'recipient.id': {
         type: params => (params.subfield ? <SelectField {...params} /> : null),
         fieldKey: '',
+        flexWidth: '1.5',
         label: 'stockMovement.recipient.label',
         getDynamicAttr: ({ users, shipmentReceived, fieldValue }) => ({
           options: users,
@@ -214,7 +219,7 @@ const FIELDS = {
       quantityShipped: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.shipped.label',
-        fixedWidth: '75px',
+        flexWidth: '0.8',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
@@ -222,7 +227,7 @@ const FIELDS = {
       quantityReceived: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.received.label',
-        fixedWidth: '75px',
+        flexWidth: '0.8',
         attributes: {
           formatValue: value => (value ? value.toLocaleString('en-US') : '0'),
         },
@@ -230,7 +235,7 @@ const FIELDS = {
       quantityRemaining: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.toReceive.label',
-        fixedWidth: '75px',
+        flexWidth: '0.8',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue, shipmentReceived }) => ({
           className: _.toInteger(fieldValue.quantityRemaining) < 0 && !shipmentReceived
@@ -253,7 +258,7 @@ const FIELDS = {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
         label: 'partialReceiving.receivingNow.label',
-        fixedWidth: '85px',
+        flexWidth: '1',
         getDynamicAttr: ({ shipmentReceived, fieldValue }) => ({
           disabled: shipmentReceived || isReceived(true, fieldValue),
         }),
@@ -261,7 +266,8 @@ const FIELDS = {
       edit: {
         type: params => (params.subfield ? <EditLineModal {...params} /> : null),
         fieldKey: '',
-        fixedWidth: '85px',
+        label: 'react.blank.label',
+        flexWidth: '1',
         attributes: {
           btnOpenText: 'partialReceiving.editLine.label',
           title: 'partialReceiving.editLine.label',
@@ -281,7 +287,7 @@ const FIELDS = {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
         label: 'partialReceiving.comment.label',
-        fixedWidth: '110px',
+        flexWidth: '1.3',
       },
     },
   },
