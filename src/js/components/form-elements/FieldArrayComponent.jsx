@@ -38,24 +38,26 @@ class FieldArrayComponent extends Component {
         <div className="text-center border">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1">
             {_.map(fieldsConfig.fields, (config, name) => (
-              <Tooltip
-                html={(<div>{this.props.translate(config.label)}</div>)}
-                theme="transparent"
-                arrow="true"
-                delay="150"
-                style={{
-                  flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
-                  minWidth: 0,
-                }}
-                duration="250"
-                hideDelay="50"
+              <div style={{
+                flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+                minWidth: 0,
+              }}
               >
-                <div
-                  key={name}
-                  className="mx-1 text-truncate font-size-xs"
-                ><Translate id={config.label} />
-                </div>
-              </Tooltip>))}
+                <Tooltip
+                  html={(config.label && <div>{this.props.translate(config.label)}</div>)}
+                  theme="transparent"
+                  arrow="true"
+                  delay="150"
+                  duration="250"
+                  hideDelay="50"
+                >
+                  <div
+                    key={name}
+                    className="mx-1 text-truncate font-size-xs"
+                  >{config.label && <Translate id={config.label} />}
+                  </div>
+                </Tooltip>
+              </div>))}
           </div>
         </div>
         <div

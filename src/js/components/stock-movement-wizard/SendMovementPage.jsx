@@ -204,6 +204,7 @@ class SendMovementPage extends Component {
         if (values.statusCode === 'ISSUED') {
           this.fetchStockMovementData();
         }
+        Alert.success(this.props.translate('alert.saveSuccess.label'));
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -301,15 +302,6 @@ class SendMovementPage extends Component {
     data.append('fileContents', file);
 
     return apiClient.post(url, data);
-  }
-
-  saveChanges(values) {
-    this.saveShipment(values)
-      .then(() => {
-        this.props.hideSpinner();
-        Alert.success('Changes saved successfully!');
-      })
-      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -432,7 +424,7 @@ class SendMovementPage extends Component {
               <hr />
               <button
                 type="button"
-                onClick={() => this.saveChanges(values)}
+                onClick={() => this.onSave(values)}
                 className="btn btn-outline-secondary float-right btn-form btn-xs"
                 disabled={invalid}
               >

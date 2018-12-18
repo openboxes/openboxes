@@ -190,7 +190,7 @@ class PutAwayCheckPage extends Component {
 
         this.props.hideSpinner();
 
-        Alert.success(this.props.translate('Put-Away was successfully completed!'));
+        Alert.success(this.props.translate('alert.putAwayCompleted.label'));
 
         this.setState({
           putAway: {
