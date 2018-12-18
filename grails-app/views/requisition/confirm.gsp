@@ -41,8 +41,8 @@
                                 </label>
                             </td>
                             <td class="middle">
-                                <g:selectPerson id="checkedBy" name="checkedBy.id" value="${requisition?.checkedBy}"
-                                                noSelection="['null':'']" size="40"/>
+                                <g:selectPerson id="checkedBy" name="checkedBy" value="${requisition?.checkedBy?.id}"
+                                                noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
                             </td>
                             <td class="left middle">
                                 <label>

@@ -53,8 +53,8 @@
                                                     <label>
                                                         ${warehouse.message(code:'requisition.pickedBy.label', default: 'Picked by')}
                                                     </label>
-                                                    <g:selectPerson id="pickedBy" name="picklist.picker.id" value="${requisition?.picklist.picker}"
-                                                                    noSelection="['null':'']" size="40"/>
+                                                    <g:selectPerson id="pickedBy" name="picklist.picker" value="${requisition?.picklist?.picker?.id}"
+                                                                    noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
                                                 </td>
                                                 <td class="middle center">
                                                     <label>
