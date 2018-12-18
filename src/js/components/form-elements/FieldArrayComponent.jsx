@@ -52,7 +52,7 @@ class FieldArrayComponent extends Component {
               >
                 <div
                   key={name}
-                  className="mx-1 text-truncate font-size-xs"
+                  className="mx-1 text-truncate font-size-label"
                 ><Translate id={config.label} />
                 </div>
               </Tooltip>))}
