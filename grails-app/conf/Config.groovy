@@ -469,7 +469,7 @@ openboxes.dashboard.shipmentSummary.enabled=true
 openboxes.dashboard.indicatorSummary.enabled=false
 
 // Column 2
-openboxes.dashboard.binLocationSummary.enabled=true
+openboxes.dashboard.binLocationSummary.enabled=false
 openboxes.dashboard.productSummary.enabled=true
 openboxes.dashboard.genericProductSummary.enabled=false
 openboxes.dashboard.expiringSummary.enabled=true
