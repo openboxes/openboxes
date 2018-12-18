@@ -96,7 +96,15 @@ class StockMovementService {
         Requisition requisition = updateRequisition(stockMovement, forceUpdate)
 
         if (stockMovement.origin.isSupplier()) {
+            def driverName = stockMovement.driverName
+            def trackingNumber = stockMovement.trackingNumber
+            def comments = stockMovement.comments
+
             stockMovement = StockMovement.createFromRequisition(requisition)
+
+            if (driverName) stockMovement.driverName = driverName
+            if (trackingNumber) stockMovement.trackingNumber = trackingNumber
+            if (comments) stockMovement.comments = comments
         }
 
         log.info "Date shipped: " + stockMovement.dateShipped
