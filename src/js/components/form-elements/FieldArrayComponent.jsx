@@ -39,7 +39,7 @@ class FieldArrayComponent extends Component {
           <div className="d-flex flex-row border-bottom font-weight-bold py-1">
             {_.map(fieldsConfig.fields, (config, name) => (
               <Tooltip
-                html={(<div>{this.props.translate(config.label)}</div>)}
+                html={(config.label && <div>{this.props.translate(config.label)}</div>)}
                 theme="transparent"
                 arrow="true"
                 delay="150"
@@ -53,7 +53,7 @@ class FieldArrayComponent extends Component {
                 <div
                   key={name}
                   className="mx-1 text-truncate font-size-label"
-                ><Translate id={config.label} />
+                >{config.label && <Translate id={config.label} />}
                 </div>
               </Tooltip>))}
           </div>
