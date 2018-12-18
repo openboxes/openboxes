@@ -318,10 +318,14 @@ class EditItemsPage extends Component {
     const errors = validate(formValues).editPageItems;
 
     if (errors.length) {
-      const errorMessage = _.reduce(errors, (message, value, key) => {
-        const error = _.map(value, val => `${val}</br>`);
-        return `${message}<Translate id="errors.errorInLine.label" /> ${key + 1}:</br>${error}`;
-      }, '');
+      let errorMessage = `${this.props.translate('errors.errorInLine.label')}:</br>`;
+      errorMessage += _.reduce(
+        errors,
+        (message, value, key) => (
+          `${message}${value ? `${key + 1} - ${_.map(value, val => this.props.translate(`${val}`))}</br>` : ''}`
+        ),
+        '',
+      );
 
       Alert.error(errorMessage);
 

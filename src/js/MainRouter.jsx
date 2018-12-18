@@ -10,6 +10,8 @@ import en from './en';
 import fr from './fr';
 import apiClient, { parseResponse } from './utils/apiClient';
 
+const onMissingTranslation = ({ translationId }) => `${translationId}`;
+
 class MainRouter extends React.Component {
   constructor(props) {
     super(props);
@@ -22,6 +24,7 @@ class MainRouter extends React.Component {
       options: {
         renderToStaticMarkup,
         defaultLanguage: 'en',
+        onMissingTranslation,
       },
     });
 

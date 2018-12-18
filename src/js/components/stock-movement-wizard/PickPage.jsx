@@ -148,8 +148,6 @@ class PickPage extends Component {
     this.state = {
       bins: [],
       sorted: false,
-      order: '',
-      orderIcon: '',
       printPicksUrl: '',
       values: this.props.initialValues,
     };
@@ -188,7 +186,6 @@ class PickPage extends Component {
             pickPageItems: this.checkForInitialPicksChanges(parseResponse(pickPageItems)),
           },
           sorted: false,
-          order: '',
         }, () => this.fetchBins()));
       })
       .catch(() => this.props.hideSpinner());
@@ -239,7 +236,7 @@ class PickPage extends Component {
           }
         });
         /* eslint-disable-next-line no-param-reassign */
-        pickPageItem.picklistItems = _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['inventoryItem.id', 'initial']);
+        pickPageItem.picklistItems = _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['binLocation.name', 'initial']);
       }
     });
     return pickPageItems;
@@ -313,6 +310,7 @@ class PickPage extends Component {
         ...this.state.values,
         pickPageItems: this.checkForInitialPicksChanges(parseResponse(pickPageItems)),
       },
+      sorted: false,
     }));
   }
 
@@ -360,31 +358,11 @@ class PickPage extends Component {
   }
 
   sortByBins() {
-    let { sorted, order, orderIcon } = this.state;
+    const { sorted } = this.state;
     let sortedValues;
 
-    switch (order) {
-      case '':
-        sorted = true;
-        order = 'desc';
-        orderIcon = 'fa-angle-up';
-        break;
-      case 'desc':
-        sorted = true;
-        order = 'asc';
-        orderIcon = 'fa-angle-down';
-        break;
-      case 'asc':
-        sorted = false;
-        order = '';
-        orderIcon = '';
-        break;
-      default:
-        break;
-    }
-
-    if (sorted) {
-      sortedValues = _.orderBy(this.state.values.pickPageItems, ['picklistItems[0].binLocation.name'], [order]);
+    if (!sorted) {
+      sortedValues = _.orderBy(this.state.values.pickPageItems, ['picklistItems[0].binLocation.name'], ['asc']);
     } else {
       sortedValues = _.orderBy(this.state.values.pickPageItems, ['sortOrder'], ['asc']);
     }
@@ -399,9 +377,7 @@ class PickPage extends Component {
         ...this.state.values,
         pickPageItems: sortedValues,
       },
-      sorted,
-      order,
-      orderIcon,
+      sorted: !this.state.sorted,
     }));
   }
 
@@ -415,7 +391,7 @@ class PickPage extends Component {
           <div className="d-flex flex-column">
             <span>
               <a
-                href={`${this.state.printPicksUrl}${this.state.sorted ? `?order=${this.state.order}` : ''}`}
+                href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -434,7 +410,8 @@ class PickPage extends Component {
                 onClick={() => this.sortByBins()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                <span><Translate id="stockMovement.sortByBins.label" />{this.state.sorted && <i className={`fa ${this.state.orderIcon} pl-2`} />}</span>
+                {this.state.sorted && <Translate id="stockMovement.originalOrder.label" />}
+                {!this.state.sorted && <Translate id="stockMovement.sortByBins.label" />}
               </button>
             </span>
             <form onSubmit={handleSubmit} className="print-mt">
