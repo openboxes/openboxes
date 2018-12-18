@@ -163,7 +163,7 @@ const FIELDS = {
   },
 };
 
-function validate(values) {
+function validateForSave(values) {
   const errors = {};
   errors.editPageItems = [];
 
@@ -178,14 +178,22 @@ function validate(values) {
         quantityRevised: 'errors.sameRevisedQty.label',
       };
     }
-    if (_.isNil(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable) && (item.statusCode !== 'SUBSTITUTED')) {
-      errors.editPageItems[key] = { quantityRevised: 'errors.lowerQty.label' };
-    }
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised > item.quantityAvailable)) {
       errors.editPageItems[key] = { quantityRevised: 'errors.higherQty.label' };
     }
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised < 0)) {
       errors.editPageItems[key] = { quantityRevised: 'errors.negativeQty.label' };
+    }
+  });
+  return errors;
+}
+
+function validate(values) {
+  const errors = validateForSave(values);
+
+  _.forEach(values.editPageItems, (item, key) => {
+    if (_.isNil(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable) && (item.statusCode !== 'SUBSTITUTED')) {
+      errors.editPageItems[key] = { quantityRevised: 'errors.lowerQty.label' };
     }
   });
   return errors;
@@ -315,7 +323,7 @@ class EditItemsPage extends Component {
   save(formValues) {
     this.props.showSpinner();
 
-    const errors = validate(formValues).editPageItems;
+    const errors = validateForSave(formValues).editPageItems;
 
     if (errors.length) {
       const errorMessage = _.reduce(errors, (message, value, key) => {
