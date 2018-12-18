@@ -123,11 +123,12 @@ const FIELDS = {
         }),
       },
       cancelRemaining: {
+        fieldKey: 'quantityRemaining',
         type: params => (params.subfield ? <CheckboxField {...params} /> : null),
         label: 'partialReceiving.cancelRemaining.label',
         fixedWidth: '140px',
-        getDynamicAttr: ({ saveDisabled }) => ({
-          disabled: saveDisabled,
+        getDynamicAttr: ({ saveDisabled, fieldValue }) => ({
+          disabled: saveDisabled || _.toInteger(fieldValue) <= 0,
         }),
       },
       comment: {
