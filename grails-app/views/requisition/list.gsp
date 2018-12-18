@@ -106,7 +106,7 @@
                             <div class="filter-list-item">
                                 <label><warehouse:message code="requisition.destination.label"/></label>
                                 <p style="line-height: 16px; font-size: 1.2em;">
-                                    <g:selectLocation name="destination.id" value="${params?.destination?.id?:session.warehouse.id}"
+                                    <g:selectLocation name="destination.id" value="${params?.destination?.id}"
                                                       noSelection="['null':'']" class="chzn-select-deselect" />
                                 </p>
                             </div>
