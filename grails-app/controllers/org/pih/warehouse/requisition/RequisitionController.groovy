@@ -41,7 +41,7 @@ class RequisitionController {
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
         def requisition = new Requisition(params)
-        requisition.destination = Location.get(session?.warehouse?.id)
+        requisition.origin = Location.get(session?.warehouse?.id)
         //def startTime = System.currentTimeMillis()
 
         // Requisitions to display in the table
