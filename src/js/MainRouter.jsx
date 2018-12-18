@@ -38,7 +38,7 @@ class MainRouter extends React.Component {
   }
 
   fetchEnglish() {
-    const url = '/openboxes/api/localizations?lang=en';
+    const url = '/openboxes/api/localizations?languageCode=en';
 
     return apiClient.get(url)
       .then((response) => {
@@ -49,7 +49,7 @@ class MainRouter extends React.Component {
   }
 
   fetchFrench() {
-    const url = '/openboxes/api/localizations?lang=fr';
+    const url = '/openboxes/api/localizations?languageCode=fr';
 
     return apiClient.get(url)
       .then((response) => {
