@@ -100,7 +100,7 @@ class Order implements Serializable {
 	 * @return	a boolean indicating whether the order has been placed
 	 */
 	Boolean isPlaced() { 
-		return (status in [OrderStatus.PLACED, OrderStatus.PARTIALLY_RECEIVED, OrderStatus.RECEIVED])
+		return (status == OrderStatus.PLACED)
 	}
 	
 	/**
@@ -119,6 +119,14 @@ class Order implements Serializable {
 	 */
 	Boolean isReceived() { 
 		return (status == OrderStatus.RECEIVED)
+	}
+
+	Boolean isCompleted() {
+		return (status == OrderStatus.COMPLETED)
+	}
+
+	Boolean isCanceled() {
+		return (status == OrderStatus.CANCELED)
 	}
 	
 	def listShipments() {
