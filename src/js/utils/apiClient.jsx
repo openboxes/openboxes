@@ -65,11 +65,7 @@ const handleError = (error) => {
         </div>`);
       break;
     case 401:
-      Alert.error(`Unauthorized.</br>${_.get(error, 'response.data.errorMessage', '')}`, {
-        onClose: () => {
-          window.location.reload();
-        },
-      });
+      window.location.reload();
       break;
     case 403:
       Alert.error(`Access denied.</br>${_.get(error, 'response.data.errorMessage', '')}`);
