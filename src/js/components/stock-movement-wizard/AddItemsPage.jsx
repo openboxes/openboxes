@@ -322,6 +322,7 @@ class AddItemsPage extends Component {
     this.productsFetch = this.productsFetch.bind(this);
     this.getSortOrder = this.getSortOrder.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
+    this.confirmTransition = this.confirmTransition.bind(this);
   }
 
   componentDidMount() {
@@ -459,6 +460,27 @@ class AddItemsPage extends Component {
     });
   }
 
+  /**
+   * Shows transition confirmation dialog if there are items with the same code.
+   * @param {function} onConfirm
+   * @public
+   */
+  confirmTransition(onConfirm, items) {
+    confirmAlert({
+      title: this.props.translate('confirmTransition.label'),
+      message: _.map(items, item => <p>{item.product.label} {item.quantityRequested}</p>),
+      buttons: [
+        {
+          label: this.props.translate('default.yes.label'),
+          onClick: onConfirm,
+        },
+        {
+          label: this.props.translate('default.no.label'),
+        },
+      ],
+    });
+  }
+
   productsFetch(searchTerm, callback) {
     if (searchTerm) {
       apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${this.state.values.origin.id}`)
@@ -567,8 +589,23 @@ class AddItemsPage extends Component {
    */
   nextPage(formValues) {
     const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val));
+    const itemsMap = {};
+    _.forEach(lineItems, (item) => {
+      if (itemsMap[item.product.productCode]) {
+        itemsMap[item.product.productCode].push(item);
+      } else itemsMap[item.product.productCode] = [item];
+    });
+    const itemsWithSameCode = _.filter(itemsMap, item => item.length > 1);
+
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() => this.saveAndTransitionToNextStep(formValues, lineItems));
+    }
+    if (_.some(itemsMap, item => item.length > 1)) {
+      this.confirmTransition(
+        () =>
+          this.saveAndTransitionToNextStep(formValues, lineItems),
+        _.reduce(itemsWithSameCode, (a, b) => a.concat(b), []),
+      );
     } else {
       this.saveAndTransitionToNextStep(formValues, lineItems);
     }
