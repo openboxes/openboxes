@@ -13,9 +13,9 @@
             <th class="center">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
             <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
             <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
-            <th class="center">${warehouse.message(code: 'requisitionItem.quantityPicked.label')}</th>
-            <th class="center">${warehouse.message(code:'requisition.checkedBy.label')}</th>
-            <th class="center">${warehouse.message(code:'requisitionItem.cancelReasonCode.label')}</th>
+            <th class="center">${warehouse.message(code: 'requisitionItem.suggestedPick.label')}</th>
+            <th class="center">${warehouse.message(code:'requisitionItem.confirmedPick.label')}</th>
+            <th class="center">${warehouse.message(code:'stockMovement.comments.label')}</th>
         </tr>
         </thead>
         <tbody>
