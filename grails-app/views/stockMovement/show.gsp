@@ -28,13 +28,15 @@
                     </button>
                     <div class="actions">
                         <g:each var="document" in="${stockMovement.documents}">
-                            <div class="action-menu-item">
-                                <g:link url="${document.uri}" target="_blank">
+                            <g:if test="${!document.hidden}">
+                                <div class="action-menu-item">
+                                    <g:link url="${document.uri}" target="_blank">
 
-                                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
-                                    ${document.name}
-                                </g:link>
-                            </div>
+                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                        ${document.name}
+                                    </g:link>
+                                </div>
+                            </g:if>
                         </g:each>
                     </div>
                 </span>

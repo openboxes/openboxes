@@ -1175,7 +1175,8 @@ class StockMovementService {
                             documentType: DocumentGroupCode.EXPORT.name(),
                             contentType : "text/csv",
                             stepNumber  : 2,
-                            uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true)
+                            uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true),
+                            hidden      : true
                     ],
                     [
                         name        : g.message(code: "picklist.button.print.label"),
@@ -1189,7 +1190,8 @@ class StockMovementService {
                             documentType: DocumentGroupCode.PICKLIST.name(),
                             contentType : "application/pdf",
                             stepNumber  : 4,
-                            uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true)
+                            uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true),
+                            hidden      : true
                     ],
                     [
                             name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
