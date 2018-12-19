@@ -23,6 +23,7 @@ class ProductApiController extends BaseDomainApiController {
     def list = {
         String [] terms = params?.name?.split(",| ")?.findAll { it }
         def products = productService.searchProducts(terms, [])
+        products = products.unique()
 		render ([data:products] as JSON)
 	}
 
