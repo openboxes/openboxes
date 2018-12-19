@@ -811,6 +811,13 @@ class ShipmentService {
 
     }
 
+
+	boolean validateShipment(Shipment shipment) {
+		shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
+			validateShipmentItem(shipmentItem)
+		}
+	}
+
 	/**
 	 *
 	 * @param shipmentItem
@@ -1243,6 +1250,9 @@ class ShipmentService {
 			shipmentInstance.errors.reject("shipment.invalid.alreadyShipped", "Shipment has already shipped")
 			//throw new ShipmentException(message: "Shipment has already been shipped.", shipment: shipmentInstance);
 		}
+
+		validateShipment(shipmentInstance)
+
 		// don't allow the shipment to go out if it has errors, or if this shipment has already been shipped, or if the shipdate is after today
 		if (!shipmentInstance.hasErrors()) {
 			// Add comment to shipment (as long as there's an actual comment
@@ -1645,9 +1655,6 @@ class ShipmentService {
                         return;
                     }
                 }
-
-				// Validate quantity available
-				validateShipmentItem(it)
 
                 // Create a new transaction entry for each shipment item
                 def transactionEntry = new TransactionEntry();
