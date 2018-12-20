@@ -38,7 +38,12 @@
             <g:each in="${sortedRequisitionItems}" status="i" var="requisitionItem">
 
                 <g:if test="${picklist}">
-                    <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItemsSortedByBinName()}"/>
+                    <g:if test="${sorted}">
+                        <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItemsSortedByBinName()}"/>
+                    </g:if>
+                    <g:else>
+                        <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
+                    </g:else>
                     <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>
                 </g:if>
                 <g:else>
