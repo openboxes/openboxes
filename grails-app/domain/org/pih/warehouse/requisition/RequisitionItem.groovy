@@ -553,7 +553,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     def retrievePicklistItemsSortedByBinName() {
         def picklistItems = PicklistItem.findAllByRequisitionItem(this)
         picklistItems.sort { a,b ->
-            b.binLocation?.name <=> a.binLocation?.name
+            a.binLocation?.name <=> b.binLocation?.name
         }
         return picklistItems
     }
