@@ -2,8 +2,10 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
+import { connect } from 'react-redux';
 
 import 'react-tippy/dist/tippy.css';
+import { getTranslate, Translate } from 'react-localize-redux';
 
 import TableBody from './TableBody';
 import TableBodyVirtualized from './TableBodyVirtualized';
@@ -36,24 +38,26 @@ class FieldArrayComponent extends Component {
         <div className="text-center border">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1">
             {_.map(fieldsConfig.fields, (config, name) => (
-              <Tooltip
-                html={(<div>{config.label}</div>)}
-                theme="transparent"
-                arrow="true"
-                delay="150"
-                style={{
-                  flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
-                  minWidth: 0,
-                }}
-                duration="250"
-                hideDelay="50"
+              <div style={{
+                flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+                minWidth: 0,
+              }}
               >
-                <div
-                  key={name}
-                  className="mx-1 text-truncate font-size-xs"
-                >{config.label}
-                </div>
-              </Tooltip>))}
+                <Tooltip
+                  html={(config.label && <div>{this.props.translate(config.label)}</div>)}
+                  theme="transparent"
+                  arrow="true"
+                  delay="150"
+                  duration="250"
+                  hideDelay="50"
+                >
+                  <div
+                    key={name}
+                    className="mx-1 text-truncate font-size-xs"
+                  >{config.label && <Translate id={config.label} />}
+                  </div>
+                </Tooltip>
+              </div>))}
           </div>
         </div>
         <div
@@ -81,7 +85,7 @@ class FieldArrayComponent extends Component {
             {
               typeof AddButton === 'string' ?
                 <button type="button" className="btn btn-outline-success btn-xs" onClick={() => addRow()}>
-                  {AddButton}
+                  <Translate id={AddButton} />
                 </button>
                 : <AddButton {...properties} addRow={addRow} />
             }
@@ -92,6 +96,10 @@ class FieldArrayComponent extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  translate: getTranslate(state.localize),
+});
+
 FieldArrayComponent.propTypes = {
   fieldsConfig: PropTypes.shape({}).isRequired,
   fields: PropTypes.oneOfType([
@@ -99,10 +107,11 @@ FieldArrayComponent.propTypes = {
     PropTypes.arrayOf(PropTypes.shape({})),
   ]).isRequired,
   properties: PropTypes.shape({}),
+  translate: PropTypes.func.isRequired,
 };
 
 FieldArrayComponent.defaultProps = {
   properties: {},
 };
 
-export default FieldArrayComponent;
+export default connect(mapStateToProps)(FieldArrayComponent);

@@ -14,7 +14,7 @@
                             ${warehouse.message(code:'requisition.verifiedBy.label', default: 'Verified by')}
                         </label>
                         <g:selectPerson id="verifiedBy" name="verifiedBy.id" value="${requisition?.verifiedBy}"
-                                        noSelection="['null':'']" size="40"/>
+                                        noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
                     </td>
                     <td class="center middle">
                         <label>

@@ -9,6 +9,10 @@
 **/ 
 package org.pih.warehouse.core
 
+import grails.util.Metadata
+import org.apache.commons.io.IOUtils
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.springframework.core.io.ClassPathResource
 import org.springframework.web.context.request.RequestContextHolder
 import org.pih.warehouse.util.LocalizationUtil
 
@@ -45,13 +49,81 @@ class LocalizationService {
 		}
 		
 		return LocalizationUtil.getLocalizedString(value, getCurrentLocale())
-	}			
+	}
+	/**
+	 * Get a locale based on the given language code. Returns default if no language code is specified.
+	 *
+	 * @param languageCode
+	 * @return
+	 */
+	Locale getLocale(String languageCode) {
+		return languageCode ? new Locale(languageCode) : currentLocale
+	}
 
 	/**
-	 * Gets the current locale
+	 * Gets the current locale or return default locale.
 	 */
 	Locale getCurrentLocale() {
 		// fetch the locale of the current user; if there isn't one, use the default locale
 		return (RequestContextHolder.currentRequestAttributes().getSession().user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale))
 	}
+
+	/**
+	 * Get all messages properties.
+	 *
+	 * @return
+	 */
+	Properties getMessagesProperties(Locale locale) {
+		Properties messagesProperties
+		def messagesPropertiesFilename = (locale && locale.language != "en") ? "messages_${locale.language}.properties" : "messages.properties"
+
+		// Get properties from classpath
+		if (!Metadata.getCurrent().isWarDeployed()) {
+			String messagesPropertiesUrl = "grails-app/i18n/" + messagesPropertiesFilename
+			messagesProperties = getMessagesPropertiesFromClasspath(messagesPropertiesUrl)
+		}
+		// Get properties from exploded WAR file
+		else {
+			String messagesPropertiesUrl = "/WEB-INF/grails-app/i18n/" + messagesPropertiesFilename
+			messagesProperties = getMessagesPropertiesFromResource(messagesPropertiesUrl)
+		}
+		return messagesProperties.sort()
+	}
+
+
+	/**
+	 * Get messages properties while running app using deployed WAR.
+	 *
+	 * @param messagesPropertiesUrl
+	 * @return
+	 */
+	Properties getMessagesPropertiesFromResource(String messagesPropertiesUrl) {
+		Properties properties = new Properties()
+		def inputStream = ServletContextHolder.servletContext.getResourceAsStream(messagesPropertiesUrl)
+		if (inputStream) {
+			String messagesPropertiesString = IOUtils.toString(inputStream)
+			properties.load(new StringReader(messagesPropertiesString))
+			inputStream.close()
+		}
+		return properties
+	}
+
+	/**
+	 * Get messages properties while running app using grails run-app.
+	 *
+	 * @param messagesPropertiesUrl
+	 * @return
+	 */
+	Properties getMessagesPropertiesFromClasspath(String messagesPropertiesUrl) {
+		Properties properties = new Properties()
+		File messagesPropertiesFile = new ClassPathResource(messagesPropertiesUrl)?.getFile();
+		log.info "messagesPropertiesFile: ${messagesPropertiesFile}"
+		if (messagesPropertiesFile.exists()) {
+			InputStream messagesPropertiesStream = new FileInputStream(messagesPropertiesFile)
+			properties.load(messagesPropertiesStream)
+			messagesPropertiesStream.close()
+		}
+		return properties
+	}
+
 }

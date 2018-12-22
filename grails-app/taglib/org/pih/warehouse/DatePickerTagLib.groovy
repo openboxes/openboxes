@@ -105,17 +105,6 @@ class DatePickerTagLib {
 				});
 			</script>""";
 
-		if (showTrigger) {
-			html += """
-			<style>
-				.ui-datepicker-trigger {
-					#position: relative; left: -16px; top: -1px;
-				}
-			</style>
-			""";
-		}
-		
-				
 		out << html;
 				
 	}

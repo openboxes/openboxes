@@ -30,21 +30,22 @@
 
         </g:unless>
 
-        <g:if test="${order == 'desc'}">
+        <g:if test="${sorted}">
             <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort() { a,b ->
-                a.retrievePicklistItems()[0]?.binLocation?.name <=> b.retrievePicklistItems()[0]?.binLocation?.name }}"/>
+                b.retrievePicklistItemsSortedByBinName()[0]?.binLocation?.name <=> a.retrievePicklistItemsSortedByBinName()[0]?.binLocation?.name }}"/>
         </g:if>
-        <g:elseif test="${order == 'asc'}">
-            <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort() { a,b ->
-                b.retrievePicklistItems()[0]?.binLocation?.name <=> a.retrievePicklistItems()[0]?.binLocation?.name }}"/>
-        </g:elseif>
         <g:else>
             <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort()}"/>
         </g:else>
 
         <g:each in="${sortedRequisitionItems}" status="i" var="requisitionItem">
             <g:if test="${picklist}">
-                <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
+                <g:if test="${sorted}">
+                    <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItemsSortedByBinName()}"/>
+                </g:if>
+                <g:else>
+                    <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
+                </g:else>
                 <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>
             </g:if>
             <g:else>

@@ -1,5 +1,6 @@
 package org.pih.warehouse.putAway
 
+import grails.plugin.rendering.pdf.PdfRenderingService
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.core.Location
@@ -9,7 +10,7 @@ import org.pih.warehouse.requisition.Requisition
 
 class PutAwayController {
 
-	def pdfRenderingService
+	PdfRenderingService pdfRenderingService
 
 	def index = {
 		redirect(action: "create")
@@ -43,7 +44,7 @@ class PutAwayController {
 		renderPdf(
 				template: "/putAway/print",
 				model: [jsonObject:jsonObject],
-				filename: "Putaway ${putaway?.putawayNumber}"
+				filename: "Putaway ${putaway?.putawayNumber}.pdf"
 		)
 	}
 }
