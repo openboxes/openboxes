@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet author="jmiranda" id="1462422439127-disable-foreign-key-checks" runAlways="true" dbms="mysql">
+    <changeSet author="jmiranda" id="1462422439127-disable-foreign-key-checks" dbms="mysql">
         <sql>SET FOREIGN_KEY_CHECKS=0</sql>
     </changeSet>
 
@@ -593,7 +593,7 @@
     </changeSet>
 
 
-    <changeSet author="jmiranda" id="1462422439127-enable-foreign-key-checks" runAlways="true" dbms="mysql">
+    <changeSet author="jmiranda" id="1462422439127-enable-foreign-key-checks" dbms="mysql">
         <sql>SET FOREIGN_KEY_CHECKS=1</sql>
     </changeSet>
 
