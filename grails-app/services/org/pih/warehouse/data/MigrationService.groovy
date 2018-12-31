@@ -50,13 +50,13 @@ class MigrationService {
 
     def getCurrentInventory(List<Location> locations) {
 
-        def currentInventory = []
+        def currentInventory
 
         GParsPool.withPool {
             log.info ("locations: ${locations.size()}")
-            currentInventory = locations.collectParallel { location ->
+            currentInventory = locations.collectParallel { Location location ->
                 persistenceInterceptor.init()
-                def currentInventoryMap = []
+                def currentInventoryMap
                 try {
                     def startTime = System.currentTimeMillis()
                     Map<Product, Integer> quantityMap = inventoryService.getQuantityByProductMap(location)
@@ -83,17 +83,18 @@ class MigrationService {
         currentInventory = currentInventory.findAll { it.products > 0 }
 
         // Convert from a list of quantity maps to a list of tuples (location, product, quantity)
-        log.info "Converting to list of tuples "
         def data = []
         currentInventory.each { result ->
             if (result) {
                 result.quantityMap.keySet().collect { product ->
                     def quantity = result.quantityMap[product]
-                    data << [location: result?.location, product: product?.productCode, quantity: quantity]
+                    data << [location: result?.location,
+                             productCode: product?.productCode,
+                             productName: product?.name,
+                             quantity: quantity]
                 }
             }
         }
-
 
         return data
     }
@@ -176,12 +177,13 @@ class MigrationService {
                 persistenceInterceptor.init()
                 def location = Location.get(it.locationId)
                 log.info("Migrating ${it.transactionCount} inventory transactions for location ${location.name}")
-                migrateInventoryTransactions(location, true)
+                migrateInventoryTransactions(location,true)
                 persistenceInterceptor.flush()
                 persistenceInterceptor.destroy()
             }
         }
     }
+
 
     /**
      * Migrate all inventory transactions for the given location.
@@ -190,15 +192,23 @@ class MigrationService {
      * @param performMigration
      * @return
      */
-    def migrateInventoryTransactions(Location location, Boolean performMigration) {
+    def migrateInventoryTransactions(Location location, boolean performMigration) {
         def products = getProductsWithTransactions(location, [TransactionCode.INVENTORY])
+        migrateInventoryTransactions(location, products, performMigration)
+    }
+
+    /**
+     * Migrate all inventory transactions for the given location and products.
+     *
+     * @param location
+     * @param performMigration
+     * @return
+     */
+    def migrateInventoryTransactions(Location location, List<Product> products, Boolean performMigration) {
 
         def results = products.collect { product ->
-            //def quantityOnHandBefore = inventoryService.getQuantityOnHand(location, product)
 
             def stockHistory = migrateInventoryTransactions(location, product, performMigration)
-
-            //def quantityOnHandAfter = inventoryService.getQuantityOnHand(location, product)
 
             return [
                     productCode : product?.productCode,
@@ -207,11 +217,6 @@ class MigrationService {
                     //quantityOnHandAfter : quantityOnHandAfter,
                     stockHistory: stockHistory
             ]
-            //log.info "Compare ${quantityOnHandBefore} vs ${quantityOnHandAfter}"
-            //if (quantityOnHandBefore != quantityOnHandAfter) {
-            //    log.error("Migration leads to different quantities (${quantityOnHandBefore} vs ${quantityOnHandAfter}) for product ${product.productCode} and location ${location.name}")
-            //    throw new RuntimeException("Migration leads to different quantities for product ${product.productCode} and location ${location.name}")
-            //}
         }
         return results
     }
@@ -221,14 +226,22 @@ class MigrationService {
 
         log.info ("Migrating inventory transactions for product ${product.productCode} ${product.name} at location ${location.name} ${performMigration}")
 
-        def results = []
         def runningBalance
         def previousTransaction
-        def transactionEntries = getTransactionEntries(location, product)
         def runningBalanceMap = [:]
         def adjustments = []
+
+        // Keep track of changes for preview and auditing purposes
+        def results = []
         results << "DATE".padRight(25) + "CODE".padRight(20) + "ITEMKEY".padRight(50) + "QTY".padRight(10) + "PRE".padRight(10) + "BAL".padRight(10) + "ADJ".padRight(10)
 
+        // Always create a stock snapshot before modifying any transactions in order to prevent quantity on hand
+        // differences for edge cases that were not addressed
+        if (performMigration) {
+            inventoryService.createStockSnapshot(location, product)
+        }
+
+        def transactionEntries = getTransactionEntries(location, product)
         for (transactionEntry in  transactionEntries) {
 
             boolean sameTransaction = (previousTransaction == transactionEntry.transaction)
@@ -240,7 +253,7 @@ class MigrationService {
 
             runningBalance = applyTransactionEntry(runningBalanceBefore, transactionEntry, sameTransaction)
             runningBalanceMap[itemKey] = runningBalance
-            Integer adjustmentQuantity = 0
+            Integer adjustmentQuantity
             Integer oldQuantity = transactionEntry.quantity
             Integer productBalance = runningBalanceMap.values().sum()
             String comments

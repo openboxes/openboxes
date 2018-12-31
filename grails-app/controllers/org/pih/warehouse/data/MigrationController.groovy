@@ -37,14 +37,13 @@ class MigrationController {
     def inventoryService
 
     def index = {
-        def location = Location.get(session.warehouse.id)
 
         def organizations = migrationService.getSuppliersForMigration()
 
         def productSuppliers = migrationService.getProductsForMigration()
 
         TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
-        def inventoryTransactionCount = Transaction.countByTransactionTypeAndInventory(inventoryTransactionType, location.inventory)
+        def inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
 
         [
                 organizationCount: organizations.size(),
@@ -53,7 +52,7 @@ class MigrationController {
         ]
     }
 
-    def currentInventory = {
+    def downloadCurrentInventory = {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
 
@@ -69,7 +68,7 @@ class MigrationController {
 
     def locationsWithInventoryTransactions = {
         def locations = migrationService.getLocationsWithTransactions([TransactionCode.INVENTORY])
-        locations = locations.collect { it.locationId }
+        //locations = locations.collect { [id: it.locationId, name:  }
         render ([count: locations.size(), locations:locations] as JSON)
     }
 

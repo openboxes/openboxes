@@ -78,7 +78,7 @@
                             <g:link controller="migration" action="migrateAllInventoryTransactions" class="button">Migrate All Locations</g:link>
                         </div>
                         <div class="button-group">
-                            <g:link controller="migration" action="currentInventory" params="[format: 'csv']" class="button" target="_blank">Download Current Inventory (.csv)</g:link>
+                            <g:link controller="migration" action="downloadCurrentInventory" params="[format: 'csv']" class="button" target="_blank">Download Current Inventory (.csv)</g:link>
                         </div>
                     </td>
                 </tr>
