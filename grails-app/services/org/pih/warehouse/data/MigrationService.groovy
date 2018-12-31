@@ -48,11 +48,9 @@ class MigrationService {
     boolean transactional = true
 
 
-    def getCurrentInventory() {
+    def getCurrentInventory(List<Location> locations) {
 
         def currentInventory
-
-        List<Location> locations = getLocationsWithTransactions([TransactionCode.INVENTORY]).collect { Location.get(it.locationId)}
 
         GParsPool.withPool {
 
@@ -62,8 +60,7 @@ class MigrationService {
                 def currentInventoryMap
                 try {
                     def startTime = System.currentTimeMillis()
-                    List<Product> products = getProductsWithTransactions(location, [TransactionCode.INVENTORY])
-                    Map<Product, Integer> quantityMap = inventoryService.getQuantityByProductMap(location, products)
+                    Map<Product, Integer> quantityMap = inventoryService.getQuantityByProductMap(location)
 
                     log.info "Calculated current inventory for ${location.name} in ${(System.currentTimeMillis()-startTime)} ms"
                     currentInventoryMap = [
