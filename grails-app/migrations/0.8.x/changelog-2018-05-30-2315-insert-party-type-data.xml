@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="jmiranda (generated)" id="1527740165368-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM party_type WHERE code = 'ORG';
+            </sqlCheck>
+        </preConditions>
         <insert tableName="party_type">
             <column name="id" value="1"/>
             <column name="version" valueNumeric="0"/>
@@ -13,6 +18,11 @@
         </insert>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1527740165368-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM party_type WHERE code = 'PERSON';
+            </sqlCheck>
+        </preConditions>
         <insert tableName="party_type">
             <column name="id" value="2"/>
             <column name="version" valueNumeric="0"/>
