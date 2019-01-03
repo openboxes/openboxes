@@ -623,8 +623,8 @@ class ReportService implements ApplicationContextAware {
     void buildLocationDimension() {
         String deleteStatement = "delete from location_dimension"
         String insertStatement = """
-            INSERT INTO location_dimension (version, location_name, location_number, location_type_code, location_type_name, location_group_name, parent_location_name, location_id, location_type_id, location_group_id)
-            SELECT 0, location.name, location.location_number, location_type.location_type_code, location_type.name, location_group.name, parent_location.name, location.id, location_type.id, location_group.id
+            INSERT INTO location_dimension (version, location_name, location_number, location_type_code, location_type_name, location_group_name, parent_location_name, location_id)
+            SELECT 0, location.name, location.location_number, location_type.location_type_code, location_type.name, location_group.name, parent_location.name, location.id
             FROM location
             JOIN location_type ON location_type.id = location.location_type_id
             LEFT JOIN location_group ON location_group.id = location.location_group_id
@@ -642,12 +642,13 @@ class ReportService implements ApplicationContextAware {
             DateDimension dateDimension = new DateDimension()
             dateDimension.date = date
             dateDimension.dayOfMonth = date[Calendar.DAY_OF_MONTH]
+			dateDimension.dayOfWeek = date[Calendar.DAY_OF_WEEK]
             dateDimension.month = date[Calendar.MONTH]+1
             dateDimension.year = date[Calendar.YEAR]
             dateDimension.week = date[Calendar.WEEK_OF_YEAR]
             dateDimension.monthName = date.format("MMMMM")
             dateDimension.monthYear = date.format("MM-yyyy")
-            dateDimension.dayOfWeek = date.format("EEEEE")
+            dateDimension.weekdayName = date.format("EEEEE")
             dateDimension.save()
         }
     }
@@ -668,9 +669,7 @@ class ReportService implements ApplicationContextAware {
                 transaction_date_key_id, 
                 transaction_type_key_id,
                 transaction_date, 
-                quantity, 
-                transaction_entry_id, 
-                transaction_id)
+                quantity)
             select  
                 0, 
                 transaction.transaction_number,
@@ -680,9 +679,7 @@ class ReportService implements ApplicationContextAware {
                 transaction_date_dimension.id as transaction_date_key,
                 transaction_type_dimension.id as transaction_type_key,
                 transaction.transaction_date,
-                transaction_entry.quantity,
-                transaction_entry.id as transaction_entry_id,
-                transaction.id as transction_id
+                transaction_entry.quantity
             from transaction_entry 
             join transaction on transaction.id = transaction_entry.transaction_id
             join inventory on transaction.inventory_id = inventory.id 
