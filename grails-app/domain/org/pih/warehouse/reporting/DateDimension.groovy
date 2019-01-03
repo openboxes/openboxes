@@ -11,20 +11,21 @@ package org.pih.warehouse.reporting
 
 class DateDimension {
 
-
     Long id
     int month
     int dayOfMonth
+    int dayOfWeek
     int year
     int week
-    Date date
     String monthName
     String monthYear
-    String dayOfWeek
+    String weekdayName
+
+    Date date
 
     static mapping = {
         id generator: 'increment'
-        date indexColumn:[name:'date_idx', unique:true]
+        cache true
     }
 
     static constraints = {

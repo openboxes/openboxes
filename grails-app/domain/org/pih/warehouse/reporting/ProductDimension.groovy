@@ -15,6 +15,7 @@ class ProductDimension {
 
     Long id
     Boolean active = Boolean.TRUE
+    String productId
     String productCode
     String productName
     String genericProduct
@@ -23,16 +24,16 @@ class ProductDimension {
     BigDecimal unitPrice
     BigDecimal unitCost
 
-    Product product
+    //Product product
 
     static mapping = {
         id generator: 'increment'
-        productCode indexColumn:[name:'product_code_idx', unique:true]
+        cache true
     }
 
     static constraints = {
         active(nullable:false)
-        product(nullable: false)
+        productId(nullable: false)
         productCode(nullable:false, blank: false)
         productName(nullable:false, blank: false)
         genericProduct(nullable:true)

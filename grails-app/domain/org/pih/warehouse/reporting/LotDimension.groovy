@@ -14,19 +14,20 @@ import org.pih.warehouse.inventory.InventoryItem
 class LotDimension {
 
     Long id
-    String productCode
     String lotNumber
+    String productCode
     Date expirationDate
+    String inventoryItemId
 
-    InventoryItem inventoryItem
-
+    //InventoryItem inventoryItem
 
     static mapping = {
         id generator: 'increment'
-        lotNumber indexColumn:[name:'lot_number_idx']
+        cache true
     }
 
     static constraints = {
+        inventoryItemId(nullable:false)
         productCode(nullable:false)
         lotNumber(nullable:true)
         expirationDate(nullable:true)

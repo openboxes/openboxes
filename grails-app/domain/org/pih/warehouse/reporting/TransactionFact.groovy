@@ -28,31 +28,15 @@ class TransactionFact {
     DateDimension transactionDateKey
     TransactionTypeDimension transactionTypeKey
 
-
     // Transaction facts
     Date transactionDate
     String transactionNumber
-    Transaction transaction
-    TransactionEntry transactionEntry
-
-    // Facts
-    Boolean canceled = Boolean.FALSE
-    Boolean substituted = Boolean.FALSE
-    Boolean modified = Boolean.FALSE
-    String reasonCode = ""
 
     BigDecimal quantity = 0;
-    BigDecimal quantityRequested = 0
-    BigDecimal quantityIssued = 0
-    BigDecimal quantityConsumed = 0
-    BigDecimal quantityExpired = 0
-    BigDecimal quantityCanceled = 0
-    BigDecimal quantityDemand = 0
-    BigDecimal quantitySubstituted = 0
-    BigDecimal quantityModified = 0
 
     static mapping = {
         id generator: 'increment'
+        cache true
     }
 
     static constraints = {
@@ -63,20 +47,6 @@ class TransactionFact {
         transactionTypeKey(nullable:false)
         transactionDate(nullable:false)
         transactionNumber(nullable:false)
-        transaction(nullable:false)
-        transactionEntry(nullable:false)
-        canceled(nullable:true)
-        substituted(nullable:true)
-        modified(nullable:true)
-        reasonCode(nullable:true)
         quantity(nullable:true)
-        quantityRequested(nullable:true)
-        quantityIssued(nullable:true)
-        quantityConsumed(nullable:true)
-        quantityExpired(nullable:true)
-        quantityCanceled(nullable:true)
-        quantityDemand(nullable:true)
-        quantitySubstituted(nullable:true)
-        quantityModified(nullable:true)
     }
 }

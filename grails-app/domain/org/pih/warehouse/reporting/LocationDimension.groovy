@@ -16,6 +16,7 @@ import org.pih.warehouse.core.LocationType
 class LocationDimension {
 
     Long id
+    String locationId
     String locationName
     String locationNumber
     String locationGroupName
@@ -23,27 +24,21 @@ class LocationDimension {
     String locationTypeName
     String parentLocationName
 
-    Location location
-    Location parentLocation
-    LocationType locationType
-    LocationGroup locationGroup
+    //Location location
 
     static mapping = {
         id generator: 'increment'
-        locationTypeCode indexColumn:[name:'location_type_code_idx']
+        cache true
     }
 
 
     static constraints = {
+        locationId(nullable:false)
         locationName(nullable:false)
         locationNumber(nullable:true)
         locationGroupName(nullable:true)
         locationTypeCode(nullable:false)
         locationTypeName(nullable:false)
-        location(nullable:false)
-        locationType(nullable:false)
-        locationGroup(nullable:true)
-        parentLocation(nullable:true)
         parentLocationName(nullable:true)
     }
 }

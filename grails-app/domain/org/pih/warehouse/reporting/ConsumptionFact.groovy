@@ -9,67 +9,23 @@
 **/ 
 package org.pih.warehouse.reporting
 
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.product.Category
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductGroup
-
 class ConsumptionFact {
 
     Long id
 
-    // Dimension Keys
-	Product product
-    ProductGroup genericProduct
-    InventoryItem inventoryItem
-    Location location
+    ProductDimension productKey
+    LotDimension lotKey
+    LocationDimension locationKey
+    DateDimension transactionDateKey
 
-    // Product dimension
-    String productCode
-    String productName
-    BigDecimal unitCost
-    BigDecimal unitPrice
-    Category category
-    String categoryName
-
-    // Inventory item dimension
-    String lotNumber
-    Date expirationDate
-
-    // Location dimension
-	String locationName
-    String locationGroup
-    String locationType
-
-    // Transaction dimension
+    // Transaction metadata
     String transactionNumber
     String transactionCode
     String transactionType
 
-    // Date dimension
-    Date transactionDate
-    String day
-    String week
-    String month
-    String year
-    String monthYear
-
-    // Fact table data
-    Boolean canceled
-    Boolean substituted
-    Boolean modified
-    String reasonCode
-
-    BigDecimal quantity = 0;
-    BigDecimal quantityRequested = 0
-    BigDecimal quantityIssued = 0
-    BigDecimal quantityConsumed = 0
-    BigDecimal quantityExpired = 0
-    BigDecimal quantityCanceled = 0
-    BigDecimal quantityDemand = 0
-    BigDecimal quantitySubstituted = 0
-    BigDecimal quantityModified = 0
+    BigDecimal quantity = 0.0
+    BigDecimal unitPrice = 0.0
+    BigDecimal unitCost = 0.0
 
     Date lastUpdated
 	Date dateCreated
@@ -80,18 +36,19 @@ class ConsumptionFact {
     }
 
     String toString() {
-        return "${id}:${productCode}:${productName}:${transactionCode}:${transactionDate}:${quantityIssued}"
+        return "${id}"
     }
 
     static constraints = {
-        genericProduct(nullable:true)
-        category(nullable:true)
-        unitCost(nullable:true)
-        unitPrice(nullable:true)
-        transactionNumber(nullable:true)
-        transactionCode(nullable:true)
-        lotNumber(nullable:true)
-        expirationDate(nullable:true)
-        reasonCode(nullable:true)
+        productKey(nullable:false)
+        lotKey(nullable:false)
+        locationKey(nullable:false)
+        transactionDateKey(nullable:false)
+        transactionNumber(nullable:false)
+        transactionCode(nullable:false)
+        transactionType(nullable:false)
+        quantity(nullable:false)
+        unitPrice(nullable:false)
+        unitCost(nullable:false)
     }
 }

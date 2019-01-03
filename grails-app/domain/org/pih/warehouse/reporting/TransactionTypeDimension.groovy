@@ -9,15 +9,12 @@
 **/ 
 package org.pih.warehouse.reporting
 
-import org.pih.warehouse.inventory.TransactionType
-
 class TransactionTypeDimension {
 
     Long id
+    String transactionTypeId
     String transactionCode
     String transactionTypeName
-
-    TransactionType transactionType
 
     static mapping = {
         id generator: 'increment'
