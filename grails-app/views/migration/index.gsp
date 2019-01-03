@@ -33,7 +33,7 @@
                 </thead>
                 <tbody>
 
-                <tr>
+                <tr class="prop">
                     <td>
                         Organizations
                     </td>
@@ -47,7 +47,7 @@
                         <g:remoteLink action="deleteOrganizations" class="button" update="status">Delete</g:remoteLink>
                     </td>
                 </tr>
-                <tr>
+                <tr class="prop">
                     <td>
                         Product Suppliers
                     </td>
@@ -62,24 +62,60 @@
                                       onLoading="onLoading()" onComplete="onComplete()">Delete</g:remoteLink>
                     </td>
                 </tr>
-                <tr>
+                <tr class="prop">
                     <td>Inventory Transactions</td>
                     <td>${inventoryTransactionCount}</td>
                     <td>
 
                         <div class="button-group">
                             <g:link controller="migration" action="nextInventoryTransaction" params="[max:1]" class="button" target="_blank">Next Product</g:link>
-                            <g:link controller="migration" action="migrateInventoryTransactions" params="[max:1, performMigration:false]" class="button" target="_blank">Preview Migration</g:link>
                             <g:link controller="migration" action="locationsWithInventoryTransactions" class="button" target="_blank">View All Locations</g:link>
-                        </div>
-                        <div class="button-group">
-                            <g:link controller="migration" action="migrateInventoryTransactions" params="[performMigration:true, format: 'json']" class="button" target="_blank">Migrate Current Location (.json)</g:link>
-                            <g:link controller="migration" action="migrateInventoryTransactions" params="[performMigration:true, format: 'csv']" class="button" target="_blank">Migrate Current Location (.csv)</g:link>
-                            <g:link controller="migration" action="migrateAllInventoryTransactions" class="button">Migrate All Locations</g:link>
                         </div>
                         <div class="button-group">
                             <g:link controller="migration" action="downloadCurrentInventory" params="[format: 'csv']" class="button" target="_blank">Download Current Inventory (.csv)</g:link>
                         </div>
+                        <div class="button-group">
+                            <g:link controller="migration" action="migrateInventoryTransactions" params="[max:1, performMigration:false]" class="button" target="_blank">Preview Migration</g:link>
+                            <g:link controller="migration" action="migrateInventoryTransactions" params="[performMigration:true, format: 'json']" class="button" target="_blank">Migrate Current Location</g:link>
+                            <g:link controller="migration" action="migrateAllInventoryTransactions" class="button">Migrate All Locations</g:link>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td>Date Dimension</td>
+                    <td>${dateDimensionCount}</td>
+                    <td rowspan="4">
+                        <g:link controller="report" action="buildDimensions" class="button">Build Dimensions</g:link>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td>Location Dimension</td>
+                    <td>${locationDimensionCount}</td>
+                    <td></td>
+                </tr>
+                <tr class="prop">
+                    <td>Lot Dimension</td>
+                    <td>${lotDimensionCount}</td>
+                    <td></td>
+                </tr>
+                <tr class="prop">
+                    <td>Product Dimension</td>
+                    <td>${productDimensionCount}</td>
+                    <td></td>
+                </tr>
+                <tr class="prop">
+                    <td>Transaction Fact</td>
+                    <td>${transactionFactCount}</td>
+                    <td>
+                        <g:link controller="report" action="buildTransactionFact" class="button">Build</g:link>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td>Consumption Fact</td>
+                    <td>${consumptionFactCount}</td>
+                    <td>
+                        <g:link controller="consumption" action="refresh" class="button">Build</g:link>
+                        <g:link controller="consumption" action="delete" class="button">Delete</g:link>
                     </td>
                 </tr>
 

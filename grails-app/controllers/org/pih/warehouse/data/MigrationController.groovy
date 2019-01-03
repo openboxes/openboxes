@@ -27,6 +27,12 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.jobs.DataMigrationJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.reporting.ConsumptionFact
+import org.pih.warehouse.reporting.DateDimension
+import org.pih.warehouse.reporting.LocationDimension
+import org.pih.warehouse.reporting.LotDimension
+import org.pih.warehouse.reporting.ProductDimension
+import org.pih.warehouse.reporting.TransactionFact
 import org.springframework.validation.Errors
 import util.ReportUtil
 
@@ -49,6 +55,14 @@ class MigrationController {
                 organizationCount: organizations.size(),
                 inventoryTransactionCount:inventoryTransactionCount,
                 productSupplierCount: productSuppliers.size(),
+                transactionFactCount: TransactionFact.count(),
+                consumptionFactCount: ConsumptionFact.count(),
+                locationDimensionCount: LocationDimension.count(),
+                productDimensionCount: ProductDimension.count(),
+                lotDimensionCount: LotDimension.count(),
+                dateDimensionCount: DateDimension.count(),
+
+
         ]
     }
 
