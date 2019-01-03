@@ -39,80 +39,102 @@
 
             </div>
 
-			<div class="box">
-				<h2><g:message code="consumption.label"/></h2>
+            <div class="yui-gf">
+                <div class="yui-u first">
 
-				<g:form action="list" method="get">
-					<table border="0">
-						<tr>
-                            <th><warehouse:message code="consumption.category.label" default="Category"/></th>
-                            <th><warehouse:message code="consumption.location.label" default="Location"/></th>
-                            <th><warehouse:message code="consumption.dateRange.label" default="Date Range"/></th>
-                            <th></th>
-						</tr>
-						<tr>
-                            <td>
-                                <g:selectCategory id="category" class="chzn-select-deselect filter"
-                                    name="category" noSelection="['':'']"
-                                    value="${command?.category?.id}"
-                                    />
-                            </td>
-                            <td>
-                                <g:selectDepot id="location" class="chzn-select-deselect filter"
-                                                  name="location" noSelection="['':'']"
-                                                  value="${command?.location?.id?:session?.warehouse?.id}"/>
-                            </td>
+                    <div class="box">
+                        <h2><g:message code="default.filters.label"/></h2>
 
-							<td>
-								<g:jqueryDatePicker
-									id="startDate"
-									name="startDate"
-                                    cssClass="filter"
-									changeMonthAndYear="true"
-                                    size="20"
-									value="${command?.startDate }"
-									format="MM/dd/yyyy"
-									showTrigger="false"
-                                />
+                        <g:form action="list" method="get">
+                            <table border="0">
+                                <tr>
+                                    <td>
+                                        <label>${g.message(code: 'location.label')}</label>
+                                        <g:selectDepot id="location" class="chzn-select-deselect filter"
+                                                       name="location" noSelection="['':'']"
+                                                       value="${command?.location?.id?:session?.warehouse?.id}"/>
+                                    </td>
+                                </tr>
 
-								<g:jqueryDatePicker
-									id="endDate"
-									name="endDate"
-                                    cssClass="filter"
-									changeMonthAndYear="true"
-                                    size="20"
-									value="${command?.endDate }"
-									format="MM/dd/yyyy"
-									showTrigger="false"
-                                />
+                                <tr>
+                                    <td>
+                                        <label>${g.message(code: 'category.label')}</label>
+                                        <g:selectCategory id="category" class="chzn-select-deselect filter"
+                                                          name="category" noSelection="['':'']"
+                                                          value="${command?.category?.id}"
+                                        />
+                                    </td>
+                                </tr>
 
-                                <button id="btn-execute" name="execute" class="button">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'lightning.png')}"/>
-                                    &nbsp;<warehouse:message code="default.button.execute.label"/> </button>
+                                <tr>
+                                    <td>
+                                        <label>${g.message(code: 'consumption.startDate.label')}</label>
+                                        <g:jqueryDatePicker
+                                                id="startDate"
+                                                name="startDate"
+                                                cssClass="large"
+                                                changeMonthAndYear="true"
+                                                size="20"
+                                                value="${command?.startDate }"
+                                                format="MM/dd/yyyy"
+                                                showTrigger="false"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label>${g.message(code: 'consumption.endDate.label')}</label>
+                                        <g:jqueryDatePicker
+                                                id="endDate"
+                                                name="endDate"
+                                                cssClass="large"
+                                                changeMonthAndYear="true"
+                                                size="20"
+                                                value="${command?.endDate }"
+                                                format="MM/dd/yyyy"
+                                                showTrigger="true"
+                                        />
+                                    </td>
+                                </tr>
 
-                                <g:link controller="consumption" action="list" class="button">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh_small.png')}"/>
-                                    <g:message code="default.button.clear.label"/>
-                                </g:link>
+                            <tr>
+                                <td>
 
-                            </td>
-							<td class="right">
+                                    <button id="btn-execute" name="execute" class="button">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'lightning.png')}"/>
+                                        &nbsp;<warehouse:message code="default.button.execute.label"/> </button>
 
-                                <button id="btn-download" name="download" class="button" value="true">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}"/>
-                                    &nbsp;<warehouse:message code="default.button.download.label"/></button>
+                                    <button id="btn-download" name="download" class="button" value="true">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}"/>
+                                        &nbsp;<warehouse:message code="default.button.download.label"/></button>
 
-							</td>
-						</tr>
-					</table>
-				</g:form>
+                                    <g:link controller="consumption" action="list" class="button">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh_small.png')}"/>
+                                        <g:message code="default.button.clear.label"/>
+                                    </g:link>
 
-                <div class="list dialog">
-                    <div id="results">
+                                </td>
+
+                            </tr>
+
+                            </table>
+                        </g:form>
                     </div>
-
                 </div>
-			</div>
+
+
+                <div class="yui-u">
+                    <div class="box">
+                        <h2><g:message code="consumption.label"/></h2>
+                        <div class="list dialog">
+                            <div id="results">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 		</div>
     %{--<script src="${createLinkTo(dir:'js/pivottable', file:'pivot.js')}" type="text/javascript" ></script>--}%
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/1.6.3/pivot.min.js" type="text/javascript" ></script>
@@ -161,7 +183,7 @@
                     data, {
                         rows: ["categoryName", "productName"],
                         cols: ["year", "month"],
-                        aggregator: sum(intFormat)(["quantityIssued"])
+                        aggregator: sum(intFormat)(["quantity"])
                     });
             }).fail(function(xhr, textStatus, error) {
                 console.log(xhr, textStatus, error);

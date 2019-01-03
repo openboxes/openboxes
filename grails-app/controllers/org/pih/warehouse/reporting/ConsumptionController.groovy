@@ -306,13 +306,21 @@ class ConsumptionController {
         redirect(action: "list")
     }
 
+
+    def delete = {
+        long startTime = System.currentTimeMillis()
+
+        Integer deletedRecords = consumptionService.deleteConsumptionRecords()
+        flash.message = "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis()-startTime}"
+        log.info "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis()-startTime}"
+        redirect(controller: "consumption", action: "list")
+    }
+
     def refresh = { ConsumptionCommand command ->
         long startTime = System.currentTimeMillis()
-        Location location = command?.location?:Location.load(session?.warehouse?.id)
-        def records = consumptionService.refreshConsumptionData(location)
+        def records = consumptionService.refreshConsumptionData()
         long duration = System.currentTimeMillis() - startTime
-        flash.message = "Calculated consumption ${records.size()} records in ${duration} ms"
-        log.info("Calculated consumption for ${records.size()} records in ${duration} ms")
+        flash.message = "Refreshed ${records.size()} consumption records in ${duration} ms"
         redirect(controller: "consumption", action: "list")
     }
 
@@ -387,6 +395,20 @@ class ConsumptionController {
         command.startDate = command?.startDate?:calendar.getTime()
 
         List <ConsumptionFact> results = consumptionService.listConsumption(location, command?.category, command.startDate, command.endDate)
+
+        results = results.collect { [
+                id: it.id,
+                productCode: it?.productKey?.productCode,
+                productName: it.productKey?.productName,
+                categoryName: it?.productKey?.categoryName,
+                year: it?.transactionDateKey?.year,
+                month: it?.transactionDateKey?.month,
+                day: it?.transactionDateKey?.dayOfMonth,
+                quantity: it?.quantity,
+                unitCost: it?.unitCost,
+                unitPrice: it?.unitPrice
+        ]}
+
 
         render results as JSON
     }
