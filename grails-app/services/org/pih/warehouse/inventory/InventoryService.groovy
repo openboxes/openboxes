@@ -3463,7 +3463,13 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
             if (fromLocations) {
-                'in'("inventory", fromLocations.collect { it.inventory })
+				and {
+					'in'("inventory", fromLocations.collect { it.inventory })
+
+					not {
+						'in'("destination", fromLocations)
+					}
+				}
             }
             between('transactionDate', fromDate, toDate)
         }

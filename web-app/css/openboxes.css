@@ -863,9 +863,6 @@ label.error {
     font-weight: bold;
     color: black;
 }
-.ui-datepicker-trigger {
-    position: relative; left: 94%; bottom: 20px;
-}
 .buttons {
     padding-top: 10px;
     /*border-top: 3px solid lightgrey;*/

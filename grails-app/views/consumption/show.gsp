@@ -130,8 +130,8 @@
 
             $(".dataTable").dataTable({
                 "bJQueryUI": true,
-                "rowHeight": '100px',
-                "sPaginationType": "full_numbers"
+                "sPaginationType": "full_numbers",
+                "iDisplayLength": 25
             });
 
 
@@ -147,7 +147,7 @@
                 $("#dlgShowDialog").dialog({
                     autoOpen: true,
                     modal: true,
-                    width: 800,
+                    width: "1200px",
                     open: function(event, ui) {
                         $("#dlgShowDialogContent").html("Loading...")
                         $('#dlgShowDialogContent').load(url, function(response, status, xhr) {
@@ -163,6 +163,16 @@
                     }
                 });
             });
+
+
+            $(".tabs").livequery(function(){
+                $(this).tabs({
+                    cookie: {
+                        expires: 1 // store cookie for a day, without, it would be a session cookie
+                    }
+                }
+            )});
+
 
         });
     </script>

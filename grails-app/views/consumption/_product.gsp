@@ -1,54 +1,13 @@
-<div class="box dialog">
-    <table>
-        <tbody>
+<div class="dialog">
 
-            <tr class="prop">
-                <td class="name">
-                    <label><warehouse:message code="product.productCode.label"/></label>
-                </td>
-                <td>
-                    ${product?.productCode}
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="name">
-                    <label><warehouse:message code="product.label"/></label>
-                </td>
-                <td>
-                    ${product?.name}
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="name">
-                    <label><warehouse:message code="category.label"/></label>
-                </td>
-                <td>
-                    ${product?.category?.name?:""}
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="name">
-                    <label><warehouse:message code="product.unitOfMeasure.label"/></label>
-                </td>
-                <td>
-                    ${product?.unitOfMeasure?:""}
-                </td>
-            </tr>
-        </tbody>
+    <g:render template="../product/summary" model="[productInstance:product]"/>
 
-    </table>
-</div>
-
-<div class="buttons">
-    <div class="button-container">
-        <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}" fragment="ui-tabs-1" class="button btn-close-dialog" target="_blank">
-            <img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}"/>
-            <warehouse:message code="inventory.showStockCard.label"/>
-        </g:link>
-        <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}" fragment="ui-tabs-2" class="button btn-close-dialog" target="_blank">
-            <img src="${resource(dir: 'images/icons/silk', file: 'date.png')}"/>
-            <warehouse:message code="inventory.showTransactionLog.label"/>
-        </g:link>
+	<div class="tabs">
+		<ul>
+			<li><a href="${request.contextPath}/inventoryItem/showCurrentStock/${product?.id}"><warehouse:message code="inventory.currentStock.label" default="Current Stock"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showStockHistory/${product?.id}"><warehouse:message code="inventory.stockHistory.label"/></a></li>
+        </ul>
     </div>
-
 </div>
+
+
