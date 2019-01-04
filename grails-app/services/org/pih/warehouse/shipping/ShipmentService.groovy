@@ -1547,6 +1547,7 @@ class ShipmentService {
 			receiptInstance.addToReceiptItems(receiptItem);
             shipmentItem.addToReceiptItems(receiptItem)
 		}
+		shipmentInstance?.addToReceipts(receiptInstance)
 		return receiptInstance;
 	}
 
