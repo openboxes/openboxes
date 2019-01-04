@@ -167,8 +167,7 @@
                                 <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
                             </g:link>
                         </div>
-                    </div>
-                    <div class="mm-content-section">
+
                         <h3><warehouse:message code="default.list.label" args="[warehouse.message(code: 'requisitions.label')]" /></h3>
                         <div class="mm-menu-item">
                             <g:link controller="requisition" action="list" class="list">
@@ -199,62 +198,60 @@
                     <warehouse:message code="default.inbound.label" />
                 </a>
                 <div class="mm-item-content">
+                    <div class="mm-content-section">
                     <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
 
-                        <div class="mm-content-section">
-                            <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
+                        <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
 
-                            <div class="mm-menu-item">
-                                <g:link controller="stockMovement" action="create" params="[direction:'INBOUND']">
-                                    <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.inbound.label')]"/>
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
-                                    <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
-                                </g:link>
-                            </div>
-                            <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
-                            <div class="mm-menu-item">
-                                <g:link controller="putAway" action="index">
-                                    <warehouse:message code="default.create.label" args="[g.message(code:'putAway.label')]"/>
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="order" action="list" params="[orderTypeCode: 'TRANSFER_ORDER']">
-                                    <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
-                                </g:link>
-                            </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="stockMovement" action="create" params="[direction:'INBOUND']">
+                                <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.inbound.label')]"/>
+                            </g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
+                                <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
+                            </g:link>
+                        </div>
+                        <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
+                        <div class="mm-menu-item">
+                            <g:link controller="putAway" action="index">
+                                <warehouse:message code="default.create.label" args="[g.message(code:'putAway.label')]"/>
+                            </g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="order" action="list" params="[orderTypeCode: 'TRANSFER_ORDER']">
+                                <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
+                            </g:link>
                         </div>
                     </g:if>
                     <g:if test="${megamenuConfig.receiving.enabled || isSuperuser}">
-                        <div class="mm-content-section">
-                            <h3><warehouse:message code="receiving.label" default="Receiving" /></h3>
+                        <h3><warehouse:message code="receiving.label" default="Receiving" /></h3>
 
-                            <div class="mm-menu-item">
-                                <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create">
-                                    <warehouse:message code="shipping.createIncomingShipment.label"/>
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="shipment" action="list" params="[type: 'incoming']" class="list">
-                                    <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
-                                    <warehouse:message code="default.all.label"/> (${inboundShipmentsTotal})
-                                </g:link>
-                            </div>
-                            <g:each in="${inboundShipmentsCount}" var="statusRow">
-                                <div class="mm-menu-item">
-                                    <g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.status]" class="shipment-status-${statusRow.status }">
-                                        <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
-                                    </g:link>
-                                </div>
-                            </g:each>
+                        <div class="mm-menu-item">
+                            <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create">
+                                <warehouse:message code="shipping.createIncomingShipment.label"/>
+                            </g:link>
                         </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="shipment" action="list" params="[type: 'incoming']" class="list">
+                                <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
+                            </g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
+                                <warehouse:message code="default.all.label"/> (${inboundShipmentsTotal})
+                            </g:link>
+                        </div>
+                        <g:each in="${inboundShipmentsCount}" var="statusRow">
+                            <div class="mm-menu-item">
+                                <g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.status]" class="shipment-status-${statusRow.status }">
+                                    <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
+                                </g:link>
+                            </div>
+                        </g:each>
                     </g:if>
+                    </div>
                 </div>
             </li>
         </a>
@@ -269,9 +266,9 @@
                     <warehouse:message code="default.outbound.label" />
                 </a>
                 <div class="mm-item-content">
-                    <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
+                    <div class="mm-content-section">
+                        <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
 
-                        <div class="mm-content-section">
                             <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
 
                             <div class="mm-menu-item">
@@ -284,10 +281,8 @@
                                     <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.outbound.label')]"/>
                                 </g:link>
                             </div>
-                        </div>
-                    </g:if>
-                    <g:if test="${megamenuConfig.shipping.enabled || isSuperuser}">
-                        <div class="mm-content-section">
+                        </g:if>
+                        <g:if test="${megamenuConfig.shipping.enabled || isSuperuser}">
                             <h3><warehouse:message code="shipping.label" default="Shipping" /></h3>
 
                             <div class="mm-menu-item">
