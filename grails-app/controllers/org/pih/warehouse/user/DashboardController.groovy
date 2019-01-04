@@ -49,19 +49,6 @@ class DashboardController {
 		render statistics
 	}
 
-    def showRequisitionStatistics = {
-        def user = User.get(session.user.id)
-        def location = Location.get(session?.warehouse?.id);
-        def statistics = requisitionService.getRequisitionStatistics(location,null,user)
-        render statistics as JSON
-    }
-
-    def showRequisitionMadeStatistics = {
-        def user = User.get(session.user.id)
-        def location = Location.get(session?.warehouse?.id);
-        def statistics = requisitionService.getRequisitionStatistics(null,location,user)
-        render statistics as JSON
-    }
 
     def globalSearch = {
 		
@@ -396,24 +383,6 @@ class DashboardController {
 				quickCategories       : productService.getQuickCategories(),
 				tags                  : productService.getAllTags()
 		]
-
-
-	}
-	
-	
-	def menu = { 
-		def incomingShipments = Shipment.findAllByDestination(session?.warehouse).groupBy{it.status.code}.sort()
-		def outgoingShipments = Shipment.findAllByOrigin(session?.warehouse).groupBy{it.status.code}.sort();
-		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [session?.warehouse])
-		def incomingRequests = Requisition.findAllByDestination(session?.warehouse).groupBy{it.status}.sort()
-		def outgoingRequests = Requisition.findAllByOrigin(session?.warehouse).groupBy{it.status}.sort()
-		
-		[incomingShipments: incomingShipments, 
-			outgoingShipments: outgoingShipments, 
-			incomingOrders: incomingOrders, 
-			incomingRequests: incomingRequests,
-			outgoingRequests: outgoingRequests,
-			quickCategories:productService.getQuickCategories()]
 	}
 
     @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
