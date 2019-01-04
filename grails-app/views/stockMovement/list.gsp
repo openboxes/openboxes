@@ -37,7 +37,6 @@
 
             <div class="button-group">
                 <g:link controller="stockMovement" action="list" params="['requestedBy.id':session?.user?.id]" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}" />&nbsp;
                     ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}
                     (${statistics["MINE"]?:0 })
                 </g:link>
