@@ -130,8 +130,8 @@
 
             $(".dataTable").dataTable({
                 "bJQueryUI": true,
-                "rowHeight": '100px',
-                "sPaginationType": "full_numbers"
+                "sPaginationType": "full_numbers",
+                "iDisplayLength": 25
             });
 
 
