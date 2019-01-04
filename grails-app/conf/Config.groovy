@@ -650,7 +650,7 @@ openboxes.shipping.search.maxResults = 1000
 
 // Automatically create temporary receiving locations for shipments
 openboxes.receiving.createReceivingLocation.enabled = true
-openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_PREFIX
+openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX
 
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"

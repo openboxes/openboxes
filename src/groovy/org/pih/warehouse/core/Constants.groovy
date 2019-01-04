@@ -98,7 +98,7 @@ class Constants {
 
 	static final String TRACKING_NUMBER_TYPE_ID = "10"
 
-	static final String DEFAULT_RECEIVING_PREFIX = "R"
+	static final String DEFAULT_RECEIVING_LOCATION_PREFIX = "R"
 
 
 }
