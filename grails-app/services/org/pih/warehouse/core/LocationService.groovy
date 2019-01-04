@@ -407,6 +407,9 @@ class LocationService {
 		return value?.trim()
 	}
 
-
+	String getReceivingLocationName(String identifier) {
+		String receivingLocationPrefix = grailsApplication.config.openboxes.receiving.receivingLocation.prefix
+		return "${receivingLocationPrefix}-${identifier}"
+	}
 
 }
