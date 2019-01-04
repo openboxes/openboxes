@@ -643,7 +643,7 @@ class RequisitionService {
                 }
                 and {
                     eq("isTemplate", false)
-                    'in'("status", [RequisitionStatus.CHECKING, RequisitionStatus.EDITING, RequisitionStatus.CONFIRMING, RequisitionStatus.PICKED, RequisitionStatus.PICKING])
+                    'in'("status", RequisitionStatus.listPending())
                 }
             }
             eq("product", product)
