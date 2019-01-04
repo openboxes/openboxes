@@ -27,6 +27,8 @@
                         <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id?:session?.warehouse?.id}"
                                           multiple="true" class="chzn-select-deselect"
                                           data-placeholder="${warehouse.message(code:'consumption.fromLocations.label', default:'Origins(s)')}"/>
+
+                        <div class="fade">NOTE: Using multiple Origin locations may provide inaccurate results.</div>
                     </td>
                 </tr>
 
