@@ -4632,7 +4632,7 @@ class InventoryService implements ApplicationContextAware {
             def criteria = RequisitionItem.createCriteria()
             def results = criteria.list {
                 requisition {
-                    eq("destination", location)
+                    eq("origin", location)
                     between("dateRequested", date-30, date)
                 }
                 projections {

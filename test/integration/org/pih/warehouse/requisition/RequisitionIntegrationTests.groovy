@@ -75,7 +75,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         def requisition = new Requisition(
                 name:'testRequisition'+ UUID.randomUUID().toString()[0..5],
                 commodityClass: CommodityClass.MEDICATION,
-                type:  RequisitionType.WARD_NON_STOCK,
+                type:  RequisitionType.NON_STOCK,
                 origin: location,
                 destination: location,
                 requestedBy: person,
