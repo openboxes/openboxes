@@ -609,6 +609,7 @@ class StockMovementService {
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         editPageItem.substitutionItems = substitutionItems
+        editPageItem.sortOrder = stockMovementItem.sortOrder
         return editPageItem
     }
 

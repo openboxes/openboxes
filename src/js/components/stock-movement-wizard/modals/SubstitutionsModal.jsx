@@ -28,8 +28,9 @@ const FIELDS = {
     type: ArrayField,
     getDynamicRowAttr: ({ rowValues, originalItem }) => {
       let className = '';
-      const rowDate = rowValues.minExpirationDate;
-      const origDate = originalItem ? originalItem.minExpirationDate : null;
+      const rowDate = new Date(rowValues.minExpirationDate);
+      const origDate = originalItem && originalItem.minExpirationDate ?
+        new Date(originalItem.minExpirationDate) : null;
       if (!rowValues.originalItem) {
         className = (origDate && rowDate && rowDate < origDate) || (!origDate && rowDate) ? 'text-danger' : '';
       } else {
@@ -182,6 +183,7 @@ class SubstitutionsModal extends Component {
         newQuantity: sub.originalItem ? sub.quantityRequested - subQty : sub.quantitySelected,
         quantityRevised: sub.originalItem ? sub.quantitySelected : '',
         reasonCode: sub.originalItem ? values.reasonCode : 'SUBSTITUTION',
+        sortOrder: this.state.attr.lineItem.sortOrder,
       })),
     };
 
