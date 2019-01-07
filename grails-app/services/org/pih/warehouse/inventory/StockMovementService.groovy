@@ -91,11 +91,18 @@ class StockMovementService {
 
 
     StockMovement updateStockMovement(StockMovement stockMovement, Boolean forceUpdate) {
+        // TODO: This function is a very good candidate for future refactor. This should be better split in case of
+        // updating stock movement basing on origin type
+
         log.info "Update stock movement " + new JSONObject(stockMovement.toJson()).toString(4)
 
         Requisition requisition = updateRequisition(stockMovement, forceUpdate)
 
         if (stockMovement.origin.isSupplier()) {
+
+            // After creating stock movement from Requisition in this case (when origin.isSupplier()), those 3 values were not
+            // populated. As a quick fix, data that came from request is preserved and reapplied to SM afterwards.
+
             def driverName = stockMovement.driverName
             def trackingNumber = stockMovement.trackingNumber
             def comments = stockMovement.comments
