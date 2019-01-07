@@ -232,6 +232,18 @@ class StocklistManagement extends Component {
               Header: 'Stocklist Name',
               accessor: 'name',
               aggregate: () => '',
+              // eslint-disable-next-line react/prop-types
+              Cell: ({ aggregated, original }) => {
+                if (aggregated) {
+                  return '';
+                }
+
+                return (
+                  <a href={`/openboxes/requisitionTemplate/show/${original.stocklistId}`}>
+                    {original.name}
+                  </a>
+                );
+              },
             },
             {
               Header: 'Monthly demand',
