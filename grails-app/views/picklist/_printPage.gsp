@@ -29,7 +29,7 @@
 
             <g:if test="${sorted}">
                 <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort() { a,b ->
-                    b.retrievePicklistItemsSortedByBinName()[0]?.binLocation?.name <=> a.retrievePicklistItemsSortedByBinName()[0]?.binLocation?.name }}"/>
+                    a.retrievePicklistItemsSortedByBinName()[0]?.binLocation?.name <=> b.retrievePicklistItemsSortedByBinName()[0]?.binLocation?.name }}"/>
             </g:if>
             <g:else>
                 <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort()}"/>
