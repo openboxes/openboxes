@@ -220,7 +220,7 @@
                             </g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="order" action="list" params="[orderTypeCode: 'TRANSFER_ORDER']">
+                            <g:link controller="order" action="list" params="[orderTypeCode: 'TRANSFER_ORDER', status: 'PENDING']">
                                 <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
                             </g:link>
                         </div>

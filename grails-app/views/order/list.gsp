@@ -1,8 +1,14 @@
+<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 <html>
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <g:set var="entityName" value="${warehouse.message(code: 'orders.label', default: 'Purchase orders')}" />
+        <g:if test="${orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
+            <g:set var="entityName" value="${warehouse.message(code: 'putAways.label', default: 'Put Aways')}" />
+        </g:if>
+        <g:else>
+            <g:set var="entityName" value="${warehouse.message(code: 'orders.label', default: 'Purchase orders')}" />
+        </g:else>
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
    	</head>
 	<body>
@@ -30,13 +36,13 @@
 									<th>${warehouse.message(code: 'default.status.label')}</th>
 									<th>${warehouse.message(code: 'order.orderNumber.label')}</th>
 									<th>${warehouse.message(code: 'default.name.label')}</th>
-									<th>${warehouse.message(code: 'order.origin.label')}</th>
-									<th>${warehouse.message(code: 'order.destination.label')}</th>
+                                    <g:if test="${orderTypeCode != OrderTypeCode.TRANSFER_ORDER}">
+                                        <th>${warehouse.message(code: 'order.origin.label')}</th>
+                                        <th>${warehouse.message(code: 'order.destination.label')}</th>
+                                    </g:if>
                                     <th>${warehouse.message(code: 'order.orderedBy.label')}</th>
 									<th>${warehouse.message(code: 'order.dateOrdered.label')}</th>
 									<th>${warehouse.message(code: 'order.orderItems.label')}</th>
-									<th class="right">${warehouse.message(code: 'order.totalPrice.label', default: 'Total price')}</th>
-									<th>${warehouse.message(code: 'order.currency.label', default: 'Currency')}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -71,12 +77,14 @@
 												${fieldValue(bean: orderInstance, field: "name")}
 											</g:link>
 										</td>
-										<td class="middle">
-											${fieldValue(bean: orderInstance, field: "origin.name")}
-										</td>
-										<td class="middle">
-											${fieldValue(bean: orderInstance, field: "destination.name")}
-										</td>
+                                        <g:if test="${orderTypeCode != OrderTypeCode.TRANSFER_ORDER}">
+                                            <td class="middle">
+                                                ${fieldValue(bean: orderInstance, field: "origin.name")}
+                                            </td>
+                                            <td class="middle">
+                                                ${fieldValue(bean: orderInstance, field: "destination.name")}
+                                            </td>
+                                        </g:if>
                                         <td class="middle center">
                                             ${orderInstance?.orderedBy?.name}
                                         </td>
@@ -85,12 +93,6 @@
 										</td>
 										<td class="middle center">
 											${orderInstance?.orderItems?.size()?:0}
-										</td>
-										<td class="middle right">
-											<g:formatNumber number="${orderInstance?.totalPrice()}" />
-										</td>
-										<td class="middle">
-                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 										</td>
 									</tr>
 								</g:each>
