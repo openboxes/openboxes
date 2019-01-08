@@ -60,7 +60,8 @@ class OrderController {
 
 		[ orders:orders, origin:origin?.id, destination:destination?.id,
 		  status:status, statusStartDate:statusStartDate, statusEndDate:statusEndDate,
-		  suppliers : suppliers, totalPrice:totalPrice, orderedByList: orderedByList
+		  suppliers : suppliers, totalPrice:totalPrice, orderedByList: orderedByList,
+		  orderTypeCode: orderTypeCode
 		]
     }
 

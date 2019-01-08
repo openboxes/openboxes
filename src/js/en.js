@@ -151,7 +151,7 @@ const en = {
         listPutAways: {
           configName: 'stockMovement',
           label: 'List Put Aways',
-          link: '/openboxes/order/list?orderTypeCode=TRANSFER_ORDER',
+          link: '/openboxes/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING',
         },
         createShipment: {
           configName: 'receiving',
