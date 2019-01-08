@@ -75,13 +75,18 @@
 
                             <td>${fieldValue(bean: productSupplier, field: "unitOfMeasure")}</td>
 
-                            <td>${fieldValue(bean: productSupplier, field: "unitPrice")}</td>
+                            <td>
+                                <g:isUserFinance>
+                                    ${fieldValue(bean: productSupplier, field: "unitPrice")}
+                                </g:isUserFinance>
+                            </td>
 
                             <td>
                                 <a href="javascript:void(0);" class="btn-show-dialog button"
                                    data-target="#product-supplier-dialog"
                                    data-title="${g.message(code:'productSupplier.label')}"
                                    data-url="${request.contextPath}/productSupplier/dialog?id=${productSupplier?.id}&product.id=${productInstance?.id}">
+                                    <img src="${createLinkTo(dir:'images/icons/silk', file:'pencil.png')}" />
                                     <g:message code="default.button.edit.label"/>
                                 </a>
                             </td>

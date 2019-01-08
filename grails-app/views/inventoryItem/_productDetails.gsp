@@ -94,6 +94,7 @@
                 </td>
             </tr>
 
+            <g:isUserFinance>
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="product.pricePerUnit.label"/></label>
@@ -114,6 +115,7 @@
                     ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                 </td>
             </tr>
+            </g:isUserFinance>
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="product.abcClass.label"/></label>

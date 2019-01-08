@@ -37,10 +37,12 @@
                 <td>
                     ${pkg?.uom?.code }/${pkg?.quantity }
                 </td>
-                <td>
-                    <g:formatNumber number="${pkg?.price}" />
-                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 
+                <td>
+                    <g:isUserFinance>
+                        <g:formatNumber number="${pkg?.price}" />
+                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                    </g:isUserFinance>
                 </td>
                 <td>
                     ${pkg?.gtin?:warehouse.message(code:'default.none.label') }

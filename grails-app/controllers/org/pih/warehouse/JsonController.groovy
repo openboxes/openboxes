@@ -46,6 +46,7 @@ class JsonController {
     def reportService
 	def messageSource
     def consoleService
+    def userService
 
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
@@ -353,12 +354,18 @@ class JsonController {
     def getStockValueByProduct = {
         def location = Location.get(session?.warehouse?.id)
         def result = inventoryService.getTotalStockValue(location)
+        def isUserFinance = userService.isUserFinance(session?.user)
 
         def stockValueByProduct = []
-        result.stockValueByProduct.sort { it.value }.reverseEach { product, value ->
-
+        result.stockValueByProduct.sort { it.value }.reverseEach { Product product, value ->
             value = g.formatNumber(number: value, format: "#######.00")
-            stockValueByProduct << [id: product.id, productCode: product.productCode, productName: product.name, unitPrice: product.pricePerUnit, totalValue: value ]
+            stockValueByProduct << [
+                    id: product.id,
+                    productCode: product.productCode,
+                    productName: product.name,
+                    unitPrice: isUserFinance ? product.pricePerUnit : null,
+                    totalValue: isUserFinance ? value : null
+            ]
         }
 
         def map = [aaData: stockValueByProduct]
@@ -1250,14 +1257,10 @@ class JsonController {
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getQuantityByProductMap(session.warehouse.id)
         def inventoryStatusMap = inventoryService.getInventoryStatusAndLevel(location)
-        quantityMap.each { product, value ->
+        quantityMap.each { Product product, value ->
             def inventoryLevel = inventoryStatusMap[product]?.inventoryLevel
             def status = inventoryStatusMap[product]?.inventoryStatus
             def quantity = inventoryStatusMap[product]?.quantity?:0
-            //def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
-            //def status = product.getStatus(session.warehouse.id, value) // statusMap[product]
-            product = product.merge()
-
 
             items << [
                     id:product.id,
@@ -1286,7 +1289,17 @@ class JsonController {
         def overStockCount = items.findAll { it.status == "OVERSTOCK" }.size()
 
         def totalValue = items.sum { it.totalValue }
-        def data = [totalValue:totalValue,items:items,elapsedTime:elapsedTime,allStockCount:items.size(),inStockCount:inStockCount,reorderStockCount:reorderStockCount,lowStockCount:lowStockCount,outOfStockCount:outOfStockCount,overStockCount:overStockCount]
+        def data = [
+                totalValue:totalValue,
+                items:items,
+                elapsedTime:elapsedTime,
+                allStockCount:items.size(),
+                inStockCount:inStockCount,
+                reorderStockCount:reorderStockCount,
+                lowStockCount:lowStockCount,
+                outOfStockCount:outOfStockCount,
+                overStockCount:overStockCount
+        ]
 
         log.info "Elapsed time " + elapsedTime + " s"
         //render "${params.callback}(${result as JSON})"
@@ -1582,29 +1595,28 @@ class JsonController {
         render(binLocationReport["summary"] as JSON)
     }
 
-    @Cacheable("binLocationReportCache")
+    //@Cacheable("binLocationReportCache")
     def getBinLocationReport = {
         log.info "binLocationReport: " + params
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
         def binLocationReport = inventoryService.getBinLocationReport(location)
 
-
         def data = binLocationReport["data"]
-
-        log.info "data " + data.size()
-
         if (params.status) {
             data = data.findAll { it.status == params.status }
         }
 
-        log.info "data " + data.size()
+        def isUserFinance = userService.isUserFinance(session?.user)
 
         // Flatten the data to make it easier to display
         data = data.collect {
+            def quantity = it?.quantity?:0
+            def unitCost = isUserFinance ? (it?.product?.pricePerUnit?:0.0) : null
+            def totalValue = isUserFinance ? g.formatNumber(number: quantity * unitCost) : null
             [
                     id: it.product?.id,
-                    status: it.status,
+                    status: g.message(code: "binLocationSummary.${it.status}.label"),
                     productCode: it.product?.productCode,
                     productName: it?.product?.name,
                     productGroup: it?.product?.genericProduct?.name,
@@ -1613,10 +1625,13 @@ class JsonController {
                     expirationDate: g.formatDate(date: it?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy"),
                     unitOfMeasure: it?.product?.unitOfMeasure,
                     binLocation: it?.binLocation?.name,
-                    quantity: it?.quantity
+                    quantity: quantity,
+                    unitCost: unitCost,
+                    totalValue: totalValue
             ]
         }
-        log.info "data: " + data
+
+
 
         render(["aaData":data] as JSON)
 

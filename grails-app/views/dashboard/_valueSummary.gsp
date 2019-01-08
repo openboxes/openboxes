@@ -1,96 +1,106 @@
-<g:isUserAdmin>
+<g:isUserFinance>
 <div class="box">
     <h2>
-        <warehouse:message code="inventory.value.label" default="Stock Value Summary"/>
+        <warehouse:message code="inventory.value.label" default="Stock Value"/>
         <%--
         <g:remoteLink controller="json" action="refreshTotalStockValue" onSuccess="refresh();" onFailure="showError();">
             <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_refresh_small.png')}" alt="Refresh" style="vertical-align: middle" /></g:remoteLink>
         --%>
     </h2>
     <div class="widget-content" style="padding:0; margin:0">
-        <table class="zebra">
-            <thead>
-                <tr class="prop odd">
-                    <td colspan="3">
-                        <label class="fade lastUpdated"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></label>
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <img src="${createLinkTo(dir:'images/icons/silk/sum.png')}" class="middle"/>
-                    </td>
-                    <td>
-                        # of products with pricing information
-                    </td>
-                    <td>
-                        <div id="progressSummary" class="right">
-                            <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <img src="${createLinkTo(dir:'images/icons/silk/chart_pie.png')}" class="middle"/>
-                    </td>
-                    <td>
-                        Percentage of products with pricing information
-                    </td>
-                    <td>
-                        <div id="progressPercentage" class="right">
-                            <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/money.png')}" class="middle"/>
-                    </td>
-                    <td>
-                        <warehouse:message code="inventory.totalStockValue.label" default="Total value of inventory"/>
-                    </td>
-                    <td class="right">
-                        <div id="totalStockValue">
-                            <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr class="odd">
-                    <td colspan="3">
-                        <span id="totalStockSummary" class="fade"></span>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
+
+        <div class="tabs">
+            <ul>
+                <li>
+                    <a href="#value-summary"><warehouse:message code="default.summary.label" default="Summary"/></a>
+                </li>
+                <li>
+                    <a href="#value-details"><warehouse:message code="default.details.label" default="Details"/></a>
+                </li>
+            </ul>
+            <div id="value-summary">
+                <table class="zebra">
+                    <thead>
+                    <tr class="prop odd">
+                        <td colspan="3">
+                            <label class="fade lastUpdated"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></label>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="center" style="width: 1%">
+                            <img src="${createLinkTo(dir:'images/icons/silk/money.png')}" class="middle"/>
+                        </td>
+                        <td>
+                            <warehouse:message code="inventory.totalStockValue.label" default="Total value of inventory"/>
+                        </td>
+                        <td class="right">
+                            <div id="totalStockValue">
+                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img src="${createLinkTo(dir:'images/icons/silk/chart_pie.png')}" class="middle"/>
+                        </td>
+                        <td>
+                            Products with pricing data
+                        </td>
+                        <td class="right">
+                            <span id="progressSummary">
+                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                            </span>
+                            (<small id="progressPercentage">0%</small>)
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr class="odd">
+                        <td colspan="3">
+                            <span id="totalStockSummary" class="fade"></span>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div id="value-details">
+                <div class="widget-content" style="padding:0; margin:0">
+                    <table id="stockValueDetailsTable">
+                        <thead>
+                        <th>${g.message(code: "product.productCode.label")}</th>
+                        <th>${g.message(code: "product.label")}</th>
+                        <th>${g.message(code: "inventory.value.label", default: "Value")}</th>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th colspan="3">
+                                <div class="fade">All values in ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</div>
+                            </th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-<div class="box">
-    <h2>
-        <warehouse:message code="inventory.stockValueDetails.label" default="Stock Value Details"/>
-        <g:remoteLink controller="json" action="refreshTotalStockValue" onSuccess="refresh();" onFailure="showError();">
-            <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_refresh_small.png')}" alt="Refresh" style="vertical-align: middle" /></g:remoteLink>
-
-    </h2>
-    <div class="widget-content" style="padding:0; margin:0">
-        <table id="stockValueDetailsTable">
-            <thead>
-            <th>Code</th>
-            <th>Product</th>
-            <%--<th>Unit Price</th>--%>
-            <th>Value (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})</th>
-            </thead>
-            <tbody>
-
-            </tbody>
-        </table>
-    </div>
-</div>
-
 
 <script type="text/javascript">
+    $(function() {
+        $(".tabs").tabs(
+            {
+                cookie: {
+                    // store cookie for a day, without, it would be a session cookie
+                    expires: 1
+                }
+            }
+        );
+    });
 
     $(window).load(function(){
         //$( "#progressbar" ).progressbar({ value: 0 });
@@ -140,12 +150,7 @@
 
                 $('#totalStockValue').html(value);
 
-                if (progress < 1.0) {
-                    $("#totalStockSummary").html("* Pricing data is available for less " + progressPercentage  + "% of all products");
-                }
-                else {
-                    $("#totalStockSummary").html("* Pricing data is available for all products");
-                }
+                $("#totalStockSummary").html("Pricing data is available for " + formatPercentage(progressPercentage)  + " of all products");
                 $('#progressSummary').html(progressSummary);
                 $( "#progressbar" ).progressbar({ value: progressPercentage });
                 $( "#progressPercentage").html("<span title='" + progressSummary + "'>" + formatPercentage(progressPercentage) + "</span>");
@@ -255,5 +260,5 @@
     }
 
 </script>
-</g:isUserAdmin>
+</g:isUserFinance>
 

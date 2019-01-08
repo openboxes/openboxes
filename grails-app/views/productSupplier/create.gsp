@@ -201,16 +201,18 @@
 									<g:textField class="text" name="standardLeadTimeDays" value="${fieldValue(bean: productSupplierInstance, field: 'standardLeadTimeDays')}" />
 								</td>
 							</tr>
-						
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label for="unitPrice"><warehouse:message code="productSupplier.unitPrice.label" default="Price Per Unit" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'unitPrice', 'errors')}">
-									<g:textField class="text" name="unitPrice" value="${fieldValue(bean: productSupplierInstance, field: 'unitPrice')}" />
-								</td>
-							</tr>
-						
+
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label for="unitPrice"><warehouse:message code="productSupplier.unitPrice.label" default="Price Per Unit" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'unitPrice', 'errors')}">
+										<g:isUserFinance>
+											<g:textField class="text" name="unitPrice" value="${fieldValue(bean: productSupplierInstance, field: 'unitPrice')}" />
+										</g:isUserFinance>
+									</td>
+								</tr>
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="minOrderQuantity"><warehouse:message code="productSupplier.minOrderQuantity.label" default="Min Order Quantity" /></label>

@@ -65,8 +65,10 @@
                         <div class="button-group">
                             <div class="action-menu">
                                 <button class="action-btn button">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'table_column.png')}" />
+                                    <g:message code="default.status.label"/>:
                                     <warehouse:message code="inventory.${actionName}.label"/>
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
                                 </button>
                                 <div class="actions">
                                     <div class="action-menu-item">
@@ -205,19 +207,23 @@
                                             ${entry.value}
                                         </td>
                                         <td class="center">
-                                            <g:if test="${entry?.key?.pricePerUnit}">
-                                                <g:formatNumber number="${entry.key.pricePerUnit}" minFractionDigits="2"/>
-                                            </g:if>
+                                            <g:isUserFinance>
+                                                <g:if test="${entry?.key?.pricePerUnit}">
+                                                    <g:formatNumber number="${entry.key.pricePerUnit}" minFractionDigits="2"/>
+                                                </g:if>
+                                            </g:isUserFinance>
                                         </td>
                                         <td class="center">
-                                            <g:if test="${entry.key.pricePerUnit && entry.value}">
-                                                <g:set var="stockValue" value="${entry.key.pricePerUnit*entry.value}"/>
-                                                <g:formatNumber number="${stockValue}" minFractionDigits="2"/>
-                                                <g:set var="totalStockValue" value="${totalStockValue + stockValue}"/>
-                                            </g:if>
-                                            <g:else>
-                                                0.00
-                                            </g:else>
+                                            <g:isUserFinance>
+                                                <g:if test="${entry.key.pricePerUnit && entry.value}">
+                                                    <g:set var="stockValue" value="${entry.key.pricePerUnit*entry.value}"/>
+                                                    <g:formatNumber number="${stockValue}" minFractionDigits="2"/>
+                                                    <g:set var="totalStockValue" value="${totalStockValue + stockValue}"/>
+                                                </g:if>
+                                                <g:else>
+                                                    0.00
+                                                </g:else>
+                                            </g:isUserFinance>
                                         </td>
                                     </tr>
                                 </g:each>
@@ -238,12 +244,13 @@
                             <tfoot>
                                 <tr>
                                     <th colspan="16">
-                                        <div class="title right middle">
-                                            <warehouse:message code="inventory.totalValue.label" default="Total value"/>
-                                            <g:formatNumber number="${totalStockValue}"/>
-                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                        </div>
-
+                                        <g:isUserFinance>
+                                            <div class="title right middle">
+                                                <warehouse:message code="inventory.totalValue.label" default="Total value"/>
+                                                <g:formatNumber number="${totalStockValue}"/>
+                                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                            </div>
+                                        </g:isUserFinance>
                                     </th>
                                 </tr>
                             </tfoot>
@@ -256,13 +263,10 @@
 
     <script>
         $(window).load(function(){
-
-
-
             var options = {
                 "bProcessing": true,
                 //"sServerMethod": "GET",
-                "iDisplayLength": 10,
+                "iDisplayLength": 25,
                 "bSearch": false,
                 "bScrollCollapse": true,
                 "bJQueryUI": true,
