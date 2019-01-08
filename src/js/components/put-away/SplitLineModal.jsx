@@ -150,7 +150,7 @@ class SplitLineModal extends Component {
           type="button"
           className="btn btn-outline-success btn-xs"
           onClick={() => this.openModal()}
-        ><Translate id="stockMovement.splitLine.label" />:
+        ><Translate id="stockMovement.splitLine.label" />
         </button>
         <Modal
           isOpen={this.state.showModal}
@@ -170,9 +170,9 @@ class SplitLineModal extends Component {
             <table className="table table-striped text-center border">
               <thead>
                 <tr>
-                  <th className="py-1"><Translate id="putAway.putAwayBin.label" />:</th>
-                  <th className="py-1"><Translate id="stockMovement.quantity.label" />:</th>
-                  <th className="py-1"><Translate id="default.button.delete.label" />:</th>
+                  <th className="py-1"><Translate id="putAway.putAwayBin.label" /></th>
+                  <th className="py-1"><Translate id="stockMovement.quantity.label" /></th>
+                  <th className="py-1"><Translate id="default.button.delete.label" /></th>
                 </tr>
               </thead>
               <tbody>

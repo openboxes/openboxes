@@ -455,7 +455,7 @@ class PutAwayPage extends Component {
         <div>
           <button
             type="button"
-            // disabled={this.state.selection.size < 1}
+            disabled={this.state.selection.size < 1}
             onClick={() => this.createPutAway()}
             className="btn btn-outline-primary float-right my-2 btn-xs"
           ><Translate id="putAway.startPutAway.label" />
