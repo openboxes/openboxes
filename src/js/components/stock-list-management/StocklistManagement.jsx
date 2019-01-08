@@ -266,7 +266,14 @@ class StocklistManagement extends Component {
 
                 return (
                   <a href={`/openboxes/requisitionTemplate/show/${original.stocklistId}`}>
-                    {original.name}
+                    <Tooltip
+                      title={original.name}
+                      theme="transparent"
+                      delay="150"
+                      duration="250"
+                      hideDelay="50"
+                    >{original.name}
+                    </Tooltip>
                   </a>
                 );
               },
@@ -284,6 +291,22 @@ class StocklistManagement extends Component {
               accessor: 'monthlyDemand',
               aggregate: vals => _.sum(vals),
               className: 'text-center',
+              Cell: ({ aggregated, original }) => {
+                if (aggregated) {
+                  return '';
+                }
+
+                return (
+                  <Tooltip
+                    title={original.monthlyDemand}
+                    theme="transparent"
+                    delay="150"
+                    duration="250"
+                    hideDelay="50"
+                  >{original.monthlyDemand}
+                  </Tooltip>
+                );
+              },
             },
             {
               Header:
@@ -297,6 +320,22 @@ class StocklistManagement extends Component {
   </Tooltip>,
               accessor: 'manager.name',
               aggregate: () => '',
+              Cell: ({ aggregated, original }) => {
+                if (aggregated) {
+                  return '';
+                }
+
+                return (
+                  <Tooltip
+                    title={original.manager.name}
+                    theme="transparent"
+                    delay="150"
+                    duration="250"
+                    hideDelay="50"
+                  >{original.manager.name}
+                  </Tooltip>
+                );
+              },
             },
             {
               Header:
@@ -311,6 +350,22 @@ class StocklistManagement extends Component {
               accessor: 'replenishmentPeriod',
               aggregate: () => '',
               className: 'text-center',
+              Cell: ({ aggregated, original }) => {
+                if (aggregated) {
+                  return '';
+                }
+
+                return (
+                  <Tooltip
+                    title={original.replenishmentPeriod}
+                    theme="transparent"
+                    delay="150"
+                    duration="250"
+                    hideDelay="50"
+                  >{original.replenishmentPeriod}
+                  </Tooltip>
+                );
+              },
             },
             {
               Header:
@@ -337,10 +392,18 @@ class StocklistManagement extends Component {
 
                 return (
                   <div className={_.isNil(original.maxQuantity) || original.maxQuantity === '' ? 'has-error' : ''}>
-                    <Input
-                      value={original.maxQuantity || ''}
-                      onChange={value => this.updateItemField(index, 'maxQuantity', value)}
-                    />
+                    <Tooltip
+                      title={original.maxQuantity}
+                      theme="transparent"
+                      delay="150"
+                      duration="250"
+                      hideDelay="50"
+                    >
+                      <Input
+                        value={original.maxQuantity || ''}
+                        onChange={value => this.updateItemField(index, 'maxQuantity', value)}
+                      />
+                    </Tooltip>
                   </div>
                 );
               },
@@ -358,6 +421,22 @@ class StocklistManagement extends Component {
               accessor: 'uom',
               aggregate: () => '',
               className: 'text-center',
+              Cell: ({ aggregated, original }) => {
+                if (aggregated) {
+                  return '';
+                }
+
+                return (
+                  <Tooltip
+                    title={original.uom}
+                    theme="transparent"
+                    delay="150"
+                    duration="250"
+                    hideDelay="50"
+                  >{original.uom}
+                  </Tooltip>
+                );
+              },
             },
             {
               Header:
