@@ -158,9 +158,9 @@ class PutAwayCheckPage extends Component {
    * @param {object} filter
    * @public
    */
-  filterMethod = (filter, row) =>
-    (row[filter.id] !== undefined ?
-      String(row[filter.id].toLowerCase()).includes(filter.value.toLowerCase()) : true);
+  // eslint-disable-next-line no-underscore-dangle
+  filterMethod = (filter, row) => (row._aggregated || row._groupedByPivot
+    || _.toString(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase()));
 
   /**
    * Sends all changes made by user in this step of put-away to API and updates data.
