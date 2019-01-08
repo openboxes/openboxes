@@ -66,8 +66,10 @@
 
             <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
+            <g:set var="hasBeenPartiallyReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"/>
             <g:set var="isSameLocation" value="${stockMovement?.requisition?.destination?.id==session.warehouse.id}"/>
             <g:set var="disableReceivingButton" value="${!hasBeenIssued || hasBeenReceived || !isSameLocation}"/>
+            <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
             <g:if test="${!hasBeenIssued}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
             </g:if>
@@ -84,6 +86,12 @@
             </g:link>
 
             <g:isSuperuser>
+                <g:if test="${showRollbackLastReceiptButton}">
+                    <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                        <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+                    </g:link>
+                </g:if>
                 <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                     <warehouse:message code="default.button.rollback.label" />
