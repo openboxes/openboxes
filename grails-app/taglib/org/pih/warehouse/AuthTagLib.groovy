@@ -36,9 +36,14 @@ class AuthTagLib {
 			out << body()
 	}
 	def isUserBrowser = { attrs, body ->		
-		if (userService.isUserBrowser(session?.user))
+		if (userService.canUserBrowse(session?.user))
 			out << body()
 	}
+	def isUserFinance = { attrs, body ->
+		if (userService.isUserFinance(session?.user))
+			out << body()
+	}
+
 	def isUserInRole = { attrs, body ->		
 		def isUserInRole = userService.isUserInRole(session?.user?.id, attrs.roles)
 		if (isUserInRole)
