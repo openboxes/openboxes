@@ -173,9 +173,19 @@ class PutAwaySecondPage extends Component {
    * @param {object} row
    * @public
    */
-  filterMethod = (filter, row) =>
-    (row[filter.id] !== undefined ?
-      String(row[filter.id].toLowerCase()).includes(filter.value.toLowerCase()) : true);
+  filterMethod = (filter, row) => {
+    // eslint-disable-next-line no-underscore-dangle
+    if (row._aggregated || row._groupedByPivot) {
+      return true;
+    }
+
+    let val = row[filter.id];
+    if (filter.id === 'putawayLocation') {
+      val = _.get(val, 'name');
+    }
+
+    return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
+  };
 
   /**
    * Fetches available bin locations from API.
