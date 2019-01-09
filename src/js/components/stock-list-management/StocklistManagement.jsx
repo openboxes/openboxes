@@ -30,7 +30,6 @@ class StocklistManagement extends Component {
     this.updateItemField = this.updateItemField.bind(this);
     this.saveItem = this.saveItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
-    this.printItem = this.printItem.bind(this);
     this.mailItem = this.mailItem.bind(this);
   }
 
@@ -158,11 +157,6 @@ class StocklistManagement extends Component {
         })
         .catch(this.props.hideSpinner());
     }
-  }
-
-  // eslint-disable-next-line no-unused-vars,class-methods-use-this
-  printItem(index) {
-    // TODO add proper implementation
   }
 
   // eslint-disable-next-line no-unused-vars,class-methods-use-this
@@ -478,12 +472,12 @@ class StocklistManagement extends Component {
                       onClick={() => this.deleteItem(index)}
                     ><Translate id="default.button.delete.label" />
                     </button>
-                    <button
+                    <a
                       className="btn btn-outline-secondary btn-xs mx-1"
                       disabled={original.edit || original.new}
-                      onClick={() => this.printItem(index)}
+                      href={`/openboxes/stocklist/renderPdf/${original.stocklistId}`}
                     ><Translate id="default.button.print.label" />
-                    </button>
+                    </a>
                     <button
                       className="btn btn-outline-secondary btn-xs mx-1"
                       disabled={original.edit || original.new}
