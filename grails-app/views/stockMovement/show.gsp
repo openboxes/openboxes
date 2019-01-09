@@ -66,12 +66,16 @@
 
             <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
-            <g:set var="disableReceivingButton" value="${!hasBeenIssued || hasBeenReceived}"/>
+            <g:set var="isSameLocation" value="${stockMovement?.requisition?.destination?.id==session.warehouse.id}"/>
+            <g:set var="disableReceivingButton" value="${!hasBeenIssued || hasBeenReceived || !isSameLocation}"/>
             <g:if test="${!hasBeenIssued}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
             </g:if>
             <g:if test="${hasBeenReceived}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasAlreadyBeenReceived.message', args: [stockMovement?.identifier])}"/>
+            </g:if>
+            <g:if test="${!isSameLocation}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.isDifferentLocation.message')}"/>
             </g:if>
             <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button"
                     disabled="${disableReceivingButton}" disabledMessage="${disabledMessage}">
