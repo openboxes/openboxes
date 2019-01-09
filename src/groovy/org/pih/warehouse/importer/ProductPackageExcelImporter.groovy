@@ -63,7 +63,6 @@ class ProductPackageExcelImporter extends AbstractExcelImporter {
             packageSize:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
             pricePerPackage:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
             pricePerUnit:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
-            //pricePerUnitStatic:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
             minQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
             reorderQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
             maxQuantity:([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue:null]),
