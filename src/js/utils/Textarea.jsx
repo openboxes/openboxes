@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Input = ({ onChange, className = '', ...props }) => {
+const Textarea = ({
+  onChange, className = '', fieldRef, ...props
+}) => {
   const handleChange = (event) => {
     const { value } = event.target;
 
@@ -12,6 +14,7 @@ const Input = ({ onChange, className = '', ...props }) => {
 
   return (
     <textarea
+      ref={fieldRef}
       onKeyPress={(event) => {
         if (event.which === 13 /* Enter */) {
           event.preventDefault();
@@ -24,14 +27,16 @@ const Input = ({ onChange, className = '', ...props }) => {
   );
 };
 
-export default Input;
+export default Textarea;
 
-Input.propTypes = {
+Textarea.propTypes = {
   onChange: PropTypes.func,
   className: PropTypes.string,
+  fieldRef: PropTypes.func,
 };
 
-Input.defaultProps = {
+Textarea.defaultProps = {
   onChange: null,
   className: '',
+  fieldRef: null,
 };
