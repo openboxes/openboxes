@@ -64,14 +64,6 @@
             </tr>
             <tr class="prop">
                 <td class="name">
-                    <label for="unitCost"><warehouse:message code="productSupplier.unitCost.label"/></label>
-                </td>
-                <td class="value ">
-                    <g:textField name="unitCost" size="80" class="medium text" value="${productSupplier?.unitCost}" />
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="name">
                     <label for="ndc"><warehouse:message code="product.ndc.label"/></label>
                 </td>
                 <td class="value ">
@@ -129,6 +121,17 @@
                     <g:textField name="supplierCode" size="80" class="medium text" value="${productSupplier?.supplierCode}" />
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="name">
+                    <label for="unitPrice"><warehouse:message code="productSupplier.unitPrice.label"/></label>
+                </td>
+                <td class="value ">
+                    <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.userNotGrantedPermission.message', args: [session.user.username])}">
+                        <g:textField name="unitPrice" size="80" class="medium text" value="${productSupplier?.unitPrice}" />
+                    </g:hasRoleFinance>
+                </td>
+            </tr>
+
             <tr class="prop">
                 <td class="name">
                     <label for="preferenceTypeCode"><warehouse:message code="productSupplier.preferenceTypeCode.label"/></label>

@@ -40,8 +40,14 @@ class AuthTagLib {
 			out << body()
 	}
 	def hasRoleFinance = { attrs, body ->
-		if (userService.hasRoleFinance(session?.user))
-			out << body()
+		if (userService.hasRoleFinance(session?.user)) {
+            out << body()
+        }
+        else {
+            if (attrs.onAccessDenied) {
+                out << attrs.onAccessDenied
+            }
+        }
 	}
 
 	def isUserInRole = { attrs, body ->		
