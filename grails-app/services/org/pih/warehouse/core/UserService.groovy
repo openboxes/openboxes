@@ -181,7 +181,7 @@ class UserService {
     void assertCurrentUserHasRoleFinance() {
         User user = AuthService.currentUser.get()
         if (!hasRoleFinance(user)) {
-            throw new IllegalAccessException("User ${user.username} must have ROLE_FINANCE role")
+            throw new IllegalStateException("User ${user.username} must have ROLE_FINANCE role")
         }
     }
 

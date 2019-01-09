@@ -999,10 +999,9 @@ class ProductController {
 					//render localFile.getText()
 					//response.outputStream << localFile.newInputStream()
 				} catch (RuntimeException e) {
-                    log.error("Runtime exception occurred while uploading product import CSV " + e.message, e)
+                    log.error("An error occurred while uploading product import CSV " + e.message, e)
 					//flash.message = e.message
-                    command.errors.reject("Runtime exception: " + e.message)
-
+                    command.errors.reject(e.message)
 				}
                 catch (FileNotFoundException e) {
                     log.error("File not found exception occurred while uploading product import CSV " + e.message, e)
