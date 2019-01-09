@@ -1,4 +1,4 @@
-<g:isUserFinance>
+<g:hasRoleFinance>
 <div class="box">
     <h2>
         <warehouse:message code="inventory.value.label" default="Stock Value"/>
@@ -260,5 +260,5 @@
     }
 
 </script>
-</g:isUserFinance>
+</g:hasRoleFinance>
 

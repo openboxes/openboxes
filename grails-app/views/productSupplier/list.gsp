@@ -75,9 +75,9 @@
                                 <td>${fieldValue(bean: productSupplierInstance, field: "unitOfMeasure")}</td>
 
                                 <td>
-                                    <g:isUserFinance>
+                                    <g:hasRoleFinance>
                                         ${g.formatNumber(number: fieldValue(bean: productSupplierInstance, field: "unitPrice"))}
-                                    </g:isUserFinance>
+                                    </g:hasRoleFinance>
                                 </td>
 
                                 <td>

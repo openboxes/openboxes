@@ -41,6 +41,7 @@ class InventoryController {
     def productService
 	def inventoryService
     def requisitionService
+    def userService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"];
 
@@ -828,6 +829,8 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
         csv += "\n"
 
+        def hasRoleFinance = userService.hasRoleFinance(session.user)
+
         map.each { inventoryItem, quantity ->
 
             def product = inventoryItem?.product
@@ -852,7 +855,7 @@ class InventoryController {
             csv += '"' + (product?.vendorCode?:"") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation?:"") + '"' + ","
             csv += '"' + (product?.unitOfMeasure?:"") + '"' + ","
-            csv += (product?.pricePerUnit?:"") + ","
+            csv += hasRoleFinance?(product?.pricePerUnit?:""):"" + ","
             csv += (inventoryLevel?.minQuantity?:"") + ","
             csv += (inventoryLevel?.reorderQuantity?:"") + ","
             csv += (inventoryLevel?.maxQuantity?:"")+ ","
@@ -888,6 +891,8 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
         csv += "\n"
 
+        def hasRoleFinance = userService.hasRoleFinance(session.user)
+
         map.sort().each { product, quantity ->
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
             def status = statusMap[product]
@@ -909,7 +914,7 @@ class InventoryController {
             csv += '"' + (inventoryLevel?.binLocation?:"")  + '"' + ","
             csv += '"' + (inventoryLevel?.abcClass?:"")  + '"' + ","
             csv += '"' + (product?.unitOfMeasure?:"")  + '"' + ","
-            csv += (product?.pricePerUnit?:"") + ","
+            csv += hasRoleFinance ? (product?.pricePerUnit?:"") : "" + ","
             csv += (inventoryLevel?.minQuantity?:"") + ","
             csv += (inventoryLevel?.reorderQuantity?:"") + ","
             csv += (inventoryLevel?.maxQuantity?:"") + ","

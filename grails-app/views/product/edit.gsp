@@ -362,13 +362,13 @@
                                             <td class="name middle"><label for="pricePerUnit"><warehouse:message
                                                     code="product.pricePerUnit.label"/></label></td>
                                             <td class="value middle ${hasErrors(bean: productInstance, field: 'pricePerUnit', 'errors')}">
-                                                <g:isUserFinance>
+                                                <g:hasRoleFinance>
                                                     <g:textField name="pricePerUnit" placeholder="Price per unit (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})"
                                                                  value="${g.formatNumber(number:productInstance?.pricePerUnit, format:'###,###,##0.####') }"
                                                                  class="text" size="50" />
 
                                                     <span class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</span>
-                                                </g:isUserFinance>
+                                                </g:hasRoleFinance>
                                             </td>
                                         </tr>
                                     </tbody>

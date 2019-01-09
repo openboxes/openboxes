@@ -94,16 +94,15 @@
                 </td>
             </tr>
 
-            <g:isUserFinance>
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="product.pricePerUnit.label"/></label>
                 </td>
                 <td class="value middle">
-                    <p>
+                    <g:hasRoleFinance>
                         ${g.formatNumber(number: (productInstance?.pricePerUnit?:0), format: '###,###,##0.00##')}
                         ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                    </p>
+                    </g:hasRoleFinance>
                 </td>
             </tr>
             <tr class="prop">
@@ -111,11 +110,12 @@
                     <label><warehouse:message code="product.totalValue.label"/></label>
                 </td>
                 <td class="value middle">
+                    <g:hasRoleFinance>
                     ${g.formatNumber(number: (totalQuantity?:0) * (productInstance?.pricePerUnit?:0), format: '###,###,##0.00') }
                     ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                    </g:hasRoleFinance>
                 </td>
             </tr>
-            </g:isUserFinance>
             <tr class="prop">
                 <td class="label">
                     <label><warehouse:message code="product.abcClass.label"/></label>

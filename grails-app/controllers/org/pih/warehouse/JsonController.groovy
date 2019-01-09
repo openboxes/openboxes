@@ -354,7 +354,7 @@ class JsonController {
     def getStockValueByProduct = {
         def location = Location.get(session?.warehouse?.id)
         def result = inventoryService.getTotalStockValue(location)
-        def isUserFinance = userService.isUserFinance(session?.user)
+        def hasRoleFinance = userService.hasRoleFinance(session?.user)
 
         def stockValueByProduct = []
         result.stockValueByProduct.sort { it.value }.reverseEach { Product product, value ->
@@ -363,13 +363,12 @@ class JsonController {
                     id: product.id,
                     productCode: product.productCode,
                     productName: product.name,
-                    unitPrice: isUserFinance ? product.pricePerUnit : null,
-                    totalValue: isUserFinance ? value : null
+                    unitPrice: hasRoleFinance ? product.pricePerUnit : null,
+                    totalValue: hasRoleFinance ? value : null
             ]
         }
 
-        def map = [aaData: stockValueByProduct]
-        render map as JSON
+        render ([aaData: stockValueByProduct] as JSON)
     }
 
 
@@ -1188,60 +1187,6 @@ class JsonController {
         return inventoryService.getQuantityByProductMap(location.inventory, products)
     }
 
-
-    /*
-    def calculateQuantityOnHandByProduct2 = {
-        def items = []
-
-        def startTime = System.currentTimeMillis()
-        def location = Location.get(session.warehouse.id)
-        //def statusMap = inventoryService.getInventoryStatus(location)
-        def statusMap = inventoryService.getInventoryStatusAndLevel(location)
-        def quantityMap = inventoryService.getQuantityByProductMap(session.warehouse.id)
-        quantityMap.each { product, value ->
-            //def inventoryLevel
-            //def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
-            //def status = product.getStatus(session.warehouse.id, value) // statusMap[product]
-            def status = statusMap[product]?.inventoryStatus
-            def inventoryLevel = statusMap[product]?.inventoryLevel
-            items << [
-                    id:product.id,
-                    name: product.name,
-                    status: status,
-                    productCode: product.productCode,
-                    genericProduct:product?.genericProduct?.name?:"Empty",
-                    //inventoryLevel: inventoryLevel,
-                    minQuantity: inventoryLevel?.minQuantity?:0,
-                    maxQuantity: inventoryLevel?.maxQuantity?:0,
-                    reorderQuantity: inventoryLevel?.reorderQuantity?:0,
-                    unitOfMeasure: product.unitOfMeasure,
-                    unitPrice: product.pricePerUnit?:0,
-                    onHandQuantity:value?:0.0,
-                    totalValue: (product.pricePerUnit?:0) * (value?:0)
-            ]
-        }
-
-
-        def elapsedTime = (System.currentTimeMillis() - startTime) / 1000
-
-        def inStockCount = items.findAll { it.status == "IN_STOCK" }.size()
-        def reorderStockCount = items.findAll { it.status == "REORDER" }.size()
-        def lowStockCount = items.findAll { it.status == "LOW_STOCK" }.size()
-        def outOfStockCount = items.findAll { it.status == "STOCK_OUT" }.size()
-        def overStockCount = items.findAll { it.status == "OVERSTOCK" }.size()
-
-        def totalValue = items.sum { it.totalValue }
-        def data = [totalValue:totalValue,items:items,elapsedTime:elapsedTime,allStockCount:items.size(),inStockCount:inStockCount,reorderStockCount:reorderStockCount,lowStockCount:lowStockCount,outOfStockCount:outOfStockCount,overStockCount:overStockCount]
-
-
-        def results = data.items
-
-        //render "${params.callback}(${result as JSON})"
-        //render data.items as JSON
-        render results as JSON
-    }
-    */
-
     @CacheFlush("quantityOnHandCache")
     def flushQuantityOnHandCache = {
         redirect(controller:"inventory", action: "analyze")
@@ -1607,13 +1552,13 @@ class JsonController {
             data = data.findAll { it.status == params.status }
         }
 
-        def isUserFinance = userService.isUserFinance(session?.user)
+        def hasRoleFinance = userService.hasRoleFinance(session?.user)
 
         // Flatten the data to make it easier to display
         data = data.collect {
             def quantity = it?.quantity?:0
-            def unitCost = isUserFinance ? (it?.product?.pricePerUnit?:0.0) : null
-            def totalValue = isUserFinance ? g.formatNumber(number: quantity * unitCost) : null
+            def unitCost = hasRoleFinance ? (it?.product?.pricePerUnit?:0.0) : null
+            def totalValue = hasRoleFinance ? g.formatNumber(number: quantity * unitCost) : null
             [
                     id: it.product?.id,
                     status: g.message(code: "binLocationSummary.${it.status}.label"),

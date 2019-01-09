@@ -39,10 +39,10 @@
                 </td>
 
                 <td>
-                    <g:isUserFinance>
+                    <g:hasRoleFinance>
                         <g:formatNumber number="${pkg?.price}" />
                         ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                    </g:isUserFinance>
+                    </g:hasRoleFinance>
                 </td>
                 <td>
                     ${pkg?.gtin?:warehouse.message(code:'default.none.label') }

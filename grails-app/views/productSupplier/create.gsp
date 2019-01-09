@@ -207,9 +207,9 @@
 										<label for="unitPrice"><warehouse:message code="productSupplier.unitPrice.label" default="Price Per Unit" /></label>
 									</td>
 									<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'unitPrice', 'errors')}">
-										<g:isUserFinance>
+										<g:hasRoleFinance>
 											<g:textField class="text" name="unitPrice" value="${fieldValue(bean: productSupplierInstance, field: 'unitPrice')}" />
-										</g:isUserFinance>
+										</g:hasRoleFinance>
 									</td>
 								</tr>
 
