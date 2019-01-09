@@ -105,14 +105,12 @@
                 { "mData": "status" }, // 0
                 { "mData": "productCodes" }, // 2
                 { "mData": "name", "sWidth": "50%" }, // 1
-                { "mData": "minQuantity" }, // 3
-                { "mData": "reorderQuantity" }, // 4
-                { "mData": "maxQuantity" }, // 5
-                { "mData": "onHandQuantity" }, //6
+                { "mData": "minQuantity", "sClass": "right" }, // 3
+                { "mData": "reorderQuantity", "sClass": "right" }, // 4
+                { "mData": "maxQuantity", "sClass": "right" }, // 5
+                { "mData": "onHandQuantity", "sClass": "right" }, //6
                 { "mData": "unitPriceFormatted", "sClass": "right" },
                 { "mData": "totalValueFormatted", "sClass": "right" } // 7
-                //{ "mData": "numProducts" }, // 2
-                //{ "mData": "inventoryStatus" }, // 3
 
             ],
             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
