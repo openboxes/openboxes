@@ -74,15 +74,21 @@
 
                                 <td>${fieldValue(bean: productSupplierInstance, field: "unitOfMeasure")}</td>
 
-                                <td>${fieldValue(bean: productSupplierInstance, field: "unitPrice")}</td>
+                                <td>
+                                    <g:hasRoleFinance>
+                                        ${g.formatNumber(number: fieldValue(bean: productSupplierInstance, field: "unitPrice"))}
+                                    </g:hasRoleFinance>
+                                </td>
 
                                 <td>
-                                    <g:link action="edit" controller="product" id="${productSupplierInstance?.id}">
+                                    <g:link action="edit" controller="productSupplier" id="${productSupplierInstance?.id}" class="button">
                                         <img src="${createLinkTo(dir:'images/icons/silk', file:'pencil.png')}" />
+                                        &nbsp;${g.message(code: "default.button.edit.label")}
                                     </g:link>
 
-                                    <g:link action="edit" controller="product" id="${productSupplierInstance?.product?.id}">
+                                    <g:link action="edit" controller="product" id="${productSupplierInstance?.product?.id}" class="button">
                                         <img src="${createLinkTo(dir:'images/icons/silk', file:'application_go.png')}"/>
+                                        &nbsp;${g.message(code: "default.button.back.label")}
                                     </g:link>
 
                                 </td>
