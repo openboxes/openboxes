@@ -81,7 +81,7 @@
                                 </td>
 
                                 <td>
-                                    <g:link action="edit" controller="product" id="${productSupplierInstance?.id}" class="button">
+                                    <g:link action="edit" controller="productSupplier" id="${productSupplierInstance?.id}" class="button">
                                         <img src="${createLinkTo(dir:'images/icons/silk', file:'pencil.png')}" />
                                         &nbsp;${g.message(code: "default.button.edit.label")}
                                     </g:link>
