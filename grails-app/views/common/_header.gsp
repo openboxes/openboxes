@@ -18,17 +18,8 @@
                                             jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
                         </li>
 					    <g:if test="${session.user}">
-                            <%--
-                            <li>
-                                <span>
-                                    <warehouse:message code="header.welcome.label" default="Welcome"/>,
-                                </span>
-                                <g:link controller="user" action="show" id="${session.user.id}" class="button icon user">
-                                    <span id="username">${session?.user?.name}</span>
-                                    <span id="userrole">[<g:userRole user="${session.user}"/>]</span></g:link>
+                            <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
 
-                            </li>
-                            --%>
                             <li>
                                 <span class="action-menu" >
                                     <button class="action-hover-btn button">
@@ -38,21 +29,6 @@
 
                                     </button>
                                     <ul class="actions" style="text-align:left;">
-                                        <%--
-                                        <li class="action-menu-item">
-                                            <g:link controller="inventory" action="browse" params="['resetSearch':'true']" style="color: #666;">
-                                                <warehouse:message code="inventory.browse.label"/>
-                                            </g:link>
-                                        </li>
-                                        --%>
-
-                                        <%--
-                                        <li>
-                                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'cart.png')}" style="vertical-align: middle" />
-                                            <g:link controller="cart" action="list">Cart <span style="color: orange; font-weight: bold;">${session?.cart ? session?.cart?.items?.size() : '0'}</span></g:link>
-
-                                        </li>
-                                        --%>
                                         <li class="action-menu-item">
                                             <g:link controller="user" action="edit" id="${session.user.id }" style="color: #666;">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}"/>
@@ -121,16 +97,15 @@
                                             </li>
                                             --%>
                                             <li class="action-menu-item">
-                                                <a href="javascript:void(0);" class="warehouse-switch" style="color: #666">
+                                                <a href="javascript:void(0);" class="btn-show-dialog"
+                                                   data-title="${g.message(code:'dashboard.chooseLocation.label')}"
+                                                   data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}"
+                                                   style="color: #666">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"/>
                                                     <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
                                                 </a>
-
                                             </li>
                                         </g:if>
-                                        <li class="action-menu-item">
-                                            <hr/>
-                                        </li>
                                         <li class="action-menu-item">
                                             <g:link class="list" controller="auth" action="logout" style="color:#666">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'door.png')}" class="middle"/>
@@ -142,8 +117,8 @@
                             </li>
                             <g:if test="${session?.warehouse}">
                                 <li>
-                                    <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-                                    <button class="btn-show-dialog button" data-title="${g.message(code:'dashboard.chooseLocation.label')}"
+                                    <button class="btn-show-dialog button"
+                                            data-title="${g.message(code:'dashboard.chooseLocation.label')}"
                                             data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" />
                                         ${session?.warehouse?.name }
