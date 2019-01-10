@@ -18,7 +18,7 @@ import Select from '../../utils/Select';
  * Modal window where user can split put-away's line. It has details of the line
  * at the top, including total quantity to be put away. After clicking "add line",
  * a new split line is added. User can select a bin and fill in the quantity to add to that bin.
-*/
+ */
 class SplitLineModal extends Component {
   constructor(props) {
     super(props);
@@ -47,10 +47,10 @@ class SplitLineModal extends Component {
         message: this.props.translate('confirmSplitLine.label'),
         buttons: [
           {
-            label: this.props.translate('default.button.yes.label'),
+            label: this.props.translate('default.yes.label'),
           },
           {
-            label: this.props.translate('default.button.no.label'),
+            label: this.props.translate('default.no.label'),
             onClick: () => this.save(),
           },
         ],
@@ -177,93 +177,93 @@ class SplitLineModal extends Component {
               </thead>
               <tbody>
                 { _.map(this.state.splitItems, (item, index) => (
-                  !item.delete &&
-                  <tr
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={index}
-                  >
-                    <td className={`py-1 ${_.isEmpty(item.putawayLocation.id) ? 'has-error align-middle' : 'align-middle'}`}>
-                      <Select
-                        options={this.props.bins}
-                        objectValue
-                        value={item.putawayLocation}
-                        onChange={value => this.setState({
-                          splitItems: update(this.state.splitItems, {
-                            [index]: {
-                              putawayLocation: { $set: value },
-                            },
-                          }),
-                        })}
-                        className="select-xs"
-                      />
-                    </td>
-                    <td className="py-1 align-middle">
-                      <Tooltip
-                        // eslint-disable-next-line max-len
-                        html={(<div><Translate id="putAway.sumOfAll.label" /></div>)}
-                        disabled={this.isValid()}
-                        theme="transparent"
-                        arrow="true"
-                        delay="150"
-                        duration="250"
-                        hideDelay="50"
-                      >
-                        <div className={!this.isValid() ? 'has-error' : ''}>
-                          <Input
-                            type="number"
-                            value={item.quantity}
-                            onChange={value => this.setState({
-                              splitItems: update(this.state.splitItems, {
-                                [index]: { quantity: { $set: value } },
-                              }),
-                            })}
-                          />
-                        </div>
-                      </Tooltip>
-                    </td>
-                    <td width="120px" className="py-1">
-                      <button
-                        className="btn btn-outline-danger btn-xs"
-                        onClick={() => {
-                          if (this.state.splitItems[index].id) {
-                            this.setState({
-                              splitItems: update(this.state.splitItems, {
-                                [index]: { delete: { $set: true } },
-                              }),
-                            });
-                          } else {
-                            this.setState({
-                              splitItems: update(this.state.splitItems, {
-                                $splice: [
-                                  [index, 1],
-                                ],
-                              }),
-                            });
-                          }
-                        }}
-                      ><Translate id="default.button.delete.label" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                !item.delete &&
+                <tr
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                >
+                  <td className={`py-1 ${_.isEmpty(item.putawayLocation.id) ? 'has-error align-middle' : 'align-middle'}`}>
+                    <Select
+                      options={this.props.bins}
+                      objectValue
+                      value={item.putawayLocation}
+                      onChange={value => this.setState({
+                        splitItems: update(this.state.splitItems, {
+                          [index]: {
+                            putawayLocation: { $set: value },
+                          },
+                        }),
+                      })}
+                      className="select-xs"
+                    />
+                  </td>
+                  <td className="py-1 align-middle">
+                    <Tooltip
+                      // eslint-disable-next-line max-len
+                      html={this.props.translate('putAway.sumOfAll.label')}
+                      disabled={this.isValid()}
+                      theme="transparent"
+                      arrow="true"
+                      delay="150"
+                      duration="250"
+                      hideDelay="50"
+                    >
+                      <div className={!this.isValid() ? 'has-error' : ''}>
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={value => this.setState({
+                            splitItems: update(this.state.splitItems, {
+                              [index]: { quantity: { $set: value } },
+                            }),
+                          })}
+                        />
+                      </div>
+                    </Tooltip>
+                  </td>
+                  <td width="120px" className="py-1">
+                    <button
+                      className="btn btn-outline-danger btn-xs"
+                      onClick={() => {
+                        if (this.state.splitItems[index].id) {
+                          this.setState({
+                            splitItems: update(this.state.splitItems, {
+                              [index]: { delete: { $set: true } },
+                            }),
+                          });
+                        } else {
+                          this.setState({
+                            splitItems: update(this.state.splitItems, {
+                              $splice: [
+                                [index, 1],
+                              ],
+                            }),
+                          });
+                        }
+                      }}
+                    ><Translate id="default.button.delete.label" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
               </tbody>
             </table>
             <button
               className="btn btn-outline-success btn-xs"
               onClick={() => this.setState({
-                  splitItems: update(this.state.splitItems, {
-                    $push: [{
-                      quantity: '',
-                      putawayFacility: {
-                        id: this.props.putawayItem.putawayFacility
-                          ? this.props.putawayItem.putawayFacility.id : null,
-                      },
-                      putawayLocation: { id: null },
-                      product: { id: this.props.putawayItem.product.id },
-                      inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
-                    }],
-                  }),
-                })}
+                splitItems: update(this.state.splitItems, {
+                  $push: [{
+                    quantity: '',
+                    putawayFacility: {
+                      id: this.props.putawayItem.putawayFacility
+                        ? this.props.putawayItem.putawayFacility.id : null,
+                    },
+                    putawayLocation: { id: null },
+                    product: { id: this.props.putawayItem.product.id },
+                    inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
+                  }],
+                }),
+              })}
             ><Translate id="default.button.addLine.label" />
             </button>
           </div>
