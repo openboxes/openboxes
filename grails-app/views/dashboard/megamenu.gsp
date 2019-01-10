@@ -693,6 +693,11 @@
                                     <warehouse:message code="users.label" />
                                 </g:link>
                             </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="role" action="list" class="role">
+                                    <warehouse:message code="roles.label" />
+                                </g:link>
+                            </div>
                         </div>
                         <div class="mm-content-section">
                             <h3><warehouse:message code="other.label" default="Other" /></h3>

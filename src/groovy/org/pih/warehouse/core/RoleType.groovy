@@ -19,6 +19,7 @@ enum RoleType {
 	ROLE_BROWSER('Browser', 4),
 
     // Complementary roles that provide additional functionality
+    ROLE_FINANCE('Financial User', 100),
     ROLE_USER_NOTIFICATION('User Notification Recipient', 100),
     ROLE_PRODUCT_NOTIFICATION('Product Notification Recipient', 100),
     ROLE_ORDER_NOTIFICATION('Order Notification Recipient', 100),
@@ -27,7 +28,7 @@ enum RoleType {
     ROLE_ERROR_NOTIFICATION('Error Notification Recipient', 100),
 
     // Employee role types
-    ROLE_EMPLOYEE('Supplier', 50),
+    ROLE_EMPLOYEE('Employee', 50),
 
     // Purchasing roles
     ROLE_APPROVER('Approver', 50),
@@ -81,6 +82,6 @@ enum RoleType {
 	}
 
 	static list() {
-		[ROLE_BROWSER, ROLE_ASSISTANT, ROLE_MANAGER,  ROLE_ADMIN, ROLE_SUPERUSER, ROLE_USER_NOTIFICATION, ROLE_PRODUCT_NOTIFICATION, ROLE_ORDER_NOTIFICATION, ROLE_SHIPMENT_NOTIFICATION]
+		[ROLE_BROWSER, ROLE_ASSISTANT, ROLE_MANAGER, ROLE_ADMIN, ROLE_SUPERUSER, ROLE_FINANCE, ROLE_USER_NOTIFICATION, ROLE_PRODUCT_NOTIFICATION, ROLE_ORDER_NOTIFICATION, ROLE_SHIPMENT_NOTIFICATION]
 	}
 }

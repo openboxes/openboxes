@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -7,16 +8,17 @@ import TextField from '../form-elements/TextField';
 import TextareaField from '../form-elements/TextareaField';
 import SelectField from '../form-elements/SelectField';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
+import { showSpinner, hideSpinner } from '../../actions';
 
 const FIELDS = {
-  recipient: {
+  recipients: {
     type: SelectField,
-    label: 'Recipients',
+    label: 'stockListManagement.recipients.label',
     attributes: {
       required: true,
       showValueTooltip: true,
       multi: true,
+      objectValue: true,
       style: { paddingBottom: 5 },
     },
     getDynamicAttr: ({ users }) => ({
@@ -25,14 +27,14 @@ const FIELDS = {
   },
   subject: {
     type: TextField,
-    label: 'Subject',
+    label: 'stockListManagement.subject.label',
     attributes: {
       required: true,
     },
   },
   text: {
     type: TextareaField,
-    label: 'Message',
+    label: 'stockListManagement.message.label',
     attributes: {
       rows: 8,
       required: true,
@@ -46,14 +48,7 @@ class EmailModal extends Component {
   constructor(props) {
     super(props);
 
-    const {
-      fieldConfig: { attributes, getDynamicAttr },
-    } = props;
-    const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
-    const attr = { ...attributes, ...dynamicAttr };
-
     this.state = {
-      attr,
       formValues: {},
     };
 
@@ -61,33 +56,17 @@ class EmailModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
-  componentDidMount() {
-    if (!this.props.usersFetched) {
-      this.fetchData(this.props.fetchUsers);
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const {
-      fieldConfig: { attributes, getDynamicAttr },
-    } = nextProps;
-    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
-    const attr = { ...attributes, ...dynamicAttr };
-
-    this.setState({ attr });
-  }
-
   /**
    * Loads initial form values
    * @public
    */
   onOpen() {
+    const { manager } = this.props;
     this.setState({
-      /* TODO add stocklist manager as default recipient */
       formValues: {
         subject: 'STOCK LIST UPDATE',
         text: '',
-        recipient: '',
+        recipients: manager ? [{ id: manager.id, email: manager.email, label: manager.name }] : [],
       },
     });
   }
@@ -100,20 +79,13 @@ class EmailModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    /* TODO add endpoint */
-    const url = '/openboxes/stockMovement/sendEmail';
+    const url = `/openboxes/api/stocklists/sendMail/${this.props.stocklistId}`;
+    const payload = {
+      ...values,
+      recipients: _.map(_.filter(values.recipients, val => val.email), val => val.email),
+    };
 
-    return apiClient.post(url, values);
-  }
-
-  /**
-   * Fetches data using function given as an argument(reducers components).
-   * @param {function} fetchFunction
-   * @public
-   */
-  fetchData(fetchFunction) {
-    this.props.showSpinner();
-    fetchFunction()
+    apiClient.post(url, payload)
       .then(() => this.props.hideSpinner())
       .catch(() => this.props.hideSpinner());
   }
@@ -121,7 +93,8 @@ class EmailModal extends Component {
   render() {
     return (
       <ModalWrapper
-        {...this.state.attr}
+        title="stockListManagement.sendMailModalTitle.label"
+        btnOpenText="default.button.email.label"
         onOpen={this.onOpen}
         onSave={this.onSave}
         fields={FIELDS}
@@ -132,32 +105,21 @@ class EmailModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  usersFetched: state.users.fetched,
-  users: state.users.data,
-});
-
-export default connect(mapStateToProps, {
-  fetchUsers, showSpinner, hideSpinner,
-})(EmailModal);
+export default connect(null, { showSpinner, hideSpinner })(EmailModal);
 
 EmailModal.propTypes = {
-  /** Name of the field */
-  fieldName: PropTypes.string.isRequired,
-  /** Configuration of the field */
-  fieldConfig: PropTypes.shape({
-    getDynamicAttr: PropTypes.func,
-  }).isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  /** Function fetching users */
-  fetchUsers: PropTypes.func.isRequired,
-  /** Indicator if users' data is fetched */
-  usersFetched: PropTypes.bool.isRequired,
+  /** Id of stocklist */
+  stocklistId: PropTypes.string.isRequired,
   /** Array of available users  */
-  users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  /** Function updating page on which modal is located called when user saves changes */
-  onResponse: PropTypes.func.isRequired,
+  users: PropTypes.arrayOf(PropTypes.shape({})),
+  manager: PropTypes.shape({}),
+};
+
+EmailModal.defaultProps = {
+  users: [],
+  manager: null,
 };

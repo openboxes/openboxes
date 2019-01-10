@@ -135,7 +135,7 @@
                                 <h3>
                                     <warehouse:message code="dashboard.noWarehouse.message"/>
                                 </h3>
-                                <div>
+                                <div class="error">
                                     <warehouse:message code="dashboard.requiredActivities.message"
                                                        args="[grailsApplication.config.openboxes.chooseLocation.requiredActivities]"/>
                                 </div>

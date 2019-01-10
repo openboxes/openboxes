@@ -28,6 +28,7 @@ class StocklistItem {
                 "locationGroup.name": requisitionItem?.requisition?.origin?.locationGroup?.name,
                 "manager.id": requisitionItem?.requisition?.requestedBy?.id,
                 "manager.name": requisitionItem?.requisition?.requestedBy?.name,
+                "manager.email": requisitionItem?.requisition?.requestedBy?.email,
                 uom: requisitionItem?.product?.unitOfMeasure,
                 maxQuantity: requisitionItem?.quantity,
                 replenishmentPeriod: requisitionItem?.requisition?.replenishmentPeriod,

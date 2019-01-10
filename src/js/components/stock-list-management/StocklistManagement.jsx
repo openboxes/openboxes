@@ -13,6 +13,7 @@ import apiClient, { parseResponse, flattenRequest } from './../../utils/apiClien
 import { hideSpinner, showSpinner } from '../../actions';
 import Select from '../../utils/Select';
 import Input from '../../utils/Input';
+import EmailModal from './EmailModal';
 
 class StocklistManagement extends Component {
   constructor(props) {
@@ -23,6 +24,7 @@ class StocklistManagement extends Component {
       selectedStocklist: null,
       availableStocklists: [],
       productInfo: null,
+      users: [],
     };
 
     this.addItem = this.addItem.bind(this);
@@ -30,13 +32,28 @@ class StocklistManagement extends Component {
     this.updateItemField = this.updateItemField.bind(this);
     this.saveItem = this.saveItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
-    this.mailItem = this.mailItem.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.fetchData();
     this.fetchAvailableStocklists();
     this.fetchProductInfo();
+    this.fetchUsers();
+  }
+
+  fetchUsers() {
+    this.props.showSpinner();
+    const url = '/openboxes/api/generic/person';
+
+    apiClient.get(url)
+      .then((response) => {
+        const users = _.map(response.data.data, user => (
+          { value: { id: user.id, email: user.email, label: user.name }, label: user.name }
+        ));
+        this.setState({ users });
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   fetchData() {
@@ -159,11 +176,6 @@ class StocklistManagement extends Component {
     }
   }
 
-  // eslint-disable-next-line no-unused-vars,class-methods-use-this
-  mailItem(index) {
-    // TODO add proper implementation
-  }
-
   removeItem(index) {
     this.setState({
       data: update(this.state.data, {
@@ -179,24 +191,24 @@ class StocklistManagement extends Component {
     return (
       <div className="main-container">
         { this.state.productInfo &&
-          <div className="mb-2">
-            <div className="d-flex flex-row justify-content-between">
-              <div className="d-flex flex-row align-items-end">
-                <h6 className="mb-0 mr-1">{this.state.productInfo.productCode}</h6>
-                <h5 className="mb-0">{this.state.productInfo.name}</h5>
-              </div>
-              <div className="align-self-center">
-                <button
-                  className="btn btn-outline-primary btn-xs"
-                  onClick={() => { window.location = `/openboxes/inventoryItem/showStockCard/${this.state.productInfo.id}`; }}
-                ><Translate id="stockListManagement.returnStockCard.label" />
-                </button>
-              </div>
+        <div className="mb-2">
+          <div className="d-flex flex-row justify-content-between">
+            <div className="d-flex flex-row align-items-end">
+              <h6 className="mb-0 mr-1">{this.state.productInfo.productCode}</h6>
+              <h5 className="mb-0">{this.state.productInfo.name}</h5>
             </div>
-            <div className="d-flex flex-row">
-              { _.map(this.state.productInfo.catalogs, catalog => (<div className="stocklist-category px-1 mr-1">{catalog.name}</div>)) }
+            <div className="align-self-center">
+              <button
+                className="btn btn-outline-primary btn-xs"
+                onClick={() => { window.location = `/openboxes/inventoryItem/showStockCard/${this.state.productInfo.id}`; }}
+              ><Translate id="stockListManagement.returnStockCard.label" />
+              </button>
             </div>
           </div>
+          <div className="d-flex flex-row">
+            { _.map(this.state.productInfo.catalogs, catalog => (<div key={catalog.id} className="stocklist-category px-1 mr-1">{catalog.name}</div>)) }
+          </div>
+        </div>
         }
         <ReactTable
           data={data}
@@ -453,37 +465,36 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <div>
+                  <div className="d-flex">
                     <button
-                      className="btn btn-outline-primary btn-xs mx-1"
+                      className="btn btn-outline-primary btn-xs mr-1"
                       disabled={original.edit || original.new}
                       onClick={() => this.editItem(index)}
                     ><Translate id="default.button.edit.label" />
                     </button>
                     <button
-                      className="btn btn-outline-primary btn-xs mx-1"
+                      className="btn btn-outline-primary btn-xs mr-1"
                       disabled={(!original.edit && !original.new) || !original.stocklistId
                       || _.isNil(original.maxQuantity) || original.maxQuantity === ''}
                       onClick={() => this.saveItem(index, original)}
                     ><Translate id="default.button.save.label" />
                     </button>
                     <button
-                      className="btn btn-outline-danger btn-xs mx-1"
+                      className="btn btn-outline-danger btn-xs mr-1"
                       onClick={() => this.deleteItem(index)}
                     ><Translate id="default.button.delete.label" />
                     </button>
                     <a
-                      className="btn btn-outline-secondary btn-xs mx-1"
+                      className="btn btn-outline-secondary btn-xs mr-1"
                       disabled={original.edit || original.new}
                       href={`/openboxes/stocklist/renderPdf/${original.stocklistId}`}
                     ><Translate id="default.button.print.label" />
                     </a>
-                    <button
-                      className="btn btn-outline-secondary btn-xs mx-1"
-                      disabled={original.edit || original.new}
-                      onClick={() => this.mailItem(index)}
-                    ><Translate id="default.button.email.label" />
-                    </button>
+                    <EmailModal
+                      stocklistId={original.stocklistId}
+                      users={this.state.users}
+                      manager={original.manager}
+                    />
                   </div>
                 );
               },
