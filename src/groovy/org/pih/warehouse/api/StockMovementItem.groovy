@@ -332,7 +332,8 @@ class SubstitutionItem {
                 minExpirationDate: minExpirationDate?.format("MM/dd/yyyy"),
                 quantityAvailable: quantityAvailable,
                 quantitySelected : quantitySelected,
-                quantityRequested : quantitySelected
+                quantityRequested : quantitySelected,
+                availableItems: availableItems
         ]
     }
 }

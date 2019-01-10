@@ -13,7 +13,9 @@ const LabelField = (props) => {
   } = props;
   const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
   const attr = { ...attributes, ...dynamicAttr };
-  const { formatValue, showValueTooltip, ...otherAttr } = attr;
+  const {
+    formatValue, tooltipValue, showValueTooltip, ...otherAttr
+  } = attr;
   const className = `text-truncate ${otherAttr.className ? otherAttr.className : ''}`;
 
   const renderField = ({ input: { value } }) => (
@@ -40,10 +42,9 @@ const LabelField = (props) => {
     return (
       <div className="form-group my-0">
         <Tooltip
-          html={(<div>{formattedValue}</div>)}
+          html={tooltipValue || (<div>{formattedValue}</div>)}
           disabled={!showValueTooltip}
           theme="transparent"
-          arrow="true"
           delay="150"
           duration="250"
           hideDelay="50"
