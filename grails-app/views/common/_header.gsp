@@ -125,67 +125,7 @@
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"/>
                                                     <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
                                                 </a>
-                                                <div id="warehouseMenu" title="${warehouse.message(code:'dashboard.chooseLocation.label')}" style="display: none; padding: 10px;">
-                                                    <div>
 
-                                                        <div id="location-tabs">
-                                                            <ul>
-                                                                <g:each var="entry" in="${session.loginLocationsMap}" status="i">
-                                                                    <li><a href="#tabs-${i}">${entry.key ?: warehouse.message(code:'locationGroup.empty.label') }</a></li>
-                                                                </g:each>
-                                                            </ul>
-                                                            <g:each var="entry" in="${session.loginLocationsMap}" status="i">
-                                                                <div id="tabs-${i}">
-                                                                    <g:each var="warehouse" in="${entry.value.sort() }">
-                                                                        <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-                                                                        <div class="left" style="margin: 2px; ">
-                                                                            <a class="button icon pin big" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
-                                                                                ${warehouse.name}
-                                                                            </a>
-                                                                        </div>
-                                                                    </g:each>
-                                                                </div>
-                                                            </g:each>
-                                                        </div>
-                                                        <script>
-                                                            $( "#location-tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
-                                                            $( "#location-tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
-                                                        </script>
-
-                                                        <%--
-                                                            <g:set var="count" value="${0 }"/>
-                                                            <g:each var="entry" in="${session.loginLocationsMap}" status="i">
-                                                                <h3>${entry.key ?: warehouse.message(code:'locationGroup.empty.label') }</h3>
-                                                                <div>
-                                                                    <p>
-                                                                        <g:each var="warehouse" in="${entry.value.sort() }">
-                                                                            <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-                                                                            <div class="left" style="margin: 1px;">
-                                                                                <a class="button big" href='${createLink(controller: "dashboard", action:"chooseLocation", id: warehouse.id, params:['targetUri':targetUri])}'>
-                                                                                    <format:metadata obj="${warehouse}"/>
-                                                                                </a>
-                                                                            </div>
-                                                                        </g:each>
-                                                                    </p>
-                                                                </div>
-                                                            </g:each>
-                                                            --%>
-                                                        <%--
-                                                        <div class="prop">
-                                                            <g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/>
-                                                            Remember my location and log me in automatically.
-
-                                                            ${session.user.rememberLastLocation}
-                                                            ${session.user.warehouse }
-                                                        </div>
-                                                        --%>
-                                                        <g:unless test="${session.loginLocationsMap }">
-                                                            <div style="background-color: black; color: white;" class="warehouse button">
-                                                                <warehouse:message code="dashboard.noWarehouse.message"/>
-                                                            </div>
-                                                        </g:unless>
-                                                    </div>
-                                                </div>
                                             </li>
                                         </g:if>
                                         <li class="action-menu-item">
@@ -197,25 +137,18 @@
                                                 <warehouse:message code="default.logout.label"/>
                                             </g:link>
                                         </li>
-
-                                        <!--
-										 <li><g:link class="list" controller="user"
-                                                     action="preferences"><warehouse:message code="default.preferences.label"  default="Preferences"/></g:link></li>
-										 -->
-                                        <!--
-										 <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
-										 -->
                                     </ul>
                                 </span>
                             </li>
                             <g:if test="${session?.warehouse}">
                                 <li>
-                                    <button class="warehouse-switch button">
+                                    <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
+                                    <button class="btn-show-dialog button" data-title="${g.message(code:'dashboard.chooseLocation.label')}"
+                                            data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" />
                                         ${session?.warehouse?.name }
                                     </button>
                                 </li>
-
                             </g:if>
 
                         </g:if>

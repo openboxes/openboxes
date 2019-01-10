@@ -136,7 +136,11 @@
         </div>
     </g:if>
 </div>
-
+<div id="dlgShowDialog" class="dialog hidden">
+    <div id="dlgShowDialogContent" class="empty center">
+        Loading ...
+    </div>
+</div>
 <!-- Include other plugins -->
 <script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
@@ -312,6 +316,44 @@
     </script>
 </g:if>
 
+<g:javascript>
+    $(document).ready(function() {
+
+        $(".btn-show-dialog").click(function(event) {
+            var url = $(this).data("url");
+            var title = $(this).data("title");
+            var target = $(this).data("target") || "#dlgShowDialog"
+            $(target).attr("title", title);
+            $(target).dialog({
+                title: title,
+                autoOpen: true,
+                modal: true,
+                width: 800,
+                open: function(event, ui) {
+                    $("#dlgShowDialogContent").html("Loading...")
+                    $('#dlgShowDialogContent').load(url, function(response, status, xhr) {
+                        if (xhr.status != 200) {
+                            $(this).text("")
+                            $("<p/>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
+                            var error = JSON.parse(response);
+                            var stack = $("<div/>").addClass("stack empty").appendTo($(this));
+                            $("<code/>").text(error.errorMessage).appendTo(stack)
+
+                        }
+                    });
+                }
+            });
+        });
+
+        $(".btn-close-dialog").live("click", function () {
+            console.log("Close dialog");
+            $("#dlgShowDialog").dialog( "close" );
+        });
+
+	});
+
+
+</g:javascript>
 <script type="text/javascript">
     $(document).ready(function() {
 
