@@ -69,21 +69,21 @@
                                         <g:else>
                                             <li class="action-menu-item">
                                                 <g:link controller="user" action="enableLocalizationMode" style="color: #666;">
-                                                    <img src="${resource(dir: 'images/icons/silk', file: 'bug_add.png')}"/>
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'flag_france.png')}"/>
                                                     ${warehouse.message(code:'localization.enable.label', default: 'Enable translation mode')}
                                                 </g:link>
                                             </li>
                                         </g:else>
                                         <li class="action-menu-item">
                                             <g:link controller="dashboard" action="flushMegamenu" style="color: #666">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}"/>
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'page_white_refresh.png')}"/>
                                                 ${warehouse.message(code:'cache.flush.label', default: 'Refresh megamenu')}
                                             </g:link>
                                         </li>
                                         <li class="action-menu-item">
                                             <g:link controller="dashboard" action="flushCache" style="color: #666">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}"/>
-                                                ${warehouse.message(code:'cache.flush.label', default: 'Refresh all data caches')}
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'database_refresh.png')}"/>
+                                                ${warehouse.message(code:'cache.flush.label', default: 'Refresh data caches')}
                                             </g:link>
                                         </li>
 
