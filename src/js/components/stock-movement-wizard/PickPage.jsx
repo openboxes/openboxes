@@ -179,14 +179,12 @@ class PickPage extends Component {
         );
         this.setState({
           printPicksUrl: printPicks ? printPicks.uri : '/',
-          values: { ...this.state.values, pickPageItems: [] },
-        }, () => this.setState({
           values: {
             ...this.state.values,
             pickPageItems: this.checkForInitialPicksChanges(parseResponse(pickPageItems)),
           },
           sorted: false,
-        }, () => this.fetchBins()));
+        }, () => this.fetchBins());
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -303,15 +301,10 @@ class PickPage extends Component {
     this.setState({
       values: {
         ...this.state.values,
-        pickPageItems: [],
-      },
-    }, () => this.setState({
-      values: {
-        ...this.state.values,
         pickPageItems: this.checkForInitialPicksChanges(parseResponse(pickPageItems)),
       },
       sorted: false,
-    }));
+    });
   }
 
   /**
