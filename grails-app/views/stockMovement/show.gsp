@@ -190,7 +190,7 @@
                             <warehouse:message code="shipping.totalValue.label"/>
                         </td>
                         <td class="value">
-                            <g:formatNumber format="###,###,##0.00" number="${shipmentInstance?.totalValue ?: 0.00 }" />
+                            <g:formatNumber format="###,###,##0.00" number="${stockMovement?.totalValue ?: 0.00 }" />
                             ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </td>
                     </tr>
