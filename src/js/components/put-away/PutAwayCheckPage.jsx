@@ -238,7 +238,7 @@ class PutAwayCheckPage extends Component {
                 type="button"
                 className="btn btn-outline-primary float-right mb-2 btn-xs"
                 onClick={() => this.props.firstPage()}
-              ><Translate id="putAway.goBack.label" />:
+              ><Translate id="putAway.goBack.label" />
               </button>
             </div> :
             <div className="d-flex justify-content-between mb-2">
@@ -262,13 +262,13 @@ class PutAwayCheckPage extends Component {
                     expanded: this.state.expanded,
                   })}
                   className="btn btn-outline-primary mb-2 btn-xs mr-2"
-                ><Translate id="default.button.edit.label" />:
+                ><Translate id="default.button.edit.label" />
                 </button>
                 <button
                   type="button"
                   onClick={() => this.completePutAway()}
                   className="btn btn-outline-primary float-right mb-2 btn-xs"
-                ><Translate id="putAway.completePutAway.label" />:
+                ><Translate id="putAway.completePutAway.label" />
                 </button>
               </div>
             </div>
