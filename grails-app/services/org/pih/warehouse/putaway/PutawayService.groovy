@@ -225,20 +225,19 @@ class PutawayService {
 
     void validatePutaway(Putaway putaway) {
         putaway.putawayItems.toArray().each { PutawayItem putawayItem ->
-            if (putawayItem.splitItems) {
-                putawayItem.splitItems.each { PutawayItem splitItem ->
-                    validatePutawayItem(splitItem)
-                }
-            }
-            else {
-                validatePutawayItem(putawayItem)
-            }
+            validatePutawayItem(putawayItem)
         }
     }
 
 
     void validatePutawayItem(PutawayItem putawayItem) {
-        validateQuantityAvailable(putawayItem.currentFacility, putawayItem.currentLocation, putawayItem.inventoryItem, putawayItem.quantity)
+        def quantity = putawayItem.quantity
+
+        if (putawayItem.splitItems) {
+            quantity = putawayItem.splitItems.sum { it.quantity }
+        }
+
+        validateQuantityAvailable(putawayItem.currentFacility, putawayItem.currentLocation, putawayItem.inventoryItem, quantity)
     }
 
 

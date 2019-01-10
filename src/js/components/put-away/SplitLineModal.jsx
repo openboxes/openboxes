@@ -98,6 +98,10 @@ class SplitLineModal extends Component {
         },
         product: { id: this.props.putawayItem.product.id },
         inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
+        currentLocation: {
+          id: this.props.putawayItem.currentLocation
+            ? this.props.putawayItem.currentLocation.id : null,
+        },
       });
     }
 
@@ -261,6 +265,10 @@ class SplitLineModal extends Component {
                     putawayLocation: { id: null },
                     product: { id: this.props.putawayItem.product.id },
                     inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
+                    currentLocation: {
+                      id: this.props.putawayItem.currentLocation
+                      ? this.props.putawayItem.currentLocation.id : null,
+                    },
                   }],
                 }),
               })}
@@ -323,6 +331,9 @@ SplitLineModal.propTypes = {
     }),
     /** Location of put-away item's bin */
     putawayLocation: PropTypes.shape({
+      id: PropTypes.string,
+    }),
+    currentLocation: PropTypes.shape({
       id: PropTypes.string,
     }),
   }),
