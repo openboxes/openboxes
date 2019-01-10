@@ -16,6 +16,7 @@ class StocklistService {
 
     def requisitionService
     def locationService
+    def mailService
 
     boolean transactional = true
 
@@ -61,5 +62,10 @@ class StocklistService {
         }
 
         requisitionService.deleteRequisition(requisition)
+    }
+
+    void sendMail(String stocklistId, String subject, String body, Collection to) {
+        //TODO add stocklist pdf report as attachment to the mail
+        mailService.sendHtmlMailWithAttachment(to, subject, body, null, null, null)
     }
 }
