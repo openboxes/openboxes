@@ -1,4 +1,17 @@
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%
+    def comparator = { a,b ->
+      def itemA = a.retrievePicklistItemsSortedByBinName()[0]
+      def itemB = b.retrievePicklistItemsSortedByBinName()[0]
+      def nameA = itemA?.binLocation?.name
+      def nameB = itemB?.binLocation?.name
+      def orderA = itemA?.sortOrder
+      def orderB = itemB?.sortOrder
+      /* null is > than string */
+      /* if both names are null or both names are equal, then compare sortOrder */
+      return !nameA ? !nameB ? orderA <=> orderB : 1 : !nameB ? -1 : nameA <=> nameB ?: orderA <=> orderB
+    }
+%>
 <div class="page-content">
     <table id="requisition-items" class="fs-repeat-header">
         <thead>
@@ -31,8 +44,8 @@
         </g:unless>
 
         <g:if test="${sorted}">
-            <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort() { a,b ->
-                a.retrievePicklistItemsSortedByBinName()[0]?.binLocation?.name <=> b.retrievePicklistItemsSortedByBinName()[0]?.binLocation?.name }}"/>
+            <!-- Sort ascending with nulls as highest values -->
+            <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort() { a,b -> comparator(a,b) }}"/>
         </g:if>
         <g:else>
             <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort()}"/>
