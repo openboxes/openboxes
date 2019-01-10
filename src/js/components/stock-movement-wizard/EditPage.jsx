@@ -363,7 +363,6 @@ class EditItemsPage extends Component {
           onClick: () => {
             this.setState({
               revisedItems: [],
-              values: { ...this.state.values, editPageItems: [] },
             });
             this.fetchAllData(true);
           },
@@ -426,11 +425,6 @@ class EditItemsPage extends Component {
     this.setState({
       values: {
         ...this.state.values,
-        editPageItems: [],
-      },
-    }, () => this.setState({
-      values: {
-        ...this.state.values,
         editPageItems: _.map(editPageItems, item => ({
           ...item,
           quantityAvailable: item.quantityAvailable || 0,
@@ -440,7 +434,7 @@ class EditItemsPage extends Component {
           })),
         })),
       },
-    }));
+    });
   }
 
   /**
