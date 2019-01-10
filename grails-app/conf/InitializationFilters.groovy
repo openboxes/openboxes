@@ -21,35 +21,18 @@ class InitializationFilters {
 
 					// Only initialize session if a user has logged in.
 					if (session.user) {
-						if (!session.hostname) {
-							session.hostname = InetAddress.getLocalHost().getHostName() + " (" + request.getHeader('Host') + ")"
-						}
 
-						// Make sure all session variables are initialized
-						if (!session.loginLocations || session.loginLocations.isEmpty() || params?.reset) {
-							log.info "Initializing login locations ..."
-							Location currentLocation = Location.get(session?.warehouse?.id)
+						if (!session.hasProperty("_showTime")) {
 							session._showTime = true
-							session.loginLocations = locationService.getLoginLocations(currentLocation)
-							session.loginLocationsMap = locationService.getLoginLocationsMap(currentLocation)
 						}
 
-						if (!session.rootCategory) {
-							session.rootCategory = productService.getRootCategory()
-							//session.quickCategories = productService.getQuickCategories()
-						}
-						if (!session.inventoryCategoryFilters) {
-							session.inventoryCategoryFilters = [];
-						}
-						if (!session.productCategoryFilters) {
-							session.productCategoryFilters = [];
+						if (!session.hasProperty("hostname")) {
+							session.hostname = InetAddress.getLocalHost().getHostName() + " (" + request.getHeader('Host') + ")"
 						}
 					}
 				} catch (Exception e) { 
 					log.error "Unable to initialize session variables: " + e.message, e
 				}				
-									
-
 			}
 		}
 
