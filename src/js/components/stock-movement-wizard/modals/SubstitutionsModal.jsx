@@ -55,9 +55,17 @@ const FIELDS = {
         type: LabelField,
         label: 'stockMovement.quantityAvailable.label',
         fixedWidth: '150px',
+        fieldKey: '',
         attributes: {
-          formatValue: value => (value ? value.toLocaleString('en-US') : null),
+          formatValue: fieldValue => (_.get(fieldValue, 'quantityAvailable') ? _.get(fieldValue, 'quantityAvailable').toLocaleString('en-US') : null),
+          showValueTooltip: true,
         },
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: _.map(fieldValue.availableItems, availableItem =>
+            (
+              <p>{fieldValue.productCode} {fieldValue.productName}, {availableItem.quantityAvailable}, {availableItem.expirationDate ? availableItem.expirationDate : '---'} </p>
+            )),
+        }),
       },
       quantitySelected: {
         type: TextField,
