@@ -3637,16 +3637,29 @@ class InventoryService implements ApplicationContextAware {
 
     def getCurrentStockAllLocations(Product product, Location currentLocation, User currentUser) {
         log.info ("Get getQuantityOnHand() for product ${product?.name} at all locations")
-        def quantityMap = [:]
         def locations = locationService.getLoginLocations(currentLocation)
-        locations.each { Location location ->
-            if (location.inventory && location.isWarehouse() && currentUser.getEffectiveRoles(location)) {
-                def quantity = getQuantityOnHand(location, product)
-                if (quantity) {
-                    quantityMap[location] = quantity
-                }
-            }
+
+		locations = locations.findAll { Location location ->
+			location.inventory && location.isWarehouse() && currentUser.getEffectiveRoles(location) }
+
+        locations = locations.collect { Location location ->
+			def quantity = getQuantityOnHand(location, product)?:0
+			def unitPrice = product?.pricePerUnit?:0
+			[
+					location: location,
+					locationGroup: location?.locationGroup,
+					quantity: quantity,
+					value: quantity * unitPrice
+			]
         }
+
+		locations = locations.findAll { it?.quantity > 0 }
+		locations.sort { it.locationGroup }
+
+		def quantityMap = locations.groupBy { it?.locationGroup }.collect{ k, v ->
+			[(k):[totalValue: v.value.sum(), totalQuantity: v.quantity.sum(), locations: v]]
+		}
+
         return quantityMap
     }
 
