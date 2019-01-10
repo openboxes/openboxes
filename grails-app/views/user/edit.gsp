@@ -213,7 +213,7 @@
                                                 <label for="email"><warehouse:message code="user.defaultLocation.label" /></label>
                                             </td>
                                             <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
-                                                <g:select name="warehouse.id" from="${org.pih.warehouse.core.Location.list()?.sort()}"
+                                                <g:select name="warehouse.id" from="${locations}"
                                                           optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['null':'']" class="chzn-select-deselect"/>
 
                                                 <div class="fade">
@@ -233,14 +233,18 @@
                                                         <table>
                                                             <thead>
                                                             <tr>
+                                                                <th><warehouse:message code="location.locationGroup.label"/></th>
                                                                 <th><warehouse:message code="location.label"/></th>
+                                                                <th><warehouse:message code="location.locationType.label"/></th>
                                                                 <th><warehouse:message code="user.role.label"/></th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
                                                             <g:each var="location" in="${locations}" status="status">
                                                                 <tr class="${status % 2 ? 'even' : 'odd'}">
+                                                                    <td>${location?.locationGroup?.name}</td>
                                                                     <td>${location.name}</td>
+                                                                    <td><format:metadata obj="${location?.locationType}"/></td>
                                                                     <td>
                                                                         <g:set var="defaultLabel"
                                                                                value="${warehouse.message(code: 'default.label')}"/>
