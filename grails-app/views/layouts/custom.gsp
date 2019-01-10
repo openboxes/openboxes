@@ -319,34 +319,46 @@
 <g:javascript>
     $(document).ready(function() {
 
-        $(".btn-show-dialog").click(function(event) {
+        $(".btn-show-dialog").live("click", function (event) {
             var url = $(this).data("url");
             var title = $(this).data("title");
             var target = $(this).data("target") || "#dlgShowDialog"
+            var width = $(this).data("width") || "800"
+            var height = $(this).data("height") || "400"
+            var position = $(this).data("position");
+            if (position === "top") {
+                position = {
+                    my: "center top",
+                    at: "center top",
+                    of: window
+                }
+            }
             $(target).attr("title", title);
             $(target).dialog({
                 title: title,
                 autoOpen: true,
                 modal: true,
-                width: 800,
+                width: width,
+                autoResize:true,
+                resizable: true,
+                minHeight:"auto",
+                position: position,
                 open: function(event, ui) {
-                    $("#dlgShowDialogContent").html("Loading...")
-                    $('#dlgShowDialogContent').load(url, function(response, status, xhr) {
+                    $(this).html("Loading...")
+                    $(this).load(url, function(response, status, xhr) {
                         if (xhr.status != 200) {
                             $(this).text("")
                             $("<p/>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
                             var error = JSON.parse(response);
                             var stack = $("<div/>").addClass("stack empty").appendTo($(this));
                             $("<code/>").text(error.errorMessage).appendTo(stack)
-
                         }
                     });
                 }
-            });
+            }).dialog('open');
         });
 
         $(".btn-close-dialog").live("click", function () {
-            console.log("Close dialog");
             $("#dlgShowDialog").dialog( "close" );
         });
 

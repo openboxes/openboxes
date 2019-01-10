@@ -105,7 +105,7 @@
                     ${inventoryItem?.product?.unitOfMeasure?:g.message(code:'default.each.label')}
                 </td>
                 <td>
-                    <input type="number" name="quantity" size="10" value="${quantityAvailable }" class="text" style="font-size:15px"/>
+                    <input type="number" name="quantity" size="10" value="${quantityAvailable }" class="text"/>
                     ${inventoryItem?.product?.unitOfMeasure?:g.message(code:'default.each.label')}
                 </td>
             </tr>

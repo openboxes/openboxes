@@ -83,7 +83,7 @@
 
                             <td>
                                 <a href="javascript:void(0);" class="btn-show-dialog button"
-                                   data-target="#product-supplier-dialog"
+                                   data-position="top"
                                    data-title="${g.message(code:'productSupplier.label')}"
                                    data-url="${request.contextPath}/productSupplier/dialog?id=${productSupplier?.id}&product.id=${productInstance?.id}">
                                     <img src="${createLinkTo(dir:'images/icons/silk', file:'pencil.png')}" />
@@ -105,11 +105,10 @@
             <tr>
                 <td colspan="12">
                     <div class="center">
-                        <button class="button btn-show-dialog"
-                                data-target="#product-supplier-dialog"
-                                data-title="${g.message(code: 'default.create.label', args: [g.message(code:'productSupplier.label')])}"
+                        <button class="button icon add btn-show-dialog" data-position="top"
+                                data-title="${g.message(code: 'default.add.label', args: [g.message(code:'productSupplier.label')])}"
                                 data-url="${request.contextPath}/productSupplier/dialog?product.id=${productInstance?.id}">
-                            ${g.message(code: 'default.button.create.label', default: 'Create')}
+                            ${g.message(code: 'default.create.label', default: 'Create', args: [g.message(code:'productSupplier.label')])}
                         </button>
                     </div>
                 </td>
@@ -178,11 +177,5 @@
                 %{--}--}%
             %{--}).dialog('open');--}%
         %{--});--}%
-
     });
-
-
-
-
-
 </g:javascript>

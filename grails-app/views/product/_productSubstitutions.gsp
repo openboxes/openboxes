@@ -71,8 +71,7 @@
                 <tr>
                     <td colspan="8">
                         <div class="center">
-                            <button class="button btn-show-dialog"
-                                    data-target="#product-substitution-dialog"
+                            <button class="button icon add btn-show-dialog"
                                     data-title="${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}"
                                     data-url="${request.contextPath}/productAssociation/dialog?product.id=${productInstance?.id}">
                                 ${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}
@@ -85,12 +84,6 @@
             </table>
         </div>
     </div>
-
-
-</div>
-
-<div id="product-substitution-dialog" class="dialog hidden" title="Product Supplier">
-    <div class="empty center">Loading ...</div>
 </div>
 
 
