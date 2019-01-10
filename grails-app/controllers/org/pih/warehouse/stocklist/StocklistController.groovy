@@ -9,14 +9,16 @@
  */
 package org.pih.warehouse.stocklist
 
-import grails.validation.ValidationException;
-
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.inventory.Inventory;
-import org.pih.warehouse.inventory.InventoryLevel;
+import grails.validation.ValidationException
+import org.pih.warehouse.api.Stocklist
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.requisition.*
 
 class StocklistController {
+
+	def stocklistService
 
 	def show = { 
 		println "stocklist " + params
@@ -27,5 +29,15 @@ class StocklistController {
 		
 		[location:location, inventoryLevels: inventoryLevels]
 		
+	}
+
+	def renderPdf = {
+		Stocklist stocklist = stocklistService.getStocklist(params.id)
+
+		renderPdf(
+			template: "/stocklist/print",
+			model: [stocklist:stocklist],
+			filename: "Stocklist - ${stocklist?.requisition?.name}"
+		)
 	}
 }
