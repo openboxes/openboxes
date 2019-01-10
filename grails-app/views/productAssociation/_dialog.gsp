@@ -9,15 +9,7 @@
 
             <tr class="prop">
                 <td class="name">
-                    <label for="code"><g:message code="default.code.label"/></label>
-                </td>
-                <td class="value ">
-                    <g:selectProductAssociationTypeCode name="code" value="${productAssociation.code}" class="chzn-select-deselect"/>
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="name" rowspan="2">
-                    <label for="product"><g:message code="productAssociation.substitutionRule.label"/></label>
+                    <label for="product"><g:message code="productAssociation.product.label"/></label>
                 </td>
                 <td class="value ">
                     <div id="product">
@@ -27,7 +19,10 @@
                     </div>
                 </td>
             </tr>
-            <tr>
+            <tr class="prop">
+                <td class="name">
+                    <label>is associated with</label>
+                </td>
                 <td class="value">
                     <div id="associatedProduct">
                         <g:textField name="quantity" size="4" class="medium text" value="${productAssociation?.quantity?:1}" /> x
@@ -39,6 +34,15 @@
 
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="name">
+                    <label>to be used as a(n)</label>
+                </td>
+                <td class="value">
+                    <g:selectProductAssociationTypeCode name="code" value="${productAssociation.code}" class="chzn-select-deselect"/>
+                </td>
+            </tr>
+
 
             <tr class="prop">
                 <td class="name">

@@ -136,7 +136,11 @@
         </div>
     </g:if>
 </div>
-
+<div id="dlgShowDialog" class="dialog hidden">
+    <div id="dlgShowDialogContent" class="empty center">
+        Loading ...
+    </div>
+</div>
 <!-- Include other plugins -->
 <script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
@@ -312,6 +316,56 @@
     </script>
 </g:if>
 
+<g:javascript>
+    $(document).ready(function() {
+
+        $(".btn-show-dialog").live("click", function (event) {
+            var url = $(this).data("url");
+            var title = $(this).data("title");
+            var target = $(this).data("target") || "#dlgShowDialog"
+            var width = $(this).data("width") || "800"
+            var height = $(this).data("height") || "400"
+            var position = $(this).data("position");
+            if (position === "top") {
+                position = {
+                    my: "center top",
+                    at: "center top",
+                    of: window
+                }
+            }
+            $(target).attr("title", title);
+            $(target).dialog({
+                title: title,
+                autoOpen: true,
+                modal: true,
+                width: width,
+                autoResize:true,
+                resizable: true,
+                minHeight:"auto",
+                position: position,
+                open: function(event, ui) {
+                    $(this).html("Loading...")
+                    $(this).load(url, function(response, status, xhr) {
+                        if (xhr.status != 200) {
+                            $(this).text("")
+                            $("<p/>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
+                            var error = JSON.parse(response);
+                            var stack = $("<div/>").addClass("stack empty").appendTo($(this));
+                            $("<code/>").text(error.errorMessage).appendTo(stack)
+                        }
+                    });
+                }
+            }).dialog('open');
+        });
+
+        $(".btn-close-dialog").live("click", function () {
+            $("#dlgShowDialog").dialog( "close" );
+        });
+
+	});
+
+
+</g:javascript>
 <script type="text/javascript">
     $(document).ready(function() {
 

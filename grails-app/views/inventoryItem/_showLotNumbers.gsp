@@ -87,36 +87,4 @@
 		</table>
 	</g:form>
 </div>
-<div id="dlgShowDialog" style="display: none;">
-	<div id="dlgShowDialogContent">
-		<!-- dynamically generated content -->
-	</div>
-</div>
 
-<g:javascript>
-	$(document).ready(function() {
-        $(".btn-show-dialog").click(function(event) {
-            var url = $(this).data("url");
-            var title = $(this).data("title");
-            $("#dlgShowDialog").dialog({
-                title: title,
-                autoOpen: true,
-                modal: true,
-                width: 800,
-                open: function(event, ui) {
-                    $("#dlgShowDialogContent").html("Loading...")
-                    $('#dlgShowDialogContent').load(url, function(response, status, xhr) {
-                        if (xhr.status != 200) {
-                            $(this).text("")
-                            $("<p/>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
-                            var error = JSON.parse(response);
-                            var stack = $("<div/>").addClass("stack empty").appendTo($(this));
-                            $("<code/>").text(error.errorMessage).appendTo(stack)
-
-                        }
-                    });
-                }
-            });
-        });
-	});
-</g:javascript>

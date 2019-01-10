@@ -64,7 +64,7 @@
             <tr class="prop">
                 <td valign="top" class="name"><label><g:message code="inventory.quantityToReturn.label" /></label></td>
                 <td valign="top" class="value">
-                    <input type="number" name="quantity" size="6" value="${quantityAvailable }" class="text" style="font-size:15px"/>
+                    <input type="number" name="quantity" size="6" value="${quantityAvailable }" class="text"/>
                     ${inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                 </td>
             </tr>

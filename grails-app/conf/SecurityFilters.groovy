@@ -27,7 +27,7 @@ class SecurityFilters {
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
 			
-			after = {
+			afterView = {
 				// Clear out current user after rendering the view 
 				AuthService.currentUser.set(null)
 				AuthService.currentLocation.set(null)

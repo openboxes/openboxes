@@ -14,6 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.pih.warehouse.auth.AuthService
 import util.ConfigHelper
 
 import javax.xml.bind.ValidationException;
@@ -160,19 +161,26 @@ class LocationService {
 	}
 
 
-	Map getLoginLocationsMap(Location currentLocation) {
-        log.info "Get login locations map (currentLocation=${currentLocation?.name})"
+	Map getLoginLocationsMap(User user, Location currentLocation) {
+        log.info "Get login locations for user ${user} and location ${currentLocation})"
         def locationMap = [:]
         def nullHigh = new NullComparator(true)
         def locations = getLoginLocations(currentLocation)
         if (locations) {
+			locations = locations.findAll { Location location -> user.getEffectiveRoles(location) }
+			locations = locations.collect { Location location ->
+				[
+						id           : location?.id,
+						name         : location?.name,
+						locationType : location.locationType?.name,
+						locationGroup: location?.locationGroup?.name,
 
-			locations = locations.collect { [id: it?.id, name: it?.name, locationType: it.locationType?.name, locationGroup: it?.locationGroup?.name,  ]}
+				]
+			}
             locationMap = locations.groupBy { it?.locationGroup }
             locationMap = locationMap.sort { a, b -> nullHigh.compare(a?.key, b?.key) }
         }
         return locationMap;
-        //return getLoginLocations(currentLocation).sort { it?.locationGroup }.reverse().groupBy { it?.locationGroup }
 	}
 
 	List getInternalLocations(Location parentLocation) {

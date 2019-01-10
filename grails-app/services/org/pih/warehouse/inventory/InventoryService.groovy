@@ -30,6 +30,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.importer.InventoryExcelImporter
@@ -66,6 +67,7 @@ class InventoryService implements ApplicationContextAware {
 	def productService
 	def identifierService
     def messageService
+	def locationService
 	//def authService
 
 	ApplicationContext applicationContext
@@ -3633,12 +3635,12 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def getQuantityOnHand(Product product) {
+    def getCurrentStockAllLocations(Product product, Location currentLocation, User currentUser) {
         log.info ("Get getQuantityOnHand() for product ${product?.name} at all locations")
         def quantityMap = [:]
-        def locations = Location.list()
-        locations.each { location ->
-            if (location.inventory && location.isWarehouse()) {
+        def locations = locationService.getLoginLocations(currentLocation)
+        locations.each { Location location ->
+            if (location.inventory && location.isWarehouse() && currentUser.getEffectiveRoles(location)) {
                 def quantity = getQuantityOnHand(location, product)
                 if (quantity) {
                     quantityMap[location] = quantity
