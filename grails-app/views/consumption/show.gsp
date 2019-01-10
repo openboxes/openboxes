@@ -119,12 +119,6 @@
             </div>
         </div>
      </div>
-    <%-- FIXME Need to move this into a javascript library that can be used on any page --%>
-    <div id="dlgShowDialog" style="display: none;">
-        <div id="dlgShowDialogContent">
-            <!-- dynamically generated content -->
-        </div>
-    </div>
     <script type="text/javascript">
         $(document).ready(function() {
 
@@ -133,37 +127,6 @@
                 "sPaginationType": "full_numbers",
                 "iDisplayLength": 25
             });
-
-
-            $(".btn-close-dialog").live("click", function () {
-                console.log("Close dialog");
-                $("#dlgShowDialog").dialog( "close" );
-            });
-
-            $(".btn-show-dialog").click(function(event) {
-                var url = $(this).data("url");
-                var title = $(this).data("title");
-                $("#dlgShowDialog").attr("title", title);
-                $("#dlgShowDialog").dialog({
-                    autoOpen: true,
-                    modal: true,
-                    width: "1200px",
-                    open: function(event, ui) {
-                        $("#dlgShowDialogContent").html("Loading...")
-                        $('#dlgShowDialogContent').load(url, function(response, status, xhr) {
-                            if (xhr.status != 200) {
-                                $(this).text("")
-                                $("<p/>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
-                                var error = JSON.parse(response);
-                                var stack = $("<div/>").addClass("stack empty").appendTo($(this));
-                                $("<code/>").text(error.errorMessage).appendTo(stack)
-
-                            }
-                        });
-                    }
-                });
-            });
-
 
             $(".tabs").livequery(function(){
                 $(this).tabs({
