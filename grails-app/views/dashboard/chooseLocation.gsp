@@ -21,7 +21,9 @@
                             <g:message code="dashboard.youLastLoggednHereOn.message"
                                        args="[g.prettyDateFormat(date: session?.user?.lastLoginDate), g.formatDate(date: session?.user?.lastLoginDate, format: 'MMM dd yyyy hh:mm:ss a z')]"/>
                         </div>
-                        <g:render template="loginLocations"/>
+                        <div id="chooseLocationSelect">
+                            <g:render template="loginLocations"/>
+                        </div>
                         <div class="prop" style="background-color: #eee; text-align: center">
                             <g:message code="dashboard.loggedInAs.message" args="[session?.user?.name]"/>.
                             <g:link class="button icon unlock" controller="auth" action="logout">
