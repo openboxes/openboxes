@@ -49,7 +49,6 @@ class PutawayService {
                     List<AvailableItem> availableItems = []
 
                     PutawayItem putawayItem = new PutawayItem()
-                    // FIXME Should be PENDING if there are existing putaways that are in-progress
                     putawayItem.putawayStatus = PutawayStatus.READY
                     putawayItem.product = it.product
                     putawayItem.inventoryItem = it.inventoryItem
@@ -82,7 +81,8 @@ class PutawayService {
         List<Putaway> putaways = orders.collect { Putaway.createFromOrder(it) }
         List<PutawayItem> putawayItems = []
 
-        putaways.each { putawayItems.addAll(it.putawayItems.findAll { it.putawayStatus == PutawayStatus.PENDING }) }
+        putaways.each { putawayItems.addAll(it.putawayItems.findAll { it.putawayStatus == PutawayStatus.PENDING ||
+                (it.putawayStatus == PutawayStatus.CANCELED && it.splitItems?.any { item -> item.putawayStatus == PutawayStatus.PENDING }) }) }
 
         return putawayItems
     }
