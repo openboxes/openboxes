@@ -36,6 +36,8 @@ import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductCatalogItem
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.reporting.Consumption
@@ -256,6 +258,7 @@ class InventoryService implements ApplicationContextAware {
 		log.info "searchTerms = " + searchTerms
 		log.debug("get products: " + commandInstance?.warehouseInstance)
 		log.info "command.tag  = " + commandInstance.tags
+		log.info "command.catalog  = " + commandInstance.catalogs
 
 		def products = []
 
@@ -265,11 +268,16 @@ class InventoryService implements ApplicationContextAware {
 			products = getProductsByTags(commandInstance.tags, commandInstance?.maxResults as int, commandInstance?.offset as int)
 		}
 
+		// User wants to view all products that match the given catalog
+		else if (commandInstance.catalogs) {
+			commandInstance.numResults = countProductsByCatalogs(commandInstance.catalogs)
+			products = getProductsByCatalogs(commandInstance.catalogs, commandInstance?.maxResults as int, commandInstance?.offset as int)
+		}
+
         // User wants to view all products in the given shipment
         else if (commandInstance.shipment) {
             commandInstance.numResults = countProductsByShipment(commandInstance.shipment)
             products = getProductsByShipment(commandInstance.shipment, commandInstance?.maxResults as int, commandInstance?.offset as int)
-
         }
         else {
 			// Get all products, including hidden ones
@@ -1172,6 +1180,33 @@ class InventoryService implements ApplicationContextAware {
 		}
 		//log.debug "Results " + results[0]
 		return results[0]
+	}
+
+	/**
+	 * Get all products in the given catalog
+	 *
+	 * @param inputCatalogs
+	 * @return
+	 */
+	def getProductsByCatalogs(List<String> inputCatalogs, int max, int offset) {
+		log.info "Get products by catalogs=${inputCatalogs} max=${max} offset=${offset}"
+		def products = []
+		for (inputCatalog in inputCatalogs) {
+			def productInstance = ProductCatalog.get(inputCatalog)
+			def productsInCatalog = productInstance.productCatalogItems.product
+			products += productsInCatalog
+		}
+		return products
+	}
+
+	def countProductsByCatalogs(List inputCatalogs) {
+		log.debug "Get products by catalogs: " + inputCatalogs
+		def result = 0
+		for (inputCatalog in inputCatalogs) {
+			def productInstance = ProductCatalog.get(inputCatalog)
+			result += productInstance.productCatalogItems.size()
+		}
+		return result
 	}
 
 

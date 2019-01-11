@@ -11,10 +11,10 @@
                 <div class="actions">
                     <div class="action-menu-item">
 
-                        <g:if test="${!params.editTags}">
-                            <g:link controller="dashboard" action="index" params="[editTags:true]">
+                        <g:if test="${!params.editCatalogs}">
+                            <g:link controller="dashboard" action="index" params="[editCatalogs:true]">
                                 <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle" />
-                                <warehouse:message code="tag.editTags.label" default="Edit tags"></warehouse:message>
+                                <warehouse:message code="catalogs.editCatalogs.label" default="Edit catalogs"></warehouse:message>
                             </g:link>
                         </g:if>
                         <g:else>
@@ -29,36 +29,36 @@
         </g:isUserAdmin>
 
 
-        <warehouse:message code="tags.label" default="Tags"/>
+        <warehouse:message code="catalogs.label" default="Formularies"/>
     </h2>
 
 	<div class="widget-content" style="max-height: 300px; overflow: auto;" >
         <div id="tag-summary" >
-            <g:if test="${params.editTags}">
+            <g:if test="${params.editCatalogs}">
                 <g:isUserAdmin>
                     <table>
                         <thead>
                             <tr>
-                                <th><warehouse:message code="tag.name.label" default="Tag"/></th>
+                                <th><warehouse:message code="catalogs.name.label" default="Formulary"/></th>
                                 <th><warehouse:message code="tag.count.label" default="Count"/></th>
                                 <th><warehouse:message code="tag.active.label" default="Active"/></th>
                                 <th><warehouse:message code="default.actions.label"/></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <g:each in="${tags }" var="tag" status="i">
+                            <g:each in="${catalogs }" var="catalog" status="i">
                                 <tr class="${i%2?'odd':'even'}">
                                     <td>
-                                        ${tag.key.tag?:"Empty tag"}
+                                        ${catalog.name?:"Empty catalog"}
                                     </td>
                                     <td>
-                                        ${tag?.value}
+                                        ${catalog.productCatalogItems.size()}
                                     </td>
                                     <td>
-                                        ${tag.key.isActive}
+                                        ${catalog.active}
                                     </td>
                                     <td>
-                                        <g:link controller="dashboard" action="hideTag" id="${tag.key}" params="[editTags:true]">
+                                        <g:link controller="dashboard" action="hideCatalog" id="${catalog}" params="[editCatalogs:true]">
                                             <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
                                     </td>
                                 </tr>
@@ -68,78 +68,34 @@
                 </g:isUserAdmin>
             </g:if>
             <g:else>
-                <g:if test="${tags}">
+                <g:if test="${catalogs}">
                     <div id="tagcloud">
-                        <g:each in="${tags }" var="tag">
-                            <g:if test="${tag.value > 1}">
-                                <g:link controller="inventory" action="browse" params="['tags':tag.key.id]" rel="${tag.value }">
-                                    ${tag.key.tag?:"Empty tag" } (${tag?.value })</g:link>
+                        <g:each in="${catalogs }" var="catalog">
+                            <g:if test="${catalog?.productCatalogItems?.size() > 1}">
+                                <g:link controller="inventory" action="browse" params="['catalogs':catalog.id]" rel="${catalog?.productCatalogItems?.size() }">
+                                    ${catalog.name?:"Empty catalog" } (${catalog?.productCatalogItems?.size() })</g:link>
                             </g:if>
                         </g:each>
-                        <%--
-                        <g:each in="${tags }" var="tag">
-                            <g:if test="${tag?.products?.size() > 1}">
-                                <g:link controller="inventory" action="browse" params="['tags':tag.id]" rel="${tag?.products?.size() }">
-                                    ${tag.tag?:"Empty tag" } (${tag?.products?.size() })</g:link>
-                            </g:if>
-                        </g:each>
-                        --%>
-
                     </div>
                 </g:if>
                 <g:else>
                     <div style="margin:10px;" class="center">
-                        <span class="fade"><warehouse:message code="tag.noTags.label"/></span>
+                        <span class="fade"><warehouse:message code="catalogs.noCatalogs.label"/></span>
                     </div>
                 </g:else>
             </g:else>
         </div>
-
-    <%--
-    <div id="tagSummary">
-        <g:isUserAdmin>
-            <div style="float: right">
-                <g:if test="${!params.editTags}">
-                    <g:link controller="dashboard" action="index" params="[editTags:true]">
-                        <warehouse:message code="tag.editTags.label" default="Edit tags"></warehouse:message>
-                    </g:link>
-                </g:if>
-                <g:else>
-                    <g:link controller="dashboard" action="index">
-                        <warehouse:message code="tag.doneEditing.label" default="Done editing"></warehouse:message>
-                    </g:link>
-                </g:else>
-            </div>
-        </g:isUserAdmin>
-        <g:each in="${tags }" var="tag">
-            <span class="tag">
-                <g:link controller="inventory" action="browse" params="['tag':tag.tag]">
-                    ${tag.tag } (${tag?.products?.size() })
-                </g:link>
-
-                <g:if test="${params.editTags}">
-                    <g:isUserAdmin>
-                        <g:link controller="dashboard" action="hideTag" id="${tag.id}">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_cross.png')}"/>
-                        </g:link>
-                    </g:isUserAdmin>
-                </g:if>
-            </span>
-        </g:each>
-    </div>
-    --%>
 		<div class="clear"></div>
 	</div>
 </div>
 <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
 
 <script>
-
     $(window).load(function(){
         $("#tagcloud a").tagcloud({
             size: {
                 start:1.0,
-                end: 2.0,
+                end: 1.0,
                 unit: 'em'
             },
             color: {

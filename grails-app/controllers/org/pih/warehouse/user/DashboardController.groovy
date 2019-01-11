@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.user
 
 import grails.converters.JSON
@@ -23,6 +23,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.CalculateQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -52,9 +53,9 @@ class DashboardController {
 
 
     def globalSearch = {
-		
+
 		def transaction = Transaction.findByTransactionNumber(params.searchTerms)
-		if (transaction) { 
+		if (transaction) {
 			redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
 			return;
 		}
@@ -81,7 +82,7 @@ class DashboardController {
 			}
 			return;
 		}
-		
+
 		def shipment = Shipment.findByShipmentNumber(params.searchTerms)
 		if (shipment) {
             if (shipment?.isStockMovement()) {
@@ -105,7 +106,7 @@ class DashboardController {
         }
 
 		redirect(controller: "inventory", action: "browse", params:params)
-			
+
 	}
     def throwException = {
         println "Configuration: " + ConfigurationHolder.config.grails
@@ -125,15 +126,15 @@ class DashboardController {
 		if (!session.warehouse) {
 			redirect(action: "chooseLocation")
 		}
-		
+
 	    def currentUser = User.get(session?.user?.id)
-		
+
 		def location = Location.get(session?.warehouse?.id);
 		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
 		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
 		//def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
 		//def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
-		
+
 		//def expiredStock = inventoryService.getExpiredStock(null, location)
 		//def expiringStockWithin30Days = inventoryService.getExpiringStock(null, location, 30)
 		//def expiringStockWithin90Days = inventoryService.getExpiringStock(null, location, 90)
@@ -163,20 +164,20 @@ class DashboardController {
                     lastUpdated: it.lastUpdated,
                     requisition: it)
         }
-				
+
         // Add recent shipments
 		def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
 			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location] );
-		shipments.each { 
+		shipments.each {
 			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-			activityType = "${warehouse.message(code: activityType)}"	
+			activityType = "${warehouse.message(code: activityType)}"
 			activityList << new DashboardActivityCommand(
 				type: "lorry",
-				label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}", 
+				label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}",
 				url: link,
-				dateCreated: it.dateCreated, 
-				lastUpdated: it.lastUpdated, 
+				dateCreated: it.dateCreated,
+				lastUpdated: it.lastUpdated,
 				shipment: it)
 		}
 		//order by e.createdDate desc
@@ -209,7 +210,7 @@ class DashboardController {
 		}
 
 		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude] );
-		products.each { 
+		products.each {
 			def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
 			def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it.updatedBy
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
@@ -223,13 +224,13 @@ class DashboardController {
 				lastUpdated: it.lastUpdated,
 				product: it)
 		}
-		
+
 		// If the current location has an inventory, add recent transactions associated with that location to the activity list
-		if (location?.inventory) { 
+		if (location?.inventory) {
 			def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
 				t.inventory = :inventory", ['lastUpdated':new Date()-daysToInclude, 'inventory':location?.inventory] );
-			
-			transactions.each { 
+
+			transactions.each {
 				def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
 				def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
 				def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
@@ -245,26 +246,26 @@ class DashboardController {
 					transaction: it)
 			}
 		}
-				
+
 		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude], [max: 10] );
-		users.each { 
+		users.each {
 			def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
 			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-			if (it.lastUpdated == it.lastLoginDate) { 
+			if (it.lastUpdated == it.lastLoginDate) {
 				activityType = "dashboard.activity.loggedIn.label"
 			}
 			activityType = "${warehouse.message(code: activityType)}"
 
-			
+
 			activityList << new DashboardActivityCommand(
 				type: "user",
-				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it.username, activityType])}",				
+				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it.username, activityType])}",
 				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
 				user: it)
 		}
-		
+
 		//activityList = activityList.groupBy { it.lastUpdated }
         def activityListTotal = 0
 		def startIndex = 0
@@ -299,7 +300,8 @@ class DashboardController {
 				startIndex               : startIndex,
 				endIndex                 : endIndex,
 				daysToInclude            : daysToInclude,
-				tags                     : productService?.getPopularTags(50)
+				tags                     : productService?.getPopularTags(50),
+				catalogs                 : productService?.getAllCatalogs()
 		]
 	}
 
@@ -318,13 +320,20 @@ class DashboardController {
         tag.save(flush:true)
         redirect(controller: "dashboard", action: "index", params: [editTags:true])
     }
-	
-	def status = { 
+
+	def hideCatalog = {
+		ProductCatalog productCatalog = ProductCatalog.get(params.id)
+		productCatalog.isActive = false
+		productCatalog.save(flush:true)
+		redirect(controller: "dashboard", action: "index", params: [editCatalogs:true])
+	}
+
+	def status = {
 		def admin = User.get(1)
-		def comments = Comment.findAllBySenderAndRecipient(admin, admin) 
-		
+		def comments = Comment.findAllBySenderAndRecipient(admin, admin)
+
 		def results = comments.collect {
-			if (it.dateSent > new Date()) { 
+			if (it.dateSent > new Date()) {
 				[ id: it.id, comment: warehouse.message(code:it.comment, args: [format.datetime(obj: it.dateSent)]), dateSent: it.dateSent ]
 			}
 		}
@@ -366,7 +375,7 @@ class DashboardController {
         def requisitionStatistics = requisitionService.getRequisitionStatistics(location, null, user, new Date()-30)
 
         def categories = []
-		def category = productService.getRootCategory()		
+		def category = productService.getRootCategory()
 		categories = category.categories
 		categories = categories.groupBy { it?.parentCategory }
 
@@ -387,7 +396,7 @@ class DashboardController {
 
     @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
 			"binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
-			"selectTagsCache", "selectCategoryCache"])
+			"selectTagsCache", "selectCategoryCache", "selectCatalogsCache"])
     def flushCache = {
         flash.message = "All data caches have been flushed"
         CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
@@ -401,15 +410,15 @@ class DashboardController {
     }
 
 	def chooseLayout = {
-		if (params.layout) { 
+		if (params.layout) {
 			session.layout = params.layout
 		}
 		redirect(controller:'dashboard', action:'index')
 	}
-	
+
 	def chooseLocation = {
 
-		// If the user has selected a new location from the topnav bar, we need 
+		// If the user has selected a new location from the topnav bar, we need
 		// to retrieve the location to make sure it exists
 		User user = User.get(session.user.id);
 		Location warehouse = params.id ? Location.get(params.id) : null
@@ -536,24 +545,24 @@ class DashboardController {
         render(contentType: "text/csv", text:sw.toString())
         return;
     }
-    
+
 }
 
 
-class DashboardCommand { 
-	
+class DashboardCommand {
+
 	List<DashboardActivityCommand> activityList;
-	
-	
+
+
 }
 
 
-class DashboardActivityCommand { 
+class DashboardActivityCommand {
 
 	String label
-	String type	
+	String type
 	String url
-	
+
 	User user
 	Shipment shipment
 	Receipt receipt
@@ -561,12 +570,12 @@ class DashboardActivityCommand {
 	Product product
 	Transaction transaction
 	InventoryItem inventoryItem
-	
+
 	Date lastUpdated
 	Date dateCreated
-	
-	
-	String getActivityType() { 
+
+
+	String getActivityType() {
 		return lastUpdated == dateCreated ? "created" : "updated"
 	}
 }
