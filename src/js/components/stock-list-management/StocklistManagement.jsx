@@ -467,7 +467,7 @@ class StocklistManagement extends Component {
                 return (
                   <div className="d-flex">
                     <button
-                      className="btn btn-outline-primary btn-xs mr-1"
+                      className="btn btn-outline-primary btn-xs mx-1"
                       disabled={original.edit || original.new}
                       onClick={() => this.editItem(index)}
                     ><Translate id="default.button.edit.label" />

@@ -17,6 +17,7 @@ class StocklistService {
     def requisitionService
     def locationService
     def mailService
+    def pdfRenderingService
 
     boolean transactional = true
 
@@ -65,7 +66,8 @@ class StocklistService {
     }
 
     void sendMail(String stocklistId, String subject, String body, Collection to) {
-        //TODO add stocklist pdf report as attachment to the mail
-        mailService.sendHtmlMailWithAttachment(to, subject, body, null, null, null)
+        Stocklist stocklist = getStocklist(stocklistId)
+        ByteArrayOutputStream bytes = pdfRenderingService.render(template: "/stocklist/print", model: [stocklist: stocklist])
+        mailService.sendHtmlMailWithAttachment(to, subject, body, bytes.toByteArray(), "Stocklist - ${stocklist?.requisition?.name}.pdf", "application/pdf")
     }
 }
