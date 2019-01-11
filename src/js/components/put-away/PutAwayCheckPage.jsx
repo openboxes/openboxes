@@ -54,11 +54,21 @@ class PutAwayCheckPage extends Component {
         ...putAway,
         putawayItems: PutAwayCheckPage.processSplitLines(putAway.putawayItems),
       },
-      completed: false,
+      completed: putAway.putawayStatus === 'COMPLETED',
       columns,
       pivotBy,
       expanded,
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      putAway: {
+        ...nextProps.putAway,
+        putawayItems: PutAwayCheckPage.processSplitLines(nextProps.putAway.putawayItems),
+      },
+      completed: nextProps.putAway.putawayStatus === 'COMPLETED',
+    });
   }
 
   /**
@@ -341,6 +351,8 @@ PutAwayCheckPage.propTypes = {
   putAway: PropTypes.shape({
     /** An array of all put-away's items */
     putawayItems: PropTypes.arrayOf(PropTypes.shape({})),
+    /** Status of the put-away */
+    putawayStatus: PropTypes.string,
   }),
   /** An array of available attributes after which a put-away can be sorted by */
   pivotBy: PropTypes.arrayOf(PropTypes.string),
@@ -352,7 +364,7 @@ PutAwayCheckPage.propTypes = {
 };
 
 PutAwayCheckPage.defaultProps = {
-  putAway: [],
+  putAway: {},
   pivotBy: ['stockMovement.name'],
   expanded: {},
 };

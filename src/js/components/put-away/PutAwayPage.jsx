@@ -154,7 +154,7 @@ class PutAwayPage extends Component {
         putAwayCandidates.forEach((item) => {
           // this _id is used internally in TreeTable
           const _id = _.uniqueId('item_');
-          if (item.putawayStatus === 'PENDING') {
+          if (item.putawayStatus !== 'READY') {
             pendingPutAways.push({ _id, ...item });
           } else {
             putawayItems.push({
@@ -221,7 +221,7 @@ class PutAwayPage extends Component {
     if (includePending) {
       putawayItems = [...this.state.putawayItems, ...this.state.pendingPutAways];
     } else {
-      putawayItems = _.filter(this.state.putawayItems, val => val.putawayStatus !== 'PENDING');
+      putawayItems = _.filter(this.state.putawayItems, val => val.putawayStatus === 'READY');
     }
 
     this.setState({ putawayItems, expanded: {} });
@@ -260,7 +260,7 @@ class PutAwayPage extends Component {
     const { target } = event;
     const { checked, value } = target;
     const itemsToToggle = _.map(_.filter(this.state.putawayItems, product =>
-      product.stockMovement.id === value && product.putawayStatus !== 'PENDING'), item => item._id);
+      product.stockMovement.id === value && product.putawayStatus === 'READY'), item => item._id);
     this.toggleSelection(itemsToToggle, checked);
   };
 
@@ -283,7 +283,7 @@ class PutAwayPage extends Component {
     const nodes = getNodes(currentRecords);
     // we just push all the IDs onto the selection array
     nodes.forEach((item) => {
-      if (item.putawayStatus !== 'PENDING') {
+      if (item.putawayStatus === 'READY') {
         selection.push(item._id);
       }
     });
@@ -432,7 +432,7 @@ class PutAwayPage extends Component {
                     e.stopPropagation();
                     onClick(id, shiftKey, row);
                   }}
-                  disabled={row.putawayStatus === 'PENDING'}
+                  disabled={row.putawayStatus !== 'READY'}
                 />)}
               defaultSorted={[{
                   id: 'name',
@@ -440,7 +440,7 @@ class PutAwayPage extends Component {
                   id: 'stockMovement.name',
               }]}
               getTdProps={(state, rowInfo) => ({
-                  style: { color: _.get(rowInfo, 'original.putawayStatus') === 'PENDING' ? 'gray' : 'black' },
+                  style: { color: _.get(rowInfo, 'original.putawayStatus') === 'READY' || rowInfo.aggregated ? 'black' : 'gray' },
                   onClick: (event, handleOriginal) => {
                     const { target } = event;
                     // Fire the original onClick handler, if the other part of row is clicked on
