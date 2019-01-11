@@ -6,7 +6,7 @@
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- **/ 
+ **/
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
@@ -128,6 +128,21 @@ class RequisitionService {
      */
     def getRequisitionTemplates() {
         return Requisition.findAllByIsTemplateAndIsPublished(true, true)
+    }
+
+    /**
+     * Get a single published stock list for the given origin
+     *
+     * @param origin
+     * @param destination
+     * @return
+     */
+    List<Requisition> getRequisitionTemplates(Location origin) {
+        return Requisition.createCriteria().list {
+            eq("isTemplate", Boolean.TRUE)
+            eq("isPublished", Boolean.TRUE)
+            eq("origin", origin)
+        }
     }
 
     /**
@@ -328,14 +343,14 @@ class RequisitionService {
      * @return
      */
 	def issueRequisition(Requisition requisition, User issuedBy, Person deliveredBy, String comments) {
-		
+
 		// Make sure a transaction has not already been created for this requisition
 		def outboundTransaction = Transaction.findByRequisition(requisition)
-		if (outboundTransaction) { 
+		if (outboundTransaction) {
 			outboundTransaction.errors.reject("Cannot create multiple outbound transaction for the same requisition")
 			throw new ValidationException("Cannot complete inventory transfer", outboundTransaction.errors)
 		}
-		
+
 		// If an outbound transaction was not found, we create a new one
 		if (!outboundTransaction) {
 			// Create a new transaction
@@ -353,16 +368,16 @@ class RequisitionService {
 		}
 
 		def picklist = Picklist.findByRequisition(requisition)
-		if (picklist) {			
-			picklist.picklistItems.each { picklistItem ->				
+		if (picklist) {
+			picklist.picklistItems.each { picklistItem ->
 				def transactionEntry = new TransactionEntry();
 				transactionEntry.inventoryItem = picklistItem.inventoryItem;
 				transactionEntry.quantity = picklistItem.quantity;
-				outboundTransaction.addToTransactionEntries(transactionEntry)				
+				outboundTransaction.addToTransactionEntries(transactionEntry)
 			}
 			// Not sure if this needs to be done here
 			//outboundTransaction.save(flush:true)
-			
+
 			if (!inventoryService.saveLocalTransfer(outboundTransaction)) {
 				throw new ValidationException("Unable to save local transfer", outboundTransaction.errors)
 			}
@@ -373,15 +388,15 @@ class RequisitionService {
                 requisition.issuedBy = issuedBy
                 requisition.dateDelivered = now
                 requisition.deliveredBy = deliveredBy
-				requisition.save(flush:true) 
+				requisition.save(flush:true)
 			}
-	
+
 		}
-		else { 
+		else {
 			requisition.errors.reject("requisition.picklist.mustHavePicklist")
 			throw new ValidationException("Could not find a picklist associated with this requisition", requisition.errors)
 		}
-		
+
 		return outboundTransaction
 	}
 

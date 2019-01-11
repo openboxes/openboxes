@@ -584,23 +584,21 @@ class StockMovementService {
         return pickPageItems
     }
 
-    Integer calculateTotalMonthlyQuantity(StockMovementItem stockMovementItem) {
-        Integer totalMonthlyQuantity = 0
-        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
+    Float calculateMonthlyStockListQuantity(StockMovementItem stockMovementItem) {
+        Integer monthlyStockListQuantity = 0
+        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         StockMovement stockMovement = stockMovementItem.stockMovement
-        List<Requisition> stocklists = requisitionService.getRequisitionTemplates(stockMovement.origin, stockMovement.destination)
+        List<Requisition> stocklists = requisitionService.getRequisitionTemplates(stockMovement.origin)
         if (stocklists) {
             stocklists.each { stocklist ->
-                // Find matching stocklist items and sum them up
                 def stocklistItems = stocklist.requisitionItems.findAll { it?.product?.id == requisitionItem?.product?.id }
                 if (stocklistItems) {
-                    totalMonthlyQuantity += stocklistItems.sum { it.quantity }
+                    monthlyStockListQuantity += stocklistItems.sum { Math.ceil(((Double) it?.quantity) / it?.requisition?.replenishmentPeriod * 30) }
                 }
             }
         }
-        return totalMonthlyQuantity
+        return monthlyStockListQuantity
     }
-
 
     EditPageItem buildEditPageItem(StockMovementItem stockMovementItem) {
         EditPageItem editPageItem = new EditPageItem()
@@ -611,16 +609,15 @@ class StockMovementService {
         List<SubstitutionItem> substitutionItems = getSubstitutionItems(location, requisitionItem)
 
 
-        // Calculate total monthly quantity
-        Integer totalMonthlyQuantity = null //calculateTotalMonthlyQuantity(stockMovementItem)
+        // Calculate monthly stock
+        Integer monthlyStockListQuantity = calculateMonthlyStockListQuantity(stockMovementItem)
 
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
-        editPageItem.totalMonthlyQuantity = totalMonthlyQuantity
         editPageItem.quantityRequested = requisitionItem.quantity
-        editPageItem.quantityConsumed = null
+        editPageItem.quantityConsumed = monthlyStockListQuantity
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         editPageItem.substitutionItems = substitutionItems

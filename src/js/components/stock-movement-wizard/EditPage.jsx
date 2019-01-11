@@ -83,14 +83,6 @@ const FIELDS = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
-      totalMonthlyQuantity: {
-        type: LabelField,
-        label: 'stockMovement.totalMonthlyQty.label',
-        flexWidth: '1.35',
-        attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
-        },
-      },
       quantityConsumed: {
         type: LabelField,
         label: 'stockMovement.monthlyQuantity.label',
