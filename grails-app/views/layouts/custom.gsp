@@ -62,6 +62,15 @@
 </g:if>
  --%>
 
+    <g:if test="${session.impersonateUserId}">
+        <div class="notice center">
+            <g:message code="user.impersonate.message" args="[session.user.username]" default="You are impersonating user {0}."/>
+            <g:link controller="auth" action="logout" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'door_out.png')}"/>&nbsp;
+                ${g.message(code:'default.logout.label', default: "Logout")}
+            </g:link>
+        </div>
+    </g:if>
     <g:if test="${session.useDebugLocale}">
 
         <div id="debug-header" class="notice" style="margin: 10px;">

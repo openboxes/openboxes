@@ -61,6 +61,19 @@ class UserController {
 
 		[userInstanceList: userInstanceList, userInstanceTotal: userInstanceTotal]
 	}
+
+
+	def impersonate = {
+		def userInstance = User.get(params.id)
+		if (session.impersonateUserId) {
+			flash.message = "Already impersonstating user ${session.user.username}"
+		}
+		else {
+			session.impersonateUserId = userInstance?.id
+			session.activeUserId = session?.user?.id
+		}
+		redirect(controller: "dashboard", action: "index")
+	}
 	
 	def sendTestEmail = {
 		def userInstance = User.get(params.id)
