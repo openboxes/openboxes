@@ -95,14 +95,9 @@
                                                 <label for="locale"><warehouse:message
                                                     code="default.timezone.label" default="Timezone" /></label></td>
                                             <td valign="top" class="value">
-                                                <g:if test="${timezones}">
-                                                    <g:selectTimezone id="timezone" name="timezone" value="${userInstance?.timezone}"
-                                                                      noSelection="['':'']"
-                                                                      class="chzn-select-deselect"/>
-                                                </g:if>
-                                                <g:else>
-                                                    <g:textField name="timezone" value="${userInstance?.timezone}" size="40" class="text medium"/>
-                                                </g:else>
+                                                <g:selectTimezone id="timezone" name="timezone" value="${userInstance?.timezone}"
+                                                                  noSelection="['':'']"
+                                                                  class="chzn-select-deselect text large"/>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -188,14 +183,6 @@
                                 <table>
                                     <tbody>
                                         <g:isUserAdmin>
-                                            <tr class="prop">
-                                                <td valign="top" class="name">
-                                                    <label for="active"><warehouse:message code="user.active.label" /></label>
-                                                </td>
-                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'active', 'errors')}">
-                                                    <g:checkBox name="active" value="${userInstance?.active}" />
-                                                </td>
-                                            </tr>
                                             <tr class="prop">
                                                 <td valign="top" class="name">
                                                     <label for="roles"><warehouse:message code="user.roles.label" /></label>
