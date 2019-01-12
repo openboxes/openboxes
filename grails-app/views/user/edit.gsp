@@ -43,7 +43,14 @@
 
                                 <table>
                                     <tbody>
-
+                                        <tr class="prop">
+                                            <td valign="top" class="name">
+                                                <label for="active"><warehouse:message code="user.active.label" /></label>
+                                            </td>
+                                            <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'active', 'errors')}">
+                                                <g:checkBox name="active" value="${userInstance?.active}" />
+                                            </td>
+                                        </tr>
                                         <tr class="prop">
                                             <td valign="top" class="name">
                                                 <label for="email"><warehouse:message code="user.email.label" /></label>
@@ -216,7 +223,7 @@
                                                     <label><warehouse:message code="user.locationRoles.label"/></label>
                                                 </td>
                                                 <td valign="top">
-                                                    <div id="location-roles" style="overflow-y:auto; max-height:500px;">
+                                                    <div id="location-roles" style="overflow-y:auto; max-height:300px;">
                                                         <table>
                                                             <thead>
                                                             <tr>
