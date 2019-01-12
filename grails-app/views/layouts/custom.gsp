@@ -331,17 +331,14 @@
         $(".btn-show-dialog").live("click", function (event) {
             var url = $(this).data("url");
             var title = $(this).data("title");
-            var target = $(this).data("target") || "#dlgShowDialog"
-            var width = $(this).data("width") || "800"
-            var height = $(this).data("height") || "400"
-            var position = $(this).data("position");
-            if (position === "top") {
-                position = {
-                    my: "center top",
-                    at: "center top",
-                    of: window
-                }
-            }
+            var target = $(this).data("target") || "#dlgShowDialog";
+            var width = $(this).data("width") || "800";
+            var position = {
+                my: "center center",
+                at: "center center",
+                of: window
+            };
+
             $(target).attr("title", title);
             $(target).dialog({
                 title: title,
@@ -353,14 +350,14 @@
                 minHeight:"auto",
                 position: position,
                 open: function(event, ui) {
-                    $(this).html("Loading...")
+                    $(this).html("Loading...");
                     $(this).load(url, function(response, status, xhr) {
-                        if (xhr.status != 200) {
-                            $(this).text("")
-                            $("<p/>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
+                        if (xhr.status !== 200) {
+                            $(this).text("");
+                            $("<p></p>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
                             var error = JSON.parse(response);
-                            var stack = $("<div/>").addClass("stack empty").appendTo($(this));
-                            $("<code/>").text(error.errorMessage).appendTo(stack)
+                            var stack = $("<div></div>").addClass("stack empty").appendTo($(this));
+                            $("<code></code>").text(error.errorMessage).appendTo(stack)
                         }
                     });
                 }
