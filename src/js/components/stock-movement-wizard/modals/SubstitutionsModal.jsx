@@ -28,8 +28,9 @@ const FIELDS = {
     type: ArrayField,
     getDynamicRowAttr: ({ rowValues, originalItem }) => {
       let className = '';
-      const rowDate = rowValues.minExpirationDate;
-      const origDate = originalItem ? originalItem.minExpirationDate : null;
+      const rowDate = new Date(rowValues.minExpirationDate);
+      const origDate = originalItem && originalItem.minExpirationDate ?
+        new Date(originalItem.minExpirationDate) : null;
       if (!rowValues.originalItem) {
         className = (origDate && rowDate && rowDate < origDate) || (!origDate && rowDate) ? 'text-danger' : '';
       } else {
@@ -54,9 +55,17 @@ const FIELDS = {
         type: LabelField,
         label: 'stockMovement.quantityAvailable.label',
         fixedWidth: '150px',
+        fieldKey: '',
         attributes: {
-          formatValue: value => (value ? value.toLocaleString('en-US') : null),
+          formatValue: fieldValue => (_.get(fieldValue, 'quantityAvailable') ? _.get(fieldValue, 'quantityAvailable').toLocaleString('en-US') : null),
+          showValueTooltip: true,
         },
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: _.map(fieldValue.availableItems, availableItem =>
+            (
+              <p>{fieldValue.productCode} {fieldValue.productName}, {availableItem.quantityAvailable}, {availableItem.expirationDate ? availableItem.expirationDate : '---'} </p>
+            )),
+        }),
       },
       quantitySelected: {
         type: TextField,
@@ -182,6 +191,7 @@ class SubstitutionsModal extends Component {
         newQuantity: sub.originalItem ? sub.quantityRequested - subQty : sub.quantitySelected,
         quantityRevised: sub.originalItem ? sub.quantitySelected : '',
         reasonCode: sub.originalItem ? values.reasonCode : 'SUBSTITUTION',
+        sortOrder: this.state.attr.lineItem.sortOrder,
       })),
     };
 

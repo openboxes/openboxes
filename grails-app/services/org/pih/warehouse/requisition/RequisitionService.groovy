@@ -6,7 +6,7 @@
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- **/ 
+ **/
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
@@ -33,20 +33,6 @@ class RequisitionService {
 	def shipmentService;
 	def inventoryService;
 
-    /*
-    def getRequisitionStats(requisition, params) {
-        def criteria = Requisition.createCriteria()
-        def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
-    }
-    */
-
-    def getRequisitionStatistics(destination, origin) {
-        return getRequisitionStatistics(destination, origin, null, null)
-    }
-
-    def getRequisitionStatistics(Location destination, Location origin) {
-        return getRequisitionStatistics(destination, origin, null, null, null)
-    }
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
         return getRequisitionStatistics(destination, origin, user, null, null)
@@ -80,13 +66,6 @@ class RequisitionService {
                     if (destination) eq("destination", destination)
                     if (origin) eq("origin", origin)
                 }
-                //if (user) {
-                //    or {
-                //        eq("createdBy", user)
-                //        eq("updatedBy", user)
-                //        eq("requestedBy", user)
-                //    }
-                //}
             }
             isNotNull("status")
             if (excludedStatuses) {
@@ -149,6 +128,21 @@ class RequisitionService {
      */
     def getRequisitionTemplates() {
         return Requisition.findAllByIsTemplateAndIsPublished(true, true)
+    }
+
+    /**
+     * Get a single published stock list for the given origin
+     *
+     * @param origin
+     * @param destination
+     * @return
+     */
+    List<Requisition> getRequisitionTemplates(Location origin) {
+        return Requisition.createCriteria().list {
+            eq("isTemplate", Boolean.TRUE)
+            eq("isPublished", Boolean.TRUE)
+            eq("origin", origin)
+        }
     }
 
     /**
@@ -349,14 +343,14 @@ class RequisitionService {
      * @return
      */
 	def issueRequisition(Requisition requisition, User issuedBy, Person deliveredBy, String comments) {
-		
+
 		// Make sure a transaction has not already been created for this requisition
 		def outboundTransaction = Transaction.findByRequisition(requisition)
-		if (outboundTransaction) { 
+		if (outboundTransaction) {
 			outboundTransaction.errors.reject("Cannot create multiple outbound transaction for the same requisition")
 			throw new ValidationException("Cannot complete inventory transfer", outboundTransaction.errors)
 		}
-		
+
 		// If an outbound transaction was not found, we create a new one
 		if (!outboundTransaction) {
 			// Create a new transaction
@@ -374,16 +368,16 @@ class RequisitionService {
 		}
 
 		def picklist = Picklist.findByRequisition(requisition)
-		if (picklist) {			
-			picklist.picklistItems.each { picklistItem ->				
+		if (picklist) {
+			picklist.picklistItems.each { picklistItem ->
 				def transactionEntry = new TransactionEntry();
 				transactionEntry.inventoryItem = picklistItem.inventoryItem;
 				transactionEntry.quantity = picklistItem.quantity;
-				outboundTransaction.addToTransactionEntries(transactionEntry)				
+				outboundTransaction.addToTransactionEntries(transactionEntry)
 			}
 			// Not sure if this needs to be done here
 			//outboundTransaction.save(flush:true)
-			
+
 			if (!inventoryService.saveLocalTransfer(outboundTransaction)) {
 				throw new ValidationException("Unable to save local transfer", outboundTransaction.errors)
 			}
@@ -394,15 +388,15 @@ class RequisitionService {
                 requisition.issuedBy = issuedBy
                 requisition.dateDelivered = now
                 requisition.deliveredBy = deliveredBy
-				requisition.save(flush:true) 
+				requisition.save(flush:true)
 			}
-	
+
 		}
-		else { 
+		else {
 			requisition.errors.reject("requisition.picklist.mustHavePicklist")
 			throw new ValidationException("Could not find a picklist associated with this requisition", requisition.errors)
 		}
-		
+
 		return outboundTransaction
 	}
 
@@ -570,7 +564,7 @@ class RequisitionService {
 	}
 
 
-    public List<Requisition> getIssuedRequisitionsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+    List<Requisition> getIssuedRequisitionsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
         def requisitions = Transaction.createCriteria().list() {
             eq("status", RequisitionStatus.ISSUED)
             if (toLocations) {
@@ -584,7 +578,7 @@ class RequisitionService {
         return requisitions
     }
 
-    public List<Requisition> getPendingRequisitionsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+    List<Requisition> getPendingRequisitionsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
         def requisitions = Requisition.createCriteria().list() {
             lt("status", RequisitionStatus.ISSUED)
             if (toLocations) {
@@ -606,7 +600,7 @@ class RequisitionService {
         return requisitions
     }
 
-    public List<RequisitionItem> getCanceledRequisitionItems(Location location, Product product) {
+    List<RequisitionItem> getCanceledRequisitionItems(Location location, Product product) {
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
                 or {
@@ -625,13 +619,13 @@ class RequisitionService {
     }
 
 
-    public List<RequisitionItem> getIssuedRequisitionItems(Location location, Product product, Date startDate, Date endDate, List<ReasonCode> cancelReasonCodes) {
+    List<RequisitionItem> getIssuedRequisitionItems(Location location, Product product, Date startDate, Date endDate, List<ReasonCode> cancelReasonCodes) {
         println "Reason codes: " + cancelReasonCodes
 
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
                 and {
-                    eq("destination", location)
+                    eq("origin", location)
                     eq("isTemplate", false)
                     eq("status", RequisitionStatus.ISSUED)
                     if (startDate) {
@@ -655,7 +649,7 @@ class RequisitionService {
     }
 
 
-    public List<RequisitionItem> getPendingRequisitionItems(Location location, Product product) {
+    List<RequisitionItem> getPendingRequisitionItems(Location location, Product product) {
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
                 or {
@@ -664,77 +658,37 @@ class RequisitionService {
                 }
                 and {
                     eq("isTemplate", false)
-                    'in'("status", [RequisitionStatus.CHECKING, RequisitionStatus.EDITING, RequisitionStatus.CONFIRMING, RequisitionStatus.PICKED, RequisitionStatus.PICKING])
+                    'in'("status", RequisitionStatus.listPending())
                 }
             }
             eq("product", product)
         }
-        //println requisitionItems
         return requisitionItems
     }
 
 
-    /*
-    def changeQuantity(Integer newQuantity, String reasonCode, String comments) {
-        // And then create a new requisition item for the remaining quantity (if not 0)
-        if (newQuantity) {
-            // Cancel the original quantity
-            cancelReasonCode = reasonCode
-            quantityCanceled = quantity
-            cancelComments = comments
 
-            // And then create a new requisition item to represent the new quantity
-            def newRequisitionItem = new RequisitionItem()
-            //newRequisitionItem.requisition = requisition
-            newRequisitionItem.product = product
-            newRequisitionItem.product = productPackage
-            newRequisitionItem.parentRequisitionItem = this
-            newRequisitionItem.quantity = newQuantity
-            if (newQuantity == quantity) {
-                throw new ValidationException("Quantity was not changed")
-                //newRequisitionItem.errors.reject("quantity was not changed")
-            }
-            else if (newQuantity == 0) {
-                throw new ValidationException("Are you sure you want to cancel?")
-                //newRequisitionItem.errors.reject("quantity was 0")
-            }
-            else {
-                addToRequisitionItems(newRequisitionItem)
-            }
-
-            //requisition.addToRequisitionItems(newRequisitionItem)
-            //requisitionItem.addToRequisitionItems(newRequisitionItem)
-            //requisitionItem.save(flush: true)
-        }
-    }
-    */
-
-    public List<RequisitionItem> getPendingRequisitionItems(Location location) {
+    List<RequisitionItem> getPendingRequisitionItems(Location location) {
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
-                eq("destination", location)
+                eq("origin", location)
                 lt("status", RequisitionStatus.ISSUED)
                 not {
                     eq("status", RequisitionStatus.CANCELED)
                 }
             }
         }
-        //println requisitionItems
 
         return requisitionItems
 
     }
 
-    public List<RequisitionItem> getCanceledRequisitionItems(Location location, List cancelReasonCodes, Date dateRequestedFrom, Date dateRequestedTo, max, offset) {
+    List<RequisitionItem> getCanceledRequisitionItems(Location location, List cancelReasonCodes, Date dateRequestedFrom, Date dateRequestedTo, max, offset) {
         println "Get canceled items " + cancelReasonCodes + " " + max + " " + offset
         def requisitionItems = RequisitionItem.createCriteria().list(max: max, offset: offset) {
             requisition {
-                eq("destination", location)
+                eq("origin", location)
                 eq("status", RequisitionStatus.ISSUED)
-                //not {
-                //    eq("status", RequisitionStatus.CANCELED)
-                //
-                //}
                 if (dateRequestedFrom && dateRequestedTo) {
                     between("dateRequested", dateRequestedFrom, dateRequestedTo)
                 }
@@ -746,47 +700,12 @@ class RequisitionService {
                 }
                 order("dateRequested", "desc")
             }
-            /*
-            or {
-                gt("quantityCanceled", 0)
-                isNotNull("cancelReasonCode")
-                isNotNull("cancelComments")
-            }*/
             if (cancelReasonCodes) {
                 'in'("cancelReasonCode", cancelReasonCodes)
             }
-
-            //eq("cancelReasonCode", "STOCKOUT")
-            //eq("status", RequisitionItemStatus.CANCELED)
-            //firstResult(offset)
-            //maxResults(max)
         }
-        println requisitionItems
-
         return requisitionItems
-
     }
-
-    public List<RequisitionItem> getRequisitionItemsByReasonCode(Location location,  max, offset) {
-        println "get canceled items "
-        def requisitionItems = RequisitionItem.createCriteria().list(max: max, offset: offset) {
-            requisition {
-                eq("destination", location)
-                eq("status", RequisitionStatus.ISSUED)
-                //not {
-                //    eq("status", RequisitionStatus.CANCELED)
-                //
-                //}
-            }
-            eq("cancelReasonCode", "STOCKOUT")
-        }
-        println requisitionItems
-
-        return requisitionItems
-
-    }
-
-
 
     void generatePicklist(Requisition requisition) {
         requisition.requisitionItems.each { requisitionItem ->

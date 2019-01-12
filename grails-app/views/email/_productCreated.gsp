@@ -61,10 +61,14 @@
             <td class="name"><label>${warehouse.message(code: 'product.vendorCode.label') }</label></td>
             <td>${productInstance.vendorCode }</td>
         </tr>
-        <tr class="prop">
-            <td class="name"><label>${warehouse.message(code: 'product.pricePerUnit.label') }</label></td>
-            <td>${productInstance.pricePerUnit }</td>
-        </tr>
+            <tr class="prop">
+                <td class="name"><label>${warehouse.message(code: 'product.pricePerUnit.label') }</label></td>
+                <td>
+                    <g:hasRoleFinance>
+                        ${g.formatNumber(number: productInstance.pricePerUnit, type: "currency") }
+                    </g:hasRoleFinance>
+                </td>
+            </tr>
     </table>
 </div>
 </g:applyLayout>

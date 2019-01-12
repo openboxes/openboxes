@@ -37,6 +37,7 @@ class InventoryController {
     def productService
 	def inventoryService
     def requisitionService
+    def userService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"];
 
@@ -824,6 +825,8 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
         csv += "\n"
 
+        def hasRoleFinance = userService.hasRoleFinance(session.user)
+
         map.each { inventoryItem, quantity ->
 
             def product = inventoryItem?.product
@@ -848,7 +851,7 @@ class InventoryController {
             csv += '"' + (product?.vendorCode?:"") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation?:"") + '"' + ","
             csv += '"' + (product?.unitOfMeasure?:"") + '"' + ","
-            csv += (product?.pricePerUnit?:"") + ","
+            csv += hasRoleFinance?(product?.pricePerUnit?:""):"" + ","
             csv += (inventoryLevel?.minQuantity?:"") + ","
             csv += (inventoryLevel?.reorderQuantity?:"") + ","
             csv += (inventoryLevel?.maxQuantity?:"")+ ","
@@ -884,6 +887,8 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
         csv += "\n"
 
+        def hasRoleFinance = userService.hasRoleFinance(session.user)
+
         map.sort().each { product, quantity ->
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
             def status = statusMap[product]
@@ -905,7 +910,7 @@ class InventoryController {
             csv += '"' + (inventoryLevel?.binLocation?:"")  + '"' + ","
             csv += '"' + (inventoryLevel?.abcClass?:"")  + '"' + ","
             csv += '"' + (product?.unitOfMeasure?:"")  + '"' + ","
-            csv += (product?.pricePerUnit?:"") + ","
+            csv += hasRoleFinance ? (product?.pricePerUnit?:"") : "" + ","
             csv += (inventoryLevel?.minQuantity?:"") + ","
             csv += (inventoryLevel?.reorderQuantity?:"") + ","
             csv += (inventoryLevel?.maxQuantity?:"") + ","
@@ -1200,22 +1205,52 @@ class InventoryController {
 		redirect(action: "listAllTransactions")
 	}
 	
-	
-	def createTransaction = { 
-		log.info("createTransaction params " + params)
+	def createInboundTransfer = {
+        params.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createOutboundTransfer = {
+        params.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createInventory = {
+        params.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createConsumed = {
+        params.transactionType = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createExpired = {
+        params.transactionType = TransactionType.get(Constants.EXPIRATION_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createDamaged = {
+        params.transactionType = TransactionType.get(Constants.DAMAGE_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createTransaction = {
+		log.info("createTransaction: " + params)
 		def command = new TransactionCommand();
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def transactionInstance = new Transaction(params);
 
 		if (!transactionInstance?.transactionType) {
-			flash.message = "Cannot create transaction for unknown transaction type";			
-			redirect(controller: "inventory", action: "browse")
+			flash.message = "Cannot create transaction for unknown transaction type ${params['transactionType.id']}";
+			redirect(controller: "inventoryItem", action: "showStockCard", id: params["product.id"])
+            return
 		}
 
         def products = []
 
 		// Process productId parameters from inventory browser
-		if (params.product?.id) {
+		if (params?.product?.id) {
 			def productIds = params.list('product.id')
 			productIds = productIds.collect { String.valueOf(it); }
             if (productIds) {

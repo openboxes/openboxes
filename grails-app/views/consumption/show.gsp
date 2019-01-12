@@ -67,13 +67,17 @@
 
                                     <tr>
                                         <td>
-                                            <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'product.label')}"
+                                            <a href="javascript:void(0);" class="btn-show-dialog" data-position="top"
+                                               data-width="1200" data-height="600"
+                                               data-title="${g.message(code:'product.label')}"
                                                data-url="${request.contextPath}/consumption/product?id=${product?.id}">
                                                 ${product?.productCode}
                                             </a>
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'product.label')}"
+                                            <a href="javascript:void(0);" class="btn-show-dialog" data-position="top"
+                                               data-width="1200" data-height="600"
+                                               data-title="${g.message(code:'product.label')}"
                                                data-url="${request.contextPath}/consumption/product?id=${product?.id}">
                                                 ${product?.name}
                                             </a>
@@ -119,50 +123,23 @@
             </div>
         </div>
      </div>
-    <%-- FIXME Need to move this into a javascript library that can be used on any page --%>
-    <div id="dlgShowDialog" style="display: none;">
-        <div id="dlgShowDialogContent">
-            <!-- dynamically generated content -->
-        </div>
-    </div>
     <script type="text/javascript">
         $(document).ready(function() {
 
             $(".dataTable").dataTable({
                 "bJQueryUI": true,
-                "rowHeight": '100px',
-                "sPaginationType": "full_numbers"
+                "sPaginationType": "full_numbers",
+                "iDisplayLength": 25
             });
 
-
-            $(".btn-close-dialog").live("click", function () {
-                console.log("Close dialog");
-                $("#dlgShowDialog").dialog( "close" );
-            });
-
-            $(".btn-show-dialog").click(function(event) {
-                var url = $(this).data("url");
-                var title = $(this).data("title");
-                $("#dlgShowDialog").attr("title", title);
-                $("#dlgShowDialog").dialog({
-                    autoOpen: true,
-                    modal: true,
-                    width: 800,
-                    open: function(event, ui) {
-                        $("#dlgShowDialogContent").html("Loading...")
-                        $('#dlgShowDialogContent').load(url, function(response, status, xhr) {
-                            if (xhr.status != 200) {
-                                $(this).text("")
-                                $("<p/>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
-                                var error = JSON.parse(response);
-                                var stack = $("<div/>").addClass("stack empty").appendTo($(this));
-                                $("<code/>").text(error.errorMessage).appendTo(stack)
-
-                            }
-                        });
+            $(".tabs").livequery(function(){
+                $(this).tabs({
+                    cookie: {
+                        expires: 1 // store cookie for a day, without, it would be a session cookie
                     }
-                });
-            });
+                }
+            )});
+
 
         });
     </script>

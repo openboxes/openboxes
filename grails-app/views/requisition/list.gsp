@@ -106,7 +106,7 @@
                             <div class="filter-list-item">
                                 <label><warehouse:message code="requisition.destination.label"/></label>
                                 <p style="line-height: 16px; font-size: 1.2em;">
-                                    <g:selectLocation name="destination.id" value="${params?.destination?.id?:session.warehouse.id}"
+                                    <g:selectLocation name="destination.id" value="${params?.destination?.id}"
                                                       noSelection="['null':'']" class="chzn-select-deselect" />
                                 </p>
                             </div>
@@ -122,25 +122,6 @@
                                 <label><warehouse:message code="requisition.dateIssued.label"/></label>
                                 <p>
                                     <g:textField id="issuedDateRange" name="issuedDateRange" style="width:100%" class="daterange text" value="${params.issuedDateRange}"/>
-                                </p>
-                            </div>
-
-                            <div class="filter-list-item">
-                                <label><warehouse:message code="requisition.commodityClass.label"/></label>
-                                <p>
-                                    <g:selectCommodityClass name="commodityClass" value="${params?.commodityClass}"
-                                                            noSelection="['null':'']" class="chzn-select-deselect"/>
-                                </p>
-                                <p>
-                                    <g:checkBox name="commodityClassIsNull" value="${params?.commodityClassIsNull}"/>
-                                    <label><warehouse:message code="requisition.commodityClassIsNull" default="Include if commodity class is empty"/></label>
-                                </p>
-                            </div>
-                            <div class="filter-list-item">
-                                <label><warehouse:message code="requisition.requisitionType.label"/></label>
-                                <p>
-                                    <g:selectRequisitionType name="type" value="${params?.type}"
-                                                            noSelection="['null':'']" class="chzn-select-deselect"/>
                                 </p>
                             </div>
                             <div class="filter-list-item">

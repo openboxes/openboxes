@@ -27,9 +27,12 @@ class RoleFilters {
 
     def static superuserControllers = []
     def static superuserActions = [
-            'console':['index','execute'], '*': ['delete'],
-            'inventory': ['editTransaction', 'deleteTransaction', 'saveTransaction'],
-            'transactionEntry': ['edit', 'delete', 'save', 'update']
+            '*': ['delete'],
+            'console':['index','execute'],
+            'inventory': ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
+            'inventoryItem': ['adjustStock', 'transferStock'],
+            'transactionEntry': ['edit', 'delete', 'save', 'update'],
+            'user': ['impersonate']
     ]
 
     def filters = {

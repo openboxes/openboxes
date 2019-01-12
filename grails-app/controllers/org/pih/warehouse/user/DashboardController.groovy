@@ -42,26 +42,14 @@ class DashboardController {
 	def userService
 	def sessionFactory
 	def grailsApplication
-	
+	def locationService
+
 	def showCacheStatistics = {
 		def statistics = sessionFactory.statistics
 		log.info(statistics)
 		render statistics
 	}
 
-    def showRequisitionStatistics = {
-        def user = User.get(session.user.id)
-        def location = Location.get(session?.warehouse?.id);
-        def statistics = requisitionService.getRequisitionStatistics(location,null,user)
-        render statistics as JSON
-    }
-
-    def showRequisitionMadeStatistics = {
-        def user = User.get(session.user.id)
-        def location = Location.get(session?.warehouse?.id);
-        def statistics = requisitionService.getRequisitionStatistics(null,location,user)
-        render statistics as JSON
-    }
 
     def globalSearch = {
 		
@@ -135,8 +123,7 @@ class DashboardController {
 
         def startTime = System.currentTimeMillis()
 		if (!session.warehouse) {
-			log.info "Location not selected, redirect to chooseLocation"	
-			redirect(action: "chooseLocation")			
+			redirect(action: "chooseLocation")
 		}
 		
 	    def currentUser = User.get(session?.user?.id)
@@ -396,24 +383,6 @@ class DashboardController {
 				quickCategories       : productService.getQuickCategories(),
 				tags                  : productService.getAllTags()
 		]
-
-
-	}
-	
-	
-	def menu = { 
-		def incomingShipments = Shipment.findAllByDestination(session?.warehouse).groupBy{it.status.code}.sort()
-		def outgoingShipments = Shipment.findAllByOrigin(session?.warehouse).groupBy{it.status.code}.sort();
-		def incomingOrders = Order.executeQuery('select o.status, count(*) from Order as o where o.destination = ? group by o.status', [session?.warehouse])
-		def incomingRequests = Requisition.findAllByDestination(session?.warehouse).groupBy{it.status}.sort()
-		def outgoingRequests = Requisition.findAllByOrigin(session?.warehouse).groupBy{it.status}.sort()
-		
-		[incomingShipments: incomingShipments, 
-			outgoingShipments: outgoingShipments, 
-			incomingOrders: incomingOrders, 
-			incomingRequests: incomingRequests,
-			outgoingRequests: outgoingRequests,
-			quickCategories:productService.getQuickCategories()]
 	}
 
     @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
@@ -439,53 +408,49 @@ class DashboardController {
 	}
 	
 	def chooseLocation = {
-		log.info params
-		def warehouse = null;
-			
+
 		// If the user has selected a new location from the topnav bar, we need 
 		// to retrieve the location to make sure it exists
-		if (params.id != 'null') {			
-			warehouse = Location.get(params.id);
-		}
+		User user = User.get(session.user.id);
+		Location warehouse = params.id ? Location.get(params.id) : null
 
 		// If a warehouse has been selected
 		if (warehouse) {
-			
-			// Reset the locations displayed in the topnav
-			session.loginLocations = null
-			
+
 			// Save the warehouse selection to the session
 			session.warehouse = warehouse;
-			
+
 			// Save the warehouse selection for "last logged into" information
-			if (session.user) {
-				def userInstance = User.get(session.user.id);
+			if (user) {
 				//userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
-				userInstance.lastLoginDate = new Date();
-				userInstance.warehouse = warehouse
-				userInstance.save(flush:true);
-				session.user = userInstance;
-			}			
-			
+				user.lastLoginDate = new Date();
+				user.warehouse = warehouse
+				user.save(flush:true);
+				session.user = user;
+			}
+
 			// Successfully logged in and selected a warehouse
 			// Try to redirect to the previous action before session timeout
 			if (session.targetUri || params.targetUri) {
-				log.info("session.targetUri: " + session.targetUri)
-				log.info("params.targetUri: " + params.targetUri)
-				def targetUri = params.targetUri ?: session.targetUri 
-				log.info("Redirecting to " + targetUri);
-				if (targetUri && !targetUri.contains("chooseLocation")) { 
+				def targetUri = params.targetUri ?: session.targetUri
+				if (targetUri && !targetUri.contains("chooseLocation")) {
 					redirect(uri: targetUri);
 					return;
 				}
 			}
-			log.info("Redirecting to dashboard");
 			redirect(controller:'dashboard', action:'index')
+			return
 		}
-		else {	
-			render(view: "chooseLocation")
-		}
-		
+
+		[loginLocationsMap:locationService.getLoginLocationsMap(user, session.warehouse)]
+	}
+
+
+	def changeLocation = {
+		User user = User.get(session.user.id);
+		Location location = params.id ? Location.get(params.id) : null
+		Map loginLocationsMap = locationService.getLoginLocationsMap(user, location)
+		render(template: "loginLocations", model: [loginLocationsMap:loginLocationsMap])
 	}
 
     def downloadGenericProductSummaryAsCsv = {

@@ -28,13 +28,15 @@
                     </button>
                     <div class="actions">
                         <g:each var="document" in="${stockMovement.documents}">
-                            <div class="action-menu-item">
-                                <g:link url="${document.uri}" target="_blank">
+                            <g:if test="${!document.hidden}">
+                                <div class="action-menu-item">
+                                    <g:link url="${document.uri}" target="_blank">
 
-                                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
-                                    ${document.name}
-                                </g:link>
-                            </div>
+                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                        ${document.name}
+                                    </g:link>
+                                </div>
+                            </g:if>
                         </g:each>
                     </div>
                 </span>
@@ -64,12 +66,18 @@
 
             <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
-            <g:set var="disableReceivingButton" value="${!hasBeenIssued || hasBeenReceived}"/>
+            <g:set var="hasBeenPartiallyReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"/>
+            <g:set var="isSameLocation" value="${stockMovement?.requisition?.destination?.id==session.warehouse.id}"/>
+            <g:set var="disableReceivingButton" value="${!hasBeenIssued || hasBeenReceived || !isSameLocation}"/>
+            <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
             <g:if test="${!hasBeenIssued}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
             </g:if>
             <g:if test="${hasBeenReceived}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasAlreadyBeenReceived.message', args: [stockMovement?.identifier])}"/>
+            </g:if>
+            <g:if test="${!isSameLocation}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.isDifferentLocation.message')}"/>
             </g:if>
             <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button"
                     disabled="${disableReceivingButton}" disabledMessage="${disabledMessage}">
@@ -78,6 +86,12 @@
             </g:link>
 
             <g:isSuperuser>
+                <g:if test="${showRollbackLastReceiptButton}">
+                    <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                        <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+                    </g:link>
+                </g:if>
                 <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                     <warehouse:message code="default.button.rollback.label" />
@@ -176,7 +190,7 @@
                             <warehouse:message code="shipping.totalValue.label"/>
                         </td>
                         <td class="value">
-                            <g:formatNumber format="###,###,##0.00" number="${shipmentInstance?.totalValue ?: 0.00 }" />
+                            <g:formatNumber format="###,###,##0.00" number="${stockMovement?.totalValue ?: 0.00 }" />
                             ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </td>
                     </tr>

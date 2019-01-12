@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Container
@@ -95,11 +96,11 @@ class InventoryItemController {
 
     def showCurrentStockAllLocations = { StockCardCommand cmd ->
         def startTime = System.currentTimeMillis()
-        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
-        // add the current warehouse to the command object
-        cmd.warehouse = Location.get(session?.warehouse?.id)
+		User currentUser = User.get(session.user.id)
+		Location currentLocation = Location.get(session?.warehouse?.id)
+        cmd.warehouse = currentLocation
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-        def quantityMap = inventoryService.getQuantityOnHand(commandInstance?.product)
+        def quantityMap = inventoryService.getCurrentStockAllLocations(commandInstance?.product, currentLocation, currentUser)
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
         render(template: "showCurrentStockAllLocations", model: [commandInstance:commandInstance, quantityMap:quantityMap])

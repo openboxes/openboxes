@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.shipping
 
 import groovy.time.TimeCategory
@@ -58,7 +58,7 @@ class Shipment implements Comparable, Serializable {
 	Date expectedShippingDate		// the date the origin expects to ship the goods (required)
 	Date expectedDeliveryDate		// the date the destination should expect to receive the goods (optional)
 	Float statedValue
-	Float totalValue				// the total value of all items in the shipment		
+	Float totalValue				// the total value of all items in the shipment
 	String additionalInformation	// any additional information about the shipment (e.g., comments)
 	Float weight											// weight of container
 	String weightUnits  = Constants.DEFAULT_WEIGHT_UNITS	// standard weight unit: kg, lb
@@ -68,14 +68,14 @@ class Shipment implements Comparable, Serializable {
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
-	
+
 	// One-to-one associations
 	Location origin					// the location from which the shipment will depart
 	Location destination			// the location to which the shipment will arrive
 	ShipmentType shipmentType		// the shipment type: Air, Sea Freight, Suitcase
-	ShipmentMethod shipmentMethod	// the shipping carrier and shipping service used	
+	ShipmentMethod shipmentMethod	// the shipping carrier and shipping service used
 	Person carrier 					// the person or organization that actually carries the goods from A to B
-	Person recipient				// the person or organization that is receiving the goods	
+	Person recipient				// the person or organization that is receiving the goods
 	Donor donor						// the information about the donor (OPTIONAL)
 	String driverName				// added for stock movements (should use carrier)
 
@@ -95,7 +95,7 @@ class Shipment implements Comparable, Serializable {
 
 	SortedSet shipmentItems
     SortedSet receipts
-	
+
 	static transients = [
 			"allShipmentItems",
 			"unpackedShipmentItems",
@@ -109,12 +109,12 @@ class Shipment implements Comparable, Serializable {
 			"consigneeAddress",
             "receipt"
     ]
-	
+
 	static mappedBy = [
             outgoingTransactions: 'outgoingShipment',
             incomingTransactions: 'incomingShipment'
     ]
-	
+
 	// Core association mappings
 	static hasMany = [
 			events : Event,
@@ -127,15 +127,15 @@ class Shipment implements Comparable, Serializable {
 			outgoingTransactions : Transaction,
 			incomingTransactions : Transaction
 	]
-	
 
-	
-	// Ran into Hibernate bug HHH-4394 and GRAILS-4089 when trying to order the associations.  This is due to the 
+
+
+	// Ran into Hibernate bug HHH-4394 and GRAILS-4089 when trying to order the associations.  This is due to the
 	// fact that the many side of the association (e.g. 'events') does not have a belongsTo 'shipment'.  So instead
-	// of adding a foreign key reference to the 'event' table, GORM creates a new join table 'shipment_event' to 
+	// of adding a foreign key reference to the 'event' table, GORM creates a new join table 'shipment_event' to
 	// map 'events' to 'shipments' (which is exactly what I want).  However, the events are not 'eagerly' fetched
-	// so the query to pull the data (and sort) only uses the 'shipment_event' table.  So for now, I'm going to 
-	// use a SortedSet for events and have the Event class implement Comparable. 
+	// so the query to pull the data (and sort) only uses the 'shipment_event' table.  So for now, I'm going to
+	// use a SortedSet for events and have the Event class implement Comparable.
 
 	static mapping = {
 		id generator: 'uuid'
@@ -156,12 +156,12 @@ class Shipment implements Comparable, Serializable {
 		name(nullable:false, blank: false, maxSize: 255)
 		description(nullable:true, blank: true)
 		shipmentNumber(nullable:true, blank: false, maxSize: 255)
-		origin(nullable:false, 
+		origin(nullable:false,
 			validator: { value, obj -> !value.equals(obj.destination)})
-		destination(nullable:false)		
-		expectedShippingDate(nullable:false, 
-			validator: { value, obj-> !obj.expectedDeliveryDate || value.before(obj.expectedDeliveryDate + 1)})		
-		expectedDeliveryDate(nullable:true)	// optional		
+		destination(nullable:false)
+		expectedShippingDate(nullable:false,
+			validator: { value, obj-> !obj.expectedDeliveryDate || value.before(obj.expectedDeliveryDate + 1)})
+		expectedDeliveryDate(nullable:true)	// optional
 		shipmentType(nullable:false)
 		shipmentMethod(nullable:true)
 		additionalInformation(nullable:true, maxSize: 2147483646)
@@ -177,13 +177,13 @@ class Shipment implements Comparable, Serializable {
 		weightUnits(nullable:true)
 		// a shipment can't have two reference numbers of the same type (we may want to change this, but UI makes this assumption at this point)
 		referenceNumbers ( validator: { referenceNumbers ->
-        	referenceNumbers?.collect( {it.referenceNumberType?.id} )?.unique( { a, b -> a <=> b } )?.size() == referenceNumbers?.size()        
+        	referenceNumbers?.collect( {it.referenceNumberType?.id} )?.unique( { a, b -> a <=> b } )?.size() == referenceNumbers?.size()
 		} )
 
 		// a shipment can't have two events with the same event code (this should be the case for the current event codes: CREATED, SHIPPED, RECEIVED)
 		// we may want to change this in the future?
 		events ( validator: { events ->
-        	events?.collect( {it.eventType?.eventCode} )?.unique( { a, b -> a <=> b } )?.size() == events?.size()        
+        	events?.collect( {it.eventType?.eventCode} )?.unique( { a, b -> a <=> b } )?.size() == events?.size()
 		} )
 		requisition(nullable:true)
 		shipmentItemCount(nullable:true)
@@ -195,46 +195,46 @@ class Shipment implements Comparable, Serializable {
 
 
 	String toString() { return "$name"; }
-	
+
 	/**
 	 * Sort by name
 	 */
-	
+
 	// TODO: is this in descending order for a good reason?
-	int compareTo(obj) { 
-		obj.name <=> name 
+	int compareTo(obj) {
+		obj.name <=> name
 	}
 
-	/** 
+	/**
 	 * Transient method that gets all shipment items two-levels deep.
-	 * 
+	 *
 	 * TODO Need to make this recursive.
-	 * 	
+	 *
 	 * @return
 	 */
-	
-	Collection<ShipmentItem> getAllShipmentItems() { 		
-		List<ShipmentItem> shipmentItems = new ArrayList<ShipmentItem>();	
-		
-		for (shipmentItem in unpackedShipmentItems) { 
+
+	Collection<ShipmentItem> getAllShipmentItems() {
+		List<ShipmentItem> shipmentItems = new ArrayList<ShipmentItem>();
+
+		for (shipmentItem in unpackedShipmentItems) {
 			shipmentItems.add(shipmentItem)
 		}
-			
+
 		for (container in containers) {
-			for (shipmentItem in container?.shipmentItems) { 
-				shipmentItems.add(shipmentItem);				
+			for (shipmentItem in container?.shipmentItems) {
+				shipmentItems.add(shipmentItem);
 			}
-			for (childContainer in container?.containers) { 
-				for (shipmentItem in childContainer?.shipmentItems) { 
+			for (childContainer in container?.containers) {
+				for (shipmentItem in childContainer?.shipmentItems) {
 					shipmentItems.add(shipmentItem);
 				}
 			}
 		}
-		return shipmentItems;		
+		return shipmentItems;
 	}
-	
-	Collection<ShipmentItem> getUnpackedShipmentItems() { 
-		return shipmentItems.findAll { !it.container }  
+
+	Collection<ShipmentItem> getUnpackedShipmentItems() {
+		return shipmentItems.findAll { !it.container }
 	}
 
 	/**
@@ -258,64 +258,64 @@ class Shipment implements Comparable, Serializable {
 
 		return shipmentItems?.sort(shipmentItemComparator)
 	}
-	
+
 	//String getShipmentNumber() {
 	//	return (id) ? "S" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
 	//}
 
 
-	Map<String, List<Container>> getContainersByType() { 
+	Map<String, List<Container>> getContainersByType() {
 		Map<String, List<Container>> containerMap = new HashMap<String,List<Container>>();
-		containers.each { 
-			
+		containers.each {
+
 			def containersByType = containerMap.get(it.containerType.name);
-			if (!containersByType) { 
+			if (!containersByType) {
 				containersByType = new ArrayList<Container>();
 			}
 			containersByType.add(it);
-			containerMap.put(it.containerType.name, containersByType)			
+			containerMap.put(it.containerType.name, containersByType)
 		}
 		return containerMap;
-		
+
 	}
-	
-	Boolean isPending() { 
+
+	Boolean isPending() {
 		return !this.hasShipped() && !this.wasReceived()
 	}
-	
-	
+
+
 	Boolean hasShipped() {
 		return events.any { it.eventType?.eventCode == EventCode.SHIPPED }
 	}
-	
-	Boolean wasReceived() { 
+
+	Boolean wasReceived() {
 		return events.any { it.eventType?.eventCode == EventCode.RECEIVED }
 	}
 
 	Boolean wasPartiallyReceived() {
 		return events.any { it.eventType?.eventCode == EventCode.PARTIALLY_RECEIVED }
 	}
-	
+
 	/*
-	Boolean isIncoming(Location currentLocation) { 
+	Boolean isIncoming(Location currentLocation) {
 		//return destination?.id == currentLocation?.id
 		return true;
 	}
-	
-	Boolean isOutgoing(Location currentLocation) { 
+
+	Boolean isOutgoing(Location currentLocation) {
 		//return origin?.id == currentLocation?.id
 		return false;
 	}
-	
-	Boolean isIncomingOrOutgoing(Location currentLocation) { 
+
+	Boolean isIncomingOrOutgoing(Location currentLocation) {
 		return isIncoming(currentLocation) || isOutgoing(currentLocation)
 	}
-	
-	Boolean isDeleteAllowed(Location currentLocation) { 
+
+	Boolean isDeleteAllowed(Location currentLocation) {
 		return isIncomingOrOutgoing(currentLocation)
 	}
-	
-	Boolean isEditAllowed(Location currentLocation) { 
+
+	Boolean isEditAllowed(Location currentLocation) {
 		return isIncomingOrOutgoing(currentLocation)
 	}
 	*/
@@ -324,7 +324,7 @@ class Shipment implements Comparable, Serializable {
         return requisition != null
     }
 
-	Boolean isReceiveAllowed() { 
+	Boolean isReceiveAllowed() {
 		return hasShipped() && !wasReceived()
 	}
 
@@ -332,7 +332,7 @@ class Shipment implements Comparable, Serializable {
         return isReceiveAllowed() && isStockMovement()
     }
 
-	Boolean isSendAllowed() { 
+	Boolean isSendAllowed() {
 		return !hasShipped() && !wasReceived()
 	}
 
@@ -340,11 +340,11 @@ class Shipment implements Comparable, Serializable {
         return shipmentItems?.every { ShipmentItem shipmentItem -> shipmentItem.isFullyReceived() }
     }
 
-	ReferenceNumber getReferenceNumber(String typeName) { 
+	ReferenceNumber getReferenceNumber(String typeName) {
 		def referenceNumberType = ReferenceNumberType.findByName(typeName);
-		if (referenceNumberType) { 
-			for(referenceNumber in referenceNumbers) { 
-				if (referenceNumber.referenceNumberType == referenceNumberType) { 
+		if (referenceNumberType) {
+			for(referenceNumber in referenceNumbers) {
+				if (referenceNumber.referenceNumberType == referenceNumberType) {
 					return referenceNumber;
 				}
 			}
@@ -352,17 +352,17 @@ class Shipment implements Comparable, Serializable {
 		return null;
 	}
 
-	
-	Date getActualShippingDate() { 
-		for (event in events) { 
-			if (event?.eventType?.eventCode == EventCode.SHIPPED) { 
+
+	Date getActualShippingDate() {
+		for (event in events) {
+			if (event?.eventType?.eventCode == EventCode.SHIPPED) {
 				return event?.eventDate;
 			}
 		}
 		return null;
 	}
 
-	Date getActualDeliveryDate() { 
+	Date getActualDeliveryDate() {
 		for (event in events) {
 			if (event?.eventType?.eventCode == EventCode.RECEIVED) {
 				return event?.eventDate;
@@ -370,18 +370,18 @@ class Shipment implements Comparable, Serializable {
 		}
 		return null;
 	}
-		
-	
-	Event getMostRecentEvent() { 		
+
+
+	Event getMostRecentEvent() {
 		if (events && events.size() > 0) {
 			return events.iterator().next();
 		}
 		return null;
 	}
-	
-	ShipmentStatus getStatus() { 		
+
+	ShipmentStatus getStatus() {
 		if (this.wasReceived()) {
-			return new ShipmentStatus( [ code:ShipmentStatusCode.RECEIVED, 
+			return new ShipmentStatus( [ code:ShipmentStatusCode.RECEIVED,
 			                             date:this.getActualDeliveryDate(),
 			                             location:this.destination] )
 		}
@@ -396,27 +396,27 @@ class Shipment implements Comparable, Serializable {
 			                             location:this.origin] )
 		}
 		else {
-			return new ShipmentStatus( [ code:ShipmentStatusCode.PENDING, 
+			return new ShipmentStatus( [ code:ShipmentStatusCode.PENDING,
 			                             date:null,
 			                             location:null] )
 		}
 	}
-		
+	
 	/**
 	 * Adds a new container to the shipment of the specified type
 	 */
 	Container addNewContainer (ContainerType containerType) {
 		def sortOrder = (this.containers) ? this.containers.size() : 0
-		
+
 		def container = new Container(
-			containerType: containerType, 
+			containerType: containerType,
 			shipment: this,
 			recipient: this.recipient,
 			sortOrder: sortOrder
 		)
-		
+
 		addToContainers(container)
-			
+
 		return container
 	}
 
@@ -464,7 +464,7 @@ class Shipment implements Comparable, Serializable {
 	void cloneContainer(Container container, Integer quantity) {
 		// def newContainer = new Container()
 	}
-	
+
 	Float totalWeightInKilograms() {
 		return containers.findAll { it.parentContainer == null }.collect { it.totalWeightInKilograms() }.sum()
 	}

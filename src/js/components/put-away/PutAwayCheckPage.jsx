@@ -54,11 +54,21 @@ class PutAwayCheckPage extends Component {
         ...putAway,
         putawayItems: PutAwayCheckPage.processSplitLines(putAway.putawayItems),
       },
-      completed: false,
+      completed: putAway.putawayStatus === 'COMPLETED',
       columns,
       pivotBy,
       expanded,
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      putAway: {
+        ...nextProps.putAway,
+        putawayItems: PutAwayCheckPage.processSplitLines(nextProps.putAway.putawayItems),
+      },
+      completed: nextProps.putAway.putawayStatus === 'COMPLETED',
+    });
   }
 
   /**
@@ -158,9 +168,9 @@ class PutAwayCheckPage extends Component {
    * @param {object} filter
    * @public
    */
-  filterMethod = (filter, row) =>
-    (row[filter.id] !== undefined ?
-      String(row[filter.id].toLowerCase()).includes(filter.value.toLowerCase()) : true);
+  // eslint-disable-next-line no-underscore-dangle
+  filterMethod = (filter, row) => (row._aggregated || row._groupedByPivot
+    || _.toString(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase()));
 
   /**
    * Sends all changes made by user in this step of put-away to API and updates data.
@@ -238,7 +248,7 @@ class PutAwayCheckPage extends Component {
                 type="button"
                 className="btn btn-outline-primary float-right mb-2 btn-xs"
                 onClick={() => this.props.firstPage()}
-              ><Translate id="putAway.goBack.label" />:
+              ><Translate id="putAway.goBack.label" />
               </button>
             </div> :
             <div className="d-flex justify-content-between mb-2">
@@ -262,13 +272,13 @@ class PutAwayCheckPage extends Component {
                     expanded: this.state.expanded,
                   })}
                   className="btn btn-outline-primary mb-2 btn-xs mr-2"
-                ><Translate id="default.button.edit.label" />:
+                ><Translate id="default.button.edit.label" />
                 </button>
                 <button
                   type="button"
                   onClick={() => this.completePutAway()}
                   className="btn btn-outline-primary float-right mb-2 btn-xs"
-                ><Translate id="putAway.completePutAway.label" />:
+                ><Translate id="putAway.completePutAway.label" />
                 </button>
               </div>
             </div>
@@ -341,6 +351,8 @@ PutAwayCheckPage.propTypes = {
   putAway: PropTypes.shape({
     /** An array of all put-away's items */
     putawayItems: PropTypes.arrayOf(PropTypes.shape({})),
+    /** Status of the put-away */
+    putawayStatus: PropTypes.string,
   }),
   /** An array of available attributes after which a put-away can be sorted by */
   pivotBy: PropTypes.arrayOf(PropTypes.string),
@@ -352,7 +364,7 @@ PutAwayCheckPage.propTypes = {
 };
 
 PutAwayCheckPage.defaultProps = {
-  putAway: [],
+  putAway: {},
   pivotBy: ['stockMovement.name'],
   expanded: {},
 };

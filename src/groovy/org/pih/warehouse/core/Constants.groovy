@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 class Constants {
 
 
-	static final controllersWithAuthUserNotRequired = ['api','rxNorm','test']
+	static final controllersWithAuthUserNotRequired = ['api','test']
 	static final actionsWithAuthUserNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale']
 	static final actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'chooseLocation', 'json', 'updateAuthUserLocale']
 	static final changeActions = ['edit', 'delete', 'create', 'add', 'process','save', 'update','importData', 'receive','showRecordInventory','withdraw', 'cancel', 'change','toggle']
@@ -109,6 +109,8 @@ class Constants {
 	static final String DEFAULT_TRANSACTION_NUMBER_FORMAT = "AAA-AAA-AAA"
 
 	static final String TRACKING_NUMBER_TYPE_ID = "10"
+
+	static final String DEFAULT_RECEIVING_LOCATION_PREFIX = "R"
 
 
 }

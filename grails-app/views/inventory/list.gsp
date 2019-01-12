@@ -27,33 +27,6 @@
                             </g:link>
 
 
-                            <div class="button-group">
-                                <div id="columnChooser" class="action-menu">
-                                    <button class="action-btn button">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'text_columns.png')}" style="vertical-align: middle"/>
-                                        Toggle Columns
-                                    </button>
-                                    <div class="actions left" style="padding: 5px;">
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="0" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.status.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="1" class="toggle-visibility" checked="true"><warehouse:message code="product.productCode.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="2" class="toggle-visibility" checked="true"><warehouse:message code="product.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="3" class="toggle-visibility" checked="true"><warehouse:message code="product.genericProduct.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="4" class="toggle-visibility" checked="true"><warehouse:message code="category.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="5" class="toggle-visibility" checked="true"><warehouse:message code="product.manufacturer.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="6" class="toggle-visibility" checked="true"><warehouse:message code="product.vendor.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="7" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.binLocation.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="8" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="9" class="toggle-visibility" checked="true"><warehouse:message code="product.unitOfMeasure.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="10" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="11" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="12" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="13" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="14" class="toggle-visibility" checked="true"><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></label></div>
-                                        <div class="action-menu-item"><label><input type="checkbox" data-column="15" class="toggle-visibility" checked="true"><warehouse:message code="product.totalValue.label" default="Total Value"/></label></div>
-
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="button-group">
@@ -65,8 +38,11 @@
                         <div class="button-group">
                             <div class="action-menu">
                                 <button class="action-btn button">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'table.png')}" />
+                                    <label><g:message code="default.status.label"/>:</label>
+
                                     <warehouse:message code="inventory.${actionName}.label"/>
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
                                 </button>
                                 <div class="actions">
                                     <div class="action-menu-item">
@@ -109,6 +85,33 @@
                                             <warehouse:message code="inventory.listReconditionedStock.label"/>
                                         </g:link>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <div id="columnChooser" class="action-menu">
+                                <button class="action-btn button">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'table_column.png')}" style="vertical-align: middle"/>
+                                    Toggle Columns
+                                </button>
+                                <div class="actions left" style="padding: 5px;">
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="0" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.status.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="1" class="toggle-visibility" checked="true"><warehouse:message code="product.productCode.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="2" class="toggle-visibility" checked="true"><warehouse:message code="product.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="3" class="toggle-visibility" checked="true"><warehouse:message code="product.genericProduct.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="4" class="toggle-visibility" checked="true"><warehouse:message code="category.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="5" class="toggle-visibility" checked="true"><warehouse:message code="product.manufacturer.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="6" class="toggle-visibility" checked="true"><warehouse:message code="product.vendor.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="7" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.binLocation.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="8" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="9" class="toggle-visibility" checked="true"><warehouse:message code="product.unitOfMeasure.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="10" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="11" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="12" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="13" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="14" class="toggle-visibility" checked="true"><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></label></div>
+                                    <div class="action-menu-item"><label><input type="checkbox" data-column="15" class="toggle-visibility" checked="true"><warehouse:message code="product.totalValue.label" default="Total Value"/></label></div>
+
                                 </div>
                             </div>
                         </div>
@@ -205,48 +208,41 @@
                                             ${entry.value}
                                         </td>
                                         <td class="center">
-                                            <g:if test="${entry?.key?.pricePerUnit}">
-                                                <g:formatNumber number="${entry.key.pricePerUnit}" minFractionDigits="2"/>
-                                            </g:if>
+                                            <g:hasRoleFinance>
+                                                <g:if test="${entry?.key?.pricePerUnit}">
+                                                    <g:formatNumber number="${entry.key.pricePerUnit}" minFractionDigits="2"/>
+                                                </g:if>
+                                            </g:hasRoleFinance>
                                         </td>
                                         <td class="center">
-                                            <g:if test="${entry.key.pricePerUnit && entry.value}">
-                                                <g:set var="stockValue" value="${entry.key.pricePerUnit*entry.value}"/>
-                                                <g:formatNumber number="${stockValue}" minFractionDigits="2"/>
-                                                <g:set var="totalStockValue" value="${totalStockValue + stockValue}"/>
-                                            </g:if>
-                                            <g:else>
-                                                0.00
-                                            </g:else>
+                                            <g:hasRoleFinance>
+                                                <g:if test="${entry.key.pricePerUnit && entry.value}">
+                                                    <g:set var="stockValue" value="${entry.key.pricePerUnit*entry.value}"/>
+                                                    <g:formatNumber number="${stockValue}" minFractionDigits="2"/>
+                                                    <g:set var="totalStockValue" value="${totalStockValue + stockValue}"/>
+                                                </g:if>
+                                                <g:else>
+                                                    0.00
+                                                </g:else>
+                                            </g:hasRoleFinance>
                                         </td>
                                     </tr>
                                 </g:each>
 
-                                <g:unless test="${quantityMap}">
-                                    <tr>
-                                        <td colspan="12" class="center">
-                                            <div class="empty fade">
-                                                <warehouse:message code="default.emptyResults.message" default="No results found"/>
-                                            </div>
-                                        </td>
-
-                                    </tr>
-
-                                </g:unless>
                             </tbody>
-
-                            <tfoot>
-                                <tr>
-                                    <th colspan="16">
-                                        <div class="title right middle">
-                                            <warehouse:message code="inventory.totalValue.label" default="Total value"/>
-                                            <g:formatNumber number="${totalStockValue}"/>
-                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                        </div>
-
-                                    </th>
-                                </tr>
-                            </tfoot>
+                            <g:hasRoleFinance>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="16">
+                                            <div class="title right middle">
+                                                <warehouse:message code="inventory.totalValue.label" default="Total value"/>
+                                                <g:formatNumber number="${totalStockValue}"/>
+                                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </g:hasRoleFinance>
                         </table>
                     </div>
                 </div>
@@ -256,43 +252,15 @@
 
     <script>
         $(window).load(function(){
-
-
-
             var options = {
                 "bProcessing": true,
                 //"sServerMethod": "GET",
-                "iDisplayLength": 10,
+                "iDisplayLength": 15,
                 "bSearch": false,
                 "bScrollCollapse": true,
                 "bJQueryUI": true,
                 "bAutoWidth": true,
                 "sPaginationType": "two_button",
-                //"sAjaxSource": "${request.contextPath}/json/getFastMovers",
-                //"fnServerParams": function ( data ) {
-                    //console.log("server data " + data);
-                    //var locationId = $("#locationId").val();
-                    //var date = $("#date").val();
-                    //data.push({ name: "location.id", value: locationId });
-                    //data.push({ name: "date", value: date })
-                //},
-//                "fnServerData": function ( sSource, aoData, fnCallback ) {
-//                    $.ajax( {
-//                        "dataType": 'json',
-//                        "type": "GET",
-//                        "url": sSource,
-//                        "data": aoData,
-//                        "success": fnCallback,
-//                        "timeout": 120000,   // optional if you want to handle timeouts (which you should)
-//                        "error": handleAjaxError // this sets up jQuery to give me errors
-//                    } );
-//                },
-//            "fnServerData": function ( sSource, aoData, fnCallback ) {
-//                $.getJSON( sSource, aoData, function (json) {
-//                    console.log(json);
-//                    fnCallback(json);
-//                });
-//            },
                 "oLanguage": {
                     "sZeroRecords": "No records found",
                     "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
@@ -300,13 +268,10 @@
                 //"fnInitComplete": fnInitComplete,
                 //"iDisplayLength" : -1,
                 "aLengthMenu": [
-                    [5, 10, 25, 100, 1000, -1],
-                    [5, 10, 25, 100, 1000, "All"]
+                    [5, 15, 25, 50, 100, 500, 1000, -1],
+                    [5, 15, 25, 50, 100, 500, 1000, "All"]
                 ],
                 "aoColumns": [
-
-                    //{ "mData": "id", "bVisible":false }, // 0
-                    //{ "mData": "rank", "sWidth": "1%" }, // 1
                     { "mData": "status" },
                     { "mData": "productCode" },
                     { "mData": "name" },

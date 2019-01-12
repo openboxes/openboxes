@@ -65,7 +65,7 @@ const FIELDS = {
       },
       expirationDate: {
         type: DateField,
-        label: 'stockMovement.expiry.label ',
+        label: 'stockMovement.expiry.label',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
           autoComplete: 'off',

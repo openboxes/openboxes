@@ -23,7 +23,6 @@ class StockMovementItem {
     RequisitionItem requisitionItem
 
     BigDecimal quantityRequested
-    BigDecimal quantityAllowed
     BigDecimal quantityAvailable
     BigDecimal quantityRevised
     BigDecimal quantityCanceled
@@ -58,6 +57,11 @@ class StockMovementItem {
 
     BigDecimal getQuantityRequired() {
         return quantityRevised?:quantityRequested
+    }
+
+    BigDecimal getQuantityAllowed() {
+        def stocklistItem = requisitionItem?.requisition?.requisitionTemplate?.requisitionItems?.find{ it?.product?.productCode == requisitionItem?.product?.productCode }
+        return stocklistItem?.quantity?:null
     }
 
 
@@ -176,7 +180,6 @@ class StockMovementItem {
                 product: requisitionItem?.product,
                 inventoryItem: requisitionItem?.inventoryItem,
                 quantityRequested: requisitionItem.quantity,
-                quantityAllowed: null,
                 quantityAvailable: null,
                 quantityCanceled: requisitionItem?.quantityCanceled,
                 quantityRevised: requisitionItem.calculateQuantityRevised(),
@@ -329,7 +332,8 @@ class SubstitutionItem {
                 minExpirationDate: minExpirationDate?.format("MM/dd/yyyy"),
                 quantityAvailable: quantityAvailable,
                 quantitySelected : quantitySelected,
-                quantityRequested : quantitySelected
+                quantityRequested : quantitySelected,
+                availableItems: availableItems
         ]
     }
 }

@@ -17,25 +17,27 @@ class AuthService {
 	boolean transactional = true
 	static ThreadLocal<User> currentUser = new ThreadLocal<User>();
 	static ThreadLocal<Location> currentLocation = new ThreadLocal<Location>();
-	
-	/**
-	 * Determine whether user is authenticated.  
-	 * 
-	 * FIXME Should not be using session object in a web-agnostic class.
-	 * 
-	 * @return	true if user is authenticated, false otherwise
-	 */
-	def isAuthenticated() {
-		return (session.user) 
-	}
-	
-	
-	def authenticate(String username, String password) { 
-		return true;				
-	}
-	
-	
-	def authorize(String username) {		
-		return true;
-	} 
+
+//	static User getCurrentUser() {
+//		return currentUser.get()
+//	}
+//
+//	static void setCurrentUser(User user) {
+//		if (!AuthService.currentUser) {
+//			AuthService.currentUser = new ThreadLocal<User>()
+//		}
+//		currentUser.set(User.get(user.id))
+//	}
+//
+//	static User getCurrentLocation() {
+//		return currentLocation.get()
+//	}
+//
+//	static void setCurrentLocation(Location location) {
+//		if (!AuthService.currentUser) {
+//			AuthService.currentLocation = new ThreadLocal<Location>()
+//		}
+//		currentLocation.set(Location.get(location.id))
+//	}
+
 }

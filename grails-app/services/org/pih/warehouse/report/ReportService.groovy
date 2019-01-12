@@ -53,15 +53,16 @@ import java.text.SimpleDateFormat
 
 class ReportService implements ApplicationContextAware {
 
-    def dataSource
-    def sessionFactory
+  def dataSource
+  def sessionFactory
 	def productService
 	def inventoryService
 	def shipmentService
 	def localizationService
 	def grailsApplication
-    def persistenceInterceptor
-    def propertyInstanceMap = DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+  def persistenceInterceptor
+  def propertyInstanceMap = DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+	def userService
 
 
 	ApplicationContext applicationContext
@@ -379,20 +380,21 @@ class ReportService implements ApplicationContextAware {
         def items = []
         def startTime = System.currentTimeMillis()
         def location = Location.get(locationId)
-        //def quantityMap = inventoryService.getQuantityByProductMap(session.warehouse.id)
-        def quantityMap = inventoryService.getInventoryStatusAndLevel(location)
 
-        quantityMap.each { product, map ->
+        def quantityMap = inventoryService.getInventoryStatusAndLevel(location)
+		def hasRoleFinance = userService.hasRoleFinance()
+
+        quantityMap.each { Product product, Map map ->
 
             def status = map.status
             def onHandQuantity = map.onHandQuantity
             def inventoryLevel = map.inventoryLevel
+			def unitPrice = hasRoleFinance? product?.pricePerUnit : null
+			def totalValue = hasRoleFinance ? ((product.pricePerUnit?:0) * (onHandQuantity?:0)) : null
 
-            println product.name + " = " + status
+			def imageUrl = (product.thumbnail)?'/openboxes/product/renderImage/${product?.thumbnail?.id}':''
 
-            //def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
-            def imageUrl = (product.thumbnail)?'/openboxes/product/renderImage/${product?.thumbnail?.id}':''
-            items << [
+			items << [
                     id:product.id,
                     name: product.name,
                     status: status,
@@ -406,10 +408,9 @@ class ReportService implements ApplicationContextAware {
                     minQuantity: inventoryLevel?.minQuantity?:0,
                     maxQuantity: inventoryLevel?.maxQuantity?:0,
                     reorderQuantity: inventoryLevel?.reorderQuantity?:0,
-                    unitPrice: product.pricePerUnit?:0.0,
-                    //onHandQuantity:value?:0.0,
+                    unitPrice: unitPrice?:0,
                     onHandQuantity:onHandQuantity,
-                    totalValue: (product.pricePerUnit?:0) * (onHandQuantity?:0)
+                    totalValue: totalValue?:0
             ]
         }
 

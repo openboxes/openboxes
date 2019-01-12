@@ -70,4 +70,13 @@ class StocklistApiController {
 
         render status: 204
     }
+
+    def sendMail = {
+        JSONObject jsonObject = request.JSON
+        log.info "send mail: " + jsonObject.toString(4)
+
+        stocklistService.sendMail(params.id, jsonObject.subject, jsonObject.text, jsonObject.recipients)
+
+        render status: 200
+    }
 }

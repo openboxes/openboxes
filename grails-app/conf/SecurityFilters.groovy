@@ -39,7 +39,6 @@ class SecurityFilters {
 					if (!AuthService.currentUser) {  
 						AuthService.currentUser = new ThreadLocal<User>()
 					}
-                    //println "Setting current user " + session.warehouse.id
 					AuthService.currentUser.set(User.get(session.user.id))
 				}
 				
@@ -47,10 +46,7 @@ class SecurityFilters {
 					if (!AuthService.currentLocation) { 
 						AuthService.currentLocation = new ThreadLocal<Location>()
 					}
-					
-					//println "Setting current location " + session.warehouse.id
 					AuthService.currentLocation.set(Location.get(session.warehouse.id))
-					//println "Getting currentLocation " + AuthService.currentLocation.get()
 				}
 				
 				// Need to bypass security filter when generating a PDF report, otherwise the 

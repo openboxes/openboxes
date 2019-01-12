@@ -83,14 +83,6 @@ const FIELDS = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
-      totalMonthlyQuantity: {
-        type: LabelField,
-        label: 'stockMovement.totalMonthlyQty.label',
-        flexWidth: '1.35',
-        attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
-        },
-      },
       quantityConsumed: {
         type: LabelField,
         label: 'stockMovement.monthlyQuantity.label',
@@ -363,7 +355,6 @@ class EditItemsPage extends Component {
           onClick: () => {
             this.setState({
               revisedItems: [],
-              values: { ...this.state.values, editPageItems: [] },
             });
             this.fetchAllData(true);
           },
@@ -426,11 +417,6 @@ class EditItemsPage extends Component {
     this.setState({
       values: {
         ...this.state.values,
-        editPageItems: [],
-      },
-    }, () => this.setState({
-      values: {
-        ...this.state.values,
         editPageItems: _.map(editPageItems, item => ({
           ...item,
           quantityAvailable: item.quantityAvailable || 0,
@@ -440,7 +426,7 @@ class EditItemsPage extends Component {
           })),
         })),
       },
-    }));
+    });
   }
 
   /**

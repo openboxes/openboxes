@@ -62,6 +62,15 @@
 </g:if>
  --%>
 
+    <g:if test="${session.impersonateUserId}">
+        <div class="notice center">
+            <g:message code="user.impersonate.message" args="[session.user.username]" default="You are impersonating user {0}."/>
+            <g:link controller="auth" action="logout" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'door_out.png')}"/>&nbsp;
+                ${g.message(code:'default.logout.label', default: "Logout")}
+            </g:link>
+        </div>
+    </g:if>
     <g:if test="${session.useDebugLocale}">
 
         <div id="debug-header" class="notice" style="margin: 10px;">
@@ -136,7 +145,11 @@
         </div>
     </g:if>
 </div>
-
+<div id="dlgShowDialog" class="dialog hidden">
+    <div id="dlgShowDialogContent" class="empty center">
+        Loading ...
+    </div>
+</div>
 <!-- Include other plugins -->
 <script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
@@ -312,6 +325,53 @@
     </script>
 </g:if>
 
+<g:javascript>
+    $(document).ready(function() {
+
+        $(".btn-show-dialog").live("click", function (event) {
+            var url = $(this).data("url");
+            var title = $(this).data("title");
+            var target = $(this).data("target") || "#dlgShowDialog";
+            var width = $(this).data("width") || "800";
+            var position = {
+                my: "center center",
+                at: "center center",
+                of: window
+            };
+
+            $(target).attr("title", title);
+            $(target).dialog({
+                title: title,
+                autoOpen: true,
+                modal: true,
+                width: width,
+                autoResize:true,
+                resizable: true,
+                minHeight:"auto",
+                position: position,
+                open: function(event, ui) {
+                    $(this).html("Loading...");
+                    $(this).load(url, function(response, status, xhr) {
+                        if (xhr.status !== 200) {
+                            $(this).text("");
+                            $("<p></p>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
+                            var error = JSON.parse(response);
+                            var stack = $("<div></div>").addClass("stack empty").appendTo($(this));
+                            $("<code></code>").text(error.errorMessage).appendTo(stack)
+                        }
+                    });
+                }
+            }).dialog('open');
+        });
+
+        $(".btn-close-dialog").live("click", function () {
+            $("#dlgShowDialog").dialog( "close" );
+        });
+
+	});
+
+
+</g:javascript>
 <script type="text/javascript">
     $(document).ready(function() {
 

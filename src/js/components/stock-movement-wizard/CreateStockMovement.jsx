@@ -239,7 +239,7 @@ class CreateStockMovement extends Component {
         stockMovementUrl = '/openboxes/api/stockMovements';
       }
 
-      const payload = {
+      let payload = {
         name: '',
         description: values.description,
         dateRequested: values.dateRequested,
@@ -249,6 +249,18 @@ class CreateStockMovement extends Component {
         'stocklist.id': _.get(values.stocklist, 'id') || '',
         forceUpdate: values.forceUpdate || '',
       };
+
+      const { stocklist } = this.props.initialValues;
+
+      const checkStockList = _.get(values.stocklist, 'id') !== _.get(stocklist, 'id');
+
+      if (values.stockMovementId && !checkStockList) {
+        payload = {
+          description: values.description,
+          dateRequested: values.dateRequested,
+          'requestedBy.id': values.requestedBy.id,
+        };
+      }
 
       apiClient.post(stockMovementUrl, payload)
         .then((response) => {

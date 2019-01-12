@@ -91,12 +91,27 @@ class StockMovementService {
 
 
     StockMovement updateStockMovement(StockMovement stockMovement, Boolean forceUpdate) {
+        // TODO: This function is a very good candidate for future refactor. This should be better split in case of
+        // updating stock movement basing on origin type
+
         log.info "Update stock movement " + new JSONObject(stockMovement.toJson()).toString(4)
 
         Requisition requisition = updateRequisition(stockMovement, forceUpdate)
 
         if (stockMovement.origin.isSupplier()) {
+
+            // After creating stock movement from Requisition in this case (when origin.isSupplier()), those 3 values were not
+            // populated. As a quick fix, data that came from request is preserved and reapplied to SM afterwards.
+
+            def driverName = stockMovement.driverName
+            def trackingNumber = stockMovement.trackingNumber
+            def comments = stockMovement.comments
+
             stockMovement = StockMovement.createFromRequisition(requisition)
+
+            if (driverName) stockMovement.driverName = driverName
+            if (trackingNumber) stockMovement.trackingNumber = trackingNumber
+            if (comments) stockMovement.comments = comments
         }
 
         log.info "Date shipped: " + stockMovement.dateShipped
@@ -569,23 +584,21 @@ class StockMovementService {
         return pickPageItems
     }
 
-    Integer calculateTotalMonthlyQuantity(StockMovementItem stockMovementItem) {
-        Integer totalMonthlyQuantity = 0
-        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
+    Float calculateMonthlyStockListQuantity(StockMovementItem stockMovementItem) {
+        Integer monthlyStockListQuantity = 0
+        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         StockMovement stockMovement = stockMovementItem.stockMovement
-        List<Requisition> stocklists = requisitionService.getRequisitionTemplates(stockMovement.origin, stockMovement.destination)
+        List<Requisition> stocklists = requisitionService.getRequisitionTemplates(stockMovement.origin)
         if (stocklists) {
             stocklists.each { stocklist ->
-                // Find matching stocklist items and sum them up
                 def stocklistItems = stocklist.requisitionItems.findAll { it?.product?.id == requisitionItem?.product?.id }
                 if (stocklistItems) {
-                    totalMonthlyQuantity += stocklistItems.sum { it.quantity }
+                    monthlyStockListQuantity += stocklistItems.sum { Math.ceil(((Double) it?.quantity) / it?.requisition?.replenishmentPeriod * 30) }
                 }
             }
         }
-        return totalMonthlyQuantity
+        return monthlyStockListQuantity
     }
-
 
     EditPageItem buildEditPageItem(StockMovementItem stockMovementItem) {
         EditPageItem editPageItem = new EditPageItem()
@@ -596,19 +609,19 @@ class StockMovementService {
         List<SubstitutionItem> substitutionItems = getSubstitutionItems(location, requisitionItem)
 
 
-        // Calculate total monthly quantity
-        Integer totalMonthlyQuantity = null //calculateTotalMonthlyQuantity(stockMovementItem)
+        // Calculate monthly stock
+        Integer monthlyStockListQuantity = calculateMonthlyStockListQuantity(stockMovementItem)
 
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
-        editPageItem.totalMonthlyQuantity = totalMonthlyQuantity
         editPageItem.quantityRequested = requisitionItem.quantity
-        editPageItem.quantityConsumed = null
+        editPageItem.quantityConsumed = monthlyStockListQuantity
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         editPageItem.substitutionItems = substitutionItems
+        editPageItem.sortOrder = stockMovementItem.sortOrder
         return editPageItem
     }
 
@@ -1142,7 +1155,8 @@ class StockMovementService {
             if (!locationType) {
                 throw new IllegalArgumentException("Unable to find location type 'Receiving'")
             }
-            locationService.findOrCreateInternalLocation("Receiving ${stockMovement.identifier}",
+            String receivingLocationName = locationService.getReceivingLocationName(stockMovement?.identifier)
+            locationService.findOrCreateInternalLocation(receivingLocationName,
                     stockMovement.identifier, locationType, stockMovement.destination)
         }
     }
@@ -1175,7 +1189,8 @@ class StockMovementService {
                             documentType: DocumentGroupCode.EXPORT.name(),
                             contentType : "text/csv",
                             stepNumber  : 2,
-                            uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true)
+                            uri         : g.createLink(controller: 'stockMovement', action: "exportCsv", id: stockMovement?.requisition?.id, absolute: true),
+                            hidden      : true
                     ],
                     [
                         name        : g.message(code: "picklist.button.print.label"),
@@ -1189,7 +1204,8 @@ class StockMovementService {
                             documentType: DocumentGroupCode.PICKLIST.name(),
                             contentType : "application/pdf",
                             stepNumber  : 4,
-                            uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true)
+                            uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true),
+                            hidden      : true
                     ],
                     [
                             name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),

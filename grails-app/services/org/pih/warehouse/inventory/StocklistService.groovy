@@ -16,6 +16,8 @@ class StocklistService {
 
     def requisitionService
     def locationService
+    def mailService
+    def pdfRenderingService
 
     boolean transactional = true
 
@@ -61,5 +63,11 @@ class StocklistService {
         }
 
         requisitionService.deleteRequisition(requisition)
+    }
+
+    void sendMail(String stocklistId, String subject, String body, Collection to) {
+        Stocklist stocklist = getStocklist(stocklistId)
+        ByteArrayOutputStream bytes = pdfRenderingService.render(template: "/stocklist/print", model: [stocklist: stocklist])
+        mailService.sendHtmlMailWithAttachment(to, subject, body, bytes.toByteArray(), "Stocklist - ${stocklist?.requisition?.name}.pdf", "application/pdf")
     }
 }

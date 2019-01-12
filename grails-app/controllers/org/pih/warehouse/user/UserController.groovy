@@ -27,6 +27,7 @@ class UserController {
     static allowedMethods = [save: "POST", update: "POST", delete: "GET"]
     MailService mailService;
 	def userService
+	def locationService
 
     /**
      * Show index page - just a redirect to the list page.
@@ -59,6 +60,19 @@ class UserController {
         //userInstanceTotal = User.countByUsernameLikeOrEmailLike(term, term, params);
 
 		[userInstanceList: userInstanceList, userInstanceTotal: userInstanceTotal]
+	}
+
+
+	def impersonate = {
+		def userInstance = User.get(params.id)
+		if (session.impersonateUserId) {
+			flash.message = "Already impersonstating user ${session.user.username}"
+		}
+		else {
+			session.impersonateUserId = userInstance?.id
+			session.activeUserId = session?.user?.id
+		}
+		redirect(controller: "dashboard", action: "index")
 	}
 	
 	def sendTestEmail = {
@@ -171,15 +185,13 @@ class UserController {
      */
     def edit = {
 
-        log.info "edit user"
-
         def userInstance = User.get(params.id)
         if (!userInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
         }
         else {
-            def locations = Location.AllDepotWardAndPharmacy()
+            def locations = locationService.getLoginLocations(session.warehouse).sort()
             return [userInstance: userInstance, locations: locations]
         }
     }

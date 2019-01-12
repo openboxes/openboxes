@@ -2,7 +2,7 @@
 <div id="product-summary" productid="${productInstance?.id}" class="summary">
 	<table id="product-summary-table" border="0">
 		<tbody>
-			<tr>						
+			<tr>
 				<td class="middle" style="width: 1%;">
                     <g:if test="${productInstance?.images }">
                         <div class="nailthumb-product">
@@ -19,23 +19,25 @@
 
 
 				<g:if test="${productInstance?.coldChain }">
-					<td style="width: 1%;" class="top">				
-						<img src="${resource(dir: 'images/icons', file: 'coldchain.gif')}" 
+					<td style="width: 1%;" class="top">
+						<img src="${resource(dir: 'images/icons', file: 'coldchain.gif')}"
 							alt="" title="${warehouse.message(code:'product.coldChain.message') }" class="middle"/>
 					</td>
-				</g:if>									
+				</g:if>
 				<td class="top">
-								
+
 					<div id="product-header" style="float: left;">
 			            <div id="product-title" class="title">
 			            	<small>${productInstance?.productCode }</small>
 			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
 			                	${productInstance?.name }
-			                </g:link>				
+			                </g:link>
 			            </div>
                         <div id="product-catalogs">
                             <g:each var="productCatalog" in="${productInstance?.productCatalogs }">
-                                <span class="tag tag-info" title="${g.message(code: 'productCatalog.label')}">${productCatalog.name }</span>
+								<g:link controller="productCatalog" action="edit" params="['id':productCatalog.id]">
+                                	<span class="tag tag-info" title="${g.message(code: 'productCatalog.label')}">${productCatalog.name }</span>
+								</g:link>
                             </g:each>
                         </div>
                         <div id="product-tags">
@@ -52,7 +54,7 @@
         			<div id="product-status" class="title">
 						<g:productStatus product="${productInstance.id}"/>
         			</div>
-			
+
 				</td>
 			</tr>
 		</tbody>

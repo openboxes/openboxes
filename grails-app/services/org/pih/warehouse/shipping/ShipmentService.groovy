@@ -13,24 +13,29 @@ import grails.validation.ValidationException
 import org.apache.commons.validator.EmailValidator
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.CreationHelper
-import org.apache.poi.ss.usermodel.Font
-import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.util.CellRangeAddress
+import org.apache.poi.ss.usermodel.Row
 import org.hibernate.FetchMode
-import org.pih.warehouse.core.*
-import org.pih.warehouse.inventory.*
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventType
+import org.pih.warehouse.core.ListCommand
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.MailService
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
-import org.springframework.validation.FieldError
 
 import javax.mail.internet.InternetAddress
 import java.math.RoundingMode
@@ -848,18 +853,16 @@ class ShipmentService {
 
             // Check whether there's any stock in the bin location for the given inventory item
             def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
-			def quantityAllocated = getQuantityAllocated(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
-            log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity on hand ${quantityOnHand} vs quantity allocated ${quantityAllocated}"
+			def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity on hand ${quantityOnHand} vs duplicated shipment items quantity ${duplicatedShipmentItemsQuantity}"
 
-            // Quantity allocated includes the current shipment item quantity
-			def quantityAvailable = quantityOnHand - quantityAllocated + shipmentItem.quantity
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
-                    shipmentItem.quantity + "] <= quantity available [" + quantityAvailable + "]");
-            if (shipmentItem.quantity > quantityAvailable) {
+                    shipmentItem.quantity + "] <= quantity on hand [" + quantityOnHand + "]");
+            if (duplicatedShipmentItemsQuantity > quantityOnHand) {
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                             shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                            quantityAvailable + " " + shipmentItem?.product?.unitOfMeasure,
+							quantityOnHand + " " + shipmentItem?.product?.unitOfMeasure,
                             shipmentItem?.product?.productCode,
                             shipmentItem?.inventoryItem?.lotNumber,
                             origin.name,
@@ -884,12 +887,36 @@ class ShipmentService {
                 eq("origin", location)
 				eq("currentStatus", ShipmentStatusCode.PENDING)
             }
-			eq("binLocation", binLocation)
+			if (binLocation) {
+				eq("binLocation", binLocation)
+			}
+			else {
+				isNull("binLocation")
+			}
 			eq("inventoryItem", inventoryItem)
 		}
 
         return results[0] ?: 0
 
+	}
+
+	Integer getDuplicatedShipmentItemsQuantity(Shipment shipment, Location binLocation, InventoryItem inventoryItem) {
+
+		def results = ShipmentItem.createCriteria().list {
+			projections {
+				sum("quantity")
+			}
+			eq("shipment", shipment)
+			if (binLocation) {
+				eq("binLocation", binLocation)
+			}
+			else {
+				isNull("binLocation")
+			}
+			eq("inventoryItem", inventoryItem)
+		}
+
+		return results[0] ?: 0
 	}
 
     /**
@@ -1547,6 +1574,7 @@ class ShipmentService {
 			receiptInstance.addToReceiptItems(receiptItem);
             shipmentItem.addToReceiptItems(receiptItem)
 		}
+		shipmentInstance?.addToReceipts(receiptInstance)
 		return receiptInstance;
 	}
 

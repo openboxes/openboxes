@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -56,13 +56,13 @@ import org.docx4j.wml.TrPr
 import org.groovydev.SimpleImageBuilder
 
 class DocumentService {
-	
+
 	def grailsApplication
 	boolean transactional = false
 
-	
-	
-	private getMessageTagLib() { 	
+
+
+	private getMessageTagLib() {
 		return grailsApplication.mainContext.getBean('org.pih.warehouse.MessageTagLib')
 	}
 
@@ -70,7 +70,7 @@ class DocumentService {
 		return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
 	}
 
-	
+
 	public File writeImage(org.pih.warehouse.core.Document document) {
 		File file
 		try {
@@ -79,19 +79,19 @@ class DocumentService {
             FileOutputStream fos = new FileOutputStream(file);
 			fos << document?.fileContents
 			fos.close()
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			log.error("Error occurred while writing file " + document.filename, e)
 		}
 		return file;
 	}
-	
-	
+
+
 	public void scaleImage(org.pih.warehouse.core.Document document, OutputStream outputStream, String width, String height) {
 
         log.info("Scale image " + document.filename + " width=" + width + " height=" + height + " contentType=" + document.contentType)
 		File file
 		FileInputStream fileInputStream
-		try { 
+		try {
 			file = writeImage(document)
 			def extension = document.extension ?: document.filename.substring(document.filename.lastIndexOf(".")+1)
 			log.info "Scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
@@ -108,16 +108,16 @@ class DocumentService {
                 log.warn("Unable to scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension)
             }
 
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			log.warn("Error scaling image " + document?.filename + ": " + e.message, e)
-		} finally { 
+		} finally {
 			if (fileInputStream) fileInputStream?.close();
 			if (file) file?.delete();
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * @param filePath
 	 * @return
 	 */
@@ -126,17 +126,17 @@ class DocumentService {
 		def appContext = ApplicationHolder.application.parentContext
 		def archiveDirectory = filePath
 		if (ApplicationHolder.application.isWarDeployed()){
-			//archiveDirectory = "${File.separator}WEB-INF${File.separator}grails-app${File.separator}conf${File.separator}${filePath}"			
+			//archiveDirectory = "${File.separator}WEB-INF${File.separator}grails-app${File.separator}conf${File.separator}${filePath}"
 			archiveDirectory = "classpath:$filePath";
 			file = appContext.getResource(archiveDirectory)?.getFile()
-		} 
+		}
 		else {
 			archiveDirectory = "grails-app${File.separator}conf${File.separator}${filePath}"
 			file = new File(archiveDirectory)
 		}
 		return file
 	}
-	
+
 	/**
 	 *
 	 * @param shipmentInstance
@@ -149,7 +149,7 @@ class DocumentService {
 		wordMLPackage.save(tempFile)
 		return tempFile;
 	}
-   
+
 	/**
 	 * @param shipmentInstance
 	 * @return
@@ -163,7 +163,7 @@ class DocumentService {
 	/**
 	 * Generate the Checklist from a template.
 	 *
-	 * @param 
+	 * @param
 	 * @return
 	 */
 	WordprocessingMLPackage generateChecklist() {
@@ -184,7 +184,7 @@ class DocumentService {
 		def xml = XmlUtils.marshaltoString(wmlDocumentEl, true);
 		def mappings = new HashMap<String, String>();
 
-		/*	   
+		/*
 		 def formatter = new SimpleDateFormat("MMM dd, yyyy");
 		 def date = formatter.format(shipmentInstance.getExpectedShippingDate());
 		 mappings.put("date", date);
@@ -229,7 +229,7 @@ class DocumentService {
 
 		return wordMLPackage;
 	}
-	
+
 	/**
 	 *
 	 * @param shipmentInstance
@@ -255,7 +255,7 @@ class DocumentService {
 
 	/**
 	 * Generate the 'Certificate of Donation' letter from a template.
-	 * 
+	 *
 	 * @param shipmentInstance
 	 * @return
 	 */
@@ -326,21 +326,21 @@ class DocumentService {
 
 		return wordMLPackage;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param wordMLPackage
 	 * @param filePath
 	 */
-	void savePackageToFile(WordprocessingMLPackage wordMLPackage, String filePath) { 		
+	void savePackageToFile(WordprocessingMLPackage wordMLPackage, String filePath) {
 		SaveToZipFile saver = new SaveToZipFile(wordMLPackage);
 		saver.save(filePath);
 		log.info( "Saved output to:" + filePath );
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param pkg
 	 * @param afterText
 	 * @param table
@@ -368,22 +368,22 @@ class DocumentService {
 		TextUtils.extractText(jaxbElem, sw);
 		return sw.toString();
 	}
-	
-   
+
+
 	/**
-	 * 
+	 *
 	 * @param shipmentInstance
 	 * @param cols
 	 * @param cellWidthTwips
 	 * @return
 	 */
 	public Tbl createPackingListTable(Shipment shipmentInstance, int cols, int cellWidthTwips) {
-		
-		Tbl tbl = Context.getWmlObjectFactory().createTbl();		
+
+		Tbl tbl = Context.getWmlObjectFactory().createTbl();
 		// w:tblPr
 		// xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 		log.info("Namespace: " + Namespaces.W_NAMESPACE_DECLARATION)
-		
+
 		TblPr tblPr = null;
 		try {
 			String strTblPr = "<w:tblPr " + Namespaces.W_NAMESPACE_DECLARATION + "><w:tblStyle w:val=\"TableGrid\"/><w:tblW w:w=\"0\" w:type=\"auto\"/><w:tblLook w:val=\"04A0\"/></w:tblPr>";
@@ -393,7 +393,7 @@ class DocumentService {
 			e.printStackTrace();
 		}
 		tbl.setTblPr(tblPr);
-		
+
 		/*
 		// <w:tblGrid><w:gridCol w:w="4788"/>
 		TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid();
@@ -404,40 +404,40 @@ class DocumentService {
 			gridCol.setW(BigInteger.valueOf(cellWidthTwips));
 			tblGrid.getGridCol().add(gridCol);
 		}
-				
+
 		// Now the rows
 		for (int j=1 ; j<=rows; j++) {
-			//shipmentInstance?.shipmentItems.each { item -> 
-		
+			//shipmentInstance?.shipmentItems.each { item ->
+
 			Tr tr = Context.getWmlObjectFactory().createTr();
 			tbl.getEGContentRowContent().add(tr);
-			createPackingListCell(tr, cellWidthTwips);	
+			createPackingListCell(tr, cellWidthTwips);
 
-			
+
 		}
 		*/
 		return tbl;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param tr
 	 * @param cellWidthTwips
 	 */
-	void createPackingListCell(Tr tr, int cellWidthTwips) { 
-		
+	void createPackingListCell(Tr tr, int cellWidthTwips) {
+
 		Tc tc = Context.getWmlObjectFactory().createTc();
 		tr.getEGContentCellContent().add(tc);
-		
+
 		TcPr tcPr = Context.getWmlObjectFactory().createTcPr();
 		tc.setTcPr(tcPr);
-		
+
 		// <w:tcW w:w="4788" w:type="dxa"/>
 		TblWidth cellWidth = Context.getWmlObjectFactory().createTblWidth();
 		tcPr.setTcW(cellWidth);
 		cellWidth.setType("dxa");
 		cellWidth.setW(BigInteger.valueOf(cellWidthTwips));
-		
+
 		// Cell content - an empty <w:p/>
 		P paragraph = Context.getWmlObjectFactory().createP()
 		//R run = Context.getWmlObjectFactory().createR();
@@ -447,11 +447,11 @@ class DocumentService {
 		//paragraph.getParagraphContent().add(run);
 		tc.getEGBlockLevelElts().add(paragraph);
 
-	} 
-	
-	
+	}
+
+
 	/**
-	 * 
+	 *
 	 * @param wmlPackage
 	 * @param shipmentInstance
 	 * @param cols
@@ -459,11 +459,11 @@ class DocumentService {
 	 * @return
 	 */
 	public Tbl createTable(WordprocessingMLPackage wmlPackage, Shipment shipmentInstance, int cols, int cellWidthTwips) {
-		
+
 		Tbl tbl = Context.getWmlObjectFactory().createTbl();
 		// w:tblPr
 		log.info("Namespace: " + Namespaces.W_NAMESPACE_DECLARATION)
-		
+
 		TblPr tblPr = null;
 		try {
 			String strTblPr =
@@ -473,14 +473,14 @@ class DocumentService {
 			log.error("Exception occurred while creating the table prolog")
 		}
 		tbl.setTblPr(tblPr);
-		
+
 		// <w:tblGrid><w:gridCol w:w="4788"/>
 		TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid();
 		tbl.setTblGrid(tblGrid);
 		// Add required <w:gridCol w:w="4788"/>
-		int writableWidthTwips = wmlPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips();		
+		int writableWidthTwips = wmlPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips();
 		cellWidthTwips = writableWidthTwips/3;
-		
+
 		for (int i=1 ; i<=cols; i++) {
 			TblGridCol gridCol = Context.getWmlObjectFactory().createTblGridCol();
 			gridCol.setW(BigInteger.valueOf(cellWidthTwips));
@@ -491,42 +491,42 @@ class DocumentService {
 		Tr trHeader = Context.getWmlObjectFactory().createTr();
 		tbl.getEGContentRowContent().add(trHeader);
 		BooleanDefaultTrue bdt = Context.getWmlObjectFactory().createBooleanDefaultTrue();
-		
+
 		TrPr trPr = Context.getWmlObjectFactory().createTrPr();
 		trHeader.setTrPr(trPr)
-		
+
 
 		//TrPr trPr = trHeader.getTrPr();
 		trPr.getCnfStyleOrDivIdOrGridBefore().add(Context.getWmlObjectFactory().createCTTrPrBaseTblHeader(bdt));
 		addTc(wmlPackage, trHeader, "Pallet/Box #", true);
 		addTc(wmlPackage, trHeader, "Item", true);
 		addTc(wmlPackage, trHeader, "Qty", true);
-		
-				
-		def previousContainer = null;		
-		def shipmentItems = shipmentInstance?.shipmentItems?.sort { it?.container?.sortOrder } 
-		// Iterate over shipment items and add them to the table 
+
+
+		def previousContainer = null;
+		def shipmentItems = shipmentInstance?.shipmentItems?.sort { it?.container?.sortOrder }
+		// Iterate over shipment items and add them to the table
 		shipmentItems?.each { itemInstance ->
-			
+
 			log.info "previous: " + previousContainer + ", current: " + itemInstance?.container + ", same: " + (itemInstance?.container == previousContainer)
 			Tr tr = Context.getWmlObjectFactory().createTr();
 			tbl.getEGContentRowContent().add(tr);
-			if (itemInstance?.container != previousContainer) { 
+			if (itemInstance?.container != previousContainer) {
 				addTc(wmlPackage, tr, itemInstance?.container?.name, false);
 			}
-			else { 
+			else {
 				addTc(wmlPackage, tr, "", false);
 			}
-			addTc(wmlPackage, tr, itemInstance?.product?.name, false);			
-			addTc(wmlPackage, tr, String.valueOf(itemInstance?.quantity), false);			
+			addTc(wmlPackage, tr, itemInstance?.product?.name, false);
+			addTc(wmlPackage, tr, String.valueOf(itemInstance?.quantity), false);
 			previousContainer = itemInstance?.container;
-			
+
 		}
 		return tbl;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param wmlPackage
 	 * @param tr
 	 * @param text
@@ -534,18 +534,18 @@ class DocumentService {
 	 */
 	void addTc(WordprocessingMLPackage wmlPackage, Tr tr, String text, boolean applyBold) {
 		Tc tc = Context.getWmlObjectFactory().createTc();
-		// wmlPackage.getMainDocumentPart().createParagraphOfText(text)		
+		// wmlPackage.getMainDocumentPart().createParagraphOfText(text)
 		tc.getEGBlockLevelElts().add( createParagraphOfText(text, applyBold) );
 		tr.getEGContentCellContent().add( tc );
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param simpleText
 	 * @param applyBold
 	 * @return
 	 */
-	P createParagraphOfText(String simpleText, boolean applyBold) { 
+	P createParagraphOfText(String simpleText, boolean applyBold) {
 		P para = Context.getWmlObjectFactory().createP();
 		// Create the text element
 		Text t = Context.getWmlObjectFactory().createText();
@@ -554,26 +554,26 @@ class DocumentService {
 		R run = Context.getWmlObjectFactory().createR();
 		run.getRunContent().add(t);
 		//run.getRPr().setB(true);
-		// Set bold property 
+		// Set bold property
 		if (applyBold) {
 			RPr rpr = Context.getWmlObjectFactory().createRPr();
 			BooleanDefaultTrue bdt = Context.getWmlObjectFactory().createBooleanDefaultTrue();
 			rpr.setB(bdt)
 			run.setRPr(rpr);
-		}		
+		}
 		para.getParagraphContent().add(run);
-		
+
 		return para;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param wordMLPackage
 	 * @return
 	 */
 	OutputStream convertToPdf(WordprocessingMLPackage wordMLPackage) {
 		PdfConversion conversion = new Conversion(wordMLPackage);
-		
+
 		((Conversion)conversion).setSaveFO(new File(inputfilepath + ".fo"));
 		OutputStream outputStream = new FileOutputStream(inputfilepath + ".pdf");
 		conversion.output(outputStream);
@@ -745,11 +745,11 @@ class DocumentService {
 
 	}
 
-	
-	
-	void generatePackingList(OutputStream outputStream, Shipment shipmentInstance) { 
+
+
+	void generatePackingList(OutputStream outputStream, Shipment shipmentInstance) {
 		// TODO Move to PoiService
-		
+
 		try {
 			Workbook workbook = new HSSFWorkbook();
 			CreationHelper createHelper = workbook.getCreationHelper();
@@ -777,7 +777,7 @@ class DocumentService {
 			// Bold font
 			Font boldFont = workbook.createFont();
 			boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
-						
+
 			// Bold cell style
 			CellStyle labelStyle = workbook.createCellStyle();
 			labelStyle.setFont(boldFont);
@@ -847,11 +847,11 @@ class DocumentService {
 			tableDataDateStyle.setBorderTop((short)1);
 			tableDataDateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy"));
 
-			
+
 			// Wrap text cell style
 			CellStyle wrapTextCellStyle = workbook.createCellStyle();
 			wrapTextCellStyle.setWrapText(true);
-			
+
 			// Date cell style
 			CellStyle dateStyle = workbook.createCellStyle();
 			dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy"));
@@ -871,6 +871,11 @@ class DocumentService {
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.name);
 
+			// SHIPMENT NUMBER
+			row = sheet.createRow((short)counter++)
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentNumber.label'))
+			row.getCell(0).setCellStyle(labelStyle)
+			row.createCell(1).setCellValue(shipmentInstance?.shipmentNumber)
 
 			// SHIPMENT TYPE
 			row = sheet.createRow((short)counter++);
@@ -878,14 +883,14 @@ class DocumentService {
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue("" + getFormatTagLib().metadata(obj: shipmentInstance?.shipmentType));
 
-			
+
 			/*
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'default.todaysDate.label'));
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(new Date());
 			row.getCell(1).setCellStyle(dateStyle);
-			
+
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentNumber.label'));
 			row.getCell(0).setCellStyle(labelStyle);
@@ -907,7 +912,7 @@ class DocumentService {
 				}
 			}
 			*/
-			
+
 			// REFERENCE NUMBERS
 			shipmentInstance.referenceNumbers.each {
 				row = sheet.createRow((short)counter++);
@@ -925,14 +930,14 @@ class DocumentService {
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.origin?.name);
 			row = sheet.createRow((short)counter++);
-			
+
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.destination.label'));
 			row.getCell(0).setCellStyle(labelStyle);
 			row.createCell(1).setCellValue(shipmentInstance?.destination?.name);
 
 			// EMPTY ROW
 			row = sheet.createRow((short)counter++);
-			
+
 			// EXPECTED SHIPMENT DATE
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.expectedShippingDate.label'));
@@ -940,7 +945,7 @@ class DocumentService {
 			Cell expectedShipmentDateCell = row.createCell(1);
 			expectedShipmentDateCell.setCellValue(shipmentInstance?.expectedShippingDate);
 			expectedShipmentDateCell.setCellStyle(dateStyle);
-			
+
 			// ACTUAL SHIPMENT DATE
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.actualShippingDate.label'));
@@ -953,7 +958,7 @@ class DocumentService {
 			else {
 				actualShipmentDateCell.setCellValue("" + getMessageTagLib().message(code:'default.notAvailable.label'));
 			}
-			
+
 			// EXPECTED ARRIVAL DATE
 			row = sheet.createRow((short)counter++);
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.expectedDeliveryDate.label'));
@@ -974,7 +979,7 @@ class DocumentService {
 			else {
 				actualArrivalDateCell.setCellValue("" + getMessageTagLib().message(code:'default.notAvailable.label'));
 			}
-			
+
 			// EMPTY ROW
 			row = sheet.createRow((short)counter++);
 
@@ -1036,16 +1041,16 @@ class DocumentService {
 
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'inventoryItem.expires.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
-						
+
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.qty.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
-			
+
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.units.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
-			
+
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'shipping.recipient.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
-			
+
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.comments.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
@@ -1055,19 +1060,19 @@ class DocumentService {
                 CELL_INDEX = 0
 				log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
 				row = sheet.createRow((short)counter++);
-				
-				if (previousContainer != itemInstance?.container?.name) { 
+
+				if (previousContainer != itemInstance?.container?.name) {
 					row.createCell(CELL_INDEX).setCellValue(itemInstance?.container?.name?:getMessageTagLib().message(code:'shipping.unpacked.label').toString());
 					row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle);
 					// If we're at a place in the XLS file where we want to merge cells (e.g. the packing list)
 					// Then we merge rows when the container name is different from the previous container name
-					if (row.getRowNum() > 16) { 
+					if (row.getRowNum() > 16) {
 						sheet.addMergedRegion( CellRangeAddress.valueOf("A${initialRowIndex+1}:A${finalRowIndex+1}") );
 					}
-					initialRowIndex = row.getRowNum() 
-					finalRowIndex = row.getRowNum() 
+					initialRowIndex = row.getRowNum()
+					finalRowIndex = row.getRowNum()
 				}
-				else { 
+				else {
 					finalRowIndex = row.getRowNum()
 					row.createCell(CELL_INDEX).setCellValue("");
 					row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle);
@@ -1096,16 +1101,16 @@ class DocumentService {
 
 				row.createCell(CELL_INDEX).setCellValue(itemInstance?.quantity);
 				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
-				
+
 				row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.each.label'));
 				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
-				
+
 				row.createCell(CELL_INDEX).setCellValue(itemInstance?.recipient?.name);
 				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle);
 
 				row.createCell(CELL_INDEX).setCellValue("");
 				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle);
-				
+
 				row.setHeightInPoints(30.0)
 				previousContainer = itemInstance?.container?.name
 			}
@@ -1117,8 +1122,8 @@ class DocumentService {
 			log.error e
 			throw e;
 		}
-	}		
-	
-	
-   
+	}
+
+
+
 }

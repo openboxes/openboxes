@@ -37,10 +37,12 @@
                 <td>
                     ${pkg?.uom?.code }/${pkg?.quantity }
                 </td>
-                <td>
-                    <g:formatNumber number="${pkg?.price}" />
-                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 
+                <td>
+                    <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
+                        <g:formatNumber number="${pkg?.price}" />
+                    </g:hasRoleFinance>
+                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                 </td>
                 <td>
                     ${pkg?.gtin?:warehouse.message(code:'default.none.label') }

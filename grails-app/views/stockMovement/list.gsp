@@ -36,8 +36,7 @@
         <div class="right">
 
             <div class="button-group">
-                <g:link controller="stockMovement" action="list" params="['requestedBy.id':session?.user?.id]" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}" />&nbsp;
+                <g:link controller="stockMovement" action="list" params="['createdBy.id':session?.user?.id]" class="button">
                     ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}
                     (${statistics["MINE"]?:0 })
                 </g:link>
@@ -142,7 +141,7 @@
                         <div class="filter-list-item">
                             <label><warehouse:message code="default.createdBy.label"/></label>
                             <p>
-                                <g:selectUser name="createdBy.id" value="${params?.requestedBy?.id}"
+                                <g:selectUser name="createdBy.id" value="${params?.createdBy?.id}"
                                               noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>

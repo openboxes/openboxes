@@ -75,13 +75,18 @@
 
                             <td>${fieldValue(bean: productSupplier, field: "unitOfMeasure")}</td>
 
-                            <td>${fieldValue(bean: productSupplier, field: "unitPrice")}</td>
+                            <td>
+                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
+                                    ${fieldValue(bean: productSupplier, field: "unitPrice")}
+                                </g:hasRoleFinance>
+                            </td>
 
                             <td>
                                 <a href="javascript:void(0);" class="btn-show-dialog button"
-                                   data-target="#product-supplier-dialog"
+                                   data-position="top"
                                    data-title="${g.message(code:'productSupplier.label')}"
                                    data-url="${request.contextPath}/productSupplier/dialog?id=${productSupplier?.id}&product.id=${productInstance?.id}">
+                                    <img src="${createLinkTo(dir:'images/icons/silk', file:'pencil.png')}" />
                                     <g:message code="default.button.edit.label"/>
                                 </a>
                             </td>
@@ -100,11 +105,10 @@
             <tr>
                 <td colspan="12">
                     <div class="center">
-                        <button class="button btn-show-dialog"
-                                data-target="#product-supplier-dialog"
-                                data-title="${g.message(code: 'default.create.label', args: [g.message(code:'productSupplier.label')])}"
+                        <button class="button icon add btn-show-dialog" data-position="top"
+                                data-title="${g.message(code: 'default.add.label', args: [g.message(code:'productSupplier.label')])}"
                                 data-url="${request.contextPath}/productSupplier/dialog?product.id=${productInstance?.id}">
-                            ${g.message(code: 'default.button.create.label', default: 'Create')}
+                            ${g.message(code: 'default.create.label', default: 'Create', args: [g.message(code:'productSupplier.label')])}
                         </button>
                     </div>
                 </td>
@@ -112,10 +116,6 @@
             </tfoot>
         </table>
     </div>
-</div>
-
-<div id="product-supplier-dialog" class="dialog hidden" title="Product Supplier">
-    <div class="empty center">Loading ...</div>
 </div>
 
 
@@ -130,58 +130,52 @@
         $(".tabs").livequery(function() {
             $(this).tabs({});
         });
-        $(".btn-show-dialog").click(function(event) {
-            var target = $(this).data("target")
-            var url = $(this).data("url");
-            var title = $(this).data("title");
-            $(target).attr("title", title);
-            $(target).dialog({
-                autoOpen: false,
-                modal: true,
-                width: 800,
-                autoResize:true,
-                resizable: true,
-                minHeight:"auto",
-                position: {
-                    my: "center top",
-                    at: "center top",
-                    of: window
-                },
-                open: function(event, ui) {
-                    $(this).html("Loading...")
-                    $(this).load(url, function (response, status, xhr) {
+        %{--$(".btn-show-dialog").click(function(event) {--}%
+            %{--var target = $(this).data("target")--}%
+            %{--var url = $(this).data("url");--}%
+            %{--var title = $(this).data("title");--}%
+            %{--$(target).attr("title", title);--}%
+            %{--$(target).dialog({--}%
+                %{--autoOpen: false,--}%
+                %{--modal: true,--}%
+                %{--width: 800,--}%
+                %{--autoResize:true,--}%
+                %{--resizable: true,--}%
+                %{--minHeight:"auto",--}%
+                %{--position: {--}%
+                    %{--my: "center top",--}%
+                    %{--at: "center top",--}%
+                    %{--of: window--}%
+                %{--},--}%
+                %{--open: function(event, ui) {--}%
+                    %{--$(this).html("Loading...")--}%
+                    %{--$(this).load(url, function (response, status, xhr) {--}%
 
-                        if (status == "error") {
+                        %{--if (status == "error") {--}%
 
-                            // Clear error
-                            $(this).text("")
-                            $("<p/>").addClass("error").text("An unexpected error has occurred: " + xhr.status + " " + xhr.statusText).appendTo($(this));
+                            %{--// Clear error--}%
+                            %{--$(this).text("")--}%
+                            %{--$("<p/>").addClass("error").text("An unexpected error has occurred: " + xhr.status + " " + xhr.statusText).appendTo($(this));--}%
 
-                            // If in debug mode (which we always are, at the moment) we can display the error response
-                            // from the server (or javascript error in case error response is not in JSON)
-                            try {
-                                var error = JSON.parse(response);
-                                var stack = $("<div/>").addClass("stack empty").appendTo($(this));
-                                $("<pre/>").text(error.errorMessage).appendTo(stack)
-                            } catch (e) {
-                                console.log("exception: ", e);
-                                //$("<pre/>").text(e.stack).appendTo($(this));
-                                $(this).append(response);
-                            }
+                            %{--// If in debug mode (which we always are, at the moment) we can display the error response--}%
+                            %{--// from the server (or javascript error in case error response is not in JSON)--}%
+                            %{--try {--}%
+                                %{--var error = JSON.parse(response);--}%
+                                %{--var stack = $("<div/>").addClass("stack empty").appendTo($(this));--}%
+                                %{--$("<pre/>").text(error.errorMessage).appendTo(stack)--}%
+                            %{--} catch (e) {--}%
+                                %{--console.log("exception: ", e);--}%
+                                %{--//$("<pre/>").text(e.stack).appendTo($(this));--}%
+                                %{--$(this).append(response);--}%
+                            %{--}--}%
 
-                        }
+                        %{--}--}%
 
-                        //$(this).dialog('open');
+                        %{--//$(this).dialog('open');--}%
 
-                    });
-                }
-            }).dialog('open');
-        });
-
+                    %{--});--}%
+                %{--}--}%
+            %{--}).dialog('open');--}%
+        %{--});--}%
     });
-
-
-
-
-
 </g:javascript>

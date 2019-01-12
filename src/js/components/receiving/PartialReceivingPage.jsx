@@ -194,7 +194,6 @@ const FIELDS = {
             />),
         fieldKey: '',
         flexWidth: '1.7',
-        clearable: false,
         label: 'stockMovement.binLocation.label',
         getDynamicAttr: ({
           bins, hasBinLocationSupport, shipmentReceived, fieldValue,

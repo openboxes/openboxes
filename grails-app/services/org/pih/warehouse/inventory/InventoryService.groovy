@@ -25,6 +25,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.importer.InventoryExcelImporter
@@ -59,6 +60,7 @@ class InventoryService implements ApplicationContextAware {
 	def productService
 	def identifierService
     def messageService
+	def locationService
 	//def authService
 
 	ApplicationContext applicationContext
@@ -3458,7 +3460,13 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
             if (fromLocations) {
-                'in'("inventory", fromLocations.collect { it.inventory })
+				and {
+					'in'("inventory", fromLocations.collect { it.inventory })
+
+					not {
+						'in'("destination", fromLocations)
+					}
+				}
             }
             between('transactionDate', fromDate, toDate)
         }
@@ -3622,18 +3630,31 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def getQuantityOnHand(Product product) {
+    def getCurrentStockAllLocations(Product product, Location currentLocation, User currentUser) {
         log.info ("Get getQuantityOnHand() for product ${product?.name} at all locations")
-        def quantityMap = [:]
-        def locations = Location.list()
-        locations.each { location ->
-            if (location.inventory && location.isWarehouse()) {
-                def quantity = getQuantityOnHand(location, product)
-                if (quantity) {
-                    quantityMap[location] = quantity
-                }
-            }
+        def locations = locationService.getLoginLocations(currentLocation)
+
+		locations = locations.findAll { Location location ->
+			location.inventory && location.isWarehouse() && currentUser.getEffectiveRoles(location) }
+
+        locations = locations.collect { Location location ->
+			def quantity = getQuantityOnHand(location, product)?:0
+			def unitPrice = product?.pricePerUnit?:0
+			[
+					location: location,
+					locationGroup: location?.locationGroup,
+					quantity: quantity,
+					value: quantity * unitPrice
+			]
         }
+
+		locations = locations.findAll { it?.quantity > 0 }
+		locations.sort { it.locationGroup }
+
+		def quantityMap = locations.groupBy { it?.locationGroup }.collect{ k, v ->
+			[(k):[totalValue: v.value.sum(), totalQuantity: v.quantity.sum(), locations: v]]
+		}
+
         return quantityMap
     }
 
@@ -4641,7 +4662,7 @@ class InventoryService implements ApplicationContextAware {
             def criteria = RequisitionItem.createCriteria()
             def results = criteria.list {
                 requisition {
-                    eq("destination", location)
+                    eq("origin", location)
                     between("dateRequested", date-30, date)
                 }
                 projections {

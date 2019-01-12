@@ -49,7 +49,6 @@ class PutawayService {
                     List<AvailableItem> availableItems = []
 
                     PutawayItem putawayItem = new PutawayItem()
-                    // FIXME Should be PENDING if there are existing putaways that are in-progress
                     putawayItem.putawayStatus = PutawayStatus.READY
                     putawayItem.product = it.product
                     putawayItem.inventoryItem = it.inventoryItem
@@ -82,7 +81,8 @@ class PutawayService {
         List<Putaway> putaways = orders.collect { Putaway.createFromOrder(it) }
         List<PutawayItem> putawayItems = []
 
-        putaways.each { putawayItems.addAll(it.putawayItems.findAll { it.putawayStatus == PutawayStatus.PENDING }) }
+        putaways.each { putawayItems.addAll(it.putawayItems.findAll { it.putawayStatus == PutawayStatus.PENDING ||
+                (it.putawayStatus == PutawayStatus.CANCELED && it.splitItems?.any { item -> item.putawayStatus == PutawayStatus.PENDING }) }) }
 
         return putawayItems
     }
@@ -225,20 +225,19 @@ class PutawayService {
 
     void validatePutaway(Putaway putaway) {
         putaway.putawayItems.toArray().each { PutawayItem putawayItem ->
-            if (putawayItem.splitItems) {
-                putawayItem.splitItems.each { PutawayItem splitItem ->
-                    validatePutawayItem(splitItem)
-                }
-            }
-            else {
-                validatePutawayItem(putawayItem)
-            }
+            validatePutawayItem(putawayItem)
         }
     }
 
 
     void validatePutawayItem(PutawayItem putawayItem) {
-        validateQuantityAvailable(putawayItem.currentFacility, putawayItem.currentLocation, putawayItem.inventoryItem, putawayItem.quantity)
+        def quantity = putawayItem.quantity
+
+        if (putawayItem.splitItems) {
+            quantity = putawayItem.splitItems.sum { it.quantity }
+        }
+
+        validateQuantityAvailable(putawayItem.currentFacility, putawayItem.currentLocation, putawayItem.inventoryItem, quantity)
     }
 
 

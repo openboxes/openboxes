@@ -14,6 +14,7 @@ import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
@@ -70,8 +71,9 @@ class ReceiptService {
         partialReceipt.dateShipped = shipment.actualShippingDate
         partialReceipt.dateDelivered = shipment.actualDeliveryDate ?: new Date()
 
+        String receivingLocationName = locationService.getReceivingLocationName(shipment?.shipmentNumber)
         Location defaultBinLocation = !shipment.destination.hasBinLocationSupport() ? null :
-                locationService.findInternalLocation(shipment.destination, "Receiving ${shipment.shipmentNumber}")
+                locationService.findInternalLocation(shipment.destination, receivingLocationName)
 
         def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
@@ -363,6 +365,36 @@ class ReceiptService {
             }
 
         }
+
+        deleteEvent(shipment, EventCode.RECEIVED)
+        deleteEvent(shipment, EventCode.PARTIALLY_RECEIVED)
     }
 
+    void rollbackLastReceipt(Shipment shipment) {
+        List<Receipt> receivedReceipts = shipment.receipts.findAll { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.RECEIVED }.sort { it.dateCreated }
+
+        if (receivedReceipts) {
+            Receipt lastReceipt = receivedReceipts.last()
+            Transaction transaction = shipment.incomingTransactions.find { it.receipt = lastReceipt }
+            if (transaction) {
+                shipment.removeFromIncomingTransactions(transaction)
+                transaction.delete()
+            }
+            shipment.removeFromReceipts(lastReceipt)
+            lastReceipt.delete()
+
+            deleteEvent(shipment, EventCode.RECEIVED)
+
+            if (receivedReceipts.size() <= 1) {
+                deleteEvent(shipment, EventCode.PARTIALLY_RECEIVED)
+            }
+        }
+    }
+
+    void deleteEvent(Shipment shipment, EventCode eventCode) {
+        Event event = shipment.events.find { it.eventType?.eventCode == eventCode }
+        if (event) {
+            shipmentService.deleteEvent(shipment, event)
+        }
+    }
 }

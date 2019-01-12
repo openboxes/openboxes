@@ -78,6 +78,13 @@ class UrlMappings {
             action = [GET:"availableStocklists"]
         }
 
+        // Stocklist API
+
+        "/api/stocklists/sendMail/$id"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "sendMail"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
