@@ -3129,7 +3129,7 @@ input {
 }
 
 /* Hack to allow Chosen results to display correctly in jQuery dialogs  */
-.ui-dialog .ui-dialog-content { overflow:visible !important;}
+.ui-dialog .ui-dialog-content { overflow:visible !important; padding: 0; }
 .ui-dialog { overflow: inherit !important; }
 
 

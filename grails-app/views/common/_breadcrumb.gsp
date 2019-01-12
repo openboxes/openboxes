@@ -8,7 +8,9 @@
     </li>
     <g:if test="${session?.user && session?.warehouse}">
         <li>
-            <a href="javascript:void(0);" class="warehouse-switch">
+            <a class="btn-show-dialog"
+               data-title="${g.message(code:'dashboard.chooseLocation.label')}"
+               data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}">
                 ${session?.warehouse?.name }
             </a>
         </li>

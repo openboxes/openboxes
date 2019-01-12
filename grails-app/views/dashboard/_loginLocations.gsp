@@ -1,5 +1,5 @@
 <g:if test="${loginLocationsMap && !loginLocationsMap.isEmpty() }">
-    <div>
+    <div style="max-height: 400px; overflow: auto">
         <table>
             <tbody>
             <g:if test="${session.user.warehouse}">

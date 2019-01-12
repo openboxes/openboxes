@@ -15,10 +15,24 @@ class RoleFilters {
     def static changeControllers = ['createProductFromTemplate']
 
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
-    def static adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create']]
+    def static adminActions = [
+            'product': ['create'],
+            'person': ['list'],
+            'user': ['list'],
+            'location': ['edit'],
+            'shipper': ['create'],
+            'locationGroup': ['create'],
+            'locationType': ['create']
+    ]
 
     def static superuserControllers = []
-    def static superuserActions = ['console':['index','execute'], '*': ['delete']]
+    def static superuserActions = [
+            'console':['index','execute'],
+            'inventory': ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed'],
+            'inventoryItem': ['adjustStock', 'transferStock'],
+            '*': ['delete'],
+            'user': ['impersonate']
+    ]
 
     def filters = {
         readonlyCheck(controller: '*', action: '*') {

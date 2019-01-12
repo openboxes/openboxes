@@ -7,7 +7,7 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/
-import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 
 class InitializationFilters {
 	def locationService
@@ -21,6 +21,10 @@ class InitializationFilters {
 
 					// Only initialize session if a user has logged in.
 					if (session.user) {
+
+						if (session.impersonateUserId && session.user.id != session.impersonateUserId) {
+							session.user = User.get(session.impersonateUserId)
+						}
 
 						if (!session.hasProperty("_showTime")) {
 							session._showTime = true
