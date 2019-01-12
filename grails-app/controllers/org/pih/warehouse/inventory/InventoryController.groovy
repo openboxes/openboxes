@@ -1353,22 +1353,58 @@ class InventoryController {
 		redirect(action: "listAllTransactions")
 	}
 	
-	
-	def createTransaction = { 
-		log.info("createTransaction params " + params)
+	def createInboundTransfer = {
+        params.product = Product.get(params?.product?.id)
+        params.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createOutboundTransfer = {
+        params.product = Product.get(params?.product?.id)
+        params.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createInventory = {
+        params.product = Product.get(params?.product?.id)
+        params.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createConsumed = {
+        params.product = Product.get(params?.product?.id)
+        params.transactionType = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createExpired = {
+        params.product = Product.get(params?.product?.id)
+        params.transactionType = TransactionType.get(Constants.EXPIRATION_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createDamaged = {
+        params.product = Product.get(params?.product?.id)
+        params.transactionType = TransactionType.get(Constants.DAMAGE_TRANSACTION_TYPE_ID)
+        forward(action: "createTransaction", params:params)
+    }
+
+    def createTransaction = {
+		log.info("createTransaction: " + params)
 		def command = new TransactionCommand();
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def transactionInstance = new Transaction(params);
 
 		if (!transactionInstance?.transactionType) {
-			flash.message = "Cannot create transaction for unknown transaction type";			
-			redirect(controller: "inventory", action: "browse")
+			flash.message = "Cannot create transaction for unknown transaction type ${params['transactionType.id']}";
+			redirect(controller: "inventoryItem", action: "showStockCard", id: params["product.id"])
+            return
 		}
 
         def products = []
 
 		// Process productId parameters from inventory browser
-		if (params.product?.id) {
+		if (params?.product?.id) {
 			def productIds = params.list('product.id')
 			productIds = productIds.collect { String.valueOf(it); }
             if (productIds) {
