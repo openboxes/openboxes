@@ -1354,37 +1354,31 @@ class InventoryController {
 	}
 	
 	def createInboundTransfer = {
-        params.product = Product.get(params?.product?.id)
         params.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params:params)
     }
 
     def createOutboundTransfer = {
-        params.product = Product.get(params?.product?.id)
         params.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params:params)
     }
 
     def createInventory = {
-        params.product = Product.get(params?.product?.id)
         params.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params:params)
     }
 
     def createConsumed = {
-        params.product = Product.get(params?.product?.id)
         params.transactionType = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params:params)
     }
 
     def createExpired = {
-        params.product = Product.get(params?.product?.id)
         params.transactionType = TransactionType.get(Constants.EXPIRATION_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params:params)
     }
 
     def createDamaged = {
-        params.product = Product.get(params?.product?.id)
         params.transactionType = TransactionType.get(Constants.DAMAGE_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params:params)
     }

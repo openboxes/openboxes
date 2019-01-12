@@ -133,24 +133,9 @@
 
 	</div>
 </span>
-<g:form id="inventoryActionForm" name="inventoryActionForm" controller="inventory" action="createTransaction" method="POST">
-	<g:hiddenField name="product.id" value="${productInstance?.id }"/>
-</g:form>
 
 <script>
 	$(document).ready(function() {		
-		$("#transactionReportBtn").click(function(event) {
-			$("#inventoryActionForm").attr("action", "${request.contextPath }/report/showTransactionReport").submit();
-		});
-		$("#markAsSupported").click(function(event) { 
-			$("#inventoryActionForm").attr("action", "${request.contextPath }/inventoryLevel/markAsSupported").submit();
-		});
-		$("#markAsNotSupported").click(function(event) { 
-			$("#inventoryActionForm").attr("action", "${request.contextPath }/inventoryLevel/markAsNotSupported").submit();
-		});
-		$("#markAsNonInventoried").click(function(event) { 
-			$("#inventoryActionForm").attr("action", "${request.contextPath }/inventoryLevel/markAsNonInventoried").submit();
-		});
 
 		$(".dialog-form").dialog({ autoOpen: false, modal: true, width: '800px', top: 10});	
 
