@@ -69,7 +69,7 @@
             </g:if>
             <g:else>
                 <g:if test="${tags}">
-                    <div id="tagcloud">
+                    <div class="tagcloud">
                         <g:each in="${tags }" var="tag">
                             <g:if test="${tag.value > 1}">
                                 <g:link controller="inventory" action="browse" params="['tags':tag.key.id]" rel="${tag.value }">
@@ -133,20 +133,3 @@
 </div>
 <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
 
-<script>
-
-    $(window).load(function(){
-        $("#tagcloud a").tagcloud({
-            size: {
-                start:1.0,
-                end: 2.0,
-                unit: 'em'
-            },
-            color: {
-                start: "#aaa", // "#CDE"
-                end: "#F52"//"#FS2"
-            }
-        });
-    });
-
-</script>

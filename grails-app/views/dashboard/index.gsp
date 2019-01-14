@@ -102,6 +102,19 @@
                 $(".spinner").click(function() {
                     $(this).hide();
                 });
+
+              $(".tagcloud a").tagcloud(
+                {
+                size: {
+                  start:1.0,
+                  end: 1.0,
+                  unit: 'em'
+                },
+                color: {
+                  start: "#aaa", // "#CDE"
+                  end: "#F52"//"#FS2"
+                }
+              });
             });
 
         </script>
