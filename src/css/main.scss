@@ -168,6 +168,10 @@ body {
 
 .font-size-xs {
   font-size: .875rem;
+  &.required::after {
+      content: "*";
+      color: red;
+  }
 }
 
 .btn-xs {
