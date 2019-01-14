@@ -226,6 +226,7 @@ const VENDOR_FIELDS = {
         type: SelectField,
         label: 'stockMovement.item.label',
         flexWidth: '4',
+        required: true,
         attributes: {
           className: 'text-left',
           async: true,
@@ -252,12 +253,14 @@ const VENDOR_FIELDS = {
         attributes: {
           dateFormat: 'MM/DD/YYYY',
           autoComplete: 'off',
+          placeholderText: 'MM/DD/YYYY',
         },
       },
       quantityRequested: {
         type: TextField,
         label: 'stockMovement.quantity.label',
         flexWidth: '1',
+        required: true,
         attributes: {
           type: 'number',
         },
