@@ -37,6 +37,10 @@ class Putaway {
                 putawayStatus: putawayStatus?.name(),
                 putawayDate: putawayDate?.format("MM/dd/yyyy"),
                 putawayAssignee: putawayAssignee,
+                "origin.id": origin?.id,
+                "origin.name": origin?.name,
+                "destination.id": destination?.id,
+                "destination.name": destination?.name,
                 putawayItems: putawayItems.collect { it?.toJson() }
         ]
     }

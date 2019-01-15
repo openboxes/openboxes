@@ -54,7 +54,13 @@ class PutAwayPage extends Component {
   }
 
   componentDidMount() {
-    this.fetchPutAwayCandidates();
+    this.fetchPutAwayCandidates(this.props.locationId);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.locationId !== nextProps.locationId) {
+      this.fetchPutAwayCandidates(nextProps.locationId);
+    }
   }
 
   /**
@@ -141,9 +147,9 @@ class PutAwayPage extends Component {
    * Fetches available items to put away from API.
    * @public
    */
-  fetchPutAwayCandidates() {
+  fetchPutAwayCandidates(locationId) {
     this.props.showSpinner();
-    const url = `/openboxes/api/putaways?location.id=${this.props.locationId}`;
+    const url = `/openboxes/api/putaways?location.id=${locationId}`;
 
     return apiClient.get(url)
       .then((response) => {
