@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse
 
 import grails.plugin.springcache.annotations.Cacheable
@@ -30,6 +30,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductAssociationTypeCode
+import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus;
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
@@ -40,7 +41,7 @@ import org.springframework.beans.SimpleTypeConverter
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 class SelectTagLib {
-	
+
 	def locationService
 	def shipmentService
     def requisitionService
@@ -103,6 +104,17 @@ class SelectTagLib {
     def selectTags = { attrs, body ->
         def tags = Tag.list(sort:"tag").collect { [ id: it.id, name: it.tag, productCount: it?.products?.size() ]}
         attrs.from = tags
+        attrs.multiple = true
+        attrs.value = attrs.value
+        attrs.optionKey = "id"
+        attrs.optionValue = { it.name + " (" + it?.productCount + ")" }
+        out << g.select(attrs)
+    }
+
+    @Cacheable("selectCatalogsCache")
+    def selectCatalogs = { attrs, body ->
+        def catalogs = ProductCatalog.list(sort:"name").collect { [id: it.id, name: it.name, productCount: it?.productCatalogItems?.size() ]}
+        attrs.from = catalogs
         attrs.multiple = true
         attrs.value = attrs.value
         attrs.optionKey = "id"
@@ -183,9 +195,9 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
-	
+
 	def selectShipper = { attrs, body ->
-		attrs.from = Shipper.list().sort { it?.name?.toLowerCase() } 
+		attrs.from = Shipper.list().sort { it?.name?.toLowerCase() }
 		attrs.optionKey = 'id'
 		attrs.value = attrs.value
 		attrs.optionValue = { it.name }
@@ -206,12 +218,12 @@ class SelectTagLib {
 		attrs.optionValue = { it.name + " (" + it.origin.name + " to " + it.destination.name + ")"}
 		out << g.select(attrs)
 	}
-	
+
 	def selectContainer = { attrs, body ->
 		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = shipmentService.getPendingShipments(currentLocation)
 		out << render(template: '/taglib/selectContainer', model: [attrs:attrs])
-		
+
 	}
 
 
@@ -291,7 +303,7 @@ class SelectTagLib {
         println locations
 		if (attrs.locationGroup) {
             println "filter by location group " + attrs.locationGroup
-			locations = locations.findAll { it.locationGroup == attrs.locationGroup } 
+			locations = locations.findAll { it.locationGroup == attrs.locationGroup }
 		}
 		if (attrs.locationType) {
             println "filter by location type " + attrs.locationType
@@ -302,7 +314,7 @@ class SelectTagLib {
 		attrs.from = locations
 		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
-		
+
 		attrs.groupBy = 'locationType'
 		attrs.value = attrs.value ?: currentLocation?.id
 		if (attrs.groupBy) {
@@ -372,7 +384,7 @@ class SelectTagLib {
         out << g.selectWithOptGroup(attrs)
     }
 
-	
+
 	def selectLocation = { attrs,body ->
 
         long startTime = System.currentTimeMillis()
@@ -387,10 +399,10 @@ class SelectTagLib {
 		//attrs.optionValue = 'name'
 		attrs.groupBy = 'locationType'
 		//attrs.value = attrs.value ?: currentLocation?.id
-		if (attrs.groupBy) { 
+		if (attrs.groupBy) {
 			attrs.optionValue = { it.name }
 		}
-		else { 
+		else {
 			attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		}
         //log.info "render select location " + (System.currentTimeMillis() - startTime) + " ms"
@@ -416,7 +428,7 @@ class SelectTagLib {
     def selectTransactionDestination = { attrs,body ->
 		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getTransactionDestinations(currentLocation).sort { it?.name?.toLowerCase() };
-		attrs.optionKey = 'id'		
+		attrs.optionKey = 'id'
 		//attrs.optionValue = 'name'
 		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
@@ -466,7 +478,7 @@ class SelectTagLib {
 		attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]"}
 		out << g.select(attrs)
 	}
-	
+
 	def selectCustomer = { attrs,body ->
 		def currentLocation = Location.get(session?.warehouse?.id)
 		attrs.from = locationService.getCustomers(currentLocation).sort { it?.name?.toLowerCase() };
@@ -596,8 +608,8 @@ class SelectTagLib {
         if (from) {
             //iterate through group set
             for(optGroup in optGroupSet) {
-				
-				def optGroupFormatted = "${format.metadata(obj: optGroup)}"				
+
+				def optGroupFormatted = "${format.metadata(obj: optGroup)}"
                 writer << " <optgroup label=\"${optGroupFormatted ?: optGroup.encodeAsHTML()}\">"
                 writer.println()
 
@@ -728,5 +740,5 @@ class SelectTagLib {
 
         el[optionValue].toString().encodeAsHTML()
     }
-		
+
 }
