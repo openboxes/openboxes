@@ -24,8 +24,9 @@
             </g:unless>
             <g:each in="${requisitionItems?.sort()}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
-                    <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
-                    <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>
+                    <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.groupBy { it?.inventoryItem }}"/>
+                    <g:set var="picklistItemsGroup" value="${inventoryItemMap?.values()?.toList()}"/>
+                    <g:set var="numInventoryItem" value="${inventoryItemMap?.size() ?: 1}"/>
                 </g:if>
                 <g:else>
                     <g:set var="numInventoryItem" value="${1}"/>
@@ -59,13 +60,13 @@
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItems}">
-                                ${picklistItems[j]?.inventoryItem?.lotNumber}
+                            <g:if test="${picklistItemsGroup}">
+                                ${picklistItemsGroup[j]?.first()?.inventoryItem?.lotNumber}
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItems}">
-                                <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
+                            <g:if test="${picklistItemsGroup}">
+                                <g:formatDate date="${picklistItemsGroup[j]?.first()?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                             </g:if>
                         </td>
                         <td class="center middle">
@@ -80,8 +81,9 @@
                             </div>
                         </td>
                         <td class="center middle">
-                            <g:if test="${picklistItems}">
-                                ${picklistItems[j]?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            <g:if test="${picklistItemsGroup}">
+                                <g:set var="picklistItemsGroupQuantity" value="${picklistItemsGroup[j]?.sum { it?.quantity }}"/>
+                                ${picklistItemsGroupQuantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                             </g:if>
                         </td>
                         <td class="middle">
