@@ -55,26 +55,24 @@
                             </tr>
                         </g:each>
                         <tr class="summary prop">
-                            <td>
+                            <th>
 
-                            </td>
-                            <td>
-                                <label>
-                                    ${locationGroupEntry.key?:g.message(code:'locationGroup.none.lable', default: "No Location Group")}
-                                    <small>(${locations.size()} locations)</small>
-                                </label>
-                            </td>
-                            <td>
+                            </th>
+                            <th>
+                                ${locationGroupEntry.key?:g.message(code:'locationGroup.none.lable', default: "No Location Group")}
+                                <small>(${locations.size()} locations)</small>
+                            </th>
+                            <th>
 
-                            </td>
-                            <td class="right">
+                            </th>
+                            <th class="right">
                                 <g:formatNumber number="${locationGroupEntry?.value?.totalQuantity}" format="###,###.#" maxFractionDigits="1"/>
-                            </td>
-                            <td class="right">
+                            </th>
+                            <th class="right">
                                 <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'access.accessDenied.label')])}">
                                     ${g.formatNumber(number: locationGroupEntry?.value?.totalValue, format: '###,###,##0.00', maxFractionDigits: 2) }
                                 </g:hasRoleFinance>
-                            </td>
+                            </th>
                         </tr>
                     </g:each>
 
