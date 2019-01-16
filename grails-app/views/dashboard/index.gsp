@@ -107,7 +107,7 @@
                 {
                 size: {
                   start:1.0,
-                  end: 1.0,
+                  end: 2.0,
                   unit: 'em'
                 },
                 color: {
