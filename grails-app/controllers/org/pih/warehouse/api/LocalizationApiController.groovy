@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
@@ -22,7 +22,7 @@ class LocalizationApiController {
     def grailsApplication
 
     def list = {
-        String languageCode = params.languageCode
+        String languageCode = params.lang
         Locale locale = localizationService.getLocale(languageCode)
         Properties messagesProperties = localizationService.getMessagesProperties(locale)
         String [] supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales
@@ -30,7 +30,7 @@ class LocalizationApiController {
 	}
 
     def read = {
-        String languageCode = params.languageCode
+        String languageCode = params.lang
         Locale locale = localizationService.getLocale(languageCode)
         String message = messageSource.getMessage(params.id, params.list("args").toArray(), locale)
         render ([code: params.id, message:message, currentLocale: locale] as JSON)

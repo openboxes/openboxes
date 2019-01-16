@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { withLocalize } from 'react-localize-redux';
-
+import connect from 'react-redux/es/connect/connect';
 
 import Router from './components/Router';
 
@@ -23,7 +23,6 @@ class MainRouter extends React.Component {
       ],
       options: {
         renderToStaticMarkup,
-        defaultLanguage: 'en',
         onMissingTranslation,
       },
     });
@@ -32,30 +31,20 @@ class MainRouter extends React.Component {
     this.props.addTranslationForLanguage(fr, 'fr');
   }
 
-  componentDidMount() {
-    this.fetchEnglish();
-    this.fetchFrench();
+  componentWillReceiveProps(nextProps) {
+    if (this.props.locale !== nextProps.locale) {
+      this.props.setActiveLanguage(nextProps.locale);
+      this.fetchLanguage(nextProps.locale);
+    }
   }
 
-  fetchEnglish() {
-    const url = '/openboxes/api/localizations?languageCode=en';
-
+  fetchLanguage(lang) {
+    const url = `/openboxes/api/localizations?lang=${lang}`;
     return apiClient.get(url)
       .then((response) => {
         const { messages } = parseResponse(response.data);
 
-        this.props.addTranslationForLanguage(messages, 'en');
-      });
-  }
-
-  fetchFrench() {
-    const url = '/openboxes/api/localizations?languageCode=fr';
-
-    return apiClient.get(url)
-      .then((response) => {
-        const { messages } = parseResponse(response.data);
-
-        this.props.addTranslationForLanguage(messages, 'fr');
+        this.props.addTranslationForLanguage(messages, lang);
       });
   }
 
@@ -66,9 +55,15 @@ class MainRouter extends React.Component {
   }
 }
 
-export default withLocalize(MainRouter);
+const mapStateToProps = state => ({
+  locale: state.session.activeLanguage,
+});
+
+export default withLocalize(connect(mapStateToProps)(MainRouter));
 
 MainRouter.propTypes = {
   initialize: PropTypes.func.isRequired,
   addTranslationForLanguage: PropTypes.func.isRequired,
+  locale: PropTypes.string.isRequired,
+  setActiveLanguage: PropTypes.func.isRequired,
 };
