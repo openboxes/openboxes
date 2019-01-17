@@ -222,7 +222,7 @@
                         </td>
                         <td class="value">
                             <span title="${g.formatDate(date:stockMovement?.dateRequested)}">
-                                <g:prettyDateFormat date="${stockMovement.dateRequested}"/>
+                                <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateRequested}"/>
                             </span>
                             <g:if test="${stockMovement?.requisition?.requestedBy}">
                                 <g:message code="default.by.label"/>
@@ -236,7 +236,7 @@
                         </td>
                         <td class="value">
                             <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
-                                <g:prettyDateFormat date="${stockMovement.dateShipped}"/>
+                                <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateShipped}"/>
                             </span>
                             <g:if test="${stockMovement?.shipment?.createdBy}">
                                 <g:message code="default.by.label"/>
@@ -252,7 +252,7 @@
                         <td class="value">
                             <g:each var="receipt" in="${stockMovement?.shipment?.receipts}">
                                 <span title="${g.formatDate(date:receipt?.actualDeliveryDate)}">
-                                    <g:prettyDateFormat date="${receipt?.actualDeliveryDate}"/>
+                                    <g:formatDate format="MMMM dd, yyyy" date="${receipt?.actualDeliveryDate}"/>
                                 </span>
                                 <g:if test="${receipt.recipient}">
                                     <g:message code="default.by.label"/>
@@ -268,7 +268,7 @@
                         </td>
                         <td class="value">
                             <span title="${g.formatDate(date:stockMovement?.requisition?.dateCreated)}">
-                                <g:prettyDateFormat date="${stockMovement?.requisition?.dateCreated}"/>
+                                <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.requisition?.dateCreated}"/>
                             </span>
                             <g:if test="${stockMovement?.requisition?.createdBy}">
                                 <g:message code="default.by.label"/>
@@ -282,7 +282,7 @@
                         </td>
                         <td class="value">
                             <span title="${g.formatDate(date:stockMovement?.requisition?.lastUpdated)}">
-                                <g:prettyDateFormat date="${stockMovement?.requisition?.lastUpdated}"/>
+                                <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.requisition?.lastUpdated}"/>
                             </span>
                             <g:if test="${stockMovement?.requisition?.updatedBy}">
                                 <g:message code="default.by.label"/>
