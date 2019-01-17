@@ -34,7 +34,7 @@
                     </span>
                 </div>
 
-			
+
 			</td>
 		</tr>
 	</table>
@@ -44,7 +44,7 @@
         <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
         <warehouse:message code="default.list.label" args="[g.message(code: 'locations.label')]" />
     </g:link>
-    <g:link class="button" action="create" controller="location">
+    <g:link class="button" action="edit" controller="location">
         <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
         <warehouse:message code="default.create.label" args="[g.message(code: 'location.label')]" />
     </g:link>
