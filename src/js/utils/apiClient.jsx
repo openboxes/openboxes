@@ -1,7 +1,11 @@
 /* eslint-disable no-console */
 import _ from 'lodash';
+import React from 'react';
 import axios from 'axios';
 import Alert from 'react-s-alert';
+import { confirmAlert } from 'react-confirm-alert';
+
+import LoginModal from '../components/LoginModal';
 
 const justRejectRequestError = error => Promise.reject(error);
 
@@ -65,7 +69,9 @@ const handleError = (error) => {
         </div>`);
       break;
     case 401:
-      window.location.reload();
+      confirmAlert({
+        customUI: props => (<LoginModal {...props} />),
+      });
       break;
     case 403:
       Alert.error(`Access denied.</br>${_.get(error, 'response.data.errorMessage', '')}`);
