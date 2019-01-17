@@ -109,6 +109,7 @@
                     <th>Name</th>
                     <th>Lot Number</th>
                     <th>Expiration Date</th>
+                    <th>Current Bins</th>
                     <th>Putaway Bin</th>
                     <th>Putaway Quantity</th>
                     <th>Total Quantity</th>
@@ -121,6 +122,7 @@
                         <td>${putawayItem["product.name"]}</td>
                         <td>${putawayItem["inventoryItem.lotNumber"]}</td>
                         <td>${putawayItem["inventoryItem.expirationDate"]}</td>
+                        <td>${putawayItem["currentBins"]}</td>
                         <td>${putawayItem["putawayLocation.name"]}</td>
                         <td>${putawayItem?.quantity}</td>
                         <td>${putawayItem?.quantity}</td>
@@ -134,6 +136,7 @@
                             <td>${status==0 ? putawayItem["product.name"]: ""}</td>
                             <td>${status==0 ? putawayItem["inventoryItem.lotNumber"]: ""}</td>
                             <td>${status==0 ? putawayItem["inventoryItem.expirationDate"]: ""}</td>
+                            <td>${putawayItem["currentBins"]}</td>
                             <td>${splitItem["putawayLocation.name"]}</td>
                             <td>${splitItem["quantity"]?:""}</td>
                             <td>${status==0 ? putawayItem?.quantity: ""}</td>
