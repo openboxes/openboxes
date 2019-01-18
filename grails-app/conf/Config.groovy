@@ -450,6 +450,9 @@ openboxes.logo.url = "/openboxes/images/logo/logo.png"
 openboxes.logoSquare.url = "/openboxes/images/logo/logo-512x512.png"
 openboxes.logoSmall.url = "/openboxes/images/logo/logo-small.png"
 
+// Allow system to anonymize user data to prevent it from being accessed by unauthorized users
+openboxes.anonymize.enabled = false
+
 // Grails Sentry/Raven plugin
 // NOTE: You'll need to enable the plugin and set a DSN using an external config properties file
 // (namely, openboxes-config.properties or openboxes-config.groovy)

@@ -259,7 +259,7 @@ class DashboardController {
 
 			activityList << new DashboardActivityCommand(
 				type: "user",
-				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it.username, activityType])}",
+				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it?.name, activityType])}",
 				url: link,
 				dateCreated: it.dateCreated,
 				lastUpdated: it.lastUpdated,
