@@ -9,7 +9,7 @@
  * */
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.pih.warehouse.auth.AuthService
 import util.StringUtil
 
@@ -105,7 +105,7 @@ class User extends Person {
 
 
     Map toJson() {
-        boolean anonymize = ConfigurationHolder.config.openboxes.anonymize.enabled
+        boolean anonymize = CH.config.openboxes.anonymize.enabled
 
         return [
                 "id": id,

@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.user
 
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.pih.warehouse.core.User;
 // import java.util.Locale;
@@ -17,16 +19,21 @@ import grails.test.*
 
 class UserTests extends GrailsUnitTestCase {
 
-	protected void setUp() {
+
+	@Before
+	void setUp() {
 		super.setUp()
 
 		// Set up default user, so we can easily test single properties.
 		def user1 = new User(username: 'tester', password: 'password', firstName: 'Tester', lastName: 'Testerson', locale: new Locale("en", "EN") )
 		// Make sure we can invoke validate() on our User domain object.
 		mockForConstraintsTests(User, [user1])
+		mockConfig("openboxes.anonymize.enabled = false")
+
 	}
 
-	protected void tearDown() {
+	@After
+	void tearDown() {
 		super.tearDown()
 	}
 

@@ -1,12 +1,25 @@
 package org.pih.warehouse.requisition
 
 import grails.test.GrailsUnitTestCase
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.pih.warehouse.core.*
 import org.pih.warehouse.picklist.PicklistItem
 
 
 class RequisitionTests extends GrailsUnitTestCase {
+
+    @Before
+    void setUp() {
+        super.setUp()
+        mockConfig("openboxes.anonymize.enabled = false")
+    }
+
+    @After
+    void tearDown() {
+        super.tearDown()
+    }
 
     @Test
     void calculatePercentageCompleted_shouldBeNotCompleted() {
