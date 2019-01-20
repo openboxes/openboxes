@@ -713,7 +713,7 @@ class ProductService {
 
 			// If the user-entered unit price is different from the current unit price validate the user is allowed to make the change
 			if (pricePerUnit) {
-				if (pricePerUnit != product.pricePerUnit) {
+				if (pricePerUnit != product?.pricePerUnit) {
 					userService.assertCurrentUserHasRoleFinance()
 					productProperties.pricePerUnit = pricePerUnit
 				}
