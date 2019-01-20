@@ -1,5 +1,5 @@
 <%@ page import="org.pih.warehouse.core.*" %>
-<g:set var="adminAndBrowser" value="${[Role.browser(), Role.assistant(), Role.manager()]}" />
+<g:set var="adminAndBrowser" value="${[Role.browser(), Role.assistant(), Role.manager(), Role.admin(), Role.superuser()]}" />
 <g:set var="allRoles" value="${[Role.admin(), Role.browser(), Role.manager()]}" />
 <g:set var="locationRolePairs" value="${userInstance?.locationRolePairs()}" />
 <html>
