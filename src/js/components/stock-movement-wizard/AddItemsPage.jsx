@@ -603,7 +603,7 @@ class AddItemsPage extends Component {
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() => this.saveAndTransitionToNextStep(formValues, lineItems));
     }
-    if (_.some(itemsMap, item => item.length > 1)) {
+    if (_.some(itemsMap, item => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER')) {
       this.confirmTransition(
         () =>
           this.saveAndTransitionToNextStep(formValues, lineItems),
