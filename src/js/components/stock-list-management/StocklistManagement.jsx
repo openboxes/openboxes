@@ -287,12 +287,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.monthlyDemand.label')}
+    title={this.props.translate('stockListManagement.monthlyStockListQty.label')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.monthlyDemand.label" />
+  ><Translate id="stockListManagement.monthlyStockListQty.label" />
   </Tooltip>,
               accessor: 'monthlyDemand',
               aggregate: vals => _.sum(vals),
@@ -376,12 +376,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.maximumQty.label')}
+    title={this.props.translate('stockListManagement.replenishmentQty.label')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.maximumQty.label" />
+  ><Translate id="stockListManagement.replenishmentQty.label" />
   </Tooltip>,
               accessor: 'maxQuantity',
               aggregate: vals => _.sum(vals),
