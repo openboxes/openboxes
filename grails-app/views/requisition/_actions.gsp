@@ -111,7 +111,7 @@
         </g:link>
     </div>
     --%>
-				<g:if test="${session?.warehouse?.id == requisition?.destination?.id }">
+				<g:if test="${session?.warehouse?.id == requisition?.origin?.id }">
 					<g:isUserManager>
                         <%--
 						<div class="action-menu-item">

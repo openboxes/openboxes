@@ -58,10 +58,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
     CommodityClass commodityClass
     Requisition requisitionTemplate
 
-    // where the requisition came from
+    // where stock is originating from
     Location origin
 
-    // who the requisition will be fulfilled by
+    // where stock is being issued to
     Location destination
 
     // Person who submitted the initial requisition paper form
