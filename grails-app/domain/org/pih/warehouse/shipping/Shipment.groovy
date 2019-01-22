@@ -401,7 +401,7 @@ class Shipment implements Comparable, Serializable {
 			                             location:null] )
 		}
 	}
-	
+
 	/**
 	 * Adds a new container to the shipment of the specified type
 	 */
@@ -473,6 +473,10 @@ class Shipment implements Comparable, Serializable {
 		return containers.findAll { it.parentContainer == null }.collect { it.totalWeightInPounds() }.sum()
 	}
 
+	Float getTotalValue() {
+		def itemsWithPrice = shipmentItems?.findAll { it.product.pricePerUnit }
+		return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum()?:0
+	}
 
 	Collection findAllParentContainers() {
 		return containers.findAll { !it.parentContainer }
