@@ -195,13 +195,13 @@ class StockMovementController {
         def lineItems = stockMovement.lineItems.collect {
             [
                     requisitionItemId: it?.id?:"",
-                    productCode: it?.product?.productCode?:"",
+                    "productCode (required)": it?.product?.productCode?:"",
                     productName: it?.product?.name?:"",
                     palletName: it?.palletName?:"",
                     boxName: it?.boxName?:"",
                     lotNumber: it?.lotNumber?:"",
-                    expirationDate: it?.expirationDate?it?.expirationDate?.format("MM/dd/yyyy"):"",
-                    quantity: it?.quantityRequested?:"",
+                    "expirationDate (MM/dd/yyyy)": it?.expirationDate?it?.expirationDate?.format("MM/dd/yyyy"):"",
+                    "quantity (required)": it?.quantityRequested?:"",
                     recipientId: it?.recipient?.id?:""
             ]
         }
