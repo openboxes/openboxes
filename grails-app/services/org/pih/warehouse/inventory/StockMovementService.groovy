@@ -201,6 +201,9 @@ class StockMovementService {
             if (stockMovement.requestedBy) {
                 eq("requestedBy", stockMovement.requestedBy)
             }
+            if (stockMovement.createdBy) {
+                eq("createdBy", stockMovement.createdBy)
+            }
 
             //if (offset) firstResult(offset)
             //if (maxResults) maxResults(maxResults)

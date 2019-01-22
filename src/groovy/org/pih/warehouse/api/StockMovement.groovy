@@ -39,6 +39,7 @@ class StockMovement {
     Location origin
     Location destination
     Person requestedBy
+    Person createdBy
     Date dateRequested
 
     // Shipment information
