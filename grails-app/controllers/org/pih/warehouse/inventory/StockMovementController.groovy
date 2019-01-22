@@ -90,6 +90,7 @@ class StockMovementController {
             stockMovement.description = "%" + params.q + "%"
         }
         stockMovement.requestedBy = requisition.requestedBy
+        stockMovement.createdBy = requisition.createdBy
         stockMovement.origin = requisition.origin
         stockMovement.destination = requisition.destination
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null

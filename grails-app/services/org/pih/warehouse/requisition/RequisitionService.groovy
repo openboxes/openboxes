@@ -98,11 +98,8 @@ class RequisitionService {
                     }
                     or {
                         eq("createdBy", user)
-                        eq("updatedBy", user)
-                        eq("requestedBy", user)
                     }
                     or {
-
                         if (destination) eq("destination", destination)
                         if (origin) eq("origin", origin)
                     }
