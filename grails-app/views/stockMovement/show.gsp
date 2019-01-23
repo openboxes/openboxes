@@ -23,8 +23,10 @@
             <div class="right">
                 <span class="action-menu">
                     <button class="action-btn button">
-                        <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" style="vertical-align: middle" />
+                        <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />
                         &nbsp; <g:message code="default.download.label"/>
+                        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+
                     </button>
                     <div class="actions">
                         <g:each var="document" in="${stockMovement.documents}">
@@ -190,7 +192,9 @@
                             <warehouse:message code="shipping.totalValue.label"/>
                         </td>
                         <td class="value">
-                            <g:formatNumber format="###,###,##0.00" number="${stockMovement?.totalValue ?: 0.00 }" />
+                            <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
+                                <g:formatNumber format="###,###,##0.00" number="${stockMovement?.shipment?.calculateTotalValue() ?: 0.00 }" />
+                            </g:hasRoleFinance>
                             ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </td>
                     </tr>
