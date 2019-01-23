@@ -52,6 +52,18 @@ class UrlMappings {
             action = [GET:"read", POST: "update"]
         }
 
+        // Stock Movement API
+
+        "/api/stockMovements/importPickListItems/$id"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "importPickListItems"]
+        }
+
+        "/api/stockMovements/exportPickListItems/$id"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [GET:"exportPickListItems"]
+        }
+
         // Partial Receiving API
 
         "/api/partialReceiving"(parseRequest: true) {

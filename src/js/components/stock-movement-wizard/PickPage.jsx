@@ -6,6 +6,7 @@ import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate, Translate } from 'react-localize-redux';
+import fileDownload from 'js-file-download';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -155,6 +156,7 @@ class PickPage extends Component {
     this.revertUserPick = this.revertUserPick.bind(this);
     this.saveNewItems = this.saveNewItems.bind(this);
     this.sortByBins = this.sortByBins.bind(this);
+    this.importTemplate = this.importTemplate.bind(this);
     this.props.showSpinner();
   }
 
@@ -374,6 +376,45 @@ class PickPage extends Component {
     }));
   }
 
+  exportTemplate(formValues) {
+    this.props.showSpinner();
+
+    const { movementNumber, stockMovementId } = formValues;
+    const url = `/openboxes/api/stockMovements/exportPickListItems/${stockMovementId}`;
+
+    apiClient.get(url, { responseType: 'blob' })
+      .then((response) => {
+        fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  importTemplate(event) {
+    this.props.showSpinner();
+    const formData = new FormData();
+    const file = event.target.files[0];
+    const { stockMovementId } = this.state.values;
+
+    formData.append('importFile', file.slice(0, file.size, 'text/csv'));
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+
+    const url = `/openboxes/api/stockMovements/importPickListItems/${stockMovementId}`;
+
+    return apiClient.post(url, formData, config)
+      .then(() => {
+        this.props.hideSpinner();
+        this.fetchAllData();
+      })
+      .catch(() => {
+        this.props.hideSpinner();
+      });
+  }
+
   render() {
     return (
       <Form
@@ -383,6 +424,30 @@ class PickPage extends Component {
         render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
             <span>
+              <label
+                htmlFor="csvInput"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-download pr-2" /><Translate id="default.button.importTemplate.label" /></span>
+                <input
+                  id="csvInput"
+                  type="file"
+                  style={{ display: 'none' }}
+                  onChange={this.importTemplate}
+                  onClick={(event) => {
+                  // eslint-disable-next-line no-param-reassign
+                  event.target.value = null;
+                }}
+                  accept=".csv"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => this.exportTemplate(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-upload pr-2" /><Translate id="default.button.exportTemplate.label" /></span>
+              </button>
               <a
                 href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"

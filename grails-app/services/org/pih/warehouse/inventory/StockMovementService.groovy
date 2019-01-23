@@ -421,6 +421,34 @@ class StockMovementService {
         picklist.save(flush: true)
     }
 
+    void createOrUpdatePicklistItem(StockMovement stockMovement) {
+
+        Requisition requisition = stockMovement.requisition
+
+        Picklist picklist = requisition?.picklist
+        if (!picklist) {
+            picklist = new Picklist()
+            picklist.requisition = requisition
+        }
+
+        stockMovement.pickPage.pickPageItems.each { pickPageItem ->
+            pickPageItem.picklistItems?.toArray()?.each { PicklistItem picklistItem ->
+                // If one does not exist add it to the list
+                if (!picklistItem.id) {
+                    picklist.addToPicklistItems(picklistItem)
+                }
+
+                // Remove from picklist
+                if (picklistItem.quantity <= 0) {
+                    picklist.removeFromPicklistItems(picklistItem)
+                    picklistItem.requisitionItem?.removeFromPicklistItems(picklistItem)
+                }
+            }
+        }
+
+        picklist.save()
+    }
+
     /**
      * Get a list of suggested items for the given stock movement item.
      *
