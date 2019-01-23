@@ -5,8 +5,10 @@ import ReactTable from 'react-table';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
 import { getTranslate, Translate } from 'react-localize-redux';
+import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-table/react-table.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
 import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
@@ -59,6 +61,9 @@ class PutAwayCheckPage extends Component {
       pivotBy,
       expanded,
     };
+
+    this.confirmPutaway = this.confirmPutawayco.bind(this);
+    this.save = this.save.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -177,6 +182,17 @@ class PutAwayCheckPage extends Component {
    * @public
    */
   completePutAway() {
+    const isBinLocationChosen = !_.some(this.props.putAway.putawayItems, putAwayItem =>
+      _.isNull(putAwayItem.putawayLocation.id));
+
+    if (!isBinLocationChosen) {
+      this.confirmPutaway();
+    } else {
+      this.save();
+    }
+  }
+
+  save() {
     this.props.showSpinner();
     const url = `/openboxes/api/putaways?location.id=${this.props.locationId}`;
     const payload = {
@@ -185,7 +201,10 @@ class PutAwayCheckPage extends Component {
       putawayItems: _.map(this.props.putAway.putawayItems, item => ({
         ...item,
         putawayStatus: 'COMPLETED',
-        splitItems: _.map(item.splitItems, splitItem => ({ ...splitItem, putawayStatus: 'COMPLETED' })),
+        splitItems: _.map(item.splitItems, splitItem => ({
+          ...splitItem,
+          putawayStatus: 'COMPLETED',
+        })),
       })),
     };
 
@@ -211,6 +230,28 @@ class PutAwayCheckPage extends Component {
         });
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+
+  /**
+   * Shows transition confirmation dialog if there are items with the same code.
+   * @param {function} onConfirm
+   * @public
+   */
+  confirmPutaway() {
+    confirmAlert({
+      title: this.props.translate('message.confirmPutAway.label'),
+      message: this.props.translate('confirmPutAway.message'),
+      buttons: [
+        {
+          label: this.props.translate('default.yes.label'),
+          onClick: () => this.save(),
+        },
+        {
+          label: this.props.translate('default.no.label'),
+        },
+      ],
+    });
   }
 
   render() {
