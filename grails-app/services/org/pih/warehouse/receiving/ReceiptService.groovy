@@ -375,7 +375,7 @@ class ReceiptService {
 
         if (receivedReceipts) {
             Receipt lastReceipt = receivedReceipts.last()
-            Transaction transaction = shipment.incomingTransactions.find { it.receipt = lastReceipt }
+            Transaction transaction = shipment.incomingTransactions.find { it.receipt?.id == lastReceipt?.id }
             if (transaction) {
                 shipment.removeFromIncomingTransactions(transaction)
                 transaction.delete()
