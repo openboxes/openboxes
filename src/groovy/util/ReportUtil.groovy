@@ -1,6 +1,7 @@
 package util
 
 import org.apache.commons.lang.StringEscapeUtils
+import org.pih.warehouse.core.Constants
 
 class ReportUtil {
 
@@ -44,21 +45,23 @@ class ReportUtil {
 
 
     static getCsvForListOfMapEntries(List list) {
-        def csv = ""
+        StringBuffer sb = new StringBuffer()
         if (list) {
             list[0].eachWithIndex { k, v, index ->
-                csv += StringEscapeUtils.escapeCsv(k) + ","
+                sb.append(StringEscapeUtils.escapeCsv(k))
+                sb.append(Constants.DEFAULT_COLUMN_SEPARATOR)
             }
-            csv+= "\n"
+            sb.append(System.lineSeparator())
 
             list.each { entry ->
                 entry.eachWithIndex { k, v, index ->
-                    csv += StringEscapeUtils.escapeCsv(v ? v.toString() : "") + ","
+                    sb.append(v ? StringEscapeUtils.escapeCsv(v.toString()) : "")
+                    sb.append(Constants.DEFAULT_COLUMN_SEPARATOR)
                 }
-                csv += "\n"
+                sb.append(System.lineSeparator())
             }
         }
-        return csv
+        return sb.toString()
     }
 
 
