@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:if test="${orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
-            <g:set var="entityName" value="${warehouse.message(code: 'putAways.label', default: 'Put Aways')}" />
+            <g:set var="entityName" value="${warehouse.message(code: 'putAways.label', default: 'Putaways')}" />
         </g:if>
         <g:else>
             <g:set var="entityName" value="${warehouse.message(code: 'orders.label', default: 'Purchase orders')}" />
@@ -131,9 +131,9 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				$(".clear-all").click(function() {
-					$('#statusStartDate-datepicker').val('');					
+					$('#statusStartDate-datepicker').val('');
 					$('#statusEndDate-datepicker').val('');
-					$('#statusStartDate').val('');					
+					$('#statusStartDate').val('');
 					$('#statusEndDate').val('');
 					$('#totalPrice').val('');
 					$('#description').val('');

@@ -229,7 +229,7 @@ class PutAwayCheckPage extends Component {
 
     return (
       <div className="main-container">
-        <h1>Put Away - {this.state.putAway.putawayNumber}</h1>
+        <h1><Translate id="putAway.putAway.label" /> {this.state.putAway.putawayNumber}</h1>
         {
           this.state.completed ?
             <div className="d-flex justify-content-between mb-2">
@@ -313,7 +313,7 @@ class PutAwayCheckPage extends Component {
                 type="button"
                 onClick={() => this.completePutAway()}
                 className="btn btn-outline-primary float-right my-2 btn-xs"
-              >Complete Put Away
+              ><Translate id="putAway.completePutAway.label" />
               </button>
               <button
                 type="button"
