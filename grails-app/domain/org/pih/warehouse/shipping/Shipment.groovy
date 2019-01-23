@@ -473,9 +473,9 @@ class Shipment implements Comparable, Serializable {
 		return containers.findAll { it.parentContainer == null }.collect { it.totalWeightInPounds() }.sum()
 	}
 
-	Float getTotalValue() {
-		def itemsWithPrice = shipmentItems?.findAll { it.product.pricePerUnit }
-		return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum()?:0
+	Float calculateTotalValue() {
+		return shipmentItems?.findAll { it.product.pricePerUnit }.
+				collect { it?.quantity?:0 * it.product.pricePerUnit }.sum()?:0
 	}
 
 	Collection findAllParentContainers() {

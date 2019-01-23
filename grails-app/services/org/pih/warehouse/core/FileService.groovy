@@ -435,7 +435,7 @@ class FileService {
 
         // Add additional properties generated
         def decimalFormatter = new DecimalFormat("\$###,##0.00")
-        String totalValue = decimalFormatter.format(shipmentInstance?.statedValue?:0.0);
+        String totalValue = decimalFormatter.format(shipmentInstance?.calculateTotalValue()?:0.0);
         mappings.put("SHIPMENT.TOTAL_VALUE", totalValue)
         mappings.put("SHIPMENT.STATUS", shipmentInstance?.getStatus())
         mappings.put("SHIPMENT.FREIGHT_FORWARDER", shipmentInstance?.shipmentMethod?.shipper?.name)
