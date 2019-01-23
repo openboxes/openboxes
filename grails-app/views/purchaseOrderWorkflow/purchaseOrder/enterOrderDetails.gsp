@@ -42,7 +42,7 @@
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'name','errors')}'>
                                     <g:textField type="text" id="name" name='name'
-                                                 placeholder="${warehouse.message(code:'order.description.placeholder')}" size="100" class="text large" value="${order?.description?.encodeAsHTML()}"/>
+                                                 placeholder="${warehouse.message(code:'order.description.placeholder')}" size="100" class="text large" value="${order?.name?.encodeAsHTML()}"/>
 
                                 </td>
                             </tr>
