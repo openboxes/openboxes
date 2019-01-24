@@ -2,17 +2,14 @@
     <table id="requisition-items" class="fs-repeat-header w100">
         <thead>
         <tr>
-            <th colspan="8" class="gray-background">${pageTitle}</th>
-        </tr>
-        <tr>
-            <th class="center b-t0 b-r0">${warehouse.message(code: 'report.pihCode.label')}</th>
-            <th class="center b-t0 b-r0">${warehouse.message(code: 'report.productDescription.label')}</th>
-            <th class="center b-t0 b-r0">${warehouse.message(code: 'import.unit.label')}</th>
-            <th class="center b-t0 b-r0">${warehouse.message(code: 'import.maxQuantity.label')}</th>
-            <th class="center b-t0 b-r0">${warehouse.message(code: 'requisition.quantityOnHand.label')}</th>
-            <th class="center b-t0 b-r0">${warehouse.message(code: 'report.quantityRequested.label')}</th>
-            <th class="center b-t0 b-r0 gray-background">${warehouse.message(code: 'report.quantityApproved.label')}</th>
-            <th class="center b-t0 gray-background">${warehouse.message(code: 'comments.label')}</th>
+            <th class="center b-r0">${warehouse.message(code: 'report.pihCode.label')}</th>
+            <th class="center b-r0">${warehouse.message(code: 'report.productDescription.label')}</th>
+            <th class="center b-r0">${warehouse.message(code: 'import.unit.label')}</th>
+            <th class="center b-r0">${warehouse.message(code: 'import.maxQuantity.label')}</th>
+            <th class="center b-r0">${warehouse.message(code: 'requisition.quantityOnHand.label')}</th>
+            <th class="center b-r0">${warehouse.message(code: 'report.quantityRequested.label')}</th>
+            <th class="center b-r0 gray-background">${warehouse.message(code: 'report.quantityApproved.label')}</th>
+            <th class="center gray-background">${warehouse.message(code: 'comments.label')}</th>
         </tr>
         </thead>
         <tbody>
@@ -25,7 +22,14 @@
                     </td>
                 </tr>
             </g:unless>
+            <g:set var="pageTitle" value="" />
             <g:each in="${requisitionItems}" status="i" var="requisitionItem">
+                <g:if test="${!pageTitle || (pageTitle && pageTitle != requisitionItem?.product?.category)}">
+                    <g:set var="pageTitle" value="${requisitionItem?.product?.category}" />
+                    <tr>
+                        <td colspan="8" class="gray-background b-t0">${pageTitle}</td>
+                    </tr>
+                </g:if>
                 <tr>
                     <td class="b-t0 b-r0">${requisitionItem?.product?.productCode}</td>
                     <td class="b-t0 b-r0">${requisitionItem?.product?.name}</td>

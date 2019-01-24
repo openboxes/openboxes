@@ -37,7 +37,7 @@ class StocklistController {
 		renderPdf(
 			template: "/stocklist/print",
 			model: [stocklist:stocklist],
-			filename: "Stocklist - ${stocklist?.requisition?.name}"
+			filename: "Stocklist - ${stocklist?.requisition?.name}.pdf"
 		)
 	}
 }
