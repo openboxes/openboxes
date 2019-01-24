@@ -16,6 +16,7 @@ import Checkbox from '../../utils/Checkbox';
 import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
 import EditLineModal from './modals/EditLineModal';
 import Translate from '../../utils/Translate';
+import apiClient from '../../utils/apiClient';
 
 const isReceived = (subfield, fieldValue) => {
   if (subfield) {
@@ -97,7 +98,7 @@ const FIELDS = {
   buttonsTop: {
     type: ({
       // eslint-disable-next-line react/prop-types
-      autofillLines, onSave, saveDisabled, shipmentReceived,
+      autofillLines, onSave, saveDisabled, shipmentReceived, exportTemplate, formValues,
     }) => (
       <div className="mb-1 text-center">
         <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
@@ -109,6 +110,13 @@ const FIELDS = {
         <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}>
           <Translate id="default.button.next.label" defaultMessage="Next" />
         </button>
+        <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}><Translate id="default.button.save.label" /></button>
+        <button type="button" className="btn btn-outline-secondary btn-xs" onClick={() => exportTemplate(formValues)}>
+          <span><i className="fa fa-upload pr-2" />
+            <Translate id="default.button.exportTemplate.label" />
+          </span>
+        </button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}><Translate id="default.button.next.label" /></button>
       </div>),
   },
   containers: {
@@ -363,6 +371,7 @@ class PartialReceivingPage extends Component {
     this.setLocation = this.setLocation.bind(this);
     this.onSave = this.onSave.bind(this);
     this.saveEditLine = this.saveEditLine.bind(this);
+    this.exportTemplate = this.exportTemplate.bind(this);
   }
 
   componentDidMount() {
@@ -447,6 +456,7 @@ class PartialReceivingPage extends Component {
       this.props.change('containers', containers);
     }
   }
+
   /**
    * Fetches data using function given as an argument.
    * @param {function} fetchFunction
@@ -479,6 +489,21 @@ class PartialReceivingPage extends Component {
     this.props.save(formValues);
   }
 
+  exportTemplate(formValues) {
+    this.props.showSpinner();
+
+    console.log(formValues);
+    const { shipmentId } = formValues;
+    const url = `/openboxes/api/partialReceiving/exportCsv/${shipmentId}`;
+
+    apiClient.get(url, { responseType: 'blob' })
+      .then((response) => {
+        fileDownload(response.data, `PartialReceiving${shipmentId ? `-${shipmentId}` : ''}.csv`, 'text/csv');
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
   render() {
     return (
       <div>
@@ -494,6 +519,8 @@ class PartialReceivingPage extends Component {
             locationId: this.props.locationId,
             saveDisabled: !isAnyItemSelected(this.props.formValues.containers),
             shipmentReceived: this.props.formValues.shipmentStatus === 'RECEIVED',
+            exportTemplate: this.exportTemplate,
+            formValues: this.props.formValues,
           }))}
       </div>
     );

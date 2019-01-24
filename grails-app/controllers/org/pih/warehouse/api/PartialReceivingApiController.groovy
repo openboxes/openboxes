@@ -19,7 +19,7 @@ class PartialReceivingApiController {
 
     def receiptService
     def shipmentService
-
+    def dataService
 
     def list = {
         render ([data: []] as JSON)
@@ -55,6 +55,36 @@ class PartialReceivingApiController {
 
 
         render([data:partialReceipt] as JSON)
+    }
+
+    def exportCsv = {
+        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id,  params.stepNumber)
+
+        // We need to create at least one row to ensure an empty template
+        if (partialReceipt?.partialReceiptContainers?.partialReceiptItems?.empty) {
+            partialReceipt?.partialReceiptContainers?.partialReceiptItems?.add(new PartialReceiptItem())
+        }
+
+        def lineItems = partialReceipt.partialReceiptItems.collect {
+            [
+            receiptItemId: it?.receiptItem?.id ?: "",
+            Code: it?.receiptItem?.product?.productCode ?: "",
+            Name: it?.receiptItem?.product?.name ?: "",
+            "Lot/Serial No.": it?.lotNumber ?: "",
+            "Expration date": it?.expirationDate?.format("MM/dd/yyyy") ?: "",
+            "Bin Location": it?.binLocation ?: "",
+            Recipient: it?.recipient ?: "",
+            Shipped: it?.quantityShipped ?: "",
+            Receied: it?.quantityReceived ?: "",
+            "To receive": it?.quantityRemaining ?: "",
+            "Receiving now": it?.quantityReceiving ?: "",
+            Comment: it?.comment ?: ""
+            ]
+        }
+
+        String csv = dataService.generateCsv(lineItems)
+        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
+        render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
     }
 
     Date parseDate(String date) {
