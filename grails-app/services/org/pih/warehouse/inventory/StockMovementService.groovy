@@ -100,18 +100,22 @@ class StockMovementService {
 
         if (stockMovement.origin.isSupplier()) {
 
-            // After creating stock movement from Requisition in this case (when origin.isSupplier()), those 3 values were not
+            // After creating stock movement from Requisition in this case (when origin.isSupplier()), those 5 values were not
             // populated. As a quick fix, data that came from request is preserved and reapplied to SM afterwards.
 
             def driverName = stockMovement.driverName
             def trackingNumber = stockMovement.trackingNumber
             def comments = stockMovement.comments
+            def shipmentType = stockMovement.shipmentType
+            def dateShipped = stockMovement.dateShipped
 
             stockMovement = StockMovement.createFromRequisition(requisition)
 
             if (driverName) stockMovement.driverName = driverName
             if (trackingNumber) stockMovement.trackingNumber = trackingNumber
             if (comments) stockMovement.comments = comments
+            stockMovement.shipmentType = shipmentType
+            stockMovement.dateShipped = dateShipped
         }
 
         log.info "Date shipped: " + stockMovement.dateShipped
