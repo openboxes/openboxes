@@ -1296,7 +1296,15 @@ class StockMovementService {
                             contentType : "application/vnd.ms-excel",
                             stepNumber  : 5,
                             uri         : g.createLink(controller: 'doc4j', action: "downloadPackingList", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "shipping.downloadRwandaCOD.label"),
+                            documentType: DocumentGroupCode.RWANDA_COD.name(),
+                            contentType : "application/vnd.ms-excel",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'doc4j', action: "downloadRwandaCOD", id: stockMovement?.shipment?.id, absolute: true)
                     ]
+
             ])
         }
 
