@@ -12,8 +12,11 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.core.Location
 
 class PartialReceivingApiController {
 
@@ -58,7 +61,11 @@ class PartialReceivingApiController {
     }
 
     def exportCsv = {
+        JSONObject jsonObject = request.JSON
+
         PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id,  params.stepNumber)
+
+        bindPartialReceiptData(partialReceipt, jsonObject)
 
         // We need to create at least one row to ensure an empty template
         if (partialReceipt?.partialReceiptContainers?.partialReceiptItems?.empty) {
@@ -67,15 +74,16 @@ class PartialReceivingApiController {
 
         def lineItems = partialReceipt.partialReceiptItems.collect {
             [
-            receiptItemId: it?.receiptItem?.id ?: "",
-            Code: it?.receiptItem?.product?.productCode ?: "",
-            Name: it?.receiptItem?.product?.name ?: "",
+            "Receipt item id": it?.receiptItem?.id ?: "",
+            "Shipment item id": it?.shipmentItem?.id ?: "",
+            Code: it?.shipmentItem?.product?.productCode ?: "",
+            Name: it?.shipmentItem?.product?.name ?: "",
             "Lot/Serial No.": it?.lotNumber ?: "",
-            "Expration date": it?.expirationDate?.format("MM/dd/yyyy") ?: "",
+            "Expiration date": it?.expirationDate?.format("MM/dd/yyyy") ?: "",
             "Bin Location": it?.binLocation ?: "",
-            Recipient: it?.recipient ?: "",
+            Recipient: it?.recipient?.id ?: "",
             Shipped: it?.quantityShipped ?: "",
-            Receied: it?.quantityReceived ?: "",
+            Received: it?.quantityReceived ?: "",
             "To receive": it?.quantityRemaining ?: "",
             "Receiving now": it?.quantityReceiving ?: "",
             Comment: it?.comment ?: ""
@@ -83,8 +91,59 @@ class PartialReceivingApiController {
         }
 
         String csv = dataService.generateCsv(lineItems)
-        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
+        response.setHeader("Content-disposition", "attachment; filename=\"PartialReceiving-${params.id}.csv\"")
         render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+    }
+
+    def importCsv = { ImportDataCommand command ->
+
+        try {
+            PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, "1")
+
+            def importFile = command.importFile
+            if (importFile.isEmpty()) {
+                throw new IllegalArgumentException("File cannot be empty")
+            }
+
+            if (importFile.fileItem.contentType != "text/csv") {
+                throw new IllegalArgumentException("File must be in CSV format")
+            }
+
+            String csv = new String(importFile.bytes)
+            def settings = [separatorChar: ',', skipLines: 1]
+            csv.toCsvReader(settings).eachLine { tokens ->
+                String receiptItemId = tokens[0] ?: null
+                String shipmentItemId = tokens[1] ?: null
+                String recipientId = tokens[7] ?: null
+                Integer quantityReceiving = tokens[11] ? tokens[11].toInteger() : null
+                String comment = tokens[12] ? tokens[12] : null
+
+                List<PartialReceiptItem> partialReceiptItems = []
+                partialReceipt.partialReceiptItems.each {
+                    partialReceiptItems.addAll(it)
+                }
+
+                PartialReceiptItem partialReceiptItem = partialReceiptItems.find { receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId }
+
+                if (!partialReceiptItem) {
+                    throw new IllegalArgumentException("Receipt item id: ${receiptItemId} not found")
+                }
+
+                partialReceiptItem.quantityReceiving = quantityReceiving
+                partialReceiptItem.comment = comment
+                partialReceiptItem.shouldSave = quantityReceiving != null
+            }
+
+            receiptService.savePartialReceipt(partialReceipt, false)
+
+        } catch (Exception e) {
+            log.warn("Error occurred while importing CSV: " + e.message, e)
+            response.status = 500
+            render([errorCode: 500, errorMessage: e?.message?:"An unknown error occurred during import"] as JSON)
+            return
+        }
+
+        render([data: "Data was imported successfully"] as JSON)
     }
 
     Date parseDate(String date) {

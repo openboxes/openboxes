@@ -83,7 +83,7 @@ class UrlMappings {
 
         "/api/partialReceiving/exportCsv/$id"(parseRequest: true) {
             controller = "partialReceivingApi"
-            action = [GET:"exportCsv"]
+            action = [POST:"exportCsv"]
         }
 
         // Internal Locations API
