@@ -351,7 +351,7 @@ class PutAwaySecondPage extends Component {
 
     return (
       <div className="main-container">
-        <h1>Put Away - {this.state.putAway.putawayNumber}</h1>
+        <h1><Translate id="putAway.putAway.label" /> {this.state.putAway.putawayNumber}</h1>
         <div className="d-flex justify-content-between mb-2">
           <div>
             <Translate id="putAway.showBy.label" />:
