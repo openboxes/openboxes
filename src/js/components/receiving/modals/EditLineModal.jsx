@@ -17,12 +17,13 @@ const FIELDS = {
   lines: {
     type: ArrayField,
     // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, shipmentItemId }) => (
+    addButton: ({ addRow, shipmentItemId, binLocation }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           shipmentItemId,
+          binLocation,
           receiptItemId: null,
           newLine: true,
         })}
@@ -202,6 +203,7 @@ class EditLineModal extends Component {
         formProps={{
           shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
           productsFetch: this.productsFetch,
+          binLocation: this.state.attr.fieldValue.binLocation,
         }}
       />
     );

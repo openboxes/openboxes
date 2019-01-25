@@ -96,7 +96,27 @@ class PutAwaySecondPage extends Component {
       Header: <Translate id="putAway.qty.label" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
-      Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
+      Cell: (props) => {
+        const itemIndex = props.index;
+        const edit = _.get(this.state.putAway.putawayItems, `[${itemIndex}].edit`);
+
+        if (edit) {
+          return (<input
+            type="number"
+            className="form-control form-control-xs"
+            value={props.value}
+            onChange={(event) => {
+              const putAway = update(this.state.putAway, {
+                putawayItems: { [itemIndex]: { quantity: { $set: event.target.value } } },
+              });
+
+              this.setState({ putAway });
+            }}
+          />);
+        }
+
+        return (<span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>);
+      },
       Filter,
     }, {
       Header: <Translate id="putAway.currentBin.label" />,
@@ -141,14 +161,26 @@ class PutAwaySecondPage extends Component {
       Header: '',
       accessor: 'splitItems',
       Cell: cellInfo => (
-        <SplitLineModal
-          putawayItem={this.state.putAway.putawayItems[cellInfo.index]}
-          splitItems={_.get(this.state.putAway.putawayItems, `[${cellInfo.index}].${cellInfo.column.id}`)}
-          saveSplitItems={(splitItems) => {
-            this.saveSplitItems(splitItems, cellInfo.index);
-          }}
-          bins={this.state.bins}
-        />),
+        <div className="d-flex flex-row">
+          <SplitLineModal
+            putawayItem={this.state.putAway.putawayItems[cellInfo.index]}
+            splitItems={_.get(this.state.putAway.putawayItems, `[${cellInfo.index}].${cellInfo.column.id}`)}
+            saveSplitItems={(splitItems) => {
+              this.saveSplitItems(splitItems, cellInfo.index);
+            }}
+            bins={this.state.bins}
+          />
+          <button
+            className="btn btn-outline-primary btn-xs mx-2"
+            onClick={() => this.editItem(cellInfo.index)}
+          ><Translate id="default.button.edit.label" />
+          </button>
+          <button
+            className="btn btn-outline-danger btn-xs"
+            onClick={() => this.deleteItem(cellInfo.index)}
+          ><Translate id="default.button.delete.label" />
+          </button>
+        </div>),
       filterable: false,
     },
   ];
@@ -245,6 +277,33 @@ class PutAwaySecondPage extends Component {
     this.savePutAways(putAway);
   }
 
+  editItem(itemIndex) {
+    const putAway = update(this.state.putAway, {
+      putawayItems: { [itemIndex]: { edit: { $set: true } } },
+    });
+
+    this.setState({ putAway });
+  }
+
+  deleteItem(itemIndex) {
+    this.props.showSpinner();
+    const url = `/openboxes/api/putawayItems/${_.get(this.state.putAway.putawayItems, `[${itemIndex}].id`)}`;
+
+    apiClient.delete(url)
+      .then(() => {
+        const putAway = update(this.state.putAway, {
+          putawayItems: {
+            $splice: [
+              [itemIndex, 1],
+            ],
+          },
+        });
+
+        this.setState({ putAway }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
   /**
    * Save put-away and go to next page.
    * @public
@@ -305,17 +364,24 @@ class PutAwaySecondPage extends Component {
               {pivotBy && pivotBy.length ? <Translate id="stockMovement.label" /> : <Translate id="product.label" /> }
             </button>
           </div>
-          <button
-            className="btn btn-outline-secondary btn-xs"
-            style={{ marginRight: 170 }}
-            onClick={() => this.generatePutAwayList()}
-          >
-            <span><i className="fa fa-print pr-2" /><Translate id="putAway.generateList.label" /></span>
-          </button>
+          <div>
+            <button
+              className="btn btn-outline-secondary btn-xs mr-3"
+              onClick={() => this.generatePutAwayList()}
+            >
+              <span><i className="fa fa-print pr-2" /><Translate id="putAway.generateList.label" /></span>
+            </button>
+            <button
+              type="button"
+              onClick={() => this.savePutAways(this.state.putAway)}
+              className="btn btn-outline-secondary btn-xs"
+            ><Translate id="default.button.save.label" />
+            </button>
+          </div>
           <button
             type="button"
             onClick={() => this.nextPage()}
-            className="float-right btn btn-outline-primary align-self-end btn-xs"
+            className="btn btn-outline-primary align-self-end btn-xs"
           ><Translate id="default.button.next.label" />
           </button>
         </div>
