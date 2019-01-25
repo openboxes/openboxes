@@ -63,7 +63,7 @@ const FIELDS = {
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: _.map(fieldValue.availableItems, availableItem =>
             (
-              <p>{fieldValue.productCode} {fieldValue.productName}, {availableItem.quantityAvailable}, {availableItem.expirationDate ? availableItem.expirationDate : '---'} </p>
+              <p>{fieldValue.productCode} {fieldValue.productName}, {availableItem.expirationDate ? availableItem.expirationDate : '---'}, Qty {availableItem.quantityAvailable}</p>
             )),
         }),
       },
