@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import _ from 'lodash';
 
 import Select from '../utils/Select';
@@ -28,21 +28,46 @@ const debouncedGlobalSearch = _.debounce((searchTerm, callback) => {
 }, 500);
 
 
-const GlobalSearch = () => (
-  <div className="global-search ">
-    <Select
-      async
-      placeholder="Search..."
-      loadOptions={debouncedGlobalSearch}
-      cache={false}
-      options={[]}
-      showValueTooltip
-      menuContainerStyle={{ maxHeight: '500px' }}
-      menuStyle={{ maxHeight: '500px' }}
-      filterOptions={options => options}
-      onChange={(value) => { window.location = value.url; }}
-    />
-  </div>
-);
+class GlobalSearch extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      inputValue: '',
+    };
+
+    this.onInputChange = this.onInputChange.bind(this);
+  }
+
+  onInputChange(inputValue) {
+    this.setState({ inputValue });
+
+    return inputValue;
+  }
+
+  render() {
+    return (
+      <div className="global-search ">
+        <Select
+          async
+          placeholder="Search..."
+          loadOptions={debouncedGlobalSearch}
+          cache={false}
+          options={[]}
+          showValueTooltip
+          menuContainerStyle={{ maxHeight: '500px' }}
+          menuStyle={{ maxHeight: '500px' }}
+          filterOptions={options => options}
+          onChange={(value) => {
+            window.location = value.url;
+          }}
+          onInputChange={this.onInputChange}
+          onEnterPress={() => {
+            window.location = `/openboxes/dashboard/globalSearch?searchTerms=${this.state.inputValue}`;
+          }}
+        />
+      </div>);
+  }
+}
 
 export default GlobalSearch;
