@@ -306,7 +306,7 @@ class PutAwayCheckPage extends Component {
               type="button"
               className="btn btn-outline-primary float-right my-2 btn-xs"
               onClick={() => this.props.firstPage()}
-            >Go back to put-away list
+            ><Translate id="putAway.goBack.label" />
             </button> :
             <div>
               <button
