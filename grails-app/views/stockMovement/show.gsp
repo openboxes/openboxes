@@ -22,12 +22,18 @@
         <g:if test="${stockMovement.documents}">
             <div class="right">
                 <span class="action-menu">
+                    <div class="button-group">
+                    <g:link controller="stockMovement" action="addDocument" class="button" id="${stockMovement?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
+                        <warehouse:message code="stockMovement.uploadDocuments.label" />
+                    </g:link>
                     <button class="action-btn button">
                         <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />
                         &nbsp; <g:message code="default.download.label"/>
                         <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 
                     </button>
+                    </div>
                     <div class="actions">
                         <g:each var="document" in="${stockMovement.documents}">
                             <g:if test="${!document.hidden}">

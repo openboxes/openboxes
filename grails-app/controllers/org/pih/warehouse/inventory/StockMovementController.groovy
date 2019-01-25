@@ -185,6 +185,22 @@ class StockMovementController {
         render ([data: "Document was uploaded successfully"] as JSON)
     }
 
+    def addDocument = {
+        log.info params
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        Shipment shipmentInstance = stockMovement.shipment
+        def documentInstance = Document.get(params?.document?.id);
+        if (!documentInstance) {
+            documentInstance = new Document();
+        }
+        if (!shipmentInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+            redirect(action: "list")
+        }
+        render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
+    }
+
 	def exportCsv = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
