@@ -87,7 +87,7 @@
                 </td>
                 <td>
                     <div title="<g:formatDate date="${stockMovement.dateRequested }"/>">
-                        <g:prettyDateFormat date="${stockMovement.dateRequested}"/>
+                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateRequested}"/>
                     </div>
                 </td>
             </tr>
