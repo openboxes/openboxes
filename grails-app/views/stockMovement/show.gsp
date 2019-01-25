@@ -94,18 +94,18 @@
             </g:link>
 
             <g:isSuperuser>
-                %{--<g:if test="${showRollbackLastReceiptButton}">--}%
-                    %{--<g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">--}%
-                        %{--<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;--}%
-                        %{--<warehouse:message code="stockMovement.rollbackLastReceipt.label" />--}%
-                    %{--</g:link>--}%
-                %{--</g:if>--}%
-                %{--<g:else>--}%
+                <g:if test="${showRollbackLastReceiptButton}">
+                    <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                        <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+                    </g:link>
+                </g:if>
+                <g:else>
                     <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>
-                %{--</g:else>--}%
+                </g:else>
                 <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
                         onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                     <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
