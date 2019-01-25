@@ -25,7 +25,7 @@
 		</g:each>
 		<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
 			&nbsp;&nbsp; | &nbsp;&nbsp;
-			<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', 
+			<a href="${createLink(controller: 'user', action: 'updateAuthUserLocale',
 				params: ['locale':'debug','targetUri':targetUri])}">
 				<g:message code="admin.debug.label"/>:
 			</a>
