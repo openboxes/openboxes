@@ -62,7 +62,7 @@ class PutAwayCheckPage extends Component {
       expanded,
     };
 
-    this.confirmPutaway = this.confirmPutawayco.bind(this);
+    this.confirmPutaway = this.confirmPutaway.bind(this);
     this.save = this.save.bind(this);
   }
 
