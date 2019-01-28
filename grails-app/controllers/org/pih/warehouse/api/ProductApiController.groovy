@@ -19,6 +19,28 @@ class ProductApiController extends BaseDomainApiController {
 
     def productService
     def inventoryService
+    def forecastingService
+
+    def demand = {
+        def product = Product.get(params.id)
+        def location = Location.get(session.warehouse.id)
+        def data = [:]
+        data.location = location
+        data.product = product
+        data.demand = forecastingService.getDemand(location, product)
+
+        render ([data:data] as JSON)
+    }
+
+
+    def demandSummary = {
+        def product = Product.get(params.id)
+        def location = Location.get(session.warehouse.id)
+        def data = forecastingService.getDemandSummary(location, product)
+
+        render ([data:data] as JSON)
+
+    }
 
     def list = {
         String [] terms = params?.name?.split(",| ")?.findAll { it }
