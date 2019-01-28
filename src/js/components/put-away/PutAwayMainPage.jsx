@@ -52,22 +52,22 @@ class PutAwayMainPage extends Component {
    * Returns array of form's components.
    * @public
    */
-  getFormList(locationId) {
+  getFormList(location) {
     return [
       <PutAwayPage
         nextPage={this.nextPage}
-        locationId={locationId}
+        locationId={location.id}
       />,
       <PutAwaySecondPage
         {...this.state.props}
         nextPage={this.nextPage}
-        locationId={locationId}
+        location={location}
       />,
       <PutAwayCheckPage
         {...this.state.props}
         prevPage={this.prevPage}
         firstPage={this.firstPage}
-        locationId={locationId}
+        location={location}
       />,
     ];
   }
@@ -101,10 +101,10 @@ class PutAwayMainPage extends Component {
 
   render() {
     const { page } = this.state;
-    const { locationId } = this.props;
+    const { location } = this.props;
 
-    if (locationId) {
-      const formList = this.getFormList(locationId);
+    if (_.get(location, 'id')) {
+      const formList = this.getFormList(location);
 
       return (
         <div>
@@ -118,13 +118,15 @@ class PutAwayMainPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  locationId: state.session.currentLocation.id,
+  location: state.session.currentLocation,
 });
 
 export default withRouter(connect(mapStateToProps, { showSpinner, hideSpinner })(PutAwayMainPage));
 
 PutAwayMainPage.propTypes = {
-  locationId: PropTypes.string.isRequired,
+  location: PropTypes.shape({
+    id: PropTypes.string,
+  }).isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */

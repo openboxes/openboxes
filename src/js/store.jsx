@@ -5,4 +5,7 @@ import reduxThunk from 'redux-thunk';
 import rootReducer from './reducers';
 
 const createStoreWithMiddleware = applyMiddleware(ReduxPromise, reduxThunk)(createStore);
-export default createStoreWithMiddleware(rootReducer);
+const store = createStoreWithMiddleware(rootReducer);
+export default store;
+
+export const { dispatch } = store;
