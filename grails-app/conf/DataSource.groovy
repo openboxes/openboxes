@@ -17,6 +17,42 @@ dataSource {
     loggingSql = false
 	format_sql = false
 	use_sql_comments = false
+
+	// Basic Pool Configuration
+	acquireIncrement = 5
+	initialPoolSize = 10
+	minPoolSize = 5
+	maxPoolSize = 100
+
+	// Statement Pooling
+	maxStatements = 180
+	maxStatementsPerConnection = 0
+	statementCacheNumDeferredCloseThreads = 1
+
+	// Connection Testing
+	testConnectionOnCheckin = false
+	testConnectionOnCheckout = false
+	preferredTestQuery = "SELECT 1"
+	idleConnectionTestPeriod = 60
+
+	// Pool Size and Connection Age
+	maxIdleTime = 0
+	maxConnectionAge = 0
+	maxIdleTimeExcessConnections = 0
+
+	// Unreturned Connections
+	unreturnedConnectionTimeout = 0
+	debugUnreturnedConnectionStackTraces = false
+
+	// Recovery from Database Outages
+	acquireRetryAttempts = 30
+	acquireRetryDelay = 1000
+	breakAfterAcquireFailure = false
+
+	// Other Configuration
+	checkoutTimeout = 0
+	numHelperThreads = 3
+	maxAdministrativeTaskTime = 0
 }
 
 // Hibernate caching properties
@@ -54,29 +90,11 @@ environments {
 			url = "jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
 	}
-	staging {
-		dataSource {
-			url = "jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
-		}
-	}
 	diff {
 		dataSource {
 			url = "jdbc:mysql://localhost:3306/openboxes_diff?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
 		}
 	}
-    aws {
-        dataSource {
-            url = System.getProperty("JDBC_CONNECTION_STRING")
-            properties {
-                validationQuery = "SELECT 1"
-                testOnBorrow = true
-                testOnReturn = true
-                testWhileIdle = true
-                timeBetweenEvictionRunsMillis = 1000 * 60 * 30
-                numTestsPerEvictionRun = 3
-                minEvictableIdleTimeMillis = 1000 * 60 * 30
-            }
-        }
-    }
+
 
 }
