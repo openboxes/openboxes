@@ -59,9 +59,9 @@ grails {
 	mail {
 		// By default we enable email.  You can enable/disable email using environment settings below or in your
 		// ${user.home}/openboxes-config.properties file
-		enabled = true
+		enabled = false
 		from = "info@openboxes.com"
-		prefix = "[OpenBoxes " + GrailsUtil.environment+"]"
+		prefix = "[OpenBoxes]"
 		host = "localhost"
 		port = "25"
 
@@ -130,6 +130,13 @@ grails.validateable.packages = [
 	'org.pih.warehouse.shipment',
 ]
 
+// Default URL
+grails.serverURL = "http://localhost:8080/${appName}";
+
+// UI performance
+uiperformance.enabled = false
+
+
 /* Default settings for emails sent through the SMTP appender  */
 //mail.error.server = 'localhost'
 //mail.error.port = 25
@@ -150,48 +157,13 @@ mail.error.prefix = grails.mail.prefix
 // set per-environment serverURL stem for creating absolute links
 environments {
 	development {
-		grails.serverURL = "http://localhost:8080/${appName}";
-		uiperformance.enabled = false
-		grails.mail.enabled = false
-		mail.error.debug = false
 	}
 	test {
-		grails.serverURL = "http://localhost:8080/${appName}"
-		uiperformance.enabled = false
-		grails.mail.enabled = false
 	}
 	loadtest {
-		grails.serverURL = "http://localhost:8080/${appName}"
-		uiperformance.enabled = false
-		grails.mail.enabled = false
 	}
 	production {
-		grails.serverURL = "http://localhost:8080/${appName}"
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-        grails.mail.prefix = "[OpenBoxes]"
     }
-	staging {
-		grails.serverURL = "http://localhost:8080/${appName}"
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-	qa {
-		grails.serverURL = "http://localhost:8080/${appName}"
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-	client {
-		grails.serverURL = "http://localhost:8080/${appName}";
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-	root {
-		grails.serverURL = "http://localhost:8080/${appName}";
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-
 }
 
 
