@@ -75,9 +75,13 @@
             <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
             <g:set var="hasBeenPartiallyReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"/>
+            <g:set var="hasBeenShipped" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.SHIPPED}"/>
             <g:set var="isSameLocation" value="${stockMovement?.requisition?.destination?.id==session.warehouse.id}"/>
-            <g:set var="disableReceivingButton" value="${!hasBeenIssued || hasBeenReceived || !isSameLocation}"/>
+            <g:set var="disableReceivingButton" value="${!hasBeenIssued || !isSameLocation || !(hasBeenShipped || hasBeenPartiallyReceived)}"/>
             <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
+            <g:if test="${!(hasBeenShipped || hasBeenPartiallyReceived)}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenShipped.message', args: [stockMovement?.identifier])}"/>
+            </g:if>
             <g:if test="${!hasBeenIssued}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
             </g:if>
