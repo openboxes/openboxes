@@ -47,8 +47,8 @@ grails.project.dependency.resolution = {
         build ('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2')  { excludes "ant", "javassist" }
 
         compile ('org.docx4j:docx4j:2.8.1') { excludes 'commons-logging:commons-logging:1.0.4', 'commons-codec', 'commons-io'}
-        compile 'c3p0:c3p0:0.9.1.2'
-        compile 'mysql:mysql-connector-java:5.1.26'
+        compile 'com.mchange:c3p0:0.9.5.3'
+        compile 'mysql:mysql-connector-java:5.1.47'
 
         compile 'com.google.zxing:javase:2.0'
         compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.6') { excludes "xercesImpl", "groovy",  "commons-lang", "commons-codec" }
