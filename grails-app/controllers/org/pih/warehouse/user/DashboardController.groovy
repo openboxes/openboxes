@@ -451,15 +451,15 @@ class DashboardController {
 			return
 		}
 
-		[loginLocationsMap:locationService.getLoginLocationsMap(user, session.warehouse)]
+		[loginLocationsMap:locationService.getLoginLocationsMap(user, warehouse)]
 	}
 
 
 	def changeLocation = {
 		User user = User.get(session.user.id);
-		Location location = params.id ? Location.get(params.id) : null
-		Map loginLocationsMap = locationService.getLoginLocationsMap(user, location)
-		render(template: "loginLocations", model: [loginLocationsMap:loginLocationsMap])
+		Location currentLocation = Location.get(session.warehouse.id)
+		Map loginLocationsMap = locationService.getLoginLocationsMap(user, currentLocation)
+		render(template: "loginLocations", model: [currentLocation: currentLocation, loginLocationsMap:loginLocationsMap])
 	}
 
     def downloadGenericProductSummaryAsCsv = {

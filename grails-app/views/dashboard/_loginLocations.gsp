@@ -2,14 +2,14 @@
     <div style="max-height: 400px; overflow: auto">
         <table>
             <tbody>
-            <g:if test="${session.user.warehouse}">
+            <g:if test="${currentLocation}">
                 <tr class="prop">
                     <td>
                         <h4><g:message code="user.favoriteLocations.label"/></h4>
                     </td>
                     <td class="middle">
-                        <a href='${createLink(action:"chooseLocation", id: session?.user?.warehouse?.id)}' class="button big">
-                            <format:metadata obj="${session?.user?.warehouse}"/>
+                        <a href='${createLink(action:"chooseLocation", id: currentLocation.id)}' class="button big">
+                            <format:metadata obj="${currentLocation}"/>
                         </a>
                     </td>
                 </tr>
