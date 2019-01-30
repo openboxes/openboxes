@@ -142,7 +142,7 @@
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.requisitions.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.requisitions.enabled}">
         <g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -191,7 +191,7 @@
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.inbound.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.inbound.enabled}">
         <g:authorize activity="[ActivityCode.RECEIVE_STOCK]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -199,7 +199,7 @@
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-section">
-                    <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
+                    <g:if test="${megamenuConfig.stockMovement.enabled}">
 
                         <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
 
@@ -225,7 +225,7 @@
                             </g:link>
                         </div>
                     </g:if>
-                    <g:if test="${megamenuConfig.receiving.enabled || isSuperuser}">
+                    <g:if test="${megamenuConfig.receiving.enabled}">
                         <h3><warehouse:message code="receiving.label" default="Receiving" /></h3>
 
                         <div class="mm-menu-item">
@@ -267,7 +267,7 @@
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-section">
-                        <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
+                        <g:if test="${megamenuConfig.stockMovement.enabled}">
 
                             <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
 
@@ -282,7 +282,7 @@
                                 </g:link>
                             </div>
                         </g:if>
-                        <g:if test="${megamenuConfig.shipping.enabled || isSuperuser}">
+                        <g:if test="${megamenuConfig.shipping.enabled}">
                             <h3><warehouse:message code="shipping.label" default="Shipping" /></h3>
 
                             <div class="mm-menu-item">
