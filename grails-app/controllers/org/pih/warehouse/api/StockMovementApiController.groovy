@@ -231,7 +231,7 @@ class StockMovementApiController {
                 }
 
                 AvailableItem availableItem = pickPageItem.availableItems?.find {
-                    (binLocation ? it.binLocation?.name == binLocation : !it.binLocation) && lotNumber == it.inventoryItem?.lotNumber &&
+                    (binLocation ? it.binLocation?.name == binLocation : !it.binLocation) && lotNumber == (it.inventoryItem?.lotNumber ?: null) &&
                             expirationDate == (it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : null)
                 }
 
