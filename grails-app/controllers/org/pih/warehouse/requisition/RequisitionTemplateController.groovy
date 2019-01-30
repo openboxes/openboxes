@@ -139,6 +139,8 @@ class RequisitionTemplateController {
                 }
             }
             requisition.properties = params
+            requisition.lastUpdated = new Date()
+
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
                 redirect(action: "edit", id: requisition.id)
@@ -267,7 +269,7 @@ class RequisitionTemplateController {
                         requisitionItem.substitutable = false
                         requisitionItem.orderIndex = count + index
                         requisition.addToRequisitionItems(requisitionItem)
-                        requisition.save(flush: true, failOnError: true)
+                        requisition.save()
                         processedProductCodes << productCode
                     }
                     else {
@@ -277,17 +279,10 @@ class RequisitionTemplateController {
                 else {
                     ignoredProductCodes << productCode
                 }
-
             }
             flash.message = "Added requisition item with product codes " + processedProductCodes?:"none" + " (ignored: " + ignoredProductCodes + ")"
-
-
-
         }
-
         redirect(action: "edit", id: requisition.id)
-
-
     }
 
 
@@ -298,6 +293,7 @@ class RequisitionTemplateController {
             def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
             if (requisitionItem) {
                 requisition.removeFromRequisitionItems(requisitionItem)
+                requisition.lastUpdated = new Date()
                 requisition.save()
             }
         }
