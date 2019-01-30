@@ -129,8 +129,13 @@
                 </td>
                 <td class="value">
                     ${requisition?.updatedBy?.name }
+
+                    <%--
+                        FIXME Kind of a hack, but lastUpdated is not updated in the parent when updating the child association.
+                     --%>
+                    <g:set var="lastUpdated" value="${[requisition?.lastUpdated, requisition?.requisitionItems?.lastUpdated?.max()].max()}"/>
                     <div class="fade">
-                        <g:formatDate date="${requisition?.lastUpdated }"/>
+                        <g:formatDate date="${ lastUpdated}"/>
                     </div>
                 </td>
             </tr>
