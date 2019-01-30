@@ -848,31 +848,37 @@ class StockMovementService {
                                     stockMovementItem.comments)
                             requisitionItem.quantityApproved = 0
                         }
+                    } else if (stockMovementItem.quantityRevised != null) {
+                        log.info "Item revised " + requisitionItem.id
+
+                        // Cannot cancel quantity if it has already been canceled
+                        if (!requisitionItem.quantityCanceled) {
+                            requisitionItem.changeQuantity(
+                                    stockMovementItem?.quantityRevised?.intValueExact(),
+                                    stockMovementItem.reasonCode,
+                                    stockMovementItem.comments)
+                            requisitionItem.quantityApproved = 0
+                        }
                     } else {
                         log.info "Item updated " + requisitionItem.id
+
+                        if (stockMovementItem.quantityRequested && stockMovementItem.quantityRequested != requisitionItem.quantity) {
+                            requisitionItem.undoChanges()
+                        }
+
                         if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
                         if (stockMovementItem.quantityRequested) {
                             requisitionItem.quantity = stockMovementItem.quantityRequested
                             requisitionItem.quantityApproved = stockMovementItem.quantityRequested
                         }
-                        if (stockMovementItem.recipient) requisitionItem.recipient = stockMovementItem.recipient
                         if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
                         if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
-                        if (stockMovementItem.palletName) requisitionItem.palletName = stockMovementItem.palletName
-                        if (stockMovementItem.boxName) requisitionItem.boxName = stockMovementItem.boxName
-                        if (stockMovementItem.lotNumber) requisitionItem.lotNumber = stockMovementItem.lotNumber
-                        if (stockMovementItem.expirationDate) requisitionItem.expirationDate = stockMovementItem.expirationDate
 
-                        if (stockMovementItem.quantityRevised != null) {
-                            // Cannot cancel quantity if it has already been canceled
-                            if (!requisitionItem.quantityCanceled) {
-                                requisitionItem.changeQuantity(
-                                        stockMovementItem?.quantityRevised?.intValueExact(),
-                                        stockMovementItem.reasonCode,
-                                        stockMovementItem.comments)
-                                requisitionItem.quantityApproved = 0
-                            }
-                        }
+                        requisitionItem.recipient = stockMovementItem.recipient
+                        requisitionItem.palletName = stockMovementItem.palletName
+                        requisitionItem.boxName = stockMovementItem.boxName
+                        requisitionItem.lotNumber = stockMovementItem.lotNumber
+                        requisitionItem.expirationDate = stockMovementItem.expirationDate
                     }
                 }
                 // Otherwise we create a new one
