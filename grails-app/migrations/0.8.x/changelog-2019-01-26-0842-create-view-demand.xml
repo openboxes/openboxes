@@ -2,7 +2,7 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <changeSet author="adminuser (generated)" id="1546667174939-1">
+    <changeSet author="adminuser (generated)" id="1546667174939-1" runOnChange="true">
         <createView viewName="product_demand" replaceIfExists="true">
             SELECT
             request_status,
@@ -58,7 +58,7 @@
             cancel_reason_code,
             cancel_comments,
             quantity AS quantity_requested,
-            IF(requisition_item.cancel_reason_code IN ('SUBSTITUTION' , 'STOCKOUT', 'LOW_STOCK', 'EXPIRED'), quantity_canceled, 0) AS quantity_canceled,
+            IF(requisition_item.cancel_reason_code IN ('SUBSTITUTION' , 'STOCKOUT', 'LOW_STOCK', 'EXPIRED', 'COULD_NOT_LOCATE'), quantity_canceled, 0) AS quantity_canceled,
             IF(quantity_canceled IS NOT NULL, 0, quantity) AS quantity_approved,
             (SELECT
             SUM(quantity_approved)
