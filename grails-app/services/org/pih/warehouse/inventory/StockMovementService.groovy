@@ -111,9 +111,9 @@ class StockMovementService {
 
             stockMovement = StockMovement.createFromRequisition(requisition)
 
-            if (driverName) stockMovement.driverName = driverName
-            if (trackingNumber) stockMovement.trackingNumber = trackingNumber
-            if (comments) stockMovement.comments = comments
+            stockMovement.driverName = driverName
+            stockMovement.trackingNumber = trackingNumber
+            stockMovement.comments = comments
             stockMovement.shipmentType = shipmentType
             stockMovement.dateShipped = dateShipped
         }
@@ -1004,17 +1004,17 @@ class StockMovementService {
             return shipment
         }
 
+        ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
+        if (!trackingNumberType) {
+            throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
+        }
+
+        // Needed to use ID since reference numbers is lazy loaded and equality operation was not working
+        ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
+            trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
+        }
+
         if (stockMovement.trackingNumber) {
-            ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
-            if (!trackingNumberType) {
-                throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
-            }
-
-            // Needed to use ID since reference numbers is lazy loaded and equality operation was not working
-            ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
-                trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
-            }
-
             // Create a new reference number
             if (!referenceNumber) {
                 referenceNumber = new ReferenceNumber()
@@ -1026,6 +1026,10 @@ class StockMovementService {
             else {
                 referenceNumber.identifier = stockMovement.trackingNumber
             }
+            shipment.save(failOnError: true)
+        } else if (referenceNumber) {
+            shipment.removeFromReferenceNumbers(referenceNumber)
+
             shipment.save(failOnError: true)
         }
 
