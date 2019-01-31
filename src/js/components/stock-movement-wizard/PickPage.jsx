@@ -127,7 +127,7 @@ const FIELDS = {
         buttonLabel: 'default.button.undo.label',
         getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
           onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
-          hidden: subfield || fieldValue.pickStatusCode === 'NOT_PICKED',
+          hidden: subfield,
         }),
         attributes: {
           className: 'btn btn-outline-danger',
@@ -318,7 +318,6 @@ class PickPage extends Component {
     this.props.showSpinner();
 
     const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}`;
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
     const pickPageItemData = _.find(
       flattenRequest(this.state.values.pickPageItems),
       item => item['requisitionItem.id'] === itemId,
@@ -327,10 +326,21 @@ class PickPage extends Component {
     const resetPicksPayload = {
       picklistItems: _.map(pickPageItemData.picklistItems, item => ({
         id: item.id,
-        quantityPicked: 0,
+        quantityPicked: '',
       })),
     };
 
+    if (resetPicksPayload.picklistItems.length) {
+      apiClient.post(itemsUrl, resetPicksPayload).then(() => {
+        this.sendInitialPicks(itemsUrl, pickPageItemData);
+      }).catch(() => { this.props.hideSpinner(); });
+    } else {
+      this.sendInitialPicks(itemsUrl, pickPageItemData);
+    }
+  }
+
+  sendInitialPicks(itemsUrl, pickPageItemData) {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
     const initialPicksPayload = {
       picklistItems: _.map(pickPageItemData.suggestedItems, item => ({
         ...item,
@@ -339,16 +349,14 @@ class PickPage extends Component {
       })),
     };
 
-    return apiClient.post(itemsUrl, resetPicksPayload).then(() => {
-      apiClient.post(itemsUrl, initialPicksPayload).then(() => {
-        apiClient.get(url)
-          .then((resp) => {
-            const { pickPageItems } = resp.data.data.pickPage;
-            this.saveNewItems(pickPageItems);
-            this.props.hideSpinner();
-          })
-          .catch(() => { this.props.hideSpinner(); });
-      }).catch(() => { this.props.hideSpinner(); });
+    apiClient.post(itemsUrl, initialPicksPayload).then(() => {
+      apiClient.get(url)
+        .then((resp) => {
+          const { pickPageItems } = resp.data.data.pickPage;
+          this.saveNewItems(pickPageItems);
+          this.props.hideSpinner();
+        })
+        .catch(() => { this.props.hideSpinner(); });
     }).catch(() => { this.props.hideSpinner(); });
   }
 
