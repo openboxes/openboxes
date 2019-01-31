@@ -2,15 +2,17 @@
     <div style="max-height: 400px; overflow: auto">
         <table>
             <tbody>
-            <g:if test="${currentLocation}">
+            <g:if test="${savedLocations}">
                 <tr class="prop">
                     <td>
-                        <h4><g:message code="user.favoriteLocations.label"/></h4>
+                        <h4><g:message code="user.savedLocations.label"/></h4>
                     </td>
                     <td class="middle">
-                        <a href='${createLink(action:"chooseLocation", id: currentLocation.id)}' class="button big">
-                            <format:metadata obj="${currentLocation}"/>
-                        </a>
+                        <g:each var="location" in="${savedLocations}">
+                            <a href='${createLink(action:"chooseLocation", id: location.id)}' class="button big">
+                                <format:metadata obj="${location}"/>
+                            </a>
+                        </g:each>
                     </td>
                 </tr>
             </g:if>

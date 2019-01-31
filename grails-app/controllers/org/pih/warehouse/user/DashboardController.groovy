@@ -442,7 +442,7 @@ class DashboardController {
 			// Try to redirect to the previous action before session timeout
 			if (session.targetUri || params.targetUri) {
 				def targetUri = params.targetUri ?: session.targetUri
-				if (targetUri && !targetUri.contains("chooseLocation")) {
+				if (targetUri && !targetUri.contains("chooseLocation") && !targetUri.contains("errors")) {
 					redirect(uri: targetUri);
 					return;
 				}
@@ -451,15 +451,15 @@ class DashboardController {
 			return
 		}
 
-		[loginLocationsMap:locationService.getLoginLocationsMap(user, warehouse)]
+		[savedLocations: [user.warehouse], loginLocationsMap:locationService.getLoginLocationsMap(user, warehouse)]
 	}
 
 
 	def changeLocation = {
 		User user = User.get(session.user.id);
-		Location currentLocation = Location.get(session.warehouse.id)
-		Map loginLocationsMap = locationService.getLoginLocationsMap(user, currentLocation)
-		render(template: "loginLocations", model: [currentLocation: currentLocation, loginLocationsMap:loginLocationsMap])
+		Map loginLocationsMap = locationService.getLoginLocationsMap(user, null)
+		List savedLocations = [user?.warehouse, session?.warehouse].unique()
+		render(template: "loginLocations", model: [savedLocations: savedLocations, loginLocationsMap:loginLocationsMap])
 	}
 
     def downloadGenericProductSummaryAsCsv = {
