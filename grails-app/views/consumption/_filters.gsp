@@ -123,9 +123,16 @@
                     <td colspan="2">
                         <label><warehouse:message code="consumption.additionalColumns.label" default="Additional columns (CSV only)"/></label>
                         <select name="selectedProperties" multiple="true" class="chzn-select-deselect">
+
+                            <g:hasRoleFinance>
+                                <g:set var="hasRoleFinance" value="${true}"/>
+                            </g:hasRoleFinance>
                             <g:each var="property" in="${command.productDomain.properties}">
                                 <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
-                                    <option value="${property.name}" ${command.selectedProperties?.toList()?.contains(property.name)?'selected':''}>
+                                    <g:set var="disabled" value="${'pricePerUnit'.equals(property?.name) && !hasRoleFinance}"/>
+                                    <option value="${property.name}"
+                                        ${command.selectedProperties?.toList()?.contains(property.name)?'selected':''}
+                                        ${disabled?'disabled':''}>
                                         ${property.naturalName} (${property.typePropertyName})
                                     </option>
                                 </g:if>
