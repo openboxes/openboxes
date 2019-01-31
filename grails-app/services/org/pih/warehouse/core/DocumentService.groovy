@@ -58,6 +58,7 @@ import org.groovydev.SimpleImageBuilder
 class DocumentService {
 
 	def grailsApplication
+	def userService
 	boolean transactional = false
 
 
@@ -1124,9 +1125,12 @@ class DocumentService {
 		}
 	}
 
-	void generateRwandaCOD(OutputStream outputStream, Shipment shipmentInstance) {
+	void generateCertificateOfDonation(OutputStream outputStream, Shipment shipmentInstance) {
 
 		try {
+
+			Boolean hasRoleFinance = userService.hasRoleFinance()
+
 			Workbook workbook = new HSSFWorkbook();
 			CreationHelper createHelper = workbook.getCreationHelper();
 			Sheet sheet = workbook.createSheet();
@@ -1139,7 +1143,6 @@ class DocumentService {
 			sheet.setColumnWidth((short)6, (short) ((50 * 4) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)7, (short) ((50 * 4) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)8, (short) ((50 * 4) / ((double) 1 / 20)))
-
 
 			// Bold font
 			Font boldFont = workbook.createFont();
@@ -1253,31 +1256,31 @@ class DocumentService {
 
 			// ITEM TABLE HEADER
 			row = sheet.createRow((short)counter++);
-			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'rwandaCOD.number.label'));
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'certificateOfDonation.number.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'rwandaCOD.code.label', default:'Code'));
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'certificateOfDonation.code.label', default:'Code'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'rwandaCOD.itemDescription.label', default: 'Item Description'));
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'certificateOfDonation.itemDescription.label', default: 'Item Description'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
 			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'default.uom.label', default: 'UoM'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'rwandaCOD.batchNumber.label'));
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'certificateOfDonation.batchNumber.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'rwandaCOD.expDate.label'));
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'certificateOfDonation.expDate.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
-			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'rwandaCOD.quantity.label'));
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'certificateOfDonation.quantity.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
 
-			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'rwandaCOD.unitPrice.label'));
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'certificateOfDonation.unitPrice.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
 
-			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'rwandaCOD.totalCost.label'));
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'certificateOfDonation.totalCost.label'));
 			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle);
 
 			def totalPrice = 0
@@ -1287,7 +1290,7 @@ class DocumentService {
 				CELL_INDEX = 0
 				row = sheet.createRow((short)counter++);
 				def totalCost = 0
-				if (itemInstance?.product?.pricePerUnit) {
+				if (itemInstance?.product?.pricePerUnit && hasRoleFinance) {
 					totalCost = itemInstance?.quantity*itemInstance?.product?.pricePerUnit;
 				}
 
@@ -1318,7 +1321,8 @@ class DocumentService {
 				row.createCell(CELL_INDEX).setCellValue(itemInstance?.quantity);
 				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
-				row.createCell(CELL_INDEX).setCellValue(itemInstance?.product?.pricePerUnit?:0);
+				def pricePerUnit = hasRoleFinance ? itemInstance?.product?.pricePerUnit : 0.0
+				row.createCell(CELL_INDEX).setCellValue(pricePerUnit?:0);
 				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle);
 
 				row.createCell(CELL_INDEX).setCellValue(totalCost);
