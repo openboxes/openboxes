@@ -362,13 +362,15 @@
                                             <td class="name middle"><label for="pricePerUnit"><warehouse:message
                                                     code="product.pricePerUnit.label"/></label></td>
                                             <td class="value middle ${hasErrors(bean: productInstance, field: 'pricePerUnit', 'errors')}">
-                                                <g:hasRoleFinance>
+                                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.userNotGrantedPermission.message', args: [session.user.username])}">
                                                     <g:textField name="pricePerUnit" placeholder="Price per unit (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})"
                                                                  value="${g.formatNumber(number:productInstance?.pricePerUnit, format:'###,###,##0.####') }"
                                                                  class="text" size="50" />
 
                                                     <span class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</span>
                                                 </g:hasRoleFinance>
+
+
                                             </td>
                                         </tr>
                                     </tbody>

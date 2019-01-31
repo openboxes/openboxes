@@ -21,34 +21,31 @@
     <div class="button-bar ">
         <g:if test="${stockMovement.documents}">
             <div class="right">
-                <span class="action-menu">
-                    <div class="button-group">
+                <div class="button-group">
                     <g:link controller="stockMovement" action="addDocument" class="button" id="${stockMovement?.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
                         <warehouse:message code="stockMovement.uploadDocuments.label" />
                     </g:link>
-                    <button class="action-btn button">
-                        <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />
-                        &nbsp; <g:message code="default.download.label"/>
-                        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
-
-                    </button>
-                    </div>
-                    <div class="actions">
-                        <g:each var="document" in="${stockMovement.documents}">
-                            <g:if test="${!document.hidden}">
-                                <div class="action-menu-item">
-                                    <g:link url="${document.uri}" target="_blank">
-
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
-                                        ${document.name}
-                                    </g:link>
-                                </div>
-                            </g:if>
-                        </g:each>
-                    </div>
-                </span>
-
+                    <span class="action-menu">
+                        <button class="action-btn button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'page_save.png')}" />
+                            &nbsp; <g:message code="default.download.label"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                        </button>
+                        <div class="actions">
+                            <g:each var="document" in="${stockMovement.documents}">
+                                <g:if test="${!document.hidden}">
+                                    <div class="action-menu-item">
+                                        <g:link url="${document.uri}" target="_blank">
+                                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                            ${document.name}
+                                        </g:link>
+                                    </div>
+                                </g:if>
+                            </g:each>
+                        </div>
+                    </span>
+                </div>
             </div>
         </g:if>
 
@@ -123,8 +120,8 @@
 <div class="yui-gf">
     <div class="yui-u first">
         <div class="box">
-            <h2><g:message code="stockMovement.label" /></h2>
-            <div>
+            <h2><g:message code="default.details.label" /></h2>
+            <div class="dialog">
 
                 <table>
                     <tr class="prop">
@@ -232,6 +229,14 @@
                             </td>
                         </tr>
                     </g:isSuperuser>
+                </table>
+            </div>
+        </div>
+        <div class="box">
+            <h2><g:message code="default.auditing.label"/></h2>
+            <div class="dialog">
+
+                <table>
                     <tr class="prop">
                         <td class="name">
                             <g:message code="stockMovement.dateRequested.label"/>
