@@ -1233,7 +1233,7 @@ class StockMovementService {
         if (stockMovement?.requisition) {
             documentList.addAll([
                     [
-                            name        : g.message(code: "export.items.label", default: "Export items for shipment creation"),
+                            name        : g.message(code: "stockMovement.exportStockMovementItems.label", default: "Export Stock Movement Items"),
                             documentType: DocumentGroupCode.EXPORT.name(),
                             contentType : "text/csv",
                             stepNumber  : 2,
@@ -1311,11 +1311,11 @@ class StockMovementService {
                             uri         : g.createLink(controller: 'doc4j', action: "downloadPackingList", id: stockMovement?.shipment?.id, absolute: true)
                     ],
                     [
-                            name        : g.message(code: "shipping.downloadRwandaCOD.label"),
-                            documentType: DocumentGroupCode.RWANDA_COD.name(),
+                            name        : g.message(code: "shipping.downloadCertificateOfDonation.label"),
+                            documentType: DocumentGroupCode.CERTIFICATE_OF_DONATION.name(),
                             contentType : "application/vnd.ms-excel",
                             stepNumber  : 5,
-                            uri         : g.createLink(controller: 'doc4j', action: "downloadRwandaCOD", id: stockMovement?.shipment?.id, absolute: true)
+                            uri         : g.createLink(controller: 'doc4j', action: "downloadCertificateOfDonation", id: stockMovement?.shipment?.id, absolute: true)
                     ]
 
             ])

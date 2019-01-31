@@ -77,7 +77,7 @@ class Doc4jController {
 
 	}
 
-	def downloadRwandaCOD = {
+	def downloadCertificateOfDonation = {
 		log.info params
 		def shipmentInstance = Shipment.get(params.id);
 
@@ -88,11 +88,11 @@ class Doc4jController {
 		// Tis needs to be here or we get a File Not Found error (ERR_FILE_NOT_FOUND)
 		render ""
 
-		def filename = "RwandaCOD - " + shipmentInstance?.shipmentNumber + ".xls"
+		def filename = "Certificate of Donation - " + shipmentInstance?.shipmentNumber + ".xls"
 		log.info ("filename " + filename )
 		response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"");
 		response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-		documentService.generateRwandaCOD(response.outputStream, shipmentInstance)
+		documentService.generateCertificateOfDonation(response.outputStream, shipmentInstance)
 		return;
 
 	}
