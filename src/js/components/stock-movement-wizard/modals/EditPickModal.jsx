@@ -9,7 +9,7 @@ import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
 import SelectField from '../../form-elements/SelectField';
 import apiClient from '../../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
+import { showSpinner, hideSpinner } from '../../../actions';
 import Translate from '../../../utils/Translate';
 
 const FIELDS = {
@@ -109,12 +109,6 @@ class EditPickModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
-  componentDidMount() {
-    if (!this.props.reasonCodesFetched) {
-      this.fetchData(this.props.fetchReasonCodes);
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
@@ -188,18 +182,6 @@ class EditPickModal extends Component {
   }
 
   /**
-   * Fetches data using function given as an argument(reducers components).
-   * @param {function} fetchFunction
-   * @public
-   */
-  fetchData(fetchFunction) {
-    this.props.showSpinner();
-    fetchFunction()
-      .then(() => this.props.hideSpinner())
-      .catch(() => this.props.hideSpinner());
-  }
-
-  /**
    * Sums up quantity picked from all available items.
    * @param {object} values
    * @public
@@ -230,7 +212,7 @@ class EditPickModal extends Component {
         fields={FIELDS}
         validate={validate}
         initialValues={this.state.formValues}
-        formProps={{ reasonCodes: this.props.reasonCodes }}
+        formProps={{ reasonCodes: this.state.attr.reasonCodes }}
         renderBodyWithValues={this.calculatePicked}
       >
         <div>
@@ -249,14 +231,7 @@ class EditPickModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  reasonCodesFetched: state.reasonCodes.fetched,
-  reasonCodes: state.reasonCodes.data,
-});
-
-export default connect(mapStateToProps, {
-  fetchReasonCodes, showSpinner, hideSpinner,
-})(EditPickModal);
+export default connect(null, { showSpinner, hideSpinner })(EditPickModal);
 
 EditPickModal.propTypes = {
   /** Name of the field */
@@ -269,12 +244,6 @@ EditPickModal.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  /** Function fetching reason codes */
-  fetchReasonCodes: PropTypes.func.isRequired,
-  /** Indicator if reason codes' data is fetched */
-  reasonCodesFetched: PropTypes.bool.isRequired,
-  /** Array of available reason codes */
-  reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   /** Function updating page on which modal is located called when user saves changes */
   onResponse: PropTypes.func.isRequired,
 };
