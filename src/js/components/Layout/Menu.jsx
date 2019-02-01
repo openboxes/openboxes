@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
 import { connect } from 'react-redux';
-import { Scrollbars } from 'react-custom-scrollbars';
 import { Translate } from 'react-localize-redux';
 import PropTypes from 'prop-types';
 
@@ -50,13 +49,7 @@ const Menu = ({
                 <Translate id={`navbar.${key}.label`} />
               </a>
               <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                <Scrollbars
-                  autoHeight
-                  autoHeightMin={0}
-                  autoHeightMax="50vh"
-                  hideTracksWhenNotNeeded
-                  autoHide
-                >
+                <div style={{ maxHeight: '50vh', overflow: 'auto' }}>
                   {sectionContent(key) &&
                     _.map(sectionContent(key), (link, idx) => {
                       if (isDisplayed(link)) {
@@ -85,7 +78,7 @@ const Menu = ({
                       return null;
                     })
                   }
-                </Scrollbars>
+                </div>
               </div>
             </li>
           );
