@@ -130,9 +130,27 @@ class EditPickModal extends Component {
    * @public
    */
   onOpen() {
+    const availableItems = _.map(this.state.attr.fieldValue.availableItems, (avItem) => {
+      // check if this picklist item already exists
+      const picklistItem = _.find(
+        _.filter(this.state.attr.fieldValue.picklistItems, listItem => !listItem.initial),
+        item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id'],
+      );
+
+      if (picklistItem) {
+        return {
+          ...avItem,
+          id: picklistItem.id,
+          quantityPicked: picklistItem.quantityPicked,
+        };
+      }
+
+      return avItem;
+    });
+
     this.setState({
       formValues: {
-        availableItems: this.state.attr.fieldValue.availableItems,
+        availableItems,
         reasonCode: '',
         quantityRequired: this.state.attr.fieldValue.quantityRequired,
       },
@@ -149,28 +167,13 @@ class EditPickModal extends Component {
 
     const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}`;
     const payload = {
-      picklistItems: _.map(values.availableItems, (avItem) => {
-        // check if this picklist item already exists
-        const picklistItem = _.find(
-          _.filter(this.state.attr.fieldValue.picklistItems, listItem => !listItem.initial),
-          item => item['inventoryItem.id'] === avItem['inventoryItem.id'],
-        );
-        if (picklistItem) {
-          return {
-            id: picklistItem.id,
-            'inventoryItem.id': avItem['inventoryItem.id'],
-            'binLocation.id': avItem['binLocation.id'] || '',
-            quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
-            reasonCode: values.reasonCode || '',
-          };
-        }
-        return {
-          'inventoryItem.id': avItem['inventoryItem.id'],
-          'binLocation.id': avItem['binLocation.id'] || '',
-          quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
-          reasonCode: values.reasonCode || '',
-        };
-      }),
+      picklistItems: _.map(values.availableItems, avItem => ({
+        id: avItem.id || '',
+        'inventoryItem.id': avItem['inventoryItem.id'],
+        'binLocation.id': avItem['binLocation.id'] || '',
+        quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
+        reasonCode: values.reasonCode || '',
+      })),
     };
 
     return apiClient.post(url, payload).then(() => {
