@@ -144,6 +144,7 @@ uiperformance.enabled = false
 //mail.error.to = 'errors@openboxes.com'
 //mail.error.subject = '[OpenBoxes '+GrailsUtil.environment+']'
 //mail.error.debug = true
+mail.error.enabled = false
 mail.error.debug = false
 mail.error.to = 'errors@openboxes.com'
 mail.error.server = grails.mail.host
@@ -183,13 +184,11 @@ log4j = {
 
 	// Example of changing the log pattern for the default console
 	appenders {
-		println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
-		//println "mail.error.server: '${mail.error.server}'"
-		//println "mail.error.username: '${mail.error.username}'"
-		//println "mail.error.password: '${mail.error.password}'"
+		println "grails.mail.enabled: ${grails.mail.enabled}"
+		println "mail.error.enabled: ${mail.error.enabled}"
 
 		// Only enable SMTP appender when mail is enabled
-        if (Boolean.parseBoolean(grails.mail.enabled.toString())) {
+        if (grails.mail.enabled && mail.error.enabled) {
 	        def smtpAppender
 			def conversionPattern =
 				"Date: %d{MMM-dd-yyyy HH:mm:ss.SSS}%n" +
