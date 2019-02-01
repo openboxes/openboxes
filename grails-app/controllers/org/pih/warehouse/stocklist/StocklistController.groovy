@@ -40,4 +40,13 @@ class StocklistController {
 			filename: "Stocklist - ${stocklist?.requisition?.name}.pdf"
 		)
 	}
+
+	def sendMail = {
+		if (!params.recipients || !params.id) {
+			throw new Exception("${warehouse.message(code:'email.noParams.message')}")
+		}
+		stocklistService.sendMail(params.id, params.subject, params.body, [params.recipients])
+		flash.message = "${warehouse.message(code:'email.sent.message',args:[params.recipients])}"
+		redirect(controller: "requisitionTemplate", action: "show", params:[id: params.id])
+	}
 }

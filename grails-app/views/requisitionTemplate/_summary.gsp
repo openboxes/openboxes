@@ -109,6 +109,19 @@
 				&nbsp;${warehouse.message(code: 'requisitionTemplate.unpublish.label', default: 'Unpublish stock list')}
 			</g:link>
 		</g:else>
+		<g:link controller="stocklist" action="renderPdf" id="${requisition?.id}" class="button">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}" />&nbsp;
+			${warehouse.message(code: 'default.button.download.label')}
+		</g:link>
+		<g:link
+			controller="stocklist"
+			action="sendMail"
+			params="['id':requisition.id,'subject':'STOCK LIST UPDATE','body':'STOCK LIST UPDATE','recipients':requisition.requestedBy?.email]"
+			class="button"
+		>
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" />&nbsp;
+			${warehouse.message(code: 'default.button.email.label')}
+		</g:link>
 
 	</div>
 </div>
