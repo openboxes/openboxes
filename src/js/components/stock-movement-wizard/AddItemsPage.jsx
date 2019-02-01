@@ -591,7 +591,7 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(formValues) {
-    const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val));
+    const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val) && val.product);
     const itemsMap = {};
     _.forEach(lineItems, (item) => {
       if (itemsMap[item.product.productCode]) {

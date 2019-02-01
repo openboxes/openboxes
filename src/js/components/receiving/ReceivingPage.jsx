@@ -173,8 +173,23 @@ class ReceivingPage extends Component {
     this.props.showSpinner();
     const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=${this.state.page + 1}`;
 
+    const payload = {
+      ...formValues,
+      containers: _.map(formValues.containers, container => ({
+        ...container,
+        shipmentItems: _.map(container.shipmentItems, (item) => {
+          if (!_.get(item, 'recipient.id')) {
+            return {
+              ...item, recipient: '',
+            };
+          }
 
-    return apiClient.post(url, flattenRequest(formValues))
+          return item;
+        }),
+      })),
+    };
+
+    return apiClient.post(url, flattenRequest(payload))
       .then((response) => {
         this.props.hideSpinner();
 
