@@ -383,7 +383,7 @@ class SendMovementPage extends Component {
                 <div id="stockMovementInfo" style={{ flexGrow: 2 }}>
                   {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
-                      canBeEdited: values.statusCode === 'ISSUED' && values.shipmentStatus !== 'PARTIALLY_RECEIVED',
+                      canBeEdited: values.statusCode === 'ISSUED' && values.shipmentStatus !== 'PARTIALLY_RECEIVED' && values.shipmentStatus !== 'RECEIVED',
                       issued: values.statusCode === 'ISSUED',
                       hasStockList: !!_.get(values.stocklist, 'id'),
                     }))}
