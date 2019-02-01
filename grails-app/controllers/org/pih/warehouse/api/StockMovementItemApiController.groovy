@@ -75,16 +75,14 @@ class StockMovementItemApiController {
                 Location binLocation = picklistItemMap["binLocation.id"] ?
                         Location.get(picklistItemMap["binLocation.id"]) : null
 
-                BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null) ?
+                BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
                         new BigDecimal(picklistItemMap.quantityPicked) : null
 
                 String reasonCode = picklistItemMap.reasonCode
                 String comment = picklistItemMap.comment
 
-                if (quantityPicked != null) {
-                    stockMovementService.createOrUpdatePicklistItem(stockMovementItem, picklistItem, inventoryItem, binLocation,
-                            quantityPicked?.intValueExact(), reasonCode, comment)
-                }
+                stockMovementService.createOrUpdatePicklistItem(stockMovementItem, picklistItem, inventoryItem, binLocation,
+                        quantityPicked?.intValueExact(), reasonCode, comment)
             }
         }
         render ([data:stockMovementItem] as JSON)
