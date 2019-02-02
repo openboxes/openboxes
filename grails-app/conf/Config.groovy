@@ -518,6 +518,11 @@ openboxes.fullstory.host = "fullstory.com"
 openboxes.fullstory.org = ""
 openboxes.fullstory.namespace = "FS"
 
+// Hotjar integration
+openboxes.hotjar.enabled = false
+openboxes.hotjar.hjid = 0
+openboxes.hotjar.hjsv = 6
+
 // Feedback mechanism that allows screenshots
 //openboxes.feedback.enabled = false
 
