@@ -321,7 +321,9 @@ class InventoryItemController {
 		// now populate the rest of the commmand object
 		def commandInstance = inventoryService.getStockCardCommand(cmd, params)
 
-		[ commandInstance: commandInstance ]
+		def demand = forecastingService.getDemand(cmd.warehouse, cmd.product)
+
+		[ commandInstance: commandInstance, demand: demand ]
 	}
 
 	/**
@@ -374,6 +376,8 @@ class InventoryItemController {
         // Compute the total quantity for the given product
         commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 
+		def demand = forecastingService.getDemand(locationInstance, productInstance)
+
 		// FIXME Use this method instead of getQuantityByProductMap
         // NEED to add tests before we introduce this change
 		//commandInstance.totalQuantity = inventoryService.getQuantityOnHand(locationInstance, productInstance)
@@ -386,7 +390,7 @@ class InventoryItemController {
         String jsonString = [product: productInstance.toJson(), inventoryItems: result] as JSON
 		log.info "record inventory " + jsonString
 
-		[ commandInstance : commandInstance, product : jsonString]
+		[ commandInstance : commandInstance, demand: demand, product : jsonString]
 	}
 	
 	def saveRecordInventory = { RecordInventoryCommand commandInstance ->
@@ -403,7 +407,6 @@ class InventoryItemController {
         commandInstance.inventory = warehouseInstance?.inventory;
         commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory);
 
-
         Product productInstance = commandInstance.product;
         List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance]);
 
@@ -412,12 +415,14 @@ class InventoryItemController {
 
         commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 
+		def demand = forecastingService.getDemand(warehouseInstance, productInstance)
+
 		log.info "commandInstance.recordInventoryRows: "
         commandInstance?.recordInventoryRows.each {
 			log.info "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
         }
 
-		render(view: "showRecordInventory", model: [ commandInstance : commandInstance ])
+		render(view: "showRecordInventory", model: [ commandInstance : commandInstance, demand: demand ])
 	}
 
 	def showTransactions = {

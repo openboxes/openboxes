@@ -63,7 +63,7 @@
                     <label><warehouse:message code="forecasting.onHandMonths.label"/></label>
                 </td>
                 <td class="value" id="onHandMonths">
-                    <g:if test="${totalQuantity && demand.monthlyDemand}">
+                    <g:if test="${totalQuantity && demand?.monthlyDemand}">
                         <g:formatNumber number="${totalQuantity / demand?.monthlyDemand}" maxFractionDigits="1"/>
                     </g:if>
                     <g:else>
@@ -78,11 +78,11 @@
                 </td>
                 <td class="value" id="demand">
                     <div>
-                        <g:formatNumber number="${demand.dailyDemand}" maxFractionDigits="1"/>
+                        <g:formatNumber number="${demand?.dailyDemand}" maxFractionDigits="1"/>
                         <g:message code="default.perDay.label" default="per day"/>
                     </div>
                     <div>
-                        <g:formatNumber number="${demand.monthlyDemand}" maxFractionDigits="1"/>
+                        <g:formatNumber number="${demand?.monthlyDemand}" maxFractionDigits="1"/>
                         <g:message code="default.perMonth.label" default="per month"/>
                     </div>
                 </td>
