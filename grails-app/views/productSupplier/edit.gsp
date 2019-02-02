@@ -221,6 +221,7 @@
 									<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'unitPrice', 'errors')}">
 										<g:hasRoleFinance>
 											<g:textField class="text" name="unitPrice" value="${fieldValue(bean: productSupplierInstance, field: 'unitPrice')}" />
+											${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 										</g:hasRoleFinance>
 									</td>
 								</tr>

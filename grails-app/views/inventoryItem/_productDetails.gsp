@@ -117,8 +117,8 @@
                 <td class="value middle">
                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
                         ${g.formatNumber(number: (productInstance?.pricePerUnit?:0), format: '###,###,##0.00##')}
+                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                     </g:hasRoleFinance>
-                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                 </td>
             </tr>
             <tr class="prop">
@@ -127,9 +127,9 @@
                 </td>
                 <td class="value middle">
                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
-                    ${g.formatNumber(number: (totalQuantity?:0) * (productInstance?.pricePerUnit?:0), format: '###,###,##0.00') }
+                        ${g.formatNumber(number: (totalQuantity?:0) * (productInstance?.pricePerUnit?:0), format: '###,###,##0.00') }
+                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                     </g:hasRoleFinance>
-                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                 </td>
             </tr>
             <tr class="prop">
