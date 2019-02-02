@@ -96,16 +96,16 @@ class ForecastingService {
         List data = allMonths.collect { monthYear ->
             def row = rows.find { it.request_year == monthYear.year && it.request_month == monthYear.month }
             [
-                    dateKey: "${row.date_key}",
-                    year: row.request_year,
-                    month: row.request_month,
-                    quantityRequested: row.quantity_requested,
-                    quantityCanceled: row.quantity_canceled,
-                    quantityApproved: row.quantity_approved,
-                    quantityDemand: row.quantity_demand
+                    dateKey: "${monthYear?.month}/${monthYear?.year}",
+                    year: monthYear?.year,
+                    month: monthYear?.month,
+                    quantityRequested: row?.quantity_requested?:0,
+                    quantityCanceled: row?.quantity_canceled?:0,
+                    quantityApproved: row?.quantity_approved?:0,
+                    quantityDemand: row?.quantity_demand?:0
             ]
         }
-
+        log.info "data: ${data}"
 
         return data
     }

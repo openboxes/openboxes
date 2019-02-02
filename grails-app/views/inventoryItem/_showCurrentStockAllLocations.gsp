@@ -36,8 +36,6 @@
                                     <g:link controller="dashboard" action="chooseLocation" id="${it?.location?.id}" class="button">
                                         <g:message code="default.button.show.label"/>
                                     </g:link>
-
-                                    ${locationEntry}
                                 </td>
                                 <td class="middle">
                                     ${locationEntry?.location?.name}
@@ -62,7 +60,7 @@
 
                             </th>
                             <th>
-                                ${locationGroupEntry.key?:g.message(code:'locationGroup.none.lable', default: "No Location Group")}
+                                ${locationGroupEntry.key?:g.message(code:'default.none.label', default: "No Location Group")}
                                 <small>(${locations.size()} locations)</small>
                             </th>
                             <th>
