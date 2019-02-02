@@ -511,6 +511,13 @@ grails.plugin.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
 
+// Fullstory integration
+openboxes.fullstory.enabled = false
+openboxes.fullstory.debug = false
+openboxes.fullstory.host = "fullstory.com"
+openboxes.fullstory.org = ""
+openboxes.fullstory.namespace = "FS"
+
 // Feedback mechanism that allows screenshots
 //openboxes.feedback.enabled = false
 

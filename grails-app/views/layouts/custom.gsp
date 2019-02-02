@@ -44,6 +44,7 @@
     <g:layoutHead />
 
     <g:render template="/common/customCss"/>
+    <g:render template="/common/fullstory"/>
 
     <ga:trackPageview />
     <r:layoutResources/>
