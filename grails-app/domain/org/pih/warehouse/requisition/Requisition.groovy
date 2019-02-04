@@ -57,6 +57,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     RequisitionStatus status;
     CommodityClass commodityClass
     Requisition requisitionTemplate
+    RequisitionItemSortByCode sortByCode
 
     // where stock is originating from
     Location origin
@@ -183,6 +184,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         datePublished(nullable: true)
         requisitionTemplate(nullable:true)
         replenishmentPeriod(nullable:true)
+        sortByCode(nullable:true)
     }
 
     def getRequisitionItemCount() {
@@ -307,6 +309,26 @@ class Requisition implements Comparable<Requisition>, Serializable {
                             a.orderIndex <=> b.orderIndex
         }
     }
+
+//    def getRequisitionItemsByDateCreated() {
+//        return requisitionItems.sort { a,b ->
+//            a.dateCreated <=> b.dateCreated
+//        }
+//    }
+//
+//    def getRequisitionItemsByOrderIndex() {
+//        return requisitionItems.sort { a,b ->
+//            a.orderIndex <=> b.orderIndex
+//        }
+//    }
+//
+//    def getRequisitionItemsByCategory() {
+//        return requisitionItems.sort { a,b ->
+//            a.product?.category?.name <=> b.product?.category?.name ?:
+//                    a.product?.name <=> b.product?.name ?:
+//                            a.orderIndex <=> b.orderIndex
+//        }
+//    }
 
     /**
      * Return the shipment associated with the requisition.
