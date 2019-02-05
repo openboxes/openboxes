@@ -9,59 +9,43 @@
 **/ 
 package org.pih.warehouse.data
 
-
-import org.pih.warehouse.core.Role
-import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.core.User
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
+import org.springframework.validation.BeanPropertyBindingResult
 
 class PersonDataService {
 
     //boolean transactional = true
 
-
-    /**
-     * Validate inventory levels
-     */
     Boolean validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-
-
-
+            Person person = createOrUpdatePerson(params)
+            if (!person.validate()) {
+                person.errors.each { BeanPropertyBindingResult error ->
+                    command.errors.reject("Row ${index+1} name = ${person.name}: ${error.getFieldError()}")
+                }
+            }
         }
     }
 
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-
+            Person person = createOrUpdatePerson(params)
+            if (person.validate()) {
+                person.save(failOnError: true)
+            }
         }
 
     }
 
-    User createOrUpdateUser(Map params) {
-        User user = User.findByUsername(params.username)
-        if (!user) {
-            user = new User(params)
-            user.password = "password"
+    Person createOrUpdatePerson(Map params) {
+        Person person = Person.findByFirstNameAndLastName(params.firstName, params.lastName)
+        if (!person) {
+            person = new Person(params)
         }
         else {
-            user.properties = params
+            person.properties = params
         }
-        return user
-    }
-
-
-    Role [] extractDefaultRoles(String defaultRolesString) {
-        String [] defaultRoles = defaultRolesString?.split(",")
-        Role [] roles = defaultRoles.collect { String roleTypeName ->
-            roleTypeName = roleTypeName.trim()
-            Role role = Role.findByName(roleTypeName)
-            if (!role) {
-                RoleType roleType = RoleType.valueOf(roleTypeName)
-                role = Role.findByRoleType(roleType)
-            }
-            return role
-        }
-        return roles
+        return person
     }
 }

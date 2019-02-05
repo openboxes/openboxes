@@ -26,7 +26,7 @@ class PersonController {
 		params.max = Math.min(params.max ? params.int('max') : 15, 100)
 		
 		if (params.q) {
-			def terms = "%" + params.q + "%"
+			String [] terms = ["%" + params.q + "%"]
 			//personInstanceList = Person.findAllByFirstNameLikeOrLastNameLike(term, term, params)
 			//personInstanceTotal = Person.countByFirstNameLikeOrLastNameLike(term, term, params);
 			personInstanceList = userService.findPersons(terms, params)
