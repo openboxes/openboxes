@@ -55,7 +55,7 @@ class UserDataService {
             log.info "user ${user.username} default role ${defaultRoles}"
 
             // Clear existing roles
-            user.roles.toArray().each { Role role ->
+            user?.roles?.toArray().each { Role role ->
                 user.removeFromRoles(role)
             }
 
@@ -75,6 +75,7 @@ class UserDataService {
         User user = User.findByUsername(params.username)
         if (!user) {
             user = new User(params)
+            user.active = true
             user.password = "password"
         }
         else {
