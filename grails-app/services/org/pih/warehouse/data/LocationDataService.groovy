@@ -9,13 +9,13 @@
 **/ 
 package org.pih.warehouse.data
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
-import org.springframework.validation.BeanPropertyBindingResult
 
-class UserRoleDataService {
+class LocationDataService {
 
     //boolean transactional = true
 
@@ -24,49 +24,16 @@ class UserRoleDataService {
      * Validate inventory levels
      */
     Boolean validateData(ImportDataCommand command) {
-        log.info "Validate data " + command.filename
-
         command.data.eachWithIndex { params, index ->
 
-            if (!params.username) {
-                throw new IllegalArgumentException("Row ${index+1}: username is required")
-            }
 
-            User user = createOrUpdateUser(params)
 
-            log.info "User: ${user}"
-            if (!user.validate()) {
-                user.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("${index+1}: username = ${user.username} ${error.getFieldError()}")
-                }
-            }
-
-            // Implicitly validates the default roles
-            Role [] defaultRoles = extractDefaultRoles(params.defaultRoles)
         }
     }
 
     void importData(ImportDataCommand command) {
-        log.info "Import data " + command.filename
-
         command.data.eachWithIndex { params, index ->
-            User user = createOrUpdateUser(params)
-            Role [] defaultRoles = extractDefaultRoles(params.defaultRoles)
-            log.info "user ${user.username} default role ${defaultRoles}"
 
-            // Clear existing roles
-            user.roles.toArray().each { Role role ->
-                user.removeFromRoles(role)
-            }
-
-            // Add default roles to user
-            defaultRoles.each { Role defaultRole ->
-                log.info "user ${user.username} default role ${defaultRole}"
-                if(!user?.roles?.contains(defaultRole)) {
-                    user.addToRoles(defaultRole)
-                }
-            }
-            user.save(failOnError: true)
         }
 
     }

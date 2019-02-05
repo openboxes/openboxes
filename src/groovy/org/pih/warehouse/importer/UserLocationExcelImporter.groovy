@@ -9,48 +9,35 @@
 **/ 
 package org.pih.warehouse.importer
 
-
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExcelImportUtils
-import org.pih.warehouse.core.Constants
-import org.pih.warehouse.data.UserDataService
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.product.Product
 
-
-class UserExcelImporter extends AbstractExcelImporter {
+class UserLocationExcelImporter extends AbstractExcelImporter {
 
 	static Map columnMap = [
 		sheet:'Sheet1',
 		startRow: 1,
 		columnMap: [
                 'A':'username',
-                'B':'firstName',
-                'C':'lastName',
-                'D':'email',
-                'E':'defaultRoles'
+                'B':'locationName',
+                'C':'roleName'
 		]
 	]
 
 	static Map propertyMap = [
 			username:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            firstName:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            lastName:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            email:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
-            defaultRoles:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			locationName:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
+			roleName:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null])
 	]
 
 
-	UserExcelImporter(String fileName) {
+    UserLocationExcelImporter(String fileName) {
 		super(fileName)
 	}
 
 	def getDataService() {
-		return ApplicationHolder.getApplication().getMainContext().getBean("userDataService")
+		return ApplicationHolder.getApplication().getMainContext().getBean("userLocationDataService")
 	}
 
 	List<Map> getData() {
@@ -71,7 +58,7 @@ class UserExcelImporter extends AbstractExcelImporter {
      * @param errors
      */
     void importData(ImportDataCommand command) {
-        dataService.importData(command)
+		dataService.importData(command)
     }
 
 }

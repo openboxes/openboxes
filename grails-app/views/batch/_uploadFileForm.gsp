@@ -39,7 +39,21 @@
                     <div>
                         <g:radio name="type" value="inventoryLevel" checked="${params.type=='inventoryLevel'}"/>
                         <label><warehouse:message code="import.inventoryLevel.label" default="Inventory levels"/></label>
-                        <g:link controller="batch" action="downloadTemplate" params="[template:'inventoryLevel.xls']">
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'inventoryLevels.xls']">
+                            <warehouse:message code="default.template.label" default="Download template"/>
+                        </g:link>
+                    </div>
+                    <div>
+                        <g:radio name="type" value="location" checked="${params.type=='location'}"/>
+                        <label><warehouse:message code="locations.label" default="Locations"/></label>
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'locations.xls']">
+                            <warehouse:message code="default.template.label" default="Download template"/>
+                        </g:link>
+                    </div>
+                    <div>
+                        <g:radio name="type" value="person" checked="${params.type=='person'}"/>
+                        <label><warehouse:message code="persons.label" default="People"/></label>
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'persons.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
@@ -50,8 +64,15 @@
                     </div>
                     <div>
                         <g:radio name="type" value="user" checked="${params.type=='user'}"/>
-                        <label><warehouse:message code="default.users.label" default="Users"/></label>
+                        <label><warehouse:message code="users.label" default="Users"/></label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'users.xls']">
+                            <warehouse:message code="default.template.label" default="Download template"/>
+                        </g:link>
+                    </div>
+                    <div>
+                        <g:radio name="type" value="userLocation" checked="${params.type=='userLocation'}"/>
+                        <label><warehouse:message code="userLocations.label" default="User Locations"/></label>
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'userLocations.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>

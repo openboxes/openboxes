@@ -15,8 +15,11 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
+import org.pih.warehouse.importer.LocationExcelImporter
+import org.pih.warehouse.importer.PersonExcelImporter
 import org.pih.warehouse.importer.ProductExcelImporter
 import org.pih.warehouse.importer.UserExcelImporter
+import org.pih.warehouse.importer.UserLocationExcelImporter
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
 // import au.com.bytecode.opencsv.CSVReader;
@@ -130,11 +133,20 @@ class BatchController {
 						case "inventoryLevel":
 							dataImporter = new InventoryLevelExcelImporter(command?.filename)
 							break;
-						case "user":
-							dataImporter = new UserExcelImporter(command?.filename)
+						case "location":
+							dataImporter = new LocationExcelImporter(command?.filename)
+							break;
+						case "person":
+							dataImporter = new PersonExcelImporter(command?.filename)
 							break;
 						case "product":
 							dataImporter = new ProductExcelImporter(command?.filename)
+							break;
+						case "user":
+							dataImporter = new UserExcelImporter(command?.filename)
+							break;
+						case "userLocation":
+							dataImporter = new UserLocationExcelImporter(command?.filename)
 							break;
 						default:
 	                        command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default:'Please choose a valid import type')}")
