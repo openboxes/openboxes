@@ -15,6 +15,7 @@ class Putaway {
     String putawayNumber
     Person putawayAssignee
     Date putawayDate
+    Date dateCreated
 
     PutawayStatus putawayStatus
     List<PutawayItem> putawayItems = []
@@ -28,6 +29,7 @@ class Putaway {
         putawayAssignee(nullable:true)
         putawayDate(nullable:true)
         putawayItems(nullable:true)
+        dateCreated(nullable:true)
     }
 
     Map toJson() {
@@ -36,6 +38,7 @@ class Putaway {
                 putawayNumber: putawayNumber,
                 putawayStatus: putawayStatus?.name(),
                 putawayDate: putawayDate?.format("MM/dd/yyyy"),
+                dateCreated: dateCreated?.format("MMMM dd, yyyy"),
                 putawayAssignee: putawayAssignee,
                 "origin.id": origin?.id,
                 "origin.name": origin?.name,
@@ -53,7 +56,8 @@ class Putaway {
                 putawayNumber: order.orderNumber,
                 putawayStatus: Putaway.getPutawayStatus(order.status),
                 putawayAssignee: order.completedBy,
-                putawayDate: order.dateCompleted
+                putawayDate: order.dateCompleted,
+                dateCreated: order.dateOrdered
         )
 
 
