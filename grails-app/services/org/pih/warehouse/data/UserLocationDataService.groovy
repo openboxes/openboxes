@@ -10,6 +10,7 @@
 package org.pih.warehouse.data
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
@@ -25,70 +26,54 @@ class UserLocationDataService {
      * Validate inventory levels
      */
     Boolean validateData(ImportDataCommand command) {
-        log.info "Validate data " + command.filename
-
         command.data.eachWithIndex { params, index ->
 
             User user = User.findByUsername(params.username)
             if (!user) {
-                throw new IllegalArgumentException("Row ${index+1}: A valid username is required")
+                command.errors.reject("Row ${index+1} User ${params.username} not found")
             }
 
-            Location location = Location.findByNameOrLocationNumber(params.locationNumber, params.locationNumber)
+            Location location = Location.findByNameOrLocationNumber(params.locationName, params.locationName)
+            if (!location) {
+                command.errors.reject("Row ${index+1} Location ${params.locationName} not found")
+            }
 
+            RoleType roleType = RoleType.valueOf(params.roleName)
+            if (!roleType) {
+                command.errors.reject("Row ${index+1} Role type ${params.roleName} not found")
+            }
+
+            Role role = Role.findByRoleType(roleType)
+            if (!role) {
+                command.errors.reject("Row ${index+1} Role for role type ${roleType} not found")
+            }
 
         }
     }
 
     void importData(ImportDataCommand command) {
-        log.info "Import data " + command.filename
-
         command.data.eachWithIndex { params, index ->
-            User user = createOrUpdateUser(params)
-            Role [] defaultRoles = extractDefaultRoles(params.defaultRoles)
-            log.info "user ${user.username} default role ${defaultRoles}"
+            User user = User.findByUsername(params.username)
+            Location location = Location.findByNameOrLocationNumber(params.locationName, params.locationName)
+            RoleType roleType = RoleType.valueOf(params.roleName)
+            Role role = Role.findByRoleType(roleType)
 
-            // Clear existing roles
-            user.roles.toArray().each { Role role ->
-                user.removeFromRoles(role)
+            LocationRole locationRole = user.locationRoles.find {
+                it.location == location
             }
 
-            // Add default roles to user
-            defaultRoles.each { Role defaultRole ->
-                log.info "user ${user.username} default role ${defaultRole}"
-                if(!user?.roles?.contains(defaultRole)) {
-                    user.addToRoles(defaultRole)
-                }
+            if (!locationRole) {
+                locationRole = new LocationRole()
+                user.addToLocationRoles(locationRole)
             }
+
+            locationRole.location = location
+            locationRole.role = role
+
             user.save(failOnError: true)
         }
 
     }
 
-    User createOrUpdateUser(Map params) {
-        User user = User.findByUsername(params.username)
-        if (!user) {
-            user = new User(params)
-            user.password = "password"
-        }
-        else {
-            user.properties = params
-        }
-        return user
-    }
 
-
-    Role [] extractDefaultRoles(String defaultRolesString) {
-        String [] defaultRoles = defaultRolesString?.split(",")
-        Role [] roles = defaultRoles.collect { String roleTypeName ->
-            roleTypeName = roleTypeName.trim()
-            Role role = Role.findByName(roleTypeName)
-            if (!role) {
-                RoleType roleType = RoleType.valueOf(roleTypeName)
-                role = Role.findByRoleType(roleType)
-            }
-            return role
-        }
-        return roles
-    }
 }

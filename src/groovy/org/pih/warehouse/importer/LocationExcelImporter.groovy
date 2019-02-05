@@ -19,17 +19,15 @@ class LocationExcelImporter extends AbstractExcelImporter {
 		sheet:'Sheet1',
 		startRow: 1,
 		columnMap: [
-                'A':'id',
-                'B':'name',
-				'C':'locationNumber',
-                'D':'locationType',
-				'E':'locationGroup',
-				'F':'parentLocation'
+                'A':'name',
+				'B':'locationNumber',
+                'C':'locationType',
+				'D':'locationGroup',
+				'E':'parentLocation'
 		]
 	]
 
 	static Map propertyMap = [
-			id:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 			name:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 			locationNumber:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),
 			locationType:([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue:null]),

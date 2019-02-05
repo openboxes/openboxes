@@ -10,15 +10,17 @@
 package org.pih.warehouse.data
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationGroup
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
+import org.springframework.validation.BeanPropertyBindingResult
 
 class LocationDataService {
 
     //boolean transactional = true
-
 
     /**
      * Validate inventory levels
@@ -26,42 +28,50 @@ class LocationDataService {
     Boolean validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
 
-
-
+            Location location = createOrUpdateLocation(params)
+            if (!location.validate()) {
+                location.errors.each { BeanPropertyBindingResult error ->
+                    command.errors.reject("Row ${index+1} name = ${location.name}: ${error.getFieldError()}")
+                }
+            }
         }
     }
 
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-
-        }
-
-    }
-
-    User createOrUpdateUser(Map params) {
-        User user = User.findByUsername(params.username)
-        if (!user) {
-            user = new User(params)
-            user.password = "password"
-        }
-        else {
-            user.properties = params
-        }
-        return user
-    }
-
-
-    Role [] extractDefaultRoles(String defaultRolesString) {
-        String [] defaultRoles = defaultRolesString?.split(",")
-        Role [] roles = defaultRoles.collect { String roleTypeName ->
-            roleTypeName = roleTypeName.trim()
-            Role role = Role.findByName(roleTypeName)
-            if (!role) {
-                RoleType roleType = RoleType.valueOf(roleTypeName)
-                role = Role.findByRoleType(roleType)
+            Location location = createOrUpdateLocation(params)
+            if (location.validate()) {
+                location.save(failOnError: true)
             }
-            return role
         }
-        return roles
+
+    }
+
+    Location createOrUpdateLocation(Map params) {
+        Location location = Location.findByNameOrLocationNumber(params.name, params.name)
+        if (!location) {
+            location = new Location()
+        }
+
+        location.name = params.name
+        location.locationNumber = params.locationNumber
+
+        LocationType locationType = LocationType.findByNameLike(params.locationType + "%")
+        if (locationType) {
+            location.locationType = locationType
+        }
+
+        LocationGroup locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
+        if (locationGroup) {
+            location.locationGroup = locationGroup
+        }
+
+        Location parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
+        if (parentLocation) {
+            location.parentLocation = parentLocation
+        }
+
+
+        return location
     }
 }
