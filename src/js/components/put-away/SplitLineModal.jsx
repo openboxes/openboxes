@@ -144,7 +144,7 @@ class SplitLineModal extends Component {
    */
   isBinSelected() {
     return _.every(this.state.splitItems, splitItem =>
-      splitItem.putawayLocation.id);
+      _.get(splitItem, 'putawayLocation.id'));
   }
 
   render() {
@@ -186,7 +186,7 @@ class SplitLineModal extends Component {
                   // eslint-disable-next-line react/no-array-index-key
                   key={index}
                 >
-                  <td className={`py-1 ${_.isEmpty(item.putawayLocation.id) ? 'has-error align-middle' : 'align-middle'}`}>
+                  <td className={`py-1 ${!_.get(item, 'putawayLocation.id') ? 'has-error align-middle' : 'align-middle'}`}>
                     <Select
                       options={this.props.bins}
                       objectValue
