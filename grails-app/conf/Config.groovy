@@ -526,6 +526,9 @@ openboxes.hotjar.hjsv = 6
 // Feedback mechanism that allows screenshots
 //openboxes.feedback.enabled = false
 
+// Forecasting feature
+openboxes.forecasting.enabled = false
+
 // Bill of Materials feature
 openboxes.bom.enabled = false
 
