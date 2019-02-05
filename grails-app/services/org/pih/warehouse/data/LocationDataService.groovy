@@ -29,9 +29,15 @@ class LocationDataService {
         command.data.eachWithIndex { params, index ->
 
             Location location = createOrUpdateLocation(params)
+
+            LocationGroup locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
+            if (params.locationGroup && !locationGroup) {
+                command.errors.reject("Row ${index+1}: Location group ${params.locationGroup} for location ${params.name} does not exist")
+            }
+
             if (!location.validate()) {
                 location.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("Row ${index+1} name = ${location.name}: ${error.getFieldError()}")
+                    command.errors.reject("Row ${index+1}: Location ${location.name} is invalid: ${error.getFieldError()}")
                 }
             }
         }
@@ -55,21 +61,9 @@ class LocationDataService {
 
         location.name = params.name
         location.locationNumber = params.locationNumber
-
-        LocationType locationType = LocationType.findByNameLike(params.locationType + "%")
-        if (locationType) {
-            location.locationType = locationType
-        }
-
-        LocationGroup locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
-        if (locationGroup) {
-            location.locationGroup = locationGroup
-        }
-
-        Location parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
-        if (parentLocation) {
-            location.parentLocation = parentLocation
-        }
+        location.locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
+        location.locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
+        location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
 
 
         return location
