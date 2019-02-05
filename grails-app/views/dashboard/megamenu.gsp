@@ -723,6 +723,12 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
+                                <g:link controller="batch" action="importData">
+                                    <warehouse:message code="default.import.label"
+                                                       args="[warehouse.message(code:'default.data.label', default: 'Data')]"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="shipper" action="list" class="shipper">
                                     <warehouse:message code="location.shippers.label" />
                                 </g:link>

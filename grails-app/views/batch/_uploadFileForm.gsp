@@ -39,7 +39,21 @@
                     <div>
                         <g:radio name="type" value="inventoryLevel" checked="${params.type=='inventoryLevel'}"/>
                         <label><warehouse:message code="import.inventoryLevel.label" default="Inventory levels"/></label>
-                        <g:link controller="batch" action="downloadTemplate" params="[template:'inventoryLevel.xls']">
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'inventoryLevels.xls']">
+                            <warehouse:message code="default.template.label" default="Download template"/>
+                        </g:link>
+                    </div>
+                    <div>
+                        <g:radio name="type" value="location" checked="${params.type=='location'}"/>
+                        <label><warehouse:message code="locations.label" default="Locations"/></label>
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'locations.xls']">
+                            <warehouse:message code="default.template.label" default="Download template"/>
+                        </g:link>
+                    </div>
+                    <div>
+                        <g:radio name="type" value="person" checked="${params.type=='person'}"/>
+                        <label><warehouse:message code="persons.label" default="People"/></label>
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'persons.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
@@ -49,22 +63,24 @@
                         <warehouse:message code="default.comingSoon.label" default="Coming soon!"/>
                     </div>
                     <div>
-                        <g:radio name="type" value="product" checked="${params.type=='shipment'}" disabled="true"/>
-                        <label><warehouse:message code="import.shipment.label" default="Shipments"/></label>
-                        <warehouse:message code="default.comingSoon.label" default="Coming soon!"/>
+                        <g:radio name="type" value="user" checked="${params.type=='user'}"/>
+                        <label><warehouse:message code="users.label" default="Users"/></label>
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'users.xls']">
+                            <warehouse:message code="default.template.label" default="Download template"/>
+                        </g:link>
                     </div>
                     <div>
-                        <g:radio name="type" value="product" checked="${params.type=='purchaseOrder'}" disabled="true"/>
-                        <label><warehouse:message code="import.purchaseOrder.label" default="Purchase orders"/></label>
-                        <warehouse:message code="default.comingSoon.label" default="Coming soon!"/>
+                        <g:radio name="type" value="userLocation" checked="${params.type=='userLocation'}"/>
+                        <label><warehouse:message code="userLocations.label" default="User Locations"/></label>
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'userLocations.xls']">
+                            <warehouse:message code="default.template.label" default="Download template"/>
+                        </g:link>
                     </div>
-                    <%--
-                    <div class="chzn-container">
-                        <g:select name="type" class="chzn-select-deselect"
-                                  from="['product':'Product','inventory':'Inventory','inventoryLevel':'Inventory levels','productPrice':'Product price']"
-                                  optionKey="${{it.key}}" optionValue="${{it.value}}" noSelection="['':'']" value="${params?.type}"></g:select>
-                    </div>
-                    --%>
+                    %{--<div class="chzn-container">--}%
+                        %{--<g:select name="type" class="chzn-select-deselect"--}%
+                                  %{--from="['product':'Product','inventory':'Inventory','inventoryLevel':'Inventory levels','productPrice':'Product price']"--}%
+                                  %{--optionKey="${{it.key}}" optionValue="${{it.value}}" noSelection="['':'']" value="${params?.type}"></g:select>--}%
+                    %{--</div>--}%
                 </td>
             </tr>
             <tr class="prop">
