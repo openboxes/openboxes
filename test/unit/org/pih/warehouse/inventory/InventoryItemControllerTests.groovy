@@ -3,6 +3,7 @@ package org.pih.warehouse.inventory
 import grails.converters.JSON
 import grails.test.ControllerUnitTestCase
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.product.Product
 
 class InventoryItemControllerTests extends ControllerUnitTestCase {
@@ -37,8 +38,14 @@ class InventoryItemControllerTests extends ControllerUnitTestCase {
         inventoryServiceMock.demand.getInventoryItemsWithQuantity(1) { product, inv ->
             return ["pro1": [[id:"item1"], [id:"item2"], [id:"item3"], [id:"item4"]]]
         }
-        controller.inventoryService = inventoryServiceMock.createMock()
 
+        def forecastingServiceMock = mockFor(ForecastingService)
+        forecastingServiceMock.demand.getDemand(1) { location, product ->
+            [:]
+        }
+
+        controller.inventoryService = inventoryServiceMock.createMock()
+        controller.forecastingService = forecastingServiceMock.createMock()
         controller.params.id = p.id
         controller.session.warehouse = myLocation
         def model = controller.showRecordInventory(com)
