@@ -16,6 +16,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
 import org.pih.warehouse.importer.ProductExcelImporter
+import org.pih.warehouse.importer.UserExcelImporter
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
 // import au.com.bytecode.opencsv.CSVReader;
@@ -36,12 +37,6 @@ class BatchController {
         if (request instanceof DefaultMultipartHttpServletRequest) {
             def uploadFile = request.getFile('xlsFile');
             if(!uploadFile.empty){
-                println "Class: ${uploadFile.class}"
-                println "Name: ${uploadFile.name}"
-                println "OriginalFileName: ${uploadFile.originalFilename}"
-                println "Size: ${uploadFile.size}"
-                println "ContentType: ${uploadFile.contentType}"
-
                 def webRootDir = servletContext.getRealPath("/")
                 def userDir = new File(webRootDir, "/uploads/")
                 userDir.mkdirs()
@@ -128,19 +123,21 @@ class BatchController {
 				command.location = Location.get(session.warehouse.id)
 				try { 
 					// Need to choose the right importer 
-					log.info command.type
-					if (command.type == "inventory") {
-						dataImporter = new InventoryExcelImporter(command?.filename);
-                    }
-					else if (command.type == "product") {
-                        dataImporter = new ProductExcelImporter(command?.filename)
-                    }
-					else if (command.type == "inventoryLevel") {
-                        dataImporter = new InventoryLevelExcelImporter(command?.filename)
-                    }
-					else {
-						//throw new RuntimeException("Unable to import data using ${command.type} importer")
-                        command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default:'Please choose a valid import type')}")
+					switch(command.type) {
+						case "inventory":
+							dataImporter = new InventoryExcelImporter(command?.filename);
+							break;
+						case "inventoryLevel":
+							dataImporter = new InventoryLevelExcelImporter(command?.filename)
+							break;
+						case "user":
+							dataImporter = new UserExcelImporter(command?.filename)
+							break;
+						case "product":
+							dataImporter = new ProductExcelImporter(command?.filename)
+							break;
+						default:
+	                        command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default:'Please choose a valid import type')}")
                     }
 				}
 				catch (OfficeXmlFileException e) {

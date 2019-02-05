@@ -49,22 +49,17 @@
                         <warehouse:message code="default.comingSoon.label" default="Coming soon!"/>
                     </div>
                     <div>
-                        <g:radio name="type" value="product" checked="${params.type=='shipment'}" disabled="true"/>
-                        <label><warehouse:message code="import.shipment.label" default="Shipments"/></label>
-                        <warehouse:message code="default.comingSoon.label" default="Coming soon!"/>
+                        <g:radio name="type" value="user" checked="${params.type=='user'}"/>
+                        <label><warehouse:message code="default.users.label" default="Users"/></label>
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'users.xls']">
+                            <warehouse:message code="default.template.label" default="Download template"/>
+                        </g:link>
                     </div>
-                    <div>
-                        <g:radio name="type" value="product" checked="${params.type=='purchaseOrder'}" disabled="true"/>
-                        <label><warehouse:message code="import.purchaseOrder.label" default="Purchase orders"/></label>
-                        <warehouse:message code="default.comingSoon.label" default="Coming soon!"/>
-                    </div>
-                    <%--
-                    <div class="chzn-container">
-                        <g:select name="type" class="chzn-select-deselect"
-                                  from="['product':'Product','inventory':'Inventory','inventoryLevel':'Inventory levels','productPrice':'Product price']"
-                                  optionKey="${{it.key}}" optionValue="${{it.value}}" noSelection="['':'']" value="${params?.type}"></g:select>
-                    </div>
-                    --%>
+                    %{--<div class="chzn-container">--}%
+                        %{--<g:select name="type" class="chzn-select-deselect"--}%
+                                  %{--from="['product':'Product','inventory':'Inventory','inventoryLevel':'Inventory levels','productPrice':'Product price']"--}%
+                                  %{--optionKey="${{it.key}}" optionValue="${{it.value}}" noSelection="['':'']" value="${params?.type}"></g:select>--}%
+                    %{--</div>--}%
                 </td>
             </tr>
             <tr class="prop">
