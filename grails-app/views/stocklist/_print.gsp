@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <style>
@@ -55,7 +55,7 @@
             border: 1px solid black;
             vertical-align: middle;
         }
-        .first-line: {
+        .first-line {
             display: flex;
             justify-content: space-between;
         }
@@ -190,11 +190,10 @@
             </tr>
          </table>
 
+        <g:set var="sortByCode" value="${stocklist?.requisition?.sortByCode ?: RequisitionItemSortByCode.CATEGORY}"/>
+
         <%-- Stock list items table --%>
-        <g:set var="requisitionItems"
-               value='${stocklist?.requisition?.requisitionItems?.sort { a, b ->
-                    a.product?.category <=> b.product?.category ?: a.product?.name <=> b.product?.name }}'
-        />
+        <g:set var="requisitionItems" value='${stocklist?.requisition?."$sortByCode.methodName"}'/>
 
         <div>
             <g:if test="${requisitionItems}">

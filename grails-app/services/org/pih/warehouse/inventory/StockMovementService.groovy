@@ -37,6 +37,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
@@ -740,14 +741,19 @@ class StockMovementService {
     void addStockListItemsToRequisition(StockMovement stockMovement, Requisition requisition) {
         // If the user specified a stocklist then we should automatically clone it as long as there are no
         // requisition items already added to the requisition
+        RequisitionItemSortByCode sortByCode = stockMovement.stocklist?.sortByCode ?: RequisitionItemSortByCode.CATEGORY
+        def orderIndex = 0
+
         if (stockMovement.stocklist && !requisition.requisitionItems) {
-            stockMovement.stocklist.requisitionItems.each { stocklistItem ->
+            stockMovement.stocklist."${sortByCode.methodName}".each { stocklistItem ->
                 RequisitionItem requisitionItem = new RequisitionItem()
                 requisitionItem.product = stocklistItem.product
                 requisitionItem.quantity = stocklistItem.quantity
                 requisitionItem.quantityApproved = stocklistItem.quantity
-                requisitionItem.orderIndex = stocklistItem.orderIndex
+                requisitionItem.orderIndex = orderIndex
                 requisition.addToRequisitionItems(requisitionItem)
+
+                orderIndex++
             }
         }
     }

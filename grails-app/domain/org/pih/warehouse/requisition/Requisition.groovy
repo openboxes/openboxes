@@ -57,6 +57,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     RequisitionStatus status;
     CommodityClass commodityClass
     Requisition requisitionTemplate
+    RequisitionItemSortByCode sortByCode
 
     // where stock is originating from
     Location origin
@@ -118,7 +119,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
-    static transients = ["sortedStocklistItems", "shipment"]
+    static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment"]
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
     static mapping = {
@@ -183,6 +184,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         datePublished(nullable: true)
         requisitionTemplate(nullable:true)
         replenishmentPeriod(nullable:true)
+        sortByCode(nullable:true)
     }
 
     def getRequisitionItemCount() {
@@ -301,6 +303,26 @@ class Requisition implements Comparable<Requisition>, Serializable {
             throw new IllegalStateException("Must only be used with a stocklist")
         }
 
+        return requisitionItems.sort { a,b ->
+            a.product?.category?.name <=> b.product?.category?.name ?:
+                    a.product?.name <=> b.product?.name ?:
+                            a.orderIndex <=> b.orderIndex
+        }
+    }
+
+    def getRequisitionItemsByDateCreated() {
+        return requisitionItems.sort { a,b ->
+            a.dateCreated <=> b.dateCreated
+        }
+    }
+
+    def getRequisitionItemsByOrderIndex() {
+        return requisitionItems.sort { a,b ->
+            a.orderIndex <=> b.orderIndex
+        }
+    }
+
+    def getRequisitionItemsByCategory() {
         return requisitionItems.sort { a,b ->
             a.product?.category?.name <=> b.product?.category?.name ?:
                     a.product?.name <=> b.product?.name ?:

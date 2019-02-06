@@ -68,6 +68,21 @@
             </tr>
             <tr class="prop">
                 <td class="name">
+                    <label><warehouse:message code="requisition.sortByCode.label" /></label>
+                </td>
+                <td class="value">
+                    <g:if test="${requisition?.sortByCode}">
+                        ${requisition?.sortByCode?.friendlyName}
+                    </g:if>
+                    <g:else>
+                        <span class="fade">
+                            ${warehouse.message(code:'default.none.label')}
+                        </span>
+                    </g:else>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">
                     <label for="description">
                         <warehouse:message code="default.comments.label" />
                     </label>
