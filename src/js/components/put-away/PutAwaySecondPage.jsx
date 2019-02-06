@@ -171,7 +171,7 @@ class PutAwaySecondPage extends Component {
       Header: '',
       accessor: 'splitItems',
       Cell: cellInfo => (
-        <div className="d-flex flex-row">
+        <div className="d-flex flex-row flex-wrap">
           <SplitLineModal
             putawayItem={this.state.putAway.putawayItems[cellInfo.index]}
             splitItems={_.get(this.state.putAway.putawayItems, `[${cellInfo.index}].${cellInfo.column.id}`)}
@@ -181,12 +181,12 @@ class PutAwaySecondPage extends Component {
             bins={this.state.bins}
           />
           <button
-            className="btn btn-outline-primary btn-xs mx-2"
+            className="btn btn-outline-primary btn-xs mr-1 mb-1"
             onClick={() => this.editItem(cellInfo.index)}
           ><Translate id="default.button.edit.label" />
           </button>
           <button
-            className="btn btn-outline-danger btn-xs"
+            className="btn btn-outline-danger btn-xs mb-1"
             onClick={() => this.deleteItem(cellInfo.index)}
           ><Translate id="default.button.delete.label" />
           </button>

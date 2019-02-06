@@ -152,7 +152,7 @@ class SplitLineModal extends Component {
       <div>
         <button
           type="button"
-          className="btn btn-outline-success btn-xs"
+          className="btn btn-outline-success btn-xs mr-1 mb-1"
           onClick={() => this.openModal()}
         ><Translate id="stockMovement.splitLine.label" />
         </button>
