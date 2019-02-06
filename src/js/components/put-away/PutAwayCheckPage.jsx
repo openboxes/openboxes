@@ -140,6 +140,11 @@ class PutAwayCheckPage extends Component {
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
       Filter,
     }, {
+      Header: <Translate id="putAway.preferredBin.label" />,
+      accessor: 'preferredBin',
+      style: { whiteSpace: 'normal' },
+      Filter,
+    }, {
       Header: <Translate id="putAway.currentBin.label" />,
       accessor: 'currentBins',
       style: { whiteSpace: 'normal' },

@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
@@ -14,6 +14,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.inventory.InventoryLevel
 
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
@@ -45,6 +46,7 @@ class PutawayApiController {
         putaway.putawayItems.each { PutawayItem putawayItem ->
             putawayItem.availableItems =
                     inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
+            putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
         }
         render ([data:putaway?.toJson()] as JSON)
     }
