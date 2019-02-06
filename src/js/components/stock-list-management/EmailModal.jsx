@@ -14,6 +14,7 @@ const FIELDS = {
   recipients: {
     type: SelectField,
     label: 'stockListManagement.recipients.label',
+    defaultMessage: 'Recipients',
     attributes: {
       required: true,
       showValueTooltip: true,
@@ -28,6 +29,7 @@ const FIELDS = {
   subject: {
     type: TextField,
     label: 'stockListManagement.subject.label',
+    defaultMessage: 'Subject',
     attributes: {
       required: true,
     },
@@ -35,6 +37,7 @@ const FIELDS = {
   text: {
     type: TextareaField,
     label: 'stockListManagement.message.label',
+    defaultMessage: 'Message',
     attributes: {
       rows: 8,
       required: true,

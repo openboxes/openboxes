@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import store from '../store';
 import apiClient from '../utils/apiClient';
+import { translateWithDefaultMessage } from '../utils/Translate';
 
 class LoginForm extends Component {
   constructor(props) {
@@ -42,14 +43,16 @@ class LoginForm extends Component {
   render() {
     return (
       <div className="login-modal-container">
-        <div className="login-modal-header px-3 py-2"><span><i className="fa fa-unlock-alt pr-2" />{this.props.translate('default.login.label')}</span></div>
+        <div className="login-modal-header px-3 py-2">
+          <span><i className="fa fa-unlock-alt pr-2" />{this.props.translate('default.login.label', 'Login')}</span>
+        </div>
         <div className="px-3">
           <input
             id="username"
             name="username"
             type="text"
             className="form-control my-2"
-            placeholder={this.props.translate('login.username.label')}
+            placeholder={this.props.translate('login.username.label', 'email or username')}
             value={this.state.username}
             onChange={(event) => {
               this.setState({ username: event.target.value });
@@ -60,7 +63,7 @@ class LoginForm extends Component {
             name="password"
             type="password"
             className="form-control my-2"
-            placeholder={this.props.translate('login.password.label')}
+            placeholder={this.props.translate('login.password.label', 'password')}
             value={this.state.password}
             onChange={(event) => {
               this.setState({ password: event.target.value });
@@ -70,7 +73,7 @@ class LoginForm extends Component {
             className="btn btn-outline-primary btn-block my-3"
             disabled={!this.state.username || !this.state.password}
             onClick={this.onLogin}
-          >{this.props.translate('auth.login.label')}
+          >{this.props.translate('auth.login.label', 'Login')}
           </button>
         </div>
       </div>
@@ -85,7 +88,7 @@ LoginForm.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currentLocationId: state.session.currentLocation.id,
 });
 

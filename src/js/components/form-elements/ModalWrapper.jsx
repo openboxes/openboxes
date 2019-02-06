@@ -4,9 +4,9 @@ import Modal from 'react-modal';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
-import { Translate } from 'react-localize-redux';
 
 import { renderFormField } from '../../utils/form-utils';
+import Translate from '../../utils/Translate';
 
 class ModalWrapper extends Component {
   constructor(props) {
@@ -48,7 +48,7 @@ class ModalWrapper extends Component {
           disabled={this.props.btnOpenDisabled}
           onClick={() => this.openModal()}
         >
-          <Translate id={this.props.btnOpenText} />
+          <Translate id={this.props.btnOpenText} defaultMessage="Open" />
         </button>
         <Modal
           isOpen={this.state.showModal}
@@ -94,7 +94,7 @@ class ModalWrapper extends Component {
                         style={this.props.btnSaveStyle}
                         disabled={this.props.btnSaveDisabled}
                       >
-                        <Translate id={this.props.btnSaveText} />
+                        <Translate id={this.props.btnSaveText} defaultMessage="Save" />
                       </button>
                       <button
                         type="button"
@@ -102,7 +102,7 @@ class ModalWrapper extends Component {
                         style={this.props.btnCancelStyle}
                         onClick={() => this.closeModal()}
                       >
-                        <Translate id={this.props.btnCancelText} />
+                        <Translate id={this.props.btnCancelText} defaultMessage="Cancel" />
                       </button>
                     </div>
                   </form>

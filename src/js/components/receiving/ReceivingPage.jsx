@@ -14,6 +14,7 @@ import PartialReceivingPage from './PartialReceivingPage';
 import ReceivingCheckScreen from './ReceivingCheckScreen';
 import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
+import { translateWithDefaultMessage } from '../../utils/Translate';
 
 function validate(values) {
   const errors = {};
@@ -142,11 +143,14 @@ class ReceivingPage extends Component {
    */
   confirmReceive(formValues) {
     confirmAlert({
-      title: this.props.translate('message.confirmReceive.label'),
-      message: this.props.translate('confirmReceive.message'),
+      title: this.props.translate('message.confirmReceive.label', 'Confirm receiving'),
+      message: this.props.translate(
+        'confirmReceive.message',
+        'Are you sure you want to receive? There are some lines with empty bin locations.',
+      ),
       buttons: [
         {
-          label: this.props.translate('default.yes.label'),
+          label: this.props.translate('default.yes.label', 'Yes'),
           onClick: () => this.save({
             ...formValues,
             receiptStatus: 'COMPLETED',
@@ -157,7 +161,7 @@ class ReceivingPage extends Component {
           }),
         },
         {
-          label: this.props.translate('default.no.label'),
+          label: this.props.translate('default.no.label', 'No'),
         },
       ],
     });
@@ -295,7 +299,7 @@ class ReceivingPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
 });
 

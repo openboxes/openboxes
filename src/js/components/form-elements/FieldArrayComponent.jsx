@@ -3,12 +3,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 import { connect } from 'react-redux';
+import { getTranslate } from 'react-localize-redux';
 
 import 'react-tippy/dist/tippy.css';
-import { getTranslate, Translate } from 'react-localize-redux';
 
 import TableBody from './TableBody';
 import TableBodyVirtualized from './TableBodyVirtualized';
+import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 class FieldArrayComponent extends Component {
   constructor(props) {
@@ -44,7 +45,8 @@ class FieldArrayComponent extends Component {
               }}
               >
                 <Tooltip
-                  html={(config.label && <div>{this.props.translate(config.label)}</div>)}
+                  html={(config.label &&
+                    <div>{this.props.translate(config.label, config.defaultMessage)}</div>)}
                   theme="transparent"
                   arrow="true"
                   delay="150"
@@ -54,7 +56,8 @@ class FieldArrayComponent extends Component {
                   <div
                     key={name}
                     className={`mx-1 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
-                  >{config.label && <Translate id={config.label} />}
+                  >{config.label &&
+                    <Translate id={config.label} defaultMessage={config.defaultMessage} />}
                   </div>
                 </Tooltip>
               </div>))}
@@ -97,7 +100,7 @@ class FieldArrayComponent extends Component {
 }
 
 const mapStateToProps = state => ({
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 FieldArrayComponent.propTypes = {

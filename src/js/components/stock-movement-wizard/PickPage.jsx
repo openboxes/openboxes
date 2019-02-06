@@ -5,7 +5,7 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
-import { getTranslate, Translate } from 'react-localize-redux';
+import { getTranslate } from 'react-localize-redux';
 import fileDownload from 'js-file-download';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -19,6 +19,7 @@ import { showSpinner, hideSpinner } from '../../actions';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import ButtonField from '../form-elements/ButtonField';
+import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const FIELDS = {
   pickPageItems: {
@@ -35,6 +36,7 @@ const FIELDS = {
       productCode: {
         type: LabelField,
         label: 'stockMovement.code.label',
+        defaultMessage: 'Code',
         flexWidth: '0.9',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
@@ -43,6 +45,7 @@ const FIELDS = {
       'product.name': {
         type: LabelField,
         label: 'stockMovement.productName.label',
+        defaultMessage: 'Product name',
         flexWidth: '4.7',
         attributes: {
           className: 'text-left ml-1',
@@ -52,20 +55,24 @@ const FIELDS = {
         type: LabelField,
         flexWidth: '1.3',
         label: 'stockMovement.lot.label',
+        defaultMessage: 'Lot',
       },
       expirationDate: {
         type: LabelField,
         flexWidth: '0.9',
         label: 'stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
       },
       'binLocation.name': {
         type: LabelField,
         flexWidth: '1.2',
         label: 'stockMovement.binLocation.label',
+        defaultMessage: 'Bin location',
       },
       quantityRequired: {
         type: LabelField,
         label: 'stockMovement.quantityRequired.label',
+        defaultMessage: 'Qty required',
         flexWidth: '0.8',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -74,6 +81,7 @@ const FIELDS = {
       quantityPicked: {
         type: LabelField,
         label: 'stockMovement.quantityPicked.label',
+        defaultMessage: 'Qty picked',
         flexWidth: '0.7',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -81,6 +89,7 @@ const FIELDS = {
       },
       buttonEditPick: {
         label: 'stockMovement.editPick.label',
+        defaultMessage: 'Edit pick',
         type: EditPickModal,
         fieldKey: '',
         flexWidth: '0.6',
@@ -100,6 +109,7 @@ const FIELDS = {
       },
       buttonAdjustInventory: {
         label: 'stockMovement.adjustInventory.label',
+        defaultMessage: 'Adjust inventory',
         type: AdjustInventoryModal,
         fieldKey: '',
         flexWidth: '1.3',
@@ -122,9 +132,11 @@ const FIELDS = {
       revert: {
         type: ButtonField,
         label: 'default.button.undo.label',
+        defaultMessage: 'Undo',
         flexWidth: '0.7',
         fieldKey: '',
         buttonLabel: 'default.button.undo.label',
+        buttonDefaultMessage: 'Undo',
         getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
           onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
           hidden: subfield,
@@ -197,15 +209,18 @@ class PickPage extends Component {
    */
   refresh() {
     confirmAlert({
-      title: this.props.translate('message.confirmRefresh.label '),
-      message: this.props.translate('confirmRefresh.message'),
+      title: this.props.translate('message.confirmRefresh.label', 'Confirm refresh'),
+      message: this.props.translate(
+        'confirmRefresh.message',
+        'Are you sure you want to refresh? Your progress since last save will be lost.',
+      ),
       buttons: [
         {
-          label: this.props.translate('default.yes.label'),
+          label: this.props.translate('default.yes.label', 'Yes'),
           onClick: () => this.fetchAllData(),
         },
         {
-          label: this.props.translate('default.no.label'),
+          label: this.props.translate('default.no.label', 'No'),
         },
       ],
     });
@@ -436,7 +451,7 @@ class PickPage extends Component {
                 htmlFor="csvInput"
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-download pr-2" /><Translate id="default.button.importTemplate.label" /></span>
+                <span><i className="fa fa-download pr-2" /><Translate id="default.button.importTemplate.label" defaultMessage="Import template" /></span>
                 <input
                   id="csvInput"
                   type="file"
@@ -454,7 +469,7 @@ class PickPage extends Component {
                 onClick={() => this.exportTemplate(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-upload pr-2" /><Translate id="default.button.exportTemplate.label" /></span>
+                <span><i className="fa fa-upload pr-2" /><Translate id="default.button.exportTemplate.label" defaultMessage="Export template" /></span>
               </button>
               <a
                 href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
@@ -462,22 +477,22 @@ class PickPage extends Component {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span><i className="fa fa-print pr-2" /><Translate id="stockMovement.printPicklist.label" /></span>
+                <span><i className="fa fa-print pr-2" /><Translate id="stockMovement.printPicklist.label" defaultMessage="Print picklist" /></span>
               </a>
               <button
                 type="button"
                 onClick={() => this.refresh()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
               >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="default.button.refresh.label" /></span>
+                <span><i className="fa fa-refresh pr-2" /><Translate id="default.button.refresh.label" defaultMessage="Reload" /></span>
               </button>
               <button
                 type="button"
                 onClick={() => this.sortByBins()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                {this.state.sorted && <Translate id="stockMovement.originalOrder.label" />}
-                {!this.state.sorted && <Translate id="stockMovement.sortByBins.label" />}
+                {this.state.sorted && <Translate id="stockMovement.originalOrder.label" defaultMessage="Original order" />}
+                {!this.state.sorted && <Translate id="stockMovement.sortByBins.label" defaultMessage="Sort by bins" />}
               </button>
             </span>
             <form onSubmit={handleSubmit} className="print-mt">
@@ -490,10 +505,10 @@ class PickPage extends Component {
               }))}
               <div className="d-print-none">
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
-                  <Translate id="default.button.previous.label" />
+                  <Translate id="default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">
-                  <Translate id="default.button.next.label" />
+                  <Translate id="default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
@@ -505,7 +520,7 @@ class PickPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(PickPage);

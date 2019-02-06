@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
@@ -11,12 +10,13 @@ import ArrayField from '../../form-elements/ArrayField';
 import SelectField from '../../form-elements/SelectField';
 import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
-
+import Translate from '../../../utils/Translate';
 
 const FIELDS = {
   reasonCode: {
     type: SelectField,
     label: 'stockMovement.reasonCode.label',
+    defaultMessage: 'Reason code',
     getDynamicAttr: props => ({
       options: props.reasonCodes,
     }),
@@ -27,18 +27,22 @@ const FIELDS = {
       lotNumber: {
         type: LabelField,
         label: 'stockMovement.lot.label',
+        defaultMessage: 'Lot',
       },
       expirationDate: {
         type: LabelField,
         label: 'stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
       },
       'binLocation.name': {
         type: LabelField,
         label: 'stockMovement.binLocation.label',
+        defaultMessage: 'Bin Location',
       },
       quantityAvailable: {
         type: LabelField,
         label: 'stockMovement.quantityAvailable.label',
+        defaultMessage: 'Qty Available',
         fixedWidth: '150px',
         attributes: {
           formatValue: value => (value ? value.toLocaleString('en-US') : null),
@@ -47,6 +51,7 @@ const FIELDS = {
       quantityPicked: {
         type: TextField,
         label: 'stockMovement.quantityPicked.label',
+        defaultMessage: 'Qty Picked',
         fixedWidth: '140px',
         attributes: {
           type: 'number',
@@ -200,8 +205,9 @@ class EditPickModal extends Component {
   calculatePicked(values) {
     return (
       <div>
-        <div className="font-weight-bold pb-2"><Translate id="stockMovement.quantityPicked.label" />: {_.reduce(values.availableItems, (sum, val) =>
-          (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
+        <div className="font-weight-bold pb-2">
+          <Translate id="stockMovement.quantityPicked.label" defaultMessage="Qty Picked" />: {_.reduce(values.availableItems, (sum, val) =>
+            (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
         </div>
         <hr />
       </div>
@@ -225,9 +231,15 @@ class EditPickModal extends Component {
         renderBodyWithValues={this.calculatePicked}
       >
         <div>
-          <div className="font-weight-bold"><Translate id="stockMovement.productCode.label" />: {this.state.attr.fieldValue.productCode}</div>
-          <div className="font-weight-bold"><Translate id="stockMovement.productName.label" />: {this.state.attr.fieldValue['product.name']}</div>
-          <div className="font-weight-bold"><Translate id="stockMovement.quantityRequired.label" />: {this.state.attr.fieldValue.quantityRequired}</div>
+          <div className="font-weight-bold">
+            <Translate id="stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.fieldValue.productCode}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.fieldValue['product.name']}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="stockMovement.quantityRequired.label" defaultMessage="Qty Required" />: {this.state.attr.fieldValue.quantityRequired}
+          </div>
         </div>
       </ModalWrapper>
     );
