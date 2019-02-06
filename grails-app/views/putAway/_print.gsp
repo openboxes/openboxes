@@ -9,6 +9,7 @@
         tr {page-break-inside: avoid; page-break-after: auto;}
         td {vertical-align: top; }
         th { background-color: lightgrey; font-weight: bold;}
+        h2 { text-align: center; }
         body { font-size: 11px; }
         * {
             padding: 0;
@@ -68,19 +69,14 @@
         table td, table th {
             padding: 5px;
             border: 1px solid black;
+            word-wrap: break-word;
+            overflow-wrap:break-word;
         }
     </style>
 
 </head>
 
 <body>
-
-    <div class="header">
-        <div id="page-header" class="small">
-            Putaway
-        </div>
-    </div>
-
     <div class="footer">
         <div id="page-footer" class="small">
             <div>
@@ -90,7 +86,6 @@
     </div>
 
     <div class="content">
-        <h1><warehouse:message code="putawayOrder.label"/></h1>
         <table>
             <tr>
                 <td>
@@ -100,19 +95,27 @@
                     ${jsonObject?.putawayNumber}
                 </td>
             </tr>
+            <tr>
+                <th><g:message code="putawayOrder.createdBy.label"/></th>
+                <td width="50%">${user?.name}</td>
+            </tr>
+            <tr>
+                <th><g:message code="default.dateCreated.label"/></th>
+                <td width="50%">${jsonObject?.dateCreated}</td>
+            </tr>
         </table>
-
+        <h2><warehouse:message code="putawayOrder.label"/></h2>
         <table>
             <thead>
                 <tr>
                     <th>Code</th>
                     <th>Name</th>
-                    <th>Lot Number</th>
-                    <th>Expiration Date</th>
+                    <th>Lot/Serial No.</th>
+                    <th>Expiry</th>
+                    <th>Total Quantity</th>
+                    <th>Putaway Quantity</th>
                     <th>Current Bins</th>
                     <th>Putaway Bin</th>
-                    <th>Putaway Quantity</th>
-                    <th>Total Quantity</th>
                 </tr>
             </thead>
             <g:each var="putawayItem" in="${jsonObject.putawayItems}">
@@ -122,11 +125,10 @@
                         <td>${putawayItem["product.name"]}</td>
                         <td>${putawayItem["inventoryItem.lotNumber"]}</td>
                         <td>${putawayItem["inventoryItem.expirationDate"]}</td>
+                        <td>${putawayItem?.quantity}</td>
+                        <td>${putawayItem?.quantity}</td>
                         <td>${putawayItem["currentBins"]}</td>
                         <td>${putawayItem["putawayLocation.name"]}</td>
-                        <td>${putawayItem?.quantity}</td>
-                        <td>${putawayItem?.quantity}</td>
-
                     </tr>
                 </g:if>
                 <g:else>
@@ -136,10 +138,10 @@
                             <td>${status==0 ? putawayItem["product.name"]: ""}</td>
                             <td>${status==0 ? putawayItem["inventoryItem.lotNumber"]: ""}</td>
                             <td>${status==0 ? putawayItem["inventoryItem.expirationDate"]: ""}</td>
+                            <td>${status==0 ? putawayItem?.quantity: ""}</td>
+                            <td>${splitItem["quantity"]?:""}</td>
                             <td>${putawayItem["currentBins"]}</td>
                             <td>${splitItem["putawayLocation.name"]}</td>
-                            <td>${splitItem["quantity"]?:""}</td>
-                            <td>${status==0 ? putawayItem?.quantity: ""}</td>
                         </tr>
                     </g:each>
 
@@ -149,15 +151,15 @@
 
         <table>
             <tr>
-                <th><g:message code="putawayOrder.createdBy.label"/></th>
+                <th><g:message code="putawayOrder.completedBy.label"/></th>
                 <td width="50%"></td>
             </tr>
             <tr>
-                <th><g:message code="putawayOrder.completedBy.label"/></th>
+                <th><g:message code="putawayOrder.putawayDate.label"/></th>
                 <td></td>
             </tr>
             <tr>
-                <th><g:message code="putawayOrder.putawayDate.label"/></th>
+                <th><g:message code="default.signature.label"/></th>
                 <td></td>
             </tr>
         </table>

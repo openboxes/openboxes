@@ -8,6 +8,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.core.User
 
 class PutAwayController {
 
@@ -33,6 +34,7 @@ class PutAwayController {
 
         Putaway putaway
         JSONObject jsonObject
+		User user = session.user
 
         if (request.method == "POST") {
             jsonObject = request.JSON
@@ -49,7 +51,7 @@ class PutAwayController {
 
 		renderPdf(
 				template: "/putAway/print",
-				model: [jsonObject:jsonObject],
+				model: [jsonObject:jsonObject, user:user],
 				filename: "Putaway ${putaway?.putawayNumber}.pdf"
 		)
 	}
