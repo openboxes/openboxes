@@ -97,7 +97,7 @@
             </tr>
             <tr>
                 <th><g:message code="putawayOrder.createdBy.label"/></th>
-                <td width="50%">${user?.name}</td>
+                <td width="50%">${jsonObject?.orderedBy}</td>
             </tr>
             <tr>
                 <th><g:message code="default.dateCreated.label"/></th>
