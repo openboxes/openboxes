@@ -97,7 +97,7 @@
             </tr>
             <tr>
                 <th><g:message code="putawayOrder.createdBy.label"/></th>
-                <td width="50%">${user?.name}</td>
+                <td width="50%">${jsonObject?.orderedBy}</td>
             </tr>
             <tr>
                 <th><g:message code="default.dateCreated.label"/></th>
@@ -114,6 +114,7 @@
                     <th>Expiry</th>
                     <th>Total Quantity</th>
                     <th>Putaway Quantity</th>
+                    <th>Preferred Bin</th>
                     <th>Current Bins</th>
                     <th>Putaway Bin</th>
                 </tr>
@@ -127,6 +128,7 @@
                         <td>${putawayItem["inventoryItem.expirationDate"]}</td>
                         <td>${putawayItem?.quantity}</td>
                         <td>${putawayItem?.quantity}</td>
+                        <td>${putawayItem["preferredBin"]}</td>
                         <td>${putawayItem["currentBins"]}</td>
                         <td>${putawayItem["putawayLocation.name"]}</td>
                     </tr>
@@ -140,6 +142,7 @@
                             <td>${status==0 ? putawayItem["inventoryItem.expirationDate"]: ""}</td>
                             <td>${status==0 ? putawayItem?.quantity: ""}</td>
                             <td>${splitItem["quantity"]?:""}</td>
+                            <td>${putawayItem["preferredBin"]}</td>
                             <td>${putawayItem["currentBins"]}</td>
                             <td>${splitItem["putawayLocation.name"]}</td>
                         </tr>

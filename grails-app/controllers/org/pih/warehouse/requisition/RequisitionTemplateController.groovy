@@ -316,7 +316,9 @@ class RequisitionTemplateController {
             })
 
             if (requisition.requisitionItems) {
-                requisition.requisitionItems.each { requisitionItem ->
+                RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.CATEGORY
+
+                requisition."${sortByCode.methodName}".each { requisitionItem ->
                     csv << [
                             productCode  : requisitionItem.product.productCode,
                             productName  : StringEscapeUtils.escapeCsv(requisitionItem.product.name),

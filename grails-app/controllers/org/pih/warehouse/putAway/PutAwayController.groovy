@@ -4,10 +4,8 @@ import grails.plugin.rendering.pdf.PdfRenderingService
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
-import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.core.User
 
 class PutAwayController {
@@ -34,7 +32,6 @@ class PutAwayController {
 
         Putaway putaway
         JSONObject jsonObject
-		User user = session.user
 
         if (request.method == "POST") {
             jsonObject = request.JSON
@@ -45,13 +42,14 @@ class PutAwayController {
 			putaway.putawayItems.each { PutawayItem putawayItem ->
 				putawayItem.availableItems =
 						inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
+				putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
 			}
 			jsonObject = new JSONObject(putaway.toJson())
 		}
 
 		renderPdf(
 				template: "/putAway/print",
-				model: [jsonObject:jsonObject, user:user],
+				model: [jsonObject:jsonObject],
 				filename: "Putaway ${putaway?.putawayNumber}.pdf"
 		)
 	}
