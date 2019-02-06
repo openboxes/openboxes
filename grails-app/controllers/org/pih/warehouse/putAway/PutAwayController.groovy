@@ -34,7 +34,6 @@ class PutAwayController {
 
         Putaway putaway
         JSONObject jsonObject
-		User user = session.user
 
         if (request.method == "POST") {
             jsonObject = request.JSON
@@ -51,7 +50,7 @@ class PutAwayController {
 
 		renderPdf(
 				template: "/putAway/print",
-				model: [jsonObject:jsonObject, user:user],
+				model: [jsonObject:jsonObject],
 				filename: "Putaway ${putaway?.putawayNumber}.pdf"
 		)
 	}
