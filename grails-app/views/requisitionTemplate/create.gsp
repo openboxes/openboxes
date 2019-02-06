@@ -1,4 +1,4 @@
-<%@ page import="grails.converters.JSON; org.pih.warehouse.core.RoleType"%>
+<%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode; grails.converters.JSON; org.pih.warehouse.core.RoleType"%>
 <%@ page import="org.pih.warehouse.requisition.RequisitionType"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
@@ -123,6 +123,19 @@
                                 <td class="value">
                                     <g:textField name="replenishmentPeriod" value="${requisition.replenishmentPeriod}"
                                                  class="text large" size="80"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="sortByCode">
+                                        <warehouse:message code="requisition.sortByCode.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:select id="sortByCode" name="sortByCode" class="chzn-select-deselect"
+                                              from="${RequisitionItemSortByCode.list()}"
+                                              optionValue="friendlyName" value="${requisition?.sortByCode}"
+                                              noSelection="['null':'']"/>
                                 </td>
                             </tr>
                             <tr class="prop">
