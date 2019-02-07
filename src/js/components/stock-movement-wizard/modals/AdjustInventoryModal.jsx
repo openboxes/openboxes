@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import TextField from '../../form-elements/TextField';
@@ -12,6 +11,7 @@ import SelectField from '../../form-elements/SelectField';
 import DateField from '../../form-elements/DateField';
 import { showSpinner, hideSpinner } from '../../../actions';
 import apiClient from '../../../utils/apiClient';
+import Translate from '../../../utils/Translate';
 
 const FIELDS = {
   adjustInventory: {
@@ -21,7 +21,7 @@ const FIELDS = {
         type="button"
         className="btn btn-outline-success btn-xs"
         onClick={() => addRow({ productId })}
-      ><Translate id="stockMovement.addLot.label" />
+      ><Translate id="stockMovement.addLot.label" defaultMessage="Add new lot number" />
       </button>
     ),
     type: ArrayField,
@@ -29,6 +29,7 @@ const FIELDS = {
       binLocation: {
         type: SelectField,
         label: 'stockMovement.binLocation.label',
+        defaultMessage: 'Bin Location',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue, bins, hasBinLocationSupport }) => ({
           disabled: !!fieldValue || !hasBinLocationSupport,
@@ -39,6 +40,7 @@ const FIELDS = {
       lotNumber: {
         type: TextField,
         label: 'stockMovement.lot.label',
+        defaultMessage: 'Lot',
         fieldKey: 'inventoryItem.id',
         getDynamicAttr: ({ fieldValue }) => ({
           disabled: !!fieldValue,
@@ -47,6 +49,7 @@ const FIELDS = {
       expirationDate: {
         type: DateField,
         label: 'stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
         fieldKey: 'inventoryItem.id',
         attributes: {
           autoComplete: 'off',
@@ -59,6 +62,7 @@ const FIELDS = {
       quantityAvailable: {
         type: LabelField,
         label: 'stockMovement.previousQuantity.label',
+        defaultMessage: 'Previous Qty',
         fixedWidth: '150px',
         attributes: {
           formatValue: value => (value ? value.toLocaleString('en-US') : null),
@@ -67,6 +71,7 @@ const FIELDS = {
       quantityAdjusted: {
         type: TextField,
         label: 'stockMovement.currentQuantity.label',
+        defaultMessage: 'Current Qty',
         fixedWidth: '140px',
         attributes: {
           type: 'number',
@@ -75,6 +80,7 @@ const FIELDS = {
       comments: {
         type: TextField,
         label: 'stockMovement.comments.label',
+        defaultMessage: 'Comments',
       },
     },
   },
@@ -204,8 +210,8 @@ class AdjustInventoryModal extends Component {
         }}
       >
         <div>
-          <div className="font-weight-bold"><Translate id="stockMovement.productCode.label" />: {this.state.attr.fieldValue.productCode}</div>
-          <div className="font-weight-bold"><Translate id="stockMovement.productName.label" />: {this.state.attr.fieldValue['product.name']} <hr /></div>
+          <div className="font-weight-bold"><Translate id="stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.fieldValue.productCode}</div>
+          <div className="font-weight-bold"><Translate id="stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.fieldValue['product.name']} <hr /></div>
         </div>
       </ModalWrapper>
     );

@@ -87,7 +87,7 @@
                             </td>
                         </tr>
 
-                        <g:set var="sortByCode" value="${requisition?.sortByCode ?: RequisitionItemSortByCode.CATEGORY}"/>
+                        <g:set var="sortByCode" value="${requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}"/>
                         <g:set var="i" value="${0}"/>
                         <g:set var="requisitionItems" value='${requisition?."$sortByCode.methodName"}'/>
                         %{--<g:set var="groupedStocklistItems" value="${requisitionItems?.groupBy { it?.product?.category }}"/>--}%

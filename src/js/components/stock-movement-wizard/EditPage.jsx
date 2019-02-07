@@ -6,7 +6,7 @@ import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
-import { Translate, getTranslate } from 'react-localize-redux';
+import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -20,6 +20,7 @@ import apiClient from '../../utils/apiClient';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../actions';
 import ButtonField from '../form-elements/ButtonField';
+import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
@@ -47,6 +48,7 @@ const FIELDS = {
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
         label: 'stockMovement.code.label',
+        defaultMessage: 'Code',
       },
       productName: {
         type: LabelField,
@@ -59,6 +61,7 @@ const FIELDS = {
       quantityRequested: {
         type: LabelField,
         label: 'stockMovement.quantityRequested.label',
+        defaultMessage: 'Qty requested',
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -67,6 +70,7 @@ const FIELDS = {
       quantityAvailable: {
         type: LabelField,
         label: 'stockMovement.quantityAvailable.label',
+        defaultMessage: 'Qty available',
         flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
@@ -86,6 +90,7 @@ const FIELDS = {
       quantityConsumed: {
         type: LabelField,
         label: 'stockMovement.monthlyQuantity.label',
+        defaultMessage: 'Monthly qty',
         flexWidth: '1.45',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -93,6 +98,7 @@ const FIELDS = {
       },
       substituteButton: {
         label: 'stockMovement.substitution.label',
+        defaultMessage: 'Substitution',
         type: SubstitutionsModal,
         fieldKey: '',
         flexWidth: '1',
@@ -115,6 +121,7 @@ const FIELDS = {
       },
       quantityRevised: {
         label: 'stockMovement.quantityRevised.label',
+        defaultMessage: 'Qty revised',
         type: TextField,
         fieldKey: 'statusCode',
         flexWidth: '1',
@@ -128,6 +135,7 @@ const FIELDS = {
       reasonCode: {
         type: SelectField,
         label: 'stockMovement.reasonCode.label',
+        defaultMessage: 'Reason code',
         flexWidth: '1.4',
         fieldKey: 'quantityRevised',
         getDynamicAttr: ({ fieldValue, subfield, reasonCodes }) => ({
@@ -139,9 +147,11 @@ const FIELDS = {
       revert: {
         type: ButtonField,
         label: 'default.button.undo.label',
+        defaultMessage: 'Undo',
         flexWidth: '0.9',
         fieldKey: '',
         buttonLabel: 'default.button.undo.label',
+        buttonDefaultMessage: 'Undo',
         getDynamicAttr: ({ fieldValue, revertItem }) => ({
           onClick: fieldValue.requisitionItemId ?
             () => revertItem(fieldValue.requisitionItemId) : () => null,
@@ -318,7 +328,7 @@ class EditItemsPage extends Component {
     const errors = validateForSave(formValues).editPageItems;
 
     if (errors.length) {
-      let errorMessage = `${this.props.translate('errors.errorInLine.label')}:</br>`;
+      let errorMessage = `${this.props.translate('errors.errorInLine.label', 'Error occurred in line')}:</br>`;
       errorMessage += _.reduce(
         errors,
         (message, value, key) => (
@@ -342,7 +352,7 @@ class EditItemsPage extends Component {
           });
         }
         this.props.hideSpinner();
-        Alert.success(this.props.translate('alert.saveSuccess.label'));
+        Alert.success(this.props.translate('alert.saveSuccess.label', 'Changes saved successfully'));
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -353,11 +363,14 @@ class EditItemsPage extends Component {
    */
   refresh() {
     confirmAlert({
-      title: this.props.translate('message.confirmRefresh.label'),
-      message: this.props.translate('confirmRefresh.message'),
+      title: this.props.translate('message.confirmRefresh.label', 'Confirm refresh'),
+      message: this.props.translate(
+        'confirmRefresh.message',
+        'Are you sure you want to refresh? Your progress since last save will be lost.',
+      ),
       buttons: [
         {
-          label: this.props.translate('default.yes.label'),
+          label: this.props.translate('default.yes.label', 'Yes'),
           onClick: () => {
             this.setState({
               revisedItems: [],
@@ -366,7 +379,7 @@ class EditItemsPage extends Component {
           },
         },
         {
-          label: this.props.translate('default.no.label'),
+          label: this.props.translate('default.no.label', 'No'),
         },
       ],
     });
@@ -459,7 +472,7 @@ class EditItemsPage extends Component {
       })
       .catch(() => {
         this.props.hideSpinner();
-        return Promise.reject(new Error(this.props.translate('error.revertRequisitionItem.label')));
+        return Promise.reject(new Error(this.props.translate('error.revertRequisitionItem.label', 'Could not revert requisition items')));
       });
   }
 
@@ -478,14 +491,14 @@ class EditItemsPage extends Component {
                 onClick={() => this.refresh()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="default.button.refresh.label" /></span>
+                <span><i className="fa fa-refresh pr-2" /><Translate id="default.button.refresh.label" defaultMessage="Reload" /></span>
               </button>
               <button
                 type="button"
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" /></span>
+                <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" defaultMessage="Save" /></span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -499,10 +512,10 @@ class EditItemsPage extends Component {
               }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
-                  <Translate id="default.button.previous.label" />
+                  <Translate id="default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">
-                  <Translate id="default.button.next.label" />
+                  <Translate id="default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
@@ -516,7 +529,7 @@ class EditItemsPage extends Component {
 const mapStateToProps = state => ({
   reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, {

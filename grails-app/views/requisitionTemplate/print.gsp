@@ -204,7 +204,7 @@
 
 <div class="clear"></div>
 
-<g:set var="sortByCode" value='${requisition?.sortByCode ?: RequisitionItemSortByCode.CATEGORY}'/>
+<g:set var="sortByCode" value='${requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}'/>
 <g:set var="requisitionItems" value='${requisition?."$sortByCode.methodName"}'/>
 <g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
 <g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>

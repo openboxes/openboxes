@@ -1,10 +1,12 @@
 import React from 'react';
 import { Tooltip } from 'react-tippy';
 import PropTypes from 'prop-types';
-import { getTranslate, Translate } from 'react-localize-redux';
+import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import 'react-tippy/dist/tippy.css';
+
+import Translate, { translateWithDefaultMessage } from './Translate';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
@@ -23,6 +25,7 @@ export const renderFormFields = ({
   renderInput,
   attributes: { required, hidden, ...otherAttributes },
   label: FieldLabel,
+  defaultMessage,
   touched: fieldTouched,
   arrayField,
   input,
@@ -55,7 +58,7 @@ export const renderFormFields = ({
       <div className="row">
         {
           typeof FieldLabel === 'string' ?
-            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right">{FieldLabel && <Translate id={FieldLabel} />}</label> :
+            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right">{FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}</label> :
             <FieldLabel />
         }
         <div className="col-md-4 col-7">
@@ -73,7 +76,7 @@ export const renderFormFields = ({
 };
 
 const mapStateToProps = state => ({
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export const renderField = connect(mapStateToProps)(renderFormFields);
@@ -85,6 +88,7 @@ renderFormFields.propTypes = {
     PropTypes.string,
     PropTypes.func,
   ]),
+  defaultMessage: PropTypes.string,
   touched: PropTypes.bool,
   arrayField: PropTypes.bool,
   input: PropTypes.shape({}).isRequired,
@@ -96,4 +100,5 @@ renderFormFields.defaultProps = {
   touched: false,
   arrayField: false,
   label: '',
+  defaultMessage: '',
 };

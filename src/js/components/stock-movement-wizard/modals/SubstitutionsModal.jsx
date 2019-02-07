@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
@@ -11,11 +10,13 @@ import TextField from '../../form-elements/TextField';
 import SelectField from '../../form-elements/SelectField';
 import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
+import Translate from '../../../utils/Translate';
 
 const FIELDS = {
   reasonCode: {
     type: SelectField,
     label: 'stockMovement.reasonFor.label',
+    defaultMessage: 'Reason for not fulfilling full qty',
     attributes: {
       required: true,
     },
@@ -42,18 +43,22 @@ const FIELDS = {
       productCode: {
         type: LabelField,
         label: 'stockMovement.code.label',
+        defaultMessage: 'Code',
       },
       productName: {
         type: LabelField,
         label: 'stockMovement.productName.label',
+        defaultMessage: 'Product name',
       },
       minExpirationDate: {
         type: LabelField,
         label: 'stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
       },
       quantityAvailable: {
         type: LabelField,
         label: 'stockMovement.quantityAvailable.label',
+        defaultMessage: 'Qty Available',
         fixedWidth: '150px',
         fieldKey: '',
         attributes: {
@@ -70,6 +75,7 @@ const FIELDS = {
       quantitySelected: {
         type: TextField,
         label: 'stockMovement.quantitySelected.label',
+        defaultMessage: 'Quantity selected',
         fixedWidth: '140px',
         attributes: {
           type: 'number',
@@ -222,8 +228,9 @@ class SubstitutionsModal extends Component {
   calculateSelected(values) {
     return (
       <div>
-        <div className="font-weight-bold pb-2"><Translate id="stockMovement.quantitySelected.label" />: {_.reduce(values.substitutions, (sum, val) =>
-          (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)
+        <div className="font-weight-bold pb-2">
+          <Translate id="stockMovement.quantitySelected.label" defaultMessage="Quantity selected" />: {_.reduce(values.substitutions, (sum, val) =>
+            (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)
         }
         </div>
         <hr />
@@ -247,9 +254,15 @@ class SubstitutionsModal extends Component {
         renderBodyWithValues={this.calculateSelected}
       >
         <div>
-          <div className="font-weight-bold"><Translate id="stockMovement.productCode.label" />: {this.state.attr.lineItem.productCode}</div>
-          <div className="font-weight-bold"><Translate id="stockMovement.productName.label" />: {this.state.attr.lineItem.productName}</div>
-          <div className="font-weight-bold"><Translate id="stockMovement.quantityRequested.label" />: {this.state.attr.lineItem.quantityRequested}</div>
+          <div className="font-weight-bold">
+            <Translate id="stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.lineItem.productCode}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.lineItem.productName}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="stockMovement.quantityRequested.label" defaultMessage="Qty Requested" />: {this.state.attr.lineItem.quantityRequested}
+          </div>
         </div>
       </ModalWrapper>
     );

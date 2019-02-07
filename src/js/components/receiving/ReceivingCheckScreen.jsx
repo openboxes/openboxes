@@ -1,50 +1,54 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Translate } from 'react-localize-redux';
 
 import ArrayField from '../form-elements/ArrayField';
 import CheckboxField from '../form-elements/CheckboxField';
 import LabelField from '../form-elements/LabelField';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import { renderFormField } from '../../utils/form-utils';
+import Translate from '../../utils/Translate';
 
 const FIELDS = {
   'origin.name': {
     type: LabelField,
     label: 'stockMovement.origin.label',
+    defaultMessage: 'Origin',
   },
   'destination.name': {
     type: LabelField,
     label: 'stockMovement.destination.label',
+    defaultMessage: 'Destination',
   },
   dateShipped: {
     type: LabelField,
     label: 'partialReceiving.shippedOn.label',
+    defaultMessage: 'Shipped on',
   },
   dateDelivered: {
     type: LabelField,
     label: 'partialReceiving.deliveredOn.label',
+    defaultMessage: 'Delivered on',
   },
   buttonsTop: {
     // eslint-disable-next-line react/prop-types
     type: ({ prevPage, onSave, saveDisabled }) => (
       <div className="mb-1 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
-          <Translate id="partialReceiving.backToEdit.label" />
+          <Translate id="partialReceiving.backToEdit.label" defaultMessage="Back to edit" />
         </button>
         <button
           type="button"
           className="btn btn-outline-success btn-form btn-xs"
           onClick={onSave}
           disabled={saveDisabled}
-        ><Translate id="default.button.save.label" />
+        ><Translate id="default.button.save.label" defaultMessage="Save" />
         </button>
         <button
           type="submit"
           className="btn btn-outline-primary float-right btn-form btn-xs"
           disabled={saveDisabled}
-        ><Translate id="partialReceiving.receiveShipment.label" />
+        ><Translate id="partialReceiving.receiveShipment.label" defaultMessage="Receive shipment" />
         </button>
       </div>),
   },
@@ -58,6 +62,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.pallet.label',
+        defaultMessage: 'Pallet',
         flexWidth: '1',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
@@ -67,6 +72,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.box.label',
+        defaultMessage: 'Box',
         flexWidth: '1',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
@@ -75,11 +81,13 @@ const FIELDS = {
       'product.productCode': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.code.label',
+        defaultMessage: 'Code',
         flexWidth: '1',
       },
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.name.label',
+        defaultMessage: 'Name',
         flexWidth: '4',
         attributes: {
           className: 'text-left ml-1',
@@ -89,26 +97,31 @@ const FIELDS = {
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.lotSerialNo.label',
+        defaultMessage: 'Lot/Serial No.',
         flexWidth: '1',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.expirationDate.label',
+        defaultMessage: 'Expiration date',
         flexWidth: '1',
       },
       'binLocation.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.binLocation.label',
+        defaultMessage: 'Bin Location',
         flexWidth: '1.5',
       },
       'recipient.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.recipient.label',
+        defaultMessage: 'Recipient',
         flexWidth: '1.5',
       },
       quantityReceiving: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.receivingNow.label',
+        defaultMessage: 'Receiving now',
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -117,6 +130,7 @@ const FIELDS = {
       quantityRemaining: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.remaining.label',
+        defaultMessage: 'Remaining',
         flexWidth: '1',
         fieldKey: '',
         attributes: {
@@ -130,6 +144,7 @@ const FIELDS = {
         fieldKey: 'quantityRemaining',
         type: params => (params.subfield ? <CheckboxField {...params} /> : null),
         label: 'partialReceiving.cancelRemaining.label',
+        defaultMessage: 'Cancel remaining',
         flexWidth: '1',
         getDynamicAttr: ({ saveDisabled, fieldValue }) => ({
           disabled: saveDisabled || _.toInteger(fieldValue) <= 0,
@@ -138,6 +153,7 @@ const FIELDS = {
       comment: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.comment.label',
+        defaultMessage: 'Comment',
         flexWidth: '1',
       },
     },
@@ -147,20 +163,20 @@ const FIELDS = {
     type: ({ prevPage, onSave, saveDisabled }) => (
       <div className="my-1 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
-          <Translate id="partialReceiving.backToEdit.label" />
+          <Translate id="partialReceiving.backToEdit.label" defaultMessage="Back to edit" />
         </button>
         <button
           type="button"
           className="btn btn-outline-success btn-xs"
           onClick={onSave}
           disabled={saveDisabled}
-        ><Translate id="default.button.save.label" />
+        ><Translate id="default.button.save.label" defaultMessage="Save" />
         </button>
         <button
           type="submit"
           className="btn btn-outline-primary float-right btn-form btn-xs"
           disabled={saveDisabled}
-        ><Translate id="partialReceiving.receiveShipment.label" />
+        ><Translate id="partialReceiving.receiveShipment.label" defaultMessage="Receive shipment" />
         </button>
       </div>),
   },

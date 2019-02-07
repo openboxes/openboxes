@@ -6,7 +6,7 @@ import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import queryString from 'query-string';
-import { Translate, getTranslate } from 'react-localize-redux';
+import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -17,6 +17,7 @@ import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import { debouncedUsersFetch, debouncedLocationsFetch } from '../../utils/option-utils';
+import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 function validate(values) {
   const errors = {};
@@ -42,6 +43,7 @@ const FIELDS = {
   description: {
     type: TextField,
     label: 'stockMovement.description.label',
+    defaultMessage: 'Description',
     attributes: {
       required: true,
       autoFocus: true,
@@ -49,7 +51,8 @@ const FIELDS = {
   },
   origin: {
     type: SelectField,
-    label: 'stockMovement.origin.label',
+    label: 'stockMovement.oigin.label',
+    defaultMessage: 'Origin',
     attributes: {
       required: true,
       async: true,
@@ -73,6 +76,7 @@ const FIELDS = {
   destination: {
     type: SelectField,
     label: 'stockMovement.destination.label',
+    defaultMessage: 'Destination',
     attributes: {
       required: true,
       async: true,
@@ -95,6 +99,7 @@ const FIELDS = {
   },
   stocklist: {
     label: 'stockMovement.stocklist.label',
+    defaultMessage: 'Stocklist',
     type: SelectField,
     getDynamicAttr: ({ origin, destination, stocklists }) => ({
       disabled: !(origin && destination && origin.id && destination.id),
@@ -106,6 +111,7 @@ const FIELDS = {
   requestedBy: {
     type: SelectField,
     label: 'stockMovement.requestedBy.label',
+    defaultMessage: 'Requested by',
     attributes: {
       async: true,
       required: true,
@@ -122,6 +128,7 @@ const FIELDS = {
   dateRequested: {
     type: DateField,
     label: 'stockMovement.dateRequested.label',
+    defaultMessage: 'Date requested',
     attributes: {
       required: true,
       dateFormat: 'MM/DD/YYYY',
@@ -279,12 +286,12 @@ class CreateStockMovement extends Component {
         })
         .catch(() => {
           this.props.hideSpinner();
-          return Promise.reject(new Error(this.props.translate('error.createStockMovement.label')));
+          return Promise.reject(new Error(this.props.translate('error.createStockMovement.label', 'Could not create stock movement')));
         });
     }
 
     return new Promise(((resolve, reject) => {
-      reject(new Error(this.props.translate('error.missingParameters.label')));
+      reject(new Error(this.props.translate('error.missingParameters.label', 'Missing required parameters')));
     }));
   }
 
@@ -307,15 +314,18 @@ class CreateStockMovement extends Component {
       this.saveStockMovement(values);
     } else {
       confirmAlert({
-        title: this.props.translate('message.confirmChange.label'),
-        message: this.props.translate('confirmChange.message'),
+        title: this.props.translate('message.confirmChange.label', 'Confirm change'),
+        message: this.props.translate(
+          'confirmChange.message',
+          'Do you want to change stock movement data? Changing origin, destination or stock list can cause loss of your current work',
+        ),
         buttons: [
           {
-            label: this.props.translate('default.no.label'),
+            label: this.props.translate('default.no.label', 'No'),
             onClick: () => this.resetToInitialValues(),
           },
           {
-            label: this.props.translate('default.yes.label'),
+            label: this.props.translate('default.yes.label', 'Yes'),
             onClick: () => this.saveStockMovement({ ...values, forceUpdate: 'true' }),
           },
         ],
@@ -342,7 +352,9 @@ class CreateStockMovement extends Component {
               }),
             )}
             <div>
-              <button type="submit" className="btn btn-outline-primary float-right btn-xs"><Translate id="default.button.next.label" /></button>
+              <button type="submit" className="btn btn-outline-primary float-right btn-xs">
+                <Translate id="default.button.next.label" defaultMessage="Next" />
+              </button>
             </div>
           </form>
         )}
@@ -354,7 +366,7 @@ class CreateStockMovement extends Component {
 const mapStateToProps = state => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default withRouter(connect(mapStateToProps, {

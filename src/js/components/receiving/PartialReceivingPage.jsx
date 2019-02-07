@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import update from 'immutability-helper';
 import PropTypes from 'prop-types';
-import { Translate } from 'react-localize-redux';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -16,6 +15,7 @@ import Select from '../../utils/Select';
 import Checkbox from '../../utils/Checkbox';
 import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
 import EditLineModal from './modals/EditLineModal';
+import Translate from '../../utils/Translate';
 
 const isReceived = (subfield, fieldValue) => {
   if (subfield) {
@@ -69,18 +69,22 @@ const FIELDS = {
   'origin.name': {
     type: LabelField,
     label: 'stockMovement.origin.label',
+    defaultMessage: 'Origin',
   },
   'destination.name': {
     type: LabelField,
     label: 'stockMovement.destination.label',
+    defaultMessage: 'Destination',
   },
   dateShipped: {
     type: LabelField,
     label: 'partialReceiving.shippedOn.label',
+    defaultMessage: 'Shipped on',
   },
   dateDelivered: {
     type: DateField,
     label: 'partialReceiving.deliveredOn.label',
+    defaultMessage: 'Delivered on',
     attributes: {
       showTimeSelect: true,
       dateFormat: 'MM/DD/YYYY HH:mm Z',
@@ -97,10 +101,14 @@ const FIELDS = {
     }) => (
       <div className="mb-1 text-center">
         <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
-          <Translate id="partialReceiving.autofillQuantities.label" />
+          <Translate id="partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
         </button>
-        <button type="button" className="btn btn-outline-success btn-xs" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}><Translate id="default.button.save.label" /></button>
-        <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}><Translate id="default.button.next.label" /></button>
+        <button type="button" className="btn btn-outline-success btn-xs" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>
+          <Translate id="default.button.save.label" defaultMessage="Save" />
+        </button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}>
+          <Translate id="default.button.next.label" defaultMessage="Next" />
+        </button>
       </div>),
   },
   containers: {
@@ -142,6 +150,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.pallet.label',
+        defaultMessage: 'Pallet',
         flexWidth: '0.8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
@@ -151,6 +160,7 @@ const FIELDS = {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.box.label',
+        defaultMessage: 'Box',
         flexWidth: '0.8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
@@ -159,11 +169,13 @@ const FIELDS = {
       'product.productCode': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.code.label',
+        defaultMessage: 'Code',
         flexWidth: '0.8',
       },
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.name.label',
+        defaultMessage: 'Name',
         flexWidth: '3.3',
         attributes: {
           className: 'text-left ml-1',
@@ -173,11 +185,13 @@ const FIELDS = {
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.lotSerialNo.label',
+        defaultMessage: 'Lot/Serial No.',
         flexWidth: '1',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'stockMovement.expirationDate.label',
+        defaultMessage: 'Expiration date',
         flexWidth: '1.5',
       },
       binLocation: {
@@ -195,6 +209,7 @@ const FIELDS = {
         fieldKey: '',
         flexWidth: '1.7',
         label: 'stockMovement.binLocation.label',
+        defaultMessage: 'Bin Location',
         getDynamicAttr: ({
           bins, hasBinLocationSupport, shipmentReceived, fieldValue,
         }) => ({
@@ -210,6 +225,7 @@ const FIELDS = {
         fieldKey: '',
         flexWidth: '1.5',
         label: 'stockMovement.recipient.label',
+        defaultMessage: 'Recipient',
         getDynamicAttr: ({ users, shipmentReceived, fieldValue }) => ({
           options: users,
           disabled: shipmentReceived || isReceived(true, fieldValue),
@@ -218,6 +234,7 @@ const FIELDS = {
       quantityShipped: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.shipped.label',
+        defaultMessage: 'Shipped',
         flexWidth: '0.8',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -226,6 +243,7 @@ const FIELDS = {
       quantityReceived: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.received.label',
+        defaultMessage: 'Received',
         flexWidth: '0.8',
         attributes: {
           formatValue: value => (value ? value.toLocaleString('en-US') : '0'),
@@ -234,6 +252,7 @@ const FIELDS = {
       quantityRemaining: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'partialReceiving.toReceive.label',
+        defaultMessage: 'To receive',
         flexWidth: '0.8',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue, shipmentReceived }) => ({
@@ -257,6 +276,7 @@ const FIELDS = {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
         label: 'partialReceiving.receivingNow.label',
+        defaultMessage: 'Receiving now',
         flexWidth: '1',
         getDynamicAttr: ({ shipmentReceived, fieldValue }) => ({
           disabled: shipmentReceived || isReceived(true, fieldValue),
@@ -286,6 +306,7 @@ const FIELDS = {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
         label: 'partialReceiving.comment.label',
+        defaultMessage: 'Comment',
         flexWidth: '1.3',
       },
     },
@@ -297,10 +318,14 @@ const FIELDS = {
     }) => (
       <div className="my-1 text-center">
         <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
-          <Translate id="partialReceiving.autofillQuantities.label" />
+          <Translate id="partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
         </button>
-        <button type="button" className="btn btn-outline-success btn-xs" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}><Translate id="default.button.save.label" /></button>
-        <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}><Translate id="default.button.next.label" /></button>
+        <button type="button" className="btn btn-outline-success btn-xs" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>
+          <Translate id="default.button.save.label" defaultMessage="Save" />
+        </button>
+        <button type="submit" className="btn btn-outline-primary float-right btn-form btn-xs" disabled={saveDisabled || shipmentReceived}>
+          <Translate id="default.button.next.label" defaultMessage="Next" />
+        </button>
       </div>),
   },
 };
