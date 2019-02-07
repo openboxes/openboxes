@@ -2,7 +2,6 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import TextField from '../../form-elements/TextField';
@@ -11,6 +10,7 @@ import LabelField from '../../form-elements/LabelField';
 import SelectField from '../../form-elements/SelectField';
 import { showSpinner, hideSpinner } from '../../../actions';
 import { debouncedUsersFetch } from '../../../utils/option-utils';
+import Translate from '../../../utils/Translate';
 
 const FIELDS = {
   splitLineItems: {
@@ -26,7 +26,7 @@ const FIELDS = {
           binLocationName: lineItem.binLocationName,
           recipient: lineItem.recipient,
         })}
-      > <Translate id="default.button.addLine.label" />
+      > <Translate id="default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
     type: ArrayField,
@@ -34,22 +34,27 @@ const FIELDS = {
       productName: {
         type: LabelField,
         label: 'stockMovement.productName.label',
+        defaultMessage: 'Product name',
       },
       lotNumber: {
         type: LabelField,
         label: 'stockMovement.lot.label',
+        defaultMessage: 'Lot',
       },
       expirationDate: {
         type: LabelField,
         label: 'stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
       },
       binLocationName: {
         type: LabelField,
         label: 'stockMovement.binLocation.label',
+        defaultMessage: 'Bin Location',
       },
       quantityShipped: {
         type: TextField,
         label: 'stockMovement.quantityShipped.label',
+        defaultMessage: 'Quantity shipped',
         fixedWidth: '150px',
         attributes: {
           type: 'number',
@@ -58,6 +63,7 @@ const FIELDS = {
       recipient: {
         type: SelectField,
         label: 'stockMovement.recipient.label',
+        defaultMessage: 'Recipient',
         fieldKey: '',
         attributes: {
           async: true,
@@ -75,11 +81,13 @@ const FIELDS = {
       palletName: {
         type: TextField,
         label: 'stockMovement.pallet.label',
+        defaultMessage: 'Pallet',
         fixedWidth: '150px',
       },
       boxName: {
         type: TextField,
         label: 'stockMovement.box.label',
+        defaultMessage: 'Box',
         fixedWidth: '150px',
       },
     },
@@ -107,7 +115,7 @@ class PackingSplitLineModal extends Component {
     return (
       <div>
         <div className="font-weight-bold pb-2">
-          <Translate id="stockMovement.quantityPacked.label" />: {PackingSplitLineModal.calculatePacked(values.splitLineItems)}
+          <Translate id="stockMovement.quantityPacked.label" defaultMessage="Qty Packed" />: {PackingSplitLineModal.calculatePacked(values.splitLineItems)}
         </div>
         <hr />
       </div>
@@ -195,7 +203,9 @@ class PackingSplitLineModal extends Component {
         renderBodyWithValues={PackingSplitLineModal.displayPackedSum}
       >
         <div>
-          <div className="font-weight-bold"><Translate id="stockMovement.totalQuantity.label" />: {this.state.attr.lineItem.quantityShipped} </div>
+          <div className="font-weight-bold">
+            <Translate id="stockMovement.totalQuantity.label" defaultMessage="Total quantity" />: {this.state.attr.lineItem.quantityShipped}
+          </div>
         </div>
       </ModalWrapper>
     );

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ReactTable from 'react-table';
 import update from 'immutability-helper';
-import { getTranslate, Translate } from 'react-localize-redux';
+import { getTranslate } from 'react-localize-redux';
 import { Tooltip } from 'react-tippy';
 
 import 'react-table/react-table.css';
@@ -14,6 +14,7 @@ import { hideSpinner, showSpinner } from '../../actions';
 import Select from '../../utils/Select';
 import Input from '../../utils/Input';
 import EmailModal from './EmailModal';
+import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 class StocklistManagement extends Component {
   constructor(props) {
@@ -201,7 +202,7 @@ class StocklistManagement extends Component {
               <button
                 className="btn btn-outline-primary btn-xs"
                 onClick={() => { window.location = `/openboxes/inventoryItem/showStockCard/${this.state.productInfo.id}`; }}
-              ><Translate id="stockListManagement.returnStockCard.label" />
+              ><Translate id="stockListManagement.returnStockCard.label" defaultMessage="Return to stock card" />
               </button>
             </div>
           </div>
@@ -228,12 +229,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.locationGroup.label')}
+    title={this.props.translate('stockListManagement.locationGroup.label', 'Location Group Name')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.locationGroup.label" />
+  ><Translate id="stockListManagement.locationGroup.label" defaultMessage="Location Group Name" />
   </Tooltip>,
               accessor: 'locationGroup.name',
               className: 'w-space-normal',
@@ -241,12 +242,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.locationName.label')}
+    title={this.props.translate('stockListManagement.locationName.label', 'Location Name')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.locationName.label" />
+  ><Translate id="stockListManagement.locationName.label" defaultMessage="Location Name" />
   </Tooltip>,
               accessor: 'location.name',
               aggregate: () => '',
@@ -255,12 +256,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.stockListName.label')}
+    title={this.props.translate('stockListManagement.stockListName.label', 'Stocklist Name')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.stockListName.label" />
+  ><Translate id="stockListManagement.stockListName.label" defaultMessage="Stocklist Name" />
   </Tooltip>,
               accessor: 'name',
               aggregate: () => '',
@@ -287,12 +288,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.monthlyStockListQty.label')}
+    title={this.props.translate('stockListManagement.monthlyStockListQty.label', 'Monthly Stocklist Qty')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.monthlyStockListQty.label" />
+  ><Translate id="stockListManagement.monthlyStockListQty.label" defaultMessage="Monthly Stocklist Qty" />
   </Tooltip>,
               accessor: 'monthlyDemand',
               aggregate: vals => _.sum(vals),
@@ -317,12 +318,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.manager.label')}
+    title={this.props.translate('stockListManagement.manager.label', 'Manager')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.manager.label" />
+  ><Translate id="stockListManagement.manager.label" defaultMessage="Manager" />
   </Tooltip>,
               accessor: 'manager.name',
               aggregate: () => '',
@@ -346,12 +347,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.replenishmentPeriod.label')}
+    title={this.props.translate('stockListManagement.replenishmentPeriod.label', 'Replenishment period')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.replenishmentPeriod.label" />
+  ><Translate id="stockListManagement.replenishmentPeriod.label" defaultMessage="Replenishment period" />
   </Tooltip>,
               accessor: 'replenishmentPeriod',
               aggregate: () => '',
@@ -376,12 +377,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.replenishmentQty.label')}
+    title={this.props.translate('stockListManagement.replenishmentQty.label', 'Replenishment Qty')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.replenishmentQty.label" />
+  ><Translate id="stockListManagement.replenishmentQty.label" defaultMessage="Replenishment Qty" />
   </Tooltip>,
               accessor: 'maxQuantity',
               aggregate: vals => _.sum(vals),
@@ -417,12 +418,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.uom.label')}
+    title={this.props.translate('stockListManagement.uom.label', 'Unit of measure')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.uom.label" />
+  ><Translate id="stockListManagement.uom.label" defaultMessage="Unit of measure" />
   </Tooltip>,
               accessor: 'uom',
               aggregate: () => '',
@@ -447,12 +448,12 @@ class StocklistManagement extends Component {
             {
               Header:
   <Tooltip
-    title={this.props.translate('stockListManagement.actions.label')}
+    title={this.props.translate('stockListManagement.actions.label', 'Actions')}
     theme="transparent"
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="stockListManagement.actions.label" />
+  ><Translate id="stockListManagement.actions.label" defaultMessage="Actions" />
   </Tooltip>,
               accessor: 'edit',
               minWidth: 230,
@@ -470,25 +471,25 @@ class StocklistManagement extends Component {
                       className="btn btn-outline-primary btn-xs mx-1"
                       disabled={original.edit || original.new}
                       onClick={() => this.editItem(index)}
-                    ><Translate id="default.button.edit.label" />
+                    ><Translate id="default.button.edit.label" defaultMessage="Edit" />
                     </button>
                     <button
                       className="btn btn-outline-primary btn-xs mr-1"
                       disabled={(!original.edit && !original.new) || !original.stocklistId
                       || _.isNil(original.maxQuantity) || original.maxQuantity === ''}
                       onClick={() => this.saveItem(index, original)}
-                    ><Translate id="default.button.save.label" />
+                    ><Translate id="default.button.save.label" defaultMessage="Save" />
                     </button>
                     <button
                       className="btn btn-outline-danger btn-xs mr-1"
                       onClick={() => this.deleteItem(index)}
-                    ><Translate id="default.button.delete.label" />
+                    ><Translate id="default.button.delete.label" defaultMessage="Delete" />
                     </button>
                     <a
                       className="btn btn-outline-secondary btn-xs mr-1"
                       disabled={original.edit || original.new}
                       href={`/openboxes/stocklist/renderPdf/${original.stocklistId}`}
-                    ><Translate id="default.button.print.label" />
+                    ><Translate id="default.button.print.label" defaultMessage="Print" />
                     </a>
                     <EmailModal
                       stocklistId={original.stocklistId}
@@ -515,7 +516,7 @@ class StocklistManagement extends Component {
             onClick={() => {
               this.addItem(this.state.selectedStocklist);
             }}
-          ><Translate id="stockListManagement.addStockList.label" />
+          ><Translate id="stockListManagement.addStockList.label" defaultMessage="Add stocklist" />
           </button>
         </div>
       </div>
@@ -524,7 +525,7 @@ class StocklistManagement extends Component {
 }
 
 const mapStateToProps = state => ({
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(StocklistManagement);

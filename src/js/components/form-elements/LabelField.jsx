@@ -2,14 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'react-final-form';
 import { Tooltip } from 'react-tippy';
-import { Translate } from 'react-localize-redux';
 
 import 'react-tippy/dist/tippy.css';
+
+import Translate from '../../utils/Translate';
 
 const LabelField = (props) => {
   const {
     fieldName, arrayField, fieldValue,
-    fieldConfig: { attributes, getDynamicAttr, label: FieldLabel },
+    fieldConfig: {
+      attributes, getDynamicAttr, label: FieldLabel, defaultMessage,
+    },
   } = props;
   const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
   const attr = { ...attributes, ...dynamicAttr };
@@ -23,7 +26,9 @@ const LabelField = (props) => {
       <div className="row">
         {
             typeof FieldLabel === 'string' ?
-              <label htmlFor={attr.id} className="col-md-2 col-form-label col-form-label-xs text-right"><Translate id={FieldLabel} /></label> :
+              <label htmlFor={attr.id} className="col-md-2 col-form-label col-form-label-xs text-right">
+                <Translate id={FieldLabel} defaultMessage={defaultMessage} />
+              </label> :
               <FieldLabel />
           }
         <div className="col-md-4 align-self-center">

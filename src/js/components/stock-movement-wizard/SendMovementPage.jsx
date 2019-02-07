@@ -6,7 +6,7 @@ import Dropzone from 'react-dropzone';
 import Alert from 'react-s-alert';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
-import { getTranslate, Translate } from 'react-localize-redux';
+import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -19,18 +19,22 @@ import SelectField from '../form-elements/SelectField';
 import TextField from '../form-elements/TextField';
 import LabelField from '../form-elements/LabelField';
 import { debouncedLocationsFetch } from '../../utils/option-utils';
+import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const SHIPMENT_FIELDS = {
   description: {
     label: 'stockMovement.description.label',
+    defaultMessage: 'Description',
     type: LabelField,
   },
   'origin.name': {
     label: 'stockMovement.origin.label',
+    defaultMessage: 'Origin',
     type: LabelField,
   },
   destination: {
     label: 'stockMovement.destination.label',
+    defaultMessage: 'Destination',
     fieldKey: '',
     type: (params) => {
       if (params.canBeEdited && !params.hasStockList) {
@@ -57,18 +61,22 @@ const SHIPMENT_FIELDS = {
   },
   'stocklist.name': {
     label: 'stockMovement.stocklist.label',
+    defaultMessage: 'Stocklist',
     type: LabelField,
   },
   'requestedBy.name': {
     label: 'stockMovement.requestedBy.label',
+    defaultMessage: 'Requested by',
     type: LabelField,
   },
   dateRequested: {
     label: 'stockMovement.dateRequested.label',
+    defaultMessage: 'Date requested',
     type: LabelField,
   },
   name: {
     label: 'stockMovement.shipmentName.label',
+    defaultMessage: 'Shipment name',
     type: (params) => {
       if (params.issued) {
         return <TextField {...params} />;
@@ -83,6 +91,7 @@ const FIELDS = {
   dateShipped: {
     type: DateField,
     label: 'stockMovement.shipDate.label',
+    defaultMessage: 'Shipment date',
     attributes: {
       dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
@@ -96,6 +105,7 @@ const FIELDS = {
   shipmentType: {
     type: SelectField,
     label: 'stockMovement.shipmentType.label',
+    defaultMessage: 'Shipment type',
     attributes: {
       required: true,
       showValueTooltip: true,
@@ -107,6 +117,7 @@ const FIELDS = {
   trackingNumber: {
     type: TextField,
     label: 'stockMovement.trackingNumber.label',
+    defaultMessage: 'Tracking number',
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
     }),
@@ -114,6 +125,7 @@ const FIELDS = {
   driverName: {
     type: TextField,
     label: 'stockMovement.driverName.label',
+    defaultMessage: 'Driver name',
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
     }),
@@ -121,6 +133,7 @@ const FIELDS = {
   comments: {
     type: TextField,
     label: 'stockMovement.comments.label',
+    defaultMessage: 'Comments',
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
     }),
@@ -204,7 +217,7 @@ class SendMovementPage extends Component {
         if (values.statusCode === 'ISSUED') {
           this.fetchStockMovementData();
         }
-        Alert.success(this.props.translate('alert.saveSuccess.label'));
+        Alert.success(this.props.translate('alert.saveSuccess.label', 'Changes saved successfully'));
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -336,8 +349,8 @@ class SendMovementPage extends Component {
     if (this.state.files.length) {
       _.forEach(this.state.files, (file) => {
         this.sendFile(file)
-          .then(() => Alert.success(this.props.translate('alert.fileSuccess.label')))
-          .catch(() => Alert.error(this.props.translate('alert.fileError.label')));
+          .then(() => Alert.success(this.props.translate('alert.fileSuccess.label', 'File uploaded successfuly!')))
+          .catch(() => Alert.error(this.props.translate('alert.fileError.label', 'Error occured during file upload!')));
       });
     }
 
@@ -350,7 +363,10 @@ class SendMovementPage extends Component {
     };
 
     if ((this.props.currentLocationId !== values.origin.id) && (values.origin.type !== 'SUPPLIER')) {
-      Alert.error(this.props.translate('alert.sendStockMovement.label'));
+      Alert.error(this.props.translate(
+        'alert.sendStockMovement.label',
+        'You are not able to send shipment from a location other than origin. Change your current location.',
+      ));
       this.props.hideSpinner();
     } else {
       this.saveShipment(payload)
@@ -433,7 +449,7 @@ class SendMovementPage extends Component {
                 className="btn btn-outline-secondary float-right btn-form btn-xs"
                 disabled={invalid}
               >
-                <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" /></span>
+                <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" defaultMessage="Save" /></span>
               </button>
               <div className="col-md-9 pl-0">
                 {_.map(FIELDS, (fieldConfig, fieldName) =>
@@ -449,29 +465,29 @@ class SendMovementPage extends Component {
                   disabled={values.statusCode === 'ISSUED'}
                   onClick={() => previousPage(values)}
                 >
-                  <Translate id="default.button.previous.label" />
+                  <Translate id="default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
                   className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={invalid || values.statusCode === 'ISSUED'}
                 >
-                  <Translate id="stockMovement.sendShipment.label" />
+                  <Translate id="stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
                 <table className="table table-striped text-center border my-2 table-xs">
                   <thead>
                     <tr>
-                      <th><Translate id="stockMovement.pallet.label" /> </th>
-                      <th><Translate id="stockMovement.box.label" /> </th>
-                      <th><Translate id="stockMovement.code.label" /> </th>
-                      <th><Translate id="stockMovement.productName.label" /> </th>
-                      <th><Translate id="stockMovement.lot.label" /> </th>
-                      <th><Translate id="stockMovement.expiry.label" /> </th>
-                      <th style={{ width: '150px' }}><Translate id="stockMovement.quantityPicked.label" /> </th>
+                      <th><Translate id="stockMovement.pallet.label" defaultMessage="Pallet" /> </th>
+                      <th><Translate id="stockMovement.box.label" defaultMessage="Box" /> </th>
+                      <th><Translate id="stockMovement.code.label" defaultMessage="Code" /> </th>
+                      <th><Translate id="stockMovement.productName.label" defaultMessage="Product name" /> </th>
+                      <th><Translate id="stockMovement.lot.label" defaultMessage="Lot" /> </th>
+                      <th><Translate id="stockMovement.expiry.label" defaultMessage="Expiry" /> </th>
+                      <th style={{ width: '150px' }}><Translate id="stockMovement.quantityPicked.label" defaultMessage="Qty Picked" /> </th>
                       {!(this.state.supplier) &&
-                      <th><Translate id="stockMovement.binLocation.label" /> </th>
+                      <th><Translate id="stockMovement.binLocation.label" defaultMessage="Bin Location" /> </th>
                     }
-                      <th><Translate id="stockMovement.recipient.label" /> </th>
+                      <th><Translate id="stockMovement.recipient.label" defaultMessage="Recipient" /> </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -512,13 +528,13 @@ class SendMovementPage extends Component {
                   className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
                   onClick={() => previousPage(values)}
-                > <Translate id="default.button.previous.label" />
+                > <Translate id="default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
                   className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={invalid || values.statusCode === 'ISSUED'}
-                ><Translate id="stockMovement.sendShipment.label" />
+                ><Translate id="stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
               </div>
             </form>
@@ -530,7 +546,7 @@ class SendMovementPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currentLocationId: state.session.currentLocation.id,
 });
 

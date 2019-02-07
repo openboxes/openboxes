@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import ArrayField from '../../form-elements/ArrayField';
@@ -12,6 +11,7 @@ import SelectField from '../../form-elements/SelectField';
 import CheckboxField from '../../form-elements/CheckboxField';
 import { showSpinner, hideSpinner } from '../../../actions';
 import apiClient from '../../../utils/apiClient';
+import Translate from '../../../utils/Translate';
 
 const FIELDS = {
   lines: {
@@ -27,7 +27,7 @@ const FIELDS = {
           receiptItemId: null,
           newLine: true,
         })}
-      ><Translate id="default.button.addLine.label" />
+      ><Translate id="default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
     getDynamicRowAttr: ({ rowValues }) => ({
@@ -44,6 +44,7 @@ const FIELDS = {
       product: {
         type: SelectField,
         label: 'product.label',
+        defaultMessage: 'Product',
         fieldKey: 'disabled',
         attributes: {
           className: 'text-left',
@@ -63,10 +64,12 @@ const FIELDS = {
       lotNumber: {
         type: TextField,
         label: 'stockMovement.lot.label',
+        defaultMessage: 'Lot',
       },
       expirationDate: {
         type: DateField,
         label: 'stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
           autoComplete: 'off',
@@ -75,6 +78,7 @@ const FIELDS = {
       quantityShipped: {
         type: TextField,
         label: 'stockMovement.quantityShipped.label',
+        defaultMessage: 'Quantity shipped',
         attributes: {
           type: 'number',
         },
