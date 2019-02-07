@@ -55,7 +55,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <g:set var="sortByCode" value='${requisition?.sortByCode ?: RequisitionItemSortByCode.CATEGORY}'/>
+                        <g:set var="sortByCode" value='${requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}'/>
                         <g:set var="requisitionItems" value='${requisition?."$sortByCode.methodName"}'/>
                         <g:each var="requisitionItem" in="${requisitionItems}" status="i">
                             <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
