@@ -190,7 +190,7 @@
             </tr>
          </table>
 
-        <g:set var="sortByCode" value="${stocklist?.requisition?.sortByCode ?: RequisitionItemSortByCode.CATEGORY}"/>
+        <g:set var="sortByCode" value="${stocklist?.requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}"/>
 
         <%-- Stock list items table --%>
         <g:set var="requisitionItems" value='${stocklist?.requisition?."$sortByCode.methodName"}'/>

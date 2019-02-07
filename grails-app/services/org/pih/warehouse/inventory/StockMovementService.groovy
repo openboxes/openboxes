@@ -741,7 +741,7 @@ class StockMovementService {
     void addStockListItemsToRequisition(StockMovement stockMovement, Requisition requisition) {
         // If the user specified a stocklist then we should automatically clone it as long as there are no
         // requisition items already added to the requisition
-        RequisitionItemSortByCode sortByCode = stockMovement.stocklist?.sortByCode ?: RequisitionItemSortByCode.CATEGORY
+        RequisitionItemSortByCode sortByCode = stockMovement.stocklist?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
         def orderIndex = 0
 
         if (stockMovement.stocklist && !requisition.requisitionItems) {

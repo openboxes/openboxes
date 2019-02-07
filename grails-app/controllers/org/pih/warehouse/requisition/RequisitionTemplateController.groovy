@@ -316,7 +316,7 @@ class RequisitionTemplateController {
             })
 
             if (requisition.requisitionItems) {
-                RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.CATEGORY
+                RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
 
                 requisition."${sortByCode.methodName}".each { requisitionItem ->
                     csv << [
