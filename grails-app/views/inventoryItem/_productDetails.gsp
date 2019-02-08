@@ -144,6 +144,14 @@
                     <g:abcClassification product="${productInstance.id}"/>
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.preferredBin.label"/></label>
+                </td>
+                <td class="value middle">
+                    ${inventoryLevelInstance?.binLocation ?: warehouse.message(code:'default.none.label')}
+                </td>
+            </tr>
 
         </tbody>
     </table>
