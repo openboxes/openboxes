@@ -3,7 +3,13 @@
 <head>
     <style>
 
-        table {border-collapse: collapse; page-break-inside: auto;}
+        table {
+            border-collapse: collapse;
+            page-break-inside: auto;
+            -fs-table-paginate: paginate;
+            border-spacing: 0;
+            margin: 5px;
+        }
         thead {display: table-header-group;}
         tr {page-break-inside: avoid; page-break-after: auto;}
         td {vertical-align: top; }
@@ -35,13 +41,6 @@
         .page-start {
             -fs-page-sequence: start;
             page-break-before: avoid;
-        }
-        table {
-            -fs-table-paginate: paginate;
-            page-break-inside: avoid;
-            border-collapse: collapse;
-            border-spacing: 0;
-            margin: 5px;
         }
 
         .page-content { page-break-after: avoid; }

@@ -76,6 +76,7 @@ class PutawayApiController {
         putaway?.putawayItems?.each { PutawayItem putawayItem ->
             putawayItem.availableItems =
                     inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
+            putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
         }
 
         render ([data:putaway?.toJson()] as JSON)
