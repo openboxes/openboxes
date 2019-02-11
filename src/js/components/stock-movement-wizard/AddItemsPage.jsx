@@ -485,12 +485,14 @@ class AddItemsPage extends Component {
   /**
    * Shows transition confirmation dialog if there are items with the same code.
    * @param {function} onConfirm
+   * @param {object} items
    * @public
    */
   confirmTransition(onConfirm, items) {
     confirmAlert({
       title: this.props.translate('confirmTransition.label', 'You have entered the same code twice. Do you want to continue?'),
-      message: _.map(items, item => <p>{item.product.label} {item.quantityRequested}</p>),
+      message: _.map(items, item =>
+        <p key={item.sortOrder}>{item.product.label} {item.quantityRequested}</p>),
       buttons: [
         {
           label: this.props.translate('default.yes.label', 'Yes'),
@@ -611,21 +613,27 @@ class AddItemsPage extends Component {
    */
   nextPage(formValues) {
     const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val) && val.product);
+
+    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+      this.confirmSave(() =>
+        this.checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems));
+    }
+  }
+
+  checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems) {
     const itemsMap = {};
     _.forEach(lineItems, (item) => {
       if (itemsMap[item.product.productCode]) {
         itemsMap[item.product.productCode].push(item);
-      } else itemsMap[item.product.productCode] = [item];
+      } else {
+        itemsMap[item.product.productCode] = [item];
+      }
     });
     const itemsWithSameCode = _.filter(itemsMap, item => item.length > 1);
 
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
-      this.confirmSave(() => this.saveAndTransitionToNextStep(formValues, lineItems));
-    }
     if (_.some(itemsMap, item => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER')) {
       this.confirmTransition(
-        () =>
-          this.saveAndTransitionToNextStep(formValues, lineItems),
+        () => this.saveAndTransitionToNextStep(formValues, lineItems),
         _.reduce(itemsWithSameCode, (a, b) => a.concat(b), []),
       );
     } else {
