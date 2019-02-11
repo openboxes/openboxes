@@ -73,6 +73,7 @@
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
             <g:set var="hasBeenPartiallyReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"/>
             <g:set var="hasBeenShipped" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.SHIPPED}"/>
+            <g:set var="hasBeenPending" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PENDING}"/>
             <g:set var="isSameLocation" value="${stockMovement?.requisition?.destination?.id==session.warehouse.id}"/>
             <g:set var="disableReceivingButton" value="${!hasBeenIssued || !isSameLocation || !(hasBeenShipped || hasBeenPartiallyReceived)}"/>
             <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
@@ -107,11 +108,13 @@
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>
                 </g:else>
-                <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
-                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
-                    <warehouse:message code="default.button.delete.label" />
-                </g:link>
+                <g:if test="${hasBeenPending}">
+                    <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
+                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
+                        <warehouse:message code="default.button.delete.label" />
+                    </g:link>
+                </g:if>
             </g:isSuperuser>
         </div>
     </div>
