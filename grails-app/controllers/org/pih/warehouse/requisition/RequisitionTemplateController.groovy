@@ -140,6 +140,7 @@ class RequisitionTemplateController {
             }
             requisition.properties = params
             requisition.lastUpdated = new Date()
+            requisition.updatedBy = session.user
 
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
@@ -156,10 +157,10 @@ class RequisitionTemplateController {
         }
     }
 
-	
+
 	def show = {
         def requisition = Requisition.get(params.id)
-		
+
         if (!requisition) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
@@ -268,6 +269,7 @@ class RequisitionTemplateController {
                         requisitionItem.quantity = 1;
                         requisitionItem.substitutable = false
                         requisitionItem.orderIndex = count + index
+                        requisition.updatedBy = session.user
                         requisition.addToRequisitionItems(requisitionItem)
                         requisition.save()
                         processedProductCodes << productCode
@@ -294,6 +296,7 @@ class RequisitionTemplateController {
             if (requisitionItem) {
                 requisition.removeFromRequisitionItems(requisitionItem)
                 requisition.lastUpdated = new Date()
+                requisition.updatedBy = session.user
                 requisition.save()
             }
         }
@@ -489,15 +492,15 @@ class RequisitionTemplateController {
 	private List<Location> getWardsPharmacies() {
 		def current = Location.get(session.warehouse.id)
 		def locations = []
-		if (current) { 
+		if (current) {
 			if(current?.locationGroup == null) {
 				locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort { it.name }
 			} else {
 				locations = Location.list().findAll { location -> location.locationGroup?.id == current.locationGroup?.id }.findAll {location -> location.isWardOrPharmacy()}.sort { it.name }
 			}
-		}				
+		}
 		return locations
 	}
 
-	
+
 }
