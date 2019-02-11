@@ -51,7 +51,6 @@
     "query-string": "^6.2.0",
     "react": "16.4.2",
     "react-confirm-alert": "^2.0.5",
-    "react-custom-scrollbars": "4.2.1",
     "react-datepicker": "1.7.0",
     "react-dom": "16.4.2",
     "react-dropzone": "4.3.0",
