@@ -1211,8 +1211,8 @@ class StockMovementService {
             if (!locationType) {
                 throw new IllegalArgumentException("Unable to find location type 'Receiving'")
             }
-            String receivingLocationName = locationService.getReceivingLocationName(stockMovement?.identifier)
-            locationService.findOrCreateInternalLocation(receivingLocationName,
+
+            locationService.findOrCreateInternalLocation(stockMovement?.identifier,
                     stockMovement.identifier, locationType, stockMovement.destination)
         }
     }
