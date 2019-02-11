@@ -45,8 +45,8 @@ class InternalLocationApiController {
         ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.BIN_LOCATION]
 
-        String receivingLocationName = locationService.getReceivingLocationName(stockMovementIdentifier)
-        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes, receivingLocationName)
+        String[] receivingLocationNames = [locationService.getReceivingLocationName(stockMovementIdentifier), "Receiving ${stockMovementIdentifier}"]
+        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes, receivingLocationNames)
         render([data: locations?.collect { [ id: it.id, name: it.name ] }] as JSON)
     }
 
