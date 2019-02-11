@@ -131,13 +131,14 @@ const STOCKLIST_FIELDS = {
     virtualized: true,
     arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder }) => (
+    addButton: ({ addRow, getSortOrder, newItemAdded }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
-        onClick={() => addRow({
-          sortOrder: getSortOrder(),
-        })}
+        onClick={() => {
+          addRow({ sortOrder: getSortOrder() });
+          newItemAdded();
+        }}
       ><Translate id="default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
@@ -158,11 +159,11 @@ const STOCKLIST_FIELDS = {
           showValueTooltip: true,
         },
         getDynamicAttr: ({
-          fieldValue, productsFetch, rowIndex, rowCount,
+          fieldValue, productsFetch, rowIndex, rowCount, newItem,
         }) => ({
           disabled: !!fieldValue,
           loadOptions: _.debounce(productsFetch, 500),
-          autoFocus: rowIndex === rowCount - 1,
+          autoFocus: newItem && rowIndex === rowCount - 1,
         }),
       },
       quantityAllowed: {
@@ -333,6 +334,7 @@ class AddItemsPage extends Component {
       currentLineItems: [],
       sortOrder: 0,
       values: this.props.initialValues,
+      newItem: false,
     };
 
     this.props.showSpinner();
@@ -342,6 +344,7 @@ class AddItemsPage extends Component {
     this.getSortOrder = this.getSortOrder.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
     this.confirmTransition = this.confirmTransition.bind(this);
+    this.newItemAdded = this.newItemAdded.bind(this);
   }
 
   componentDidMount() {
@@ -456,6 +459,12 @@ class AddItemsPage extends Component {
     });
 
     return this.state.sortOrder;
+  }
+
+  newItemAdded() {
+    this.setState({
+      newItem: true,
+    });
   }
 
   /**
@@ -985,6 +994,8 @@ class AddItemsPage extends Component {
                   removeItem: this.removeItem,
                   productsFetch: this.productsFetch,
                   getSortOrder: this.getSortOrder,
+                  newItemAdded: this.newItemAdded,
+                  newItem: this.state.newItem,
                 }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => previousPage(values)}>

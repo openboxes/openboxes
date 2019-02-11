@@ -39,10 +39,12 @@ class FieldArrayComponent extends Component {
         <div className="text-center border">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1">
             {_.map(fieldsConfig.fields, (config, name) => (
-              <div style={{
-                flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
-                minWidth: 0,
-              }}
+              <div
+                key={name}
+                style={{
+                  flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+                  minWidth: 0,
+                }}
               >
                 <Tooltip
                   html={(config.label &&
@@ -54,7 +56,6 @@ class FieldArrayComponent extends Component {
                   hideDelay="50"
                 >
                   <div
-                    key={name}
                     className={`mx-1 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
                   >{config.label &&
                     <Translate id={config.label} defaultMessage={config.defaultMessage} />}

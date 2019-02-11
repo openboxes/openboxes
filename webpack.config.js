@@ -34,7 +34,7 @@ module.exports = {
       chunkFilename: 'css/bundle.[hash].[name].css',
     }),
     new OptimizeCSSAssetsPlugin({}),
-    new CleanWebpackPlugin([`${JS_DEST}/bundle.*`, `${CSS_DEST}/bundle.*`]),
+    new CleanWebpackPlugin([`${JS_DEST}/bundle.**`, `${CSS_DEST}/bundle.**`]),
     new HtmlWebpackPlugin({
       filename: `${COMMON_VIEW}/_react.gsp`,
       template: `${ASSETS}/grails-template.html`,
