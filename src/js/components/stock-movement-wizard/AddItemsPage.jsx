@@ -70,6 +70,7 @@ const NO_STOCKLIST_FIELDS = {
           cache: false,
           options: [],
           showValueTooltip: true,
+          className: 'text-left',
         },
         getDynamicAttr: ({
           fieldValue, productsFetch, rowIndex, rowCount,
@@ -157,6 +158,7 @@ const STOCKLIST_FIELDS = {
           cache: false,
           options: [],
           showValueTooltip: true,
+          className: 'text-left',
         },
         getDynamicAttr: ({
           fieldValue, productsFetch, rowIndex, rowCount, newItem,
