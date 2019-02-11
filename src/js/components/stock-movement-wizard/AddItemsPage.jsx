@@ -931,8 +931,29 @@ class AddItemsPage extends Component {
       });
   }
 
+  previousPage(values) {
+    const errors = validate(values).lineItems;
+    if (!errors.length) {
+      this.saveRequisitionItemsInCurrentStep(values.lineItems)
+        .then(() => this.props.previousPage(values));
+    } else {
+      confirmAlert({
+        title: this.props.translate('confirmPreviousPage.label', 'Validation error'),
+        message: this.props.translate('confirmPreviousPage.message.label', 'Cannot save due to validation error on page'),
+        buttons: [
+          {
+            label: this.props.translate('confirmPreviousPage.correctError.label', 'Correct error'),
+          },
+          {
+            label: this.props.translate('confirmPreviousPage.continue.label ', 'Continue (lose unsaved work)'),
+            onClick: () => this.props.previousPage(values),
+          },
+        ],
+      });
+    }
+  }
+
   render() {
-    const { previousPage } = this.props;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -1002,7 +1023,7 @@ class AddItemsPage extends Component {
                   newItem: this.state.newItem,
                 }))}
               <div>
-                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => previousPage(values)}>
+                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.previousPage(values)}>
                   <Translate id="default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
