@@ -106,7 +106,8 @@ const FIELDS = {
           title: 'stockMovement.substitutes.label',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, stockMovementId, onResponse, reviseRequisitionItems, values,
+          fieldValue, rowIndex, stockMovementId, onResponse,
+          reviseRequisitionItems, values, reasonCodes,
         }) => ({
           onOpen: () => reviseRequisitionItems(values),
           productCode: fieldValue.productCode,
@@ -117,6 +118,7 @@ const FIELDS = {
           lineItem: fieldValue,
           stockMovementId,
           onResponse,
+          reasonCodes,
         }),
       },
       quantityRevised: {
