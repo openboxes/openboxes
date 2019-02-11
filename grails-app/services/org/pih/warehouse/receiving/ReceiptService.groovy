@@ -71,9 +71,9 @@ class ReceiptService {
         partialReceipt.dateShipped = shipment.actualShippingDate
         partialReceipt.dateDelivered = shipment.actualDeliveryDate ?: new Date()
 
-        String receivingLocationName = locationService.getReceivingLocationName(shipment?.shipmentNumber)
+        String[] receivingLocationNames = [locationService.getReceivingLocationName(shipment?.shipmentNumber), "Receiving ${shipment?.shipmentNumber}"]
         Location defaultBinLocation = !shipment.destination.hasBinLocationSupport() ? null :
-                locationService.findInternalLocation(shipment.destination, receivingLocationName)
+                locationService.findInternalLocation(shipment.destination, receivingLocationNames)
 
         def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
@@ -103,8 +103,9 @@ class ReceiptService {
         partialReceipt.dateShipped = receipt?.shipment?.actualShippingDate
         partialReceipt.dateDelivered = receipt.actualDeliveryDate
 
+        String[] receivingLocationNames = [locationService.getReceivingLocationName(receipt.shipment?.shipmentNumber), "Receiving ${receipt.shipment?.shipmentNumber}"]
         Location defaultBinLocation = !receipt.shipment.destination.hasBinLocationSupport() ? null :
-                locationService.findInternalLocation(receipt.shipment.destination, "Receiving ${receipt.shipment.shipmentNumber}")
+                locationService.findInternalLocation(receipt.shipment.destination, receivingLocationNames)
 
         def shipmentItemsByContainer = receipt.shipment.shipmentItems.groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
