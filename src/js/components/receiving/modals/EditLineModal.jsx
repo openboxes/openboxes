@@ -16,14 +16,20 @@ import Translate from '../../../utils/Translate';
 const FIELDS = {
   lines: {
     type: ArrayField,
+    addButton: ({
     // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, shipmentItemId, binLocation }) => (
+      addRow, shipmentItemId, binLocation, product,
+    }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
         onClick={() => addRow({
           shipmentItemId,
           binLocation,
+          product: {
+            ...product,
+           label: `${product.productCode} - ${product.name}`,
+          },
           receiptItemId: null,
           newLine: true,
         })}
@@ -208,6 +214,7 @@ class EditLineModal extends Component {
           shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
           productsFetch: this.productsFetch,
           binLocation: this.state.attr.fieldValue.binLocation,
+          product: this.state.attr.fieldValue.product,
         }}
       />
     );
