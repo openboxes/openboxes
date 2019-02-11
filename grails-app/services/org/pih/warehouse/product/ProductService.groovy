@@ -1231,6 +1231,9 @@ class ProductService {
 			if (types) {
 				'in'("code", types)
 			}
+			associatedProduct {
+				eq("active", true)
+			}
 		}
 	}
 
