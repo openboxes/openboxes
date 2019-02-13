@@ -628,6 +628,8 @@ class AddItemsPage extends Component {
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() =>
         this.checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems));
+    } else {
+      this.checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
     }
   }
 
