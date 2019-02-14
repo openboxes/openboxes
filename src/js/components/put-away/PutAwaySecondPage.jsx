@@ -31,6 +31,7 @@ class PutAwaySecondPage extends Component {
       putAway, pivotBy, expanded, location,
     } = this.props;
     this.getColumns = this.getColumns.bind(this);
+    this.fetchItems = this.fetchItems.bind(this);
     const columns = this.getColumns();
     this.state = {
       putAway,
@@ -39,6 +40,8 @@ class PutAwaySecondPage extends Component {
       expanded,
       bins: [],
       location,
+      sortBy: '',
+      orderText: 'Sort by current bins',
     };
   }
 
@@ -264,11 +267,6 @@ class PutAwaySecondPage extends Component {
     return apiClient.post(url, flattenRequest(putAwayToSave))
       .then((response) => {
         const putAway = parseResponse(response.data.data);
-        putAway.putawayItems = _.map(putAway.putawayItems, item => ({
-          _id: _.uniqueId('item_'),
-          ...item,
-          splitItems: _.map(item.splitItems, splitItem => ({ _id: _.uniqueId('item_'), ...splitItem })),
-        }));
 
         this.setState({ putAway }, () => {
           this.props.hideSpinner();
@@ -358,7 +356,52 @@ class PutAwaySecondPage extends Component {
     return apiClient.post(url, flattenRequest(this.state.putAway), { responseType: 'blob' })
       .then((response) => {
         fileDownload(response.data, `PutawayReport${putawayNumber ? `-${putawayNumber}` : ''}.pdf`, 'application/pdf');
+        this.fetchItems(this.state.sortBy);
         this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  /**
+   * Sort putaway items in order chosen by the user
+   * @public
+   */
+  sortPutawayItems() {
+    let { sortBy, orderText } = this.state;
+
+    switch (sortBy) {
+      case 'currentBins':
+        orderText = <Translate id="putAway.originalOrder.label" defaultMessage="Original order" />;
+        sortBy = 'preferredBin';
+        break;
+      case 'preferredBin':
+        orderText = <Translate id="putAway.sortByCurrentBins.label" defaultMessage="Sort by current bins" />;
+        sortBy = '';
+        break;
+      default:
+        orderText = <Translate id="putAway.sortByPreferredBin.label" defaultMessage="Sort by preferred bin" />;
+        sortBy = 'currentBins';
+        break;
+    }
+
+    this.setState({
+      sortBy,
+      orderText,
+    });
+
+    this.fetchItems(sortBy);
+  }
+
+  fetchItems(sortBy) {
+    const url = `/openboxes/api/putaways/${this.props.putAway.id}?sortBy=${sortBy}`;
+    return apiClient.get(url)
+      .then((response) => {
+        this.setState({
+          putAway: {
+            ...this.state.putAway,
+            putawayItems: parseResponse(response.data.data.putawayItems),
+          },
+        });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -395,6 +438,13 @@ class PutAwaySecondPage extends Component {
             </button>
           </div>
           <div>
+            <button
+              type="button"
+              onClick={() => this.sortPutawayItems()}
+              className="btn btn-outline-secondary btn-xs mr-3"
+            >
+              <span>{this.state.orderText}</span>
+            </button>
             <button
               className="btn btn-outline-secondary btn-xs mr-3"
               onClick={() => this.generatePutAwayList()}
@@ -461,6 +511,7 @@ PutAwaySecondPage.propTypes = {
   putAway: PropTypes.shape({
     /** An array of all put-away's items */
     putawayItems: PropTypes.arrayOf(PropTypes.shape({})),
+    id: PropTypes.string,
   }),
   /** An array of available attributes after which a put-away can be sorted by */
   pivotBy: PropTypes.arrayOf(PropTypes.string),

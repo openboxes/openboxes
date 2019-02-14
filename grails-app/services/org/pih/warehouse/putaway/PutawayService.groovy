@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.putaway
 
 import org.apache.commons.beanutils.BeanUtils
@@ -73,7 +73,10 @@ class PutawayService {
 
         putawayItems.addAll(pendingPutawayItems)
 
-        return putawayItems
+        return putawayItems.sort { a,b ->
+            a.product?.category?.name <=> b.product?.category?.name ?:
+                    a.product?.name <=> b.product?.name
+        }
     }
 
     List<PutawayItem> getPendingItems(Location location) {
