@@ -38,7 +38,7 @@ class PutawayItem {
     String getCurrentBins() {
         String currentBins = ""
         if (availableItems) {
-            currentBins = availableItems?.collect { it?.binLocation?.name }.sort().join(", ")
+            currentBins = availableItems?.collect { it?.binLocation?.name }?.sort()?.join(", ")
         }
         return currentBins
     }

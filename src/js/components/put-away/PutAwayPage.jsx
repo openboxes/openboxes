@@ -196,7 +196,6 @@ class PutAwayPage extends Component {
     return apiClient.post(url, flattenRequest(payload))
       .then((response) => {
         const putAway = parseResponse(response.data.data);
-        putAway.putawayItems = _.map(putAway.putawayItems, item => ({ _id: _.uniqueId('item_'), ...item }));
 
         this.props.hideSpinner();
         const expanded = {};
