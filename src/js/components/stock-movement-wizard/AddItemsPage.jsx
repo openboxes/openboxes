@@ -772,6 +772,38 @@ class AddItemsPage extends Component {
   }
 
   /**
+   * Saves changes made by user in this step and redirects to the shipment view page
+   * @param {object} formValues
+   * @public
+   */
+  saveAndExit(formValues) {
+    const errors = validate(formValues).lineItems;
+    if (!errors.length) {
+      this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
+        .then(() => {
+          window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+        });
+    } else {
+      confirmAlert({
+        title: this.props.translate('confirmExit.label', 'Confirm save'),
+        message: this.props.translate(
+          'confirmExit.message',
+          'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+        ),
+        buttons: [
+          {
+            label: this.props.translate('default.yes.label', 'Yes'),
+            onClick: () => { window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`; },
+          },
+          {
+            label: this.props.translate('default.no.label', 'No'),
+          },
+        ],
+      });
+    }
+  }
+
+  /**
    * Saves list of requisition items in current step (without step change).
    * @param {object} lineItems
    * @public
@@ -931,6 +963,11 @@ class AddItemsPage extends Component {
       });
   }
 
+  /**
+   * Saves changes made by user in this step and go back to previous page
+   * @param {object} formValues
+   * @public
+   */
   previousPage(values) {
     const errors = validate(values).lineItems;
     if (!errors.length) {
@@ -1001,6 +1038,14 @@ class AddItemsPage extends Component {
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" defaultMessage="Save" /></span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.saveAndExit(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="stockMovement.saveAndExit.label" defaultMessage="Save and exit" /></span>
               </button>
               <button
                 type="button"

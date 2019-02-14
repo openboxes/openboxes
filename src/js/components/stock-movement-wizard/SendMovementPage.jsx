@@ -387,6 +387,11 @@ class SendMovementPage extends Component {
     }
   }
 
+  /**
+   * Saves changes made by user in this step and go back to previous page
+   * @param {object} formValues
+   * @public
+   */
   previousPage(values) {
     const errors = validate(values);
     if (_.isEmpty(errors)) {
@@ -403,6 +408,38 @@ class SendMovementPage extends Component {
           {
             label: this.props.translate('confirmPreviousPage.continue.label ', 'Continue (lose unsaved work)'),
             onClick: () => this.props.previousPage(values),
+          },
+        ],
+      });
+    }
+  }
+
+  /**
+   * Saves changes made by user in this step and redirects to the shipment view page
+   * @param {object} formValues
+   * @public
+   */
+  saveAndExit(values) {
+    const errors = validate(values);
+    if (_.isEmpty(errors)) {
+      this.saveValues(values)
+        .then(() => {
+          window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`;
+        });
+    } else {
+      confirmAlert({
+        title: this.props.translate('confirmExit.label', 'Confirm save'),
+        message: this.props.translate(
+          'confirmExit.message',
+          'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+        ),
+        buttons: [
+          {
+            label: this.props.translate('default.yes.label', 'Yes'),
+            onClick: () => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; },
+          },
+          {
+            label: this.props.translate('default.no.label', 'No'),
           },
         ],
       });
@@ -475,6 +512,13 @@ class SendMovementPage extends Component {
                 disabled={invalid}
               >
                 <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" defaultMessage="Save" /></span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.saveAndExit(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+              >
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="stockMovement.saveAndExit.label" defaultMessage="Save and exit" /></span>
               </button>
               <div className="col-md-9 pl-0">
                 {_.map(FIELDS, (fieldConfig, fieldName) =>

@@ -483,6 +483,13 @@ class PickPage extends Component {
               </button>
               <button
                 type="button"
+                onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+              >
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="stockMovement.saveAndExit.label" defaultMessage="Save and exit" /></span>
+              </button>
+              <button
+                type="button"
                 onClick={() => this.sortByBins()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >

@@ -451,6 +451,40 @@ class EditItemsPage extends Component {
   }
 
   /**
+   * Saves changes made by user in this step and redirects to the shipment view page
+   * @param {object} formValues
+   * @public
+   */
+  saveAndExit(formValues) {
+    const errors = validateForSave(formValues).editPageItems;
+
+    if (errors.length) {
+      confirmAlert({
+        title: this.props.translate('confirmExit.label', 'Confirm save'),
+        message: this.props.translate(
+          'confirmExit.message',
+          'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+        ),
+        buttons: [
+          {
+            label: this.props.translate('default.yes.label', 'Yes'),
+            onClick: () => { window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`; },
+          },
+          {
+            label: this.props.translate('default.no.label', 'No'),
+          },
+        ],
+      });
+      this.props.hideSpinner();
+    } else {
+      this.reviseRequisitionItems(formValues)
+        .then(() => {
+          window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+        });
+    }
+  }
+
+  /**
    * Reverts to previous state of requisition item (reverts substitutions and quantity revisions)
    * @param {string} itemId
    * @public
@@ -478,6 +512,11 @@ class EditItemsPage extends Component {
       });
   }
 
+  /**
+   * Saves changes made by user in this step and go back to previous page
+   * @param {object} formValues
+   * @public
+   */
   previousPage(values) {
     const errors = validate(values).editPageItems;
     if (!errors.length) {
@@ -520,9 +559,16 @@ class EditItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => this.save(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-save pr-2" /><Translate id="default.button.save.label" defaultMessage="Save" /></span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.saveAndExit(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+              >
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="stockMovement.saveAndExit.label" defaultMessage="Save and exit" /></span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
