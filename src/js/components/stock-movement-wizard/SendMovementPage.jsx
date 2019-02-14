@@ -7,6 +7,7 @@ import Alert from 'react-s-alert';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { getTranslate } from 'react-localize-redux';
+import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -194,6 +195,19 @@ class SendMovementPage extends Component {
   onSave(values) {
     this.props.showSpinner();
 
+    this.saveValues(values)
+      .then(() => {
+        this.props.hideSpinner();
+
+        if (values.statusCode === 'ISSUED') {
+          this.fetchStockMovementData();
+        }
+        Alert.success(this.props.translate('alert.saveSuccess.label', 'Changes saved successfully'));
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  saveValues(values) {
     let payload = {
       dateShipped: values.dateShipped,
       'shipmentType.id': values.shipmentType,
@@ -210,16 +224,7 @@ class SendMovementPage extends Component {
       };
     }
 
-    this.saveShipment(payload)
-      .then(() => {
-        this.props.hideSpinner();
-
-        if (values.statusCode === 'ISSUED') {
-          this.fetchStockMovementData();
-        }
-        Alert.success(this.props.translate('alert.saveSuccess.label', 'Changes saved successfully'));
-      })
-      .catch(() => this.props.hideSpinner());
+    return this.saveShipment(payload);
   }
 
   /**
@@ -382,9 +387,29 @@ class SendMovementPage extends Component {
     }
   }
 
-  render() {
-    const { previousPage } = this.props;
+  previousPage(values) {
+    const errors = validate(values);
+    if (_.isEmpty(errors)) {
+      this.saveValues(values)
+        .then(() => this.props.previousPage(values));
+    } else {
+      confirmAlert({
+        title: this.props.translate('confirmPreviousPage.label', 'Validation error'),
+        message: this.props.translate('confirmPreviousPage.message.label', 'Cannot save due to validation error on page'),
+        buttons: [
+          {
+            label: this.props.translate('confirmPreviousPage.correctError.label', 'Correct error'),
+          },
+          {
+            label: this.props.translate('confirmPreviousPage.continue.label ', 'Continue (lose unsaved work)'),
+            onClick: () => this.props.previousPage(values),
+          },
+        ],
+      });
+    }
+  }
 
+  render() {
     return (
       <div>
         <hr />
@@ -463,7 +488,7 @@ class SendMovementPage extends Component {
                   type="button"
                   className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
-                  onClick={() => previousPage(values)}
+                  onClick={() => this.previousPage(values)}
                 >
                   <Translate id="default.button.previous.label" defaultMessage="Previous" />
                 </button>
@@ -527,7 +552,7 @@ class SendMovementPage extends Component {
                   type="button"
                   className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
-                  onClick={() => previousPage(values)}
+                  onClick={() => this.previousPage(values)}
                 > <Translate id="default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button

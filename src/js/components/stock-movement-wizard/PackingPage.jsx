@@ -320,7 +320,7 @@ class PackingPage extends Component {
                 formValues: values,
               }))}
               <div>
-                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
+                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.savePackingData(values.packPageItems).then(() => this.props.previousPage(values))}>
                   <Translate id="default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">

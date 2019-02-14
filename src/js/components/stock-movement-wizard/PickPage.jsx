@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
-import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import fileDownload from 'js-file-download';
 
@@ -220,29 +219,6 @@ class PickPage extends Component {
     fetchFunction()
       .then(() => this.props.hideSpinner())
       .catch(() => this.props.hideSpinner());
-  }
-
-  /**
-   * Refetch the data, all not saved changes will be lost.
-   * @public
-   */
-  refresh() {
-    confirmAlert({
-      title: this.props.translate('message.confirmRefresh.label', 'Confirm refresh'),
-      message: this.props.translate(
-        'confirmRefresh.message',
-        'Are you sure you want to refresh? Your progress since last save will be lost.',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('default.yes.label', 'Yes'),
-          onClick: () => this.fetchAllData(true),
-        },
-        {
-          label: this.props.translate('default.no.label', 'No'),
-        },
-      ],
-    });
   }
 
   /**
@@ -500,7 +476,7 @@ class PickPage extends Component {
               </a>
               <button
                 type="button"
-                onClick={() => this.refresh()}
+                onClick={() => this.fetchAllData(true)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
               >
                 <span><i className="fa fa-refresh pr-2" /><Translate id="default.button.refresh.label" defaultMessage="Reload" /></span>
@@ -561,7 +537,6 @@ PickPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  translate: PropTypes.func.isRequired,
   /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
   /** Indicator if reason codes' data is fetched */
