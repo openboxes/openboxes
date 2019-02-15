@@ -11,7 +11,7 @@ import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
+import apiClient, { flattenRequest } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import showLocationChangedAlert from '../../utils/location-change-alert';
@@ -225,20 +225,12 @@ class PutAwayCheckPage extends Component {
     };
 
     return apiClient.post(url, flattenRequest(payload))
-      .then((response) => {
-        const putAway = parseResponse(response.data.data);
-
+      .then(() => {
         this.props.hideSpinner();
 
         Alert.success(this.props.translate('alert.putAwayCompleted.label', 'Putaway was successfully completed!'));
 
-        this.setState({
-          putAway: {
-            ...putAway,
-            putawayItems: PutAwayCheckPage.processSplitLines(putAway.putawayItems),
-          },
-          completed: true,
-        });
+        this.props.firstPage();
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -284,63 +276,47 @@ class PutAwayCheckPage extends Component {
     return (
       <div className="main-container">
         <h1><Translate id="putAway.putAway.label" defaultMessage="Putaway -" /> {this.state.putAway.putawayNumber}</h1>
-        {
-          this.state.completed ?
-            <div className="d-flex justify-content-between mb-2">
-              <div>
-                <Translate id="putAway.showBy.label" defaultMessage="Show by" />:
-                <button
-                  className="btn btn-primary ml-2 btn-xs"
-                  data-toggle="button"
-                  aria-pressed="false"
-                  onClick={toggleTree}
-                >
-                  {pivotBy && pivotBy.length ?
-                    <Translate id="stockMovement.label" defaultMessage="Stock Movement" />
+        <div className="d-flex justify-content-between mb-2">
+          <div>
+            <Translate id="putAway.showBy.label" defaultMessage="Show by" />:
+            <button
+              className="btn btn-primary ml-2 btn-xs"
+              data-toggle="button"
+              aria-pressed="false"
+              onClick={toggleTree}
+            >
+              {pivotBy && pivotBy.length ?
+                <Translate id="stockMovement.label" defaultMessage="Stock Movement" />
                     : <Translate id="product.label" defaultMessage="Product" /> }
-                </button>
-              </div>
+            </button>
+          </div>
+          {this.state.completed ?
+            <button
+              type="button"
+              className="btn btn-outline-primary float-right mb-2 btn-xs"
+              onClick={() => this.props.firstPage()}
+            ><Translate id="putAway.goBack.label" defaultMessage="Go back to putaway list" />
+            </button> :
+            <div>
               <button
                 type="button"
-                className="btn btn-outline-primary float-right mb-2 btn-xs"
-                onClick={() => this.props.firstPage()}
-              ><Translate id="putAway.goBack.label" defaultMessage="Go back to putaway list" />
+                onClick={() => this.props.prevPage({
+                  putAway: this.props.putAway,
+                  pivotBy: this.state.pivotBy,
+                  expanded: this.state.expanded,
+                })}
+                className="btn btn-outline-primary mb-2 btn-xs mr-2"
+              ><Translate id="default.button.edit.label" defaultMessage="Edit" />
               </button>
-            </div> :
-            <div className="d-flex justify-content-between mb-2">
-              <div>
-                <Translate id="putAway.showBy.label" defaultMessage="Show by" />:
-                <button
-                  className="btn btn-primary ml-2 btn-xs"
-                  data-toggle="button"
-                  aria-pressed="false"
-                  onClick={toggleTree}
-                >
-                  {pivotBy && pivotBy.length ?
-                    <Translate id="stockMovement.label" defaultMessage="Stock Movement" />
-                    : <Translate id="product.label" defaultMessage="Product" /> }
-                </button>
-              </div>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => this.props.prevPage({
-                    putAway: this.props.putAway,
-                    pivotBy: this.state.pivotBy,
-                    expanded: this.state.expanded,
-                  })}
-                  className="btn btn-outline-primary mb-2 btn-xs mr-2"
-                ><Translate id="default.button.edit.label" defaultMessage="Edit" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.completePutAway()}
-                  className="btn btn-outline-primary float-right mb-2 btn-xs"
-                ><Translate id="putAway.completePutAway.label" defaultMessage="Complete Putaway" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => this.completePutAway()}
+                className="btn btn-outline-primary float-right mb-2 btn-xs"
+              ><Translate id="putAway.completePutAway.label" defaultMessage="Complete Putaway" />
+              </button>
             </div>
-        }
+          }
+        </div>
         {
           putAway.putawayItems ?
             <SelectTreeTable
