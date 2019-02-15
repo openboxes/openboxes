@@ -99,7 +99,7 @@ const FIELDS = {
   buttonsTop: {
     type: ({
       // eslint-disable-next-line max-len, react/prop-types
-      autofillLines, onSave, saveDisabled, shipmentReceived, exportTemplate, importTemplate,
+      autofillLines, onSave, saveDisabled, shipmentReceived, exportTemplate, importTemplate, saveAndExit,
     }) => (
       <div className="mb-1 text-center">
         <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
@@ -107,6 +107,9 @@ const FIELDS = {
         </button>
         <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>
           <Translate id="default.button.save.label" defaultMessage="Save" />
+        </button>
+        <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => saveAndExit()}>
+          <span><i className="fa fa-sign-out pr-2" /><Translate id="stockMovement.saveAndExit.label" defaultMessage="Save and exit" /></span>
         </button>
         <button
           type="button"
@@ -343,8 +346,8 @@ const FIELDS = {
   },
   buttonsBottom: {
     type: ({
-      // eslint-disable-next-line react/prop-types
-      autofillLines, onSave, saveDisabled, shipmentReceived, exportTemplate, importTemplate,
+      // eslint-disable-next-line react/prop-types, max-len
+      autofillLines, onSave, saveDisabled, shipmentReceived, exportTemplate, importTemplate, saveAndExit,
     }) => (
       <div className="my-1 text-center">
         <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
@@ -352,6 +355,9 @@ const FIELDS = {
         </button>
         <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>
           <Translate id="default.button.save.label" defaultMessage="Save" />
+        </button>
+        <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => saveAndExit()}>
+          <span><i className="fa fa-sign-out pr-2" /><Translate id="stockMovement.saveAndExit.label" defaultMessage="Save and exit" /></span>
         </button>
         <button
           type="button"
@@ -420,6 +426,7 @@ class PartialReceivingPage extends Component {
     this.autofillLines = this.autofillLines.bind(this);
     this.setLocation = this.setLocation.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.onExit = this.onExit.bind(this);
     this.saveEditLine = this.saveEditLine.bind(this);
     this.exportTemplate = this.exportTemplate.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
@@ -437,6 +444,14 @@ class PartialReceivingPage extends Component {
    */
   onSave() {
     this.props.save(this.props.formValues);
+  }
+
+  /**
+   * Calls save and exit method.
+   * @public
+   */
+  onExit() {
+    this.props.saveAndExit(this.props.formValues);
   }
 
   /**
@@ -595,6 +610,7 @@ class PartialReceivingPage extends Component {
             shipmentReceived: this.props.formValues.shipmentStatus === 'RECEIVED',
             exportTemplate: this.exportTemplate,
             importTemplate: this.importTemplate,
+            saveAndExit: this.onExit,
           }))}
       </div>
     );
@@ -616,6 +632,8 @@ PartialReceivingPage.propTypes = {
   change: PropTypes.func.isRequired,
   /** Function sending all changes mage by user to API and updating data */
   save: PropTypes.func.isRequired,
+  /** Function sending all changes made by user to API and redirect user to shipment page */
+  saveAndExit: PropTypes.func.isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */

@@ -61,6 +61,7 @@ class ReceivingPage extends Component {
     this.nextPage = this.nextPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
     this.save = this.save.bind(this);
+    this.saveAndExit = this.saveAndExit.bind(this);
     this.confirmReceive = this.confirmReceive.bind(this);
   }
 
@@ -126,11 +127,13 @@ class ReceivingPage extends Component {
         {...props}
         bins={this.state.bins}
         save={this.save}
+        saveAndExit={this.saveAndExit}
       />,
       <ReceivingCheckScreen
         {...props}
         prevPage={this.prevPage}
         save={this.save}
+        saveAndExit={this.saveAndExit}
         completed={this.state.completed}
       />,
     ];
@@ -174,6 +177,25 @@ class ReceivingPage extends Component {
   * @public
   */
   save(formValues, callback) {
+    this.saveValues(formValues)
+      .then((response) => {
+        this.props.hideSpinner();
+
+        this.setState({ formData: {} }, () =>
+          this.setState({ formData: parseResponse(response.data.data) }));
+        if (callback) {
+          callback();
+        }
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  /**
+   * Sends all changes made by user in this step of partial receiving to API
+   * @param {object} formValues
+   * @public
+   */
+  saveValues(formValues) {
     this.props.showSpinner();
     const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=${this.state.page + 1}`;
 
@@ -193,15 +215,20 @@ class ReceivingPage extends Component {
       })),
     };
 
-    return apiClient.post(url, flattenRequest(payload))
-      .then((response) => {
-        this.props.hideSpinner();
+    return apiClient.post(url, flattenRequest(payload));
+  }
 
-        this.setState({ formData: {} }, () =>
-          this.setState({ formData: parseResponse(response.data.data) }));
-        if (callback) {
-          callback();
-        }
+  /**
+   * Sends all changes made by user in this step of partial receiving to API and redirects
+   * user to shipment page
+   * @param {object} formValues
+   * @public
+   */
+  saveAndExit(formValues) {
+    this.saveValues(formValues)
+      .then(() => {
+        const { requisition } = formValues;
+        window.location = `/openboxes/stockMovement/show/${requisition}`;
       })
       .catch(() => this.props.hideSpinner());
   }
