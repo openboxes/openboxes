@@ -2,7 +2,6 @@ import React from 'react';
 import translations from '../../en';
 import GlobalSearch from '../GlobalSearch';
 import LocationChooser from '../location/LocationChooser';
-import LanguageSelector from '../LanguageSelector';
 
 const { dashboard } = translations.navbar;
 
@@ -17,7 +16,6 @@ const Header = () => (
     <div className="d-flex">
       <GlobalSearch />
       <LocationChooser />
-      <LanguageSelector />
     </div>
   </div>
 );
