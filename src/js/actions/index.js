@@ -5,7 +5,6 @@ import {
   FETCH_REASONCODES,
   FETCH_SESSION_INFO,
   CHANGE_CURRENT_LOCATION,
-  CHANGE_CURRENT_LOCALE,
 } from './types';
 import apiClient from '../utils/apiClient';
 
@@ -63,21 +62,6 @@ export function changeCurrentLocation(location) {
         dispatch({
           type: CHANGE_CURRENT_LOCATION,
           payload: location,
-        });
-      });
-  };
-}
-
-
-export function changeCurrentLocale(locale) {
-  return (dispatch) => {
-    const url = `/openboxes/api/chooseLocale/${locale}`;
-
-    apiClient.put(url)
-      .then(() => {
-        dispatch({
-          type: CHANGE_CURRENT_LOCALE,
-          payload: locale,
         });
       });
   };

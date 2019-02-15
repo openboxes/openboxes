@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { FETCH_SESSION_INFO, CHANGE_CURRENT_LOCATION, CHANGE_CURRENT_LOCALE } from '../actions/types';
+import { FETCH_SESSION_INFO, CHANGE_CURRENT_LOCATION } from '../actions/types';
 
 const initialState = {
   currentLocation: {
@@ -30,8 +30,6 @@ export default function (state = initialState, action) {
       };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload };
-    case CHANGE_CURRENT_LOCALE:
-      return { ...state, activeLanguage: action.payload };
     default:
       return state;
   }
