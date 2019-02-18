@@ -117,27 +117,28 @@ class StockMovementController {
 
 
     def delete = {
-
-        try {
-            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-            Requisition requisition = stockMovement?.requisition
-            if (requisition) {
-                def shipments = stockMovement?.requisition?.shipments
-                shipments.toArray().each { Shipment shipment ->
-                    requisition.removeFromShipments(shipment)
-                    if (!shipment?.events?.empty) {
-                        shipmentService.rollbackLastEvent(shipment)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING) {
+            try {
+                Requisition requisition = stockMovement?.requisition
+                if (requisition) {
+                    def shipments = stockMovement?.requisition?.shipments
+                    shipments.toArray().each { Shipment shipment ->
+                        requisition.removeFromShipments(shipment)
+                        if (!shipment?.events?.empty) {
+                            shipmentService.rollbackLastEvent(shipment)
+                        }
+                        shipmentService.deleteShipment(shipment)
                     }
-                    shipmentService.deleteShipment(shipment)
+                    //requisitionService.rollbackRequisition(requisition)
+                    requisitionService.deleteRequisition(requisition)
                 }
-                //requisitionService.rollbackRequisition(requisition)
-                requisitionService.deleteRequisition(requisition)
+                flash.message = "Successfully deleted stock movement with ID ${params.id}"
+            } catch (Exception e) {
+                log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
+                flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
             }
-            flash.message = "Successfully deleted stock movement with ID ${params.id}"
-        } catch (Exception e) {
-            log.error ("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
-            flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
-        }
+        } else flash.message = "You can only delete pending shipments"
 
         redirect(action: "list")
     }
