@@ -79,7 +79,7 @@
                 <h2><warehouse:message code="default.filters.label"/></h2>
                 <g:form action="list" method="GET">
                     <g:hiddenField name="max" value="${params.max}"/>
-                    <g:hiddenField name="offset" value="${params.offset}"/>
+                    <g:hiddenField name="offset" value="0"/>
                     <div class="filter-list">
                         <div class="filter-list-item">
                             <label><warehouse:message code="default.search.label"/></label>
