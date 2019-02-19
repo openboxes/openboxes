@@ -44,6 +44,8 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 
+	Integer sortOrder
+
 	static mapping = {
 		id generator: 'uuid', sqlType: "char(38)"
 	}
@@ -62,6 +64,7 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 		recipient(nullable:true)
 		isSplitItem(nullable:true)
 		comment(nullable:true, maxSize: 255)
+		sortOrder(nullable:true)
 	}
 
 	//int compareTo(obj) { product.name.compareTo(obj.product.name) }

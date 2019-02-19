@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.shipping
 
 import org.pih.warehouse.core.Location
@@ -30,10 +30,10 @@ class ShipmentItem implements Comparable, Serializable {
 
 	String id
 	//String description		// Item description (for one-off items)
-	String lotNumber			// Loose coupling to the inventory lot 
-	Date expirationDate			
+	String lotNumber			// Loose coupling to the inventory lot
+	Date expirationDate
 	Product product		    	// Specific product that we're tracking
-	Integer quantity		    // Quantity could be a class on its own				
+	Integer quantity		    // Quantity could be a class on its own
 	Person recipient 			// Recipient of an item
 	Donor donor					// Organization that donated the goods
 	Date dateCreated;
@@ -41,28 +41,30 @@ class ShipmentItem implements Comparable, Serializable {
 	InventoryItem inventoryItem
 	Container container
 	Location binLocation
-	//PackageType packageType		// The type of packaging that this item is stored 
-									// within.  This is different from the container type  
-									// (which might be a pallet or shipping container), in  
-									// that this will likely be a box that the item is 
+	//PackageType packageType		// The type of packaging that this item is stored
+									// within.  This is different from the container type
+									// (which might be a pallet or shipping container), in
+									// that this will likely be a box that the item is
 									// actually contained within.
 
 	RequisitionItem requisitionItem
 
+	Integer sortOrder
+
 	static belongsTo = [ shipment : Shipment ]
-	
+
 	static hasMany = [ orderShipments : OrderShipment, receiptItems: ReceiptItem]
 
 	static transients = ["comments", "quantityReceivedAndCanceled", "quantityRemaining"]
 
 	//static hasOne = [receiptItem: ReceiptItem]
-	
-	
+
+
 	static mapping = {
 		id generator: 'uuid'
 		cache true
 	}
-	
+
 	static constraints = {
         binLocation(nullable:true)
 		container(nullable:true)
@@ -75,6 +77,7 @@ class ShipmentItem implements Comparable, Serializable {
 		donor(nullable:true)
         requisitionItem(nullable:true)
 		shipment(nullable:true)
+		sortOrder(nullable:true)
 	}
 
 	Boolean isFullyReceived() {
@@ -84,17 +87,17 @@ class ShipmentItem implements Comparable, Serializable {
 	/**
 	 * @return	the lot number of the inventory item (or the lot number of the shipment item for backwards compatibility)
 	 */
-	def getLotNumber() { 
+	def getLotNumber() {
 		return inventoryItem?.lotNumber?:lotNumber
 	}
-	
+
 	/**
 	 * @return	the expiration date of the inventory item (or the expiration date of the shipment item for backwards compatibility)
 	 */
-	def getExpirationDate() { 
+	def getExpirationDate() {
 		return inventoryItem?.expirationDate?:expirationDate
 	}
-	
+
 
 	def listOrderItems() {
 		return orderShipments.collect{it.orderItem}
@@ -130,7 +133,7 @@ class ShipmentItem implements Comparable, Serializable {
 		}
 		return totalQuantityReceived
 	}
-	
+
 	/*
 	List addToOrderShipments(OrderShipment orderShipment) {
 		OrderShipment.link(orderShipment, this)
@@ -177,12 +180,12 @@ class ShipmentItem implements Comparable, Serializable {
 
     /**
 	 * Sorts shipping items by associated product name, then lot number, then quantity,
-	 * and finally by id. 
-	 * 
+	 * and finally by id.
+	 *
 	 * FIXME Need to get rid of the product and lot number comparison
 	 */
-	int compareTo(obj) { 
-		def sortOrder = 
+	int compareTo(obj) {
+		def sortOrder =
 			container?.parentContainer?.sortOrder <=> obj?.container?.parentContainer?.sortOrder ?:
 				container?.sortOrder <=> obj?.container?.sortOrder ?:
 					inventoryItem?.product?.name <=> obj?.inventoryItem?.product?.name ?:
@@ -194,15 +197,15 @@ class ShipmentItem implements Comparable, Serializable {
                                             id <=> obj?.id
 		return sortOrder;
 	}
-	
+
 	ShipmentItem cloneShipmentItem() {
 		return new ShipmentItem(
-			lotNumber: this.lotNumber, 
-			expirationDate: this.expirationDate,			
+			lotNumber: this.lotNumber,
+			expirationDate: this.expirationDate,
 			product: this.product,
 			inventoryItem: this.inventoryItem,
 			binLocation: this.binLocation,
-			quantity: this.quantity,				
+			quantity: this.quantity,
 			recipient: this.recipient,
 			donor: this.donor,
 			container: this.container
