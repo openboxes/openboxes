@@ -74,6 +74,7 @@ class PutawayApiController {
         }
 
         putaway = Putaway.createFromOrder(order)
+        putaway.sortBy = jsonObject.sortBy
         putaway?.putawayItems?.each { PutawayItem putawayItem ->
             putawayItem.availableItems =
                     inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
