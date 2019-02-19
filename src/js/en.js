@@ -293,6 +293,10 @@ const en = {
           label: 'Export bin locations',
           link: '/openboxes/report/exportBinLocation?downloadFormat=csv',
         },
+        showInventoryByLocationReport: {
+          label: 'Inventory By Location Report',
+          link: '/openboxes/report/showInventoryByLocationReport',
+        },
         exportAsCsv: {
           label: 'Export products',
           link: '/openboxes/product/exportAsCsv',
