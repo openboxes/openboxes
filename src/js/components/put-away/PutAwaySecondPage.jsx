@@ -33,6 +33,8 @@ class PutAwaySecondPage extends Component {
     this.getColumns = this.getColumns.bind(this);
     this.fetchItems = this.fetchItems.bind(this);
     const columns = this.getColumns();
+    /* eslint-disable no-nested-ternary */
+    const orderText = !putAway.sortBy ? 'Sort by current bins' : (putAway.sortBy === 'currentBins' ? 'Sort by preferred bin' : 'Original order');
     this.state = {
       putAway,
       columns,
@@ -40,8 +42,8 @@ class PutAwaySecondPage extends Component {
       expanded,
       bins: [],
       location,
-      sortBy: '',
-      orderText: 'Sort by current bins',
+      sortBy: putAway.sortBy,
+      orderText,
     };
   }
 
