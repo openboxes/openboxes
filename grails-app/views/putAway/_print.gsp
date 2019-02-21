@@ -112,7 +112,7 @@
                     <th>Name</th>
                     <th>Lot/Serial No.</th>
                     <th>Expiry</th>
-                    <th>Total Quantity</th>
+                    <th>Total Qty</th>
                     <th>Putaway Quantity</th>
                     <th>Preferred Bin</th>
                     <th>Current Bins</th>
@@ -126,11 +126,11 @@
                         <td style="width: 100px;">${putawayItem["product.name"]}</td>
                         <td>${putawayItem["inventoryItem.lotNumber"]}</td>
                         <td>${putawayItem["inventoryItem.expirationDate"]}</td>
-                        <td style="width: 60px;">${putawayItem?.quantity}</td>
-                        <td style="width: 60px;">${putawayItem?.quantity}</td>
-                        <td style="width: 70px;">${putawayItem["preferredBin"]}</td>
+                        <td style="width: 30px;">${putawayItem?.quantity}</td>
+                        <td style="width: 50px;">${putawayItem?.quantity}</td>
+                        <td style="width: 50px;">${putawayItem["preferredBin"]}</td>
                         <td style="width: 70px;">${putawayItem["currentBins"]}</td>
-                        <td style="width: 70px;">${putawayItem["putawayLocation.name"]}</td>
+                        <td style="width: 130px;">${putawayItem["putawayLocation.name"]}</td>
                     </tr>
                 </g:if>
                 <g:else>
@@ -140,11 +140,11 @@
                             <td style="width: 100px;">${status==0 ? putawayItem["product.name"]: ""}</td>
                             <td>${status==0 ? putawayItem["inventoryItem.lotNumber"]: ""}</td>
                             <td>${status==0 ? putawayItem["inventoryItem.expirationDate"]: ""}</td>
-                            <td style="width: 60px;">${status==0 ? putawayItem?.quantity: ""}</td>
-                            <td style="width: 60px;">${splitItem["quantity"]?:""}</td>
-                            <td style="width: 70px;">${putawayItem["preferredBin"]}</td>
+                            <td style="width: 30px;">${status==0 ? putawayItem?.quantity: ""}</td>
+                            <td style="width: 50px;">${splitItem["quantity"]?:""}</td>
+                            <td style="width: 50px;">${putawayItem["preferredBin"]}</td>
                             <td style="width: 70px;">${putawayItem["currentBins"]}</td>
-                            <td style="width: 70px;">${splitItem["putawayLocation.name"]}</td>
+                            <td style="width: 130px;">${splitItem["putawayLocation.name"]}</td>
                         </tr>
                     </g:each>
 
