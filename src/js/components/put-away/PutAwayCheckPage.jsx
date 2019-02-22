@@ -199,7 +199,7 @@ class PutAwayCheckPage extends Component {
    */
   completePutAway() {
     const isBinLocationChosen = !_.some(this.props.putAway.putawayItems, putAwayItem =>
-      _.isNull(putAwayItem.putawayLocation.id));
+      _.isNull(putAwayItem.putawayLocation.id) && _.isEmpty(putAwayItem.splitItems));
 
     if (!isBinLocationChosen) {
       this.confirmPutaway();
