@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom';
 import PutAwayPage from './PutAwayPage';
 import PutAwaySecondPage from './PutAwaySecondPage';
 import PutAwayCheckPage from './PutAwayCheckPage';
-import apiClient, { parseResponse } from '../../utils/apiClient';
+import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 
 /** Main put-away form's component. */
@@ -23,6 +23,8 @@ class PutAwayMainPage extends Component {
     this.nextPage = this.nextPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
     this.firstPage = this.firstPage.bind(this);
+    this.changePutAway = this.changePutAway.bind(this);
+    this.savePutAways = this.savePutAways.bind(this);
   }
 
   componentDidMount() {
@@ -57,6 +59,8 @@ class PutAwayMainPage extends Component {
         {...this.state.props}
         nextPage={this.nextPage}
         location={location}
+        changePutAway={this.changePutAway}
+        savePutAways={this.savePutAways}
       />,
       <PutAwayCheckPage
         {...this.state.props}
@@ -65,6 +69,33 @@ class PutAwayMainPage extends Component {
         location={location}
       />,
     ];
+  }
+
+  changePutAway(putAway) {
+    this.setState({ props: { putAway } });
+  }
+
+  /**
+   * Sends all changes made by user in this step of put-away to API and updates data.
+   * @public
+   */
+  savePutAways(putAwayToSave, callback) {
+    this.props.showSpinner();
+    const url = `/openboxes/api/putaways?location.id=${this.props.location.id}`;
+
+    return apiClient.post(url, flattenRequest(putAwayToSave))
+      .then((response) => {
+        const putAway = parseResponse(response.data.data);
+
+        this.setState({ props: { putAway } }, () => {
+          this.props.hideSpinner();
+
+          if (callback) {
+            callback(putAway);
+          }
+        });
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
