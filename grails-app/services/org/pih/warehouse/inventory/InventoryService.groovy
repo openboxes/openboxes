@@ -10,20 +10,12 @@
 package org.pih.warehouse.inventory
 
 import grails.orm.PagedResultList
-import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.sql.Sql
-import groovy.time.TimeCategory
-import org.apache.commons.lang.StringEscapeUtils
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringUtils
-import org.apache.poi.hssf.usermodel.HSSFSheet
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.Row
 import org.grails.plugins.csv.CSVWriter
 import org.hibernate.criterion.CriteriaSpecification
-import org.hibernate.id.UUIDHexGenerator
 import org.joda.time.LocalDate
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
@@ -37,7 +29,6 @@ import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
-import org.pih.warehouse.product.ProductCatalogItem
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.reporting.Consumption
@@ -46,14 +37,11 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Errors
 
-import java.sql.Timestamp
 import java.sql.BatchUpdateException
-import java.text.ParseException;
-
-
+import java.sql.Timestamp
+import java.text.ParseException
 import java.text.SimpleDateFormat
 
 class InventoryService implements ApplicationContextAware {
@@ -1740,6 +1728,44 @@ class InventoryService implements ApplicationContextAware {
 
         return quantityMap
     }
+
+	/**
+	 * Get quantity on hand by product for the given locations.
+	 *
+	 * @param location
+	 * @return
+	 */
+	Map<Product, Map<Location, Integer>> getQuantityOnHandByProductAndLocation(Location[] locations) {
+		def quantityMap = [:]
+		if (locations) {
+			Date date = getMostRecentInventorySnapshotDate()
+			log.info "getQuantityOnHandByProductAndLocation " + locations + " " + date
+			def startTime = System.currentTimeMillis()
+			def results = InventorySnapshot.executeQuery("""
+						select i.date, product, i.location, category.name, i.quantityOnHand
+						from InventorySnapshot i, Product product, Category category
+						where i.location in (:locations)
+						and i.date = :date
+						and i.product = product
+						and i.product.category = category
+						""", [locations: locations, date: date])
+
+			log.info "Results: " + results.size()
+			log.info "Query response time: " + (System.currentTimeMillis() - startTime)
+			startTime = System.currentTimeMillis()
+
+
+			results.each {
+				if (!quantityMap[it[1]]) {
+					quantityMap[it[1]] = [:]
+				}
+				quantityMap[it[1]][it[2]?.id] = it[4]
+			}
+			log.debug "Post-processing response time: " + (System.currentTimeMillis() - startTime)
+		}
+
+		return quantityMap
+	}
 
     /**
      * Get the most recent date from the inventory item snapshot table.

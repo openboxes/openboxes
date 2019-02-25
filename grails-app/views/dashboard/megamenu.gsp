@@ -396,6 +396,10 @@
                         <g:link controller="report" action="exportBinLocation" params="[downloadFormat:'csv']" class="">
                             <warehouse:message code="report.exportBinLocations.label" default="Export bin locations"/></g:link>
                     </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="showInventoryByLocationReport" class="">
+                            <warehouse:message code="report.inventoryByLocationReport.label" default="Inventory By Location Report"/></g:link>
+                    </div>
                 </div>
                 <div class="mm-content-section">
 
