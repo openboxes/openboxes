@@ -37,7 +37,7 @@ class Putaway {
 
     List<PutawayItem> getPutawayItems() {
        return putawayItems.sort { a,b ->
-           (sortBy == "currentBins" ? b.currentBins <=> a.currentBins : 0) ?:
+           (sortBy == "currentBins" ? a.currentBins <=> b.currentBins : 0) ?:
                    (sortBy == "preferredBin" ? a.preferredBin <=> b.preferredBin : 0) ?:
                            a.product?.category?.name <=> b.product?.category?.name ?:
                                    a.product?.name <=> b.product?.name ?:
