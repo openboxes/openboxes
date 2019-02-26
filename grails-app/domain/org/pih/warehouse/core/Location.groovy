@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import org.pih.warehouse.inventory.Inventory
@@ -16,10 +16,10 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 
 /**
- * A location can be a customer, warehouse, or supplier.  
+ * A location can be a customer, warehouse, or supplier.
  */
 class Location implements Comparable<Location>, java.io.Serializable {
-	
+
 	String id
 	String name
 	String description
@@ -29,9 +29,9 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	Address address
 	String fgColor	= "000000"
 	String bgColor = "FFFFFF"
-	
-	Location parentLocation; 
-	LocationType locationType	
+
+	Location parentLocation;
+	LocationType locationType
 	LocationGroup locationGroup;
 	Organization organization
 
@@ -58,7 +58,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 		parentLocation(nullable:true)
 		bgColor(nullable:true, validator: {bgColor, obj ->
 			def fgColor = obj.properties['fgColor']
-			if(fgColor == null) return true 
+			if(fgColor == null) return true
 			bgColor != fgColor ? true : ['invalid.matchingcolor']
 		})
 		fgColor(nullable:true)
@@ -71,7 +71,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 		lastUpdated(display:false)
         sortOrder(nullable: true)
 	}
-	
+
 	static mapping = {
 		id generator: 'uuid'
 		// Needs to be eagerly fetched because of Location.supportsActivity() method
@@ -79,17 +79,17 @@ class Location implements Comparable<Location>, java.io.Serializable {
 		locationType lazy: false
 		cache true
 	}
-	
+
 	static transients = ["transactions", "events", "shipments", "requests", "orders"]
-	
+
 	List getTransactions() { return Transaction.findAllByDestinationOrSource(this,this) }
 	List getEvents() { return Event.findAllByEventLocation(this) }
 	List getShipments() { return Shipment.findAllByOriginOrDestination(this,this) }
 	List getRequests() { return Requisition.findAllByOriginOrDestination(this,this) }
-	List getOrders() { return Order.findAllByOriginOrDestination(this,this) } 
+	List getOrders() { return Order.findAllByOriginOrDestination(this,this) }
 	List getUsers() { return User.findAllByWarehouse(this) }
-	
-	String toString() { return this.name } 
+
+	String toString() { return this.name }
 
     /**
      * Compares location by sort order and name.
@@ -108,10 +108,10 @@ class Location implements Comparable<Location>, java.io.Serializable {
 	Boolean supportsAny(ActivityCode [] activityCodes) {
 		activityCodes.any { supports(it) }
 	}
-	
+
 	/**
 	 * Indicates whether the location supports the given activity.
-	 * 
+	 *
 	 * @param activity	the given activity
 	 * @return	true if the activity is supported, false otherwise
 	 */
@@ -121,11 +121,11 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
 	/**
 	 * Indicates whether the location supports the given activity.
-	 * 
+	 *
 	 * @param activity	the given activity id
 	 * @return	true if the activity is supported, false otherwise
 	 */
-	Boolean supports(String activity) { 
+	Boolean supports(String activity) {
 		boolean supportsActivity = false
 		if (supportedActivities) {
 			supportsActivity = supportedActivities?.any{a -> activity == a.toString()};

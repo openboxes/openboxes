@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
@@ -15,7 +15,7 @@ import util.StringUtil
 // import java.util.Date
 
 class Person implements Comparable, Serializable {
-    
+
 	String id;
 	String firstName;
 	String lastName;
@@ -23,22 +23,22 @@ class Person implements Comparable, Serializable {
 	String phoneNumber;
 	Date dateCreated;
 	Date lastUpdated;
-	
-	static mapping = { 
+
+	static mapping = {
 		tablePerHierarchy false
-		table 'person' 
+		table 'person'
 		id generator: 'uuid'
 	}
 
 	static transients = ["name", "lastInitial"]
-	
-	static constraints = { 
+
+	static constraints = {
 		firstName(blank:false, maxSize: 255)
-		lastName(blank:false, maxSize: 255)	
+		lastName(blank:false, maxSize: 255)
 		phoneNumber(nullable:true, maxSize: 255)
 		email(nullable:true, email: true, maxSize: 255)
 	}
-	
+
 	int compareTo(Object obj) {
 
 		def sortOrder =

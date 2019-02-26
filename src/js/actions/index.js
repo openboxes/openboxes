@@ -37,7 +37,7 @@ export function fetchReasonCodes() {
 }
 
 export function fetchUsers() {
-  const url = '/openboxes/api/generic/person';
+  const url = '/openboxes/api/persons?fields=id,firstName,lastName';
   const request = apiClient.get(url);
 
   return {

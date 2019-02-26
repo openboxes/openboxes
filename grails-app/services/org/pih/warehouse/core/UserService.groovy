@@ -28,6 +28,13 @@ import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
 import org.pih.warehouse.auth.AuthService
+import org.hibernate.SessionFactory
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Criterion
+import org.hibernate.criterion.MatchMode
+import org.hibernate.criterion.Order
+import org.hibernate.transform.Transformers
 
 import util.StringUtil
 
@@ -38,6 +45,7 @@ class UserService {
 
     def dataSource
     def grailsApplication
+    SessionFactory sessionFactory
     boolean transactional = true
 
     User getUser(String id) {
@@ -185,25 +193,34 @@ class UserService {
         }
     }
 
-    def findPersons(String [] terms) {
-        return findPersons(terms, [:])
+    def findPersons(String [] fields, String [] terms) {
+        return findPersons(fields, terms, [:])
     }
 
-    def findPersons(String[] terms, params) {
-        def results = Person.createCriteria().list(params) {
+    def findPersons(String [] fields, String[] terms, params) {
+        def session = sessionFactory.currentSession
+        def criteria = session.createCriteria(Person.class)
 
-            if (terms) {
-                terms.each { term ->
-                    or {
-                        ilike("firstName", "%" + term + "%")
-                        ilike("lastName", "%" + term + "%")
-                        ilike("email", "%" + term + "%")
-                    }
-                }
+        if (fields) {
+            def projection = Projections.projectionList()
+            fields.each {
+                projection.add(Projections.property(it), it)
             }
-            order("lastName", "desc")
+            criteria.setProjection(projection)
+            criteria.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
         }
-        return results
+
+        if(terms) {
+            terms.each { term ->
+                Criterion lastName = Restrictions.ilike("this.lastName", "%" + term + "%", MatchMode.ANYWHERE)
+                Criterion firstName = Restrictions.ilike("this.firstName", "%" + term + "%", MatchMode.ANYWHERE)
+                Criterion email = Restrictions.ilike("this.email", "%" + term + "%", MatchMode.ANYWHERE)
+                criteria.add(Restrictions.or(Restrictions.or(lastName, firstName), email))
+            }
+        }
+        criteria.addOrder(Order.desc("lastName"))
+
+        return criteria.list()
     }
 
     def findUsers(String query, Map params) {

@@ -26,7 +26,7 @@ class StocklistApiController {
         Requisition requisition = new Requisition(params)
         requisition.isTemplate = true
         List<Requisition> requisitions = requisitionService.getAllRequisitionTemplates(requisition, params)
-        render ([data:requisitions] as JSON)
+        render ([data:requisitions?.collect { [ id: it.id, name: it.name ] }] as JSON)
     }
 
     def read = {

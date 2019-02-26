@@ -11,7 +11,7 @@ export default function (state = initialState, action) {
     case FETCH_USERS:
       if (action.payload.data !== undefined) {
         const users = _.map(action.payload.data.data, user => (
-          { value: user.id, label: user.name, name: user.name }
+          { value: user.id, label: `${user.firstName} ${user.lastName}`, name: `${user.firstName} ${user.lastName}` }
         ));
         return { ...state, data: users, fetched: true };
       }

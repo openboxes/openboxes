@@ -5,7 +5,7 @@ import apiClient from './apiClient';
 export const debounceUsersFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/persons?name=${searchTerm}`)
+      apiClient.get(`/openboxes/api/persons?name=${searchTerm}&fields=id,firstName,lastName`)
         .then(result => callback(
           null,
           {
@@ -30,7 +30,8 @@ export const debounceUsersFetch = (waitTime, minSearchLength) =>
 export const debounceLocationsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/locations?direction=${queryString.parse(window.location.search).direction}&name=${searchTerm}`)
+      const fields = ['id', 'name', 'locationType'];
+      apiClient.get(`/openboxes/api/locations?direction=${queryString.parse(window.location.search).direction}&name=${searchTerm}&fields=${fields.join(',')}`)
         .then(result => callback(
           null,
           {

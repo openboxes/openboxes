@@ -67,12 +67,12 @@ class StocklistManagement extends Component {
 
   fetchUsers() {
     this.props.showSpinner();
-    const url = '/openboxes/api/generic/person';
+    const url = '/openboxes/api/persons?fields=firstName,lastName,id,email';
 
     apiClient.get(url)
       .then((response) => {
         const users = _.map(response.data.data, user => (
-          { value: { id: user.id, email: user.email, label: user.name }, label: user.name }
+          { value: { id: user.id, email: user.email, label: `${user.firstName} ${user.lastName}` }, label: `${user.firstName} ${user.lastName}` }
         ));
         this.setState({ users });
         this.props.hideSpinner();
