@@ -90,11 +90,20 @@ const FIELDS = {
       quantityConsumed: {
         type: LabelField,
         label: 'stockMovement.monthlyQuantity.label',
-        defaultMessage: 'Monthly qty',
+        defaultMessage: 'Monthly stocklist qty',
         flexWidth: '1.45',
-        attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
-        },
+        getDynamicAttr: ({ hasStockList, translate }) => ({
+          formatValue: (value) => {
+            if (value && value !== '0') {
+              return value.toLocaleString('en-US');
+            } else if (hasStockList) {
+              return translate('stockMovement.replenishmentPeriodNeeded.label', 'Replenishment period needed');
+            }
+
+            return '0';
+          },
+          showValueTooltip: true,
+        }),
       },
       substituteButton: {
         label: 'stockMovement.substitution.label',
@@ -574,6 +583,8 @@ class EditItemsPage extends Component {
             <form onSubmit={handleSubmit}>
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stockMovementId: values.stockMovementId,
+                hasStockList: !!_.get(values.stocklist, 'id'),
+                translate: this.props.translate,
                 reasonCodes: this.props.reasonCodes,
                 onResponse: this.saveNewItems,
                 revertItem: this.revertItem,
