@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<changeSet author="jmiranda (generated)" id="1551120163248-1">
+    <preConditions onFail="MARK_RAN">
+        <not>
+            <columnExists tableName="picklist_item" columnName="sort_order"/>
+        </not>
+    </preConditions>
+    <addColumn tableName="picklist_item">
+        <column name="sort_order" type="INT"/>
+    </addColumn>
+</changeSet>
+<changeSet author="jmiranda (generated)" id="1551120163248-2">
+    <preConditions onFail="MARK_RAN">
+        <not>
+            <columnExists tableName="receipt_item" columnName="sort_order"/>
+        </not>
+    </preConditions>
+    <addColumn tableName="receipt_item">
+        <column name="sort_order" type="INT"/>
+    </addColumn>
+</changeSet>
+<changeSet author="jmiranda (generated)" id="1551120163248-3">
+    <preConditions onFail="MARK_RAN">
+        <not>
+            <columnExists tableName="shipment_item" columnName="sort_order"/>
+        </not>
+    </preConditions>
+    <addColumn tableName="shipment_item">
+        <column name="sort_order" type="INT"/>
+    </addColumn>
+</changeSet>
+</databaseChangeLog>
