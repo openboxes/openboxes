@@ -1093,6 +1093,7 @@ class StockMovementService {
         shipmentItem.expirationDate = inventoryItem.expirationDate
         shipmentItem.quantity = stockMovementItem.quantityRequested
         shipmentItem.recipient = stockMovementItem.recipient
+        shipmentItem.sortOrder = stockMovementItem.sortOrder
         return shipmentItem
     }
 
@@ -1151,6 +1152,7 @@ class StockMovementService {
                         picklistItem?.requisitionItem?.parentRequisitionItem?.recipient
                 shipmentItem.inventoryItem = picklistItem?.inventoryItem
                 shipmentItem.binLocation = picklistItem?.binLocation
+                shipmentItem.sortOrder = shipmentItems.size()
 
                 shipmentItems.add(shipmentItem)
             }
