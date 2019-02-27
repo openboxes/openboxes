@@ -48,7 +48,7 @@ class ModalWrapper extends Component {
           disabled={this.props.btnOpenDisabled}
           onClick={() => this.openModal()}
         >
-          <Translate id={this.props.btnOpenText} defaultMessage="Open" />
+          <Translate id={this.props.btnOpenText} defaultMessage={this.props.btnOpenDefaultText} />
         </button>
         <Modal
           isOpen={this.state.showModal}
@@ -94,7 +94,10 @@ class ModalWrapper extends Component {
                         style={this.props.btnSaveStyle}
                         disabled={this.props.btnSaveDisabled}
                       >
-                        <Translate id={this.props.btnSaveText} defaultMessage="Save" />
+                        <Translate
+                          id={this.props.btnSaveText}
+                          defaultMessage={this.props.btnSaveDefaultText}
+                        />
                       </button>
                       <button
                         type="button"
@@ -102,7 +105,10 @@ class ModalWrapper extends Component {
                         style={this.props.btnCancelStyle}
                         onClick={() => this.closeModal()}
                       >
-                        <Translate id={this.props.btnCancelText} defaultMessage="Cancel" />
+                        <Translate
+                          id={this.props.btnCancelText}
+                          defaultMessage={this.props.btnCancelDefaultText}
+                        />
                       </button>
                     </div>
                   </form>
@@ -121,6 +127,7 @@ export default ModalWrapper;
 ModalWrapper.propTypes = {
   /** Open button properties */
   btnOpenText: PropTypes.string,
+  btnOpenDefaultText: PropTypes.string,
   btnOpenClassName: PropTypes.string,
   btnOpenStyle: PropTypes.shape({}),
   btnOpenDisabled: PropTypes.bool,
@@ -142,12 +149,14 @@ ModalWrapper.propTypes = {
 
   /** Save button properties */
   btnSaveText: PropTypes.string,
+  btnSaveDefaultText: PropTypes.string,
   btnSaveClassName: PropTypes.string,
   btnSaveStyle: PropTypes.shape({}),
   btnSaveDisabled: PropTypes.bool,
 
   /** Cancel button properties */
   btnCancelText: PropTypes.string,
+  btnCancelDefaultText: PropTypes.string,
   btnCancelClassName: PropTypes.string,
   btnCancelStyle: PropTypes.shape({}),
 
@@ -169,6 +178,7 @@ ModalWrapper.propTypes = {
 
 ModalWrapper.defaultProps = {
   btnOpenText: 'default.button.open.label',
+  btnOpenDefaultText: 'Open',
   btnOpenClassName: 'btn btn-outline-primary',
   btnOpenStyle: {},
   btnOpenDisabled: false,
@@ -181,11 +191,13 @@ ModalWrapper.defaultProps = {
   btnContainerStyle: {},
 
   btnSaveText: 'default.button.save.label',
+  btnSaveDefaultText: 'Save',
   btnSaveClassName: 'btn btn-outline-success',
   btnSaveStyle: {},
   btnSaveDisabled: false,
 
   btnCancelText: 'default.button.cancel.label',
+  btnCancelDefaultText: 'Cancel',
   btnCancelClassName: 'btn btn-outline-secondary',
   btnCancelStyle: {},
 

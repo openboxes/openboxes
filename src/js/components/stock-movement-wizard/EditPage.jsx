@@ -121,6 +121,7 @@ const FIELDS = {
           onOpen: () => reviseRequisitionItems(values),
           productCode: fieldValue.productCode,
           btnOpenText: `default.${fieldValue.substitutionStatus}.label`,
+          btnOpenDefaultText: `${fieldValue.substitutionStatus}`,
           btnOpenDisabled: fieldValue.substitutionStatus === 'NO' || fieldValue.statusCode === 'SUBSTITUTED',
           btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus || 'HIDDEN'],
           rowIndex,

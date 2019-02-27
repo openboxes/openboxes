@@ -102,6 +102,7 @@ const FIELDS = {
           subfield,
           stockMovementId,
           btnOpenText: fieldValue.hasChangedPick ? '' : 'default.button.edit.label',
+          btnOpenDefaultText: fieldValue.hasChangedPick ? '' : 'Edit',
           btnOpenClassName: fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse,
           reasonCodes,
@@ -123,6 +124,7 @@ const FIELDS = {
           subfield,
           stockMovementId,
           btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'stockMovement.adjust.label',
+          btnOpenDefaultText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse,
           bins,
@@ -185,7 +187,7 @@ class PickPage extends Component {
     this.props.showSpinner();
 
     if (!this.props.reasonCodesFetched || forceFetch) {
-      this.fetchData(this.props.fetchReasonCodes);
+      this.props.fetchReasonCodes();
     }
 
     this.fetchLineItems()
@@ -206,18 +208,6 @@ class PickPage extends Component {
           sorted: false,
         }, () => this.fetchBins());
       })
-      .catch(() => this.props.hideSpinner());
-  }
-
-  /**
-   * Fetches data using function given as an argument.
-   * @param {function} fetchFunction
-   * @public
-   */
-  fetchData(fetchFunction) {
-    this.props.showSpinner();
-    fetchFunction()
-      .then(() => this.props.hideSpinner())
       .catch(() => this.props.hideSpinner());
   }
 

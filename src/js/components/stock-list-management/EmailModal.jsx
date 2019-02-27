@@ -120,7 +120,9 @@ class EmailModal extends Component {
       <ModalWrapper
         title="stockListManagement.sendMailModalTitle.label"
         btnOpenText="default.button.email.label"
+        btnOpenDefaultText="Email"
         btnSaveText="default.button.send.label"
+        btnSaveDefaultText="Send"
         btnOpenClassName="btn btn-outline-secondary btn-xs mr-1"
         onOpen={this.onOpen}
         onSave={this.onSave}
