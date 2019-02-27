@@ -37,7 +37,7 @@
   "homepage": "https://github.com/openboxes/openboxes#readme",
   "dependencies": {
     "axios": "0.18.0",
-    "bootstrap": "4.1.3",
+    "bootstrap": "4.3.1",
     "final-form": "4.9.1",
     "final-form-arrays": "1.0.4",
     "font-awesome": "4.7.0",
