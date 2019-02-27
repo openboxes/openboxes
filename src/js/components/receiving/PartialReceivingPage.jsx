@@ -322,6 +322,7 @@ const FIELDS = {
         flexWidth: '1',
         attributes: {
           btnOpenText: 'partialReceiving.editLine.label',
+          btnOpenDefaultText: 'Edit line',
           title: 'partialReceiving.editLine.label',
           className: 'btn btn-outline-primary',
         },

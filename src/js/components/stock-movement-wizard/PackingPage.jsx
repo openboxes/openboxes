@@ -112,6 +112,7 @@ const FIELDS = {
         attributes: {
           title: 'stockMovement.splitLine.label',
           btnOpenText: 'stockMovement.splitLine.label',
+          btnOpenDefaultText: 'Split line',
           btnOpenClassName: 'btn btn-outline-success',
         },
         getDynamicAttr: ({

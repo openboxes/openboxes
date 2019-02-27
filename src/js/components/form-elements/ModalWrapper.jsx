@@ -178,7 +178,7 @@ ModalWrapper.propTypes = {
 
 ModalWrapper.defaultProps = {
   btnOpenText: 'default.button.open.label',
-  btnOpenDefaultText: 'default.button.open.label',
+  btnOpenDefaultText: 'Open',
   btnOpenClassName: 'btn btn-outline-primary',
   btnOpenStyle: {},
   btnOpenDisabled: false,
@@ -191,13 +191,13 @@ ModalWrapper.defaultProps = {
   btnContainerStyle: {},
 
   btnSaveText: 'default.button.save.label',
-  btnSaveDefaultText: 'default.button.save.label',
+  btnSaveDefaultText: 'Save',
   btnSaveClassName: 'btn btn-outline-success',
   btnSaveStyle: {},
   btnSaveDisabled: false,
 
   btnCancelText: 'default.button.cancel.label',
-  btnCancelDefaultText: 'default.button.cancel.label',
+  btnCancelDefaultText: 'Cancel',
   btnCancelClassName: 'btn btn-outline-secondary',
   btnCancelStyle: {},
 
