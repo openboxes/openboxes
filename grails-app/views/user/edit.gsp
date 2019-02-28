@@ -103,8 +103,7 @@
                                                     code="default.timezone.label" default="Timezone" /></label></td>
                                             <td valign="top" class="value">
                                                 <g:selectTimezone id="timezone" name="timezone" value="${userInstance?.timezone}"
-                                                                  noSelection="['':'']"
-                                                                  class="chzn-select-deselect text large"/>
+                                                                  noSelection="['':'']"/>
                                             </td>
                                         </tr>
                                     </tbody>
