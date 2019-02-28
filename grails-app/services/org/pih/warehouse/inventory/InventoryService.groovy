@@ -91,7 +91,7 @@ class InventoryService implements ApplicationContextAware {
 
         // Should not allow user to disable a bin location that has items in it
         if (!location.active && location.parentLocation) {
-            List binLocationEntries = getQuantityByBinLocation(location.parentLocation, location)
+			List binLocationEntries = getQuantityByBinLocation(location.parentLocation, location)
             if (!binLocationEntries.isEmpty()) {
                 location.errors.reject("location.cannotDisableBinLocationWithStock.message")
                 throw new ValidationException("cannot save location", location.errors)
@@ -1526,10 +1526,17 @@ class InventoryService implements ApplicationContextAware {
         return binLocations
     }
 
-    List getQuantityByBinLocation(Location location, Location binLocation) {
-        List transactionEntries = getTransactionEntriesByInventoryAndBinLocation(location?.inventory, binLocation)
-        List binLocations = getQuantityByBinLocation(transactionEntries)
-        return binLocations
+	/**
+	 * Should be used with caution (i.e. not in a loop) since it requires an expensive call to
+	 * calculate all quantity within a parent location.
+	 *
+	 * @param location
+	 * @param internalLocation
+	 * @return
+	 */
+    List getQuantityByBinLocation(Location location, Location internalLocation) {
+		List binLocationEntries = getQuantityByBinLocation(location.parentLocation)
+		return binLocationEntries.findAll { it.binLocation == internalLocation }
     }
 
     List getProductQuantityByBinLocation(Location location, Product product) {
