@@ -44,15 +44,80 @@ class UrlMappings {
 
         "/api/stockMovementItems"(parseRequest: true) {
             controller = "stockMovementItemApi"
-            action = [GET:"list", POST: "update"]
+            action = [GET:"list"]
         }
 
         "/api/stockMovementItems/$id"(parseRequest: true) {
             controller = "stockMovementItemApi"
-            action = [GET:"read", POST: "update"]
+            action = [GET:"read"]
+        }
+
+        "/api/stockMovementItems/$id/updatePicklist"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [POST: "updatePicklist"]
+        }
+
+        "/api/stockMovementItems/$id/createPicklist"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [POST: "createPicklist"]
+        }
+
+        "/api/stockMovementItems/$id/clearPicklist"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [POST: "clearPicklist"]
+        }
+
+        "/api/stockMovementItems/$id/substituteItem"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [POST: "substituteItem"]
+        }
+
+        "/api/stockMovementItems/$id/revertItem"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [POST: "revertItem"]
+        }
+
+        "/api/stockMovementItems/$id/cancelItem"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [POST: "cancelItem"]
+        }
+
+        "/api/stockMovementItems/$id/removeItem"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [DELETE: "removeItem"]
         }
 
         // Stock Movement API
+
+        "/api/stockMovements/$id/removeAllItems"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [DELETE: "removeAllItems"]
+        }
+
+        "/api/stockMovements/$id/reviseItems"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "reviseItems"]
+        }
+
+        "/api/stockMovements/$id/updateItems"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "updateItems"]
+        }
+
+        "/api/stockMovements/$id/updateShipmentItems"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "updateShipmentItems"]
+        }
+
+        "/api/stockMovements/$id/updateRequisition"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "updateRequisition"]
+        }
+
+        "/api/stockMovements/$id/updateShipment"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "updateShipment"]
+        }
 
         "/api/stockMovements/importPickListItems/$id"(parseRequest: true) {
             controller = "stockMovementApi"

@@ -431,11 +431,9 @@ class AddItemsPage extends Component {
           expirationDate: item.expirationDate,
           'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
           sortOrder: item.sortOrder,
-          delete: item.quantityRequested && item.quantityRequested !== '0' ? 'false' : 'true',
         })),
       );
     }
-
 
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
@@ -450,7 +448,6 @@ class AddItemsPage extends Component {
         quantityRequested: item.quantityRequested,
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
         sortOrder: item.sortOrder,
-        delete: item.quantityRequested && item.quantityRequested !== '0' ? 'false' : 'true',
       })),
     );
   }
@@ -701,7 +698,7 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItems(lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -722,7 +719,7 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -848,16 +845,9 @@ class AddItemsPage extends Component {
    * @public
    */
   removeItem(itemId) {
-    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
-    const payload = {
-      id: this.state.values.stockMovementId,
-      lineItems: [{
-        id: itemId,
-        delete: 'true',
-      }],
-    };
+    const removeItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/removeItem`;
 
-    return apiClient.post(removeItemsUrl, payload)
+    return apiClient.delete(removeItemsUrl)
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error('error.deleteRequisitionItem.label'));
@@ -869,16 +859,9 @@ class AddItemsPage extends Component {
    * @public
    */
   removeAll() {
-    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
-    const payload = {
-      id: this.state.values.stockMovementId,
-      lineItems: _.map(this.state.values.lineItems, item => ({
-        id: item.id,
-        delete: 'true',
-      })),
-    };
+    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
 
-    return apiClient.post(removeItemsUrl, payload)
+    return apiClient.delete(removeItemsUrl)
       .catch(() => {
         this.fetchAndSetLineItems();
         this.props.hideSpinner();

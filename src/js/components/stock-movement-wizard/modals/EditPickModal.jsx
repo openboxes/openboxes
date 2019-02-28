@@ -159,7 +159,7 @@ class EditPickModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}`;
+    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}/updatePicklist`;
     const payload = {
       picklistItems: _.map(values.availableItems, avItem => ({
         id: avItem.id || '',
@@ -170,15 +170,14 @@ class EditPickModal extends Component {
       })),
     };
 
-    return apiClient.post(url, payload).then(() => {
-      apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
-        .then((resp) => {
-          const { pickPageItems } = resp.data.data.pickPage;
-          this.props.onResponse(pickPageItems);
-          this.props.hideSpinner();
-        })
-        .catch(() => { this.props.hideSpinner(); });
-    }).catch(() => { this.props.hideSpinner(); });
+    return apiClient.post(url, payload)
+      .then((resp) => {
+        const pickPageItem = resp.data.data;
+
+        this.state.attr.onResponse(pickPageItem);
+        this.props.hideSpinner();
+      })
+      .catch(() => { this.props.hideSpinner(); });
   }
 
   /**
@@ -244,6 +243,4 @@ EditPickModal.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  /** Function updating page on which modal is located called when user saves changes */
-  onResponse: PropTypes.func.isRequired,
 };
