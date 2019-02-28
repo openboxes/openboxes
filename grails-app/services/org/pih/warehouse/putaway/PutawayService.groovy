@@ -39,9 +39,11 @@ class PutawayService {
         List<Location> internalLocations = locationService.getInternalLocations(location,
                 [ActivityCode.RECEIVE_STOCK] as ActivityCode[])
 
+        List binLocationEntries = inventoryService.getQuantityByBinLocation(location)
+
         log.info "internalLocations " + internalLocations
         internalLocations.each { internalLocation ->
-            List putawayItemsTemp = inventoryService.getQuantityByBinLocation(location, internalLocation)
+            List putawayItemsTemp = binLocationEntries.findAll { it.binLocation == internalLocation }
             if (putawayItemsTemp) {
                 putawayItemsTemp = putawayItemsTemp.collect {
 

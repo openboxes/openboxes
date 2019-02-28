@@ -73,12 +73,7 @@ class ReportController {
         long startTime = System.currentTimeMillis()
         log.info "Export by bin location " + params
 		Location location = Location.get(session.warehouse.id)
-        Location binLocation = (params.binLocation) ? Location.findByParentLocationAndNameLike(location, "%" + params.binLocation + "%") : null
-
-
-
-		List binLocations = inventoryService.getQuantityByBinLocation(location, binLocation)
-
+		List binLocations = inventoryService.getQuantityByBinLocation(location)
         def products = binLocations.collect { it.product.productCode }.unique()
         binLocations = binLocations.collect { [productCode: it.product.productCode,
                                                productName: it.product.name,
@@ -91,8 +86,7 @@ class ReportController {
 
         if (params.downloadFormat == "csv") {
             String csv = ReportUtil.getCsvForListOfMapEntries(binLocations)
-            String binLocationName = binLocation ? binLocation?.name : "All Bins"
-            def filename = "bin-location-report-" + location.name + "-" + binLocationName + ".csv"
+            def filename = "Bin Locations - ${location.name}.csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: csv)
             return
