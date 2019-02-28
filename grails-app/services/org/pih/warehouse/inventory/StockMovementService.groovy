@@ -29,7 +29,6 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
@@ -1208,17 +1207,6 @@ class StockMovementService {
         }
 
         shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
-
-        // Create temporary receiving area for the Partial Receipt process
-        if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && stockMovement.destination.hasBinLocationSupport()) {
-            LocationType locationType = LocationType.findByName("Receiving")
-            if (!locationType) {
-                throw new IllegalArgumentException("Unable to find location type 'Receiving'")
-            }
-
-            locationService.findOrCreateInternalLocation(stockMovement?.identifier,
-                    stockMovement.identifier, locationType, stockMovement.destination)
-        }
     }
 
 
