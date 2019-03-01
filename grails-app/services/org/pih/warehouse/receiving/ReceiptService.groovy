@@ -17,10 +17,12 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -32,6 +34,7 @@ class ReceiptService {
     def inventoryService
     def locationService
     def identifierService
+    def grailsApplication
 
     PartialReceipt getPartialReceipt(String id, String stepNumber) {
         Shipment shipment = Shipment.get(id)
@@ -412,6 +415,19 @@ class ReceiptService {
             if (item.quantityReceived > quantityAvailable) {
                 throw new IllegalStateException("Insufficient qty of product ${item.product?.productCode} ${item.product?.name} lot: ${item.inventoryItem?.lotNumber ?: ""} in bin: ${item.binLocation?.name ?: ""}")
             }
+        }
+    }
+
+    void createTemporaryReceivingBin(Requisition requisition) {
+        // Create temporary receiving area for the Partial Receipt process
+        if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && requisition?.destination?.hasBinLocationSupport()) {
+            LocationType locationType = LocationType.findByName("Receiving")
+            if (!locationType) {
+                throw new IllegalArgumentException("Unable to find location type 'Receiving'")
+            }
+
+            locationService.findOrCreateInternalLocation(requisition.requestNumber,
+                    requisition.requestNumber, locationType, requisition.destination)
         }
     }
 }
