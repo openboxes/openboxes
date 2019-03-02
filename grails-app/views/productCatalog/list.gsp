@@ -16,7 +16,7 @@
 
             <div class="button-bar">
                 <g:link class="button" action="list">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'text_list_bullets.png')}" />&nbsp;
+                    <img src="${resource(dir: 'images/icons/silk', file: 'table.png')}" />&nbsp;
                     <warehouse:message code="default.list.label" args="[entityName]"/>
                 </g:link>
                 <g:isSuperuser>
