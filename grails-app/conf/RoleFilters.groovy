@@ -30,6 +30,7 @@ class RoleFilters {
             'console':['index','execute'],
             'inventory': ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed'],
             'inventoryItem': ['adjustStock', 'transferStock'],
+            'productCatalog':['create', 'importProductCatalog'],
             '*': ['delete'],
             'user': ['impersonate']
     ]
