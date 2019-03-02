@@ -333,7 +333,7 @@ class LocationController {
 		if (location.locations) {
 			def date = new Date();
 			response.setHeader("Content-disposition",
-					"attachment; filename='BinLocations-${location?.name}-${date.format("yyyyMMdd-hhmmss")}.csv'")
+					"attachment; filename=\"BinLocations-${location?.name}-${date.format("yyyyMMdd-hhmmss")}.csv\"")
 			response.contentType = "text/csv"
     		def csvrows = location.locations.collect { binLocation ->
 				return [

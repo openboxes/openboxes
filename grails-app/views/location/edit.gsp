@@ -372,7 +372,7 @@
                             <label for="name"><warehouse:message code="location.locationType.label" /></label>
                         </td>
                         <td valign="top" class="value">
-                            <g:set var="binLocationTypes" value="${org.pih.warehouse.core.LocationType.internalLocationTypes}"/>
+                            <g:set var="binLocationTypes" value="${org.pih.warehouse.core.LocationType.internalLocationTypes.sort()}"/>
                             <g:set var="defaultBinLocationType" value="${org.pih.warehouse.core.LocationType.defaultInternalLocationType}"/>
                             <g:select name="locationType.id" from="${binLocationTypes}" class="chzn-select-deselect"
                                       value="${binLocation?.locationType?.id?:defaultBinLocationType?.id}"
