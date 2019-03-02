@@ -13,9 +13,7 @@
         <g:each var="productCatalogItem" in="${productCatalogItems}" status="status">
             <tr>
                 <td>
-                    <g:link controller="product" action="edit" id="${productCatalogItem?.product?.id}">
-                        ${productCatalogItem?.product?.productCode}
-                    </g:link>
+                    ${productCatalogItem?.product?.productCode}
                 </td>
                 <td>
                     <g:link controller="product" action="edit" id="${productCatalogItem?.product?.id}">

@@ -21,11 +21,24 @@
         <g:render template="summary" model="[productInstance:productInstance]"/>
 
         <div class="button-bar">
-            <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[entityName]"/></g:link>
-            <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[entityName]"/></g:link>
-            <a href="#" class="button button-dialog" data-dialog="#dialog-import-data" action="importCsv"><warehouse:message code="default.import.label" args="[warehouse.message(code: 'productCatalogItems.label', default: 'Product Catalog Items')]"/></a>
+            <g:link class="button" action="list">
+                <img src="${resource(dir: 'images/icons/silk', file: 'table.png')}" />&nbsp;
+                <warehouse:message code="default.list.label" args="[entityName]"/>
+            </g:link>
+            <g:isSuperuser>
+                <g:link class="button" action="create">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                    <warehouse:message code="default.create.label" args="[entityName]"/>
+                </g:link>
+                <a href="#" class="button button-dialog" data-dialog="#dialog-import-data" action="importCsv">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'table_add.png')}" />&nbsp;
+                    <warehouse:message code="default.import.label" args="[warehouse.message(code: 'productCatalogItems.label', default: 'Product Catalog Items')]"/>
+                </a>
+            </g:isSuperuser>
             <g:link class="button" action="exportProductCatalog" id="${productCatalogInstance?.id}">
-                <warehouse:message code="default.export.label" args="[entityName]"/></g:link>
+                <img src="${resource(dir: 'images/icons/silk', file: 'table_go.png')}" />&nbsp;
+                <warehouse:message code="default.export.label" args="[entityName]"/>
+            </g:link>
 
         </div>
 
