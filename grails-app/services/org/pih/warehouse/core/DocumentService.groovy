@@ -156,9 +156,9 @@ class DocumentService {
 	 * @param shipmentInstance
 	 * @return
 	 */
-	OutputStream generateChecklistAsPdf() {
+	void generateChecklistAsPdf(OutputStream outputStream) {
 		WordprocessingMLPackage wordMLPackage = generateChecklist();
-		return convertToPdf(wordMLPackage);
+		convertToPdf(outputStream);
 	}
 
 
@@ -249,9 +249,9 @@ class DocumentService {
 	 * @param shipmentInstance
 	 * @return
 	 */
-	OutputStream generateLetterAsPdf(Shipment shipmentInstance) {
+	void generateLetterAsPdf(Shipment shipmentInstance, OutputStream outputStream) {
 		WordprocessingMLPackage wordMLPackage = generateLetter(shipmentInstance);
-		return convertToPdf(wordMLPackage);
+		convertToPdf(wordMLPackage, outputStream);
 	}
 
 
@@ -573,7 +573,7 @@ class DocumentService {
 	 * @param wordMLPackage
 	 * @return
 	 */
-	OutputStream convertToPdf(WordprocessingMLPackage wordMLPackage) {
+	void convertToPdf(WordprocessingMLPackage wordMLPackage, OutputStream outputStream) {
 		PdfConversion conversion = new Conversion(wordMLPackage);
 		conversion.output(outputStream, null);
 	}
