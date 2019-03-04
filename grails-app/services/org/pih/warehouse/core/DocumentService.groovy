@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.core
 
+import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment;
@@ -574,11 +575,37 @@ class DocumentService {
 	 */
 	OutputStream convertToPdf(WordprocessingMLPackage wordMLPackage) {
 		PdfConversion conversion = new Conversion(wordMLPackage);
+		conversion.output(outputStream, null);
+	}
 
-		((Conversion)conversion).setSaveFO(new File(inputfilepath + ".fo"));
-		OutputStream outputStream = new FileOutputStream(inputfilepath + ".pdf");
-		conversion.output(outputStream);
-		return outputStream;
+	void generateExcel(OutputStream outputStream, List<Map> data) {
+		try {
+			Workbook workbook = new HSSFWorkbook();
+			HSSFSheet sheet = workbook.createSheet();
+			createExcelHeader(sheet, 0, data.get(0).keySet().toList());
+			data.eachWithIndex { Map dataRow, index ->
+				createExcelRow(sheet, index+1, dataRow);
+			}
+			workbook.write(outputStream)
+			outputStream.close()
+		} catch (IOException e) {
+			log.error("IO exception while generating excel file")
+		}
+	}
+
+	void createExcelHeader(HSSFSheet sheet, int rowNumber, List columnNames) {
+		Row excelRow = sheet.createRow(rowNumber);
+		columnNames.eachWithIndex { columnName, index ->
+			excelRow.createCell(index).setCellValue(columnName);
+		}
+	}
+
+	void createExcelRow(HSSFSheet sheet, int rowNumber, Map dataRow) {
+		Row excelRow = sheet.createRow(rowNumber);
+		dataRow.keySet().eachWithIndex { columnName, index ->
+			def cellValue = dataRow.get(columnName)?:""
+			excelRow.createCell(index).setCellValue(cellValue);
+		}
 	}
 
 

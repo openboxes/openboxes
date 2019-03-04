@@ -123,5 +123,24 @@ class ProductSupplier implements Comparable<ProductSupplier>{
                         id <=> obj.id
     }
 
-
+    static PROPERTIES = [
+            "id",
+            "product.productCode",
+            "productCode",
+            "name",
+            "description",
+            "supplier.id",
+            "supplier.name",
+            "supplierCode",
+            "supplierName",
+            "manufacturer.id",
+            "manufacturer.name",
+            "manufacturerCode",
+            "manufacturerName",
+            "unitPrice",
+            "standardLeadTimeDays",
+            "preferenceTypeCode",
+            "ratingTypeCode",
+            "comments"
+    ]
 }

@@ -3,6 +3,15 @@
         <tbody>
             <tr class="prop">
                 <td class="name">
+                    <label><warehouse:message code="location.label"/></label>
+                </td>
+                <td class="value">
+                    ${session?.warehouse?.name }
+                    <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">
                     <label><warehouse:message code="inventory.uploadAFileToImport.label"/></label>
                 </td>
                 <td class="value">
@@ -15,63 +24,76 @@
                     <label><warehouse:message code="default.type.label"/></label>
                 </td>
                 <td class="value">
-
-
-
-
-
-                    <%--
                     <div>
-                        <g:radio name="type" value="product" checked="${params.type=='product'}"/>
-                        <label><warehouse:message code="import.product.label" default="Products"/></label>
-                        <g:link controller="batch" action="downloadTemplate" params="[type:'product']">
-                            <warehouse:message code="default.template.label" default="Download template"/>
-                        </g:link>
-                    </div>
-                    --%>
-                    <div>
-                        <g:radio name="type" value="inventory" checked="${params.type=='inventory'}"/>
-                        <label><warehouse:message code="import.inventory.label" default="Inventory"/></label>
+                        <label>
+                            <g:radio name="type" value="inventory" checked="${params.type=='inventory'}"/>
+                            <warehouse:message code="import.inventory.label" default="Inventory"/>
+                        </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'inventory.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
                     <div>
-                        <g:radio name="type" value="inventoryLevel" checked="${params.type=='inventoryLevel'}"/>
-                        <label><warehouse:message code="import.inventoryLevel.label" default="Inventory levels"/></label>
+                        <label>
+                            <g:radio name="type" value="inventoryLevel" checked="${params.type=='inventoryLevel'}"/>
+                            <warehouse:message code="import.inventoryLevel.label" default="Inventory levels"/>
+                        </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'inventoryLevels.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
                     <div>
-                        <g:radio name="type" value="location" checked="${params.type=='location'}"/>
-                        <label><warehouse:message code="locations.label" default="Locations"/></label>
+                        <label>
+                            <g:radio name="type" value="location" checked="${params.type=='location'}"/>
+                            <warehouse:message code="locations.label" default="Locations"/>
+                        </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'locations.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
                     <div>
-                        <g:radio name="type" value="person" checked="${params.type=='person'}"/>
-                        <label><warehouse:message code="persons.label" default="People"/></label>
+                        <label>
+                            <g:radio name="type" value="person" checked="${params.type=='person'}"/>
+                            <warehouse:message code="persons.label" default="People"/>
+                        </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'persons.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
+                    <%--
                     <div>
-                        <g:radio name="type" value="productPrice" checked="${params.type=='productPrice'}" disabled="true"/>
-                        <label><warehouse:message code="import.productPrice.label" default="Product pricing"/></label>
-                        <warehouse:message code="default.comingSoon.label" default="Coming soon!"/>
+                        <label>
+                            <g:radio name="type" value="product" checked="${params.type=='Product'}"/>
+                            ${g.message(code:'products.label')}
+                        </label>
+                        <g:link controller="batch" action="downloadExcel" params="[type:'Product']">
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                        </g:link>
+                    </div>
+                    --%>
+                    <div>
+                        <label>
+                            <g:radio name="type" value="productSupplier" checked="${params.type=='productSupplier'}"/>
+                            ${g.message(code:'productSuppliers.label')}
+                        </label>
+                        <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplier']">
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                        </g:link>
                     </div>
                     <div>
-                        <g:radio name="type" value="user" checked="${params.type=='user'}"/>
-                        <label><warehouse:message code="users.label" default="Users"/></label>
+                        <label>
+                            <g:radio name="type" value="user" checked="${params.type=='user'}"/>
+                            <warehouse:message code="users.label" default="Users"/>
+                        </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'users.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
                     <div>
-                        <g:radio name="type" value="userLocation" checked="${params.type=='userLocation'}"/>
-                        <label><warehouse:message code="userLocations.label" default="User Locations"/></label>
+                        <label>
+                            <g:radio name="type" value="userLocation" checked="${params.type=='userLocation'}"/>
+                            <warehouse:message code="userLocations.label" default="User Locations"/>
+                        </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'userLocations.xls']">
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
@@ -81,15 +103,6 @@
                                   %{--from="['product':'Product','inventory':'Inventory','inventoryLevel':'Inventory levels','productPrice':'Product price']"--}%
                                   %{--optionKey="${{it.key}}" optionValue="${{it.value}}" noSelection="['':'']" value="${params?.type}"></g:select>--}%
                     %{--</div>--}%
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="name">
-                    <label><warehouse:message code="inventory.label"/></label>
-                </td>
-                <td class="value">
-                    ${session?.warehouse?.name }
-                    <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
                 </td>
             </tr>
             <tr class="prop">

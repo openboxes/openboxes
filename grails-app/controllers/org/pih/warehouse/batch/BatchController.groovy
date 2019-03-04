@@ -31,6 +31,8 @@ class BatchController {
     def documentService
 	def inventoryService
 	def importService
+	def grailsApplication
+	def genericApiService
 
 	def index = { }
 
@@ -49,6 +51,19 @@ class BatchController {
         }
     }
 
+
+	def downloadExcel = {
+		println "Download XLS template " + params
+
+		def objects = genericApiService.getList(params.type, [:])
+		def domainClass = genericApiService.getDomainClass(params.type)
+		def data = dataService.transformObjects(objects, domainClass.PROPERTIES)
+
+		response.contentType = "application/vnd.ms-excel"
+		response.setHeader 'Content-disposition', "attachment; filename=\"${params.type}.xls\""
+		documentService.generateExcel(response.outputStream, data)
+		response.outputStream.flush()
+	}
 
     def downloadTemplate = {
         println "Download XLS template " + params
