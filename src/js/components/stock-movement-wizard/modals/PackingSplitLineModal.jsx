@@ -26,34 +26,34 @@ const FIELDS = {
           binLocationName: lineItem.binLocationName,
           recipient: lineItem.recipient,
         })}
-      > <Translate id="default.button.addLine.label" defaultMessage="Add line" />
+      > <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
     type: ArrayField,
     fields: {
       productName: {
         type: LabelField,
-        label: 'stockMovement.productName.label',
+        label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
       },
       lotNumber: {
         type: LabelField,
-        label: 'stockMovement.lot.label',
+        label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
       },
       expirationDate: {
         type: LabelField,
-        label: 'stockMovement.expiry.label',
+        label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
       },
       binLocationName: {
         type: LabelField,
-        label: 'stockMovement.binLocation.label',
+        label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin Location',
       },
       quantityShipped: {
         type: TextField,
-        label: 'stockMovement.quantityShipped.label',
+        label: 'react.stockMovement.quantityShipped.label',
         defaultMessage: 'Quantity shipped',
         fixedWidth: '150px',
         attributes: {
@@ -62,7 +62,7 @@ const FIELDS = {
       },
       recipient: {
         type: SelectField,
-        label: 'stockMovement.recipient.label',
+        label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
         fieldKey: '',
         attributes: {
@@ -80,13 +80,13 @@ const FIELDS = {
       },
       palletName: {
         type: TextField,
-        label: 'stockMovement.pallet.label',
+        label: 'react.stockMovement.pallet.label',
         defaultMessage: 'Pallet',
         fixedWidth: '150px',
       },
       boxName: {
         type: TextField,
-        label: 'stockMovement.box.label',
+        label: 'react.stockMovement.box.label',
         defaultMessage: 'Box',
         fixedWidth: '150px',
       },
@@ -115,7 +115,7 @@ class PackingSplitLineModal extends Component {
     return (
       <div>
         <div className="font-weight-bold pb-2">
-          <Translate id="stockMovement.quantityPacked.label" defaultMessage="Qty Packed" />: {PackingSplitLineModal.calculatePacked(values.splitLineItems)}
+          <Translate id="react.stockMovement.quantityPacked.label" defaultMessage="Qty Packed" />: {PackingSplitLineModal.calculatePacked(values.splitLineItems)}
         </div>
         <hr />
       </div>
@@ -179,10 +179,10 @@ class PackingSplitLineModal extends Component {
 
     _.forEach(values.splitLineItems, (item, key) => {
       if (shippedQty !== splitItemsQty) {
-        errors.splitLineItems[key] = { quantityShipped: 'errors.packingQty.label' };
+        errors.splitLineItems[key] = { quantityShipped: 'react.stockMovement.errors.packingQty.label' };
       }
       if (item.quantityShipped < 0) {
-        errors.splitLineItems[key] = { quantityShipped: 'errors.negativeQtyShipped.label' };
+        errors.splitLineItems[key] = { quantityShipped: 'react.stockMovement.errors.negativeQtyShipped.label' };
       }
     });
 
@@ -204,7 +204,7 @@ class PackingSplitLineModal extends Component {
       >
         <div>
           <div className="font-weight-bold">
-            <Translate id="stockMovement.totalQuantity.label" defaultMessage="Total quantity" />: {this.state.attr.lineItem.quantityShipped}
+            <Translate id="react.stockMovement.totalQuantity.label" defaultMessage="Total quantity" />: {this.state.attr.lineItem.quantityShipped}
           </div>
         </div>
       </ModalWrapper>

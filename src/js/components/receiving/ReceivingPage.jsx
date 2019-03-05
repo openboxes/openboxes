@@ -13,7 +13,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import PartialReceivingPage from './PartialReceivingPage';
 import ReceivingCheckScreen from './ReceivingCheckScreen';
 import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
+import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
 function validate(values) {
@@ -21,22 +21,22 @@ function validate(values) {
   errors.containers = [];
 
   if (!values.dateDelivered) {
-    errors.dateDelivered = 'error.requiredField.label';
+    errors.dateDelivered = 'react.default.error.requiredField.label';
   } else {
     const dateDelivered = moment(values.dateDelivered, 'MM/DD/YYYY HH:mm Z');
     if (moment().diff(dateDelivered) < 0) {
-      errors.dateDelivered = 'error.futureDate.label';
+      errors.dateDelivered = 'react.partialReceiving.error.futureDate.label';
     }
     const dateShipped = values.dateShipped ? moment(values.dateShipped, 'MM/DD/YYYY HH:mm Z') : null;
     if (dateShipped && dateDelivered < dateShipped) {
-      errors.dateDelivered = 'error.dateBeforeShipment.label';
+      errors.dateDelivered = 'react.partialReceiving.error.dateBeforeShipment.label';
     }
   }
   _.forEach(values.containers, (container, key) => {
     errors.containers[key] = { shipmentItems: [] };
     _.forEach(container.shipmentItems, (item, key2) => {
       if (item.quantityReceiving < 0) {
-        errors.containers[key].shipmentItems[key2] = { quantityReceiving: 'error.quantityToReceiveNegative.label' };
+        errors.containers[key].shipmentItems[key2] = { quantityReceiving: 'react.partialReceiving.error.quantityToReceiveNegative.label' };
       }
     });
   });
@@ -66,7 +66,25 @@ class ReceivingPage extends Component {
   }
 
   componentDidMount() {
-    this.fetchPartialReceiptCandidates();
+    this.props.fetchTranslations('', 'partialReceiving');
+
+    if (this.props.partialReceivingTranslationsFetched) {
+      this.dataFetched = true;
+
+      this.fetchPartialReceiptCandidates();
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.locale && this.props.locale !== nextProps.locale) {
+      this.props.fetchTranslations(nextProps.locale, 'partialReceiving');
+    }
+
+    if (nextProps.partialReceivingTranslationsFetched && !this.dataFetched) {
+      this.dataFetched = true;
+
+      this.fetchPartialReceiptCandidates();
+    }
   }
 
   /**
@@ -139,6 +157,8 @@ class ReceivingPage extends Component {
     ];
   }
 
+  dataFetched = false;
+
   /**
    * Shows transition confirmation dialog if there are items with the same code.
    * @param {function} onConfirm
@@ -146,14 +166,14 @@ class ReceivingPage extends Component {
    */
   confirmReceive(formValues) {
     confirmAlert({
-      title: this.props.translate('message.confirmReceive.label', 'Confirm receiving'),
+      title: this.props.translate('react.partialReceiving.message.confirmReceive.label', 'Confirm receiving'),
       message: this.props.translate(
-        'confirmReceive.message',
+        'react.partialReceiving.confirmReceive.message',
         'Are you sure you want to receive? There are some lines with empty bin locations.',
       ),
       buttons: [
         {
-          label: this.props.translate('default.yes.label', 'Yes'),
+          label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => this.save({
             ...formValues,
             receiptStatus: 'COMPLETED',
@@ -164,7 +184,7 @@ class ReceivingPage extends Component {
           }),
         },
         {
-          label: this.props.translate('default.no.label', 'No'),
+          label: this.props.translate('react.default.no.label', 'No'),
         },
       ],
     });
@@ -328,9 +348,13 @@ class ReceivingPage extends Component {
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  locale: state.session.activeLanguage,
+  partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
 });
 
-export default connect(mapStateToProps, { showSpinner, hideSpinner })(ReceivingPage);
+export default connect(mapStateToProps, {
+  showSpinner, hideSpinner, fetchTranslations,
+})(ReceivingPage);
 
 ReceivingPage.propTypes = {
   /** React router's object which contains information about url varaiables and params */
@@ -343,4 +367,7 @@ ReceivingPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  locale: PropTypes.string.isRequired,
+  partialReceivingTranslationsFetched: PropTypes.bool.isRequired,
+  fetchTranslations: PropTypes.func.isRequired,
 };

@@ -15,7 +15,7 @@ import Translate from '../../../utils/Translate';
 const FIELDS = {
   reasonCode: {
     type: SelectField,
-    label: 'stockMovement.reasonFor.label',
+    label: 'react.stockMovement.reasonFor.label',
     defaultMessage: 'Reason for not fulfilling full qty',
     attributes: {
       required: true,
@@ -42,22 +42,22 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
-        label: 'stockMovement.code.label',
+        label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
       },
       productName: {
         type: LabelField,
-        label: 'stockMovement.productName.label',
+        label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
       },
       minExpirationDate: {
         type: LabelField,
-        label: 'stockMovement.expiry.label',
+        label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
       },
       quantityAvailable: {
         type: LabelField,
-        label: 'stockMovement.quantityAvailable.label',
+        label: 'react.stockMovement.quantityAvailable.label',
         defaultMessage: 'Qty Available',
         fixedWidth: '150px',
         fieldKey: '',
@@ -74,7 +74,7 @@ const FIELDS = {
       },
       quantitySelected: {
         type: TextField,
-        label: 'stockMovement.quantitySelected.label',
+        label: 'react.stockMovement.quantitySelected.label',
         defaultMessage: 'Quantity selected',
         fixedWidth: '140px',
         attributes: {
@@ -100,16 +100,16 @@ function validate(values) {
     }
 
     if (item.quantitySelected > item.quantityAvailable) {
-      errors.substitutions[key] = { quantitySelected: 'errors.higherQtySelected.label' };
+      errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.higherQtySelected.label' };
     }
     if (item.quantitySelected < 0) {
-      errors.substitutions[key] = { quantitySelected: 'errors.negativeQtySelected.label' };
+      errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.negativeQtySelected.label' };
     }
   });
 
   if (originalItem && originalItem.quantitySelected && subQty < originalItem.quantityRequested
     && !values.reasonCode) {
-    errors.reasonCode = 'error.requiredField.label';
+    errors.reasonCode = 'react.default.error.requiredField.label';
   }
   return errors;
 }
@@ -218,7 +218,7 @@ class SubstitutionsModal extends Component {
     return (
       <div>
         <div className="font-weight-bold pb-2">
-          <Translate id="stockMovement.quantitySelected.label" defaultMessage="Quantity selected" />: {_.reduce(values.substitutions, (sum, val) =>
+          <Translate id="react.stockMovement.quantitySelected.label" defaultMessage="Quantity selected" />: {_.reduce(values.substitutions, (sum, val) =>
             (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)
         }
         </div>
@@ -244,13 +244,13 @@ class SubstitutionsModal extends Component {
       >
         <div>
           <div className="font-weight-bold">
-            <Translate id="stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.lineItem.productCode}
+            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.lineItem.productCode}
           </div>
           <div className="font-weight-bold">
-            <Translate id="stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.lineItem.productName}
+            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.lineItem.productName}
           </div>
           <div className="font-weight-bold">
-            <Translate id="stockMovement.quantityRequested.label" defaultMessage="Qty Requested" />: {this.state.attr.lineItem.quantityRequested}
+            <Translate id="react.stockMovement.quantityRequested.label" defaultMessage="Qty Requested" />: {this.state.attr.lineItem.quantityRequested}
           </div>
         </div>
       </ModalWrapper>
