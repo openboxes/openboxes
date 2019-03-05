@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
+import update from 'immutability-helper';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -228,7 +229,7 @@ class EditItemsPage extends Component {
     };
 
     this.revertItem = this.revertItem.bind(this);
-    this.saveNewItems = this.saveNewItems.bind(this);
+    this.updateEditPageItem = this.updateEditPageItem.bind(this);
     this.reviseRequisitionItems = this.reviseRequisitionItems.bind(this);
     this.props.showSpinner();
   }
@@ -313,7 +314,7 @@ class EditItemsPage extends Component {
         return false;
       },
     );
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=3`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/reviseItems`;
     const payload = {
       lineItems: _.map(itemsToRevise, item => ({
         id: item.requisitionItemId,
@@ -441,21 +442,28 @@ class EditItemsPage extends Component {
 
   /**
    * Saves changes made in subsitution modal and updates data.
-   * @param {object} editPageItems
+   * @param {object} editPageItem
    * @public
    */
-  saveNewItems(editPageItems) {
+  updateEditPageItem(editPageItem) {
+    const editPageItemIndex = _.findIndex(this.state.values.editPageItems, item =>
+      item.requisitionItemId === editPageItem.requisitionItemId);
+
     this.setState({
       values: {
         ...this.state.values,
-        editPageItems: _.map(editPageItems, item => ({
-          ...item,
-          quantityAvailable: item.quantityAvailable || 0,
-          substitutionItems: _.map(item.substitutionItems, sub => ({
-            ...sub,
-            requisitionItemId: item.requisitionItemId,
-          })),
-        })),
+        editPageItems: update(this.state.values.editPageItems, {
+          [editPageItemIndex]: {
+            $set: {
+              ...editPageItem,
+              quantityAvailable: editPageItem.quantityAvailable || 0,
+              substitutionItems: _.map(editPageItem.substitutionItems, sub => ({
+                ...sub,
+                requisitionItemId: editPageItem.requisitionItemId,
+              })),
+            },
+          },
+        }),
       },
     });
   }
@@ -501,19 +509,12 @@ class EditItemsPage extends Component {
    */
   revertItem(itemId) {
     this.props.showSpinner();
-    const revertItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=3`;
-    const payload = {
-      id: this.state.values.stockMovementId,
-      lineItems: [{
-        id: itemId,
-        revert: 'true',
-      }],
-    };
+    const revertItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/revertItem`;
 
-    return apiClient.post(revertItemsUrl, payload)
+    return apiClient.post(revertItemsUrl)
       .then((response) => {
-        const { editPageItems } = response.data.data.editPage;
-        this.saveNewItems(editPageItems);
+        const editPageItem = response.data.data;
+        this.updateEditPageItem(editPageItem);
         this.props.hideSpinner();
       })
       .catch(() => {
@@ -524,7 +525,7 @@ class EditItemsPage extends Component {
 
   /**
    * Saves changes made by user in this step and go back to previous page
-   * @param {object} formValues
+   * @param {object} values
    * @public
    */
   previousPage(values) {
@@ -587,7 +588,7 @@ class EditItemsPage extends Component {
                 hasStockList: !!_.get(values.stocklist, 'id'),
                 translate: this.props.translate,
                 reasonCodes: this.props.reasonCodes,
-                onResponse: this.saveNewItems,
+                onResponse: this.updateEditPageItem,
                 revertItem: this.revertItem,
                 reviseRequisitionItems: this.reviseRequisitionItems,
                 values,

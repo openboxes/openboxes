@@ -65,20 +65,30 @@ class StockMovementApiController {
         render ([data:stockMovement] as JSON)
 	}
 
-    def update = { //StockMovement stockMovement ->
+    def updateRequisition = { //StockMovement stockMovement ->
 
         JSONObject jsonObject = request.JSON
         log.info "update: " + jsonObject.toString(4)
 
         // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            stockMovement = new StockMovement()
-        }
 
         bindStockMovement(stockMovement, jsonObject)
-        Boolean forceUpdate = jsonObject.forceUpdate ? Boolean.parseBoolean(jsonObject.forceUpdate) : Boolean.FALSE
-        stockMovementService.updateStockMovement(stockMovement, forceUpdate)
+        stockMovementService.updateRequisition(stockMovement)
+
+        forward(action: "read")
+    }
+
+    def updateShipment = { //StockMovement stockMovement ->
+
+        JSONObject jsonObject = request.JSON
+        log.info "update: " + jsonObject.toString(4)
+
+        // Bind all other properties to stock movement
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        bindStockMovement(stockMovement, jsonObject)
+        stockMovementService.updateShipment(stockMovement)
 
         forward(action: "read")
     }
@@ -146,10 +156,10 @@ class StockMovementApiController {
                         if (createPicklist) stockMovementService.createPicklist(stockMovement)
                         break;
                     case RequisitionStatus.PICKED:
-                        stockMovementService.createOrUpdateShipment(stockMovement)
+                        stockMovementService.createShipment(stockMovement)
                         break;
                     case RequisitionStatus.CHECKING:
-                        stockMovementService.createOrUpdateShipment(stockMovement)
+                        stockMovementService.createShipment(stockMovement)
                         break;
                     case RequisitionStatus.ISSUED:
                         stockMovementService.sendStockMovement(params.id)
@@ -164,6 +174,53 @@ class StockMovementApiController {
             }
         }
         forward(action: "read")
+    }
+
+    def removeAllItems = {
+        Requisition requisition = Requisition.get(params.id)
+
+        stockMovementService.removeRequisitionItems(requisition)
+
+        render status: 204
+    }
+
+    def reviseItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        JSONObject jsonObject = request.JSON
+        log.info "revise items: " + jsonObject.toString(4)
+
+        bindStockMovement(stockMovement, jsonObject)
+
+        stockMovement = stockMovementService.reviseItems(stockMovement)
+
+        render ([data:stockMovement] as JSON)
+    }
+
+    def updateItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        JSONObject jsonObject = request.JSON
+        log.info "update items: " + jsonObject.toString(4)
+
+        bindStockMovement(stockMovement, jsonObject)
+
+        stockMovement = stockMovementService.updateItems(stockMovement)
+
+        render ([data:stockMovement] as JSON)
+    }
+
+    def updateShipmentItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        JSONObject jsonObject = request.JSON
+        log.info "revise items: " + jsonObject.toString(4)
+
+        bindStockMovement(stockMovement, jsonObject)
+
+        stockMovement = stockMovementService.updatePackPageItems(stockMovement)
+
+        render ([data:stockMovement] as JSON)
     }
 
     def exportPickListItems = {

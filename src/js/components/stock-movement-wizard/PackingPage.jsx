@@ -249,7 +249,7 @@ class PackingPage extends Component {
    * @public
    */
   savePackingData(packPageItems) {
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateShipmentItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       stepNumber: '5',

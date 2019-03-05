@@ -203,7 +203,7 @@ class CreateStockMovement extends Component {
 
     const checkDest = stocklist && newValues.destination && destination ?
       newValues.destination.id !== destination.id : false;
-    const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id') !== _.get(stocklist, 'id') : false;
+    const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id', null) !== _.get(stocklist, 'id', null) : false;
 
     return (checkOrigin || checkDest || checkStockList);
   }
@@ -250,7 +250,7 @@ class CreateStockMovement extends Component {
 
       let stockMovementUrl = '';
       if (values.stockMovementId) {
-        stockMovementUrl = `/openboxes/api/stockMovements/${values.stockMovementId}`;
+        stockMovementUrl = `/openboxes/api/stockMovements/${values.stockMovementId}/updateRequisition`;
       } else {
         stockMovementUrl = '/openboxes/api/stockMovements';
       }
@@ -263,7 +263,6 @@ class CreateStockMovement extends Component {
         'destination.id': values.destination.id,
         'requestedBy.id': values.requestedBy.id,
         'stocklist.id': _.get(values.stocklist, 'id') || '',
-        forceUpdate: values.forceUpdate || '',
       };
 
       apiClient.post(stockMovementUrl, payload)
@@ -278,7 +277,6 @@ class CreateStockMovement extends Component {
               movementNumber: resp.identifier,
               name: resp.name,
               stocklist: resp.stocklist,
-              forceUpdate: '',
             });
           }
         })
@@ -320,7 +318,7 @@ class CreateStockMovement extends Component {
           },
           {
             label: this.props.translate('default.yes.label', 'Yes'),
-            onClick: () => this.saveStockMovement({ ...values, forceUpdate: 'true' }),
+            onClick: () => this.saveStockMovement(values),
           },
         ],
       });

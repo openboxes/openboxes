@@ -309,7 +309,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         substitutionItem.productPackage = newProductPackage?:productPackage
         substitutionItem.quantity = newQuantity
         substitutionItem.quantityApproved = newQuantity
-        substitutionItem.parentRequisitionItem = this
+        addToRequisitionItems(substitutionItem)
         substitutionItem.orderIndex = orderIndex
         substitutionItem.save(flush: true, failOnError: true)
     }

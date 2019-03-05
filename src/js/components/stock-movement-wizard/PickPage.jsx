@@ -6,6 +6,7 @@ import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import fileDownload from 'js-file-download';
+import update from 'immutability-helper';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -96,7 +97,7 @@ const FIELDS = {
           title: 'stockMovement.editPick.label',
         },
         getDynamicAttr: ({
-          fieldValue, subfield, stockMovementId, onResponse, reasonCodes,
+          fieldValue, subfield, stockMovementId, updatePickPageItem, reasonCodes,
         }) => ({
           fieldValue: flattenRequest(fieldValue),
           subfield,
@@ -104,7 +105,7 @@ const FIELDS = {
           btnOpenText: fieldValue.hasChangedPick ? '' : 'default.button.edit.label',
           btnOpenDefaultText: fieldValue.hasChangedPick ? '' : 'Edit',
           btnOpenClassName: fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
-          onResponse,
+          onResponse: updatePickPageItem,
           reasonCodes,
         }),
       },
@@ -118,7 +119,7 @@ const FIELDS = {
           title: 'stockMovement.adjustInventory.label',
         },
         getDynamicAttr: ({
-          fieldValue, subfield, stockMovementId, onResponse, bins, locationId,
+          fieldValue, subfield, stockMovementId, fetchPickPageItems, bins, locationId,
         }) => ({
           fieldValue: flattenRequest(fieldValue),
           subfield,
@@ -126,7 +127,7 @@ const FIELDS = {
           btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'stockMovement.adjust.label',
           btnOpenDefaultText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
-          onResponse,
+          onResponse: fetchPickPageItems,
           bins,
           locationId,
         }),
@@ -168,10 +169,10 @@ class PickPage extends Component {
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
-    this.saveNewItems = this.saveNewItems.bind(this);
+    this.updatePickPageItem = this.updatePickPageItem.bind(this);
+    this.fetchPickPageItems = this.fetchPickPageItems.bind(this);
     this.sortByBins = this.sortByBins.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
-    this.props.showSpinner();
   }
 
   componentDidMount() {
@@ -190,7 +191,47 @@ class PickPage extends Component {
       this.props.fetchReasonCodes();
     }
 
-    this.fetchLineItems()
+    this.fetchPickPageData();
+  }
+
+  /**
+   * Checks if any changes has been made and adjusts initial pick.
+   * @param {object} pickPageItem
+   * @public
+   */
+  checkForInitialPicksChanges(pickPageItem) {
+    if (pickPageItem.picklistItems.length) {
+      const initialPicks = [];
+      _.forEach(pickPageItem.suggestedItems, (suggestion) => {
+        // search if suggested picks are inside picklist
+        // if no -> add suggested pick as initial pick (to be crossed out)
+        // if yes -> compare quantityPicked of item in picklist with sugestion
+        const pick = _.find(
+          pickPageItem.picklistItems,
+          item => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
+        );
+        if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
+          initialPicks.push({
+            ...suggestion,
+            initial: true,
+          });
+        }
+      });
+
+      return { ...pickPageItem, picklistItems: _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['binLocation.name', 'initial']) };
+    }
+
+    return pickPageItem;
+  }
+
+  /**
+   * Fetches 4th step data from current stock movement.
+   * @public
+   */
+  fetchPickPageData() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
+
+    return apiClient.get(url)
       .then((resp) => {
         const { associations } = resp.data.data;
         const { pickPageItems } = resp.data.data.pickPage;
@@ -203,7 +244,8 @@ class PickPage extends Component {
           printPicksUrl: printPicks ? printPicks.uri : '/',
           values: {
             ...this.state.values,
-            pickPageItems: this.checkForInitialPicksChanges(parseResponse(pickPageItems)),
+            pickPageItems: _.map(parseResponse(pickPageItems), item =>
+              this.checkForInitialPicksChanges(item)),
           },
           sorted: false,
         }, () => this.fetchBins());
@@ -211,47 +253,23 @@ class PickPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  /**
-   * Checks if any changes has been made and adjusts initial pick.
-   * @param {object} pickPageItems
-   * @public
-   */
-  checkForInitialPicksChanges(pickPageItems) {
-    _.forEach(pickPageItems, (pickPageItem) => {
-      if (pickPageItem.picklistItems.length) {
-        const initialPicks = [];
-        _.forEach(pickPageItem.suggestedItems, (suggestion) => {
-          // search if suggested picks are inside picklist
-          // if no -> add suggested pick as initial pick (to be crossed out)
-          // if yes -> compare quantityPicked of item in picklist with sugestion
-          const pick = _.find(
-            pickPageItem.picklistItems,
-            item => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
-          );
-          if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
-            initialPicks.push({
-              ...suggestion,
-              initial: true,
-            });
-          }
+  fetchPickPageItems() {
+    apiClient.get(`/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`)
+      .then((resp) => {
+        const { pickPageItems } = resp.data.data.pickPage;
+
+        this.setState({
+          values: {
+            ...this.state.values,
+            pickPageItems: _.map(parseResponse(pickPageItems), item =>
+              this.checkForInitialPicksChanges(item)),
+          },
+          sorted: false,
         });
-        /* eslint-disable-next-line no-param-reassign */
-        pickPageItem.picklistItems = _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['binLocation.name', 'initial']);
-      }
-    });
-    return pickPageItems;
-  }
 
-  /**
-   * Fetches 4th step data from current stock movement.
-   * @public
-   */
-  fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
-
-    return apiClient.get(url)
-      .then(resp => resp)
-      .catch(err => err);
+        this.props.hideSpinner();
+      })
+      .catch(() => { this.props.hideSpinner(); });
   }
 
   /**
@@ -295,17 +313,23 @@ class PickPage extends Component {
   }
 
   /**
-   * Saves changes made in edit pick or adjust inventory modals and updates data.
-   * @param {object} pickPageItems
+   * Saves changes made in edit pick and updates data.
+   * @param {object} pickPageItem
    * @public
    */
-  saveNewItems(pickPageItems) {
+  updatePickPageItem(pickPageItem) {
+    const pickPageItemIndex =
+      _.findIndex(this.state.values.pickPageItems, item => _.get(item, 'requisitionItem.id') === _.get(pickPageItem, 'requisitionItem.id'));
+
     this.setState({
       values: {
         ...this.state.values,
-        pickPageItems: this.checkForInitialPicksChanges(parseResponse(pickPageItems)),
+        pickPageItems: update(this.state.values.pickPageItems, {
+          [pickPageItemIndex]: {
+            $set: this.checkForInitialPicksChanges(parseResponse(pickPageItem)),
+          },
+        }),
       },
-      sorted: false,
     });
   }
 
@@ -317,47 +341,16 @@ class PickPage extends Component {
   revertUserPick(itemId) {
     this.props.showSpinner();
 
-    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}`;
-    const pickPageItemData = _.find(
-      flattenRequest(this.state.values.pickPageItems),
-      item => item['requisitionItem.id'] === itemId,
-    );
+    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}/createPicklist`;
 
-    const resetPicksPayload = {
-      picklistItems: _.map(pickPageItemData.picklistItems, item => ({
-        id: item.id,
-        quantityPicked: '',
-      })),
-    };
+    apiClient.post(itemsUrl)
+      .then((resp) => {
+        const pickPageItem = resp.data.data;
 
-    if (resetPicksPayload.picklistItems.length) {
-      apiClient.post(itemsUrl, resetPicksPayload).then(() => {
-        this.sendInitialPicks(itemsUrl, pickPageItemData);
-      }).catch(() => { this.props.hideSpinner(); });
-    } else {
-      this.sendInitialPicks(itemsUrl, pickPageItemData);
-    }
-  }
-
-  sendInitialPicks(itemsUrl, pickPageItemData) {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
-    const initialPicksPayload = {
-      picklistItems: _.map(pickPageItemData.suggestedItems, item => ({
-        ...item,
-        'binLocation.id': item['binLocation.id'] || '',
-        reasonCode: '',
-      })),
-    };
-
-    apiClient.post(itemsUrl, initialPicksPayload).then(() => {
-      apiClient.get(url)
-        .then((resp) => {
-          const { pickPageItems } = resp.data.data.pickPage;
-          this.saveNewItems(pickPageItems);
-          this.props.hideSpinner();
-        })
-        .catch(() => { this.props.hideSpinner(); });
-    }).catch(() => { this.props.hideSpinner(); });
+        this.updatePickPageItem(pickPageItem);
+        this.props.hideSpinner();
+      })
+      .catch(() => { this.props.hideSpinner(); });
   }
 
   sortByBins() {
@@ -490,7 +483,8 @@ class PickPage extends Component {
             <form onSubmit={handleSubmit} className="print-mt">
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stockMovementId: values.stockMovementId,
-                onResponse: this.saveNewItems,
+                updatePickPageItem: this.updatePickPageItem,
+                fetchPickPageItems: this.fetchPickPageItems,
                 revertUserPick: this.revertUserPick,
                 bins: this.state.bins,
                 locationId: this.state.values.origin.id,

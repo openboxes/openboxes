@@ -233,7 +233,6 @@ class StockMovementController {
 
         try {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-            Requisition requisition = stockMovement.requisition
 
             def importFile = command.importFile
             if (importFile.isEmpty()) {
@@ -252,7 +251,7 @@ class StockMovementController {
                 stockMovementItem.stockMovement = stockMovement
                 stockMovement.lineItems.add(stockMovementItem)
             }
-            stockMovementService.updateStockMovement(stockMovement, false)
+            stockMovementService.updateItems(stockMovement)
 
         } catch (Exception e) {
             // FIXME The global error handler does not return JSON for multipart uploads

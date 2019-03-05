@@ -179,27 +179,34 @@ class SubstitutionsModal extends Component {
    */
   onSave(values) {
     this.props.showSpinner();
-    const substitutions = _.filter(values.substitutions, sub => sub.quantitySelected > 0);
+
+    const substitutions = _.filter(values.substitutions, sub =>
+      sub.quantitySelected > 0 && !sub.originalItem);
     const subQty = _.reduce(values.substitutions, (sum, val) =>
       (sum + (!val.originalItem ? _.toInteger(val.quantitySelected) : 0)), 0);
-    const url = `/openboxes/api/stockMovements/${this.props.stockMovementId}?stepNumber=3`;
+    const originalItem = _.find(values.substitutions, sub => sub.originalItem);
+
+    const url = `/openboxes/api/stockMovementItems/${originalItem.requisitionItemId}/substituteItem`;
     const payload = {
-      lineItems: _.map(substitutions, sub => ({
-        id: this.state.attr.lineItem.requisitionItemId,
-        substitute: 'true',
+      newQuantity: originalItem.quantitySelected && originalItem.quantitySelected !== '0' ? originalItem.quantityRequested - subQty : '',
+      quantityRevised: originalItem.quantitySelected,
+      reasonCode: values.reasonCode,
+      sortOrder: originalItem.sortOrder,
+      substitutionItems: _.map(substitutions, sub => ({
         'newProduct.id': sub.productId,
-        newQuantity: sub.originalItem ? sub.quantityRequested - subQty : sub.quantitySelected,
-        quantityRevised: sub.originalItem ? sub.quantitySelected : '',
-        reasonCode: sub.originalItem ? values.reasonCode : 'SUBSTITUTION',
-        sortOrder: this.state.attr.lineItem.sortOrder,
+        newQuantity: sub.quantitySelected,
+        reasonCode: 'SUBSTITUTION',
+        sortOrder: originalItem.sortOrder,
       })),
     };
 
-    return apiClient.post(url, payload).then((resp) => {
-      const { editPageItems } = resp.data.data.editPage;
-      this.props.onResponse(editPageItems);
-      this.props.hideSpinner();
-    }).catch(() => { this.props.hideSpinner(); });
+    return apiClient.post(url, payload)
+      .then((resp) => {
+        const editPageItem = resp.data.data;
+        this.props.onResponse(editPageItem);
+        this.props.hideSpinner();
+      })
+      .catch(() => { this.props.hideSpinner(); });
   }
 
   /** Sums up quantity selected from all available substitutions.
