@@ -72,7 +72,11 @@ class PartialReceivingApiController {
             partialReceipt?.partialReceiptContainers?.partialReceiptItems?.add(new PartialReceiptItem())
         }
 
-        def lineItems = partialReceipt.partialReceiptItems.collect {
+        def lineItems = partialReceipt.partialReceiptItems.sort { a,b ->
+            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
+                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
+                            a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
+        }.collect {
             [
             "Receipt item id": it?.receiptItem?.id ?: "",
             "Shipment item id": it?.shipmentItem?.id ?: "",
@@ -114,6 +118,8 @@ class PartialReceivingApiController {
             csv.toCsvReader(settings).eachLine { tokens ->
                 String receiptItemId = tokens[0] ?: null
                 String shipmentItemId = tokens[1] ?: null
+                String lotNumber = tokens[4] ?: null
+                String expirationDate = tokens[5] ?: null
                 String recipientId = tokens[7] ?: null
                 Integer quantityReceiving = tokens[11] ? tokens[11].toInteger() : null
                 String comment = tokens[12] ? tokens[12] : null
@@ -124,6 +130,11 @@ class PartialReceivingApiController {
                 }
 
                 PartialReceiptItem partialReceiptItem = partialReceiptItems.find { receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId }
+
+                if ((expirationDate && expirationDate != partialReceiptItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT))
+                    || (recipientId && recipientId != partialReceiptItem?.recipient?.id) || (lotNumber && lotNumber != partialReceiptItem.lotNumber)) {
+                    throw new IllegalArgumentException("You cannot import other fields than quantity. Edit all necessary lines and try the import again.")
+                }
 
                 if (!partialReceiptItem) {
                     throw new IllegalArgumentException("Receipt item id: ${receiptItemId} not found")
