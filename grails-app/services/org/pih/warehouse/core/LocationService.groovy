@@ -14,6 +14,13 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.hibernate.Criteria
+import org.hibernate.SessionFactory
+import org.hibernate.criterion.Projection
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.transform.ResultTransformer
+import org.hibernate.transform.Transformers
 import util.ConfigHelper
 
 import javax.xml.bind.ValidationException
@@ -23,6 +30,7 @@ import javax.xml.bind.ValidationException
 class LocationService {
 
 	def grailsApplication
+	SessionFactory sessionFactory
 	boolean transactional = true
 
 
@@ -64,29 +72,48 @@ class LocationService {
 
 		LocationTypeCode locationTypeCode = params.locationTypeCode?:null
 
-		def locations = Location.createCriteria().list() {
-			if (fields) {
-				projections {
-					fields.each { field ->
-						property(field)
-					}
-				}
+		def session = sessionFactory.currentSession
+		def criteria = session.createCriteria(Location.class)
+		criteria.createAlias("locationType", "lt")
+		if (fields) {
+			def projection = Projections.projectionList()
+			fields.each {
+				projection.add(Projections.property(it), it)
 			}
-
-			if (params.name) {
-				ilike("name", "%" + params.name + "%")
-			}
-
-			if (params.locationTypeCode) {
-				locationType {
-					eq("locationTypeCode", locationTypeCode)
-				}
-			}
-
-			eq("active", Boolean.TRUE)
-			isNull("parentLocation")
+			criteria.setProjection(projection)
+			criteria.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
 		}
-		return locations
+		if (params.name) {
+			criteria.add(Restrictions.ilike("name", "%" + params.name + "%"))
+		}
+		if (params.locationTypeCode) {
+			criteria.add(Restrictions.eq("lt.locationTypeCode", locationTypeCode))
+		}
+		criteria.add(Restrictions.eq("active", Boolean.TRUE))
+		criteria.add(Restrictions.isNull("parentLocation"))
+		return criteria.list()
+
+//		def locations = Location.createCriteria().list() {
+//			if (fields) {
+//				projections {
+//					projection
+//				}
+//			}
+//
+//			if (params.name) {
+//				ilike("name", "%" + params.name + "%")
+//			}
+//
+//			if (params.locationTypeCode) {
+//				locationType {
+//					eq("locationTypeCode", locationTypeCode)
+//				}
+//			}
+//
+//			eq("active", Boolean.TRUE)
+//			isNull("parentLocation")
+//		}
+//		return locations
 	}
 
 	def getLocations(String [] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation) {
@@ -102,11 +129,6 @@ class LocationService {
 				return locations.findAll { (it.locationGroup == currentLocation.locationGroup) ||
 						(it.locationGroup != currentLocation.locationGroup && it.supports(ActivityCode.MANAGE_INVENTORY) && it.supports(ActivityCode.RECEIVE_STOCK)) }
 			}
-		}
-
-		if (params.locationTypeCode) {
-			LocationTypeCode locationTypeCode = params.locationTypeCode as LocationTypeCode
-			return locations.findAll { it.locationType.locationTypeCode == locationTypeCode }
 		}
 
 		return locations
