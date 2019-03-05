@@ -20,6 +20,7 @@ class PartialReceiptContainer {
                 "parentContainer.name": container?.parentContainer?.name,
                 "container.type": container?.containerType?.name,
                 shipmentItems: partialReceiptItems. sort { a,b ->
+                    a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
                         a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
                                 a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
                 }
