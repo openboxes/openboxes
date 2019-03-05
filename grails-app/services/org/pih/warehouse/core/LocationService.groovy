@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.hibernate.Criteria
 import org.hibernate.SessionFactory
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Projection
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
@@ -70,11 +71,9 @@ class LocationService {
 
 	def getLocations(String [] fields, Map params) {
 
-		LocationTypeCode locationTypeCode = params.locationTypeCode?:null
-
 		def session = sessionFactory.currentSession
 		def criteria = session.createCriteria(Location.class)
-		criteria.createAlias("locationType", "lt")
+		criteria.createAlias("locationType", "locationType")
 		if (fields) {
 			def projection = Projections.projectionList()
 			fields.each {
@@ -87,16 +86,21 @@ class LocationService {
 			criteria.add(Restrictions.ilike("name", "%" + params.name + "%"))
 		}
 		if (params.locationTypeCode) {
-			criteria.add(Restrictions.eq("lt.locationTypeCode", locationTypeCode))
+			criteria.add(Restrictions.eq("locationType.locationTypeCode", params.locationTypeCode))
 		}
 		criteria.add(Restrictions.eq("active", Boolean.TRUE))
 		criteria.add(Restrictions.isNull("parentLocation"))
 		return criteria.list()
 
+		// Adding the resultTransformer causes an exception
+		// ClassCastException: java.util.HashMap cannot be cast to [Ljava.lang.Object;
 //		def locations = Location.createCriteria().list() {
 //			if (fields) {
+//				resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
 //				projections {
-//					projection
+//                    fields.each { field ->
+//                        property(field, field)
+//                    }
 //				}
 //			}
 //
@@ -106,7 +110,7 @@ class LocationService {
 //
 //			if (params.locationTypeCode) {
 //				locationType {
-//					eq("locationTypeCode", locationTypeCode)
+//					eq("locationTypeCode", params.locationTypeCode)
 //				}
 //			}
 //
