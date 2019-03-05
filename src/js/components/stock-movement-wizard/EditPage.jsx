@@ -98,7 +98,7 @@ const FIELDS = {
             if (value && value !== '0') {
               return value.toLocaleString('en-US');
             } else if (hasStockList) {
-              return translate('stockMovement.replenishmentPeriodNeeded.label', 'Replenishment period needed');
+              return translate('stockMovement.replenishmentPeriodNotFound.label', 'Replenishment period not found');
             }
 
             return '0';
