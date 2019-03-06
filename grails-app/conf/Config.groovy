@@ -617,6 +617,7 @@ openboxes.megamenu.configuration.enabled = true
 openboxes.megamenu.customLinks.enabled = false
 openboxes.megamenu.inbound.enabled = true
 openboxes.megamenu.outbound.enabled = true
+openboxes.megamenu.requisitionTemplate.enabled = true
 
 
 // Custom links example

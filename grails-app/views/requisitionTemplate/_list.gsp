@@ -1,19 +1,21 @@
 <table>
 	<thead>
 		<tr>
-			<th>
-				<warehouse:message code="default.actions.label"/>
-			</th>
+            <g:isUserAdmin>
+                <th>
+                    <warehouse:message code="default.actions.label"/>
+                </th>
+            </g:isUserAdmin>
 
             <%--
 			<g:sortableColumn property="status"
 				title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
-				
-				
+
+
 			<g:sortableColumn property="requestNumber"
 				title="${warehouse.message(code: 'requisition.requestNumber.label', default: 'Request number')}" />
-				
-				
+
+
 			<g:sortableColumn property="description"
 				title="${warehouse.message(code: 'default.description.label', default: 'Description')}" />
 			--%>
@@ -63,13 +65,15 @@
            			    <warehouse:message code="requisition.noRequisitionsMatchingCriteria.message"/>
                     </div>
 	           	</td>
-			</tr>     
-		</g:unless>	
+			</tr>
+		</g:unless>
 		<g:each in="${requisitions}" status="i" var="requisition">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-				<td>			
-					<g:render template="/requisitionTemplate/actions" model="[requisition:requisition]"/>
-				</td>
+                <g:isUserAdmin>
+                    <td>
+                        <g:render template="/requisitionTemplate/actions" model="[requisition:requisition]"/>
+                    </td>
+                </g:isUserAdmin>
                 <td>
                     <g:if test="${requisition.isPublished}">
                         <div class="tag tag-alert">
