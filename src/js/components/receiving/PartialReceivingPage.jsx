@@ -311,6 +311,9 @@ const FIELDS = {
         label: 'react.partialReceiving.receivingNow.label',
         defaultMessage: 'Receiving now',
         flexWidth: '1',
+        attributes: {
+          autoComplete: 'off',
+        },
         getDynamicAttr: ({ shipmentReceived, fieldValue }) => ({
           disabled: shipmentReceived || isReceived(true, fieldValue),
         }),
@@ -342,6 +345,9 @@ const FIELDS = {
         label: 'react.partialReceiving.comment.label',
         defaultMessage: 'Comment',
         flexWidth: '1.3',
+        attributes: {
+          autoComplete: 'off',
+        },
       },
     },
   },
