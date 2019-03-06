@@ -226,7 +226,7 @@ class CreateStockMovement extends Component {
 
         const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));
 
-        if (stocklistChanged) {
+        if (stocklistChanged && !_.isNil(this.state.values.statusCode)) {
           this.setState({ stocklists, values: { ...this.state.values, stocklist: null } });
         } else {
           this.setState({ stocklists });
