@@ -3,15 +3,6 @@
         <tbody>
             <tr class="prop">
                 <td class="name">
-                    <label><warehouse:message code="location.label"/></label>
-                </td>
-                <td class="value">
-                    ${session?.warehouse?.name }
-                    <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="name">
                     <label><warehouse:message code="inventory.uploadAFileToImport.label"/></label>
                 </td>
                 <td class="value">
@@ -105,6 +96,16 @@
                     %{--</div>--}%
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="name">
+                    <label><warehouse:message code="location.label"/></label>
+                </td>
+                <td class="value">
+                    ${session?.warehouse?.name }
+                    <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
+                </td>
+            </tr>
+
             <tr class="prop">
                 <td class="name">
                     <label><warehouse:message code="default.date.label"/></label>

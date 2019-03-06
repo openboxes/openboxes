@@ -9,10 +9,14 @@
 **/ 
 package org.pih.warehouse.data
 
+import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductSupplier
 import org.springframework.validation.BeanPropertyBindingResult
 
 class ProductSupplierDataService {
@@ -22,7 +26,31 @@ class ProductSupplierDataService {
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
-            log.info params
+
+            if(params.id && !ProductSupplier.exists(params["code"])) {
+                command.errors.reject("Row ${index+1}: Product supplier with ID ${params.id} does not exist")
+            }
+
+            if (!Product.findByProductCode(params["product.productCode"])) {
+                command.errors.reject("Row ${index+1}: Product with productCode ${params['product.productCode']} does not exist")
+            }
+
+            def supplier = Organization.get(params["supplier.id"])
+            if(supplier?.name != params["supplier.name"]) {
+                command.errors.reject("Row ${index+1}: Organization ${supplier.name} with id ${params['supplier.id']} does not match ${params['supplier.name']}")
+            }
+
+            def manufacturer = Organization.get(params["manufacturer.id"])
+            if(manufacturer?.name != params["manufacturer.name"]) {
+                command.errors.reject("Row ${index+1}: Organization ${manufacturer.name} with id ${params['manufacturer.id']} does not match ${params['manufacturer.name']}")
+            }
+
+            def productSupplier = createOrUpdate(params)
+            if (!productSupplier.validate()) {
+                productSupplier.errors.each { BeanPropertyBindingResult error ->
+                    command.errors.reject("Row ${index+1}: ${error.getFieldError()}")
+                }
+            }
         }
     }
 
@@ -30,11 +58,26 @@ class ProductSupplierDataService {
         log.info "Process data " + command.filename
 
         command.data.eachWithIndex { params, index ->
-
+            ProductSupplier productSupplier = createOrUpdate(params)
+            if (productSupplier.validate()) {
+                productSupplier.save(failOnError: true)
+            }
         }
     }
 
     def createOrUpdate(Map params) {
+        ProductSupplier productSupplier = ProductSupplier.get(params["code"])
+        if (!productSupplier) {
+            productSupplier = new ProductSupplier(params)
+        }
+        else {
+            productSupplier.properties = params
+        }
 
+        productSupplier.product = Product.findByProductCode(params["product.productCode"])
+        productSupplier.supplier = Organization.get(params["supplier.id"])
+        productSupplier.manufacturer = Organization.get(params["manufacturer.id"])
+
+        return productSupplier
     }
 }
