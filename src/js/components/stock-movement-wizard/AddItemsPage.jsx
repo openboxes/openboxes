@@ -570,7 +570,6 @@ class AddItemsPage extends Component {
           val => ({
             ...val,
             disabled: true,
-            rowKey: _.uniqueId('lineItem_'),
             product: {
               ...val.product,
               label: `${val.productCode} ${val.product.name}`,

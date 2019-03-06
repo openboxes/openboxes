@@ -229,7 +229,7 @@ class EditItemsPage extends Component {
     };
 
     this.revertItem = this.revertItem.bind(this);
-    this.updateEditPageItem = this.updateEditPageItem.bind(this);
+    this.fetchEditPageItems = this.fetchEditPageItems.bind(this);
     this.reviseRequisitionItems = this.reviseRequisitionItems.bind(this);
     this.props.showSpinner();
   }
@@ -256,7 +256,6 @@ class EditItemsPage extends Component {
         val => ({
           ...val,
           disabled: true,
-          rowKey: _.uniqueId('lineItem_'),
           quantityAvailable: val.quantityAvailable > 0 ? val.quantityAvailable : 0,
           product: {
             ...val.product,
@@ -441,7 +440,7 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Saves changes made in subsitution modal and updates data.
+   * Saves changes made when item reverted.
    * @param {object} editPageItem
    * @public
    */
@@ -465,6 +464,34 @@ class EditItemsPage extends Component {
           },
         }),
       },
+    });
+  }
+
+  /**
+   * Saves changes made in subsitution modal and updates data.
+   * @public
+   */
+  fetchEditPageItems() {
+    this.fetchLineItems().then((resp) => {
+      const { editPage } = resp.data.data;
+
+      this.setState({
+        values: {
+          ...this.state.values,
+          editPageItems: _.map(editPage.editPageItems, item => ({
+            ...item,
+            quantityAvailable: item.quantityAvailable || 0,
+            substitutionItems: _.map(item.substitutionItems, sub => ({
+              ...sub,
+              requisitionItemId: item.requisitionItemId,
+            })),
+          })),
+        },
+      });
+
+      this.props.hideSpinner();
+    }).catch(() => {
+      this.props.hideSpinner();
     });
   }
 
@@ -588,7 +615,7 @@ class EditItemsPage extends Component {
                 hasStockList: !!_.get(values.stocklist, 'id'),
                 translate: this.props.translate,
                 reasonCodes: this.props.reasonCodes,
-                onResponse: this.updateEditPageItem,
+                onResponse: this.fetchEditPageItems,
                 revertItem: this.revertItem,
                 reviseRequisitionItems: this.reviseRequisitionItems,
                 values,

@@ -200,12 +200,8 @@ class SubstitutionsModal extends Component {
       })),
     };
 
-    return apiClient.post(url, payload)
-      .then((resp) => {
-        const editPageItem = resp.data.data;
-        this.props.onResponse(editPageItem);
-        this.props.hideSpinner();
-      })
+    apiClient.post(url, payload)
+      .then(() => { this.props.onResponse(); })
       .catch(() => { this.props.hideSpinner(); });
   }
 
