@@ -10,10 +10,6 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductAssociation
-import org.pih.warehouse.product.ProductAssociationTypeCode
 
 class LocalizationApiController {
 
@@ -23,10 +19,15 @@ class LocalizationApiController {
 
     def list = {
         String languageCode = params.lang
-        Locale locale = localizationService.getLocale(languageCode)
+        String prefix = params.prefix
+
+        Locale locale = languageCode ? localizationService.getLocale(languageCode) : localizationService.getCurrentLocale()
         Properties messagesProperties = localizationService.getMessagesProperties(locale)
         String [] supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales
-        render ([messages:messagesProperties?.sort(), supportedLocales: supportedLocales, currentLocale: locale] as JSON)
+
+        def selectedMessages = prefix ? messagesProperties.findAll { it.key.startsWith(prefix) } : messagesProperties
+
+        render ([messages:selectedMessages?.sort(), supportedLocales: supportedLocales, currentLocale: locale] as JSON)
 	}
 
     def read = {

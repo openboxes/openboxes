@@ -11,7 +11,7 @@ import PackingPage from './PackingPage';
 import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
 import apiClient from '../../utils/apiClient';
-import { fetchSessionInfo, showSpinner, hideSpinner } from '../../actions';
+import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
 
 /** Main stock movement form's wizard component. */
 class StockMovements extends Component {
@@ -31,8 +31,25 @@ class StockMovements extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchSessionInfo();
-    this.fetchInitialValues();
+    this.props.fetchTranslations('', 'stockMovement');
+
+    if (this.props.stockMovementTranslationsFetched) {
+      this.dataFetched = true;
+
+      this.fetchInitialValues();
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.locale && this.props.locale !== nextProps.locale) {
+      this.props.fetchTranslations(nextProps.locale, 'stockMovement');
+    }
+
+    if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
+      this.dataFetched = true;
+
+      this.fetchInitialValues();
+    }
   }
 
   /**
@@ -103,6 +120,8 @@ class StockMovements extends Component {
     }
     return this.state.values.name;
   }
+
+  dataFetched = false;
 
   /**
    * Fetches initial values from API.
@@ -230,7 +249,14 @@ class StockMovements extends Component {
   }
 }
 
-export default connect(null, { fetchSessionInfo, showSpinner, hideSpinner })(StockMovements);
+const mapStateToProps = state => ({
+  locale: state.session.activeLanguage,
+  stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
+});
+
+export default connect(mapStateToProps, {
+  showSpinner, hideSpinner, fetchTranslations,
+})(StockMovements);
 
 StockMovements.propTypes = {
   /** React router's object which contains information about url varaiables and params */
@@ -243,8 +269,9 @@ StockMovements.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Initial components' data */
   initialValues: PropTypes.shape({}),
-  /** Function called to get the currently selected location */
-  fetchSessionInfo: PropTypes.func.isRequired,
+  locale: PropTypes.string.isRequired,
+  stockMovementTranslationsFetched: PropTypes.bool.isRequired,
+  fetchTranslations: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {

@@ -35,7 +35,7 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
-        label: 'stockMovement.code.label',
+        label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
         flexWidth: '0.9',
         getDynamicAttr: ({ subfield }) => ({
@@ -44,7 +44,7 @@ const FIELDS = {
       },
       'product.name': {
         type: LabelField,
-        label: 'stockMovement.productName.label',
+        label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         flexWidth: '4.7',
         attributes: {
@@ -54,24 +54,24 @@ const FIELDS = {
       lotNumber: {
         type: LabelField,
         flexWidth: '1.3',
-        label: 'stockMovement.lot.label',
+        label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
       },
       expirationDate: {
         type: LabelField,
         flexWidth: '0.9',
-        label: 'stockMovement.expiry.label',
+        label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
       },
       'binLocation.name': {
         type: LabelField,
         flexWidth: '1.2',
-        label: 'stockMovement.binLocation.label',
+        label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin location',
       },
       quantityRequired: {
         type: LabelField,
-        label: 'stockMovement.quantityRequired.label',
+        label: 'react.stockMovement.quantityRequired.label',
         defaultMessage: 'Qty required',
         flexWidth: '0.8',
         attributes: {
@@ -80,7 +80,7 @@ const FIELDS = {
       },
       quantityPicked: {
         type: LabelField,
-        label: 'stockMovement.quantityPicked.label',
+        label: 'react.stockMovement.quantityPicked.label',
         defaultMessage: 'Qty picked',
         flexWidth: '0.7',
         attributes: {
@@ -88,13 +88,13 @@ const FIELDS = {
         },
       },
       buttonEditPick: {
-        label: 'stockMovement.editPick.label',
+        label: 'react.stockMovement.editPick.label',
         defaultMessage: 'Edit pick',
         type: EditPickModal,
         fieldKey: '',
         flexWidth: '0.6',
         attributes: {
-          title: 'stockMovement.editPick.label',
+          title: 'react.stockMovement.editPick.label',
         },
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, updatePickPageItem, reasonCodes,
@@ -102,7 +102,7 @@ const FIELDS = {
           fieldValue: flattenRequest(fieldValue),
           subfield,
           stockMovementId,
-          btnOpenText: fieldValue.hasChangedPick ? '' : 'default.button.edit.label',
+          btnOpenText: fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
           btnOpenDefaultText: fieldValue.hasChangedPick ? '' : 'Edit',
           btnOpenClassName: fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse: updatePickPageItem,
@@ -110,13 +110,13 @@ const FIELDS = {
         }),
       },
       buttonAdjustInventory: {
-        label: 'stockMovement.adjustInventory.label',
+        label: 'react.stockMovement.adjustInventory.label',
         defaultMessage: 'Adjust inventory',
         type: AdjustInventoryModal,
         fieldKey: '',
         flexWidth: '1.3',
         attributes: {
-          title: 'stockMovement.adjustInventory.label',
+          title: 'react.stockMovement.adjustInventory.label',
         },
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, fetchPickPageItems, bins, locationId,
@@ -124,7 +124,7 @@ const FIELDS = {
           fieldValue: flattenRequest(fieldValue),
           subfield,
           stockMovementId,
-          btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'stockMovement.adjust.label',
+          btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'react.stockMovement.adjust.label',
           btnOpenDefaultText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse: fetchPickPageItems,
@@ -134,11 +134,11 @@ const FIELDS = {
       },
       revert: {
         type: ButtonField,
-        label: 'default.button.undo.label',
+        label: 'react.default.button.undo.label',
         defaultMessage: 'Undo',
         flexWidth: '0.7',
         fieldKey: '',
-        buttonLabel: 'default.button.undo.label',
+        buttonLabel: 'react.default.button.undo.label',
         buttonDefaultMessage: 'Undo',
         getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
           onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
@@ -176,8 +176,22 @@ class PickPage extends Component {
   }
 
   componentDidMount() {
-    this.fetchAllData(false);
+    if (this.props.stockMovementTranslationsFetched) {
+      this.dataFetched = true;
+
+      this.fetchAllData(false);
+    }
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
+      this.dataFetched = true;
+
+      this.fetchAllData(false);
+    }
+  }
+
+  dataFetched = false;
 
   /**
    * Fetches all required data.
@@ -429,7 +443,7 @@ class PickPage extends Component {
                 htmlFor="csvInput"
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-download pr-2" /><Translate id="default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
                 <input
                   id="csvInput"
                   type="file"
@@ -447,7 +461,7 @@ class PickPage extends Component {
                 onClick={() => this.exportTemplate(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-upload pr-2" /><Translate id="default.button.exportTemplate.label" defaultMessage="Export template" /></span>
+                <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
               </button>
               <a
                 href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
@@ -455,29 +469,29 @@ class PickPage extends Component {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span><i className="fa fa-print pr-2" /><Translate id="stockMovement.printPicklist.label" defaultMessage="Print picklist" /></span>
+                <span><i className="fa fa-print pr-2" /><Translate id="react.stockMovement.printPicklist.label" defaultMessage="Print picklist" /></span>
               </a>
               <button
                 type="button"
                 onClick={() => this.fetchAllData(true)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
               >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="default.button.refresh.label" defaultMessage="Reload" /></span>
+                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
               </button>
               <button
                 type="button"
                 onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="stockMovement.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
               </button>
               <button
                 type="button"
                 onClick={() => this.sortByBins()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                {this.state.sorted && <Translate id="stockMovement.originalOrder.label" defaultMessage="Original order" />}
-                {!this.state.sorted && <Translate id="stockMovement.sortByBins.label" defaultMessage="Sort by bins" />}
+                {this.state.sorted && <Translate id="react.stockMovement.originalOrder.label" defaultMessage="Original order" />}
+                {!this.state.sorted && <Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" />}
               </button>
             </span>
             <form onSubmit={handleSubmit} className="print-mt">
@@ -492,10 +506,10 @@ class PickPage extends Component {
               }))}
               <div className="d-print-none">
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
-                  <Translate id="default.button.previous.label" defaultMessage="Previous" />
+                  <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">
-                  <Translate id="default.button.next.label" defaultMessage="Next" />
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
@@ -510,6 +524,7 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
+  stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
@@ -534,4 +549,5 @@ PickPage.propTypes = {
   reasonCodesFetched: PropTypes.bool.isRequired,
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  stockMovementTranslationsFetched: PropTypes.bool.isRequired,
 };

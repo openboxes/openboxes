@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import PropTypes from 'prop-types';
 
-import { fetchSessionInfo, changeCurrentLocation } from '../../actions';
+import { changeCurrentLocation } from '../../actions';
 import apiClient from '../../utils/apiClient';
 
 class LocationChooser extends Component {
@@ -22,9 +22,20 @@ class LocationChooser extends Component {
   }
 
   componentDidMount() {
-    this.fetchLocations();
-    this.props.fetchSessionInfo();
+    if (this.props.defaultTranslationsFetched) {
+      this.dataFetched = true;
+      this.fetchLocations();
+    }
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.defaultTranslationsFetched && !this.dataFetched) {
+      this.dataFetched = true;
+      this.fetchLocations();
+    }
+  }
+
+  dataFetched = false;
 
   openModal() {
     this.setState({ showModal: true });
@@ -100,17 +111,15 @@ class LocationChooser extends Component {
 
 const mapStateToProps = state => ({
   currentLocationName: state.session.currentLocation.name,
+  defaultTranslationsFetched: state.session.fetchedTranslations.default,
 });
 
-export default connect(mapStateToProps, {
-  fetchSessionInfo, changeCurrentLocation,
-})(LocationChooser);
+export default connect(mapStateToProps, { changeCurrentLocation })(LocationChooser);
 
 LocationChooser.propTypes = {
-  /** Function called to get the currently selected location */
-  fetchSessionInfo: PropTypes.func.isRequired,
   /** Function called to change the currently selected location */
   changeCurrentLocation: PropTypes.func.isRequired,
   /** Name of the currently selected location */
   currentLocationName: PropTypes.string.isRequired,
+  defaultTranslationsFetched: PropTypes.bool.isRequired,
 };

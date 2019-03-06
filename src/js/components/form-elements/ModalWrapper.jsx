@@ -177,7 +177,7 @@ ModalWrapper.propTypes = {
 };
 
 ModalWrapper.defaultProps = {
-  btnOpenText: 'default.button.open.label',
+  btnOpenText: 'react.default.button.open.label',
   btnOpenDefaultText: 'Open',
   btnOpenClassName: 'btn btn-outline-primary',
   btnOpenStyle: {},
@@ -190,13 +190,13 @@ ModalWrapper.defaultProps = {
   btnContainerClassName: 'btn-group float-right',
   btnContainerStyle: {},
 
-  btnSaveText: 'default.button.save.label',
+  btnSaveText: 'react.default.button.save.label',
   btnSaveDefaultText: 'Save',
   btnSaveClassName: 'btn btn-outline-success',
   btnSaveStyle: {},
   btnSaveDisabled: false,
 
-  btnCancelText: 'default.button.cancel.label',
+  btnCancelText: 'react.default.button.cancel.label',
   btnCancelDefaultText: 'Cancel',
   btnCancelClassName: 'btn btn-outline-secondary',
   btnCancelStyle: {},

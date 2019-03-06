@@ -54,12 +54,21 @@ class PutAwayPage extends Component {
   }
 
   componentDidMount() {
-    this.fetchPutAwayCandidates(this.props.locationId);
+    if (this.props.putAwayTranslationsFetched) {
+      this.dataFetched = true;
+      this.fetchPutAwayCandidates(this.props.locationId);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.locationId !== nextProps.locationId) {
-      this.fetchPutAwayCandidates(nextProps.locationId);
+    if (nextProps.putAwayTranslationsFetched) {
+      if (!this.dataFetched) {
+        this.dataFetched = true;
+
+        this.fetchPutAwayCandidates(this.props.locationId);
+      } else if (this.props.locationId !== nextProps.locationId) {
+        this.fetchPutAwayCandidates(nextProps.locationId);
+      }
     }
   }
 
@@ -86,38 +95,38 @@ class PutAwayPage extends Component {
    */
   getColumns = () => [
     {
-      Header: <Translate id="stockMovement.code.label" defaultMessage="Code" />,
+      Header: <Translate id="react.putAway.code.label" defaultMessage="Code" />,
       accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="stockMovement.name.label" defaultMessage="Name" />,
+      Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
       accessor: 'product.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="stockMovement.lotSerialNo.label" defaultMessage="Lot/Serial No." />,
+      Header: <Translate id="react.putAway.lotSerialNo.label" defaultMessage="Lot/Serial No." />,
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="stockMovement.expiry.label" defaultMessage="Expiry" />,
+      Header: <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="stockMovement.recipient.label" defaultMessage="Recipient" />,
+      Header: <Translate id="react.putAway.recipient.label" defaultMessage="Recipient" />,
       accessor: 'recipient.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="putAway.qtyReceiving.label" defaultMessage="Qty in receiving" />,
+      Header: <Translate id="react.putAway.qtyReceiving.label" defaultMessage="Qty in receiving" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
       Filter,
     }, {
-      Header: <Translate id="stockMovement.label" defaultMessage="Stock Movement" />,
+      Header: <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />,
       accessor: 'stockMovement.name',
       style: { whiteSpace: 'normal' },
       Expander: ({ row, isExpanded }) => (
@@ -142,6 +151,8 @@ class PutAwayPage extends Component {
       Filter,
     },
   ];
+
+  dataFetched = false;
 
   /**
    * Fetches available items to put away from API.
@@ -376,10 +387,10 @@ class PutAwayPage extends Component {
 
     return (
       <div className="main-container">
-        <h1><Translate id="putAway.label" defaultMessage="Putaway" /> </h1>
+        <h1><Translate id="react.putAway.label" defaultMessage="Putaway" /></h1>
         <div className="d-flex justify-content-between mb-2">
           <div>
-            <Translate id="putAway.showBy.label" defaultMessage="Show by" />:
+            <Translate id="react.putAway.showBy.label" defaultMessage="Show by" />:
             <button
               className="btn btn-primary ml-2 btn-xs"
               data-toggle="button"
@@ -387,16 +398,16 @@ class PutAwayPage extends Component {
               onClick={toggleTree}
             >
               {pivotBy && pivotBy.length ?
-                <Translate id="stockMovement.label" defaultMessage="Stock Movement" />
-                : <Translate id="product.label" defaultMessage="Product" /> }
+                <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />
+                : <Translate id="react.putAway.product.label" defaultMessage="Product" /> }
             </button>
           </div>
           <div className="row bd-highlight">
-            <div className="mr-1"><Translate id="putAway.lines.label" defaultMessage="Lines in pending putaways" />:</div>
+            <div className="mr-1"><Translate id="react.putAway.lines.label" defaultMessage="Lines in pending putaways" />:</div>
             <div style={{ width: '150px' }}>
               <Select
-                options={[{ value: false, label: <Translate id="putAway.exclude.label" defaultMessage="Exclude" /> },
-                  { value: true, label: <Translate id="putAway.include.label" defaultMessage="Include" /> }]}
+                options={[{ value: false, label: <Translate id="react.putAway.exclude.label" defaultMessage="Exclude" /> },
+                  { value: true, label: <Translate id="react.putAway.include.label" defaultMessage="Include" /> }]}
                 onChange={val => this.filterPutAways(val)}
                 objectValue
                 initialValue={false}
@@ -410,7 +421,7 @@ class PutAwayPage extends Component {
             disabled={this.state.selection.size < 1}
             onClick={() => this.createPutAway()}
             className="btn btn-outline-primary btn-xs"
-          ><Translate id="putAway.startPutAway.label" defaultMessage="Start Putaway" />
+          ><Translate id="react.putAway.startPutAway.label" defaultMessage="Start Putaway" />
           </button>
         </div>
         {
@@ -466,7 +477,7 @@ class PutAwayPage extends Component {
             disabled={this.state.selection.size < 1}
             onClick={() => this.createPutAway()}
             className="btn btn-outline-primary float-right my-2 btn-xs"
-          ><Translate id="putAway.startPutAway.label" defaultMessage="Start Putaway" />
+          ><Translate id="react.putAway.startPutAway.label" defaultMessage="Start Putaway" />
           </button>
         </div>
       </div>
@@ -474,7 +485,11 @@ class PutAwayPage extends Component {
   }
 }
 
-export default withRouter(connect(null, { showSpinner, hideSpinner })(PutAwayPage));
+const mapStateToProps = state => ({
+  putAwayTranslationsFetched: state.session.fetchedTranslations.putAway,
+});
+
+export default withRouter(connect(mapStateToProps, { showSpinner, hideSpinner })(PutAwayPage));
 
 PutAwayPage.propTypes = {
   /** Function called when data is loading */
@@ -487,5 +502,6 @@ PutAwayPage.propTypes = {
   locationId: PropTypes.string.isRequired,
   /** React router's object used to manage session history */
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  putAwayTranslationsFetched: PropTypes.bool.isRequired,
 };
 

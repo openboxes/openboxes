@@ -1,3 +1,5 @@
+import { addTranslationForLanguage } from 'react-localize-redux';
+
 import {
   SHOW_SPINNER,
   HIDE_SPINNER,
@@ -5,8 +7,9 @@ import {
   FETCH_REASONCODES,
   FETCH_SESSION_INFO,
   CHANGE_CURRENT_LOCATION,
+  TRANSLATIONS_FETCHED,
 } from './types';
-import apiClient from '../utils/apiClient';
+import apiClient, { parseResponse } from '../utils/apiClient';
 
 
 export function showSpinner() {
@@ -62,6 +65,24 @@ export function changeCurrentLocation(location) {
         dispatch({
           type: CHANGE_CURRENT_LOCATION,
           payload: location,
+        });
+      });
+  };
+}
+
+export function fetchTranslations(lang, prefix) {
+  return (dispatch) => {
+    const url = `/openboxes/api/localizations?lang=${lang || ''}&prefix=react.${prefix || ''}`;
+
+    apiClient.get(url)
+      .then((response) => {
+        const { messages, currentLocale } = parseResponse(response.data);
+
+        dispatch(addTranslationForLanguage(messages, currentLocale));
+
+        dispatch({
+          type: TRANSLATIONS_FETCHED,
+          payload: prefix,
         });
       });
   };
