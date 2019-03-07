@@ -118,7 +118,7 @@ class StockMovementController {
 
     def delete = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING) {
+        if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
             try {
                 Requisition requisition = stockMovement?.requisition
                 if (requisition) {
@@ -138,7 +138,7 @@ class StockMovementController {
                 log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
                 flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
             }
-        } else flash.message = "You can only delete pending shipments"
+        } else flash.message = "You cannot delete this shipment"
 
         redirect(action: "list")
     }
