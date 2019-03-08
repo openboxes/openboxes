@@ -105,11 +105,11 @@ const FIELDS = {
         <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
           <Translate id="react.partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
         </button>
-        <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>
-          <Translate id="react.default.button.save.label" defaultMessage="Save" />
-        </button>
         <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => saveAndExit()}>
           <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+        </button>
+        <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>
+          <Translate id="react.default.button.save.label" defaultMessage="Save" />
         </button>
         <button
           type="button"
@@ -360,11 +360,11 @@ const FIELDS = {
         <button type="button" className="btn btn-outline-success mr-3 btn-xs" disabled={shipmentReceived} onClick={() => autofillLines()}>
           <Translate id="react.partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
         </button>
-        <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>
-          <Translate id="react.default.button.save.label" defaultMessage="Save" />
-        </button>
         <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => saveAndExit()}>
           <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+        </button>
+        <button type="button" className="btn btn-outline-success btn-xs mr-3" disabled={saveDisabled || shipmentReceived} onClick={() => onSave()}>
+          <Translate id="react.default.button.save.label" defaultMessage="Save" />
         </button>
         <button
           type="button"
