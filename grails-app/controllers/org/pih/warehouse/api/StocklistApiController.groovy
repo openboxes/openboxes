@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
@@ -74,8 +74,8 @@ class StocklistApiController {
     def sendMail = {
         JSONObject jsonObject = request.JSON
         log.info "send mail: " + jsonObject.toString(4)
-
-        stocklistService.sendMail(params.id, jsonObject.subject, jsonObject.text, jsonObject.recipients)
+        def emailBody = jsonObject.text + "\n\n" + "Sent by " + session.user.name
+        stocklistService.sendMail(params.id, jsonObject.subject, emailBody, jsonObject.recipients)
 
         render status: 200
     }

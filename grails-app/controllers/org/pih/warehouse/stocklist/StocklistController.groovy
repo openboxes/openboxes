@@ -20,15 +20,15 @@ class StocklistController {
 
 	def stocklistService
 
-	def show = { 
+	def show = {
 		println "stocklist " + params
 		def location = Location.get(params.id)
 		//def inventory = Inventory.findByLocation(location)
 		def inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
-		
-		
+
+
 		[location:location, inventoryLevels: inventoryLevels]
-		
+
 	}
 
 	def renderPdf = {
@@ -45,7 +45,8 @@ class StocklistController {
 		if (!params.recipients || !params.id) {
 			throw new Exception("${warehouse.message(code:'email.noParams.message')}")
 		}
-		stocklistService.sendMail(params.id, params.subject, params.body, [params.recipients])
+		def emailBody = params.body + "\n\n" + "Sent by " + session.user.name
+		stocklistService.sendMail(params.id, params.subject, emailBody, [params.recipients])
 		flash.message = "${warehouse.message(code:'email.sent.message',args:[params.recipients])}"
 		redirect(controller: "requisitionTemplate", action: "show", params:[id: params.id])
 	}
