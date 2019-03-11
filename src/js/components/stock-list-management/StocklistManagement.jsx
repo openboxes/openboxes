@@ -492,19 +492,20 @@ class StocklistManagement extends Component {
                   <div className="d-flex">
                     <button
                       className="btn btn-outline-primary btn-xs mx-1"
-                      disabled={original.edit || original.new}
+                      disabled={original.edit || original.new || !this.props.isUserAdmin}
                       onClick={() => this.editItem(index)}
                     ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
                     </button>
                     <button
                       className="btn btn-outline-primary btn-xs mr-1"
                       disabled={(!original.edit && !original.new) || !original.stocklistId
-                      || _.isNil(original.maxQuantity) || original.maxQuantity === ''}
+                      || _.isNil(original.maxQuantity) || original.maxQuantity === '' || !this.props.isUserAdmin}
                       onClick={() => this.saveItem(index, original)}
                     ><Translate id="react.default.button.save.label" defaultMessage="Save" />
                     </button>
                     <button
                       className="btn btn-outline-danger btn-xs mr-1"
+                      disabled={!this.props.isUserAdmin}
                       onClick={() => this.deleteItem(index)}
                     ><Translate id="react.default.button.delete.label" defaultMessage="Delete" />
                     </button>
@@ -518,6 +519,7 @@ class StocklistManagement extends Component {
                       stocklistId={original.stocklistId}
                       users={this.state.users}
                       manager={original.manager}
+                      isUserAdmin={this.props.isUserAdmin}
                     />
                   </div>
                 );
@@ -551,6 +553,7 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   locale: state.session.activeLanguage,
   stockListManagementTranslationsFetched: state.session.fetchedTranslations.stockListManagement,
+  isUserAdmin: state.session.isUserAdmin,
 });
 
 export default connect(mapStateToProps, {
@@ -570,4 +573,5 @@ StocklistManagement.propTypes = {
   locale: PropTypes.string.isRequired,
   stockListManagementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
+  isUserAdmin: PropTypes.bool.isRequired,
 };
