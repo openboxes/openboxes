@@ -453,11 +453,6 @@ class PutAwayPage extends Component {
                   }}
                   disabled={row.putawayStatus !== 'READY'}
                 />)}
-              defaultSorted={[{
-                  id: 'name',
-                }, {
-                  id: 'stockMovement.name',
-              }]}
               getTdProps={(state, rowInfo) => ({
                   style: { color: _.get(rowInfo, 'original.putawayStatus') === 'READY' || rowInfo.aggregated ? 'black' : 'gray' },
                   onClick: (event, handleOriginal) => {
