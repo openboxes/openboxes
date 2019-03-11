@@ -317,7 +317,7 @@ function validate(values) {
   errors.lineItems = [];
 
   _.forEach(values.lineItems, (item, key) => {
-    if (!_.isNil(item.product) && item.quantityRequested < 0) {
+    if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
       errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
     }
   });
