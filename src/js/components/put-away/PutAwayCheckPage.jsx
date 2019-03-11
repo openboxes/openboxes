@@ -330,7 +330,6 @@ class PutAwayCheckPage extends Component {
               showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
-              defaultSorted={[{ id: 'name' }, { id: 'stockMovement.name' }]}
             />
             : null
         }
