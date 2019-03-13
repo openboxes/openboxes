@@ -119,7 +119,7 @@ const FIELDS = {
           title: 'react.stockMovement.adjustInventory.label',
         },
         getDynamicAttr: ({
-          fieldValue, subfield, stockMovementId, fetchPickPageItems, bins, locationId,
+          fieldValue, subfield, stockMovementId, fetchAdjustedItems, bins, locationId,
         }) => ({
           fieldValue: flattenRequest(fieldValue),
           subfield,
@@ -127,19 +127,19 @@ const FIELDS = {
           btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'react.stockMovement.adjust.label',
           btnOpenDefaultText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
           btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
-          onResponse: fetchPickPageItems,
+          onResponse: fetchAdjustedItems,
           bins,
           locationId,
         }),
       },
       revert: {
         type: ButtonField,
-        label: 'react.default.button.undo.label',
-        defaultMessage: 'Undo',
+        label: 'react.default.button.undoEdit.label',
+        defaultMessage: 'Undo edit',
         flexWidth: '0.7',
         fieldKey: '',
-        buttonLabel: 'react.default.button.undo.label',
-        buttonDefaultMessage: 'Undo',
+        buttonLabel: 'react.default.button.undoEdit.label',
+        buttonDefaultMessage: 'Undo edit',
         getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
           onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
           hidden: subfield,
@@ -170,7 +170,7 @@ class PickPage extends Component {
 
     this.revertUserPick = this.revertUserPick.bind(this);
     this.updatePickPageItem = this.updatePickPageItem.bind(this);
-    this.fetchPickPageItems = this.fetchPickPageItems.bind(this);
+    this.fetchAdjustedItems = this.fetchAdjustedItems.bind(this);
     this.sortByBins = this.sortByBins.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
   }
@@ -267,8 +267,8 @@ class PickPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  fetchPickPageItems() {
-    apiClient.get(`/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`)
+  fetchAdjustedItems(adjustedProductCode) {
+    apiClient.post(`/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateAdjustedItems?adjustedProduct=${adjustedProductCode}`)
       .then((resp) => {
         const { pickPageItems } = resp.data.data.pickPage;
 
@@ -498,7 +498,7 @@ class PickPage extends Component {
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stockMovementId: values.stockMovementId,
                 updatePickPageItem: this.updatePickPageItem,
-                fetchPickPageItems: this.fetchPickPageItems,
+                fetchAdjustedItems: this.fetchAdjustedItems,
                 revertUserPick: this.revertUserPick,
                 bins: this.state.bins,
                 locationId: this.state.values.origin.id,
