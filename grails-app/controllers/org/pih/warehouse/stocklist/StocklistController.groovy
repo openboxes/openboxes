@@ -9,16 +9,14 @@
  */
 package org.pih.warehouse.stocklist
 
-import grails.validation.ValidationException
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.requisition.*
 
 class StocklistController {
 
 	def stocklistService
+	def documentService
 
 	def show = {
 		println "stocklist " + params
@@ -41,12 +39,26 @@ class StocklistController {
 		)
 	}
 
+	def generateCsv = {
+		Stocklist stocklist = stocklistService.getStocklist(params.id)
+
+		render ""
+
+		def filename = "Stocklist - " + stocklist?.requisition?.name + ".xls"
+
+		response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+		response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+		log.info response
+		documentService.generateStocklistCsv(response.outputStream, stocklist)
+	}
+
 	def sendMail = {
 		if (!params.recipients || !params.id) {
 			throw new Exception("${warehouse.message(code:'email.noParams.message')}")
 		}
 		def emailBody = params.body + "\n\n" + "Sent by " + session.user.name
-		stocklistService.sendMail(params.id, params.subject, emailBody, [params.recipients])
+		stocklistService.sendMail(params.id, params.subject, emailBody, [params.recipients], params.includePdf == "on", params.includeXls == "on")
 		flash.message = "${warehouse.message(code:'email.sent.message')}"
 		redirect(controller: "requisitionTemplate", action: "show", params:[id: params.id])
 	}

@@ -61,6 +61,22 @@
                                     'recent updates. Please use this version for your next replenishment request.'}" class="text" cols="60" rows="10"/>
                         </td>
                     </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">
+                            <label for="includePdf"><warehouse:message code="stockList.includePdf.label" default="Include PDF document" /></label>
+                        </td>
+                        <td valign="top" class="value">
+                            <g:checkBox name="includePdf" value="${true}" />
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">
+                            <label for="includeXls"><warehouse:message code="stockList.includeXls.label" default="Include XLS document" /></label>
+                        </td>
+                        <td valign="top" class="value">
+                            <g:checkBox name="includeXls" value="${true}" />
+                        </td>
+                    </tr>
                     </tbody>
                     <tfoot>
                     <tr>

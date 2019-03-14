@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment;
 
@@ -1445,6 +1446,274 @@ class DocumentService {
 			row.getCell(4).setCellStyle(tableDataLeftStyle);
 			row.createCell(5).setCellValue("");
 			row.getCell(5).setCellStyle(tableDataLeftStyle);
+
+			log.info ("workbook " + workbook)
+			workbook.write(outputStream)
+		}
+		catch (Exception e) {
+			log.error e
+			throw e;
+		}
+	}
+
+	void generateStocklistCsv(OutputStream outputStream, Stocklist stocklistInstance) {
+
+		try {
+			Workbook workbook = new HSSFWorkbook();
+			CreationHelper createHelper = workbook.getCreationHelper();
+			Sheet sheet = workbook.createSheet();
+			sheet.setColumnWidth((short)0, (short) ((50 * 4) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)1, (short) ((50 * 6) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)2, (short) ((50 * 2) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)3, (short) ((50 * 4) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)4, (short) ((50 * 6) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)5, (short) ((50 * 6) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)6, (short) ((50 * 6) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)7, (short) ((50 * 6) / ((double) 1 / 20)))
+
+			// Bold font
+			Font boldFont = workbook.createFont();
+			boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+
+			// Bold cell style
+			CellStyle labelStyle = workbook.createCellStyle();
+			labelStyle.setFont(boldFont);
+
+			// Label center style
+			CellStyle labelCenterStyle = workbook.createCellStyle();
+			labelCenterStyle.setFont(boldFont);
+			labelCenterStyle.setAlignment(CellStyle.ALIGN_CENTER);
+			labelCenterStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+
+			CellStyle tableHeaderCenterStyle = workbook.createCellStyle();
+			tableHeaderCenterStyle.setAlignment(CellStyle.ALIGN_CENTER);
+			tableHeaderCenterStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+			tableHeaderCenterStyle.setBorderBottom((short)1);
+			tableHeaderCenterStyle.setBorderLeft((short)1);
+			tableHeaderCenterStyle.setBorderRight((short)1);
+			tableHeaderCenterStyle.setBorderTop((short)1);
+			tableHeaderCenterStyle.setFont(boldFont);
+			tableHeaderCenterStyle.setWrapText(true)
+
+			CellStyle tableHeaderLeftStyle = workbook.createCellStyle();
+			tableHeaderLeftStyle.setBorderBottom((short)1);
+			tableHeaderLeftStyle.setBorderLeft((short)1);
+			tableHeaderLeftStyle.setBorderRight((short)1);
+			tableHeaderLeftStyle.setBorderTop((short)1);
+			tableHeaderLeftStyle.setFont(boldFont);
+			tableHeaderLeftStyle.setWrapText(true)
+
+			// Bold and align center cell style
+			CellStyle boldAndCenterStyle = workbook.createCellStyle();
+			boldAndCenterStyle.setAlignment(CellStyle.ALIGN_CENTER);
+			boldAndCenterStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+			boldAndCenterStyle.setBorderBottom((short)1);
+			boldAndCenterStyle.setBorderLeft((short)1);
+			boldAndCenterStyle.setBorderRight((short)1);
+			boldAndCenterStyle.setBorderTop((short)1);
+			boldAndCenterStyle.setFont(boldFont);
+			boldAndCenterStyle.setWrapText(true)
+
+			// Align center cell style
+			CellStyle tableDataCenterStyle = workbook.createCellStyle();
+			tableDataCenterStyle.setAlignment(CellStyle.ALIGN_CENTER);
+			tableDataCenterStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+			tableDataCenterStyle.setBorderBottom((short)1);
+			tableDataCenterStyle.setBorderLeft((short)1);
+			tableDataCenterStyle.setBorderRight((short)1);
+			tableDataCenterStyle.setBorderTop((short)1);
+
+			// Align left cell style
+			CellStyle tableDataLeftStyle = workbook.createCellStyle();
+			tableDataLeftStyle.setAlignment(CellStyle.ALIGN_LEFT);
+			tableDataLeftStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+			tableDataLeftStyle.setBorderBottom((short)1);
+			tableDataLeftStyle.setBorderLeft((short)1);
+			tableDataLeftStyle.setBorderRight((short)1);
+			tableDataLeftStyle.setBorderTop((short)1);
+			tableDataLeftStyle.setWrapText(true)
+
+			// Align left cell style
+			CellStyle tableDataDateStyle = workbook.createCellStyle();
+			tableDataDateStyle.setAlignment(CellStyle.ALIGN_CENTER);
+			tableDataDateStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+			tableDataDateStyle.setBorderBottom((short)1);
+			tableDataDateStyle.setBorderLeft((short)1);
+			tableDataDateStyle.setBorderRight((short)1);
+			tableDataDateStyle.setBorderTop((short)1);
+			tableDataDateStyle.setDataFormat(createHelper.createDataFormat().getFormat("MMMM dd, yyyy"));
+
+			// SHIPMENT NUMBER
+			int counter = 0;
+			Row row = sheet.createRow((short)counter++);
+			row.setHeightInPoints(20.0)
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'report.stockRequisition.label'))
+			row.getCell(0).setCellStyle(labelStyle)
+			row.createCell(1).setCellValue(stocklistInstance?.requisition?.name)
+
+			// For warehouse use
+			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'report.forWarehouseUse.label'))
+			row.getCell(6).setCellStyle(tableDataCenterStyle)
+			row.createCell(7).setCellValue("");
+			row.getCell(7).setCellStyle(tableDataLeftStyle);
+			sheet.addMergedRegion(new CellRangeAddress(0, 0, 6, 7)) // Commercial Invoice
+
+			// Destination
+			row = sheet.createRow((short)counter++);
+			row.setHeightInPoints(20.0)
+			row.createCell(0).setCellValue(stocklistInstance?.destination?.name)
+			row.getCell(0).setCellStyle(labelStyle)
+
+			// Approved by
+			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'deliveryNote.approvedBy.label'))
+			row.getCell(6).setCellStyle(tableDataLeftStyle);
+			row.createCell(7).setCellValue("");
+			row.getCell(7).setCellStyle(tableDataLeftStyle);
+
+			// Signature
+			row = sheet.createRow((short)counter++);
+			row.setHeightInPoints(20.0)
+			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'default.signature.label'))
+			row.getCell(6).setCellStyle(tableDataLeftStyle);
+			row.createCell(7).setCellValue("");
+			row.getCell(7).setCellStyle(tableDataLeftStyle);
+
+			// Date
+			row = sheet.createRow((short)counter++);
+			row.setHeightInPoints(20.0)
+			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'default.date.label'))
+			row.getCell(6).setCellStyle(tableDataLeftStyle);
+			row.createCell(7).setCellValue("");
+			row.getCell(7).setCellStyle(tableDataLeftStyle);
+
+			// Processed by
+			row = sheet.createRow((short)counter++);
+			row.setHeightInPoints(20.0)
+			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'requisition.processedBy.label'))
+			row.getCell(6).setCellStyle(tableDataLeftStyle);
+			row.createCell(7).setCellValue("");
+			row.getCell(7).setCellStyle(tableDataLeftStyle);
+
+			// Date
+			row = sheet.createRow((short)counter++);
+			row.setHeightInPoints(20.0)
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'default.date.label'))
+			row.getCell(0).setCellStyle(tableDataLeftStyle);
+			row.createCell(1).setCellValue("");
+			row.getCell(1).setCellStyle(tableDataLeftStyle);
+
+			row.createCell(3).setCellValue("" + getMessageTagLib().message(code:'default.date.label'))
+			row.getCell(3).setCellStyle(tableDataLeftStyle);
+			row.createCell(4).setCellValue("");
+			row.getCell(4).setCellStyle(tableDataLeftStyle);
+
+
+			// Signature
+			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'default.signature.label'))
+			row.getCell(6).setCellStyle(tableDataLeftStyle);
+			row.createCell(7).setCellValue("");
+			row.getCell(7).setCellStyle(tableDataLeftStyle);
+
+			// Requested by
+			row = sheet.createRow((short)counter++);
+			row.setHeightInPoints(20.0)
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'requisition.requestedBy.label'))
+			row.getCell(0).setCellStyle(tableDataLeftStyle);
+			row.createCell(1).setCellValue("");
+			row.getCell(1).setCellStyle(tableDataLeftStyle);
+
+			// Approved by
+			row.createCell(3).setCellValue("" + getMessageTagLib().message(code:'deliveryNote.approvedBy.label'))
+			row.getCell(3).setCellStyle(tableDataLeftStyle);
+			row.createCell(4).setCellValue("");
+			row.getCell(4).setCellStyle(tableDataLeftStyle);
+
+			// Date
+			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'default.date.label'))
+			row.getCell(6).setCellStyle(tableDataLeftStyle);
+			row.createCell(7).setCellValue("");
+			row.getCell(7).setCellStyle(tableDataLeftStyle);
+
+			// Signature
+			row = sheet.createRow((short)counter++);
+			row.setHeightInPoints(20.0)
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'default.signature.label'))
+			row.getCell(0).setCellStyle(tableDataLeftStyle);
+			row.createCell(1).setCellValue("");
+			row.getCell(1).setCellStyle(tableDataLeftStyle);
+
+			row.createCell(3).setCellValue("" + getMessageTagLib().message(code:'default.signature.label'))
+			row.getCell(3).setCellStyle(tableDataLeftStyle);
+			row.createCell(4).setCellValue("");
+			row.getCell(4).setCellStyle(tableDataLeftStyle);
+
+			// Requisition number
+			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'requisition.requisitionNumber.label'))
+			row.getCell(6).setCellStyle(tableDataLeftStyle);
+			row.createCell(7).setCellValue("");
+			row.getCell(7).setCellStyle(tableDataLeftStyle);
+
+			row = sheet.createRow((short)counter++);
+			int CELL_INDEX = 0;
+
+			// ITEM TABLE HEADER
+			row = sheet.createRow((short)counter++);
+			row.setHeightInPoints(25.0)
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'report.pihCode.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'report.productDescription.label', default:'Product description'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'import.unit.label', default: 'Unit'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'import.maxQuantity.label', default: 'Max quantity'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'requisition.quantityOnHand.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'report.quantityRequested.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'report.quantityApproved.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+			row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code:'comments.label'));
+			row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle);
+
+			stocklistInstance.requisition.requisitionItems.sort(). each { requisitionItem ->
+
+				CELL_INDEX = 0
+				row = sheet.createRow((short)counter++);
+
+				row.createCell(CELL_INDEX).setCellValue(requisitionItem?.product?.productCode);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+				row.createCell(CELL_INDEX).setCellValue(requisitionItem?.product?.name);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+				row.createCell(CELL_INDEX).setCellValue(requisitionItem?.product?.defaultUom);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+				row.createCell(CELL_INDEX).setCellValue(requisitionItem?.quantity);
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle);
+
+				row.createCell(CELL_INDEX).setCellValue("");
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle);
+
+				row.createCell(CELL_INDEX).setCellValue("");
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle);
+
+				row.createCell(CELL_INDEX).setCellValue("");
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle);
+
+				row.createCell(CELL_INDEX).setCellValue("");
+				row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle);
+
+				row.setHeightInPoints(30.0)
+			}
 
 			log.info ("workbook " + workbook)
 			workbook.write(outputStream)
