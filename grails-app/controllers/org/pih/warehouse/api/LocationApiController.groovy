@@ -21,6 +21,13 @@ class LocationApiController extends BaseDomainApiController {
     def userService
 
     def list = {
+
+        def minLength = grailsApplication.config.openboxes.typeahead.minLength
+        if (params.name && params.name.size()<minLength) {
+            render([data:[]])
+            return
+        }
+
         Location currentLocation = Location.get(session?.warehouse?.id)
         boolean isSuperuser = userService.isSuperuser(session?.user)
         String direction = params?.direction
