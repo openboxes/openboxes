@@ -1139,6 +1139,12 @@ class JsonController {
 
 	def globalSearch = {
 
+        def minLength = grailsApplication.config.openboxes.typeahead.minLength
+        if (params.name && params.name.size()<minLength) {
+            render([:] as JSON)
+            return
+        }
+
 		def terms = params.term?.split(" ")
         def location = Location.get(session.warehouse.id)
 
