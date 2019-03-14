@@ -51,14 +51,14 @@ class StockMovementApiController {
         // FIXME Debugging
         JSONObject jsonObject = new JSONObject(stockMovement.toJson())
 
-        log.info "read " + jsonObject.toString(4)
+        log.debug "read " + jsonObject.toString(4)
         render ([data:stockMovement] as JSON)
     }
 
     def create = { StockMovement stockMovement ->
 
         JSONObject jsonObject = request.JSON
-        log.info "create " + jsonObject.toString(4)
+        log.debug "create " + jsonObject.toString(4)
 
         stockMovement = stockMovementService.createStockMovement(stockMovement)
         response.status = 201
@@ -68,7 +68,7 @@ class StockMovementApiController {
     def updateRequisition = { //StockMovement stockMovement ->
 
         JSONObject jsonObject = request.JSON
-        log.info "update: " + jsonObject.toString(4)
+        log.debug "update: " + jsonObject.toString(4)
 
         // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
@@ -82,7 +82,7 @@ class StockMovementApiController {
     def updateShipment = { //StockMovement stockMovement ->
 
         JSONObject jsonObject = request.JSON
-        log.info "update: " + jsonObject.toString(4)
+        log.debug "update: " + jsonObject.toString(4)
 
         // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
@@ -116,7 +116,7 @@ class StockMovementApiController {
 
 
         JSONObject jsonObject = request.JSON
-        log.info "update status: " + jsonObject.toString(4)
+        log.debug "update status: " + jsonObject.toString(4)
 
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
@@ -188,7 +188,7 @@ class StockMovementApiController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         JSONObject jsonObject = request.JSON
-        log.info "revise items: " + jsonObject.toString(4)
+        log.debug "revise items: " + jsonObject.toString(4)
 
         bindStockMovement(stockMovement, jsonObject)
 
@@ -201,7 +201,7 @@ class StockMovementApiController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         JSONObject jsonObject = request.JSON
-        log.info "update items: " + jsonObject.toString(4)
+        log.debug "update items: " + jsonObject.toString(4)
 
         bindStockMovement(stockMovement, jsonObject)
 
@@ -214,7 +214,7 @@ class StockMovementApiController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         JSONObject jsonObject = request.JSON
-        log.info "revise items: " + jsonObject.toString(4)
+        log.debug "revise items: " + jsonObject.toString(4)
 
         bindStockMovement(stockMovement, jsonObject)
 
@@ -363,7 +363,7 @@ class StockMovementApiController {
         }
 
         // Bind the rest of the JSON attributes to the stock movement object
-        log.info "Binding line items: " + lineItems
+        log.debug "Binding line items: " + lineItems
         bindData(stockMovement, jsonObject)
 
         // Need to clear the existing line items so we only process the modified ones
@@ -393,7 +393,7 @@ class StockMovementApiController {
      * @param lineItems
      */
     void bindLineItems(StockMovement stockMovement, List lineItems) {
-        log.info "line items: " + lineItems
+        log.debug "line items: " + lineItems
         List<StockMovementItem> stockMovementItems = createLineItemsFromJson(stockMovement, lineItems)
         stockMovement.lineItems.addAll(stockMovementItems)
     }
@@ -459,7 +459,7 @@ class StockMovementApiController {
     }
 
     void bindPackPage(StockMovement stockMovement, List lineItems) {
-        log.info "line items: " + lineItems
+        log.debug "line items: " + lineItems
         List<PackPageItem> packPageItems = createPackPageItemsFromJson(stockMovement, lineItems)
         PackPage packPage = new PackPage(packPageItems: packPageItems)
         stockMovement.packPage = packPage

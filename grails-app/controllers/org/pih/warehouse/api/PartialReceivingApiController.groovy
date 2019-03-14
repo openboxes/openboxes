@@ -37,14 +37,14 @@ class PartialReceivingApiController {
 
         JSONObject jsonObject = request.JSON
 
-        log.info "JSON " + jsonObject.toString(4)
+        log.debug "JSON " + jsonObject.toString(4)
 
         PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
 
         bindPartialReceiptData(partialReceipt, jsonObject)
 
         if (partialReceipt.receiptStatus == PartialReceiptStatus.COMPLETED) {
-            log.info "Save partial receipt"
+            log.debug "Save partial receipt"
             receiptService.saveAndCompletePartialReceipt(partialReceipt)
             receiptService.saveInboundTransaction(partialReceipt)
         }
