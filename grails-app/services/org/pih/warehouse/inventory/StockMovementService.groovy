@@ -136,7 +136,7 @@ class StockMovementService {
         }
 
         if (RequisitionStatus.ISSUED == requisition.status) {
-            requisition.name = stockMovement.name
+            requisition.name = stockMovement.name != requisition.name || requisition.destination == stockMovement.destination ? stockMovement.name : stockMovement.generateName()
             requisition.destination = stockMovement.destination
 
             if (requisition.hasErrors() || !requisition.save(flush: true)) {
@@ -1093,6 +1093,19 @@ class StockMovementService {
             throw new IllegalArgumentException("Could not find shipment for stock movement with ID ${stockMovement.id}")
         }
 
+        if (stockMovement.requisition.status == RequisitionStatus.ISSUED) {
+            shipment.name = stockMovement.name != shipment.name || shipment.destination == stockMovement.destination ? stockMovement.name : stockMovement.generateName()
+
+            if (shipment.destination != stockMovement.destination) {
+                shipment.outgoingTransactions?.each { transaction ->
+                    transaction.destination = stockMovement.destination
+                    transaction.save()
+                }
+            }
+        } else {
+            shipment.name = stockMovement.generateName()
+        }
+
         shipment.origin = stockMovement.origin
         shipment.destination = stockMovement.destination
         shipment.description = stockMovement.description
@@ -1103,9 +1116,6 @@ class StockMovementService {
         shipment.expectedShippingDate = stockMovement.dateShipped ?: shipment.expectedShippingDate
 
         shipment.shipmentType = stockMovement.shipmentType ?: shipment.shipmentType
-
-        // Last step will be to update the generated name
-        shipment.name = stockMovement.requisition.status == RequisitionStatus.ISSUED ? stockMovement.name : stockMovement.generateName()
 
         ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
         if (!trackingNumberType) {
