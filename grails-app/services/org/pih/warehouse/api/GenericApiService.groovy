@@ -59,7 +59,7 @@ class GenericApiService {
     }
 
     Object createObject(String resourceName, JSONObject jsonObject) {
-        log.info "Create object " + jsonObject.class + ": " + jsonObject
+        log.debug "Create object " + jsonObject.class + ": " + jsonObject
         def domainClass = getDomainClass(resourceName)
 
         def domainObject
@@ -77,7 +77,7 @@ class GenericApiService {
     }
 
     Object createObjects(String resourceName, JSONArray jsonArray) {
-        log.info "Create objects " + jsonArray.class + ": " + jsonArray
+        log.debug "Create objects " + jsonArray.class + ": " + jsonArray
         def domainObjects = []
         jsonArray.each { JSONObject jsonObject ->
             domainObjects << createObject(resourceName, jsonObject)
@@ -86,7 +86,7 @@ class GenericApiService {
     }
 
     Object updateObject(String resourceName, String id, JSONObject jsonObject) {
-        log.info "Update " + jsonObject
+        log.debug "Update " + jsonObject
         def domainObject = getObject(resourceName, id)
         domainObject.properties = jsonObject
         if (domainObject.hasErrors() || !domainObject.save()) {
@@ -96,6 +96,7 @@ class GenericApiService {
     }
 
     boolean deleteObject(String resourceName, String id) {
+        log.debug "Delete " + id
         def domainObject = getObject(resourceName, id)
         return domainObject.delete()
     }

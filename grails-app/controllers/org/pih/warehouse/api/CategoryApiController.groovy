@@ -20,7 +20,7 @@ class CategoryApiController {
     def productService
 
     def list = {
-        log.info "List products " + params
+        log.debug "List products " + params
 		def categories = productService.getCategoryTree()
         categories = categories.collect { it.toJson() }
 		render ([data:categories] as JSON)
@@ -35,7 +35,7 @@ class CategoryApiController {
     }
 
     def save = {
-        log.info "Save category " + params
+        log.debug "Save category " + params
         def category = Category.get(params.id)
         if (!category) {
             category = new Category(request.JSON)

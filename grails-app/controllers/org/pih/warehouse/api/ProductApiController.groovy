@@ -95,7 +95,7 @@ class ProductApiController extends BaseDomainApiController {
     def associatedProducts = {
         Product product = Product.get(params.id)
         ProductAssociationTypeCode[] types = params.list("type")
-        log.info "Types: " + types
+        log.debug "Types: " + types
         def productAssociations = ProductAssociation.createCriteria().list {
             eq("product", product)
             'in'("code", types)
@@ -106,7 +106,7 @@ class ProductApiController extends BaseDomainApiController {
         def location = (locationId) ? Location.get(locationId) : null
         if (location) {
             def products = productAssociations.collect { it.associatedProduct }
-            log.info("Location " + location + " products = " + products)
+            log.debug("Location " + location + " products = " + products)
 
             availableItems = inventoryService.getAvailableItems(location, product)
 

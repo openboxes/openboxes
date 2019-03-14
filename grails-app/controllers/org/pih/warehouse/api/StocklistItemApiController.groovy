@@ -47,7 +47,7 @@ class StocklistItemApiController {
         }
 
         JSONObject jsonObject = request.JSON
-        log.info "create " + jsonObject.toString(4)
+        log.debug "create " + jsonObject.toString(4)
 
         stocklistItem = stocklistItemService.createStocklistItem(stocklistItem, productId)
 
@@ -57,7 +57,7 @@ class StocklistItemApiController {
 
     def update = {
         JSONObject jsonObject = request.JSON
-        log.info "update: " + jsonObject.toString(4)
+        log.debug "update: " + jsonObject.toString(4)
 
         StocklistItem stocklistItem = stocklistItemService.getStocklistItem(params.id)
         if (!stocklistItem) {
