@@ -3,9 +3,11 @@
 		<table>
 			<tbody>
 				<tr>
-                    <td class="middle" width="1%">
-                        <g:render template="actions" model="[requisition:requisition]" />
-                    </td>
+					<g:isUserAdmin>
+						<td class="middle" width="1%">
+							<g:render template="actions" model="[requisition:requisition]" />
+						</td>
+					</g:isUserAdmin>
 					<td class="left">
 						<div class="title" id="description">
                             ${requisition.name}
