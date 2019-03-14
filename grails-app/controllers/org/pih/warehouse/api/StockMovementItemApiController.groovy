@@ -38,12 +38,12 @@ class StockMovementItemApiController {
     def updatePicklist = {
         JSONObject jsonObject = request.JSON
 
-        log.info "JSON " + jsonObject.toString(4)
+        log.debug "JSON " + jsonObject.toString(4)
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
         stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
 
-        log.info("Updating picklist items")
+        log.debug("Updating picklist items")
         List picklistItems = jsonObject.remove("picklistItems")
 
         if (!picklistItems) {
@@ -83,7 +83,7 @@ class StockMovementItemApiController {
 
         stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
 
-        log.info "Creating picklist for stock movement item ${stockMovementItem}"
+        log.debug "Creating picklist for stock movement item ${stockMovementItem}"
         stockMovementService.createPicklist(stockMovementItem)
 
         RequisitionItem requisitionItem = RequisitionItem.get(params.id)
@@ -99,7 +99,7 @@ class StockMovementItemApiController {
 
         stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
 
-        log.info "Clear picklist for stock movement item ${stockMovementItem}"
+        log.debug "Clear picklist for stock movement item ${stockMovementItem}"
         stockMovementService.clearPicklist(stockMovementItem)
 
         RequisitionItem requisitionItem = RequisitionItem.get(params.id)
@@ -111,7 +111,7 @@ class StockMovementItemApiController {
     def substituteItem = {
         JSONObject jsonObject = request.JSON
 
-        log.info "JSON " + jsonObject.toString(4)
+        log.debug "JSON " + jsonObject.toString(4)
 
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
@@ -151,7 +151,7 @@ class StockMovementItemApiController {
 
         RequisitionItem requisitionItem = stockMovementItem.requisitionItem
 
-        log.info "Item canceled " + requisitionItem.id
+        log.debug "Item canceled " + requisitionItem.id
         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
         requisitionItem.quantityApproved = 0
 
