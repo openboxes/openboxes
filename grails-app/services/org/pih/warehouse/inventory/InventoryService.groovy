@@ -13,6 +13,7 @@ import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.grails.plugins.csv.CSVWriter
 import org.hibernate.criterion.CriteriaSpecification
