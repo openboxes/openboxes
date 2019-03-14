@@ -103,6 +103,7 @@ class StockMovementService {
         if (stockMovement.description) requisition.description = stockMovement.description
         if (stockMovement.requestedBy) requisition.requestedBy = stockMovement.requestedBy
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
+        requisition.name = stockMovement.generateName()
 
         if (requisition.requisitionTemplate?.id != stockMovement.stocklist?.id) {
             removeRequisitionItems(requisition)
@@ -1164,6 +1165,7 @@ class StockMovementService {
         shipment.origin = stockMovement.origin
         shipment.destination = stockMovement.destination
         shipment.description = stockMovement.description
+        shipment.name = stockMovement.generateName()
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
