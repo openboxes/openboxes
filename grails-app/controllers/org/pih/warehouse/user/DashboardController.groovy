@@ -128,162 +128,11 @@ class DashboardController {
 		}
 
 	    def currentUser = User.get(session?.user?.id)
-
 		def location = Location.get(session?.warehouse?.id);
 		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
 		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
-		//def allOutgoingShipments = shipmentService.getShipmentsByOrigin(location)
-		//def allIncomingShipments = shipmentService.getShipmentsByDestination(location)
-
-		//def expiredStock = inventoryService.getExpiredStock(null, location)
-		//def expiringStockWithin30Days = inventoryService.getExpiringStock(null, location, 30)
-		//def expiringStockWithin90Days = inventoryService.getExpiringStock(null, location, 90)
-		//def expiringStockWithin180Days = inventoryService.getExpiringStock(null, location, 180)
-		//def expiringStockWithin365Days = inventoryService.getExpiringStock(null, location, 365)
-		//def lowStock = inventoryService.getLowStock(location)
-		//def reorderStock = inventoryService.getReorderStock(location)
-
-        // Days to include for activity list
-        def daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):3
-        def activityList = []
-
-        // Find recent requisition activity
-        def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where (r.isTemplate = false or r.isTemplate is null) and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
-                ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination': location])
-        requisitions.each {
-            def link = "${createLink(controller: 'requisition', action: 'show', id: it.id)}"
-            def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
-            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-            def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
-            activityType = "${warehouse.message(code: activityType)}"
-            activityList << new DashboardActivityCommand(
-                    type: "basket",
-                    label: "${warehouse.message(code:'dashboard.activity.requisition.label', args: [link, it.name, activityType, username])}",
-                    url: link,
-                    dateCreated: it.dateCreated,
-                    lastUpdated: it.lastUpdated,
-                    requisition: it)
-        }
-
-        // Add recent shipments
-		def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
-			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location] );
-		shipments.each {
-			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
-			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-			activityType = "${warehouse.message(code: activityType)}"
-			activityList << new DashboardActivityCommand(
-				type: "lorry",
-				label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}",
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				shipment: it)
-		}
-		//order by e.createdDate desc
-		//[max:params.max.toInteger(), offset:params.offset.toInteger ()]
-		def shippedShipments = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'SHIPPED'", ['eventDate':new Date()-daysToInclude])
-		shippedShipments.each {
-			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
-			def activityType = "dashboard.activity.shipped.label"
-			activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.destination.name])}"
-			activityList << new DashboardActivityCommand(
-				type: "lorry_go",
-				label: activityType,
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				shipment: it)
-		}
-		def receivedShipment = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'RECEIVED'", ['eventDate':new Date()-daysToInclude])
-		receivedShipment.each {
-			def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
-			def activityType = "dashboard.activity.received.label"
-			activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.origin.name])}"
-			activityList << new DashboardActivityCommand(
-				type: "lorry_stop",
-				label: activityType,
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				shipment: it)
-		}
-
-		def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude] );
-		products.each {
-			def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
-			def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it.updatedBy
-			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-			activityType = "${warehouse.message(code: activityType)}"
-			def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
-			activityList << new DashboardActivityCommand(
-				type: "package",
-				label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.name, activityType, username])}",
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				product: it)
-		}
-
-		// If the current location has an inventory, add recent transactions associated with that location to the activity list
-		if (location?.inventory) {
-			def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
-				t.inventory = :inventory", ['lastUpdated':new Date()-daysToInclude, 'inventory':location?.inventory] );
-
-			transactions.each {
-				def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
-				def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
-				def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-				activityType = "${warehouse.message(code: activityType)}"
-				def label = LocalizationUtil.getLocalizedString(it)
-				def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
-				activityList << new DashboardActivityCommand(
-					type: "arrow_switch_bluegreen",
-					label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType, username])}",
-					url: link,
-					dateCreated: it.dateCreated,
-					lastUpdated: it.lastUpdated,
-					transaction: it)
-			}
-		}
-
-		def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude], [max: 10] );
-		users.each {
-			def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
-			def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-			if (it.lastUpdated == it.lastLoginDate) {
-				activityType = "dashboard.activity.loggedIn.label"
-			}
-			activityType = "${warehouse.message(code: activityType)}"
-
-
-			activityList << new DashboardActivityCommand(
-				type: "user",
-				label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it?.name, activityType])}",
-				url: link,
-				dateCreated: it.dateCreated,
-				lastUpdated: it.lastUpdated,
-				user: it)
-		}
-
-		//activityList = activityList.groupBy { it.lastUpdated }
-        def activityListTotal = 0
-		def startIndex = 0
-        def endIndex = 0
-        if (activityList) {
-            activityList = activityList.sort { it.lastUpdated }.reverse()
-            activityListTotal = activityList.size()
-            startIndex = params.offset?Integer.valueOf(params.offset):0
-            endIndex = (startIndex + (params.max?Integer.valueOf(params.max):10))
-            if (endIndex > activityListTotal) endIndex = activityListTotal
-            endIndex -= 1
-    		activityList = activityList[startIndex..endIndex]
-        }
-
 
         log.info "dashboard.index Response time: " + (System.currentTimeMillis() - startTime) + " ms"
-		//def outgoingOrders = orderService.getOutgoingOrders(location)
-		//def incomingOrders = orderService.getIncomingOrders(location)
 
 		def newsItems = ConfigurationHolder.config.openboxes.dashboard.newsSummary.newsItems
 
@@ -295,11 +144,6 @@ class DashboardController {
 				requisitions             : [],
 				outgoingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentOutgoingShipments),
 				incomingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentIncomingShipments),
-				activityList             : activityList,
-				activityListTotal        : activityListTotal,
-				startIndex               : startIndex,
-				endIndex                 : endIndex,
-				daysToInclude            : daysToInclude,
 				tags                     : productService?.getPopularTags(50),
 				catalogs                 : productService?.getAllCatalogs()
 		]
@@ -549,33 +393,3 @@ class DashboardController {
 }
 
 
-class DashboardCommand {
-
-	List<DashboardActivityCommand> activityList;
-
-
-}
-
-
-class DashboardActivityCommand {
-
-	String label
-	String type
-	String url
-
-	User user
-	Shipment shipment
-	Receipt receipt
-    Requisition requisition
-	Product product
-	Transaction transaction
-	InventoryItem inventoryItem
-
-	Date lastUpdated
-	Date dateCreated
-
-
-	String getActivityType() {
-		return lastUpdated == dateCreated ? "created" : "updated"
-	}
-}
