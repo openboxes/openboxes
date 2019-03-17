@@ -20,6 +20,7 @@ import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -32,6 +33,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.util.LocalizationUtil
 import org.springframework.transaction.annotation.Transactional
 import util.InventoryUtil
 import java.text.NumberFormat
@@ -1600,6 +1602,138 @@ class JsonController {
         render ([count: count] as JSON)
     }
 
+    def getDashboardActivity = {
+
+        List activityList = []
+        def currentUser = User.get(session?.user?.id)
+        def location = Location.get(session.warehouse.id)
+        def daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):7
+
+        // Find recent requisition activity
+        def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where (r.isTemplate = false or r.isTemplate is null) and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
+                ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination': location])
+        requisitions.each {
+            def link = "${createLink(controller: 'requisition', action: 'show', id: it.id)}"
+            def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
+            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
+            activityType = "${warehouse.message(code: activityType)}"
+            activityList << [
+                    type: "basket",
+                    label: "${warehouse.message(code:'dashboard.activity.requisition.label', args: [link, it.name, activityType, username])}",
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    requisition: it]
+        }
+
+        // Add recent shipments
+        def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
+			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location] );
+        shipments.each {
+            def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            activityType = "${warehouse.message(code: activityType)}"
+            activityList << [
+                    type: "lorry",
+                    label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}",
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    shipment: it]
+        }
+        //order by e.createdDate desc
+        //[max:params.max.toInteger(), offset:params.offset.toInteger ()]
+        def shippedShipments = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'SHIPPED'", ['eventDate':new Date()-daysToInclude])
+        shippedShipments.each {
+            def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+            def activityType = "dashboard.activity.shipped.label"
+            activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.destination.name])}"
+            activityList << [
+                    type: "lorry_go",
+                    label: activityType,
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    shipment: it]
+        }
+        def receivedShipment = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'RECEIVED'", ['eventDate':new Date()-daysToInclude])
+        receivedShipment.each {
+            def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+            def activityType = "dashboard.activity.received.label"
+            activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.origin.name])}"
+            activityList << [
+                    type: "lorry_stop",
+                    label: activityType,
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    shipment: it]
+        }
+
+        def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude] );
+        products.each {
+            def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
+            def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it.updatedBy
+            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            activityType = "${warehouse.message(code: activityType)}"
+            def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
+            activityList << [
+                    type: "package",
+                    label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.name, activityType, username])}",
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    product: it]
+        }
+
+        // If the current location has an inventory, add recent transactions associated with that location to the activity list
+        if (location?.inventory) {
+            def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
+				t.inventory = :inventory", ['lastUpdated':new Date()-daysToInclude, 'inventory':location?.inventory] );
+
+            transactions.each {
+                def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
+                def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
+                def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+                activityType = "${warehouse.message(code: activityType)}"
+                def label = LocalizationUtil.getLocalizedString(it)
+                def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
+                activityList << [
+                        type: "arrow_switch_bluegreen",
+                        label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType, username])}",
+                        url: link,
+                        dateCreated: it.dateCreated,
+                        lastUpdated: it.lastUpdated,
+                        transaction: it]
+            }
+        }
+
+        def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude], [max: 10] );
+        users.each {
+            def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
+            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            if (it.lastUpdated == it.lastLoginDate) {
+                activityType = "dashboard.activity.loggedIn.label"
+            }
+            activityType = "${warehouse.message(code: activityType)}"
+            activityList << [
+                    type: "user",
+                    label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it?.name, activityType])}",
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    user: it]
+        }
+
+
+        def aaData = activityList.collect {
+            [type: it.type, label: it.label, lastUpdated:it.lastUpdated?.format('MMM d hh:mma')]
+        }
+
+
+        render ([aaData:aaData] as JSON)
+    }
 
 
 }
