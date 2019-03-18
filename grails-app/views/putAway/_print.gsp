@@ -1,5 +1,5 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" defaultCodec="html" %>
 <html>
 <head>
     <style>

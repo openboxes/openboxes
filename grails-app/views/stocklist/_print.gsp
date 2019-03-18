@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode" contentType="text/html;charset=UTF-8" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode" contentType="text/html;charset=UTF-8" defaultCodec="html" %>
 <html>
 <head>
     <style>
@@ -67,7 +67,7 @@
         .b-l0 { border-left: 0 !important; }
         .no-padding { padding: 0 !important; }
         .w100 { width: 100% !important; }
-        .no-wrap { white-space: nowrap; }      
+        .no-wrap { white-space: nowrap; }
         .gray-background { background-color: #ddd !important; }
         .fixed-layout { table-layout: fixed; }
     </style>
