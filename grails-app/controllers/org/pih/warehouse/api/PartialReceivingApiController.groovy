@@ -131,7 +131,7 @@ class PartialReceivingApiController {
 
                 PartialReceiptItem partialReceiptItem = partialReceiptItems.find { receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId }
 
-                if ((expirationDate && expirationDate != partialReceiptItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT))
+                if ((expirationDate && Constants.EXPIRATION_DATE_FORMATTER.parse(expirationDate).format(Constants.EXPIRATION_DATE_FORMAT) != partialReceiptItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT))
                     || (recipientId && recipientId != partialReceiptItem?.recipient?.id) || (lotNumber && lotNumber != partialReceiptItem.lotNumber)) {
                     throw new IllegalArgumentException("You cannot import other fields than quantity. To make other changes, please edit all necessary lines before trying the import again.")
                 }
