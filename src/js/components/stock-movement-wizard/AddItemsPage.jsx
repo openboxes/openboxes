@@ -961,12 +961,12 @@ class AddItemsPage extends Component {
 
   /**
    * Saves changes made by user in this step and go back to previous page
-   * @param {object} formValues
+   * @param {object} values
+   * @param {boolean} invalid
    * @public
    */
-  previousPage(values) {
-    const errors = validate(values).lineItems;
-    if (!errors.length) {
+  previousPage(values, invalid) {
+    if (!invalid) {
       this.saveRequisitionItemsInCurrentStep(values.lineItems)
         .then(() => this.props.previousPage(values));
     } else {
@@ -989,7 +989,7 @@ class AddItemsPage extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={() => {}}
         validate={validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
@@ -1064,11 +1064,20 @@ class AddItemsPage extends Component {
                   newItem: this.state.newItem,
                 }))}
               <div>
-                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.previousPage(values)}>
+                <button
+                  type="submit"
+                  onClick={() => this.previousPage(values, invalid)}
+                  className="btn btn-outline-primary btn-form btn-xs"
+                >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
+                  onClick={() => {
+                    if (!invalid) {
+                      this.nextPage(values);
+                    }
+                  }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />

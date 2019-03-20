@@ -567,11 +567,11 @@ class EditItemsPage extends Component {
   /**
    * Saves changes made by user in this step and go back to previous page
    * @param {object} values
+   * @param {boolean} invalid
    * @public
    */
-  previousPage(values) {
-    const errors = validate(values).editPageItems;
-    if (!errors.length) {
+  previousPage(values, invalid) {
+    if (!invalid) {
       this.reviseRequisitionItems(values)
         .then(() => this.props.previousPage(values));
     } else {
@@ -594,11 +594,11 @@ class EditItemsPage extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={() => {}}
         validate={validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values }) => (
+        render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <span>
               <button
@@ -635,10 +635,22 @@ class EditItemsPage extends Component {
                 values,
               }))}
               <div>
-                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.previousPage(values)}>
+                <button
+                  type="submit"
+                  onClick={() => this.previousPage(values, invalid)}
+                  className="btn btn-outline-primary btn-form btn-xs"
+                >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">
+                <button
+                  type="submit"
+                  onClick={() => {
+                    if (!invalid) {
+                      this.nextPage(values);
+                    }
+                  }}
+                  className="btn btn-outline-primary btn-form float-right btn-xs"
+                >
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
