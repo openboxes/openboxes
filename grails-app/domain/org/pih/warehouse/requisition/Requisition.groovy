@@ -119,7 +119,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
-    static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment"]
+    static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
     static mapping = {
@@ -347,6 +347,16 @@ class Requisition implements Comparable<Requisition>, Serializable {
             shipment = shipments.iterator().next()
         }
         return shipment
+    }
+
+    /**
+     * Return total value of the issued shipment
+     *
+     * @return
+     */
+    BigDecimal getTotalCost() {
+        def itemsWithPrice = requisitionItems?.findAll { it.product.pricePerUnit }
+        return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum()?:0
     }
 
 

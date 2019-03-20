@@ -54,6 +54,10 @@
                             <th class="center"><warehouse:message code="requisitionTemplate.maxQuantity.label"/></th>
                             <th class="center"><warehouse:message code="unitOfMeasure.label"/></th>
                             <th class="center"><warehouse:message code="requisitionTemplate.monthlyQuantity.label"/></th>
+                            <g:hasRoleFinance>
+                                <th class="center"><warehouse:message code="requisitionTemplate.unitCost.label"/></th>
+                                <th class="center"><warehouse:message code="requisitionTemplate.totalCost.label"/></th>
+                            </g:hasRoleFinance>
                             <g:isUserAdmin>
                                 <th><warehouse:message code="default.actions.label"/></th>
                             </g:isUserAdmin>
@@ -81,6 +85,10 @@
                                           from="['EA/1']"/>
                             </td>
                             <td></td>
+                            <g:hasRoleFinance>
+                                <td></td>
+                                <td></td>
+                            </g:hasRoleFinance>
                             <g:isUserAdmin>
                                 <td>
                                     <button class="button icon add" id="add-requisition-item">
@@ -141,6 +149,16 @@
                                             <g:message code="requisitionTemplate.noReplenishmentPeriod.message"/>
                                         </g:else>
                                     </td>
+                                    <g:hasRoleFinance>
+                                        <td class="center middle">
+                                             ${g.formatNumber(number: (requisitionItem?.product?.pricePerUnit?:0), format: '###,###,##0.00##')}
+                                             ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                        </td>
+                                        <td class="center middle">
+                                            ${g.formatNumber(number: (requisitionItem?.totalCost?:0), format: '###,###,##0.00##')}
+                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                        </td>
+                                    </g:hasRoleFinance>
                                     <g:isUserAdmin>
                                         <td>
                                             <g:link controller="requisitionTemplate" action="removeFromRequisitionItems" id="${requisition?.id}"
