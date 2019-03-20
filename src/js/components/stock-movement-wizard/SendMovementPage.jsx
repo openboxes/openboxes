@@ -404,12 +404,12 @@ class SendMovementPage extends Component {
 
   /**
    * Saves changes made by user in this step and go back to previous page
-   * @param {object} formValues
+   * @param {object} values
+   * @param {boolean} invalid
    * @public
    */
-  previousPage(values) {
-    const errors = validate(values);
-    if (_.isEmpty(errors)) {
+  previousPage(values, invalid) {
+    if (!invalid) {
       this.saveValues(values)
         .then(() => this.props.previousPage(values));
     } else {
@@ -431,7 +431,7 @@ class SendMovementPage extends Component {
 
   /**
    * Saves changes made by user in this step and redirects to the shipment view page
-   * @param {object} formValues
+   * @param {object} values
    * @public
    */
   saveAndExit(values) {
@@ -466,7 +466,7 @@ class SendMovementPage extends Component {
       <div>
         <hr />
         <Form
-          onSubmit={values => this.submitStockMovement(values)}
+          onSubmit={() => {}}
           validate={validate}
           mutators={{ ...arrayMutators }}
           initialValues={this.state.values}
@@ -544,15 +544,16 @@ class SendMovementPage extends Component {
               </div>
               <div>
                 <button
-                  type="button"
+                  type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
-                  onClick={() => this.previousPage(values)}
+                  onClick={() => this.previousPage(values, invalid)}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
+                  onClick={() => { this.submitStockMovement(values); }}
                   className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={invalid || values.statusCode === 'ISSUED'}
                 >
@@ -608,14 +609,15 @@ class SendMovementPage extends Component {
                   </tbody>
                 </table>
                 <button
-                  type="button"
+                  type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
-                  onClick={() => this.previousPage(values)}
+                  onClick={() => this.previousPage(values, invalid)}
                 > <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
+                  onClick={() => { this.submitStockMovement(values); }}
                   className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={invalid || values.statusCode === 'ISSUED'}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
