@@ -115,7 +115,7 @@
 			<g:link
 					controller="stocklist"
 					action="sendMail"
-					params="['id':requisition.id,'subject':'STOCK LIST UPDATE','body':'STOCK LIST UPDATE','recipients':requisition.requestedBy?.email]"
+					params="['id':requisition.id,'subject':'STOCK LIST UPDATE','body':'Please find attached a new version of your stock list reflecting recent updates. Please use this version for your next replenishment request.','recipients':requisition.requestedBy?.email]"
 					class="button"
 			>
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" />&nbsp;
