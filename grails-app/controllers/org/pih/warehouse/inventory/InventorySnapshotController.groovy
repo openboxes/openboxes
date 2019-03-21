@@ -16,6 +16,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.jobs.CalculateQuantityJob
 import org.pih.warehouse.product.Product
+import org.springframework.http.HttpStatus
 
 import java.text.DateFormat
 import java.text.ParseException
@@ -23,8 +24,9 @@ import java.text.SimpleDateFormat
 
 class InventorySnapshotController {
 
-    InventoryService inventoryService
     DataService dataService
+    InventoryService inventoryService
+    InventorySnapshotService inventorySnapshotService
 
     def index = {
         redirect(action:"list")
@@ -51,17 +53,46 @@ class InventorySnapshotController {
 
     }
 
+    // TODO The following method should be removed before merge
+    def getBinLocations = {
+        Date date = new Date()
+        date.clearTime()
+        Location location = Location.get(session.warehouse.id)
+        def binLocations = inventorySnapshotService.getBinLocations(location)
+        render([binLocations:binLocations] as JSON)
+    }
+
+    // TODO The following method should be removed before merge
+    def triggerAll = {
+        def startTime = System.currentTimeMillis()
+        Date date = new Date()
+        date.clearTime()
+        inventorySnapshotService.triggerInventorySnapshot(date)
+        render ([status: HttpStatus.OK.name(), responseTime: "${System.currentTimeMillis()-startTime}ms"] as JSON)
+    }
+
+    // TODO The following method should be removed before merge
+    def trigger = {
+        def startTime = System.currentTimeMillis()
+        Date date = new Date()
+        date.clearTime()
+        Product product = Product.get(params.productId)
+        Location location = Location.get(session.warehouse.id)
+
+        if (product) {
+            inventorySnapshotService.triggerInventorySnapshot(date, location, product)
+        }
+        else {
+            inventorySnapshotService.triggerInventorySnapshot(date, location)
+        }
+        render ([status: HttpStatus.OK.name(), responseTime: "${System.currentTimeMillis()-startTime}ms"] as JSON)
+    }
+
     def update = {
         println "Update inventory snapshot " + params
         try {
-
-            log.info "Params.date = " + params.date
-            log.info "Params.date.class = " + params.date.class
-
             def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-
-            def date = new Date()
-            date = dateFormat.parse(params.date)
+            def date = dateFormat.parse(params.date)
             date.clearTime()
 
             def results = CalculateQuantityJob.triggerNow([locationId: params.location.id, date: date])
