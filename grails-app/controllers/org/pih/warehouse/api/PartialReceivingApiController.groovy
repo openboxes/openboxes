@@ -12,11 +12,9 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.core.Location
 
 class PartialReceivingApiController {
 
@@ -133,7 +131,7 @@ class PartialReceivingApiController {
 
                 if ((expirationDate && Constants.EXPIRATION_DATE_FORMATTER.parse(expirationDate).format(Constants.EXPIRATION_DATE_FORMAT) != partialReceiptItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT))
                     || (recipientId && recipientId != partialReceiptItem?.recipient?.id) || (lotNumber && lotNumber != partialReceiptItem.lotNumber)) {
-                    throw new IllegalArgumentException("You cannot import other fields than quantity. To make other changes, please edit all necessary lines before trying the import again.")
+                    throw new IllegalArgumentException("You can only import the Receiving Now and the Comment fields. To make other changes, please use the edit line feature. You can then export and import the template again.")
                 }
 
                 if (!partialReceiptItem) {
