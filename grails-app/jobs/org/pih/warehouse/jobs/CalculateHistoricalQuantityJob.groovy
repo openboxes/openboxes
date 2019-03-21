@@ -20,7 +20,7 @@ class CalculateHistoricalQuantityJob {
 
     static dates = []
     static enabled = true
-    def inventoryService
+    def inventorySnapshotService
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
@@ -41,7 +41,7 @@ class CalculateHistoricalQuantityJob {
                 // Filter down to the transaction dates within the last 18 months
                 def daysToProcess = ConfigHolder.config.openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess
                 def startDate = new Date() - daysToProcess
-                def transactionDates = inventoryService.getTransactionDates()
+                def transactionDates = inventorySnapshotService.getTransactionDates()
                 transactionDates = transactionDates.findAll { it >= startDate }
                 dates = transactionDates.reverse()
                 log.info "Refreshing ${dates.size()} dates"
@@ -55,7 +55,7 @@ class CalculateHistoricalQuantityJob {
             // FIXME This could get stuck if there's a date that generates 0 inventory snapshot records (but that should not happen)
             log.info "Triggering inventory snapshot for date ${nextDate}"
             //CalculateQuantityJob.triggerNow([date: nextDate, includeInventoryItemSnapshot: false])
-            inventoryService.createOrUpdateInventorySnapshot(nextDate)
+            inventorySnapshotService.triggerInventorySnapshot(nextDate)
         }
     }
 
