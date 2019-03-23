@@ -1609,8 +1609,7 @@ class JsonController {
         Location location = Location.get(session.warehouse.id)
         def startTime = System.currentTimeMillis()
         def results = inventoryService.getTransactionEntriesByLocation(location)
-        render ([status: "OK", count: results.size(), responseTime: "${System.currentTimeMillis()-startTime} ms",
-        results:results] as JSON)
+        render ([status: "OK", count: results.size(), responseTime: "${System.currentTimeMillis()-startTime} ms"] as JSON)
         //render ([result: result] as JSON)
 
     }
