@@ -3804,9 +3804,7 @@ class InventoryService implements ApplicationContextAware {
             throw new RuntimeException("Location must have an inventory")
         }
 
-        def criteria = Transaction.createCriteria();
-        def transactionEntries = criteria.list {
-
+        def transactions = Transaction.createCriteria().list {
             // eager fetch transaction and transaction type
 			fetchMode("transactionType", org.hibernate.FetchMode.JOIN)
 			fetchMode("inboundTransfer", org.hibernate.FetchMode.JOIN)
@@ -3815,8 +3813,8 @@ class InventoryService implements ApplicationContextAware {
 			eq("inventory", location.inventory)
 			order("transactionDate", "asc")
 			order("dateCreated", "asc")
-			maxResults(10)
         }
+		def transactionEntries = transactions*.transactionEntries.flatten()
 
 //		def transactionEntries = TransactionEntry.executeQuery(
 //				'select te from TransactionEntry te ' +
