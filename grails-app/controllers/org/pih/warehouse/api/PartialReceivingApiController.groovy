@@ -116,8 +116,10 @@ class PartialReceivingApiController {
             csv.toCsvReader(settings).eachLine { tokens ->
                 String receiptItemId = tokens[0] ?: null
                 String shipmentItemId = tokens[1] ?: null
+                String code = tokens[2] ?: null
                 String lotNumber = tokens[4] ?: null
                 String expirationDate = tokens[5] ?: null
+                String binLocation = tokens[6] ?: null
                 String recipientId = tokens[7] ?: null
                 Integer quantityReceiving = tokens[11] ? tokens[11].toInteger() : null
                 String comment = tokens[12] ? tokens[12] : null
@@ -130,7 +132,8 @@ class PartialReceivingApiController {
                 PartialReceiptItem partialReceiptItem = partialReceiptItems.find { receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId }
 
                 if ((expirationDate && Constants.EXPIRATION_DATE_FORMATTER.parse(expirationDate).format(Constants.EXPIRATION_DATE_FORMAT) != partialReceiptItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT))
-                    || (recipientId && recipientId != partialReceiptItem?.recipient?.id) || (lotNumber && lotNumber != partialReceiptItem.lotNumber)) {
+                    || (recipientId && recipientId != partialReceiptItem?.recipient?.id) || (lotNumber && lotNumber != partialReceiptItem.lotNumber) || (binLocation && binLocation != partialReceiptItem.binLocation.name)
+                    || (code && code != partialReceiptItem.product.productCode)) {
                     throw new IllegalArgumentException("You can only import the Receiving Now and the Comment fields. To make other changes, please use the edit line feature. You can then export and import the template again.")
                 }
 
