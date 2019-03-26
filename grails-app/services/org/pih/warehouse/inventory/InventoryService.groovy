@@ -3762,7 +3762,7 @@ class InventoryService implements ApplicationContextAware {
 		def binLocations = getBinLocationDetails(location)
 
         binLocationReport.data = binLocations
-        //binLocationReport.summary = getBinLocationSummary(binLocations)
+        binLocationReport.summary = getBinLocationSummary(binLocations)
 
         return binLocationReport
     }
