@@ -24,6 +24,12 @@ class InventorySnapshotService {
     def dataSource
     def inventoryService
 
+    def refreshInventorySnapshots(Date date) {
+        deleteInventorySnapshots(date)
+        populateInventorySnapshots(date)
+    }
+
+
     def populateInventorySnapshots() {
         def transactionDates = getTransactionDates()
         for (Date date: transactionDates) {
@@ -39,8 +45,8 @@ class InventorySnapshotService {
         }
     }
 
-    def populateInventorySnapshot(Date date, Location location) {
-        populateInventorySnapshot(date, location, null)
+    def populateInventorySnapshots(Date date, Location location) {
+        populateInventorySnapshots(date, location, null)
     }
 
     def populateInventorySnapshots(Date date, Location location, Product product) {
@@ -53,15 +59,32 @@ class InventorySnapshotService {
         log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${readTime}ms/${writeTime}ms"
     }
 
-    def deleteInventorySnapshots(Date date, Location location) {
-        InventorySnapshot.executeUpdate("""delete from InventorySnapshot snapshot 
-        where snapshot.date = :date and snapshot.location = :location""", [date: date, location:location])
+    def deleteInventorySnapshots(Date date) {
+        deleteInventorySnapshots(date, null, null)
     }
 
+    def deleteInventorySnapshots(Date date, Location location) {
+        deleteInventorySnapshots(date, location, null)
+    }
+
+
     def deleteInventorySnapshots(Date date, Location location, Product product) {
-        InventorySnapshot.executeUpdate("""delete from InventorySnapshot snapshot 
-            where snapshot.date = :date and snapshot.location = :location
-            and snapshot.product = :product""", [date: date, location:location, product: product])
+        Map params = [:]
+
+        String deleteStmt = """delete from InventorySnapshot snapshot where snapshot.date = :date"""
+        params.put("date", date)
+
+        if (location) {
+            deleteStmt + " and snapshot.location = :location"
+            params.put("location", location)
+        }
+
+        if (product) {
+            deleteStmt + " and snapshot.product = :product"
+            params.put("product", product)
+        }
+
+        InventorySnapshot.executeUpdate(deleteStmt, params)
     }
 
     def calculateBinLocations(Location location, Product product) {
