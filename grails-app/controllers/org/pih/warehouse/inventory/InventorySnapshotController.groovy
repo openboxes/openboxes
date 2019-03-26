@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat
 class InventorySnapshotController {
 
     DataService dataService
-    InventoryService inventoryService
     InventorySnapshotService inventorySnapshotService
 
     def index = {
@@ -68,9 +67,18 @@ class InventorySnapshotController {
             log.error("An error occurred while attempting to trigger inventory snapshot update: " + e.message, e)
             render([error:e.class.name, message:e.message]as JSON)
         }
-
-
     }
+
+    def trigger = {
+        Date date = new Date()
+        date.clearTime()
+        Product product = Product.get(params.productId)
+        Location location = Location.get(session.warehouse.id)
+        inventorySnapshotService.deleteInventorySnapshots(date, location, product)
+        inventorySnapshotService.populateInventorySnapshots(date, location, product)
+        render ([status: "OK"] as JSON)
+    }
+
 
     def triggerCalculateQuantityOnHandJob = {
         println "triggerCalculateQuantityOnHandJob: " + params
@@ -85,12 +93,12 @@ class InventorySnapshotController {
 
     def dates = {
         Location location = Location.get(session.warehouse.id)
-        def dates = inventoryService.getTransactionDates()
+        def dates = inventorySnapshotService.getTransactionDates()
         render (dates as JSON)
     }
 
     def locations = {
-        def locations = inventoryService.getDepotLocations()
+        def locations = inventorySnapshotService.getDepotLocations()
 
         render (locations as JSON)
 
@@ -119,7 +127,7 @@ class InventorySnapshotController {
         Location location = Location.get(params?.location?.id?:session?.warehouse?.id)
         Date date = (params.date) ? dateFormat.parse(params.date) : new Date()
 
-        def data = inventoryService.findInventorySnapshotByDateAndLocation(date, location)
+        def data = inventorySnapshotService.findInventorySnapshotByDateAndLocation(date, location)
 
         def csv = dataService.generateCsv(data)
         println "CSV: " + csv
@@ -141,7 +149,7 @@ class InventorySnapshotController {
             Date date = (params.date) ? dateFormat.parse(params.date) : new Date()
             Location location = Location.get(params?.location?.id?:session?.warehouse?.id)
 
-            List data = inventoryService.findInventorySnapshotByDateAndLocation(date, location)
+            List data = inventorySnapshotService.findInventorySnapshotByDateAndLocation(date, location)
             render(["aaData": data, "iTotalRecords": data.size() ?: 0, "iTotalDisplayRecords": data.size() ?: 0, "sEcho": 1] as JSON)
 
 

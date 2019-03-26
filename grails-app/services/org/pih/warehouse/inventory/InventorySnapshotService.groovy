@@ -19,7 +19,7 @@ import java.sql.BatchUpdateException
 
 class InventorySnapshotService {
 
-    //boolean transactional = true
+    boolean transactional = true
 
     def dataSource
     def inventoryService
@@ -32,35 +32,40 @@ class InventorySnapshotService {
     }
 
     def populateInventorySnapshots(Date date) {
-        def startTime = System.currentTimeMillis()
         def locations = getDepotLocations()
         locations.each { location ->
             log.debug "Creating or updating inventory snapshot for date ${date}, location ${location.name} ..."
             populateInventorySnapshots(date, location)
         }
-        log.info "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
     }
 
-    def populateInventorySnapshots(Date date, Location location) {
-        def binLocations = getBinLocations(location)
-        saveInventorySnapshots(date, location, binLocations)
+    def populateInventorySnapshot(Date date, Location location) {
+        populateInventorySnapshot(date, location, null)
     }
 
     def populateInventorySnapshots(Date date, Location location, Product product) {
-        def binLocations = getBinLocations(location, product)
+        def startTime = System.currentTimeMillis()
+        def binLocations = calculateBinLocations(location, product)
+        def readTime = (System.currentTimeMillis()-startTime)
+        startTime = System.currentTimeMillis()
         saveInventorySnapshots(date, location, binLocations)
+        def writeTime = System.currentTimeMillis()-startTime
+        log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${readTime}ms/${writeTime}ms"
     }
 
-
-    def getBinLocations(Location location) {
-        def binLocations = inventoryService.getBinLocationDetails(location)
-        binLocations = transformBinLocations(binLocations)
-        return binLocations
+    def deleteInventorySnapshots(Date date, Location location) {
+        InventorySnapshot.executeUpdate("""delete from InventorySnapshot snapshot 
+        where snapshot.date = :date and snapshot.location = :location""", [date: date, location:location])
     }
 
+    def deleteInventorySnapshots(Date date, Location location, Product product) {
+        InventorySnapshot.executeUpdate("""delete from InventorySnapshot snapshot 
+            where snapshot.date = :date and snapshot.location = :location
+            and snapshot.product = :product""", [date: date, location:location, product: product])
+    }
 
-    def getBinLocations(Location location, Product product) {
-        def binLocations = inventoryService.getProductQuantityByBinLocation(location, product)
+    def calculateBinLocations(Location location, Product product) {
+        def binLocations = product ? inventoryService.getProductQuantityByBinLocation(location, product) : inventoryService.getBinLocationDetails(location)
         binLocations = transformBinLocations(binLocations)
         return binLocations
     }
@@ -117,7 +122,6 @@ class InventorySnapshotService {
                 log.error("Error executing batch update for location ${location.name}" + e.message, e)
             }
         }
-        log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${System.currentTimeMillis()-startTime}ms"
     }
 
     def getTransactionDates(Location location, Product product) {
