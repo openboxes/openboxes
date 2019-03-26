@@ -24,32 +24,37 @@ class InventorySnapshotService {
     def dataSource
     def inventoryService
 
-    def triggerInventorySnapshot(Date date) {
+    def populateInventorySnapshots() {
+        def transactionDates = getTransactionDates()
+        for (Date date: transactionDates) {
+            populateInventorySnapshots(date)
+        }
+    }
+
+    def populateInventorySnapshots(Date date) {
         def startTime = System.currentTimeMillis()
         def locations = getDepotLocations()
         locations.each { location ->
             log.debug "Creating or updating inventory snapshot for date ${date}, location ${location.name} ..."
-            triggerInventorySnapshot(date, location)
+            populateInventorySnapshots(date, location)
         }
         log.info "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
     }
 
-    def triggerInventorySnapshot(Date date, Location location) {
+    def populateInventorySnapshots(Date date, Location location) {
         def binLocations = getBinLocations(location)
         saveInventorySnapshots(date, location, binLocations)
     }
 
-    def triggerInventorySnapshot(Date date, Location location, Product product) {
+    def populateInventorySnapshots(Date date, Location location, Product product) {
         def binLocations = getBinLocations(location, product)
         saveInventorySnapshots(date, location, binLocations)
     }
 
 
     def getBinLocations(Location location) {
-        def startTime = System.currentTimeMillis()
         def binLocations = inventoryService.getBinLocationDetails(location)
         binLocations = transformBinLocations(binLocations)
-        log.info ("Get bin locations: ${System.currentTimeMillis()-startTime} ms")
         return binLocations
     }
 

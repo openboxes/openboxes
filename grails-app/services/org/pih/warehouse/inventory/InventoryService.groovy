@@ -3814,7 +3814,6 @@ class InventoryService implements ApplicationContextAware {
 			order("transactionDate", "asc")
 			order("dateCreated", "asc")
         }
-		def transactionEntries = transactions*.transactionEntries.flatten()
 
 //		def transactionEntries = TransactionEntry.executeQuery(
 //				'select te from TransactionEntry te ' +
@@ -3837,12 +3836,8 @@ class InventoryService implements ApplicationContextAware {
 //						'order by t.dateCreated asc'
 //				, [inventory: location.inventory])
 //
-//		def transactionEntries = results*.transactionEntries.flatten()
 
-		log.info "Results: " + transactionEntries
-        log.info "Response time: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        return transactionEntries;
+        return transactions*.transactionEntries.flatten();
     }
 
 

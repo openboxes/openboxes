@@ -1605,20 +1605,9 @@ class JsonController {
     }
 
     // TODO The following method should be removed before merge
-    def getTransactionEntriesByLocation = {
-        Location location = Location.get(session.warehouse.id)
-        def startTime = System.currentTimeMillis()
-        def results = inventoryService.getTransactionEntriesByLocation(location)
-        render ([status: "OK", count: results.size(), responseTime: "${System.currentTimeMillis()-startTime} ms"] as JSON)
-        //render ([result: result] as JSON)
-
-    }
-
-    // TODO The following method should be removed before merge
     def getLocation = {
         List locations = Location.list([max:10])
         render ([status: "OK", locations: locations] as JSON)
-
     }
 
 }
