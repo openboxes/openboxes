@@ -265,6 +265,13 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectRecipient = { attrs, body ->
+        attrs.from = User.list().sort { it.firstName }
+        attrs.optionKey = 'email'
+        attrs.optionValue = { it.name + " (" + it.username + ")"}
+        out << g.select(attrs)
+    }
+
 
     def selectProducts = { attrs, body ->
         def products = Product.executeQuery("select id, name from Product")

@@ -112,13 +112,8 @@
 					&nbsp;${warehouse.message(code: 'requisitionTemplate.unpublish.label', default: 'Unpublish stock list')}
 				</g:link>
 			</g:else>
-			<g:link
-					controller="stocklist"
-					action="sendMail"
-					params="['id':requisition.id,'subject':'STOCK LIST UPDATE','body':'STOCK LIST UPDATE','recipients':requisition.requestedBy?.email]"
-					class="button"
-			>
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" />&nbsp;
+			<g:link controller="requisitionTemplate" action="sendMail" id="${requisition?.id}" class="button">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" />
 				${warehouse.message(code: 'default.button.email.label')}
 			</g:link>
 		</g:isUserAdmin>
