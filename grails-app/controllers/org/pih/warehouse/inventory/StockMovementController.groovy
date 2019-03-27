@@ -96,7 +96,7 @@ class StockMovementController {
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
         stockMovement.receiptStatusCode = params?.receiptStatusCode ? params.receiptStatusCode as ShipmentStatusCode : null
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, max, offset)
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params, max, offset)
         def statistics = requisitionService.getRequisitionStatistics(requisition.destination, requisition.origin, currentUser)
 
         render(view:"list", params:params, model:[stockMovements: stockMovements, statistics:statistics])
