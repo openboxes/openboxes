@@ -417,7 +417,7 @@ class RequisitionTemplateController {
                 println "line: " + tokens + " delimiter=" + delimiter
                 println "ROW " + tokens
                 if (tokens) {
-                    data << tokens
+                    data << tokens[0..3]
                 }
             }
 
