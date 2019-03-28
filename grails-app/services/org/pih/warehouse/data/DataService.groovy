@@ -729,16 +729,16 @@ class DataService {
         return sw.toString()
     }
 
-    def transformObjects(List objects, List includeFields) {
+    def transformObjects(List objects, Map includeFields) {
         objects.collect { object ->
             return transformObject(object, includeFields)
         }
     }
 
-    def transformObject(Object object, List includeFields) {
+    def transformObject(Object object, Map includeFields) {
         Map properties = [:]
-        includeFields.each { fieldName ->
-            def value = fieldName.tokenize('.').inject(object) {v, k -> v?."$k"}
+        includeFields.each { fieldName, property ->
+            def value = property.tokenize('.').inject(object) {v, k -> v?."$k"}
             properties[fieldName] = value?:""
         }
         return properties

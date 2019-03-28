@@ -581,7 +581,7 @@ class DocumentService {
 	void generateExcel(OutputStream outputStream, List<Map> data) {
 		try {
 			Workbook workbook = new HSSFWorkbook();
-			HSSFSheet sheet = workbook.createSheet();
+			HSSFSheet sheet = workbook.createSheet("Sheet1");
 			createExcelHeader(sheet, 0, data.get(0).keySet().toList());
 			data.eachWithIndex { Map dataRow, index ->
 				createExcelRow(sheet, index+1, dataRow);

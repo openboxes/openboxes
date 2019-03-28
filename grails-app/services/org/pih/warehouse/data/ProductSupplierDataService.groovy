@@ -27,22 +27,30 @@ class ProductSupplierDataService {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
 
-            if(params.id && !ProductSupplier.exists(params["code"])) {
-                command.errors.reject("Row ${index+1}: Product supplier with ID ${params.id} does not exist")
+            def id = params.id
+            def code = params.code
+            def productCode = params.productCode
+            def supplierId = params.supplierId
+            def supplierName = params.supplierName
+            def manufacturerId = params.manufacturerId
+            def manufacturerName = params.manufacturerName
+
+            if(id && !ProductSupplier.exists(id)) {
+                command.errors.reject("Row ${index+1}: Product supplier with ID ${id} does not exist")
             }
 
-            if (!Product.findByProductCode(params["product.productCode"])) {
-                command.errors.reject("Row ${index+1}: Product with productCode ${params['product.productCode']} does not exist")
+            if (!Product.findByProductCode(productCode)) {
+                command.errors.reject("Row ${index+1}: Product with productCode ${productCode} does not exist")
             }
 
-            def supplier = Organization.get(params["supplier.id"])
-            if(supplier?.name != params["supplier.name"]) {
-                command.errors.reject("Row ${index+1}: Organization ${supplier.name} with id ${params['supplier.id']} does not match ${params['supplier.name']}")
+            def supplier = Organization.get(supplierId)
+            if(supplier?.name != supplierName) {
+                command.errors.reject("Row ${index+1}: Organization ${supplier?.name} with id ${supplier?.id} does not match ${supplierName}")
             }
 
-            def manufacturer = Organization.get(params["manufacturer.id"])
-            if(manufacturer?.name != params["manufacturer.name"]) {
-                command.errors.reject("Row ${index+1}: Organization ${manufacturer.name} with id ${params['manufacturer.id']} does not match ${params['manufacturer.name']}")
+            def manufacturer = Organization.get(manufacturerId)
+            if(manufacturer?.name != manufacturerName) {
+                command.errors.reject("Row ${index+1}: Organization ${manufacturer?.name} with id ${manufacturer?.id} does not match ${manufacturerName}")
             }
 
             def productSupplier = createOrUpdate(params)
@@ -66,7 +74,10 @@ class ProductSupplierDataService {
     }
 
     def createOrUpdate(Map params) {
-        ProductSupplier productSupplier = ProductSupplier.get(params["code"])
+
+        log.info ("params: ${params}")
+
+        ProductSupplier productSupplier = ProductSupplier.findByIdOrCode(params["id"], params["code"])
         if (!productSupplier) {
             productSupplier = new ProductSupplier(params)
         }
@@ -74,10 +85,10 @@ class ProductSupplierDataService {
             productSupplier.properties = params
         }
 
-        productSupplier.product = Product.findByProductCode(params["product.productCode"])
-        productSupplier.supplier = Organization.get(params["supplier.id"])
-        productSupplier.manufacturer = Organization.get(params["manufacturer.id"])
-
+        productSupplier.name = params["productName"]
+        productSupplier.product = Product.findByProductCode(params["productCode"])
+        productSupplier.supplier = Organization.get(params["supplierId"])
+        productSupplier.manufacturer = Organization.get(params["manufacturerId"])
         return productSupplier
     }
 }
