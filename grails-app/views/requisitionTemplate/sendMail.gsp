@@ -38,7 +38,7 @@
                             <label><warehouse:message code="mail.to.label" default="To"/></label>
                         </td>
                         <td class="value">
-                            <g:selectRecipient name="recipients" noSelection="['':'']"
+                            <g:selectRecipient name="recipients" required="required" noSelection="['':'']"
                                           value="${requisition?.requestedBy?.email}"
                                           multiple="true"
                                           class="chzn-select-deselect"/>
@@ -49,7 +49,7 @@
                             <label><warehouse:message code="mail.subject.label" default="Subject"/></label>
                         </td>
                         <td class="value">
-                            <g:textField name="subject" value="${params.subject?:'STOCK LIST UPDATE'}" class="text" size="60"/>
+                            <g:textField name="subject" required="required" value="${params.subject?:'STOCK LIST UPDATE'}" class="text" size="60"/>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -57,7 +57,7 @@
                             <label><warehouse:message code="mail.message.label" default="Message"/></label>
                         </td>
                         <td class="value">
-                            <g:textArea name="body" value="${params?.body?:'Please find attached a new version of your stock list reflecting ' +
+                            <g:textArea name="body" required="required" value="${params?.body?:'Please find attached a new version of your stock list reflecting ' +
                                     'recent updates. Please use this version for your next replenishment request.'}" class="text" cols="60" rows="10"/>
                         </td>
                     </tr>
