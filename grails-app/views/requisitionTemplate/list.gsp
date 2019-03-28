@@ -18,10 +18,12 @@
                     <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                     <warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/>
                 </g:link>
-                <g:link class="button" controller="requisitionTemplate" action="create" params="[type:'STOCK']">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-                    <warehouse:message code="default.add.label" args="[g.message(code:'requisitionTemplate.label')]"/>
-                </g:link>
+                <g:isUserAdmin>
+                    <g:link class="button" controller="requisitionTemplate" action="create" params="[type:'STOCK']">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                        <warehouse:message code="default.add.label" args="[g.message(code:'requisitionTemplate.label')]"/>
+                    </g:link>
+                </g:isUserAdmin>
             </div>
             <div class="yui-gf">
                 <div class="yui-u first">

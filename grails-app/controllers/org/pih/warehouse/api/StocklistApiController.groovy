@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
@@ -42,7 +42,7 @@ class StocklistApiController {
     def create = { Stocklist stocklist ->
 
         JSONObject jsonObject = request.JSON
-        log.info "create " + jsonObject.toString(4)
+        log.debug "create " + jsonObject.toString(4)
 
         stocklist = stocklistService.createStocklist(stocklist)
 
@@ -52,7 +52,7 @@ class StocklistApiController {
 
     def update = {
         JSONObject jsonObject = request.JSON
-        log.info "update: " + jsonObject.toString(4)
+        log.debug "update: " + jsonObject.toString(4)
 
         Stocklist stocklist = stocklistService.getStocklist(params.id)
         if (!stocklist) {
@@ -73,9 +73,9 @@ class StocklistApiController {
 
     def sendMail = {
         JSONObject jsonObject = request.JSON
-        log.info "send mail: " + jsonObject.toString(4)
-
-        stocklistService.sendMail(params.id, jsonObject.subject, jsonObject.text, jsonObject.recipients)
+        log.debug "send mail: " + jsonObject.toString(4)
+        def emailBody = jsonObject.text + "\n\n" + "Sent by " + session.user.name
+        stocklistService.sendMail(params.id, jsonObject.subject, emailBody, jsonObject.recipients, jsonObject.includePdf, jsonObject.includeXls)
 
         render status: 200
     }

@@ -15,7 +15,7 @@ import Translate from '../../../utils/Translate';
 const FIELDS = {
   reasonCode: {
     type: SelectField,
-    label: 'stockMovement.reasonCode.label',
+    label: 'react.stockMovement.reasonCode.label',
     defaultMessage: 'Reason code',
     getDynamicAttr: props => ({
       options: props.reasonCodes,
@@ -26,22 +26,22 @@ const FIELDS = {
     fields: {
       lotNumber: {
         type: LabelField,
-        label: 'stockMovement.lot.label',
+        label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
       },
       expirationDate: {
         type: LabelField,
-        label: 'stockMovement.expiry.label',
+        label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
       },
       'binLocation.name': {
         type: LabelField,
-        label: 'stockMovement.binLocation.label',
+        label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin Location',
       },
       quantityAvailable: {
         type: LabelField,
-        label: 'stockMovement.quantityAvailable.label',
+        label: 'react.stockMovement.quantityAvailable.label',
         defaultMessage: 'Qty Available',
         fixedWidth: '150px',
         attributes: {
@@ -50,7 +50,7 @@ const FIELDS = {
       },
       quantityPicked: {
         type: TextField,
-        label: 'stockMovement.quantityPicked.label',
+        label: 'react.stockMovement.quantityPicked.label',
         defaultMessage: 'Qty Picked',
         fixedWidth: '140px',
         attributes: {
@@ -66,10 +66,10 @@ function validate(values) {
   errors.availableItems = [];
   _.forEach(values.availableItems, (item, key) => {
     if (item.quantityPicked > item.quantityAvailable) {
-      errors.availableItems[key] = { quantityPicked: 'errors.higherTyPicked.label ' };
+      errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.higherTyPicked.label ' };
     }
     if (item.quantityPicked < 0) {
-      errors.availableItems[key] = { quantityPicked: 'errors.negativeQtyPicked.label' };
+      errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.negativeQtyPicked.label' };
     }
   });
 
@@ -82,7 +82,7 @@ function validate(values) {
 
   if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
     !values.reasonCode && pickedSum !== values.quantityRequired) {
-    errors.reasonCode = 'errors.differentTotalQty.label';
+    errors.reasonCode = 'react.stockMovement.errors.differentTotalQty.label';
   }
 
   return errors;
@@ -159,7 +159,7 @@ class EditPickModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}`;
+    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}/updatePicklist`;
     const payload = {
       picklistItems: _.map(values.availableItems, avItem => ({
         id: avItem.id || '',
@@ -170,15 +170,14 @@ class EditPickModal extends Component {
       })),
     };
 
-    return apiClient.post(url, payload).then(() => {
-      apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
-        .then((resp) => {
-          const { pickPageItems } = resp.data.data.pickPage;
-          this.props.onResponse(pickPageItems);
-          this.props.hideSpinner();
-        })
-        .catch(() => { this.props.hideSpinner(); });
-    }).catch(() => { this.props.hideSpinner(); });
+    return apiClient.post(url, payload)
+      .then((resp) => {
+        const pickPageItem = resp.data.data;
+
+        this.state.attr.onResponse(pickPageItem);
+        this.props.hideSpinner();
+      })
+      .catch(() => { this.props.hideSpinner(); });
   }
 
   /**
@@ -191,7 +190,7 @@ class EditPickModal extends Component {
     return (
       <div>
         <div className="font-weight-bold pb-2">
-          <Translate id="stockMovement.quantityPicked.label" defaultMessage="Qty Picked" />: {_.reduce(values.availableItems, (sum, val) =>
+          <Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" />: {_.reduce(values.availableItems, (sum, val) =>
             (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
         </div>
         <hr />
@@ -217,13 +216,13 @@ class EditPickModal extends Component {
       >
         <div>
           <div className="font-weight-bold">
-            <Translate id="stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.fieldValue.productCode}
+            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.fieldValue.productCode}
           </div>
           <div className="font-weight-bold">
-            <Translate id="stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.fieldValue['product.name']}
+            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.fieldValue['product.name']}
           </div>
           <div className="font-weight-bold">
-            <Translate id="stockMovement.quantityRequired.label" defaultMessage="Qty Required" />: {this.state.attr.fieldValue.quantityRequired}
+            <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />: {this.state.attr.fieldValue.quantityRequired}
           </div>
         </div>
       </ModalWrapper>
@@ -244,6 +243,4 @@ EditPickModal.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  /** Function updating page on which modal is located called when user saves changes */
-  onResponse: PropTypes.func.isRequired,
 };

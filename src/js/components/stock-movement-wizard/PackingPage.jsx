@@ -30,12 +30,12 @@ const FIELDS = {
       productCode: {
         type: LabelField,
         flexWidth: '0.7',
-        label: 'stockMovement.code.label',
+        label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
       },
       productName: {
         type: LabelField,
-        label: 'stockMovement.productName.label',
+        label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product Name',
         flexWidth: '3',
         attributes: {
@@ -44,37 +44,37 @@ const FIELDS = {
       },
       binLocationName: {
         type: LabelField,
-        label: 'stockMovement.binLocation.label',
+        label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin location',
         flexWidth: '1',
       },
       lotNumber: {
         type: LabelField,
-        label: 'stockMovement.lot.label',
+        label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
         flexWidth: '1',
       },
       expirationDate: {
         type: LabelField,
-        label: 'stockMovement.expiry.label',
+        label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
         flexWidth: '1',
       },
       quantityShipped: {
         type: LabelField,
-        label: 'stockMovement.quantityShipped.label',
+        label: 'react.stockMovement.quantityShipped.label',
         defaultMessage: 'Qty shipped',
         flexWidth: '0.8',
       },
       uom: {
         type: LabelField,
-        label: 'default.uom.label',
+        label: 'react.stockMovement.uom.label',
         defaultMessage: 'UoM',
         flexWidth: '0.8',
       },
       recipient: {
         type: SelectField,
-        label: 'stockMovement.recipient.label',
+        label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
         flexWidth: '2.5',
         fieldKey: '',
@@ -93,25 +93,25 @@ const FIELDS = {
       },
       palletName: {
         type: TextField,
-        label: 'stockMovement.pallet.label',
+        label: 'react.stockMovement.pallet.label',
         defaultMessage: 'Pallet',
         flexWidth: '0.8',
       },
       boxName: {
         type: TextField,
-        label: 'stockMovement.box.label',
+        label: 'react.stockMovement.box.label',
         defaultMessage: 'Box',
         flexWidth: '0.8',
       },
       splitLineItems: {
         type: PackingSplitLineModal,
-        label: 'stockMovement.splitLine.label',
+        label: 'react.stockMovement.splitLine.label',
         defaultMessage: 'Split line',
         flexWidth: '1',
         fieldKey: '',
         attributes: {
-          title: 'stockMovement.splitLine.label',
-          btnOpenText: 'stockMovement.splitLine.label',
+          title: 'react.stockMovement.splitLine.label',
+          btnOpenText: 'react.stockMovement.splitLine.label',
           btnOpenDefaultText: 'Split line',
           btnOpenClassName: 'btn btn-outline-success',
         },
@@ -144,8 +144,22 @@ class PackingPage extends Component {
   }
 
   componentDidMount() {
-    this.fetchAllData();
+    if (this.props.stockMovementTranslationsFetched) {
+      this.dataFetched = true;
+
+      this.fetchAllData();
+    }
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
+      this.dataFetched = true;
+
+      this.fetchAllData();
+    }
+  }
+
+  dataFetched = false;
 
   /**
    * Fetches all required data.
@@ -173,7 +187,7 @@ class PackingPage extends Component {
         const { packPageItems } = resp.data.data.packPage;
         this.setState({ values: { ...this.state.values, packPageItems } });
         this.props.hideSpinner();
-        Alert.success(this.props.translate('alert.saveSuccess.label', 'Changes saved successfully'));
+        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'));
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -184,18 +198,18 @@ class PackingPage extends Component {
    */
   refresh() {
     confirmAlert({
-      title: this.props.translate('message.confirmRefresh.label', 'Confirm refresh'),
+      title: this.props.translate('react.stockMovement.message.confirmRefresh.label', 'Confirm refresh'),
       message: this.props.translate(
-        'confirmRefresh.message',
+        'react.stockMovement.confirmRefresh.message',
         'Are you sure you want to refresh? Your progress since last save will be lost.',
       ),
       buttons: [
         {
-          label: this.props.translate('default.yes.label', 'Yes'),
+          label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => this.fetchAllData(),
         },
         {
-          label: this.props.translate('default.no.label', 'No'),
+          label: this.props.translate('react.default.no.label', 'No'),
         },
       ],
     });
@@ -249,7 +263,7 @@ class PackingPage extends Component {
    * @public
    */
   savePackingData(packPageItems) {
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateShipmentItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       stepNumber: '5',
@@ -258,7 +272,7 @@ class PackingPage extends Component {
 
     if (payload.packPageItems.length) {
       return apiClient.post(updateItemsUrl, flattenRequest(payload))
-        .catch(() => Promise.reject(new Error('error.saveRequisitionItems.label')));
+        .catch(() => Promise.reject(new Error('react.stockMovement.error.saveRequisitionItems.label')));
     }
 
     return Promise.resolve();
@@ -301,7 +315,7 @@ class PackingPage extends Component {
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-refresh pr-2" />
-                  <Translate id="default.button.refresh.label" defaultMessage="Reload" />
+                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
                 </span>
               </button>
               <button
@@ -311,7 +325,7 @@ class PackingPage extends Component {
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
               >
                 <span><i className="fa fa-save pr-2" />
-                  <Translate id="default.button.save.label" defaultMessage="Save" />
+                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
                 </span>
               </button>
               <button
@@ -319,7 +333,7 @@ class PackingPage extends Component {
                 onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; })}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="stockMovement.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -329,10 +343,10 @@ class PackingPage extends Component {
               }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.savePackingData(values.packPageItems).then(() => this.props.previousPage(values))}>
-                  <Translate id="default.button.previous.label" defaultMessage="Previous" />
+                  <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">
-                  <Translate id="default.button.next.label" defaultMessage="Next" />
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
@@ -347,6 +361,7 @@ const mapStateToProps = state => ({
   recipients: state.users.data,
   recipientsFetched: state.users.fetched,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
 });
 
 export default (connect(mapStateToProps, {
@@ -368,4 +383,5 @@ PackingPage.propTypes = {
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  stockMovementTranslationsFetched: PropTypes.bool.isRequired,
 };

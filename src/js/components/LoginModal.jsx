@@ -44,7 +44,7 @@ class LoginForm extends Component {
     return (
       <div className="login-modal-container">
         <div className="login-modal-header px-3 py-2">
-          <span><i className="fa fa-unlock-alt pr-2" />{this.props.translate('default.login.label', 'Login')}</span>
+          <span><i className="fa fa-unlock-alt pr-2" />{this.props.translate('react.default.login.label', 'Login')}</span>
         </div>
         <div className="px-3">
           <input
@@ -52,7 +52,7 @@ class LoginForm extends Component {
             name="username"
             type="text"
             className="form-control my-2"
-            placeholder={this.props.translate('login.username.label', 'email or username')}
+            placeholder={this.props.translate('react.default.username.placeholder', 'email or username')}
             value={this.state.username}
             onChange={(event) => {
               this.setState({ username: event.target.value });
@@ -63,7 +63,7 @@ class LoginForm extends Component {
             name="password"
             type="password"
             className="form-control my-2"
-            placeholder={this.props.translate('login.password.label', 'password')}
+            placeholder={this.props.translate('react.default.password.placeholder', 'password')}
             value={this.state.password}
             onChange={(event) => {
               this.setState({ password: event.target.value });
@@ -73,7 +73,7 @@ class LoginForm extends Component {
             className="btn btn-outline-primary btn-block my-3"
             disabled={!this.state.username || !this.state.password}
             onClick={this.onLogin}
-          >{this.props.translate('auth.login.label', 'Login')}
+          >{this.props.translate('react.default.button.login.label', 'Login')}
           </button>
         </div>
       </div>

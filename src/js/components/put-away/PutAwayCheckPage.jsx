@@ -110,53 +110,53 @@ class PutAwayCheckPage extends Component {
    */
   getColumns = () => [
     {
-      Header: <Translate id="stockMovement.code.label" defaultMessage="Code" />,
+      Header: <Translate id="react.putAway.code.label" defaultMessage="Code" />,
       accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="stockMovement.name.label" defaultMessage="Name" />,
+      Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
       accessor: 'product.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="stockMovement.lotSerialNo.label" defaultMessage="Lot/Serial No." />,
+      Header: <Translate id="react.putAway.lotSerialNo.label" defaultMessage="Lot/Serial No." />,
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="stockMovement.expiry.label" defaultMessage="Expiry" />,
+      Header: <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="stockMovement.recipient.label" defaultMessage="Recipient" />,
+      Header: <Translate id="react.putAway.recipient.label" defaultMessage="Recipient" />,
       accessor: 'recipient.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="putAway.qty.label" defaultMessage="QTY" />,
+      Header: <Translate id="react.putAway.qty.label" defaultMessage="QTY" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
       Filter,
     }, {
-      Header: <Translate id="putAway.preferredBin.label" defaultMessage="Preferred bin" />,
+      Header: <Translate id="react.putAway.preferredBin.label" defaultMessage="Preferred bin" />,
       accessor: 'preferredBin',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="putAway.currentBin.label" defaultMessage="Current bin" />,
+      Header: <Translate id="react.putAway.currentBin.label" defaultMessage="Current bin" />,
       accessor: 'currentBins',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="putAway.putAwayBin.label" defaultMessage="Putaway Bin" />,
+      Header: <Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" />,
       accessor: 'putawayLocation.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="stockMovement.label" defaultMessage="Stock Movement" />,
+      Header: <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />,
       accessor: 'stockMovement.name',
       style: { whiteSpace: 'normal' },
       Expander: ({ isExpanded }) => (
@@ -228,7 +228,7 @@ class PutAwayCheckPage extends Component {
       .then(() => {
         this.props.hideSpinner();
 
-        Alert.success(this.props.translate('alert.putAwayCompleted.label', 'Putaway was successfully completed!'));
+        Alert.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'));
 
         this.props.firstPage();
       })
@@ -242,18 +242,18 @@ class PutAwayCheckPage extends Component {
    */
   confirmPutaway() {
     confirmAlert({
-      title: this.props.translate('message.confirmPutAway.label', 'Confirm putaway'),
+      title: this.props.translate('react.putAway.message.confirmPutAway.label', 'Confirm putaway'),
       message: this.props.translate(
-        'confirmPutAway.message',
+        'react.putAway.confirmPutAway.message',
         'Are you sure you want to putaway? There are some lines with empty bin locations.',
       ),
       buttons: [
         {
-          label: this.props.translate('default.yes.label', 'Yes'),
+          label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => this.save(),
         },
         {
-          label: this.props.translate('default.no.label', 'No'),
+          label: this.props.translate('react.default.no.label', 'No'),
         },
       ],
     });
@@ -275,10 +275,10 @@ class PutAwayCheckPage extends Component {
 
     return (
       <div className="main-container">
-        <h1><Translate id="putAway.putAway.label" defaultMessage="Putaway -" /> {this.state.putAway.putawayNumber}</h1>
+        <h1><Translate id="react.putAway.putAway.label" defaultMessage="Putaway -" /> {this.state.putAway.putawayNumber}</h1>
         <div className="d-flex justify-content-between mb-2">
           <div>
-            <Translate id="putAway.showBy.label" defaultMessage="Show by" />:
+            <Translate id="react.putAway.showBy.label" defaultMessage="Show by" />:
             <button
               className="btn btn-primary ml-2 btn-xs"
               data-toggle="button"
@@ -286,8 +286,8 @@ class PutAwayCheckPage extends Component {
               onClick={toggleTree}
             >
               {pivotBy && pivotBy.length ?
-                <Translate id="stockMovement.label" defaultMessage="Stock Movement" />
-                    : <Translate id="product.label" defaultMessage="Product" /> }
+                <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />
+                    : <Translate id="react.putAway.product.label" defaultMessage="Product" /> }
             </button>
           </div>
           {this.state.completed ?
@@ -295,7 +295,7 @@ class PutAwayCheckPage extends Component {
               type="button"
               className="btn btn-outline-primary float-right mb-2 btn-xs"
               onClick={() => this.props.firstPage()}
-            ><Translate id="putAway.goBack.label" defaultMessage="Go back to putaway list" />
+            ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
             </button> :
             <div>
               <button
@@ -306,13 +306,13 @@ class PutAwayCheckPage extends Component {
                   expanded: this.state.expanded,
                 })}
                 className="btn btn-outline-primary mb-2 btn-xs mr-2"
-              ><Translate id="default.button.edit.label" defaultMessage="Edit" />
+              ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
               </button>
               <button
                 type="button"
                 onClick={() => this.completePutAway()}
                 className="btn btn-outline-primary float-right mb-2 btn-xs"
-              ><Translate id="putAway.completePutAway.label" defaultMessage="Complete Putaway" />
+              ><Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
               </button>
             </div>
           }
@@ -330,7 +330,6 @@ class PutAwayCheckPage extends Component {
               showPaginationBottom={false}
               filterable
               defaultFilterMethod={this.filterMethod}
-              defaultSorted={[{ id: 'name' }, { id: 'stockMovement.name' }]}
             />
             : null
         }
@@ -340,14 +339,14 @@ class PutAwayCheckPage extends Component {
               type="button"
               className="btn btn-outline-primary float-right my-2 btn-xs"
               onClick={() => this.props.firstPage()}
-            ><Translate id="putAway.goBack.label" defaultMessage="Go back to putaway list" />
+            ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
             </button> :
             <div>
               <button
                 type="button"
                 onClick={() => this.completePutAway()}
                 className="btn btn-outline-primary float-right my-2 btn-xs"
-              ><Translate id="putAway.completePutAway.label" defaultMessage="Complete Putaway" />
+              ><Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
               </button>
               <button
                 type="button"

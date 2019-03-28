@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
@@ -43,6 +44,13 @@ class ProductApiController extends BaseDomainApiController {
     }
 
     def list = {
+
+        def minLength = grailsApplication.config.openboxes.typeahead.minLength
+        if (params.name && params.name.size()<minLength) {
+            render([data:[]])
+            return
+        }
+
         String [] terms = params?.name?.split(",| ")?.findAll { it }
         def products = productService.searchProducts(terms, [])
         products = products.unique()
@@ -87,7 +95,7 @@ class ProductApiController extends BaseDomainApiController {
     def associatedProducts = {
         Product product = Product.get(params.id)
         ProductAssociationTypeCode[] types = params.list("type")
-        log.info "Types: " + types
+        log.debug "Types: " + types
         def productAssociations = ProductAssociation.createCriteria().list {
             eq("product", product)
             'in'("code", types)
@@ -98,7 +106,7 @@ class ProductApiController extends BaseDomainApiController {
         def location = (locationId) ? Location.get(locationId) : null
         if (location) {
             def products = productAssociations.collect { it.associatedProduct }
-            log.info("Location " + location + " products = " + products)
+            log.debug("Location " + location + " products = " + products)
 
             availableItems = inventoryService.getAvailableItems(location, product)
 

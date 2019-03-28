@@ -13,6 +13,7 @@ import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.grails.plugins.csv.CSVWriter
 import org.hibernate.criterion.CriteriaSpecification
@@ -4291,9 +4292,10 @@ class InventoryService implements ApplicationContextAware {
 							//log.info "Saving snapshot for product[${index}]: " + product
 							def onHandQuantity = onHandQuantityMap[inventoryItem]
 
+							String inventoryItemId = StringEscapeUtils.escapeSql(inventoryItem?.id)
 							//stmt.addBatch(date:date.format("yyyy-MM-dd hh:mm:ss"), locationId:location.id, productId:product.id, inventoryItemId:null, quantityOnHand:onHandQuantity)
 							def insertStmt = "insert into inventory_item_snapshot(id,version,date,location_id,product_id,inventory_item_id,quantity_on_hand,date_created,last_updated) " +
-									"values ('${UUID.randomUUID().toString()}', 0,'${dateString}','${location?.id}','${inventoryItem?.product?.id}','${inventoryItem?.id}',${onHandQuantity},now(),now()) " +
+									"values ('${UUID.randomUUID().toString()}', 0,'${dateString}','${location?.id}','${inventoryItem?.product?.id}','${inventoryItemId}',${onHandQuantity},now(),now()) " +
 									"ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity},last_updated=now()"
 							stmt.addBatch(insertStmt)
 						}

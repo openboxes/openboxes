@@ -22,19 +22,19 @@ import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 function validate(values) {
   const errors = {};
   if (!values.description) {
-    errors.description = 'error.requiredField.label';
+    errors.description = 'react.default.error.requiredField.label';
   }
   if (!values.origin) {
-    errors.origin = 'error.requiredField.label';
+    errors.origin = 'react.default.error.requiredField.label';
   }
   if (!values.destination) {
-    errors.destination = 'error.requiredField.label';
+    errors.destination = 'react.default.error.requiredField.label';
   }
   if (!values.requestedBy) {
-    errors.requestedBy = 'error.requiredField.label';
+    errors.requestedBy = 'react.default.error.requiredField.label';
   }
   if (!values.dateRequested) {
-    errors.dateRequested = 'error.requiredField.label';
+    errors.dateRequested = 'react.default.error.requiredField.label';
   }
   return errors;
 }
@@ -42,7 +42,7 @@ function validate(values) {
 const FIELDS = {
   description: {
     type: TextField,
-    label: 'stockMovement.description.label',
+    label: 'react.stockMovement.description.label',
     defaultMessage: 'Description',
     attributes: {
       required: true,
@@ -51,7 +51,7 @@ const FIELDS = {
   },
   origin: {
     type: SelectField,
-    label: 'stockMovement.oigin.label',
+    label: 'react.stockMovement.origin.label',
     defaultMessage: 'Origin',
     attributes: {
       required: true,
@@ -75,7 +75,7 @@ const FIELDS = {
   },
   destination: {
     type: SelectField,
-    label: 'stockMovement.destination.label',
+    label: 'react.stockMovement.destination.label',
     defaultMessage: 'Destination',
     attributes: {
       required: true,
@@ -98,7 +98,7 @@ const FIELDS = {
     }),
   },
   stocklist: {
-    label: 'stockMovement.stocklist.label',
+    label: 'react.stockMovement.stocklist.label',
     defaultMessage: 'Stocklist',
     type: SelectField,
     getDynamicAttr: ({ origin, destination, stocklists }) => ({
@@ -110,7 +110,7 @@ const FIELDS = {
   },
   requestedBy: {
     type: SelectField,
-    label: 'stockMovement.requestedBy.label',
+    label: 'react.stockMovement.requestedBy.label',
     defaultMessage: 'Requested by',
     attributes: {
       async: true,
@@ -127,7 +127,7 @@ const FIELDS = {
   },
   dateRequested: {
     type: DateField,
-    label: 'stockMovement.dateRequested.label',
+    label: 'react.stockMovement.dateRequested.label',
     defaultMessage: 'Date requested',
     attributes: {
       required: true,
@@ -203,7 +203,7 @@ class CreateStockMovement extends Component {
 
     const checkDest = stocklist && newValues.destination && destination ?
       newValues.destination.id !== destination.id : false;
-    const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id') !== _.get(stocklist, 'id') : false;
+    const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id', null) !== _.get(stocklist, 'id', null) : false;
 
     return (checkOrigin || checkDest || checkStockList);
   }
@@ -212,9 +212,10 @@ class CreateStockMovement extends Component {
    * Fetches available stock lists from API with given origin and destination.
    * @param {object} origin
    * @param {object} destination
+   * @param {function} clearStocklist
    * @public
    */
-  fetchStockLists(origin, destination) {
+  fetchStockLists(origin, destination, clearStocklist) {
     this.props.showSpinner();
     const url = `/openboxes/api/stocklists?origin.id=${origin.id}&destination.id=${destination.id}`;
 
@@ -226,11 +227,11 @@ class CreateStockMovement extends Component {
 
         const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));
 
-        if (stocklistChanged) {
-          this.setState({ stocklists, values: { ...this.state.values, stocklist: null } });
-        } else {
-          this.setState({ stocklists });
+        if (stocklistChanged && clearStocklist) {
+          clearStocklist();
         }
+
+        this.setState({ stocklists });
 
         this.props.hideSpinner();
       })
@@ -250,7 +251,7 @@ class CreateStockMovement extends Component {
 
       let stockMovementUrl = '';
       if (values.stockMovementId) {
-        stockMovementUrl = `/openboxes/api/stockMovements/${values.stockMovementId}`;
+        stockMovementUrl = `/openboxes/api/stockMovements/${values.stockMovementId}/updateRequisition`;
       } else {
         stockMovementUrl = '/openboxes/api/stockMovements';
       }
@@ -263,7 +264,6 @@ class CreateStockMovement extends Component {
         'destination.id': values.destination.id,
         'requestedBy.id': values.requestedBy.id,
         'stocklist.id': _.get(values.stocklist, 'id') || '',
-        forceUpdate: values.forceUpdate || '',
       };
 
       apiClient.post(stockMovementUrl, payload)
@@ -278,13 +278,12 @@ class CreateStockMovement extends Component {
               movementNumber: resp.identifier,
               name: resp.name,
               stocklist: resp.stocklist,
-              forceUpdate: '',
             });
           }
         })
         .catch(() => {
           this.props.hideSpinner();
-          return Promise.reject(new Error(this.props.translate('error.createStockMovement.label', 'Could not create stock movement')));
+          return Promise.reject(new Error(this.props.translate('react.stockMovement.error.createStockMovement.label', 'Could not create stock movement')));
         });
     }
   }
@@ -308,19 +307,19 @@ class CreateStockMovement extends Component {
       this.saveStockMovement(values);
     } else {
       confirmAlert({
-        title: this.props.translate('message.confirmChange.label', 'Confirm change'),
+        title: this.props.translate('react.stockMovement.message.confirmChange.label', 'Confirm change'),
         message: this.props.translate(
-          'confirmChange.message',
+          'react.stockMovement.confirmChange.message',
           'Do you want to change stock movement data? Changing origin, destination or stock list can cause loss of your current work',
         ),
         buttons: [
           {
-            label: this.props.translate('default.no.label', 'No'),
+            label: this.props.translate('react.default.no.label', 'No'),
             onClick: () => this.resetToInitialValues(),
           },
           {
-            label: this.props.translate('default.yes.label', 'Yes'),
-            onClick: () => this.saveStockMovement({ ...values, forceUpdate: 'true' }),
+            label: this.props.translate('react.default.yes.label', 'Yes'),
+            onClick: () => this.saveStockMovement(values),
           },
         ],
       });
@@ -333,13 +332,19 @@ class CreateStockMovement extends Component {
         onSubmit={values => this.nextPage(values)}
         validate={validate}
         initialValues={this.state.values}
-        render={({ handleSubmit, values }) => (
+        mutators={{
+          clearStocklist: (args, state, utils) => {
+            utils.changeValue(state, 'stocklist', () => null);
+          },
+        }}
+        render={({ mutators, handleSubmit, values }) => (
           <form className="create-form" onSubmit={handleSubmit}>
             {_.map(
               FIELDS,
               (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stocklists: this.state.stocklists,
-                fetchStockLists: this.fetchStockLists,
+                fetchStockLists: (origin, destination) =>
+                  this.fetchStockLists(origin, destination, mutators.clearStocklist),
                 origin: values.origin,
                 destination: values.destination,
                 isSuperuser: this.props.isSuperuser,
@@ -347,7 +352,7 @@ class CreateStockMovement extends Component {
             )}
             <div>
               <button type="submit" className="btn btn-outline-primary float-right btn-xs">
-                <Translate id="default.button.next.label" defaultMessage="Next" />
+                <Translate id="react.default.button.next.label" defaultMessage="Next" />
               </button>
             </div>
           </form>

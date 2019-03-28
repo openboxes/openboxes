@@ -79,24 +79,24 @@
 				<div class="action-menu-item">
 					<hr/>
 				</div>
-				<div class="action-menu-item">
-					<g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}"
-						disabled="${!(orderInstance?.isReceived()||orderInstance?.isCompleted())}"
-						disabledMessage="${g.message(code: 'order.errors.rollback.message')}"
-						onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />
-						&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollack order status" )}
-					</g:link>
-				</div>
-				<div class="action-menu-item">
-					<g:link controller="order" action="delete" id="${orderInstance?.id}"
-							disabled="${orderInstance?.isCompleted()}"
-							disabledMessage="${g.message(code: 'order.errors.delete.message')}"
-							onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-						<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
-						&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
-					</g:link>
-				</div>
+				<g:if test="${orderInstance?.isReceived()||orderInstance?.isCompleted()}">
+					<div class="action-menu-item">
+						<g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}"
+								onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+							<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />
+							&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollack order status" )}
+						</g:link>
+					</div>
+				</g:if>
+				<g:if test="${!orderInstance?.isCompleted()}">
+					<div class="action-menu-item">
+						<g:link controller="order" action="delete" id="${orderInstance?.id}"
+								onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+							<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
+							&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
+						</g:link>
+					</div>
+				</g:if>
 			</g:isSuperuser>
         </div>
 	</span>

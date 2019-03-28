@@ -96,7 +96,7 @@ class StockMovementController {
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
         stockMovement.receiptStatusCode = params?.receiptStatusCode ? params.receiptStatusCode as ShipmentStatusCode : null
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, max, offset)
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params, max, offset)
         def statistics = requisitionService.getRequisitionStatistics(requisition.destination, requisition.origin, currentUser)
 
         render(view:"list", params:params, model:[stockMovements: stockMovements, statistics:statistics])
@@ -118,7 +118,7 @@ class StockMovementController {
 
     def delete = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING) {
+        if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
             try {
                 Requisition requisition = stockMovement?.requisition
                 if (requisition) {
@@ -138,7 +138,7 @@ class StockMovementController {
                 log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
                 flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
             }
-        } else flash.message = "You can only delete pending shipments"
+        } else flash.message = "You cannot delete this shipment"
 
         redirect(action: "list")
     }
@@ -233,7 +233,6 @@ class StockMovementController {
 
         try {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-            Requisition requisition = stockMovement.requisition
 
             def importFile = command.importFile
             if (importFile.isEmpty()) {
@@ -252,7 +251,7 @@ class StockMovementController {
                 stockMovementItem.stockMovement = stockMovement
                 stockMovement.lineItems.add(stockMovementItem)
             }
-            stockMovementService.updateStockMovement(stockMovement, false)
+            stockMovementService.updateItems(stockMovement)
 
         } catch (Exception e) {
             // FIXME The global error handler does not return JSON for multipart uploads

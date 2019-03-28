@@ -572,6 +572,13 @@
         </g:authorize>
     </g:if>
 
+    <g:if test="${megamenuConfig.requisitionTemplate.enabled || isSuperuser}">
+        <li class="mm-item">
+            <g:link controller="requisitionTemplate" action="list" class="list">
+                <warehouse:message code="requisitionTemplates.list.label" default="Stock lists" />
+            </g:link>
+        </li>
+    </g:if>
 
     <g:if test="${megamenuConfig.configuration.enabled || isSuperuser}">
         <g:isUserAdmin>
@@ -746,12 +753,6 @@
                                     <warehouse:message code="shipmentWorkflows.label" default="Shipment Workflows" />
                                 </g:link>
                             </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="requisitionTemplate" action="list" class="list">
-                                    <warehouse:message code="requisitionTemplates.label" default="Stock lists" />
-                                </g:link>
-                            </div>
-
                         </div>
 
                     </div>

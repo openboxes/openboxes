@@ -85,7 +85,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     User updatedBy
 
 
-    static transients = [ "type", "substitutionItems", "monthlyDemand"]
+    static transients = [ "type", "substitutionItems", "monthlyDemand", 'totalCost']
 
 	static belongsTo = [ requisition: Requisition ]
 	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
@@ -309,7 +309,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         substitutionItem.productPackage = newProductPackage?:productPackage
         substitutionItem.quantity = newQuantity
         substitutionItem.quantityApproved = newQuantity
-        substitutionItem.parentRequisitionItem = this
+        addToRequisitionItems(substitutionItem)
         substitutionItem.orderIndex = orderIndex
         substitutionItem.save(flush: true, failOnError: true)
     }
@@ -582,6 +582,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return requisition?.replenishmentPeriod ? Math.ceil(((Double) quantity) / requisition.replenishmentPeriod * 30) : null
     }
 
+    BigDecimal getTotalCost() {
+        return product.pricePerUnit ? quantity * product?.pricePerUnit : null
+    }
 
     def next() {
         def requisitionItems = requisition.requisitionItems as List

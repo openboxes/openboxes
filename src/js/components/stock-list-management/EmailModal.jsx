@@ -12,12 +12,13 @@ import SelectField from '../form-elements/SelectField';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
+import CheckboxField from '../form-elements/CheckboxField';
 
 
 const FIELDS = {
   recipients: {
     type: SelectField,
-    label: 'stockListManagement.recipients.label',
+    label: 'react.stockListManagement.recipients.label',
     defaultMessage: 'Recipients',
     attributes: {
       required: true,
@@ -32,7 +33,7 @@ const FIELDS = {
   },
   subject: {
     type: TextField,
-    label: 'stockListManagement.subject.label',
+    label: 'react.stockListManagement.subject.label',
     defaultMessage: 'Subject',
     attributes: {
       required: true,
@@ -40,25 +41,35 @@ const FIELDS = {
   },
   text: {
     type: TextareaField,
-    label: 'stockListManagement.message.label',
+    label: 'react.stockListManagement.message.label',
     defaultMessage: 'Message',
     attributes: {
       rows: 8,
       required: true,
     },
   },
+  includePdf: {
+    type: CheckboxField,
+    label: 'react.stockListManagement.includePdf.label',
+    defaultMessage: 'Include PDF document',
+  },
+  includeXls: {
+    type: CheckboxField,
+    label: 'react.stockListManagement.includeXls.label',
+    defaultMessage: 'Include XLS document',
+  },
 };
 
 function validate(values) {
   const errors = {};
   if (_.isEmpty(values.recipients)) {
-    errors.recipients = 'error.requiredField.label';
+    errors.recipients = 'react.default.error.requiredField.label';
   }
   if (!values.subject) {
-    errors.subject = 'error.requiredField.label';
+    errors.subject = 'react.default.error.requiredField.label';
   }
   if (!values.text) {
-    errors.text = 'error.requiredField.label';
+    errors.text = 'react.default.error.requiredField.label';
   }
   return errors;
 }
@@ -89,6 +100,8 @@ class EmailModal extends Component {
         text: 'Please find attached a new version of your stock list reflecting' +
           ' recent updates. Please use this version for your next replenishment request.',
         recipients: manager ? [{ id: manager.id, email: manager.email, label: manager.name }] : [],
+        includePdf: true,
+        includeXls: true,
       },
     });
   }
@@ -101,7 +114,7 @@ class EmailModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stocklists/sendMail/${this.props.stocklistId}`;
+    const url = `/openboxes/api/stocklists/sendMail/${this.props.stocklistId}?includePdf=${this.state.formValues.includePdf}?includeXls=${this.state.formValues.includeXls}`;
     const payload = {
       ...values,
       recipients: _.map(_.filter(values.recipients, val => val.email), val => val.email),
@@ -110,7 +123,7 @@ class EmailModal extends Component {
     apiClient.post(url, payload)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('alert.emailSend.label', 'Email sent successfully'), { timeout: 1000 });
+        Alert.success(this.props.translate('react.stockListManagement.alert.emailSend.label', 'Email sent successfully'), { timeout: 1000 });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -118,10 +131,10 @@ class EmailModal extends Component {
   render() {
     return (
       <ModalWrapper
-        title="stockListManagement.sendMailModalTitle.label"
-        btnOpenText="default.button.email.label"
+        title="react.stockListManagement.sendMailModalTitle.label"
+        btnOpenText="react.default.button.email.label"
         btnOpenDefaultText="Email"
-        btnSaveText="default.button.send.label"
+        btnSaveText="react.default.button.send.label"
         btnSaveDefaultText="Send"
         btnOpenClassName="btn btn-outline-secondary btn-xs mr-1"
         onOpen={this.onOpen}
@@ -130,6 +143,7 @@ class EmailModal extends Component {
         initialValues={this.state.formValues}
         formProps={{ users: this.props.users }}
         validate={validate}
+        btnOpenDisabled={!this.props.isUserAdmin}
       />
     );
   }
@@ -148,6 +162,8 @@ EmailModal.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Id of stocklist */
   stocklistId: PropTypes.string.isRequired,
+  /** Id of stocklist */
+  isUserAdmin: PropTypes.bool.isRequired,
   /** Array of available users  */
   users: PropTypes.arrayOf(PropTypes.shape({})),
   manager: PropTypes.shape({}),

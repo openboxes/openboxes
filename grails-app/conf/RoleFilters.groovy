@@ -10,7 +10,7 @@
 class RoleFilters {
     def userService
     def dependsOn = [SecurityFilters]
-    def static changeActions = ['edit', 'delete', 'create', 'add', 'process', 'save',
+    def static changeActions = ['delete', 'create', 'add', 'process', 'save',
             'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
     def static changeControllers = ['createProductFromTemplate']
 
@@ -30,6 +30,7 @@ class RoleFilters {
             'console':['index','execute'],
             'inventory': ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed'],
             'inventoryItem': ['adjustStock', 'transferStock'],
+            'productCatalog':['create', 'importProductCatalog'],
             '*': ['delete'],
             'user': ['impersonate']
     ]

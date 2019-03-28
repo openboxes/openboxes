@@ -51,34 +51,44 @@ class StockMovementApiController {
         // FIXME Debugging
         JSONObject jsonObject = new JSONObject(stockMovement.toJson())
 
-        log.info "read " + jsonObject.toString(4)
+        log.debug "read " + jsonObject.toString(4)
         render ([data:stockMovement] as JSON)
     }
 
     def create = { StockMovement stockMovement ->
 
         JSONObject jsonObject = request.JSON
-        log.info "create " + jsonObject.toString(4)
+        log.debug "create " + jsonObject.toString(4)
 
         stockMovement = stockMovementService.createStockMovement(stockMovement)
         response.status = 201
         render ([data:stockMovement] as JSON)
 	}
 
-    def update = { //StockMovement stockMovement ->
+    def updateRequisition = { //StockMovement stockMovement ->
 
         JSONObject jsonObject = request.JSON
-        log.info "update: " + jsonObject.toString(4)
+        log.debug "update: " + jsonObject.toString(4)
 
         // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            stockMovement = new StockMovement()
-        }
 
         bindStockMovement(stockMovement, jsonObject)
-        Boolean forceUpdate = jsonObject.forceUpdate ? Boolean.parseBoolean(jsonObject.forceUpdate) : Boolean.FALSE
-        stockMovementService.updateStockMovement(stockMovement, forceUpdate)
+        stockMovementService.updateRequisition(stockMovement)
+
+        forward(action: "read")
+    }
+
+    def updateShipment = { //StockMovement stockMovement ->
+
+        JSONObject jsonObject = request.JSON
+        log.debug "update: " + jsonObject.toString(4)
+
+        // Bind all other properties to stock movement
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        bindStockMovement(stockMovement, jsonObject)
+        stockMovementService.updateShipment(stockMovement)
 
         forward(action: "read")
     }
@@ -106,7 +116,7 @@ class StockMovementApiController {
 
 
         JSONObject jsonObject = request.JSON
-        log.info "update status: " + jsonObject.toString(4)
+        log.debug "update status: " + jsonObject.toString(4)
 
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
@@ -146,10 +156,10 @@ class StockMovementApiController {
                         if (createPicklist) stockMovementService.createPicklist(stockMovement)
                         break;
                     case RequisitionStatus.PICKED:
-                        stockMovementService.createOrUpdateShipment(stockMovement)
+                        stockMovementService.createShipment(stockMovement)
                         break;
                     case RequisitionStatus.CHECKING:
-                        stockMovementService.createOrUpdateShipment(stockMovement)
+                        stockMovementService.createShipment(stockMovement)
                         break;
                     case RequisitionStatus.ISSUED:
                         stockMovementService.sendStockMovement(params.id)
@@ -164,6 +174,53 @@ class StockMovementApiController {
             }
         }
         forward(action: "read")
+    }
+
+    def removeAllItems = {
+        Requisition requisition = Requisition.get(params.id)
+
+        stockMovementService.removeRequisitionItems(requisition)
+
+        render status: 204
+    }
+
+    def reviseItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        JSONObject jsonObject = request.JSON
+        log.debug "revise items: " + jsonObject.toString(4)
+
+        bindStockMovement(stockMovement, jsonObject)
+
+        stockMovement = stockMovementService.reviseItems(stockMovement)
+
+        render ([data:stockMovement] as JSON)
+    }
+
+    def updateItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        JSONObject jsonObject = request.JSON
+        log.debug "update items: " + jsonObject.toString(4)
+
+        bindStockMovement(stockMovement, jsonObject)
+
+        stockMovement = stockMovementService.updateItems(stockMovement)
+
+        render ([data:stockMovement] as JSON)
+    }
+
+    def updateShipmentItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        JSONObject jsonObject = request.JSON
+        log.debug "revise items: " + jsonObject.toString(4)
+
+        bindStockMovement(stockMovement, jsonObject)
+
+        stockMovement = stockMovementService.updatePackPageItems(stockMovement)
+
+        render ([data:stockMovement] as JSON)
     }
 
     def exportPickListItems = {
@@ -306,7 +363,7 @@ class StockMovementApiController {
         }
 
         // Bind the rest of the JSON attributes to the stock movement object
-        log.info "Binding line items: " + lineItems
+        log.debug "Binding line items: " + lineItems
         bindData(stockMovement, jsonObject)
 
         // Need to clear the existing line items so we only process the modified ones
@@ -336,7 +393,7 @@ class StockMovementApiController {
      * @param lineItems
      */
     void bindLineItems(StockMovement stockMovement, List lineItems) {
-        log.info "line items: " + lineItems
+        log.debug "line items: " + lineItems
         List<StockMovementItem> stockMovementItems = createLineItemsFromJson(stockMovement, lineItems)
         stockMovement.lineItems.addAll(stockMovementItems)
     }
@@ -402,7 +459,7 @@ class StockMovementApiController {
     }
 
     void bindPackPage(StockMovement stockMovement, List lineItems) {
-        log.info "line items: " + lineItems
+        log.debug "line items: " + lineItems
         List<PackPageItem> packPageItems = createPackPageItemsFromJson(stockMovement, lineItems)
         PackPage packPage = new PackPage(packPageItems: packPageItems)
         stockMovement.packPage = packPage
