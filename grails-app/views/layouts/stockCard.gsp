@@ -66,7 +66,14 @@
 				},
                 ajaxOptions: {
                     error: function(xhr, status, index, anchor) {
-                        $(anchor.hash).html();
+                        var errorMessage = "Error loading tab: " + xhr.status + " " + xhr.statusText;
+                    	if (xhr.responseText) {
+                    	    var json = JSON.parse(xhr.responseText);
+                            errorMessage = json.errorMessage
+                        }
+                        $(anchor.hash).html(errorMessage);
+						alert(errorMessage);
+                        window.location.reload();
                     },
                     beforeSend: function() {
                         $('.loading').show();
