@@ -729,7 +729,20 @@ class DataService {
         return sw.toString()
     }
 
+    def transformObjects(List objects, Map includeFields) {
+        objects.collect { object ->
+            return transformObject(object, includeFields)
+        }
+    }
 
+    def transformObject(Object object, Map includeFields) {
+        Map properties = [:]
+        includeFields.each { fieldName, property ->
+            def value = property.tokenize('.').inject(object) {v, k -> v?."$k"}
+            properties[fieldName] = value?:""
+        }
+        return properties
+    }
 
     /**
      * Generic method to generate CSV string based on given csvrows map.

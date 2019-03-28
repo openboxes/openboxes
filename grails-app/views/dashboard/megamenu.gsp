@@ -405,8 +405,12 @@
 
                     <h3><warehouse:message code="dataExports.label" default="Data Exports" /></h3>
                     <div class="mm-menu-item">
-                        <g:link controller="product" action="exportAsCsv" class="list">
+                        <g:link controller="product" action="exportAsCsv">
                             <warehouse:message code="product.exportAsCsv.label"/></g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="productSupplier" action="export">
+                            <warehouse:message code="default.export.label" args="[g.message(code: 'productSuppliers.label').toLowerCase()]"/></g:link>
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="inventory" action="exportLatestInventoryDate" class="list">
