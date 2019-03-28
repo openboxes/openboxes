@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.core.Attachment
 
 class StocklistService {
 
@@ -18,6 +19,7 @@ class StocklistService {
     def locationService
     def mailService
     def pdfRenderingService
+    def documentService
 
     boolean transactional = true
 
@@ -65,9 +67,20 @@ class StocklistService {
         requisitionService.deleteRequisition(requisition)
     }
 
-    void sendMail(String stocklistId, String subject, String body, Collection to) {
+    void sendMail(String stocklistId, String subject, String body, Collection to, Boolean includePdf, Boolean includeXls) {
         Stocklist stocklist = getStocklist(stocklistId)
-        ByteArrayOutputStream bytes = pdfRenderingService.render(template: "/stocklist/print", model: [stocklist: stocklist])
-        mailService.sendHtmlMailWithAttachment(to, subject, body, bytes.toByteArray(), "Stocklist - ${stocklist?.requisition?.name}.pdf", "application/pdf")
+        List<Attachment> attachments = []
+
+        if (includeXls) {
+            OutputStream os = new ByteArrayOutputStream()
+            documentService.generateStocklistCsv(os, stocklist)
+            Attachment attachment = new Attachment(name: "Stocklist - " + stocklist?.requisition?.name + ".xls", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", bytes: os.toByteArray())
+            attachments.add(attachment)
+        }
+        if (includePdf) {
+            Attachment attachment = new Attachment(name: "Stocklist - ${stocklist?.requisition?.name}.pdf", mimeType:  "application/pdf", bytes: pdfRenderingService.render(template: "/stocklist/print", model: [stocklist: stocklist]).toByteArray())
+            attachments.add(attachment)
+        }
+        mailService.sendHtmlMailWithAttachment(to, subject, body, attachments)
     }
 }

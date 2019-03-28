@@ -75,7 +75,7 @@ class StocklistApiController {
         JSONObject jsonObject = request.JSON
         log.debug "send mail: " + jsonObject.toString(4)
         def emailBody = jsonObject.text + "\n\n" + "Sent by " + session.user.name
-        stocklistService.sendMail(params.id, jsonObject.subject, emailBody, jsonObject.recipients)
+        stocklistService.sendMail(params.id, jsonObject.subject, emailBody, jsonObject.recipients, jsonObject.includePdf, jsonObject.includeXls)
 
         render status: 200
     }
