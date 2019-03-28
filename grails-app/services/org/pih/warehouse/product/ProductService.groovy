@@ -896,11 +896,11 @@ class ProductService {
 	def getPopularTags(Integer limit) {
 		def popularTags = [:]
 		String sql = """
-            select tag.id, count(*) as count
+            select tag.id, tag.tag, count(*) as count
             from product_tag
             join tag on tag.id = product_tag.tag_id
             where tag.is_active = true
-            group by tag.tag
+            group by tag.id, tag.tag
             order by count(*) desc
             """
 
@@ -913,7 +913,7 @@ class ProductService {
         def list = sqlQuery.list()
 		list.each {
             Tag tag = Tag.load(it[0])
-			popularTags[tag] = it[1]
+			popularTags[tag] = it[2]
 		}
 		return popularTags
 	}
