@@ -104,7 +104,7 @@ class RequisitionTemplateController {
             requisition.isPublished = true
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action: "edit", id: requisition.id)
+                redirect(action: "show", id: requisition.id)
             }
             else {
                 render(view: "edit", model: [requisition: requisition])
@@ -122,7 +122,7 @@ class RequisitionTemplateController {
             requisition.isPublished = false
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action: "edit", id: requisition.id)
+                redirect(action: "show", id: requisition.id)
             }
             else {
                 render(view: "edit", model: [requisition: requisition])
