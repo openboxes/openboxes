@@ -26,6 +26,8 @@
     </div>
 </g:hasErrors>
 
+<div id="error-messages" ></div>
+
 <g:render template="summary" model="[requisition:requisition]"/>
 
 <div class="yui-gf">
@@ -38,13 +40,12 @@
             <h2>
                 ${warehouse.message(code:'requisitionTemplate.requisitionItems.label')}
             </h2>
-            <g:form name="requisitionItemForm" method="post" controller="requisitionTemplate" action="update">
 
                 <g:hiddenField name="id" value="${requisition.id}"/>
                 <g:hiddenField name="version" value="${requisition.version}"/>
 
                 <div>
-                    <table class="sortable" data-update-url="${createLink(controller:'json', action:'sortRequisitionItems')}">
+                    <table class="sortable dataTable" data-update-url="${createLink(controller:'json', action:'sortRequisitionItems')}">
                         <thead>
                         <tr>
                             %{--<th></th>--}%
@@ -55,129 +56,50 @@
                             <th class="center"><warehouse:message code="unitOfMeasure.label"/></th>
                             <th class="center"><warehouse:message code="requisitionTemplate.monthlyQuantity.label"/></th>
                             <g:hasRoleFinance>
-                                <th class="center"><warehouse:message code="requisitionTemplate.unitCost.label"/></th>
+                                <th id="finance" class="center"><warehouse:message code="requisitionTemplate.unitCost.label"/></th>
                                 <th class="center"><warehouse:message code="requisitionTemplate.totalCost.label"/></th>
                             </g:hasRoleFinance>
                             <g:isUserAdmin>
-                                <th><warehouse:message code="default.actions.label"/></th>
+                                <th id="actions"><warehouse:message code="default.actions.label"/></th>
                             </g:isUserAdmin>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr class="prop">
-                            %{--<td>--}%
-                                %{--<span class="sorthandle"></span>--}%
-                            %{--</td>--}%
-                            <td></td>
-                            <td>
-                                <g:set var="orderIndex" value="${requisition.requisitionItems.size()}"/>
-                                <g:hiddenField id="orderIndex" name="orderIndex" value="${orderIndex}"/>
-                                <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
-                                               width="100%" styleClass="text"/>
-                            </td>
-                            <td></td>
-                            <td class="center">
-                                <g:textField name="quantity" value="" class="text" size="6"/>
-                            </td>
-                            <td class="center">
-                                <g:select name="unitOfMeasure"
-                                          class="chzn-select-deselect"
-                                          from="['EA/1']"/>
-                            </td>
-                            <td></td>
-                            <g:hasRoleFinance>
-                                <td></td>
-                                <td></td>
-                            </g:hasRoleFinance>
-                            <g:isUserAdmin>
-                                <td>
-                                    <button class="button icon add" id="add-requisition-item">
-                                        <warehouse:message code="default.button.add.label"/>
-                                    </button>
-
-                                </td>
-                             </g:isUserAdmin>
-                        </tr>
-
-                        <g:set var="sortByCode" value="${requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}"/>
-                        <g:set var="i" value="${0}"/>
-                        <g:set var="requisitionItems" value='${requisition?."$sortByCode.methodName"}'/>
-                        %{--<g:set var="groupedStocklistItems" value="${requisitionItems?.groupBy { it?.product?.category }}"/>--}%
-
-                        %{--<g:each var="mapEntry" in="${groupedStocklistItems}">--}%
-                            %{--<g:set var="category" value="${mapEntry.key}"/>--}%
-                            %{--<g:set var="requisitionItems" value="${mapEntry.value}"/>--}%
-                            %{--<tr class="prop">--}%
-                                %{--<th colspan="8">--}%
-                                    %{--${category.name} <small class="muted">(${requisitionItems.size()})</small>--}%
-                                %{--</th>--}%
-                            %{--</tr>--}%
-
-                            <g:each var="requisitionItem" in="${requisitionItems}">
-                                <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
-                                    %{--<td>--}%
-                                        %{--<span class="sorthandle"></span>--}%
-                                    %{--</td>--}%
-                                    <td class="center middle">
-                                        ${requisitionItem?.product?.productCode}
-                                    </td>
-                                    <td class="middle">
-                                        <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
-                                        <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                                            ${requisitionItem?.product?.name}
-                                        </g:link>
-                                    </td>
-                                    <td class="middle">
-                                        <format:metadata obj="${requisitionItem?.product?.category}"/>
-                                    </td>
-                                    <td class="center">
-                                        <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="text" size="6"/>
-                                    </td>
-                                    <td class="center middle">
-                                        <g:selectProductPackage name="requisitionItems[${i}].productPackage.id"
-                                                                product="${requisitionItem?.product}"
-                                                                class="chzn-select-deselect"
-                                                                value="${requisitionItem?.productPackage?.id}"/>
-                                    </td>
-                                    <td class="center middle">
-                                        <g:if test="${requisitionItem?.requisition?.replenishmentPeriod}">
-                                            ${requisitionItem?.monthlyDemand}
-                                            ${requisitionItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
-
-                                        </g:if>
-                                        <g:else>
-                                            <g:message code="requisitionTemplate.noReplenishmentPeriod.message"/>
-                                        </g:else>
-                                    </td>
-                                    <g:hasRoleFinance>
-                                        <td class="center middle">
-                                             ${g.formatNumber(number: (requisitionItem?.product?.pricePerUnit?:0), format: '###,###,##0.00##')}
-                                             ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                        </td>
-                                        <td class="center middle">
-                                            ${g.formatNumber(number: (requisitionItem?.totalCost?:0), format: '###,###,##0.00##')}
-                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                        </td>
-                                    </g:hasRoleFinance>
-                                    <g:isUserAdmin>
-                                        <td>
-                                            <g:link controller="requisitionTemplate" action="removeFromRequisitionItems" id="${requisition?.id}"
-                                                    params="['requisitionItem.id':requisitionItem?.id]" class="button icon trash">
-                                                ${warehouse.message(code:'default.button.delete.label')}
-                                            </g:link>
-                                        </td>
-                                    </g:isUserAdmin>
-                                </tr>
-                                <g:set var="i" value="${i+1}"/>
-                            </g:each>
-                        %{--</g:each>--}%
 
                         </tbody>
                         <tfoot>
+                            <g:isUserAdmin>
+                                <tr class="prop">
+                                    <td></td>
+                                    <td>
+                                        <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
+                                                       width="100%" styleClass="text"/>
+                                    </td>
+                                    <td></td>
+                                    <td class="center">
+                                        <g:textField name="quantity" value="" class="text" size="6"/>
+                                    </td>
+                                    <td class="center">
+                                        <g:select name="unitOfMeasure"
+                                                  class="chzn-select-deselect"
+                                                  from="['EA/1']"/>
+                                    </td>
+                                    <td></td>
+                                    <g:hasRoleFinance>
+                                        <td></td>
+                                        <td></td>
+                                    </g:hasRoleFinance>
+                                    <td>
+                                        <button class="button icon add" id="add-requisition-item">
+                                            <warehouse:message code="default.button.add.label"/>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </g:isUserAdmin>
                             <tr>
-                                <td colspan="8">
+                                <td colspan="9">
                                     <div class="buttons">
-                                        <button class="button" name="save">
+                                        <button id="update-requisition" class="button" name="save">
                                             <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" />&nbsp;
                                             ${warehouse.message(code:'default.button.save.label', default: 'Save') }
                                         </button>
@@ -190,24 +112,133 @@
                         </tfoot>
                     </table>
                 </div>
-            </g:form>
         </div>
     </div>
 </div>
 <script>
     $(document).ready(function() {
+        var columns = [
+          { "mData": "product.productCode" },
+          { "mData": "product.name" },
+          { "mData": "product.category" },
+          { "mData": "quantity" },
+          { "mData": "productPackageId" },
+          { "mData": "monthlyDemand" }
+        ];
+
+        if ($("#finance").length) {
+          columns.push({ "mData": "product.pricePerUnit" });
+          columns.push({ "mData": "totalCost" });
+        }
+
+        if ($("#actions").length) {
+          columns.push({ "mData": "id", "bSortable": false });
+        }
+
+        var table = $(".dataTable").dataTable({
+          "bProcessing": true,
+          "sServerMethod": "GET",
+          "bSearch": false,
+          "bScrollCollapse": true,
+          "bJQueryUI": true,
+          "bAutoWidth": true,
+          "sPaginationType": "full_numbers",
+          "sAjaxSource": "${request.contextPath}/json/getRequisitionItems/" + $("#id").val(),
+          "fnServerData": function ( sSource, aoData, fnCallback ) {
+            $.ajax( {
+              "dataType": 'json',
+              "type": "GET",
+              "url": sSource,
+              "data": aoData,
+              "success": fnCallback,
+              "timeout": 10000,   // optional if you want to handle timeouts (which you should)
+              "error": handleAjaxError // this sets up jQuery to give me errors
+            } );
+          },
+          "oLanguage": {
+            "sZeroRecords": "No records found",
+            "sProcessing": "Loading ... <img alt='spinner' src='${request.contextPath}/images/spinner.gif' />"
+          },
+          //"fnInitComplete": fnInitComplete,
+          "iDisplayLength" : -1,
+          "aLengthMenu": [
+            [5, 10, 25, 100, 1000, -1],
+            [5, 10, 25, 100, 1000, "All"]
+          ],
+          "aoColumns": columns,
+          "bUseRendered": false,
+          "fnRowCallback": function( nRow, aData) {
+
+              $('td:eq(0)', nRow).addClass('center middle');
+
+              $('td:eq(1)', nRow).addClass('middle');
+              $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + aData["product"].name + '</a>');
+
+              $('td:eq(2)', nRow).addClass('middle');
+
+              $('td:eq(3)', nRow).addClass('center');
+              $('td:eq(3)', nRow).html('<input class="text" id="quantity-' + aData["id"] + '" size="6" value=' + aData["quantity"] + ' />');
+
+              $('td:eq(4)', nRow).addClass('center middle');
+              var selectPackage = $('<select/>', {
+                id: 'productPackage-' + aData["id"]
+              });
+              selectPackage.css('width', '100%');
+
+              selectPackage.append($("<option>").attr('value', null).text('EA/1'));
+              $(aData["product"].packages).each(function() {
+                selectPackage.append($("<option>", { value: this.id, selected: this.id === aData["productPackageId"] }).text(this.uom.code + "/" + this.quantity + " -- " + this.uom.name));
+              });
+
+              $('td:eq(4)', nRow).html(selectPackage);
+
+              $('td:eq(5)', nRow).addClass('center middle');
+
+              if (aData["monthlyDemand"] === null) {
+                $('td:eq(5)', nRow).html("${warehouse.message(code: 'requisitionTemplate.noReplenishmentPeriod.message')}");
+              } else {
+                $('td:eq(5)', nRow).html(aData["monthlyDemand"] + aData["product"].unitOfMeasure ? aData["product"].unitOfMeasure : "${warehouse.message(code:'default.each.label')}");
+              }
+
+              if ($("#finance").length) {
+                $('td:eq(6)', nRow).html(Number(aData["product"].pricePerUnit).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}");
+                $('td:eq(7)', nRow).html(Number(aData["totalCost"]).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}");
+              }
+
+              if ($("#actions").length) {
+                var deleteButton = $('<button/>', {
+                  text: "${warehouse.message(code:'default.button.delete.label')}",
+                  id: 'delete-' + aData["id"],
+                  type: 'button',
+                  class: 'button icon trash',
+                  click: function (event) {
+                    event.preventDefault();
+                    table.fnDeleteRow(nRow);
+                  }
+                });
+
+                if ($("#finance").length) {
+                  $('td:eq(8)', nRow).html(deleteButton);
+                } else {
+                  $('td:eq(6)', nRow).html(deleteButton);
+                }
+              }
+
+              return nRow;
+          }
+
+        });
+
         $("#product-suggest").focus();
         $("#add-requisition-item").click(function(event) {
             event.preventDefault();
             var productId = $("#product-id").val();
             var requisitionId = $("#id").val();
             var quantity = $("#quantity").val();
-            var orderIndex = $("#orderIndex").val();
-            console.log(productId);
-            console.log(requisitionId);
+            var orderIndex = table.fnGetData().length;
 
-            var params = { "product.id": productId, "requisition.id": requisitionId, "quantity": quantity, "orderIndex": orderIndex }
-            console.log(params);
+            var params = { "product.id": productId, "requisition.id": requisitionId, "quantity": quantity, "orderIndex": orderIndex };
+
             $.ajax({
                 url: "${request.contextPath}/json/addToRequisitionItems",
                 type: "get",
@@ -215,14 +246,40 @@
                 dataType: "json",
                 data: params,
                 success: function(data) {
-                    console.log(data);
-                    location.reload();
+                    table.fnAddData(data.data);
+                    $("#product-suggest").val('');
+                    $("#quantity").val('');
                 },
-                error: function(data) {
-                    console.log(data);
-                    location.reload();
-                }
+                error: handleAjaxError
             });
+
+        });
+
+        $("#update-requisition").click(function(event) {
+          event.preventDefault();
+          var requisitionId = $("#id").val();
+          var data = [];
+          $(table.fnGetData()).each(function() {
+            var id = this.id;
+
+            var quantityInput = $('#quantity-' + id);
+            var packageSelect = $('#productPackage-' + id);
+
+            if (quantityInput.length && packageSelect.length) {
+              data.push({ id: id, quantity: quantityInput.val(), productPackageId: packageSelect.val() || '' })
+            }
+          });
+
+          $.ajax({
+            url: "${request.contextPath}/json/updateRequisitionItems/" + requisitionId,
+            type: "post",
+            contentType: 'application/json',
+            dataType: "json",
+            data: JSON.stringify({ items: data }),
+            success: function(data) {
+            },
+            error: handleAjaxError
+          });
 
         });
 
@@ -238,70 +295,30 @@
             'height': 'auto',
             'removeWithBackspace' : true
         });
-
-
-        $(".sortable tbody").sortable({
-            handle : '.sorthandle',
-            axis : "y",
-            helper: "clone",
-            forcePlaceholderSize: true,
-            placeholder: "ui-state-highlight",
-            //connectWith: ".connectable",
-            update : function() {
-                var updateUrl = "${createLink(controller:'json', action:'sortRequisitionItems') }";
-                var sortOrder = $(this).sortable('serialize');
-                $.post(updateUrl, sortOrder);
-                //$(".sortable tbody tr").removeClass("odd").removeClass("even").filter(":odd").addClass("odd")
-                //        .filter(":even").addClass("even");
-                //location.reload();
-                refreshTable();
-            }
-        });
-        $( ".sortable" ).disableSelection();
-        /*
-         //$('.selectable').selectable();
-         $('.draggable').draggable({
-         handle		: ".draghandle",
-         helper		: "clone",
-         //helper		: function( event ) { return $("<div class='ui-widget-header'>I'm a custom helper</div>"); },
-         revert		: true,
-         zIndex		: 2700,
-         autoSize	: true,
-         ghosting	: true,
-         onStart		: function ( event ) { alert("started") },
-         onStop		: function() { $('.droppable').each(function() { this.expanded = false; }); }
-         });
-         */
-        /*
-         $('.droppable').droppable( {
-         accept: '.draggable',
-         tolerance: 'intersect',
-         //greedy: true,
-         over: function(event, ui) {
-         $( this ).addClass( "ui-state-highlight" );
-         },
-         out: function(event, ui) {
-         $( this ).removeClass( "ui-state-highlight" );
-         },
-         drop: function( event, ui ) {
-         //alert("dropped");
-         //ui.draggable.hide();
-         ui.draggable.addClass( "strikethrough" );
-         $( this ).removeClass( "ui-state-highlight" );
-         var requisitionItem = ui.draggable.attr("data-requisitionItem");
-         var container = $(this).attr("container");
-         $("#shipmentItemRow-" + shipmentItem).hide();
-         moveShipmentItemToContainer(shipmentItem, container);
-         window.location.reload();
-         //alert("Move item " + shipmentItem + " to container " + container);
-         }
-         });
-         */
     });
 
+    function handleAjaxError( xhr, status, error ) {
+      if ( status === 'timeout' ) {
+        alert( 'The server took too long to send the data.' );
+      }
+      else {
+        // User probably refreshed page or clicked on a link, so this isn't really an error
+        if(xhr.readyState == 0 || xhr.status == 0) {
+          return;
+        }
 
-    function refreshTable(id) {
+        var errorMessage = "<p class='error'>An unexpected error has occurred on the server.  Please contact your system administrator.";
 
+        if (xhr.responseText) {
+          var errors = JSON.parse(xhr.responseText).errors;
+          if (errors && errors.length) {
+            $(errors).each(function () {
+              errorMessage += "</br><code>" + this + "</code>"
+            });
+          }
+        }
+        $("#error-messages").html(errorMessage + "</p>");
+      }
     }
 
 </script>

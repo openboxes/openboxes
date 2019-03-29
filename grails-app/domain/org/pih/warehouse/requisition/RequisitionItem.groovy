@@ -656,5 +656,30 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         ]
     }
 
+    Map toStockListDetailsJson() {
+        [
+                id: id,
+                quantity: quantity,
+                monthlyDemand: monthlyDemand,
+                productPackageId: productPackage?.id,
+                totalCost: totalCost ?: 0,
+                product: [
+                        id: product.id,
+                        productCode: product.productCode,
+                        name: product.name,
+                        category: product.category?.name,
+                        unitOfMeasure: product.unitOfMeasure,
+                        pricePerUnit: product.pricePerUnit ?: 0,
+                        packages: product.packages?.collect { [
+                                id: it.id,
+                                quantity: it.quantity,
+                                uom: [
+                                        code: it.uom?.code,
+                                        name: it.uom?.name
+                                ]
+                        ] }
+                ]
+        ]
+    }
 
 }

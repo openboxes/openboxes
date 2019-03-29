@@ -65,7 +65,7 @@ class ForecastingService {
     }
 
     def getDemandSummary(Location origin, Product product) {
-
+        List data = []
         String query = """
             select 
                 min(date_requested) as min_date_requested,
@@ -79,7 +79,6 @@ class ForecastingService {
                 sum(quantity_change_approved) as quantity_change_approved,
                 sum(quantity_substitution_approved) as quantity_substitution_approved,
                 sum(quantity_demand) as quantity_demand
-                
             FROM product_demand
             WHERE product_id = :productId
             AND origin_id = :originId
@@ -88,25 +87,25 @@ class ForecastingService {
         """
         Sql sql = new Sql(dataSource)
         List rows = sql.rows(query, [productId: product.id, originId: origin.id])
+        if (rows) {
+            Timestamp startDate = rows.min { it.min_date_requested }?.min_date_requested
+            Timestamp endDate = rows.max { it.max_date_requested }?.max_date_requested
+            List allMonths = getMonths(startDate, endDate)
 
-        Timestamp startDate = rows.min { it.min_date_requested }?.min_date_requested
-        Timestamp endDate = rows.max { it.max_date_requested }?.max_date_requested
-        List allMonths = getMonths(startDate, endDate)
-
-        List data = allMonths.collect { monthYear ->
-            def row = rows.find { it.request_year == monthYear.year && it.request_month == monthYear.month }
-            [
-                    dateKey: "${monthYear?.month}/${monthYear?.year}",
-                    year: monthYear?.year,
-                    month: monthYear?.month,
-                    quantityRequested: row?.quantity_requested?:0,
-                    quantityCanceled: row?.quantity_canceled?:0,
-                    quantityApproved: row?.quantity_approved?:0,
-                    quantityDemand: row?.quantity_demand?:0
-            ]
+            data = allMonths.collect { monthYear ->
+                def row = rows.find { it.request_year == monthYear.year && it.request_month == monthYear.month }
+                [
+                        dateKey          : "${monthYear?.month}/${monthYear?.year}",
+                        year             : monthYear?.year,
+                        month            : monthYear?.month,
+                        quantityRequested: row?.quantity_requested ?: 0,
+                        quantityCanceled : row?.quantity_canceled ?: 0,
+                        quantityApproved : row?.quantity_approved ?: 0,
+                        quantityDemand   : row?.quantity_demand ?: 0
+                ]
+            }
+            log.info "data: ${data}"
         }
-        log.info "data: ${data}"
-
         return data
     }
 
