@@ -583,11 +583,13 @@
                         <warehouse:message code="requisitionTemplates.list.label" default="List stock lists"/>
                     </g:link>
                 </div>
-                <div class="mm-menu-item">
-                    <g:link controller="requisitionTemplate" action="create">
-                        <warehouse:message code="requisitionTemplates.create.label" default="Create stock list" />
-                    </g:link>
-                </div>
+                <g:isUserAdmin>
+                    <div class="mm-menu-item">
+                        <g:link controller="requisitionTemplate" action="create">
+                            <warehouse:message code="requisitionTemplates.create.label" default="Create stock list" />
+                        </g:link>
+                    </div>
+                </g:isUserAdmin>
             </div>
         </li>
     </g:if>

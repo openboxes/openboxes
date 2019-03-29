@@ -143,7 +143,6 @@ class EmailModal extends Component {
         initialValues={this.state.formValues}
         formProps={{ users: this.props.users }}
         validate={validate}
-        btnOpenDisabled={!this.props.isUserAdmin}
       />
     );
   }
@@ -162,8 +161,6 @@ EmailModal.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Id of stocklist */
   stocklistId: PropTypes.string.isRequired,
-  /** Id of stocklist */
-  isUserAdmin: PropTypes.bool.isRequired,
   /** Array of available users  */
   users: PropTypes.arrayOf(PropTypes.shape({})),
   manager: PropTypes.shape({}),

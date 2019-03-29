@@ -111,11 +111,11 @@
 					&nbsp;${warehouse.message(code: 'requisitionTemplate.unpublish.label', default: 'Unpublish stock list')}
 				</g:link>
 			</g:else>
-			<g:link controller="requisitionTemplate" action="sendMail" id="${requisition?.id}" class="button">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" />
-				${warehouse.message(code: 'default.button.email.label')}
-			</g:link>
 		</g:isUserAdmin>
+		<g:link controller="requisitionTemplate" action="sendMail" id="${requisition?.id}" class="button">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" />
+			${warehouse.message(code: 'default.button.email.label')}
+		</g:link>
 		<span class="action-menu" style="margin-left: 15px">
 			<button class="action-btn button">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}" />&nbsp;
