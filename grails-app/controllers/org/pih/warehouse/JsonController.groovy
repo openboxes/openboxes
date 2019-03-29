@@ -12,11 +12,14 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
-import groovy.time.TimeCategory
-import org.apache.commons.lang.StringEscapeUtils
-import org.hibernate.FetchMode
-import org.hibernate.annotations.Cache
-import org.pih.warehouse.core.*
+import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Localization
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
@@ -27,15 +30,15 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.reporting.Indicator
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.util.LocalizationUtil
-import org.springframework.transaction.annotation.Transactional
-import util.InventoryUtil
+
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
@@ -76,9 +79,11 @@ class JsonController {
         def requisition = Requisition.get(params?.requisition?.id)
         def product = Product.get(params?.product?.id);
         if (!requisition) {
+            response.status = 400
             json = [success: false, errors: ["Unable to find requisition with ID ${params?.requisition?.id}"]]
         }
         else if (!product) {
+            response.status = 400
             json = [success: false, errors: ["Unable to find product with ID ${params?.product?.id}"]]
         }
         else {
@@ -93,14 +98,64 @@ class JsonController {
                 requisition.updatedBy = session.user
                 requisition.addToRequisitionItems(requisitionItem)
                 if (requisition.validate() && requisition.save(flush: true)) {
-                    json = [success: true, data: requisition]
+                    json = [success: true, data: requisitionItem.toStockListDetailsJson()]
                 } else {
+                    response.status = 400
                     json = [success: false, errors: requisitionItem.errors]
                 }
             }
         }
         log.info(json as JSON)
         render json as JSON
+    }
+
+    def getRequisitionItems = {
+        log.info "getRequisitionItems: ${params} "
+        def json
+        def requisition = Requisition.get(params?.id)
+        if (!requisition) {
+            json = [success: false, errors: ["Unable to find requisition with ID ${params?.id}"]]
+        }
+        else {
+            RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
+            def requisitionItems = requisition."${sortByCode.methodName}"?.collect { it.toStockListDetailsJson() }
+            json = [aaData: requisitionItems]
+        }
+        log.info(json as JSON)
+        render json as JSON
+    }
+
+    def updateRequisitionItems = {
+        log.info "updateRequisitionItems: ${params} "
+
+        JSONObject jsonObject = request.JSON
+
+        def requisition = Requisition.get(params?.id)
+        if (!requisition) {
+            response.status = 400
+            render ([success: false, errors: ["Unable to find requisition with ID ${params?.id}"]] as JSON)
+        }
+        else {
+            def items = jsonObject.get("items")
+
+            items?.each { item ->
+                RequisitionItem requisitionItem = requisition.requisitionItems.find { it.id == item.id }
+
+                if (requisitionItem) {
+                    requisitionItem.quantity = item.quantity ? new Integer(item.quantity) : null
+                    requisitionItem.productPackage = item.productPackageId ? ProductPackage.get(item.productPackageId) : null
+                }
+            }
+
+            requisition.updatedBy = session.user
+
+            if (requisition.validate() && requisition.save(flush: true)) {
+                forward(action: "getRequisitionItems")
+            } else {
+                response.status = 400
+                render ([success: false, errors: requisition.errors] as JSON)
+            }
+        }
     }
 
     def getTranslation = {
