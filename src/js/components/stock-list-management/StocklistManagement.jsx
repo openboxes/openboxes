@@ -490,9 +490,9 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <div className="d-flex">
+                  <div className="d-flex flex-wrap">
                     <button
-                      className="btn btn-outline-primary btn-xs mx-1"
+                      className="btn btn-outline-primary btn-xs mr-1"
                       disabled={original.edit || original.new || !this.props.isUserAdmin}
                       onClick={() => this.editItem(index)}
                     ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
