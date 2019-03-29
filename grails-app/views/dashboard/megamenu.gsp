@@ -574,9 +574,21 @@
 
     <g:if test="${megamenuConfig.requisitionTemplate.enabled || isSuperuser}">
         <li class="mm-item">
-            <g:link controller="requisitionTemplate" action="list" class="list">
-                <warehouse:message code="requisitionTemplates.list.label" default="Stock lists" />
-            </g:link>
+            <a href="javascript:void(0)" class="mm-item-link">
+                <warehouse:message code="requisitionTemplates.label" default="Stock Lists" />
+            </a>
+            <div class="mm-item-content">
+                <div class="mm-menu-item">
+                    <g:link controller="requisitionTemplate" action="list">
+                        <warehouse:message code="requisitionTemplates.list.label" default="List stock lists"/>
+                    </g:link>
+                </div>
+                <div class="mm-menu-item">
+                    <g:link controller="requisitionTemplate" action="create">
+                        <warehouse:message code="requisitionTemplates.create.label" default="Create stock list" />
+                    </g:link>
+                </div>
+            </div>
         </li>
     </g:if>
 
