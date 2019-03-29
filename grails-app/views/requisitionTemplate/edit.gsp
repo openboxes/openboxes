@@ -26,6 +26,7 @@
     </div>
 </g:hasErrors>
 
+<div id="success-messages"></div>
 <div id="error-messages" ></div>
 
 <g:render template="summary" model="[requisition:requisition]"/>
@@ -213,7 +214,17 @@
                   class: 'button icon trash',
                   click: function (event) {
                     event.preventDefault();
-                    table.fnDeleteRow(nRow);
+
+                    $.ajax({
+                      url: "${request.contextPath}/json/removeRequisitionItem/" + aData["id"],
+                      type: "delete",
+                      contentType: 'text/json',
+                      dataType: "json",
+                      success: function() {
+                        table.fnDeleteRow(nRow);
+                      },
+                      error: handleAjaxError
+                    });
                   }
                 });
 
@@ -237,22 +248,25 @@
             var quantity = $("#quantity").val();
             var orderIndex = table.fnGetData().length;
 
-            var params = { "product.id": productId, "requisition.id": requisitionId, "quantity": quantity, "orderIndex": orderIndex };
+            if (productId && quantity) {
+              var params = { "product.id": productId, "requisition.id": requisitionId, "quantity": quantity, "orderIndex": orderIndex };
+              console.log('params: ', params);
 
-            $.ajax({
+              $.ajax({
                 url: "${request.contextPath}/json/addToRequisitionItems",
                 type: "get",
                 contentType: 'text/json',
                 dataType: "json",
                 data: params,
                 success: function(data) {
-                    table.fnAddData(data.data);
-                    $("#product-suggest").val('');
-                    $("#quantity").val('');
+                  table.fnAddData(data.data);
+                  $("#product-id").val('');
+                  $("#product-suggest").val('');
+                  $("#quantity").val('');
                 },
                 error: handleAjaxError
-            });
-
+              });
+            }
         });
 
         $("#update-requisition").click(function(event) {
@@ -276,7 +290,8 @@
             contentType: 'application/json',
             dataType: "json",
             data: JSON.stringify({ items: data }),
-            success: function(data) {
+            success: function() {
+              $("#success-messages").html('<div class="message">${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition')])}</div>');
             },
             error: handleAjaxError
           });
