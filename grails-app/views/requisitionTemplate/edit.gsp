@@ -175,7 +175,7 @@
               $('td:eq(1)', nRow).addClass('middle');
               $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + aData["product"].name + '</a>');
 
-              $('td:eq(2)', nRow).addClass('middle');
+              $('td:eq(2)', nRow).addClass('middle dont-break-out');
 
               $('td:eq(3)', nRow).addClass('center');
               $('td:eq(3)', nRow).html('<input class="text" id="quantity-' + aData["id"] + '" size="6" value=' + aData["quantity"] + ' />');
