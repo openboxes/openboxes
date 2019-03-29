@@ -158,6 +158,23 @@ class JsonController {
         }
     }
 
+    def removeRequisitionItem = {
+        log.info "removeRequisitionItem: ${params} "
+        def json
+        def requisitionItem = RequisitionItem.get(params?.id)
+        if (!requisitionItem) {
+            response.status = 400
+            json = [success: false, errors: ["Unable to find requisition item with ID ${params?.id}"]]
+        }
+        else {
+            requisitionItem.requisition.removeFromRequisitionItems(requisitionItem)
+            requisitionItem.delete()
+            json = [success: true]
+        }
+        log.info(json as JSON)
+        render json as JSON
+    }
+
     def getTranslation = {
         def translation = getTranslation(params.text, params.src, params.dest)
         def json = [translation]
