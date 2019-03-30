@@ -651,17 +651,17 @@ class RequisitionService {
             requisition {
                 and {
                     eq("isTemplate", false)
+                    // Items that have been issued and are enroute to current location
                     if (destination) {
                         eq("destination", destination)
                         'in'("status", [RequisitionStatus.ISSUED])
                     }
+                    // Items that are pending from current location
                     if (origin) {
                         eq("origin", origin)
                         not {
                             'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
                         }
-                        // Or
-                        //'in'("status", RequisitionStatus.listPending())
                     }
                 }
             }

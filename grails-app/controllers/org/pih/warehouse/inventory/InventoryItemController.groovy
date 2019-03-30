@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -239,9 +240,23 @@ class InventoryItemController {
 		log.info "requisitionmap: " + requisitionMap
         if (requisitionMap) {
             requisitionMap.keySet().each {
-                def quantity = requisitionMap[it].sum() { it.quantity }
-                requisitionMap.put(it, quantity)
-            }
+				def quantityRequested = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.quantity }
+				def quantityRequired = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() }
+				def quantityPicked = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() }
+				def quantityRemaining = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRemaining() }
+				def quantityReceived = requisitionMap[it].sum() { RequisitionItem requisitionItem ->
+					ShipmentItem.findAllByRequisitionItem(requisitionItem).sum { it.quantityReceived()?:0 }?:0
+				}
+
+				def quantityMap = [
+						quantityRequested: quantityRequested,
+						quantityRequired : quantityRequired,
+						quantityPicked   : quantityPicked,
+						quantityRemaining: quantityRemaining,
+						quantityReceived: quantityReceived
+				]
+				requisitionMap.put(it, quantityMap)
+			}
         }
 
         render(template: "showPendingStock", model: [product: product, requisitionMap:requisitionMap])

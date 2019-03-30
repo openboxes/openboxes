@@ -27,8 +27,21 @@
                         ${warehouse.message(code: 'requisition.destination.label')}
                     </th>
                     <th>
-                        ${warehouse.message(code: 'requisition.quantity.label')}
+                        ${warehouse.message(code: 'requisition.quantityRequested.label')}
                     </th>
+                    <g:if test="${params.type=='OUTBOUND'}">
+                        <th>
+                            ${warehouse.message(code: 'requisition.quantityRequired.label')}
+                        </th>
+                        <th>
+                            ${warehouse.message(code: 'requisition.quantityPicked.label')}
+                        </th>
+                    </g:if>
+                    <g:if test="${params.type=='INBOUND'}">
+                        <th>
+                            ${warehouse.message(code: 'requisition.quantityReceived.label')}
+                        </th>
+                    </g:if>
                 </tr>
 
             </thead>
@@ -60,9 +73,22 @@
                         <td>
                             ${requisition?.destination?.name }
                         </td>
-                        <td class="center">
-                            ${entry.value} ${product?.unitOfMeasure}
+                        <td>
+                            ${entry.value["quantityRequested"]} ${product?.unitOfMeasure}
                         </td>
+                        <g:if test="${params.type=='OUTBOUND'}">
+                            <td>
+                                ${entry.value["quantityRequired"]} ${product?.unitOfMeasure}
+                            </td>
+                            <td>
+                                ${entry.value["quantityPicked"]} ${product?.unitOfMeasure}
+                            </td>
+                        </g:if>
+                        <g:if test="${params.type=='INBOUND'}">
+                            <td>
+                                ${entry.value["quantityReceived"]} ${product?.unitOfMeasure}
+                            </td>
+                        </g:if>
                     </tr>
                 </g:each>
                 <g:if test="${!requisitionMap}">
@@ -80,10 +106,22 @@
                 <td colspan="6">
 
                 </td>
-                <td class="center">
-                    ${requisitionMap.values().sum()} ${product?.unitOfMeasure}
-
+                <td>
+                    ${requisitionMap.values()["quantityRequested"].sum()} ${product?.unitOfMeasure}
                 </td>
+                <g:if test="${params.type=='OUTBOUND'}">
+                <td>
+                    ${requisitionMap.values()["quantityRequired"].sum()} ${product?.unitOfMeasure}
+                </td>
+                <td>
+                    ${requisitionMap.values()["quantityPicked"].sum()} ${product?.unitOfMeasure}
+                </td>
+                </g:if>
+                <g:if test="${params.type=='INBOUND'}">
+                <td>
+                    ${requisitionMap.values()["quantityReceived"].sum()} ${product?.unitOfMeasure}
+                </td>
+                </g:if>
             </tr>
             </tfoot>
         </table>
