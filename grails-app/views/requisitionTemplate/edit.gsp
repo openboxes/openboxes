@@ -212,6 +212,7 @@
                   id: 'delete-' + aData["id"],
                   type: 'button',
                   class: 'button icon trash',
+                  style: 'min-width: 70px',
                   click: function (event) {
                     event.preventDefault();
 
