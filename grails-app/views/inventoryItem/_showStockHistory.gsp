@@ -120,7 +120,7 @@
 
                     </td>
 
-                    <td class="border-right middle">
+                    <td class="border-right middle dont-break-out">
 
                         <g:if test="${stockHistoryEntry?.showDetails}">
                             <div>
@@ -278,4 +278,3 @@
     </table>
 </div>
 
-	
