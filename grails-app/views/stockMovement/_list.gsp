@@ -1,7 +1,7 @@
 <div class="box">
     <h2>
         ${entityName} &rsaquo;
-        <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
+        <warehouse:message code="enum.StockMovementType.${params.direction}"/>
         (${totalCount?:0})
     </h2>
     <table>
