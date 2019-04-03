@@ -971,6 +971,7 @@ class JsonController {
             }
 		}
 
+		boolean skipQuantity = params.boolean("skipQuantity") ?: false
 		// Convert from products to json objects
 		if (products) {
 			// Make sure items are unique
@@ -979,7 +980,7 @@ class JsonController {
 				def productQuantity = 0
 				// We need to check to make sure this is a valid product
 				def inventoryItemList = []
-				if (product.id) {
+				if (product.id && !skipQuantity) {
 					def inventoryItems = InventoryItem.findAllByProduct(product)
 					inventoryItemList = inventoryItems.collect() { inventoryItem ->
 						// FIXME Getting the quantity from the inventory map does not work at the moment
