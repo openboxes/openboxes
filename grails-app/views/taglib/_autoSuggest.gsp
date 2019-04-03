@@ -21,8 +21,8 @@
         });
 
         $("#${attrs.id}-suggest").autocomplete({
-            delay: ${attrs.delay?:300},
-            minLength: ${attrs.minLength?:3},
+            delay: ${attrs.delay},
+            minLength: ${attrs.minLength},
             dataType: 'json',
             //define callback to format results
             source: function(req, add){

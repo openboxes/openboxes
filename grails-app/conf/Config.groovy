@@ -468,7 +468,8 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 openboxes.scannerDetection.enabled = false
 
 
-// Default min length for typeahead
+// Default delay and min length for typeahead components
+openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
 // Assign identifier job
