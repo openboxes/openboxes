@@ -471,15 +471,21 @@ openboxes.scannerDetection.enabled = false
 // Default min length for typeahead
 openboxes.typeahead.minLength = 3
 
+// Assign identifier job
+openboxes.jobs.assignIdentifierJob.enabled = true
+openboxes.jobs.assignIdentifierJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+
 // Calculate current quantity on hand
+openboxes.jobs.calculateQuantityJob.enabled = true
 openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 
 // Calculate historical quantity on hand
 openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
-openboxes.jobs.calculateHistoricalQuantityJob.cronExpression = "0 * * * * ?" // every minute
+openboxes.jobs.calculateHistoricalQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 
 // Data Cleaning Job
+openboxes.jobs.dataCleaningJob.enabled = true
 openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
 
 // LDAP configuration
