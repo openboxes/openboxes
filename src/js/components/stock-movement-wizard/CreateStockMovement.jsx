@@ -155,17 +155,15 @@ class CreateStockMovement extends Component {
     }
   }
 
-  componentWillReceiveProps() {
+  componentWillReceiveProps(nextProps) {
     if (!this.props.match.params.stockMovementId && this.state.setInitialLocations
-      && this.props.location.id) {
-      this.setInitialLocations();
+      && nextProps.location.id) {
+      this.setInitialLocations(nextProps.location);
     }
   }
 
-  setInitialLocations() {
-    const { id } = this.props.location;
-    const { locationType } = this.props.location;
-    const { name } = this.props.location;
+  setInitialLocations(location) {
+    const { id, locationType, name } = location;
 
     if (queryString.parse(window.location.search).direction === 'INBOUND') {
       const values = {
