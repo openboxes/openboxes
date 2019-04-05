@@ -33,14 +33,14 @@ class LocationService {
 		}
 	}
 
-	Location findOrCreateInternalLocation(String stockMovementIdentifier, String locationNumber, LocationType locationType, Location parentLocation) {
-		log.info "find or create internal location name=${stockMovementIdentifier}, type=${locationType}"
-		if (!stockMovementIdentifier || !locationNumber || !locationType || !parentLocation) {
+	Location findOrCreateInternalLocation(String shipmentNumber, String locationNumber, LocationType locationType, Location parentLocation) {
+		log.info "find or create internal location name=${shipmentNumber}, type=${locationType}"
+		if (!shipmentNumber || !locationNumber || !locationType || !parentLocation) {
 			throw new IllegalArgumentException("Must specify name, location number, location type, and parent location in order to create internal location")
 		}
 
-		String name = getReceivingLocationName(stockMovementIdentifier)
-		String[] receivingLocationNames = [name, "Receiving ${stockMovementIdentifier}"]
+		String name = getReceivingLocationName(shipmentNumber)
+		String[] receivingLocationNames = [name, "Receiving ${shipmentNumber}"]
 		Location location = findInternalLocation(parentLocation, receivingLocationNames)
 		if (!location) {
 			log.info "creating internal location name=${name}, type=${locationType}"
