@@ -26,6 +26,7 @@ class PutawayItem {
     Location putawayLocation
     Person recipient
     BigDecimal quantity
+    Integer quantityAvailable
     List<AvailableItem> availableItems
     PutawayStatus putawayStatus
     Transaction transaction
@@ -34,6 +35,10 @@ class PutawayItem {
 
     Boolean delete = Boolean.FALSE
     List<PutawayItem> splitItems = []
+
+    static constrants = {
+        quantityAvailable(nullable:true)
+    }
 
     String getCurrentBins() {
         String currentBins = ""
@@ -114,6 +119,7 @@ class PutawayItem {
                 "putawayLocation.id": putawayLocation?.id,
                 "putawayLocation.name": putawayLocation?.name,
                 quantity: quantity,
+                quantityAvailable: quantityAvailable,
                 splitItems: splitItems.collect { it?.toJson() }
         ]
     }
