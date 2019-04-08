@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.jobs.CalculateQuantityJob
+import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.product.Product
 import org.springframework.http.HttpStatus
 
@@ -25,7 +26,6 @@ import java.text.SimpleDateFormat
 class InventorySnapshotController {
 
     DataService dataService
-    InventoryService inventoryService
     InventorySnapshotService inventorySnapshotService
 
     def index = {
@@ -75,7 +75,7 @@ class InventorySnapshotController {
     def triggerCalculateQuantityOnHandJob = {
         println "triggerCalculateQuantityOnHandJob: " + params
 
-        def results = CalculateQuantityJob.triggerNow([productId:params.product.id,locationId:params.location.id,includeAllDates:true])
+        def results = CalculateQuantityJob.triggerNow([productId:params.product.id, locationId:params.location.id, includeAllDates:true])
 
         render ([started:true, results:results] as JSON)
 
@@ -85,12 +85,12 @@ class InventorySnapshotController {
 
     def dates = {
         Location location = Location.get(session.warehouse.id)
-        def dates = inventoryService.getTransactionDates()
+        def dates = inventorySnapshotService.getTransactionDates()
         render (dates as JSON)
     }
 
     def locations = {
-        def locations = inventoryService.getDepotLocations()
+        def locations = inventorySnapshotService.getDepotLocations()
 
         render (locations as JSON)
 
@@ -119,7 +119,7 @@ class InventorySnapshotController {
         Location location = Location.get(params?.location?.id?:session?.warehouse?.id)
         Date date = (params.date) ? dateFormat.parse(params.date) : new Date()
 
-        def data = inventoryService.findInventorySnapshotByDateAndLocation(date, location)
+        def data = inventorySnapshotService.findInventorySnapshotByDateAndLocation(date, location)
 
         def csv = dataService.generateCsv(data)
         println "CSV: " + csv
@@ -141,7 +141,7 @@ class InventorySnapshotController {
             Date date = (params.date) ? dateFormat.parse(params.date) : new Date()
             Location location = Location.get(params?.location?.id?:session?.warehouse?.id)
 
-            List data = inventoryService.findInventorySnapshotByDateAndLocation(date, location)
+            List data = inventorySnapshotService.findInventorySnapshotByDateAndLocation(date, location)
             render(["aaData": data, "iTotalRecords": data.size() ?: 0, "iTotalDisplayRecords": data.size() ?: 0, "sEcho": 1] as JSON)
 
 
@@ -153,6 +153,18 @@ class InventorySnapshotController {
             return;
         }
 
+    }
+
+    def transactionDates = {
+
+        Product product = Product.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+
+        def transactionDates = (product) ?
+                inventorySnapshotService.getTransactionDates(location, product) :
+                inventorySnapshotService.transactionDates
+
+        render([dates: transactionDates] as JSON)
     }
 
 }

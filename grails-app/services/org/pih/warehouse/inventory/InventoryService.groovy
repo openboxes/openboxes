@@ -3367,21 +3367,7 @@ class InventoryService implements ApplicationContextAware {
         return data
     }
 
-    def getTransactionDates() {
-        //return Transaction.executeQuery('select distinct transactionDate from Transaction')
-        def transactionDates = []
-        //def results = Transaction.executeQuery("select distinct year(transactionDate), month(transactionDate), day(transactionDate) from Transaction where inventory = :inventory",
-        //        [inventory:location.inventory])
 
-        def results = Transaction.executeQuery("select transactionDate from Transaction")
-
-        results.each { date ->
-            //def date = new Date().updated([year: it[0], month: it[1], day: it[2]])
-            date.clearTime()
-            transactionDates << date
-        }
-        return transactionDates.unique().sort().reverse()
-    }
 
 
 	/**

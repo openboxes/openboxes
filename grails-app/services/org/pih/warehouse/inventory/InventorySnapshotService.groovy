@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
+import org.grails.datastore.mapping.query.api.Criteria
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.springframework.transaction.annotation.Transactional
@@ -41,14 +42,26 @@ class InventorySnapshotService {
         log.info "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
     }
 
-    def populateInventorySnapshots(Date date, Location location) {
+    def populateInventorySnapshots(Location location) {
         def binLocations = getBinLocations(location)
+        saveInventorySnapshots(new Date(), location, binLocations)
+    }
+
+
+    def populateInventorySnapshots(Date date, Location location) {
+        def binLocations = getBinLocations(date, location)
         saveInventorySnapshots(date, location, binLocations)
     }
 
     def populateInventorySnapshots(Date date, Location location, Product product) {
         def binLocations = getBinLocations(location, product)
         saveInventorySnapshots(date, location, binLocations)
+    }
+
+    def getBinLocations(Date date, Location location) {
+        def transactionEntries = inventoryService.getTransactionEntriesBeforeDate(location, date)
+        def binLocations = inventoryService.getQuantityByBinLocation(transactionEntries)
+        return transformBinLocations(binLocations)
     }
 
 
@@ -86,6 +99,8 @@ class InventorySnapshotService {
                 // Clear time in case caller did not
                 date.clearTime()
                 String dateString = date.format("yyyy-MM-dd HH:mm:ss")
+
+                // Execute inventory snapshot insert/update in batches
                 sql.withBatch(1000) { stmt ->
                     binLocations.eachWithIndex { entry, index ->
 
@@ -120,37 +135,36 @@ class InventorySnapshotService {
         log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${System.currentTimeMillis()-startTime}ms"
     }
 
+    def getTransactionDates() {
+        return Transaction.executeQuery("select distinct(date(transactionDate)) from Transaction order by transactionDate desc")
+    }
+
+
     def getTransactionDates(Location location, Product product) {
-        def transactionDates = []
-        def startDate = new Date() - 365 * 5
-        def endDate = new Date()
-        (endDate..startDate).each {
-            it.clearTime()
-            transactionDates.add(it)
-        }
-        println "transactionDates: " + transactionDates
-        /*
+
+        String query = """
+            select distinct(date(transactionDate)) 
+            from TransactionEntry te join Transaction t 
+            where 
+        """
+        TransactionEntry.executeQuery()
+
         def criteria = TransactionEntry.createCriteria()
-        def results = criteria.list {
+        def transactionDates = criteria.list {
             projections {
                 transaction {
-                    distinct ("transactionDate")
+                    distinct(date("transactionDate"))
                 }
             }
 
             transaction {
                 eq("inventory", location.inventory)
+                order("transactionDate", "desc")
             }
             inventoryItem {
                 eq("product", product)
             }
         }
-        results.each { date ->
-            date.clearTime()
-            transactionDates << date
-        }
-        */
-
         return transactionDates
     }
 
@@ -182,7 +196,6 @@ class InventorySnapshotService {
                     and i.date = :date
                     and i.product = product
                     and i.product.category = category
-                    group by i.date, i.location.name, product
                     """, [location:location, date: date])
 
             // group by i.date, i.location.name, product

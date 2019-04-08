@@ -13,8 +13,8 @@ import util.LiquibaseUtil
 
 class CalculateQuantityJob {
 
-    def inventorySnapshotService
     def mailService
+    def inventorySnapshotService
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
@@ -67,26 +67,28 @@ class CalculateQuantityJob {
             else if (date) {
                 log.info "Triggered calculate quantity job for all locations and products on ${date}"
                 inventorySnapshotService.populateInventorySnapshots(date)
-            } else {
+            }
+            else {
                 log.info "Triggered calculate quantity job for all dates, locations, products"
                 def transactionDates = inventorySnapshotService.getTransactionDates()
-                transactionDates.each { transactionDate ->
-                    log.info "Triggered calculate quantity job for all products at all locations on date ${date}"
-                    inventorySnapshotService.populateInventorySnapshots(transactionDate)
-                }
+                log.info "Transaction dates: " + transactionDates
+                //transactionDates.each { transactionDate ->
+                //    log.info "Triggered calculate quantity job for all products at all locations on date ${date}"
+                //    inventorySnapshotService.populateInventorySnapshots(transactionDate)
+                //}
             }
         }
 
         def elapsedTime = (System.currentTimeMillis() - startTime)
-        if (user?.email) {
-            String subject = "Calculate quantity job completed in ${elapsedTime} ms"
-            String message = """Location: ${location}\nProduct: ${product}\nDate: ${date}\n"""
-            try {
-                mailService.sendMail(subject, message, user.email)
-            } catch (Exception e) {
-                log.error("Unable to send email " + e.message, e)
-            }
-        }
+//        if (user?.email) {
+//            String subject = "Calculate quantity job completed in ${elapsedTime} ms"
+//            String message = """Location: ${location}\nProduct: ${product}\nDate: ${date}\n"""
+//            try {
+//                mailService.sendMail(subject, message, user.email)
+//            } catch (Exception e) {
+//                log.error("Unable to send email " + e.message, e)
+//            }
+//        }
 
         log.info "Successfully completed job for location=${location?:"ALL"}, product=${product?:"ALL"}, ${date?:"ALL"}): " + elapsedTime + " ms"
         println "=".multiply(60)

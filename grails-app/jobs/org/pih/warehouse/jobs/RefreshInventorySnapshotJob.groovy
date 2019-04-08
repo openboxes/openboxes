@@ -2,6 +2,7 @@ package org.pih.warehouse.jobs
 
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Product
 import org.quartz.JobExecutionContext
@@ -15,12 +16,9 @@ class RefreshInventorySnapshotJob {
     static triggers = { }
 
     def execute(JobExecutionContext context) {
-        if (LiquibaseUtil.isRunningMigrations()) {
-            log.info "Postponing job execution until liquibase migrations are complete"
-            return
-        }
 
         def startTime = System.currentTimeMillis()
+        def transactionId = context.mergedJobDataMap.get('transactionId')
         def transactionEntryId = context.mergedJobDataMap.get('transactionEntryId')
         if (transactionEntryId) {
             TransactionEntry transactionEntry = TransactionEntry.get(transactionEntryId)
@@ -32,6 +30,19 @@ class RefreshInventorySnapshotJob {
                 inventorySnapshotService.populateInventorySnapshots(transactionDate, location, product)
             }
         }
+        else if (transactionId) {
+            Transaction transaction = Transaction.get(transactionId)
+            if (transaction) {
+                Location location = Location.findByInventory(transaction.inventory)
+                if (location) {
+                    Date transactionDate = transaction.transactionDate
+                    log.info "Updating location ${location} from date ${transactionDate}"
+                    inventorySnapshotService.populateInventorySnapshots(transactionDate, location)
+                }
+            }
+        }
+
+
         log.info "Refreshed inventory snapshot table for transaction transactionEntryId ${transactionEntryId}: ${(System.currentTimeMillis() - startTime)} ms"
     }
 }
