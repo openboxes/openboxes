@@ -1203,7 +1203,7 @@ class JsonController {
 	def globalSearch = {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
-        if (params.name && params.name.size()<minLength) {
+        if (params.term && params.term.size()<minLength) {
             render([:] as JSON)
             return
         }
@@ -1211,13 +1211,15 @@ class JsonController {
 		def terms = params.term?.split(" ")
         def location = Location.get(session.warehouse.id)
 
+        // FIXME Should replace this with an elasticsearch implementation
         // Get all products that match terms
         def products = productService.searchProducts(terms, [])
 
         products = products.unique()
 
+        // FIXME Need to add quantity once we improve inventory snapshot feature (OBPIH-1602 and OBPIH-1890)
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
-        def quantityMap = products ? getQuantityByProductMapCached(location, products) : [:]
+        def quantityMap = [:]//products ? getQuantityByProductMapCached(location, products) : [:]
 
         if (terms) {
             products = products.sort() {
@@ -1231,15 +1233,21 @@ class JsonController {
         def items = []
         items.addAll(products)
 		items.unique{ it.id }
-		def json = items.collect {
+		def json = items.collect { Product product ->
             def quantity = quantityMap[it] ?: 0
-            def type = it.class.simpleName.toLowerCase()
+            if (quantityMap.containsKey(it)) {
+                quantity = " [" + quantity + " " + (product?.unitOfMeasure ?: "EA") + "]"
+            }
+            else {
+                quantity = ""
+            }
+            def type = product.class.simpleName.toLowerCase()
             [
-                    id   : it.id,
-                    type : it.class,
-                    url  : request.contextPath + "/" + type + "/redirect/" + it.id,
-                    value: it.name,
-                    label: it.productCode + " " + it.name + " x " + quantity + " " + (it?.unitOfMeasure ?: "EA")
+                    id   : product.id,
+                    type : product.class,
+                    url  : request.contextPath + "/" + type + "/redirect/" + product.id,
+                    value: product.name,
+                    label: product.productCode + " " + product.name + " " + quantity
             ]
         }
 		render json as JSON
