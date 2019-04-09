@@ -154,77 +154,6 @@
         </h2>
         <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled, location:location, pageBreakAfter: 'avoid']"/>
     </g:if>
-
-</div>
-
-
-<div class="page" style="page-break-before: always;">
-
-    <table border="0">
-        <tr>
-            <td width="1%">
-                <div class="requisition-header cf-header" style="margin-bottom: 20px;">
-                    <div class="print-logo nailthumb-container" style="float: left;">
-                        <img src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>
-                    </div>
-                </div>
-            </td>
-            <td>
-                <div class="header">
-                    <h1><warehouse:message code="requisition.deliveryNote.label"/></h1>
-                    <h3>${requisition?.requestNumber} - ${requisition?.name }</h3>
-
-                </div>
-
-                <div class="header">
-                    <g:if test="${requisition.requestNumber}">
-                        <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
-                    </g:if>
-                </div>
-            </td>
-            <td>
-                <table>
-
-                    <tr>
-                        <td class="name right">
-                            <label><warehouse:message code="requisition.origin.label"/>:</label>
-                        </td>
-                        <td>
-                            ${requisition.origin?.name}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="name right">
-                            <label><warehouse:message code="requisition.destination.label"/>:</label>
-                        </td>
-                        <td>
-                            ${requisition.destination?.name}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="name right">
-                            <label><warehouse:message code="requisition.date.label"/>:</label>
-                        </td>
-                        <td>
-                            <g:formatDate date="${requisition?.dateRequested}" format="d MMMMM yyyy  hh:mma"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="name right">
-                            <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
-                        </td>
-                        <td>
-                            <g:formatDate date="${new Date()}" format="d MMMMM yyyy hh:mma"/>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <hr/>
-    <br/>
-    <div class="clear"></div>
-
     <table class="signature-table">
         <tr>
             <td width="33%" class="left">
@@ -284,6 +213,7 @@
     </table>
 
 </div>
+
 
 <script>
     $(document).ready(function () {
