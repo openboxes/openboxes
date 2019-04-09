@@ -469,6 +469,7 @@ openboxes.scannerDetection.enabled = false
 
 
 // Default min length for typeahead
+openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
 // Assign identifier job
