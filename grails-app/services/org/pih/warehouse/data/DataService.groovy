@@ -730,6 +730,15 @@ class DataService {
         return sw.toString()
     }
 
+    def transformObjects(List objects, List includeFields) {
+        Map includeFieldsMap = includeFields.inject([:]) { result, includeField ->
+            result[includeField] = includeField
+            return result
+        }
+
+        transformObjects(objects, includeFieldsMap)
+    }
+
     def transformObjects(List objects, Map includeFields) {
         objects.collect { object ->
             return transformObject(object, includeFields)
