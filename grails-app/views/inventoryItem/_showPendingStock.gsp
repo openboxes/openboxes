@@ -9,7 +9,7 @@
             <thead>
                 <tr class="odd">
                     <th>
-                        ${warehouse.message(code: 'default.date.label')}
+                        ${warehouse.message(code: 'requisition.date.label')}
                     </th>
                     <th class="center">
                         ${warehouse.message(code: 'requisition.status.label')}
@@ -93,9 +93,10 @@
                 </g:each>
                 <g:if test="${!requisitionMap}">
                     <tr>
-                        <td colspan="7" class="even center">
+                        <g:set var="colspan" value="${params.type=='INBOUND'?8:9}"/>
+                        <td colspan="${colspan}" class="even center">
                             <div class="fade empty">
-                                <warehouse:message code="requisition.empty.label" default="No pending requisitions"/>
+                                <warehouse:message code="stockMovements.empty.label" default="No pending stock movements"/>
                             </div>
                         </td>
                     </tr>
