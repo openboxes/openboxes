@@ -17,7 +17,7 @@
             <g:set var="transactionCount" value="${0 }"/>
 
             <g:if test="${transactionInstance?.transactionEntries }">
-                <g:each in="${transactionInstance?.transactionEntries.sort { it?.inventoryItem?.product?.name } }" var="transactionEntry" status="status">
+                <g:each in="${transactionInstance?.transactionEntries }" var="transactionEntry" status="status">
                     <g:set var="selected" value="${transactionEntry?.inventoryItem?.product?.id == params?.product?.id}"/>
                     <g:set var="transactionSum" value="${transactionSum + transactionEntry?.quantity}"/>
                     <g:set var="transactionCount" value="${transactionCount+1 }"/>
