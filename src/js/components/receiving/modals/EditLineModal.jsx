@@ -10,8 +10,8 @@ import DateField from '../../form-elements/DateField';
 import SelectField from '../../form-elements/SelectField';
 import CheckboxField from '../../form-elements/CheckboxField';
 import { showSpinner, hideSpinner } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
 import Translate from '../../../utils/Translate';
+import { debounceProductsFetch } from '../../../utils/option-utils';
 
 const FIELDS = {
   lines: {
@@ -62,9 +62,9 @@ const FIELDS = {
           options: [],
           showValueTooltip: true,
         },
-        getDynamicAttr: ({ fieldValue, productsFetch }) => ({
+        getDynamicAttr: ({ fieldValue, debouncedProductsFetch }) => ({
           disabled: fieldValue,
-          loadOptions: _.debounce(productsFetch, 500),
+          loadOptions: debouncedProductsFetch,
         }),
       },
       lotNumber: {
@@ -129,7 +129,12 @@ class EditLineModal extends Component {
 
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
-    this.productsFetch = this.productsFetch.bind(this);
+
+    this.debouncedProductsFetch = debounceProductsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+      this.props.locationId,
+    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -175,32 +180,6 @@ class EditLineModal extends Component {
     );
   }
 
-  productsFetch(searchTerm, callback) {
-    if (searchTerm) {
-      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${this.props.locationId}`)
-        .then(result => callback(
-          null,
-          {
-            complete: true,
-            options: _.map(result.data.data, obj => (
-              {
-                value: {
-                  id: obj.id,
-                  name: obj.name,
-                  productCode: obj.productCode,
-                  label: `${obj.productCode} - ${obj.name}`,
-                },
-                label: `${obj.productCode} - ${obj.name}`,
-              }
-            )),
-          },
-        ))
-        .catch(error => callback(error, { options: [] }));
-    } else {
-      callback(null, { options: [] });
-    }
-  }
-
   render() {
     return (
       <ModalWrapper
@@ -212,7 +191,7 @@ class EditLineModal extends Component {
         fields={FIELDS}
         formProps={{
           shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
-          productsFetch: this.productsFetch,
+          debouncedProductsFetch: this.debouncedProductsFetch,
           binLocation: this.state.attr.fieldValue.binLocation,
           product: this.state.attr.fieldValue.product,
         }}
@@ -221,7 +200,12 @@ class EditLineModal extends Component {
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(EditLineModal);
+const mapStateToProps = state => ({
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(EditLineModal);
 
 EditLineModal.propTypes = {
   /** Name of the field */
@@ -238,4 +222,6 @@ EditLineModal.propTypes = {
   rowIndex: PropTypes.number.isRequired,
   /** Location ID (destination). Needs to be used in /api/products request. */
   locationId: PropTypes.string.isRequired,
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
 };

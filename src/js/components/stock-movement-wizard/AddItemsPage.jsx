@@ -21,6 +21,7 @@ import { renderFormField } from '../../utils/form-utils';
 import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
 import apiClient from '../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import { debounceProductsFetch } from '../../utils/option-utils';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -73,10 +74,10 @@ const NO_STOCKLIST_FIELDS = {
           className: 'text-left',
         },
         getDynamicAttr: ({
-          fieldValue, productsFetch, rowIndex, rowCount,
+          fieldValue, debouncedProductsFetch, rowIndex, rowCount,
         }) => ({
           disabled: !!fieldValue,
-          loadOptions: _.debounce(productsFetch, 500),
+          loadOptions: debouncedProductsFetch,
           autoFocus: rowIndex === rowCount - 1,
         }),
       },
@@ -161,10 +162,10 @@ const STOCKLIST_FIELDS = {
           className: 'text-left',
         },
         getDynamicAttr: ({
-          fieldValue, productsFetch, rowIndex, rowCount, newItem,
+          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
         }) => ({
           disabled: !!fieldValue,
-          loadOptions: _.debounce(productsFetch, 500),
+          loadOptions: debouncedProductsFetch,
           autoFocus: newItem && rowIndex === rowCount - 1,
         }),
       },
@@ -252,8 +253,8 @@ const VENDOR_FIELDS = {
           options: [],
           showValueTooltip: true,
         },
-        getDynamicAttr: ({ productsFetch }) => ({
-          loadOptions: _.debounce(productsFetch, 500),
+        getDynamicAttr: ({ debouncedProductsFetch }) => ({
+          loadOptions: debouncedProductsFetch,
         }),
       },
       lotNumber: {
@@ -342,11 +343,16 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
     this.removeItem = this.removeItem.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
-    this.productsFetch = this.productsFetch.bind(this);
     this.getSortOrder = this.getSortOrder.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
     this.confirmTransition = this.confirmTransition.bind(this);
     this.newItemAdded = this.newItemAdded.bind(this);
+
+    this.debouncedProductsFetch = debounceProductsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+      this.props.initialValues.origin.id,
+    );
   }
 
   componentDidMount() {
@@ -525,32 +531,6 @@ class AddItemsPage extends Component {
         },
       ],
     });
-  }
-
-  productsFetch(searchTerm, callback) {
-    if (searchTerm) {
-      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${this.state.values.origin.id}`)
-        .then(result => callback(
-          null,
-          {
-            complete: true,
-            options: _.map(result.data.data, obj => (
-              {
-                value: {
-                  id: obj.id,
-                  name: obj.name,
-                  productCode: obj.productCode,
-                  label: `${obj.productCode} - ${obj.name}`,
-                },
-                label: `${obj.productCode} - ${obj.name}`,
-              }
-            )),
-          },
-        ))
-        .catch(error => callback(error, { options: [] }));
-    } else {
-      callback(null, { options: [] });
-    }
   }
 
   /**
@@ -1058,7 +1038,7 @@ class AddItemsPage extends Component {
                   stocklist: values.stocklist,
                   recipients: this.props.recipients,
                   removeItem: this.removeItem,
-                  productsFetch: this.productsFetch,
+                  debouncedProductsFetch: this.debouncedProductsFetch,
                   getSortOrder: this.getSortOrder,
                   newItemAdded: this.newItemAdded,
                   newItem: this.state.newItem,
@@ -1096,6 +1076,8 @@ const mapStateToProps = state => ({
   recipientsFetched: state.users.fetched,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
 });
 
 export default (connect(mapStateToProps, {
@@ -1104,7 +1086,11 @@ export default (connect(mapStateToProps, {
 
 AddItemsPage.propTypes = {
   /** Initial component's data */
-  initialValues: PropTypes.shape({}).isRequired,
+  initialValues: PropTypes.shape({
+    origin: PropTypes.shape({
+      id: PropTypes.string,
+    }),
+  }).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
   /** Function taking user to specified page */
@@ -1126,4 +1112,6 @@ AddItemsPage.propTypes = {
   recipientsFetched: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
 };
