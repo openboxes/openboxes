@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.putaway
 
 import org.apache.commons.beanutils.BeanUtils
@@ -39,9 +39,11 @@ class PutawayService {
         List<Location> internalLocations = locationService.getInternalLocations(location,
                 [ActivityCode.RECEIVE_STOCK] as ActivityCode[])
 
+        List binLocationEntries = inventoryService.getQuantityByBinLocation(location)
+
         log.info "internalLocations " + internalLocations
         internalLocations.each { internalLocation ->
-            List putawayItemsTemp = inventoryService.getQuantityByBinLocation(location, internalLocation)
+            List putawayItemsTemp = binLocationEntries.findAll { it.binLocation == internalLocation }
             if (putawayItemsTemp) {
                 putawayItemsTemp = putawayItemsTemp.collect {
 
@@ -73,7 +75,10 @@ class PutawayService {
 
         putawayItems.addAll(pendingPutawayItems)
 
-        return putawayItems
+        return putawayItems.sort { a,b ->
+            a.product?.category?.name <=> b.product?.category?.name ?:
+                    a.product?.name <=> b.product?.name
+        }
     }
 
     List<PutawayItem> getPendingItems(Location location) {
@@ -207,6 +212,23 @@ class PutawayService {
         return order
     }
 
+    void deletePutawayItem(String id) {
+        OrderItem orderItem = OrderItem.get(id)
+        if (!orderItem) {
+            throw new IllegalArgumentException("No putaway item found with ID ${id}")
+        }
+
+        def splitItems = orderItem.orderItems?.toArray()
+
+        splitItems?.each { OrderItem item ->
+            orderItem.removeFromOrderItems(item)
+            item.order.removeFromOrderItems(item)
+            item.delete()
+        }
+
+        orderItem.order.removeFromOrderItems(orderItem)
+        orderItem.delete()
+    }
 
     OrderItem updateOrderItem(PutawayItem putawayItem, OrderItem orderItem) {
         OrderItemStatusCode orderItemStatusCode =
@@ -255,7 +277,7 @@ class PutawayService {
         }
 
         if (quantity > quantityAvailable) {
-            throw new IllegalStateException("Quantity available ${quantityAvailable} is less than quantity to putaway ${quantity}")
+            throw new IllegalStateException("Quantity available ${quantityAvailable} is less than quantity to putaway ${quantity} for product ${inventoryItem.product.productCode} ${inventoryItem.product.name}")
         }
 
     }

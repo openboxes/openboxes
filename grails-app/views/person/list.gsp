@@ -56,8 +56,7 @@
 
                                 <td>
                                     <g:link action="edit" id="${personInstance.id}">
-                                        ${fieldValue(bean: personInstance, field: "firstName")}
-                                        ${fieldValue(bean: personInstance, field: "lastName")}
+                                        ${fieldValue(bean: personInstance, field: "name")}
                                     </g:link>
                                 </td>
 
@@ -65,7 +64,14 @@
                                     ${warehouse.message(code: (personInstance.class.simpleName.toLowerCase() + '.label'))}
                                 </td>
 
-                                <td>${fieldValue(bean: personInstance, field: "email")}</td>
+                                <td>
+                                    <g:if test="${grailsApplication.config.openboxes.anonymize.enabled}">
+                                        ${util.StringUtil.mask(personInstance?.email)}
+                                    </g:if>
+                                    <g:else>
+                                        ${fieldValue(bean: personInstance, field: "email")}
+                                    </g:else>
+                                </td>
 
                                 <td>${fieldValue(bean: personInstance, field: "phoneNumber")}</td>
 

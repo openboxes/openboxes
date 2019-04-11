@@ -145,12 +145,12 @@ const en = {
         },
         createPutAway: {
           configName: 'stockMovement',
-          label: 'Create Put Away',
+          label: 'Create Putaway',
           link: '/openboxes/putAway/index',
         },
         listPutAways: {
           configName: 'stockMovement',
-          label: 'List Put Aways',
+          label: 'List Putaways',
           link: '/openboxes/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING',
         },
         createShipment: {
@@ -293,6 +293,10 @@ const en = {
           label: 'Export bin locations',
           link: '/openboxes/report/exportBinLocation?downloadFormat=csv',
         },
+        showInventoryByLocationReport: {
+          label: 'Inventory By Location Report',
+          link: '/openboxes/report/showInventoryByLocationReport',
+        },
         exportAsCsv: {
           label: 'Export products',
           link: '/openboxes/product/exportAsCsv',
@@ -390,6 +394,10 @@ const en = {
         },
       },
     },
+    requisitionTemplate: {
+      label: 'Stock lists',
+      link: '/openboxes/requisitionTemplate/list',
+    },
     configuration: {
       label: 'Configuration',
       link: '#',
@@ -470,10 +478,6 @@ const en = {
         person: {
           label: 'People',
           link: '/openboxes/person/list',
-        },
-        requisitionTemplate: {
-          label: 'Stock lists',
-          link: '/openboxes/requisitionTemplate/list',
         },
         listAllTransactions: {
           label: 'Transactions',

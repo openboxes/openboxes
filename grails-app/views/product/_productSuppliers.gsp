@@ -78,6 +78,7 @@
                             <td>
                                 <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
                                     ${fieldValue(bean: productSupplier, field: "unitPrice")}
+                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </g:hasRoleFinance>
                             </td>
 

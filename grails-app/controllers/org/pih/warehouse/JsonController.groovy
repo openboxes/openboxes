@@ -12,28 +12,33 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
-import groovy.time.TimeCategory
-import org.apache.commons.lang.StringEscapeUtils
-import org.hibernate.FetchMode
-import org.hibernate.annotations.Cache
-import org.pih.warehouse.core.*
+import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Localization
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.reporting.Indicator
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
-import org.springframework.transaction.annotation.Transactional
-import util.InventoryUtil
+import org.pih.warehouse.util.LocalizationUtil
+
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
@@ -74,9 +79,11 @@ class JsonController {
         def requisition = Requisition.get(params?.requisition?.id)
         def product = Product.get(params?.product?.id);
         if (!requisition) {
+            response.status = 400
             json = [success: false, errors: ["Unable to find requisition with ID ${params?.requisition?.id}"]]
         }
         else if (!product) {
+            response.status = 400
             json = [success: false, errors: ["Unable to find product with ID ${params?.product?.id}"]]
         }
         else {
@@ -88,13 +95,81 @@ class JsonController {
                 requisitionItem.quantity = quantity
                 requisitionItem.substitutable = false
                 requisitionItem.orderIndex = orderIndex
+                requisition.updatedBy = session.user
                 requisition.addToRequisitionItems(requisitionItem)
                 if (requisition.validate() && requisition.save(flush: true)) {
-                    json = [success: true, data: requisition]
+                    json = [success: true, data: requisitionItem.toStockListDetailsJson()]
                 } else {
+                    response.status = 400
                     json = [success: false, errors: requisitionItem.errors]
                 }
             }
+        }
+        log.info(json as JSON)
+        render json as JSON
+    }
+
+    def getRequisitionItems = {
+        log.info "getRequisitionItems: ${params} "
+        def json
+        def requisition = Requisition.get(params?.id)
+        if (!requisition) {
+            json = [success: false, errors: ["Unable to find requisition with ID ${params?.id}"]]
+        }
+        else {
+            RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
+            def requisitionItems = requisition."${sortByCode.methodName}"?.collect { it.toStockListDetailsJson() }
+            json = [aaData: requisitionItems]
+        }
+        log.info(json as JSON)
+        render json as JSON
+    }
+
+    def updateRequisitionItems = {
+        log.info "updateRequisitionItems: ${params} "
+
+        JSONObject jsonObject = request.JSON
+
+        def requisition = Requisition.get(params?.id)
+        if (!requisition) {
+            response.status = 400
+            render ([success: false, errors: ["Unable to find requisition with ID ${params?.id}"]] as JSON)
+        }
+        else {
+            def items = jsonObject.get("items")
+
+            items?.each { item ->
+                RequisitionItem requisitionItem = requisition.requisitionItems.find { it.id == item.id }
+
+                if (requisitionItem) {
+                    requisitionItem.quantity = item.quantity ? new Integer(item.quantity) : null
+                    requisitionItem.productPackage = item.productPackageId ? ProductPackage.get(item.productPackageId) : null
+                }
+            }
+
+            requisition.updatedBy = session.user
+
+            if (requisition.validate() && requisition.save(flush: true)) {
+                forward(action: "getRequisitionItems")
+            } else {
+                response.status = 400
+                render ([success: false, errors: requisition.errors] as JSON)
+            }
+        }
+    }
+
+    def removeRequisitionItem = {
+        log.info "removeRequisitionItem: ${params} "
+        def json
+        def requisitionItem = RequisitionItem.get(params?.id)
+        if (!requisitionItem) {
+            response.status = 400
+            json = [success: false, errors: ["Unable to find requisition item with ID ${params?.id}"]]
+        }
+        else {
+            requisitionItem.requisition.removeFromRequisitionItems(requisitionItem)
+            requisitionItem.delete()
+            json = [success: true]
         }
         log.info(json as JSON)
         render json as JSON
@@ -876,51 +951,40 @@ class JsonController {
 
 		log.info("find products by name " + params)
 		def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT);
-		def products = new TreeSet();
+		def products = new TreeSet()
 
 		if (params.term) {
-			// Match full name
+            def terms = params.term.split(" ")
 
-            products = Product.withCriteria {
-                ilike("productCode", params.term + "%")
-            }
-            if (!products) {
-                products = Product.withCriteria {
-                    ilike("name", "%" + params.term + "%")
+            // Get all products that match terms
+            products = productService.searchProducts(terms, [])
+
+            products = products.unique()
+
+            if (terms) {
+                products = products.sort() {
+                    a, b ->
+                        (terms.any { a?.productCode?.contains(it) ? a.productCode : null }) <=> (terms.any { b?.productCode?.contains(it) ? b.productCode : null }) ?:
+                                (terms.any { a?.name?.contains(it) ? a.name : null }) <=> (terms.any { b?.name?.contains(it) ? b.name : null })
                 }
+                products = products.reverse()
             }
 		}
 
-		def location = Location.get(params.warehouseId);
-		log.info ("warehouse: " + location);
-		def quantityMap = [:]
-
-        if (false) {
-		    quantityMap = inventoryService.getQuantityForInventory(location?.inventory)
-        }
-
-		// FIXME Needed to create a new map with inventory item id as the index
-		// in order to get the quantity below.  For some reason, the inventory item
-		// object was getting toString()'d when used below as a key and therefore
-		// the keys were mismatched and the quantity was always null.
-		def idQuantityMap = [:]
-		quantityMap.keySet().each {
-			idQuantityMap[it.id] = quantityMap[it]
-		}
-
+		boolean skipQuantity = params.boolean("skipQuantity") ?: false
 		// Convert from products to json objects
 		if (products) {
 			// Make sure items are unique
 			//products.unique();
 			products = products.collect() { product ->
-				def productQuantity = 0;
+				def productQuantity = 0
 				// We need to check to make sure this is a valid product
 				def inventoryItemList = []
-				if (product.id) {
-					def inventoryItems = InventoryItem.findAllByProduct(product);
+				if (product.id && !skipQuantity) {
+					def inventoryItems = InventoryItem.findAllByProduct(product)
 					inventoryItemList = inventoryItems.collect() { inventoryItem ->
 						// FIXME Getting the quantity from the inventory map does not work at the moment
-						def quantity = idQuantityMap[inventoryItem.id]?:0;
+						def quantity = 0
 
 						// Create inventory items object
 						//if (quantity > 0) {
@@ -1138,16 +1202,24 @@ class JsonController {
 
 	def globalSearch = {
 
+        def minLength = grailsApplication.config.openboxes.typeahead.minLength
+        if (params.term && params.term.size()<minLength) {
+            render([:] as JSON)
+            return
+        }
+
 		def terms = params.term?.split(" ")
         def location = Location.get(session.warehouse.id)
 
+        // FIXME Should replace this with an elasticsearch implementation
         // Get all products that match terms
         def products = productService.searchProducts(terms, [])
 
         products = products.unique()
 
+        // FIXME Need to add quantity once we improve inventory snapshot feature (OBPIH-1602 and OBPIH-1890)
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
-        def quantityMap = products ? getQuantityByProductMapCached(location, products) : [:]
+        def quantityMap = [:]//products ? getQuantityByProductMapCached(location, products) : [:]
 
         if (terms) {
             products = products.sort() {
@@ -1161,15 +1233,21 @@ class JsonController {
         def items = []
         items.addAll(products)
 		items.unique{ it.id }
-		def json = items.collect {
+		def json = items.collect { Product product ->
             def quantity = quantityMap[it] ?: 0
-            def type = it.class.simpleName.toLowerCase()
+            if (quantityMap.containsKey(it)) {
+                quantity = " [" + quantity + " " + (product?.unitOfMeasure ?: "EA") + "]"
+            }
+            else {
+                quantity = ""
+            }
+            def type = product.class.simpleName.toLowerCase()
             [
-                    id   : it.id,
-                    type : it.class,
-                    url  : request.contextPath + "/" + type + "/redirect/" + it.id,
-                    value: it.name,
-                    label: it.productCode + " " + it.name + " x " + quantity + " " + (it?.unitOfMeasure ?: "EA")
+                    id   : product.id,
+                    type : product.class,
+                    url  : request.contextPath + "/" + type + "/redirect/" + product.id,
+                    value: product.name,
+                    label: product.productCode + " " + product.name + " " + quantity
             ]
         }
 		render json as JSON
@@ -1593,6 +1671,138 @@ class JsonController {
         render ([count: count] as JSON)
     }
 
+    def getDashboardActivity = {
+
+        List activityList = []
+        def currentUser = User.get(session?.user?.id)
+        def location = Location.get(session.warehouse.id)
+        def daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):7
+
+        // Find recent requisition activity
+        def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where (r.isTemplate = false or r.isTemplate is null) and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
+                ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination': location])
+        requisitions.each {
+            def link = "${createLink(controller: 'requisition', action: 'show', id: it.id)}"
+            def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
+            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
+            activityType = "${warehouse.message(code: activityType)}"
+            activityList << [
+                    type: "basket",
+                    label: "${warehouse.message(code:'dashboard.activity.requisition.label', args: [link, it.name, activityType, username])}",
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    requisition: it]
+        }
+
+        // Add recent shipments
+        def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
+			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location] );
+        shipments.each {
+            def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            activityType = "${warehouse.message(code: activityType)}"
+            activityList << [
+                    type: "lorry",
+                    label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}",
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    shipment: it]
+        }
+        //order by e.createdDate desc
+        //[max:params.max.toInteger(), offset:params.offset.toInteger ()]
+        def shippedShipments = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'SHIPPED'", ['eventDate':new Date()-daysToInclude])
+        shippedShipments.each {
+            def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+            def activityType = "dashboard.activity.shipped.label"
+            activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.destination.name])}"
+            activityList << [
+                    type: "lorry_go",
+                    label: activityType,
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    shipment: it]
+        }
+        def receivedShipment = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'RECEIVED'", ['eventDate':new Date()-daysToInclude])
+        receivedShipment.each {
+            def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
+            def activityType = "dashboard.activity.received.label"
+            activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.origin.name])}"
+            activityList << [
+                    type: "lorry_stop",
+                    label: activityType,
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    shipment: it]
+        }
+
+        def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude] );
+        products.each {
+            def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
+            def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it.updatedBy
+            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            activityType = "${warehouse.message(code: activityType)}"
+            def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
+            activityList << [
+                    type: "package",
+                    label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.name, activityType, username])}",
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    product: it]
+        }
+
+        // If the current location has an inventory, add recent transactions associated with that location to the activity list
+        if (location?.inventory) {
+            def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
+				t.inventory = :inventory", ['lastUpdated':new Date()-daysToInclude, 'inventory':location?.inventory] );
+
+            transactions.each {
+                def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
+                def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
+                def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+                activityType = "${warehouse.message(code: activityType)}"
+                def label = LocalizationUtil.getLocalizedString(it)
+                def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
+                activityList << [
+                        type: "arrow_switch_bluegreen",
+                        label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType, username])}",
+                        url: link,
+                        dateCreated: it.dateCreated,
+                        lastUpdated: it.lastUpdated,
+                        transaction: it]
+            }
+        }
+
+        def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude], [max: 10] );
+        users.each {
+            def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
+            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
+            if (it.lastUpdated == it.lastLoginDate) {
+                activityType = "dashboard.activity.loggedIn.label"
+            }
+            activityType = "${warehouse.message(code: activityType)}"
+            activityList << [
+                    type: "user",
+                    label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it?.name, activityType])}",
+                    url: link,
+                    dateCreated: it.dateCreated,
+                    lastUpdated: it.lastUpdated,
+                    user: it]
+        }
+
+
+        def aaData = activityList.collect {
+            [type: it.type, label: it.label, lastUpdated:it.lastUpdated?.format('MMM d hh:mma')]
+        }
+
+
+        render ([aaData:aaData] as JSON)
+    }
 
 
 }

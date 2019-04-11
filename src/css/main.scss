@@ -168,6 +168,10 @@ body {
 
 .font-size-xs {
   font-size: .875rem;
+  &.required::after {
+      content: "*";
+      color: red;
+  }
 }
 
 .btn-xs {
@@ -650,4 +654,20 @@ div.crossed-out .table-inner-row:before {
 
 .w-space-normal {
   white-space: normal !important;
+}
+
+/* LOGIN MODAL
+----------------------------*/
+
+.login-modal-container {
+  width: 500px;
+  background-color: white;
+  border: 1px solid $gray-gamma;
+  border-radius: 5px;
+}
+
+.login-modal-header {
+  background-color: $gray-eta;
+  border-bottom: 1px solid $gray-gamma;
+  border-radius: 5px 5px 0 0;
 }

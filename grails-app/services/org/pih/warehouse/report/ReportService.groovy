@@ -144,8 +144,11 @@ class ReportService implements ApplicationContextAware {
 	 * 
 	 * @param command
 	 */
-	public void generateTransactionReport(InventoryReportCommand command) { 
-		
+	void generateTransactionReport(InventoryReportCommand command) {
+
+		// Ensure that the includeChildren flag is disabled
+		command?.includeChildren = false
+
 		def products = 
 			//inventoryService.getProductsByNestedCategory(command.category)
 			(command?.includeChildren) ? inventoryService.getProductsByNestedCategory(command.category) : 
@@ -212,7 +215,7 @@ class ReportService implements ApplicationContextAware {
 			def inventoryItem = it?.inventoryItem
 			def transactionType = it?.transaction?.transactionType
 			
-			log.info "transactionEntry -> " + it.transaction.transactionType.name + " = " + it.quantity
+			log.debug "transactionEntry -> " + it.transaction.transactionType.name + " = " + it.quantity
 			
 			def productEntry = command.entries[inventoryItem.product]
 			if (productEntry) { 

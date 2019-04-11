@@ -10,18 +10,23 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.apache.commons.lang.math.NumberUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 
 class StockMovementApiController {
 
     StockMovementService stockMovementService
+    def dataService
 
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
@@ -46,34 +51,44 @@ class StockMovementApiController {
         // FIXME Debugging
         JSONObject jsonObject = new JSONObject(stockMovement.toJson())
 
-        log.info "read " + jsonObject.toString(4)
+        log.debug "read " + jsonObject.toString(4)
         render ([data:stockMovement] as JSON)
     }
 
     def create = { StockMovement stockMovement ->
 
         JSONObject jsonObject = request.JSON
-        log.info "create " + jsonObject.toString(4)
+        log.debug "create " + jsonObject.toString(4)
 
         stockMovement = stockMovementService.createStockMovement(stockMovement)
         response.status = 201
         render ([data:stockMovement] as JSON)
 	}
 
-    def update = { //StockMovement stockMovement ->
+    def updateRequisition = { //StockMovement stockMovement ->
 
         JSONObject jsonObject = request.JSON
-        log.info "update: " + jsonObject.toString(4)
+        log.debug "update: " + jsonObject.toString(4)
 
         // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            stockMovement = new StockMovement()
-        }
 
         bindStockMovement(stockMovement, jsonObject)
-        Boolean forceUpdate = jsonObject.forceUpdate ? Boolean.parseBoolean(jsonObject.forceUpdate) : Boolean.FALSE
-        stockMovementService.updateStockMovement(stockMovement, forceUpdate)
+        stockMovementService.updateRequisition(stockMovement)
+
+        forward(action: "read")
+    }
+
+    def updateShipment = { //StockMovement stockMovement ->
+
+        JSONObject jsonObject = request.JSON
+        log.debug "update: " + jsonObject.toString(4)
+
+        // Bind all other properties to stock movement
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        bindStockMovement(stockMovement, jsonObject)
+        stockMovementService.updateShipment(stockMovement)
 
         forward(action: "read")
     }
@@ -101,7 +116,7 @@ class StockMovementApiController {
 
 
         JSONObject jsonObject = request.JSON
-        log.info "update status: " + jsonObject.toString(4)
+        log.debug "update status: " + jsonObject.toString(4)
 
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
@@ -141,10 +156,10 @@ class StockMovementApiController {
                         if (createPicklist) stockMovementService.createPicklist(stockMovement)
                         break;
                     case RequisitionStatus.PICKED:
-                        stockMovementService.createOrUpdateShipment(stockMovement)
+                        stockMovementService.createShipment(stockMovement)
                         break;
                     case RequisitionStatus.CHECKING:
-                        stockMovementService.createOrUpdateShipment(stockMovement)
+                        stockMovementService.createShipment(stockMovement)
                         break;
                     case RequisitionStatus.ISSUED:
                         stockMovementService.sendStockMovement(params.id)
@@ -159,6 +174,157 @@ class StockMovementApiController {
             }
         }
         forward(action: "read")
+    }
+
+    def removeAllItems = {
+        Requisition requisition = Requisition.get(params.id)
+
+        stockMovementService.removeRequisitionItems(requisition)
+
+        render status: 204
+    }
+
+    def reviseItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        JSONObject jsonObject = request.JSON
+        log.debug "revise items: " + jsonObject.toString(4)
+
+        bindStockMovement(stockMovement, jsonObject)
+
+        stockMovement = stockMovementService.reviseItems(stockMovement)
+
+        render ([data:stockMovement] as JSON)
+    }
+
+    def updateItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        JSONObject jsonObject = request.JSON
+        log.debug "update items: " + jsonObject.toString(4)
+
+        bindStockMovement(stockMovement, jsonObject)
+
+        stockMovement = stockMovementService.updateItems(stockMovement)
+
+        render ([data:stockMovement] as JSON)
+    }
+
+    def updateShipmentItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        JSONObject jsonObject = request.JSON
+        log.debug "revise items: " + jsonObject.toString(4)
+
+        bindStockMovement(stockMovement, jsonObject)
+
+        stockMovement = stockMovementService.updatePackPageItems(stockMovement)
+
+        render ([data:stockMovement] as JSON)
+    }
+
+    def exportPickListItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, "4")
+
+        List<PicklistItem> picklistItems = stockMovement?.pickPage?.pickPageItems?.inject([]) { result, pickPageItem ->
+            result.addAll(pickPageItem.picklistItems)
+            result
+        }
+        // We need to create at least one row to ensure an empty template
+        if (picklistItems?.empty) {
+            picklistItems.add(new PicklistItem())
+        }
+
+        def lineItems = picklistItems.collect {
+            [
+                    requisitionItemId: it?.requisitionItem?.id ?: "",
+                    lotNumber: it?.inventoryItem?.lotNumber ?:"",
+                    expirationDate: it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    binLocation: it?.binLocation?.name ?: "",
+                    quantity: it?.quantity ?: "",
+            ]
+        }
+        String csv = dataService.generateCsv(lineItems)
+        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
+        render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+    }
+
+    def importPickListItems = { ImportDataCommand command ->
+
+        try {
+            StockMovement stockMovement = stockMovementService.getStockMovement(params.id, "4")
+
+            def importFile = command.importFile
+            if (importFile.isEmpty()) {
+                throw new IllegalArgumentException("File cannot be empty")
+            }
+
+            if (importFile.fileItem.contentType != "text/csv") {
+                throw new IllegalArgumentException("File must be in CSV format")
+            }
+
+            String csv = new String(importFile.bytes)
+            def settings = [separatorChar: ',', skipLines: 1]
+            csv.toCsvReader(settings).eachLine { tokens ->
+                String requisitionItemId = tokens[0]
+                String lotNumber = tokens[1] ?: null
+                String expirationDate = tokens[2] ?: null
+                String binLocation = tokens[3] ?: null
+                Integer quantityPicked = tokens[4] ? tokens[4].toInteger() : null
+
+                if (!requisitionItemId || quantityPicked == null) {
+                    throw new IllegalArgumentException("Requisition item id and quantity picked are required")
+                }
+
+                if (lotNumber?.contains("E") && NumberUtils.isNumber(lotNumber)) {
+                    throw new IllegalArgumentException("Lot numbers must not be specified in scientific notation. " +
+                            "Please reformat field with Lot Number: \"${lotNumber}\" to a number format")
+                }
+
+                PickPageItem pickPageItem = stockMovement?.pickPage?.pickPageItems?.find { it.requisitionItem?.id == requisitionItemId }
+
+                if (!pickPageItem) {
+                    throw new IllegalArgumentException("Requisition item id: ${requisitionItemId} not found")
+                }
+
+		// FIXME Should find bin location by name and parent and inventory item by lot number and expiration date 
+		// and compare object equality (or at least PK equality) rather than comparing various components   
+		AvailableItem availableItem = pickPageItem.availableItems?.find {
+                    (binLocation ? it.binLocation?.name == binLocation : !it.binLocation) && lotNumber == (it.inventoryItem?.lotNumber ?: null) &&
+                            expirationDate == (it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : null)
+                }
+
+                if (!availableItem) {
+                    throw new IllegalArgumentException("There is no item available with lot: ${lotNumber ?: ""}, expiration date: ${tokens[2] ?: ""} and bin: ${binLocation ?: ""}")
+                }
+
+                RequisitionItem requisitionItem = pickPageItem.requisitionItem?.modificationItem ?: pickPageItem.requisitionItem
+
+                pickPageItem.picklistItems.each {
+                    if (it.id) {
+                        it.quantity = 0
+                    }
+                }
+                pickPageItem.picklistItems.add(new PicklistItem(
+                        requisitionItem: requisitionItem,
+                        inventoryItem: availableItem.inventoryItem,
+                        binLocation: availableItem.binLocation,
+                        quantity: quantityPicked,
+                        sortOrder: pickPageItem.sortOrder
+                ))
+            }
+
+            stockMovementService.createOrUpdatePicklistItem(stockMovement)
+
+        } catch (Exception e) {
+            // FIXME The global error handler does not return JSON for multipart uploads
+            log.warn("Error occurred while importing CSV: " + e.message, e)
+            response.status = 500
+            render([errorCode: 500, errorMessage: e?.message?:"An unknown error occurred during import"] as JSON)
+            return
+        }
+
+        render([data: "Data will be imported successfully"] as JSON)
     }
 
     /**
@@ -197,7 +363,7 @@ class StockMovementApiController {
         }
 
         // Bind the rest of the JSON attributes to the stock movement object
-        log.info "Binding line items: " + lineItems
+        log.debug "Binding line items: " + lineItems
         bindData(stockMovement, jsonObject)
 
         // Need to clear the existing line items so we only process the modified ones
@@ -227,7 +393,7 @@ class StockMovementApiController {
      * @param lineItems
      */
     void bindLineItems(StockMovement stockMovement, List lineItems) {
-        log.info "line items: " + lineItems
+        log.debug "line items: " + lineItems
         List<StockMovementItem> stockMovementItems = createLineItemsFromJson(stockMovement, lineItems)
         stockMovement.lineItems.addAll(stockMovementItems)
     }
@@ -293,7 +459,7 @@ class StockMovementApiController {
     }
 
     void bindPackPage(StockMovement stockMovement, List lineItems) {
-        log.info "line items: " + lineItems
+        log.debug "line items: " + lineItems
         List<PackPageItem> packPageItems = createPackPageItemsFromJson(stockMovement, lineItems)
         PackPage packPage = new PackPage(packPageItems: packPageItems)
         stockMovement.packPage = packPage

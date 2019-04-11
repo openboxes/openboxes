@@ -10,6 +10,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.inventory.InventoryLevel
 
 
 @Validateable
@@ -25,19 +26,30 @@ class PutawayItem {
     Location putawayLocation
     Person recipient
     BigDecimal quantity
+    Integer quantityAvailable
     List<AvailableItem> availableItems
     PutawayStatus putawayStatus
     Transaction transaction
+    InventoryLevel inventoryLevel
+
 
     Boolean delete = Boolean.FALSE
     List<PutawayItem> splitItems = []
 
+    static constrants = {
+        quantityAvailable(nullable:true)
+    }
+
     String getCurrentBins() {
         String currentBins = ""
         if (availableItems) {
-            currentBins = availableItems?.collect { it?.binLocation?.name }.sort().join(",")
+            currentBins = availableItems?.collect { it?.binLocation?.name }?.sort()?.join(", ")
         }
         return currentBins
+    }
+
+    String getPreferredBin() {
+        return inventoryLevel?.binLocation ?: ""
     }
 
     String getCurrentBinsAbbreviated() {
@@ -100,12 +112,14 @@ class PutawayItem {
                 "recipient.id": recipient?.id,
                 "recipient.name": recipient?.name,
                 currentBins: currentBins,
+                preferredBin: preferredBin,
                 currentBinsAbbreviated: currentBinsAbbreviated,
                 "putawayFacility.id": putawayFacility?.id,
                 "putawayFacility.name": putawayFacility?.name,
                 "putawayLocation.id": putawayLocation?.id,
                 "putawayLocation.name": putawayLocation?.name,
                 quantity: quantity,
+                quantityAvailable: quantityAvailable,
                 splitItems: splitItems.collect { it?.toJson() }
         ]
     }

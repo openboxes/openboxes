@@ -30,6 +30,14 @@
 									  class="chzn-select-deselect"/>
 					</td>
 				</tr>
+				<tr>
+					<td>
+						<g:selectCatalogs name="catalogs" noSelection="['':'']"
+									  value="${commandInstance?.catalogs}"
+									  data-placeholder="Select a catalog"
+									  class="chzn-select-deselect"/>
+					</td>
+				</tr>
                 <%--
                 <tr>
                     <td>

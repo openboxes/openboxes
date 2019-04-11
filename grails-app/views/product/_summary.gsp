@@ -85,12 +85,10 @@
 							<img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
 							<warehouse:message code="inventory.showLotNumbers.label"/>
 						</g:link>
-						<g:isSuperuser>
-							<g:link controller="stocklistManagement" action="index" id="${productInstance?.id}" class="button">
-								<img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}"/>&nbsp;
-								${warehouse.message(code: 'button.manage.label', default: 'Manage stock lists', args:[warehouse.message(code:'requisitionTemplates.label')])}
-							</g:link>
-						</g:isSuperuser>
+						<g:link controller="stocklistManagement" action="index" id="${productInstance?.id}" class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}"/>&nbsp;
+							${warehouse.message(code: 'button.manage.label', default: 'Manage stock lists', args:[warehouse.message(code:'requisitionTemplates.label')])}
+						</g:link>
 					</div>
 
 					<g:isSuperuser>

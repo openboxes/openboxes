@@ -51,14 +51,6 @@ class RequisitionController {
         render(view:"list", model:[requisitions: requisitions, requisitionStatistics:requisitionStatistics])
     }
 
-	def listStock = {
-        def requisitions = []
-        def destination = Location.get(session.warehouse.id)
-		//requisitions = Requisition.findAllByIsTemplate(true)
-        requisitions = Requisition.findAllByIsTemplateAndDestination(true, destination)
-		render(view:"listStock", model:[requisitions: requisitions])		
-	}
-
     def chooseTemplate = {
         render(view:"chooseTemplate")
     }

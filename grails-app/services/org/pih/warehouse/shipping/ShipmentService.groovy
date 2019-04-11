@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.shipping
 
 import grails.validation.ValidationException
@@ -93,8 +93,8 @@ class ShipmentService {
             return shipment
 		}
 	}
-	
-	
+
+
 	/**
 	 * @param sort
 	 * @param order
@@ -103,23 +103,23 @@ class ShipmentService {
 	List<Shipment> getAllShipments(String sort, String order) {
 		return Shipment.list(['sort':sort, 'order':order])
 	}
-	
-	
+
+
 	/**
-	 * @return all shipments 
+	 * @return all shipments
 	 */
 	List<Shipment> getAllShipments() {
 		return Shipment.list()
 	}
 
-	
+
 	/**
-	 * 	
+	 *
 	 * @return
 	 */
-	Object getProductMap() { 
-		
-		def criteria = ShipmentItem.createCriteria();		
+	Object getProductMap() {
+
+		def criteria = ShipmentItem.createCriteria();
 		def quantityMap = criteria.list {
 			projections {
 				sum('quantity')
@@ -127,24 +127,24 @@ class ShipmentService {
 			groupProperty "product"
 		}
 		return quantityMap
-		
+
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param locationId
 	 * @return
 	 */
-	List<Shipment> getRecentOutgoingShipments(String locationId, int daysBefore, int daysAfter) { 		
+	List<Shipment> getRecentOutgoingShipments(String locationId, int daysBefore, int daysAfter) {
 		Location location = Location.get(locationId);
-		//def upcomingShipments = Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
+		//def upcomingShipments = Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30,
 		//	[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
-		
+
 		def criteria = Shipment.createCriteria()
 		def now = new Date()
 		def upcomingShipments = criteria.list {
-			and { 
+			and {
 				eq("origin", location)
 				or {
 					//between("expectedShippingDate",null,null)
@@ -153,55 +153,55 @@ class ShipmentService {
 				}
 			}
 		}
-		
-		def shipments = new ArrayList<Shipment>();		
-		for (shipment in upcomingShipments) { 
+
+		def shipments = new ArrayList<Shipment>();
+		for (shipment in upcomingShipments) {
 			shipments.add(shipment);
 		}
-						
+
 		/*
-		def unknownShipments = Shipment.findAllByOriginAndExpectedShippingDateIsNull(location);		
-		for (shipment in unknownShipments) { 
+		def unknownShipments = Shipment.findAllByOriginAndExpectedShippingDateIsNull(location);
+		for (shipment in unknownShipments) {
 			shipments.add(shipment);
 		}*/
-		
+
 		return shipments;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param locationId
 	 * @return
 	 */
-	List<Shipment> getRecentIncomingShipments(String locationId, int daysBefore, int daysAfter) { 		
+	List<Shipment> getRecentIncomingShipments(String locationId, int daysBefore, int daysAfter) {
 		def startTime = System.currentTimeMillis()
 		Location location = Location.get(locationId);
 		Date fromDate = new Date() - daysBefore
 		Date toDate = new Date() + daysAfter
-		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30, 
-		def shipments = Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, fromDate, toDate, 
+		//return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30,
+		def shipments = Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, fromDate, toDate,
 			[max:10, offset:2, sort:"expectedShippingDate", order:"desc"]);
-		
+
 		log.debug "Get recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
 		return shipments
 	}
-	
+
 
 	/**
-	 * 	
+	 *
 	 * @param shipments
 	 * @return
 	 */
-	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) { 
+	Map<EventType, ListCommand> getShipmentsByStatus(List shipments) {
 		def startTime = System.currentTimeMillis()
 		def shipmentMap = new TreeMap<ShipmentStatusCode, ListCommand>();
-		
-		ShipmentStatusCode.list().each { 
+
+		ShipmentStatusCode.list().each {
 			shipmentMap[it] = [];
 		}
 		shipments.each {
-			
-			def key = it.getStatus().code;			 
+
+			def key = it.getStatus().code;
 			def shipmentList = shipmentMap[key];
 			if (!shipmentList) {
 				shipmentList = new ListCommand(category: key, objectList: new ArrayList());
@@ -211,33 +211,33 @@ class ShipmentService {
 		}
 
         log.debug "Get shipments by status " + (System.currentTimeMillis() - startTime) + " ms"
-		
+
 		return shipmentMap;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
-	List<Shipment> getShipments() { 		
-		
+	List<Shipment> getShipments() {
+
 		return getAllShipments()
-		
+
 		/*
-		return Shipment.withCriteria { 				
+		return Shipment.withCriteria {
 			eq("mostRecentEvent.eventType.id", EventType.findByName("Departed"))  // change this to reference by id if we reimplement this
 		}*/
 
-		/*		
+		/*
 		//def sessionFactory
 		//sessionFactory = ctx.sessionFactory  // this only necessary if your are working with the Grails console/shell
-		def session = sessionFactory.currentSession		
+		def session = sessionFactory.currentSession
 		def query = session.createSQLQuery(
 			"""
 			select s.* , count(*)
-			from shipment s, shipment_event se, event e 
-			where se.shipment_events_id = s.id 
-			and se.event_id = e.id 
+			from shipment s, shipment_event se, event e
+			where se.shipment_events_id = s.id
+			and se.event_id = e.id
 			group by s.id having count(*) > 1
 			order by s.name
 			"""
@@ -246,7 +246,7 @@ class ShipmentService {
 		//query.setInteger("ids", 1);
 		return query.list();	// return query.list()*.name;
 		*/
-		
+
 		//def criteria = Shipment.createCriteria()
 		//def results = criteria.list {
 			//or {
@@ -256,32 +256,32 @@ class ShipmentService {
 			//	}
 		//}
 	}
-	
 
-	
-	
+
+
+
 	/**
-	 * 
+	 *
 	 * @param location
 	 * @return
 	 */
 	List<Shipment> getShipmentsByLocation(Location location) {
-		return Shipment.withCriteria { 
-			or {	
+		return Shipment.withCriteria {
+			or {
 				eq("destination", location)
 				eq("origin", location)
 			}
 		}
-	}    
-	
-	
+	}
+
+
 	/**
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
 	List<Shipment> getShipmentsByName(String name) {
-		return Shipment.withCriteria { 
+		return Shipment.withCriteria {
 			ilike("name", "%" +name + "%")
         }
     }
@@ -321,8 +321,16 @@ class ShipmentService {
         return getPendingShipments(origin, null)
     }
 
+	List<Shipment> getPendingInboundShipments(Location location) {
+		return getPendingShipments(null, location)
+	}
+
+	List<Shipment> getPendingOutboundShipments(Location location) {
+		return getPendingShipments(location, null)
+	}
+
 	/**
-	 * 
+	 *
 	 * @param location
 	 * @return
 	 */
@@ -346,45 +354,44 @@ class ShipmentService {
                 }
             }
 		}
-		
+
 		return shipments
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param location
 	 * @param product
 	 * @return
 	 */
 	List<ShipmentItem> getPendingShipmentItemsWithProduct(Location location, Product product) {
 		def shipmentItems = []
-		def shipments = getPendingShipments(location);
-        shipments.addAll(getIncomingShipments(location));
-		
+		def shipments = getPendingInboundShipments(location);
+
 		shipments.each { 
 			def shipmentItemList = it.shipmentItems.findAll { it.product == product }
-			shipmentItemList.each { 
+			shipmentItemList.each {
 				shipmentItems << it;
 			}
 		}
-	
-		return shipmentItems;		
+
+		return shipmentItems;
 	}
-	
+
 	/**
 	 * Get all shipments that are shipping to the given location.
-	 * 
+	 *
 	 * @param location
 	 * @return
 	 */
 	List<Shipment> getIncomingShipments(Location destination) {
         return getPendingShipments(null, destination)
 	}
-	
-	
+
+
 	/**
 	 * Get all shipments that are shipping from the given location.
-	 * 
+	 *
 	 * @param location
 	 * @return
 	 */
@@ -392,33 +399,33 @@ class ShipmentService {
         getPendingShipments(origin, null)
 	}
 
-	
+
 	/**
-	 * 
+	 *
 	 * @param location
 	 * @return
 	 */
 	List<Shipment> getShipmentsByDestination(Location location) {
 		def startTime = System.currentTimeMillis()
-		def shipments = Shipment.withCriteria { 
-			eq("destination", location) 
+		def shipments = Shipment.withCriteria {
+			eq("destination", location)
 		}
         log.info "Get shipments by destination " + (System.currentTimeMillis() - startTime) + " ms"
 		return shipments
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param location
 	 * @return
 	 */
 	List<Shipment> getShipmentsByOrigin(Location location) {
 		def startTime = System.currentTimeMillis()
-		def shipments = Shipment.withCriteria { 
+		def shipments = Shipment.withCriteria {
 			eq("origin", location);
 		}
         log.info "Get shipments by origin " + (System.currentTimeMillis() - startTime) + " ms"
-		
+
 		return shipments
 	}
 
@@ -455,7 +462,7 @@ class ShipmentService {
     }
 
 	/**
-	 * 
+	 *
 	 * @param shipmentType
 	 * @param origin
 	 * @param destination
@@ -494,45 +501,45 @@ class ShipmentService {
 
 		return shipments
 	}
-	
+
 	/**
 	 * Saves a shipment
-	 * 
+	 *
 	 * @param shipment
 	 */
 	void saveShipment(Shipment shipment) {
-		if (!shipment.shipmentNumber) { 
+		if (!shipment.shipmentNumber) {
 			shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
 		}
 		shipment.save()
 	}
-	
+
 	/**
 	 * Saves a container
-	 * 
+	 *
 	 * @param container
 	 */
-	void saveContainer(Container container) {	
-		if (!container.recipient) { 			
+	void saveContainer(Container container) {
+		if (!container.recipient) {
 			container.recipient = (container?.parentContainer?.recipient)?:container.shipment.recipient;
 		}
 		container.save()
 	}
-	
+
 	/**
 	 * Move a container and all of its children to the new shipment.
-	 * 
+	 *
 	 * @param oldContainer
 	 * @param newShipment
 	 */
-	void moveContainers(Container oldContainer, Shipment newShipment) { 		
-		//if (oldContainer.containers) { 			
-			//oldContainer.containers.each { 
+	void moveContainers(Container oldContainer, Shipment newShipment) {
+		//if (oldContainer.containers) {
+			//oldContainer.containers.each {
 			//	moveContainer(it, newShipment)
 			//}
 		//	throw new UnsupportedOperationException();
 		//}
-		moveContainer(oldContainer, newShipment)		
+		moveContainer(oldContainer, newShipment)
 	}
 
 	void moveShipmentItemToContainer(String shipmentItemId, String containerId) {
@@ -578,20 +585,20 @@ class ShipmentService {
 		}
 
 	}
-	
+
 	/**
 	 * Move a container from one shipment to the given shipment.
-	 * 
+	 *
 	 * @param container
 	 * @param shipment
 	 */
 	/*
-	void moveContainer(Container oldContainer, Shipment newShipment) { 
-		
+	void moveContainer(Container oldContainer, Shipment newShipment) {
+
 		// Copy the container and add to the new shipment
-		def newContainer = oldContainer.copyContainer();		
+		def newContainer = oldContainer.copyContainer();
 		newShipment.addToContainers(newContainer)
-		
+
 		// Copy each shipment item from one shipment to the other
 		def oldShipment = oldContainer.shipment;
 		oldContainer.shipmentItems.each {
@@ -605,26 +612,26 @@ class ShipmentService {
 			newShipment.addToShipmentItems(shipmentItem);
 			oldShipment.removeFromShipmentItems(it)
 			it.delete();
-		}		
+		}
 		newShipment.save(failOnError:true)
-		
+
 		// Remove old container from shipment
 		oldShipment.removeFromContainers(oldContainer);
 		oldContainer.delete();
 	}
 	*/
-	
-	
+
+
 	/**
 	 * @param container the container to be moved
 	 * @param shipmentTo the shipment to which the container will be moved
 	 */
-	void moveContainer(Container container, Shipment shipmentTo) { 		
-		
-		if (container.containers) { 
+	void moveContainer(Container container, Shipment shipmentTo) {
+
+		if (container.containers) {
 			throw new ValidationException("Cannot move a container with child containers", container.errors)
 		}
-				
+
 		def shipmentFrom = container.shipment
 		shipmentFrom.removeFromContainers(container)
 		shipmentTo.addToContainers(container)
@@ -635,7 +642,7 @@ class ShipmentService {
 			shipmentFrom.removeFromShipmentItems(shipmentItem)
 			shipmentTo.addToShipmentItems(shipmentItem)
 		}
-		
+
 
 		/*
 		def previousShipment = container.shipment;
@@ -651,12 +658,12 @@ class ShipmentService {
 		//previousShipment.refresh()
 		 */
 	}
-	
+
 	/*
-	void moveContainer(Container container, Shipment shipment) { 
-		// Get a copy of the container to be moved		
+	void moveContainer(Container container, Shipment shipment) {
+		// Get a copy of the container to be moved
 		def newContainer = container.copyContainer()
-		
+
 		// Move all children containers
 		container.containers.each { childContainer ->
 			newContainer.addToContainers(childContainer)
@@ -664,29 +671,29 @@ class ShipmentService {
 			childContainer.parentContainer.shipment = shipment
 		}
 
-		
-		// 
+
+		//
 		//newContainer.containers.each { childContainer ->
 		//}
-		
+
 		// Remove the container from the existing shipment
 		def shipmentOld = container.shipment
 		shipmentOld.removeFromContainers(container)
 		saveShipment(shipmentOld)
-		
+
 		// Add the cloned container to the new shipment
 		shipment.addToContainers(newContainer)
-		
+
 		saveShipment(shipment)
 	}
 	*/
-	
+
 	/*
-	void moveContainer(Container container, Shipment newShipment) { 
-		
+	void moveContainer(Container container, Shipment newShipment) {
+
 		def oldShipment = container.shipment
-		
-		
+
+
 		// Move all shipment items in the container
 		def shipmentItems = oldShipment.shipmentItems.findAll { it.container == container }
 		shipmentItems.each { item ->
@@ -694,10 +701,10 @@ class ShipmentService {
 		}
 
 		// Move all subcontainers and shipment items in the subcontainer
-		container?.containers?.each { box -> 
+		container?.containers?.each { box ->
 			newShipment.addToContainers(box);
 			shipmentItems = oldShipment.shipmentItems.findAll { it.container == box }
-			shipmentItems.each { item -> 
+			shipmentItems.each { item ->
 				newShipment.addToShipmentItems(item);
 			}
 		}
@@ -705,32 +712,32 @@ class ShipmentService {
 		newShipment.addToContainers(container);
 		container.shipment = newShipment
 		saveShipment(newShipment)
-		
+
 		oldShipment.removeFromContainers(container)
 		saveShipment(oldShipment)
 		//container.shipment = newShipment
 		//container.save(true)
-		//container.shipment = newShipment;		
+		//container.shipment = newShipment;
 		//newShipment.addToContainers(container);
 		//saveShipment(newShipment)
 		//oldShipment.removeFromContainers(container);
-		//saveShipment(oldShipment)		
+		//saveShipment(oldShipment)
 	}
 	*/
-	
+
 	/**
 	 * Saves an item
-	 * 
+	 *
 	 * @param item
 	 */
 	boolean saveShipmentItem(ShipmentItem shipmentItem) {
         return shipmentItem.save()
 	}
-	
-	
+
+
 	/**
 	 * Add a shipment item to a shipment.
-	 * 
+	 *
 	 * @param shipmentItem
 	 * @param shipment
 	 */
@@ -854,6 +861,8 @@ class ShipmentService {
             // Check whether there's any stock in the bin location for the given inventory item
             def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
 			def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
+			def allPendingShipmentsWithProduct = getPendingShipmentItemsWithProduct(origin, shipmentItem.product)
+
             log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity on hand ${quantityOnHand} vs duplicated shipment items quantity ${duplicatedShipmentItemsQuantity}"
 
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
@@ -868,7 +877,7 @@ class ShipmentService {
                             origin.name,
                             shipmentItem?.binLocation?.name?:'Default'
                         ].toArray(),
-                        "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode)
+                        "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode + " " + allPendingShipmentsWithProduct.shipment.shipmentNumber.unique())
                 //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
@@ -970,10 +979,10 @@ class ShipmentService {
         return transactionEntries;
     }
 
-	
+
 	/**
 	 * Deletes a shipment and all of its related objects
-	 * 
+	 *
 	 * @param shipment
 	 */
 	void deleteShipment(Shipment shipment) {
@@ -1052,8 +1061,8 @@ class ShipmentService {
 	}
 
 	/**
-	 * Deletes a container, but leaves all shipment items 
-	 * 
+	 * Deletes a container, but leaves all shipment items
+	 *
 	 * @param container
 	 */
 	void deleteContainer(Container container) {
@@ -1092,14 +1101,14 @@ class ShipmentService {
 			//shipment.removeFromShipmentItems(it)
 			shipmentItem.container = null
 		}
-		
+
 		// NOTE: I'm using the standard "remove" set method here instead of the removeFrom Grails
 		// code because the removeFrom code wasn't working correctly, I think because of
 		// the fact that a container can be associated with both a shipment and another container
-		
+
 		// remove the container from its parent
 		//container.parentContainer?.removeFromContainers(container)
-					
+
 		// remove the container itself from the parent shipment
 		shipment.removeFromContainers(container)
 
@@ -1110,11 +1119,11 @@ class ShipmentService {
 		//container.shipment.save()
 		container.delete()
 	}
-	
-	
+
+
 	/**
 	 * Deletes a shipment item
-	 * 
+	 *
 	 * @param item
 	 */
 	void deleteShipmentItem(ShipmentItem shipmentItem) {
@@ -1124,26 +1133,26 @@ class ShipmentService {
 			shipmentItem.delete(flush: true)
 		}
 	}
-	
+
 	/**
-	 * Makes a specified number of copies of the passed container, including it's children containers 
+	 * Makes a specified number of copies of the passed container, including it's children containers
 	 * and shipment item, and connects them all properly to the parent shipment
-	 * 
+	 *
 	 * @param container
 	 * @param quantity
 	 */
 	void copyContainer(Container container, Integer quantity) {
 		// probably could speed the performance up on this by not going one by one
 		// but this is pretty clear to understand
-		quantity.times { 
-			copyContainer(container) 
+		quantity.times {
+			copyContainer(container)
 		}
 	}
-	
+
 	/**
 	 * Makes a copy of the passed container, including it's children containers and shipment items,
 	 * and connects it properly to the parent shipment
-	 * 
+	 *
 	 * @param container
 	 * @return
 	 */
@@ -1151,28 +1160,28 @@ class ShipmentService {
 		Container newContainer = copyContainerHelper(container)
 
 		// the new container should have the same parent as the old container
-		if (container.parentContainer) { container.parentContainer.addToContainers(newContainer) }		
+		if (container.parentContainer) { container.parentContainer.addToContainers(newContainer) }
 		saveShipment(container.shipment)
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param container
 	 * @return
 	 */
 	private Container copyContainerHelper(Container container) {
-		
+
 		// first, make a copy of this container
 		Container newContainer = container.copyContainer()
-		
-		// clone all the child containers and attach them to this container		
-		for (Container c in container.containers) {	
-			newContainer.addToContainers(copyContainerHelper(c)) 
+
+		// clone all the child containers and attach them to this container
+		for (Container c in container.containers) {
+			newContainer.addToContainers(copyContainerHelper(c))
 		}
-		
+
 		// TODO: figure out sort order
-		
+
 		// now create clones of all the shipping items on this container
 		for (ShipmentItem item in container.shipment.shipmentItems.findAll( {it.container == container} )) {
 			def newItem = item.cloneShipmentItem()
@@ -1181,13 +1190,13 @@ class ShipmentService {
 			// add the item to the parent shipment
 			container.shipment.addToShipmentItems(newItem)
 		}
-		
+
 		// add the new container to the shipment
 		container.shipment.addToContainers(newContainer)
-				
-		return newContainer	
+
+		return newContainer
 	}
-	
+
 	public ShipmentItem copyShipmentItem(ShipmentItem itemToCopy) {
 		def shipmentItem = new ShipmentItem();
         shipmentItem.inventoryItem = itemToCopy.inventoryItem
@@ -1202,11 +1211,11 @@ class ShipmentService {
 		return shipmentItem;
 	}
 
-	
-	ShipmentItem findShipmentItem(Shipment shipment, Container container, InventoryItem inventoryItem) { 
-		return shipment.shipmentItems.find { it.container == container && it.inventoryItem == inventoryItem } 
+
+	ShipmentItem findShipmentItem(Shipment shipment, Container container, InventoryItem inventoryItem) {
+		return shipment.shipmentItems.find { it.container == container && it.inventoryItem == inventoryItem }
 	}
-	
+
     ShipmentItem findShipmentItem(Shipment shipment,
                                   Container container,
                                   Product product,
@@ -1229,22 +1238,22 @@ class ShipmentService {
 
     /**
 	 * Get a list of shipments.
-	 * 
+	 *
 	 * @param location
 	 * @param eventCode
 	 * @return
 	 */
-	List<Shipment> getReceivingByDestinationAndStatus(Location location, ShipmentStatusCode statusCode) { 		
+	List<Shipment> getReceivingByDestinationAndStatus(Location location, ShipmentStatusCode statusCode) {
 		def shipmentList = getRecentIncomingShipments(location?.id)
-		if (shipmentList) { 
-			shipmentList = shipmentList.findAll { it.status.code == statusCode } 
+		if (shipmentList) {
+			shipmentList = shipmentList.findAll { it.status.code == statusCode }
 		}
-		return shipmentList;		
+		return shipmentList;
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param shipmentInstance
 	 * @param comment
 	 * @param userInstance
@@ -1252,12 +1261,12 @@ class ShipmentService {
 	 * @param shipDate
 	 * @param emailRecipients
 	 */
-	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate) { 
+	void sendShipment(Shipment shipmentInstance, String comment, User userInstance, Location locationInstance, Date shipDate) {
 		sendShipment(shipmentInstance, comment, userInstance, locationInstance, shipDate, true);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param shipmentInstance
 	 * @param comment
 	 * @param userInstance
@@ -1311,10 +1320,10 @@ class ShipmentService {
 			throw new ValidationException("Failed to send shipment", shipmentInstance?.errors)
 		}
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param shipmentInstance
 	 * @param eventDate
 	 * @param eventCode
@@ -1384,25 +1393,25 @@ class ShipmentService {
 
 
 
-	void markAsReceived(Shipment shipment, Location location) { 
-		try { 
+	void markAsReceived(Shipment shipment, Location location) {
+		try {
 			// Add a Received event to the shipment
 			createShipmentEvent(shipment, new Date(), EventCode.RECEIVED, location);
-											
+
 			// Save updated shipment instance
 			shipment.save();
-			
-		} catch (Exception e) { 
+
+		} catch (Exception e) {
 			throw new ShipmentException(message: e.message);
 		}
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param command
 	 */
-	void receiveShipment(command) { 
+	void receiveShipment(command) {
 		if (!command.validate()) {
 			throw new ValidationException("Receive shipment is not valid", command.errors)
 		}
@@ -1474,9 +1483,9 @@ class ShipmentService {
 
 	}
 
-	
+
 	/**
-	 * 
+	 *
 	 * @param shipmentInstance
 	 * @param comment
 	 * @param user
@@ -1551,7 +1560,7 @@ class ShipmentService {
         return true
     }
 	/**
-	 * 
+	 *
 	 * @param shipmentInstance
 	 * @param dateDelivered
 	 * @return
@@ -1710,23 +1719,23 @@ class ShipmentService {
 
 
     /**
-	 * Fetches shipment workflow associated with a shipment of the 
+	 * Fetches shipment workflow associated with a shipment of the
 	 * given shipmentId.
-	 * 
+	 *
 	 * @param shipmentId
 	 * @return
 	 */
 	ShipmentWorkflow getShipmentWorkflow(String shipmentId) {
-		def shipment = Shipment.get(shipmentId)		
+		def shipment = Shipment.get(shipmentId)
 		if (!shipment?.shipmentType) { return null }
 		return ShipmentWorkflow.findByShipmentType(shipment.shipmentType)
 	}
 
-	
+
 	/**
 	 * Fetches the shipment workflow associated with this shipment
 	 * (Note that, as of now, there can only be one shipment workflow per shipment type)
-	 * 
+	 *
 	 * @param shipment
 	 * @return
 	 */
@@ -1734,15 +1743,15 @@ class ShipmentService {
 		if (!shipment?.shipmentType) { return null }
 		return ShipmentWorkflow.findByShipmentType(shipment.shipmentType)
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param productIds
 	 * @param location
 	 * @return
 	 */
-	ItemListCommand getAddToShipmentCommand(List<String> productIds, Location location) { 
+	ItemListCommand getAddToShipmentCommand(List<String> productIds, Location location) {
 		// Find all inventory items that match the selected products
 		//def products = []
 		def inventoryItems = []
@@ -1755,8 +1764,8 @@ class ShipmentService {
 		def quantityOnHandMap = inventoryService.getQuantityForInventory(location.inventory)
 		def quantityShippingMap = getQuantityForShipping(location)
 		def quantityReceivingMap = getQuantityForReceiving(location)
-		
-				
+
+
 		// Create command objects for each item
 		def commandInstance = new ItemListCommand();
 		if (inventoryItems) {
@@ -1771,35 +1780,35 @@ class ShipmentService {
 				commandInstance.items << item;
 			}
 		}
-		
+
 		return commandInstance
 	}
-	
-   
 
-	
-	Boolean addToShipment(ItemListCommand command) { 	
-			
+
+
+
+	Boolean addToShipment(ItemListCommand command) {
+
 		def atLeastOneUpdate = false;
-		
+
 		command.items.each {
 			// Check if shipment item already exists
-			def shipmentItem = findShipmentItem(it.shipment, it.container, it.inventoryItem)			
+			def shipmentItem = findShipmentItem(it.shipment, it.container, it.inventoryItem)
 
 			// Only add a shipment item for rows that have a quantity greater than 0
 			if (it.quantity > 0) {
-				
-				if (!it.shipment) { 
+
+				if (!it.shipment) {
 					command.errors.reject("shipmentItem.shipment.required")
 					throw new ValidationException("Shipment is required", command.errors);
 				}
-				
-				// If the shipment item already exists, we just add to the quantity 
+
+				// If the shipment item already exists, we just add to the quantity
 				if (shipmentItem) {
-					log.info "Found existing shipment item ..." + shipmentItem.id					
+					log.info "Found existing shipment item ..." + shipmentItem.id
 					shipmentItem.quantity += it.quantity;
-					try { 
-						validateShipmentItem(shipmentItem); 
+					try {
+						validateShipmentItem(shipmentItem);
 					} catch (ShipmentItemException e) {
 						log.info("Validation exception " + e.message);
 						throw new ValidationException(e.message, e.shipmentItem.errors);
@@ -1808,46 +1817,46 @@ class ShipmentService {
 				else {
 					log.info("Creating new shipment item ...");
 					// def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
-					shipmentItem = new ShipmentItem(shipment: it.shipment, container: it.container, 
-						inventoryItem: it.inventoryItem, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);					
+					shipmentItem = new ShipmentItem(shipment: it.shipment, container: it.container,
+						inventoryItem: it.inventoryItem, product: it.product, lotNumber: it.lotNumber, quantity: it.quantity);
 					addToShipmentItems(shipmentItem, it.shipment);
 				}
 				atLeastOneUpdate = true;
 			}
 			log.info "Adding item with lotNumber=" + it?.lotNumber + " product=" + it?.product?.name + " and  qty=" + it?.quantity +
 			" to shipment=" + it.shipment + " into container=" + it.container
-		
+
 
 		}
 		return atLeastOneUpdate
-	}	
-	
-	/**
-	 * 
-	 * @param location
-	 * @return
-	 */
-	Map getQuantityForShipping(Location location) { 
-		return getQuantityByInventoryItem(getPendingShipments(location));
-		
 	}
-	
 
 	/**
-	 * 
+	 *
 	 * @param location
 	 * @return
 	 */
-	Map getQuantityForReceiving(Location location) { 
+	Map getQuantityForShipping(Location location) {
+		return getQuantityByInventoryItem(getPendingShipments(location));
+
+	}
+
+
+	/**
+	 *
+	 * @param location
+	 * @return
+	 */
+	Map getQuantityForReceiving(Location location) {
 		return getQuantityByInventoryItem(getIncomingShipments(location));
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param shipments
 	 * @return
 	 */
-	Map getQuantityByInventoryItem(List<Shipment> shipments) { 		
+	Map getQuantityByInventoryItem(List<Shipment> shipments) {
 		def quantityMap = [:]
 		shipments.each { shipment ->
 			shipment.shipmentItems.each { shipmentItem ->
@@ -1863,7 +1872,7 @@ class ShipmentService {
 		return quantityMap;
 
 	}
-	
+
    /**
 	*
 	* @param location
@@ -1872,7 +1881,7 @@ class ShipmentService {
    Map getIncomingQuantityByProduct(Location location, List<Product> products) {
 	   return getQuantityByProduct(getIncomingShipments(location), products)
    }
-   
+
    /**
    *
    * @param location
@@ -1881,14 +1890,14 @@ class ShipmentService {
   Map getOutgoingQuantityByProduct(Location location, List<Product> products) {
 	  return getQuantityByProduct(getOutgoingShipments(location), products)
   }
-  
+
   /**
-   * 
+   *
    * @param shipments
    * @return
    */
    Map getQuantityByProduct(List<Shipment> shipments, List<Product> products) {
-	   def quantityMap = [:]	   
+	   def quantityMap = [:]
 	   shipments.each { shipment ->
 		   shipment.shipmentItems.each { shipmentItem ->
                def product = shipmentItem.product
@@ -1955,17 +1964,17 @@ class ShipmentService {
         shipment.save()
     }
 
-   
+
 	void rollbackLastEvent(Shipment shipmentInstance) {
-		
+
 		def eventInstance = shipmentInstance.mostRecentEvent
-		
+
 		if (!eventInstance) {
 			throw new RuntimeException("Cannot rollback shipment status because there are no recent events")
 		}
 
 		try {
-			
+
 			if (eventInstance?.eventType?.eventCode in [EventCode.RECEIVED, EventCode.PARTIALLY_RECEIVED]) {
 				deleteReceipts(shipmentInstance)
 				deleteInboundTransactions(shipmentInstance)
@@ -1979,7 +1988,7 @@ class ShipmentService {
 			else {
 				deleteEvent(shipmentInstance, eventInstance)
 			}
-			
+
 		} catch (Exception e) {
 			log.error("Error rolling back most recent event", e)
 			throw new IllegalStateException("Error rolling back most recent event", e)

@@ -82,27 +82,6 @@
                                 </h2>
                                 <table>
                                     <tbody>
-
-                                        <%--
-                                        <tr class="prop">
-                                            <td class="name"><label for="name"><warehouse:message
-                                                code="product.genericName.label" /></label></td>
-                                            <td
-                                                class="value ${hasErrors(bean: productInstance, field: 'genericProducts', 'errors')}">
-                                                <ul>
-                                                    <g:each var="productGroup" in="${productInstance?.productGroups }">
-                                                        <li>
-                                                            ${productGroup.description }
-                                                            <g:link controller="productGroup" action="edit" id="${productGroup.id }">
-                                                                <warehouse:message code="default.button.edit.label"/>
-                                                            </g:link>
-                                                        </li>
-                                                    </g:each>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                        --%>
-
                                         <tr class="prop">
                                             <td class="name">
                                                 <label for="active"><warehouse:message
@@ -112,8 +91,6 @@
                                                 <g:checkBox name="active" value="${productInstance?.active}" />
                                             </td>
                                         </tr>
-
-
                                         <tr class="prop first">
                                             <td class="name middle"><label for="productCode"><warehouse:message
                                                     code="product.productCode.label"/></label>
@@ -124,7 +101,6 @@
                                                              placeholder="${warehouse.message(code:'product.productCode.placeholder') }"/>
                                             </td>
                                         </tr>
-
                                         <tr class="prop first">
                                             <td class="name middle"><label for="name"><warehouse:message
                                                 code="product.title.label" /></label></td>
@@ -265,9 +241,6 @@
                                         <td class="name middle"><label for="manufacturer"><warehouse:message
                                                 code="product.manufacturer.label" /></label></td>
                                         <td class="value ${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
-                                            <%--
-                                            <g:textField name="unitOfMeasure" value="${productInstance?.manufacturer}" size="60" class="medium text"/>
-                                            --%>
                                             <g:autoSuggestString id="manufacturer" name="manufacturer" size="50" class="text"
                                                                  jsonUrl="${request.contextPath}/json/autoSuggest"
                                                                  value="${productInstance?.manufacturer}"
@@ -281,12 +254,6 @@
                                                 code="product.manufacturerCode.label"/></label></td>
                                         <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
                                             <g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="50" class="text"/>
-                                            <%--
-                                            <g:autoSuggestString id="manufacturerCode" name="manufacturerCode" size="50" class="text"
-                                                jsonUrl="${request.contextPath}/json/autoSuggest"
-                                                value="${productInstance?.manufacturerCode}"
-                                                placeholder=""/>
-                                            --%>
                                         </td>
                                     </tr>
                                     <tr class="prop">
@@ -294,12 +261,6 @@
                                                 code="product.manufacturerName.label"/></label></td>
                                         <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerName', 'errors')}">
                                             <g:textField name="manufacturerName" value="${productInstance?.manufacturerName}" size="50" class="text"/>
-                                            <%--
-                                            <g:autoSuggestString id="manufacturerName" name="manufacturerName" size="50" class="text"
-                                                jsonUrl="${request.contextPath}/json/autoSuggest"
-                                                value="${productInstance?.manufacturerName}"
-                                                placeholder=""/>
-                                            --%>
                                         </td>
                                     </tr>
 
@@ -310,12 +271,6 @@
                                         <td
                                                 class="value ${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
                                             <g:textField name="modelNumber" value="${productInstance?.modelNumber}" size="50" class="text"/>
-                                            <%--
-                                            <g:autoSuggestString id="modelNumber" name="modelNumber" size="50" class="text"
-                                                jsonUrl="${request.contextPath}/json/autoSuggest"
-                                                value="${productInstance?.modelNumber}" promptOnMatch="true"
-                                                placeholder="e.g. Usually only pertains to equipment "/>
-                                            --%>
                                         </td>
                                     </tr>
 
@@ -336,12 +291,6 @@
                                                 code="product.vendorCode.label"/></label></td>
                                         <td class="value ${hasErrors(bean: productInstance, field: 'vendorCode', 'errors')}">
                                             <g:textField name="vendorCode" value="${productInstance?.vendorCode}" size="50" class="text"/>
-                                            <%--
-                                            <g:autoSuggestString id="vendorCode" name="vendorCode" size="50" class="text"
-                                                jsonUrl="${request.contextPath}/json/autoSuggest"
-                                                value="${productInstance?.vendorCode}"
-                                                placeholder=""/>
-                                            --%>
                                         </td>
                                     </tr>
                                     <tr class="prop">
@@ -349,26 +298,21 @@
                                                 code="product.vendorName.label"/></label></td>
                                         <td class="value ${hasErrors(bean: productInstance, field: 'vendorName', 'errors')}">
                                             <g:textField name="vendorName" value="${productInstance?.vendorName}" size="50" class="text"/>
-                                            <%--
-                                            <g:autoSuggestString id="vendorName" name="vendorName" size="50" class="text"
-                                                jsonUrl="${request.contextPath}/json/autoSuggest"
-                                                value="${productInstance?.vendorName}"
-                                                placeholder=""/>
-                                            --%>
-
                                         </td>
                                     </tr>
                                         <tr class="prop">
                                             <td class="name middle"><label for="pricePerUnit"><warehouse:message
                                                     code="product.pricePerUnit.label"/></label></td>
                                             <td class="value middle ${hasErrors(bean: productInstance, field: 'pricePerUnit', 'errors')}">
-                                                <g:hasRoleFinance>
+                                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.userNotGrantedPermission.message', args: [session.user.username])}">
                                                     <g:textField name="pricePerUnit" placeholder="Price per unit (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})"
                                                                  value="${g.formatNumber(number:productInstance?.pricePerUnit, format:'###,###,##0.####') }"
                                                                  class="text" size="50" />
 
                                                     <span class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</span>
                                                 </g:hasRoleFinance>
+
+
                                             </td>
                                         </tr>
                                     </tbody>
@@ -396,10 +340,6 @@
                                     </tfoot>
                                 </table>
                             </div>
-
-
-
-
                         </g:form>
                     </div>
 
@@ -420,11 +360,6 @@
                                 <g:render template="productGroups" model="[product: productInstance, productGroups:productInstance?.productGroups]"/>
                             </div>
                         </div>
-                        <%--
-                        <div id="tabs-attributes" class="ui-tabs-hide">
-                            <g:render template="attributes" model="[productInstance:productInstance]"/>
-                        </div>
-                        --%>
                         <div id="tabs-status" class="ui-tabs-hide">
                             <g:render template="inventoryLevels" model="[productInstance:productInstance]"/>
 						</div>

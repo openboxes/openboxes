@@ -298,8 +298,7 @@ class ProductController {
 				inventoryLevelInstance = new InventoryLevel();
 			}
 
-			[productInstance: productInstance, rootCategory: productService.getRootCategory(),
-				inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
+			[productInstance: productInstance, inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
 		}
 	}
 
@@ -916,21 +915,14 @@ class ProductController {
      * Export all products as CSV
      */
 	def exportAsCsv = {
-        log.info "Export as CSV: " + params
 
-		//def products = session.productIds ? Product.getAll(session.productIds) : Product.list()
-
-        def products = Product.list()
+        def products = Product.findAllByActive(true)
 
         if (products) {
-			def date = new Date();
 			response.setHeader("Content-disposition",
-					"attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
+					"attachment; filename=\"Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
 			response.contentType = "text/csv"
-			def csv = productService.exportProducts(products)
-			//println "export products: " + csv
-
-            render csv
+			render productService.exportProducts(products)
 		}
 		else {
 			render(text: 'No products found', status: 404)

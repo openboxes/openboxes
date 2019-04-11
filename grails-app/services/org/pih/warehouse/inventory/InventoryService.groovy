@@ -10,12 +10,10 @@
 package org.pih.warehouse.inventory
 
 import grails.orm.PagedResultList
-import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.sql.Sql
-import groovy.time.TimeCategory
-import org.apache.commons.lang.StringEscapeUtils
 import groovyx.gpars.GParsPool
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.grails.plugins.csv.CSVWriter
 import org.hibernate.criterion.CriteriaSpecification
@@ -31,6 +29,7 @@ import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.requisition.RequisitionItem
@@ -40,11 +39,9 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
 
-import java.sql.Timestamp
 import java.sql.BatchUpdateException
-import java.text.ParseException;
-
-
+import java.sql.Timestamp
+import java.text.ParseException
 import java.text.SimpleDateFormat
 
 class InventoryService implements ApplicationContextAware {
@@ -94,7 +91,7 @@ class InventoryService implements ApplicationContextAware {
 
         // Should not allow user to disable a bin location that has items in it
         if (!location.active && location.parentLocation) {
-            List binLocationEntries = getQuantityByBinLocation(location.parentLocation, location)
+			List binLocationEntries = getQuantityByBinLocation(location.parentLocation, location)
             if (!binLocationEntries.isEmpty()) {
                 location.errors.reject("location.cannotDisableBinLocationWithStock.message")
                 throw new ValidationException("cannot save location", location.errors)
@@ -249,6 +246,7 @@ class InventoryService implements ApplicationContextAware {
 		log.info "searchTerms = " + searchTerms
 		log.debug("get products: " + commandInstance?.warehouseInstance)
 		log.info "command.tag  = " + commandInstance.tags
+		log.info "command.catalog  = " + commandInstance.catalogs
 
 		def products = []
 
@@ -258,11 +256,16 @@ class InventoryService implements ApplicationContextAware {
 			products = getProductsByTags(commandInstance.tags, commandInstance?.maxResults as int, commandInstance?.offset as int)
 		}
 
+		// User wants to view all products that match the given catalog
+		else if (commandInstance.catalogs) {
+			commandInstance.numResults = countProductsByCatalogs(commandInstance.catalogs)
+			products = getProductsByCatalogs(commandInstance.catalogs, commandInstance?.maxResults as int, commandInstance?.offset as int)
+		}
+
         // User wants to view all products in the given shipment
         else if (commandInstance.shipment) {
             commandInstance.numResults = countProductsByShipment(commandInstance.shipment)
             products = getProductsByShipment(commandInstance.shipment, commandInstance?.maxResults as int, commandInstance?.offset as int)
-
         }
         else {
 			// Get all products, including hidden ones
@@ -1168,6 +1171,33 @@ class InventoryService implements ApplicationContextAware {
 		return results[0]
 	}
 
+	/**
+	 * Get all products in the given catalog
+	 *
+	 * @param inputCatalogs
+	 * @return
+	 */
+	def getProductsByCatalogs(List<String> inputCatalogs, int max, int offset) {
+		log.info "Get products by catalogs=${inputCatalogs} max=${max} offset=${offset}"
+		def products = []
+		for (inputCatalog in inputCatalogs) {
+			def productInstance = ProductCatalog.get(inputCatalog)
+			def productsInCatalog = productInstance.productCatalogItems.product
+			products += productsInCatalog
+		}
+		return products
+	}
+
+	def countProductsByCatalogs(List inputCatalogs) {
+		log.debug "Get products by catalogs: " + inputCatalogs
+		def result = 0
+		for (inputCatalog in inputCatalogs) {
+			def productInstance = ProductCatalog.get(inputCatalog)
+			result += productInstance.productCatalogItems.size()
+		}
+		return result
+	}
+
 
 	/**
 	 * Get all products that have the given tag.
@@ -1497,10 +1527,17 @@ class InventoryService implements ApplicationContextAware {
         return binLocations
     }
 
-    List getQuantityByBinLocation(Location location, Location binLocation) {
-        List transactionEntries = getTransactionEntriesByInventoryAndBinLocation(location?.inventory, binLocation)
-        List binLocations = getQuantityByBinLocation(transactionEntries)
-        return binLocations
+	/**
+	 * Should be used with caution (i.e. not in a loop) since it requires an expensive call to
+	 * calculate all quantity within a parent location.
+	 *
+	 * @param location
+	 * @param internalLocation
+	 * @return
+	 */
+    List getQuantityByBinLocation(Location location, Location internalLocation) {
+		List binLocationEntries = getQuantityByBinLocation(location.parentLocation)
+		return binLocationEntries.findAll { it.binLocation == internalLocation }
     }
 
     List getProductQuantityByBinLocation(Location location, Product product) {
@@ -1699,6 +1736,44 @@ class InventoryService implements ApplicationContextAware {
 
         return quantityMap
     }
+
+	/**
+	 * Get quantity on hand by product for the given locations.
+	 *
+	 * @param location
+	 * @return
+	 */
+	Map<Product, Map<Location, Integer>> getQuantityOnHandByProductAndLocation(Location[] locations) {
+		def quantityMap = [:]
+		if (locations) {
+			Date date = getMostRecentInventorySnapshotDate()
+			log.info "getQuantityOnHandByProductAndLocation " + locations + " " + date
+			def startTime = System.currentTimeMillis()
+			def results = InventorySnapshot.executeQuery("""
+						select i.date, product, i.location, category.name, i.quantityOnHand
+						from InventorySnapshot i, Product product, Category category
+						where i.location in (:locations)
+						and i.date = :date
+						and i.product = product
+						and i.product.category = category
+						""", [locations: locations, date: date])
+
+			log.info "Results: " + results.size()
+			log.info "Query response time: " + (System.currentTimeMillis() - startTime)
+			startTime = System.currentTimeMillis()
+
+
+			results.each {
+				if (!quantityMap[it[1]]) {
+					quantityMap[it[1]] = [:]
+				}
+				quantityMap[it[1]][it[2]?.id] = it[4]
+			}
+			log.debug "Post-processing response time: " + (System.currentTimeMillis() - startTime)
+		}
+
+		return quantityMap
+	}
 
     /**
      * Get the most recent date from the inventory item snapshot table.
@@ -4232,9 +4307,10 @@ class InventoryService implements ApplicationContextAware {
 							//log.info "Saving snapshot for product[${index}]: " + product
 							def onHandQuantity = onHandQuantityMap[inventoryItem]
 
+							String inventoryItemId = StringEscapeUtils.escapeSql(inventoryItem?.id)
 							//stmt.addBatch(date:date.format("yyyy-MM-dd hh:mm:ss"), locationId:location.id, productId:product.id, inventoryItemId:null, quantityOnHand:onHandQuantity)
 							def insertStmt = "insert into inventory_item_snapshot(id,version,date,location_id,product_id,inventory_item_id,quantity_on_hand,date_created,last_updated) " +
-									"values ('${UUID.randomUUID().toString()}', 0,'${dateString}','${location?.id}','${inventoryItem?.product?.id}','${inventoryItem?.id}',${onHandQuantity},now(),now()) " +
+									"values ('${UUID.randomUUID().toString()}', 0,'${dateString}','${location?.id}','${inventoryItem?.product?.id}','${inventoryItemId}',${onHandQuantity},now(),now()) " +
 									"ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity},last_updated=now()"
 							stmt.addBatch(insertStmt)
 						}

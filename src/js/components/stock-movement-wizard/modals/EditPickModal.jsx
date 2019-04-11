@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
@@ -10,13 +9,14 @@ import TextField from '../../form-elements/TextField';
 import ArrayField from '../../form-elements/ArrayField';
 import SelectField from '../../form-elements/SelectField';
 import apiClient from '../../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
-
+import { showSpinner, hideSpinner } from '../../../actions';
+import Translate from '../../../utils/Translate';
 
 const FIELDS = {
   reasonCode: {
     type: SelectField,
-    label: 'stockMovement.reasonCode.label',
+    label: 'react.stockMovement.reasonCode.label',
+    defaultMessage: 'Reason code',
     getDynamicAttr: props => ({
       options: props.reasonCodes,
     }),
@@ -26,19 +26,23 @@ const FIELDS = {
     fields: {
       lotNumber: {
         type: LabelField,
-        label: 'stockMovement.lot.label',
+        label: 'react.stockMovement.lot.label',
+        defaultMessage: 'Lot',
       },
       expirationDate: {
         type: LabelField,
-        label: 'stockMovement.expiry.label',
+        label: 'react.stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
       },
       'binLocation.name': {
         type: LabelField,
-        label: 'stockMovement.binLocation.label',
+        label: 'react.stockMovement.binLocation.label',
+        defaultMessage: 'Bin Location',
       },
       quantityAvailable: {
         type: LabelField,
-        label: 'stockMovement.quantityAvailable.label',
+        label: 'react.stockMovement.quantityAvailable.label',
+        defaultMessage: 'Qty Available',
         fixedWidth: '150px',
         attributes: {
           formatValue: value => (value ? value.toLocaleString('en-US') : null),
@@ -46,7 +50,8 @@ const FIELDS = {
       },
       quantityPicked: {
         type: TextField,
-        label: 'stockMovement.quantityPicked.label',
+        label: 'react.stockMovement.quantityPicked.label',
+        defaultMessage: 'Qty Picked',
         fixedWidth: '140px',
         attributes: {
           type: 'number',
@@ -61,10 +66,10 @@ function validate(values) {
   errors.availableItems = [];
   _.forEach(values.availableItems, (item, key) => {
     if (item.quantityPicked > item.quantityAvailable) {
-      errors.availableItems[key] = { quantityPicked: 'errors.higherTyPicked.label ' };
+      errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.higherTyPicked.label ' };
     }
     if (item.quantityPicked < 0) {
-      errors.availableItems[key] = { quantityPicked: 'errors.negativeQtyPicked.label' };
+      errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.negativeQtyPicked.label' };
     }
   });
 
@@ -77,7 +82,7 @@ function validate(values) {
 
   if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
     !values.reasonCode && pickedSum !== values.quantityRequired) {
-    errors.reasonCode = 'errors.differentTotalQty.label';
+    errors.reasonCode = 'react.stockMovement.errors.differentTotalQty.label';
   }
 
   return errors;
@@ -104,12 +109,6 @@ class EditPickModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
-  componentDidMount() {
-    if (!this.props.reasonCodesFetched) {
-      this.fetchData(this.props.fetchReasonCodes);
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
@@ -125,9 +124,27 @@ class EditPickModal extends Component {
    * @public
    */
   onOpen() {
+    const availableItems = _.map(this.state.attr.fieldValue.availableItems, (avItem) => {
+      // check if this picklist item already exists
+      const picklistItem = _.find(
+        _.filter(this.state.attr.fieldValue.picklistItems, listItem => !listItem.initial),
+        item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id'],
+      );
+
+      if (picklistItem) {
+        return {
+          ...avItem,
+          id: picklistItem.id,
+          quantityPicked: picklistItem.quantityPicked,
+        };
+      }
+
+      return avItem;
+    });
+
     this.setState({
       formValues: {
-        availableItems: this.state.attr.fieldValue.availableItems,
+        availableItems,
         reasonCode: '',
         quantityRequired: this.state.attr.fieldValue.quantityRequired,
       },
@@ -142,53 +159,25 @@ class EditPickModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}`;
+    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}/updatePicklist`;
     const payload = {
-      picklistItems: _.map(values.availableItems, (avItem) => {
-        // check if this picklist item already exists
-        const picklistItem = _.find(
-          _.filter(this.state.attr.fieldValue.picklistItems, listItem => !listItem.initial),
-          item => item['inventoryItem.id'] === avItem['inventoryItem.id'],
-        );
-        if (picklistItem) {
-          return {
-            id: picklistItem.id,
-            'inventoryItem.id': avItem['inventoryItem.id'],
-            'binLocation.id': avItem['binLocation.id'] || '',
-            quantityPicked: avItem.quantityPicked || 0,
-            reasonCode: values.reasonCode || '',
-          };
-        }
-        return {
-          'inventoryItem.id': avItem['inventoryItem.id'],
-          'binLocation.id': avItem['binLocation.id'] || '',
-          quantityPicked: avItem.quantityPicked || 0,
-          reasonCode: values.reasonCode || '',
-        };
-      }),
+      picklistItems: _.map(values.availableItems, avItem => ({
+        id: avItem.id || '',
+        'inventoryItem.id': avItem['inventoryItem.id'],
+        'binLocation.id': avItem['binLocation.id'] || '',
+        quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
+        reasonCode: values.reasonCode || '',
+      })),
     };
 
-    return apiClient.post(url, payload).then(() => {
-      apiClient.get(`/openboxes/api/stockMovements/${this.state.attr.stockMovementId}?stepNumber=4`)
-        .then((resp) => {
-          const { pickPageItems } = resp.data.data.pickPage;
-          this.props.onResponse(pickPageItems);
-          this.props.hideSpinner();
-        })
-        .catch(() => { this.props.hideSpinner(); });
-    }).catch(() => { this.props.hideSpinner(); });
-  }
+    return apiClient.post(url, payload)
+      .then((resp) => {
+        const pickPageItem = resp.data.data;
 
-  /**
-   * Fetches data using function given as an argument(reducers components).
-   * @param {function} fetchFunction
-   * @public
-   */
-  fetchData(fetchFunction) {
-    this.props.showSpinner();
-    fetchFunction()
-      .then(() => this.props.hideSpinner())
-      .catch(() => this.props.hideSpinner());
+        this.state.attr.onResponse(pickPageItem);
+        this.props.hideSpinner();
+      })
+      .catch(() => { this.props.hideSpinner(); });
   }
 
   /**
@@ -200,8 +189,9 @@ class EditPickModal extends Component {
   calculatePicked(values) {
     return (
       <div>
-        <div className="font-weight-bold pb-2"><Translate id="stockMovement.quantityPicked.label" />: {_.reduce(values.availableItems, (sum, val) =>
-          (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
+        <div className="font-weight-bold pb-2">
+          <Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" />: {_.reduce(values.availableItems, (sum, val) =>
+            (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
         </div>
         <hr />
       </div>
@@ -221,27 +211,26 @@ class EditPickModal extends Component {
         fields={FIELDS}
         validate={validate}
         initialValues={this.state.formValues}
-        formProps={{ reasonCodes: this.props.reasonCodes }}
+        formProps={{ reasonCodes: this.state.attr.reasonCodes }}
         renderBodyWithValues={this.calculatePicked}
       >
         <div>
-          <div className="font-weight-bold"><Translate id="stockMovement.productCode.label" />: {this.state.attr.fieldValue.productCode}</div>
-          <div className="font-weight-bold"><Translate id="stockMovement.productName.label" />: {this.state.attr.fieldValue['product.name']}</div>
-          <div className="font-weight-bold"><Translate id="stockMovement.quantityRequired.label" />: {this.state.attr.fieldValue.quantityRequired}</div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.fieldValue.productCode}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.fieldValue['product.name']}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />: {this.state.attr.fieldValue.quantityRequired}
+          </div>
         </div>
       </ModalWrapper>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  reasonCodesFetched: state.reasonCodes.fetched,
-  reasonCodes: state.reasonCodes.data,
-});
-
-export default connect(mapStateToProps, {
-  fetchReasonCodes, showSpinner, hideSpinner,
-})(EditPickModal);
+export default connect(null, { showSpinner, hideSpinner })(EditPickModal);
 
 EditPickModal.propTypes = {
   /** Name of the field */
@@ -254,12 +243,4 @@ EditPickModal.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  /** Function fetching reason codes */
-  fetchReasonCodes: PropTypes.func.isRequired,
-  /** Indicator if reason codes' data is fetched */
-  reasonCodesFetched: PropTypes.bool.isRequired,
-  /** Array of available reason codes */
-  reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  /** Function updating page on which modal is located called when user saves changes */
-  onResponse: PropTypes.func.isRequired,
 };

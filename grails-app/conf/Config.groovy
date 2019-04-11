@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 import it.openutils.log4j.AlternateSMTPAppender;
 import grails.util.GrailsUtil
 import org.apache.log4j.AsyncAppender
@@ -18,7 +18,7 @@ import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
 
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
-grails.config.locations = [ 
+grails.config.locations = [
 	"classpath:${appName}-config.properties",
 	"classpath:${appName}-config.groovy",
 	"file:${userHome}/.grails/${appName}-config.properties",
@@ -56,12 +56,12 @@ grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
 
 // Default mail settings
 grails {
-	mail { 		
-		// By default we enable email.  You can enable/disable email using environment settings below or in your 
-		// ${user.home}/openboxes-config.properties file 
-		enabled = true			
+	mail {
+		// By default we enable email.  You can enable/disable email using environment settings below or in your
+		// ${user.home}/openboxes-config.properties file
+		enabled = false
 		from = "info@openboxes.com"
-		prefix = "[OpenBoxes " + GrailsUtil.environment+"]"
+		prefix = "[OpenBoxes]"
 		host = "localhost"
 		port = "25"
 
@@ -108,7 +108,7 @@ grails.views.gsp.sitemesh.preprocess = true
 grails.views.javascript.library="jquery"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
-// Set to true if BootStrap.groovy is failing to add all sample data 
+// Set to true if BootStrap.groovy is failing to add all sample data
 grails.gorm.failOnError = false
 // Set to false to use the new Grails 1.2 JSONBuilder in the render method
 grails.json.legacy.builder = false
@@ -123,12 +123,19 @@ grails.spring.bean.packages = []
 grails.exceptionresolver.params.exclude = ['password']
 
 grails.validateable.packages = [
-	'org.pih.warehouse.inventory', 
+	'org.pih.warehouse.inventory',
 	'org.pih.warehouse.fulfillment',
-	'org.pih.warehouse.order', 
+	'org.pih.warehouse.order',
 	'org.pih.warehouse.request',
 	'org.pih.warehouse.shipment',
 ]
+
+// Default URL
+grails.serverURL = "http://localhost:8080/${appName}";
+
+// UI performance
+uiperformance.enabled = false
+
 
 /* Default settings for emails sent through the SMTP appender  */
 //mail.error.server = 'localhost'
@@ -137,6 +144,7 @@ grails.validateable.packages = [
 //mail.error.to = 'errors@openboxes.com'
 //mail.error.subject = '[OpenBoxes '+GrailsUtil.environment+']'
 //mail.error.debug = true
+mail.error.enabled = false
 mail.error.debug = false
 mail.error.to = 'errors@openboxes.com'
 mail.error.server = grails.mail.host
@@ -150,149 +158,24 @@ mail.error.prefix = grails.mail.prefix
 // set per-environment serverURL stem for creating absolute links
 environments {
 	development {
-		grails.serverURL = "http://localhost:8080/${appName}";
-		uiperformance.enabled = false
-		grails.mail.enabled = false
-		mail.error.debug = false
 	}
-	test {  
-		grails.serverURL = "http://localhost:8080/${appName}"  
-		uiperformance.enabled = false
-		grails.mail.enabled = false
+	test {
 	}
-	loadtest {  
-		grails.serverURL = "http://localhost:8080/${appName}"  
-		uiperformance.enabled = false
-		grails.mail.enabled = false
+	loadtest {
 	}
-	production {  
-		grails.serverURL = "http://localhost:8080/${appName}"
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-        grails.mail.prefix = "[OpenBoxes]"
+	production {
     }
-	staging {  
-		grails.serverURL = "http://localhost:8080/${appName}"
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-	qa {  
-		grails.serverURL = "http://localhost:8080/${appName}"  
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-	client {
-		grails.serverURL = "http://localhost:8080/${appName}";
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-	root {
-		grails.serverURL = "http://localhost:8080/${appName}";
-		uiperformance.enabled = false
-		grails.mail.enabled = true
-	}
-
 }
 
 
 // log4j configuration
 log4j = {
 
-	// Used to debug hibernate/SQL queries
-	//trace 'org.hibernate.type'
-	//debug 'org.hibernate.SQL'
-
-	System.setProperty 'mail.smtp.port', mail.error.port.toString()
-    System.setProperty 'mail.smtp.connectiontimeout', "5000"
-    System.setProperty 'mail.smtp.timeout', "5000"
-
-    if (mail.error.starttls)
-		System.setProperty 'mail.smtp.starttls.enable', mail.error.starttls.toString()
-
-	// Example of changing the log pattern for the default console
-	appenders {
-		println "grails.mail.enabled: '${grails.mail.enabled.toString()}'"
-		//println "mail.error.server: '${mail.error.server}'"
-		//println "mail.error.username: '${mail.error.username}'"
-		//println "mail.error.password: '${mail.error.password}'"
-
-		// Only enable SMTP appender when mail is enabled
-        if (Boolean.parseBoolean(grails.mail.enabled.toString())) {
-	        def smtpAppender
-			def conversionPattern =
-				"Date: %d{MMM-dd-yyyy HH:mm:ss.SSS}%n" +
-				"Thread: [%t]%n" +
-                "Username: %X{username}%n" +
-                "Location: %X{location}%n" +
-                "Locale: %X{locale}%n" +
-				"IP address: %X{ipAddress}%n" +
-				"Request URI: %X{requestUri}%n" +
-                "Request URL: %X{requestUrl}%n" +
-				"Query string: %X{queryString}%n" +
-                "Server: %X{serverUrl}%n" +
-                "Clickstream: %X{clickStreamUrl}%n%n" +
-                "Stacktrace: %n%m%n"
-
-			// The 'alternate' appender is the best, but only works on localhost w/o authentication
-			if ("alternate".equals(mail.error.appender)&&"localhost".equals(mail.error.server)) {
-				smtpAppender = new AlternateSMTPAppender(
-					name: 'smtp',
-					to: mail.error.to,
-					from: mail.error.from,
-					subject: mail.error.prefix + " %m",
-					threshold: Level.ERROR,
-					//SMTPHost: mail.error.server,
-					layout: pattern(conversionPattern: conversionPattern))
-			}
-			// The 'dynamic' appender allows configurable subject with authenticated mail (e.g. gmail)
-			else if ("dynamic".equals(mail.error.appender)) {
-				smtpAppender = new DynamicSubjectSMTPAppender(
-					name: 'smtp',
-					to: mail.error.to,
-					from: mail.error.from,
-					subject: mail.error.prefix + " %m",
-					threshold: Level.ERROR,
-					SMTPHost: mail.error.server,
-					SMTPUsername: mail.error.username,
-					SMTPPassword: mail.error.password,
-					SMTPDebug: mail.error.debug,
-					layout: pattern(conversionPattern: conversionPattern))
-			}
-			// Default SMTP error appender does not allow configurable subject line
-			else {
-				smtpAppender = new SMTPAppender(
-					name: 'smtp',
-					to: mail.error.to,
-					from: mail.error.from,
-					subject: mail.error.prefix + " Application error occurred",
-					threshold: Level.ERROR,
-					SMTPHost: mail.error.server,
-					SMTPUsername: mail.error.username,
-					SMTPDebug: mail.error.debug,
-					SMTPPassword: mail.error.password,
-					layout: pattern(conversionPattern: conversionPattern))
-			}
-
-			// These are common attributes for each of the appenders
-			if (mail.error.server) smtpAppender.SMTPHost = mail.error.server
-			if (mail.error.username) smtpAppender.SMTPUsername = mail.error.username
-			if (mail.error.password) smtpAppender.SMTPPassword = mail.error.password
-			//if (mail.error.debug) smtpAppender.SMTPDebug = mail.error.debug
-
-			println "Using " + mail.error.appender + " SMTP appender " + smtpAppender.class.name
-        	appender smtpAppender
-
-            def asyncAppender = new AsyncAppender(name: 'async', bufferSize: 500)
-            asyncAppender.addAppender(smtpAppender)
-            appender asyncAppender
-        }
-    }
 
 	root {
-		error 'stdout', 'smtp'
+		error 'stdout'
 		additivity = false
 	}
-
 
 	fatal	'com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter',
             'org.grails.plugin.resource.ResourceMeta',
@@ -313,7 +196,7 @@ log4j = {
             'org.codehaus.groovy.grails.orm.hibernate',
 			'org.codehaus.groovy.grails.commons', 			// core / classloading
 			'org.codehaus.groovy.grails.plugins',			// plugins
-			//'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
+			'org.codehaus.groovy.grails.orm.hibernate', 		// hibernate integration
 			'org.docx4j',
 			'org.apache.http.headers',
 			'org.apache.ddlutils',
@@ -375,12 +258,12 @@ jqueryValidationUi {
 	validClass = 'valid'
 	onsubmit = true
 	renderErrorsOnTop = true
-	
+
 	qTip {
 		packed = true
-		classes = 'ui-tooltip-red ui-tooltip-shadow ui-tooltip-rounded'  
+		classes = 'ui-tooltip-red ui-tooltip-shadow ui-tooltip-rounded'
 	}
-	
+
 	/*
 	  Grails constraints to JQuery Validation rules mapping for client side validation.
 	  Constraint not found in the ConstraintsMap will trigger remote AJAX validation.
@@ -400,7 +283,7 @@ jqueryValidationUi {
 		unique:'unique',
 		validator:'validator'
 	]
-	
+
 	// Long, Integer, Short, Float, Double, BigInteger, BigDecimal
 	NumberConstraintsMap = [
 		min:'min',
@@ -412,7 +295,7 @@ jqueryValidationUi {
 		unique:'unique',
 		validator:'validator'
 	]
-	
+
 	CollectionConstraintsMap = [
 		minSize:'minlength',
 		maxSize:'maxlength',
@@ -420,7 +303,7 @@ jqueryValidationUi {
 		nullable:'required',
 		validator:'validator'
 	]
-	
+
 	DateConstraintsMap = [
 		min:'minDate',
 		max:'maxDate',
@@ -431,16 +314,16 @@ jqueryValidationUi {
 		unique:'unique',
 		validator:'validator'
 	]
-	
+
 	ObjectConstraintsMap = [
 		nullable:'required',
 		validator:'validator'
 	]
-	
+
 	CustomConstraintsMap = [
 		phone:'true', // International phone number validation
 		phoneUS:'true'
-	]	
+	]
 }
 
 
@@ -449,6 +332,9 @@ openboxes.logo.label = ""
 openboxes.logo.url = "/openboxes/images/logo/logo.png"
 openboxes.logoSquare.url = "/openboxes/images/logo/logo-512x512.png"
 openboxes.logoSmall.url = "/openboxes/images/logo/logo-small.png"
+
+// Allow system to anonymize user data to prevent it from being accessed by unauthorized users
+openboxes.anonymize.enabled = false
 
 // Grails Sentry/Raven plugin
 // NOTE: You'll need to enable the plugin and set a DSN using an external config properties file
@@ -459,7 +345,7 @@ grails.plugins.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/
 // Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
 openboxes.dashboard.column1.widgets=["requisitionItemSummary","requisitionSummary","receiptSummary","shipmentSummary","indicatorSummary"]
 openboxes.dashboard.column2.widgets=["binLocationSummary", "expiringSummary","productSummary","genericProductSummary",]
-openboxes.dashboard.column3.widgets=["newsSummary","activitySummary","valueSummary","tagSummary"]
+openboxes.dashboard.column3.widgets=["newsSummary","activitySummary","valueSummary","tagSummary","catalogsSummary"]
 
 // Column 1
 openboxes.dashboard.requisitionItemSummary.enabled=true
@@ -479,6 +365,7 @@ openboxes.dashboard.newsSummary.enabled=false
 openboxes.dashboard.activitySummary.enabled=true
 openboxes.dashboard.valueSummary.enabled=false
 openboxes.dashboard.tagSummary.enabled=true
+openboxes.dashboard.catalogsSummary.enabled=true
 
 // Default value for news summary
 openboxes.dashboard.newsSummary.newsItems = []
@@ -521,6 +408,7 @@ springcache {
         selectTagCache { }
         selectTagsCache { }
         selectCategoryCache { }
+		selectCatalogsCache { }
 	}
 }
 
@@ -535,8 +423,23 @@ grails.plugin.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
 
+// Fullstory integration
+openboxes.fullstory.enabled = false
+openboxes.fullstory.debug = false
+openboxes.fullstory.host = "fullstory.com"
+openboxes.fullstory.org = ""
+openboxes.fullstory.namespace = "FS"
+
+// Hotjar integration
+openboxes.hotjar.enabled = false
+openboxes.hotjar.hjid = 0
+openboxes.hotjar.hjsv = 6
+
 // Feedback mechanism that allows screenshots
 //openboxes.feedback.enabled = false
+
+// Forecasting feature
+openboxes.forecasting.enabled = false
 
 // Bill of Materials feature
 openboxes.bom.enabled = false
@@ -564,15 +467,26 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 // Barcode scanner (disabled by default)
 openboxes.scannerDetection.enabled = false
 
+
+// Default delay and min length for typeahead components
+openboxes.typeahead.delay = 300
+openboxes.typeahead.minLength = 3
+
+// Assign identifier job
+openboxes.jobs.assignIdentifierJob.enabled = true
+openboxes.jobs.assignIdentifierJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+
 // Calculate current quantity on hand
+openboxes.jobs.calculateQuantityJob.enabled = true
 openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 
 // Calculate historical quantity on hand
 openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
-openboxes.jobs.calculateHistoricalQuantityJob.cronExpression = "0 * * * * ?" // every minute
+openboxes.jobs.calculateHistoricalQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 
 // Data Cleaning Job
+openboxes.jobs.dataCleaningJob.enabled = true
 openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
 
 
@@ -633,6 +547,7 @@ openboxes.megamenu.configuration.enabled = true
 openboxes.megamenu.customLinks.enabled = false
 openboxes.megamenu.inbound.enabled = true
 openboxes.megamenu.outbound.enabled = true
+openboxes.megamenu.requisitionTemplate.enabled = true
 
 
 // Custom links example

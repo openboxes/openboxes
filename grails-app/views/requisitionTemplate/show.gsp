@@ -1,4 +1,4 @@
-<%@ page import="grails.converters.JSON; org.pih.warehouse.core.RoleType"%>
+<%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode; grails.converters.JSON; org.pih.warehouse.core.RoleType"%>
 <%@ page import="org.pih.warehouse.requisition.RequisitionType"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
@@ -52,10 +52,16 @@
                             <th><warehouse:message code="category.label"/></th>
                             <th><warehouse:message code="default.quantity.label"/></th>
                             <th><warehouse:message code="unitOfMeasure.label"/></th>
+                            <g:hasRoleFinance>
+                                <th><warehouse:message code="requisitionTemplate.unitCost.label"/></th>
+                                <th><warehouse:message code="requisitionTemplate.totalCost.label"/></th>
+                            </g:hasRoleFinance>
                         </tr>
                         </thead>
                         <tbody>
-                        <g:each var="requisitionItem" in="${requisition?.sortedStocklistItems}" status="i">
+                        <g:set var="sortByCode" value='${requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}'/>
+                        <g:set var="requisitionItems" value='${requisition?."$sortByCode.methodName"}'/>
+                        <g:each var="requisitionItem" in="${requisitionItems}" status="i">
                             <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
                                 <td>
                                     ${requisitionItem?.product?.productCode}
@@ -74,6 +80,16 @@
                                 <td>
                                     EA/1
                                 </td>
+                                <g:hasRoleFinance>
+                                    <td>
+                                        ${g.formatNumber(number: (requisitionItem?.product?.pricePerUnit?:0), format: '###,###,##0.00##')}
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </td>
+                                    <td>
+                                        ${g.formatNumber(number: (requisitionItem?.totalCost?:0), format: '###,###,##0.00##')}
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </td>
+                                </g:hasRoleFinance>
                             </tr>
                         </g:each>
                         <g:unless test="${requisition?.requisitionItems}">

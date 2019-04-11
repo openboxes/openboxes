@@ -19,6 +19,7 @@ class RequisitionTemplateController {
     def requisitionService
     def inventoryService
 	def productService
+    def userService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -72,6 +73,17 @@ class RequisitionTemplateController {
         }
     }
 
+    def sendMail = {
+        def requisition = Requisition.get(params.id)
+        if (!requisition) {
+            flash.message = "Could not find requisition with ID ${params.id}"
+            redirect(action: "list")
+        }
+        else {
+            [requisition: requisition];
+        }
+    }
+
 	def save = {
         def requisition = new Requisition(params)
 
@@ -92,7 +104,7 @@ class RequisitionTemplateController {
             requisition.isPublished = true
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action: "edit", id: requisition.id)
+                redirect(action: "show", id: requisition.id)
             }
             else {
                 render(view: "edit", model: [requisition: requisition])
@@ -110,7 +122,7 @@ class RequisitionTemplateController {
             requisition.isPublished = false
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action: "edit", id: requisition.id)
+                redirect(action: "show", id: requisition.id)
             }
             else {
                 render(view: "edit", model: [requisition: requisition])
@@ -139,9 +151,12 @@ class RequisitionTemplateController {
                 }
             }
             requisition.properties = params
+            requisition.lastUpdated = new Date()
+            requisition.updatedBy = session.user
+
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action: "edit", id: requisition.id)
+                redirect(action: "show", id: requisition.id)
                 //redirect(action:"list")
             }
             else {
@@ -154,10 +169,10 @@ class RequisitionTemplateController {
         }
     }
 
-	
+
 	def show = {
         def requisition = Requisition.get(params.id)
-		
+
         if (!requisition) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
@@ -198,7 +213,8 @@ class RequisitionTemplateController {
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
         }
-        redirect(action: "list", id:params.id)
+
+        redirect(action: "show", id:params.id)
     }
 
     def clone = {
@@ -266,8 +282,9 @@ class RequisitionTemplateController {
                         requisitionItem.quantity = 1;
                         requisitionItem.substitutable = false
                         requisitionItem.orderIndex = count + index
+                        requisition.updatedBy = session.user
                         requisition.addToRequisitionItems(requisitionItem)
-                        requisition.save(flush: true, failOnError: true)
+                        requisition.save()
                         processedProductCodes << productCode
                     }
                     else {
@@ -277,17 +294,10 @@ class RequisitionTemplateController {
                 else {
                     ignoredProductCodes << productCode
                 }
-
             }
             flash.message = "Added requisition item with product codes " + processedProductCodes?:"none" + " (ignored: " + ignoredProductCodes + ")"
-
-
-
         }
-
         redirect(action: "edit", id: requisition.id)
-
-
     }
 
 
@@ -298,6 +308,8 @@ class RequisitionTemplateController {
             def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
             if (requisitionItem) {
                 requisition.removeFromRequisitionItems(requisitionItem)
+                requisition.lastUpdated = new Date()
+                requisition.updatedBy = session.user
                 requisition.save()
             }
         }
@@ -308,6 +320,8 @@ class RequisitionTemplateController {
 
     def export = {
         def requisition = Requisition.get(params.id)
+        def hasRoleFinance = userService.hasRoleFinance(session?.user)
+
         if (requisition) {
             def date = new Date();
             def sw = new StringWriter()
@@ -317,20 +331,26 @@ class RequisitionTemplateController {
                 "Product Name" {it.productName}
                 "Quantity" {it.quantity}
                 "UOM" {it.unitOfMeasure}
+                hasRoleFinance ? "Unit cost" { it.unitCost } : null
+                hasRoleFinance ? "Total cost" { it.totalCost } : null
             })
 
             if (requisition.requisitionItems) {
-                requisition.requisitionItems.each { requisitionItem ->
+                RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
+
+                requisition."${sortByCode.methodName}".each { requisitionItem ->
                     csv << [
                             productCode  : requisitionItem.product.productCode,
                             productName  : StringEscapeUtils.escapeCsv(requisitionItem.product.name),
                             quantity     : requisitionItem.quantity,
-                            unitOfMeasure: "EA/1"
+                            unitOfMeasure: "EA/1",
+                            unitCost     : hasRoleFinance ? formatNumber(number: requisitionItem.product.pricePerUnit?:0, format: '###,###,##0.00##') : null,
+                            totalCost    : hasRoleFinance ? formatNumber(number: requisitionItem.totalCost?:0, format: '###,###,##0.00##') : null
                     ]
                 }
             }
             else {
-                csv << [productCode:"", productName: "", quantity: "", unitOfMeasure: ""]
+                csv << [productCode:"", productName: "", quantity: "", unitOfMeasure: "", unitCost: "", totalCost: ""]
             }
 
             response.contentType = "text/csv"
@@ -398,7 +418,7 @@ class RequisitionTemplateController {
                 println "line: " + tokens + " delimiter=" + delimiter
                 println "ROW " + tokens
                 if (tokens) {
-                    data << tokens
+                    data << tokens[0..3]
                 }
             }
 
@@ -491,15 +511,15 @@ class RequisitionTemplateController {
 	private List<Location> getWardsPharmacies() {
 		def current = Location.get(session.warehouse.id)
 		def locations = []
-		if (current) { 
+		if (current) {
 			if(current?.locationGroup == null) {
 				locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort { it.name }
 			} else {
 				locations = Location.list().findAll { location -> location.locationGroup?.id == current.locationGroup?.id }.findAll {location -> location.isWardOrPharmacy()}.sort { it.name }
 			}
-		}				
+		}
 		return locations
 	}
 
-	
+
 }

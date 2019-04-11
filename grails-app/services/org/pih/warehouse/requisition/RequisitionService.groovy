@@ -98,11 +98,8 @@ class RequisitionService {
                     }
                     or {
                         eq("createdBy", user)
-                        eq("updatedBy", user)
-                        eq("requestedBy", user)
                     }
                     or {
-
                         if (destination) eq("destination", destination)
                         if (origin) eq("origin", origin)
                     }
@@ -420,27 +417,6 @@ class RequisitionService {
                 }
                 requisition.save()
             }
-            // FIXME We actually need status history so we can rollback to the correct status here
-            else if (requisition.status == RequisitionStatus.CHECKING) {
-                requisition.status = RequisitionStatus.PICKED
-            }
-            else if (requisition.status == RequisitionStatus.PICKED) {
-                requisition.status = RequisitionStatus.PICKING
-            }
-            else if (requisition.status == RequisitionStatus.PICKING) {
-                requisition.status = RequisitionStatus.VERIFYING
-            }
-            else if (requisition.status == RequisitionStatus.VERIFYING) {
-                requisition.status = RequisitionStatus.EDITING
-            }
-            else if (requisition.status == RequisitionStatus.EDITING) {
-                requisition.status = RequisitionStatus.CREATED
-            }
-            else if (requisition.status == RequisitionStatus.CANCELED) {
-                requisition.status = RequisitionStatus.PENDING
-            }
-            requisition.save(flush:true)
-
         } catch (Exception e) {
             throw new RuntimeException(e)
         }
@@ -649,16 +625,23 @@ class RequisitionService {
     }
 
 
-    List<RequisitionItem> getPendingRequisitionItems(Location location, Product product) {
+    List<RequisitionItem> getPendingRequisitionItems(Location origin, Location destination, Product product) {
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
-                or {
-                    eq("destination", location)
-                    eq("origin", location)
-                }
                 and {
                     eq("isTemplate", false)
-                    'in'("status", RequisitionStatus.listPending())
+                    // Items that have been issued and are enroute to current location
+                    if (destination) {
+                        eq("destination", destination)
+                        'in'("status", [RequisitionStatus.ISSUED])
+                    }
+                    // Items that are pending from current location
+                    if (origin) {
+                        eq("origin", origin)
+                        not {
+                            'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
+                        }
+                    }
                 }
             }
             eq("product", product)

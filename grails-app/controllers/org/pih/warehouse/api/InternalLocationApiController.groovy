@@ -28,7 +28,7 @@ class InternalLocationApiController {
         ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
         List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes)
-        render([data: locations] as JSON)
+        render([data: locations?.collect { [ id: it.id, name: it.name ] }] as JSON)
     }
 
     def listReceiving = {
@@ -37,17 +37,17 @@ class InternalLocationApiController {
         if (!parentLocation) {
             throw new IllegalArgumentException("Must provide location.id as a request parameter")
         }
-        String stockMovementIdentifier = params?.stockMovementIdentifier
-        if (!stockMovementIdentifier) {
-            throw new IllegalArgumentException("Must provide stockMovementIdentifier as a request parameter")
+        String shipmentNumber = params?.shipmentNumber
+        if (!shipmentNumber) {
+            throw new IllegalArgumentException("Must provide shipmentNumber as a request parameter")
         }
 
         ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.BIN_LOCATION]
 
-        String receivingLocationName = locationService.getReceivingLocationName(stockMovementIdentifier)
-        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes, receivingLocationName)
-        render([data: locations] as JSON)
+        String[] receivingLocationNames = [locationService.getReceivingLocationName(shipmentNumber), "Receiving ${shipmentNumber}"]
+        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes, receivingLocationNames)
+        render([data: locations?.collect { [ id: it.id, name: it.name ] }] as JSON)
     }
 
     def read = {

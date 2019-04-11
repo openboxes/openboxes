@@ -17,10 +17,12 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -32,6 +34,7 @@ class ReceiptService {
     def inventoryService
     def locationService
     def identifierService
+    def grailsApplication
 
     PartialReceipt getPartialReceipt(String id, String stepNumber) {
         Shipment shipment = Shipment.get(id)
@@ -71,9 +74,9 @@ class ReceiptService {
         partialReceipt.dateShipped = shipment.actualShippingDate
         partialReceipt.dateDelivered = shipment.actualDeliveryDate ?: new Date()
 
-        String receivingLocationName = locationService.getReceivingLocationName(shipment?.shipmentNumber)
+        String[] receivingLocationNames = [locationService.getReceivingLocationName(shipment?.shipmentNumber), "Receiving ${shipment?.shipmentNumber}"]
         Location defaultBinLocation = !shipment.destination.hasBinLocationSupport() ? null :
-                locationService.findInternalLocation(shipment.destination, receivingLocationName)
+                locationService.findInternalLocation(shipment.destination, receivingLocationNames)
 
         def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
@@ -103,8 +106,9 @@ class ReceiptService {
         partialReceipt.dateShipped = receipt?.shipment?.actualShippingDate
         partialReceipt.dateDelivered = receipt.actualDeliveryDate
 
+        String[] receivingLocationNames = [locationService.getReceivingLocationName(receipt.shipment?.shipmentNumber), "Receiving ${receipt.shipment?.shipmentNumber}"]
         Location defaultBinLocation = !receipt.shipment.destination.hasBinLocationSupport() ? null :
-                locationService.findInternalLocation(receipt.shipment.destination, "Receiving ${receipt.shipment.shipmentNumber}")
+                locationService.findInternalLocation(receipt.shipment.destination, receivingLocationNames)
 
         def shipmentItemsByContainer = receipt.shipment.shipmentItems.groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
@@ -180,6 +184,7 @@ class ReceiptService {
             receiptItem = partialReceiptItem.receiptItem
         } else {
             receiptItem = new ReceiptItem()
+            receiptItem.sortOrder = partialReceiptItem.shipmentItem.receiptItems.size()
         }
 
         receiptItem.binLocation = partialReceiptItem.binLocation
@@ -375,7 +380,10 @@ class ReceiptService {
 
         if (receivedReceipts) {
             Receipt lastReceipt = receivedReceipts.last()
-            Transaction transaction = shipment.incomingTransactions.find { it.receipt = lastReceipt }
+
+            validateReceiptForRollback(lastReceipt)
+
+            Transaction transaction = shipment.incomingTransactions.find { it.receipt?.id == lastReceipt?.id }
             if (transaction) {
                 shipment.removeFromIncomingTransactions(transaction)
                 transaction.delete()
@@ -395,6 +403,31 @@ class ReceiptService {
         Event event = shipment.events.find { it.eventType?.eventCode == eventCode }
         if (event) {
             shipmentService.deleteEvent(shipment, event)
+        }
+    }
+
+    void validateReceiptForRollback(Receipt receipt) {
+        Location location = receipt.shipment?.destination
+
+        receipt.receiptItems?.each { item ->
+            Integer quantityAvailable = inventoryService.getQuantityFromBinLocation(location, item.binLocation, item.inventoryItem)
+
+            if (item.quantityReceived > quantityAvailable) {
+                throw new IllegalStateException("Insufficient qty of product ${item.product?.productCode} ${item.product?.name} lot: ${item.inventoryItem?.lotNumber ?: ""} in bin: ${item.binLocation?.name ?: ""}")
+            }
+        }
+    }
+
+    void createTemporaryReceivingBin(Shipment shipment) {
+        // Create temporary receiving area for the Partial Receipt process
+        if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && shipment?.destination?.hasBinLocationSupport()) {
+            LocationType locationType = LocationType.findByName("Receiving")
+            if (!locationType) {
+                throw new IllegalArgumentException("Unable to find location type 'Receiving'")
+            }
+
+            locationService.findOrCreateInternalLocation(shipment.shipmentNumber,
+                    shipment.shipmentNumber, locationType, shipment.destination)
         }
     }
 }

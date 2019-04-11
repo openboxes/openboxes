@@ -9,7 +9,9 @@
  * */
 package org.pih.warehouse.core
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.pih.warehouse.auth.AuthService
+import util.StringUtil
 
 // import java.util.Date
 
@@ -100,5 +102,20 @@ class User extends Person {
         def roleArray = locationRoles.collect { "${it.location?.name}: ${it.role?.roleType?.name}" }
         roleArray?.join(" | ")
     }
+
+
+    Map toJson() {
+        boolean anonymize = CH.config.openboxes.anonymize.enabled
+
+        return [
+                "id": id,
+                "name": name,
+                "firstName": firstName,
+                "lastName": (anonymize) ? lastInitial : lastName,
+                "email": anonymize ? StringUtil.mask(email) : email,
+                "username": anonymize ? StringUtil.mask(username) : username
+        ]
+    }
+
 
 }

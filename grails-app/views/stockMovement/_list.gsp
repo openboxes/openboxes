@@ -1,7 +1,7 @@
 <div class="box">
     <h2>
         ${entityName} &rsaquo;
-        <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
+        <warehouse:message code="enum.StockMovementType.${params.direction}"/>
         (${totalCount?:0})
     </h2>
     <table>
@@ -34,6 +34,8 @@
 
             <g:sortableColumn property="dateRequested" params="${pageParams}"
                               title="${warehouse.message(code: 'stockMovement.dateRequested.label', default: 'Date requested')}" />
+
+            <th><g:message code="default.dateCreated.label"/></th>
 
         </tr>
         </thead>
@@ -86,9 +88,10 @@
                     ${stockMovement.requestedBy?:warehouse.message(code:'default.noone.label')}
                 </td>
                 <td>
-                    <div title="<g:formatDate date="${stockMovement.dateRequested }"/>">
-                        <g:prettyDateFormat date="${stockMovement.dateRequested}"/>
-                    </div>
+                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateRequested}"/>
+                </td>
+                <td>
+                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.requisition?.dateCreated}"/>
                 </td>
             </tr>
         </g:each>

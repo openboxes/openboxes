@@ -57,11 +57,12 @@ class Requisition implements Comparable<Requisition>, Serializable {
     RequisitionStatus status;
     CommodityClass commodityClass
     Requisition requisitionTemplate
+    RequisitionItemSortByCode sortByCode
 
-    // where the requisition came from
+    // where stock is originating from
     Location origin
 
-    // who the requisition will be fulfilled by
+    // where stock is being issued to
     Location destination
 
     // Person who submitted the initial requisition paper form
@@ -118,7 +119,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
-    static transients = ["sortedStocklistItems", "shipment"]
+    static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
     static mapping = {
@@ -183,6 +184,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         datePublished(nullable: true)
         requisitionTemplate(nullable:true)
         replenishmentPeriod(nullable:true)
+        sortByCode(nullable:true)
     }
 
     def getRequisitionItemCount() {
@@ -308,6 +310,26 @@ class Requisition implements Comparable<Requisition>, Serializable {
         }
     }
 
+    def getRequisitionItemsByDateCreated() {
+        return requisitionItems.sort { a,b ->
+            a.dateCreated <=> b.dateCreated
+        }
+    }
+
+    def getRequisitionItemsByOrderIndex() {
+        return requisitionItems.sort { a,b ->
+            a.orderIndex <=> b.orderIndex
+        }
+    }
+
+    def getRequisitionItemsByCategory() {
+        return requisitionItems.sort { a,b ->
+            a.product?.category?.name <=> b.product?.category?.name ?:
+                    a.product?.name <=> b.product?.name ?:
+                            a.orderIndex <=> b.orderIndex
+        }
+    }
+
     /**
      * Return the shipment associated with the requisition.
      *
@@ -325,6 +347,16 @@ class Requisition implements Comparable<Requisition>, Serializable {
             shipment = shipments.iterator().next()
         }
         return shipment
+    }
+
+    /**
+     * Return total value of the issued shipment
+     *
+     * @return
+     */
+    BigDecimal getTotalCost() {
+        def itemsWithPrice = requisitionItems?.findAll { it.product.pricePerUnit }
+        return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum()?:0
     }
 
 

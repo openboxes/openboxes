@@ -21,26 +21,31 @@
     <div class="button-bar ">
         <g:if test="${stockMovement.documents}">
             <div class="right">
-                <span class="action-menu">
-                    <button class="action-btn button">
-                        <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" style="vertical-align: middle" />
-                        &nbsp; <g:message code="default.download.label"/>
-                    </button>
-                    <div class="actions">
-                        <g:each var="document" in="${stockMovement.documents}">
-                            <g:if test="${!document.hidden}">
-                                <div class="action-menu-item">
-                                    <g:link url="${document.uri}" target="_blank">
-
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
-                                        ${document.name}
-                                    </g:link>
-                                </div>
-                            </g:if>
-                        </g:each>
-                    </div>
-                </span>
-
+                <div class="button-group">
+                    <g:link controller="stockMovement" action="addDocument" class="button" id="${stockMovement?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
+                        <warehouse:message code="stockMovement.uploadDocuments.label" />
+                    </g:link>
+                    <span class="action-menu">
+                        <button class="action-btn button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'page_save.png')}" />
+                            &nbsp; <g:message code="default.download.label"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                        </button>
+                        <div class="actions">
+                            <g:each var="document" in="${stockMovement.documents}">
+                                <g:if test="${!document.hidden}">
+                                    <div class="action-menu-item">
+                                        <g:link url="${document.uri}" target="_blank">
+                                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                            ${document.name}
+                                        </g:link>
+                                    </div>
+                                </g:if>
+                            </g:each>
+                        </div>
+                    </span>
+                </div>
             </div>
         </g:if>
 
@@ -67,9 +72,14 @@
             <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
             <g:set var="hasBeenPartiallyReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"/>
+            <g:set var="hasBeenShipped" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.SHIPPED}"/>
+            <g:set var="hasBeenPending" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PENDING}"/>
             <g:set var="isSameLocation" value="${stockMovement?.requisition?.destination?.id==session.warehouse.id}"/>
-            <g:set var="disableReceivingButton" value="${!hasBeenIssued || hasBeenReceived || !isSameLocation}"/>
+            <g:set var="disableReceivingButton" value="${!hasBeenIssued || !isSameLocation || !(hasBeenShipped || hasBeenPartiallyReceived)}"/>
             <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
+            <g:if test="${!(hasBeenShipped || hasBeenPartiallyReceived)}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenShipped.message', args: [stockMovement?.identifier])}"/>
+            </g:if>
             <g:if test="${!hasBeenIssued}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
             </g:if>
@@ -84,23 +94,28 @@
                 <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                 <warehouse:message code="default.button.receive.label" />
             </g:link>
-
-            <g:isSuperuser>
+            <g:isUserAdmin>
                 <g:if test="${showRollbackLastReceiptButton}">
                     <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                         <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                     </g:link>
                 </g:if>
-                <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
-                    <warehouse:message code="default.button.rollback.label" />
-                </g:link>
-                <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
-                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
-                    <warehouse:message code="default.button.delete.label" />
-                </g:link>
+                <g:elseif test="${stockMovement?.requisition?.status == RequisitionStatus.ISSUED}">
+                    <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                        <warehouse:message code="default.button.rollback.label" />
+                    </g:link>
+                </g:elseif>
+            </g:isUserAdmin>
+            <g:isSuperuser>
+                <g:if test="${hasBeenPending || !stockMovement?.shipment?.currentStatus}">
+                    <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
+                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
+                        <warehouse:message code="default.button.delete.label" />
+                    </g:link>
+                </g:if>
             </g:isSuperuser>
         </div>
     </div>
@@ -109,8 +124,8 @@
 <div class="yui-gf">
     <div class="yui-u first">
         <div class="box">
-            <h2><g:message code="stockMovement.label" /></h2>
-            <div>
+            <h2><g:message code="default.details.label" /></h2>
+            <div class="dialog">
 
                 <table>
                     <tr class="prop">
@@ -190,8 +205,10 @@
                             <warehouse:message code="shipping.totalValue.label"/>
                         </td>
                         <td class="value">
-                            <g:formatNumber format="###,###,##0.00" number="${stockMovement?.totalValue ?: 0.00 }" />
-                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                            <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
+                                <g:formatNumber format="###,###,##0.00" number="${stockMovement?.shipment?.calculateTotalValue() ?: 0.00 }" />
+                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                            </g:hasRoleFinance>
                         </td>
                     </tr>
                     <g:isSuperuser>
@@ -216,13 +233,21 @@
                             </td>
                         </tr>
                     </g:isSuperuser>
+                </table>
+            </div>
+        </div>
+        <div class="box">
+            <h2><g:message code="default.auditing.label"/></h2>
+            <div class="dialog">
+
+                <table>
                     <tr class="prop">
                         <td class="name">
                             <g:message code="stockMovement.dateRequested.label"/>
                         </td>
                         <td class="value">
                             <span title="${g.formatDate(date:stockMovement?.dateRequested)}">
-                                <g:prettyDateFormat date="${stockMovement.dateRequested}"/>
+                                <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateRequested}"/>
                             </span>
                             <g:if test="${stockMovement?.requisition?.requestedBy}">
                                 <g:message code="default.by.label"/>
@@ -236,7 +261,7 @@
                         </td>
                         <td class="value">
                             <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
-                                <g:prettyDateFormat date="${stockMovement.dateShipped}"/>
+                                <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateShipped}"/>
                             </span>
                             <g:if test="${stockMovement?.shipment?.createdBy}">
                                 <g:message code="default.by.label"/>
@@ -252,7 +277,7 @@
                         <td class="value">
                             <g:each var="receipt" in="${stockMovement?.shipment?.receipts}">
                                 <span title="${g.formatDate(date:receipt?.actualDeliveryDate)}">
-                                    <g:prettyDateFormat date="${receipt?.actualDeliveryDate}"/>
+                                    <g:formatDate format="MMMM dd, yyyy" date="${receipt?.actualDeliveryDate}"/>
                                 </span>
                                 <g:if test="${receipt.recipient}">
                                     <g:message code="default.by.label"/>
@@ -268,7 +293,7 @@
                         </td>
                         <td class="value">
                             <span title="${g.formatDate(date:stockMovement?.requisition?.dateCreated)}">
-                                <g:prettyDateFormat date="${stockMovement?.requisition?.dateCreated}"/>
+                                <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.requisition?.dateCreated}"/>
                             </span>
                             <g:if test="${stockMovement?.requisition?.createdBy}">
                                 <g:message code="default.by.label"/>
@@ -282,7 +307,7 @@
                         </td>
                         <td class="value">
                             <span title="${g.formatDate(date:stockMovement?.requisition?.lastUpdated)}">
-                                <g:prettyDateFormat date="${stockMovement?.requisition?.lastUpdated}"/>
+                                <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.requisition?.lastUpdated}"/>
                             </span>
                             <g:if test="${stockMovement?.requisition?.updatedBy}">
                                 <g:message code="default.by.label"/>

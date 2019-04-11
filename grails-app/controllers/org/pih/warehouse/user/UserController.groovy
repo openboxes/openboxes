@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.user
 
 import grails.plugin.springcache.annotations.CacheFlush
@@ -32,7 +32,7 @@ class UserController {
     /**
      * Show index page - just a redirect to the list page.
      */
-    def index = {    	
+    def index = {
     	log.info "user controller index"
         redirect(action: "list", params: params)
     }
@@ -49,9 +49,9 @@ class UserController {
         println params
 		def userInstanceList = []
 		def userInstanceTotal = 0;
-		
+
 		params.max = Math.min(params.max ? params.int('max') : 15, 100)
-		
+
         def query = params.q ? "%" + params.q + "%" : ""
 
         userInstanceList = userService.findUsers(query, params)
@@ -74,7 +74,7 @@ class UserController {
 		}
 		redirect(controller: "dashboard", action: "index")
 	}
-	
+
 	def sendTestEmail = {
 		def userInstance = User.get(params.id)
 		if (!userInstance) {
@@ -82,22 +82,22 @@ class UserController {
 			redirect(action: "list")
 		}
 		else {
-			
-			try { 
+
+			try {
 				String subject = "${warehouse.message(code:'system.testEmailSubject.label')}"
 				String body = g.render(template:"/email/userCanReceiveEmail", model:[userInstance:userInstance])
-					
+
 				mailService.sendHtmlMail(subject, body, userInstance?.email)
 				flash.message = "Email successfully sent to " + userInstance?.email
-				
-			} catch (Exception e) { 
+
+			} catch (Exception e) {
 				flash.message = "Error sending email " + e.message
 			}
 		}
 		redirect(action: "edit", id: userInstance?.id)
 	}
 
-	
+
     /**
      * Create a user
      */
@@ -105,7 +105,7 @@ class UserController {
     	log.info "create a new user based on request parameters"
         def userInstance = new User()
         userInstance.properties = params
-		
+
 		return [userInstance: userInstance]
     }
 
@@ -115,7 +115,7 @@ class UserController {
     def save = {
     	log.info "attempt to save the user; show form with validation errors on failure"
         def userInstance = new User(params)
-		
+
 		userInstance.password = params?.password?.encodeAsPassword();
 		userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
 
@@ -128,7 +128,7 @@ class UserController {
         }
     }
 
-    
+
     /**
      * Show a user
      */
@@ -157,8 +157,8 @@ class UserController {
 			[userInstance: userInstance]
 		}
 	}
-	
-	def cropPhoto = { 
+
+	def cropPhoto = {
 		log.info "change photo for given user"
 		def userInstance = User.get(params.id)
 		if (!userInstance) {
@@ -169,7 +169,7 @@ class UserController {
 			[userInstance: userInstance]
 		}
 	}
-	
+
 
     /**
      * Show user preferences.
@@ -177,8 +177,8 @@ class UserController {
     def preferences = {
     	log.info "show user preferences"
     }
-    
-    
+
+
 
     /**
      * Show the edit form for a user
@@ -195,17 +195,17 @@ class UserController {
             return [userInstance: userInstance, locations: locations]
         }
     }
-	
-	
-	def toggleActivation = { 
+
+
+	def toggleActivation = {
 		def userInstance = User.get(params.id)
 		if (!userInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 		}
-		else {			
+		else {
 			userInstance.active = !userInstance.active;
 			if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"				
+				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
 				sendUserStatusChanged(userInstance)
 			}
 			else {
@@ -218,7 +218,7 @@ class UserController {
 	}
 
     /**
-     * Update a user 
+     * Update a user
      */
     def update = {
 
@@ -294,84 +294,84 @@ class UserController {
 	   }
 
    }
-    
+
 	/**
 	 * Updates the locale of the default user
 	 * Used by the locale selectors in the footer
 	 */
     @CacheFlush(["megamenuCache"])
 	def updateAuthUserLocale = {
-		
+
 		log.info "update auth user locale " + params
 		log.info params.locale == 'debug'
-		if (params.locale == 'debug') { 
+		if (params.locale == 'debug') {
 			//def locale = new Locale(params.locale)
-			//if (session.user) { 
+			//if (session.user) {
 			//	session.user.locale = locale;
-			//	session.locale = null				
+			//	session.locale = null
 			//}
-			//else { 
+			//else {
 			//	session.locale = locale;
 			//}
 			session.useDebugLocale = true
 		}
-		else { 
+		else {
 			session.useDebugLocale = false
 			// if no locale specified, do nothing
 			if (!params.locale) {
-				redirect(controller: "dashboard", action: "index")	
-			}		
-			
+				redirect(controller: "dashboard", action: "index")
+			}
+
 			// convert the passed locale parameter to an actual locale
 			Locale locale = new Locale(params.locale)
-			
+
 			// if this isn't a valid locale, do nothing
 			if (!locale) {
 				redirect(controller: "dashboard", action: "index")
 			}
-			
+
 			// fetch an instance of authenticated user
 			def userInstance = User.get(session?.user?.id)
 			if (userInstance) {
 				userInstance.locale = locale
 				userInstance.save(flush: true)
 
-				session.locale = null				
+				session.locale = null
 				// update the reference to the user in the session
 				session.user = User.get(userInstance.id)
-			}	
-			
+			}
+
 			// when user is anonymous (not logged in)
-			else { 		 
-				session.locale = locale			
+			else {
+				session.locale = locale
 			}
 		}
-		
+
 		log.info "Redirecting to " + params?.targetUri
 		if (params?.targetUri) {
 			redirect(uri: params.targetUri);
 			return;
 		}
 
-		
+
 		// redirect to the dashboard
 		redirect(controller: "dashboard", action: "index")
 	}
-	
+
     /**
      * Delete a user
      */
-    def delete = {    	
-		
+    def delete = {
+
 		log.info(params)
-		
+
         def userInstance = User.get(params.id)
-        if (userInstance) {			
-			if (userInstance?.id == session?.user?.id) { 
+        if (userInstance) {
+			if (userInstance?.id == session?.user?.id) {
 				flash.message = "${warehouse.message(code: 'default.cannot.delete.self.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 				redirect(action: "edit", id: params.id)
 			}
-			else { 			
+			else {
 	            try {
 	                userInstance.delete(flush: true)
 	                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'user.label'), params.id])}"
@@ -390,61 +390,61 @@ class UserController {
     }
 
 	/**
-	 * View user's profile photo 
+	 * View user's profile photo
 	 */
-	def viewPhoto = { 
-		def userInstance = User.get(params.id);		
-		if (userInstance) { 
-			byte[] image = userInstance.photo 
-			response.outputStream << image
-		} 
-		else { 
-			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
-		}
-	} 
-
-	
-	def viewThumb = { 
-		def width = params.width ?: 128
-		def height = params.height ?: 128
-		
+	def viewPhoto = {
 		def userInstance = User.get(params.id);
 		if (userInstance) {
-			byte[] bytes = userInstance.photo
-			try { 
-				resize(bytes, response.outputStream, width, height)
-			} catch (Exception e) { 
-				//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
-				response.outputStream << bytes
-			}
+			byte[] image = userInstance.photo
+			response.outputStream << image
 		}
-		else { 
+		else {
 			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 		}
 	}
 
-	def uploadPhoto = { 
-		
-		def userInstance = User.get(params.id);		
-		if (userInstance) { 
+
+	def viewThumb = {
+		def width = params.width ?: 128
+		def height = params.height ?: 128
+
+		def userInstance = User.get(params.id);
+		if (userInstance) {
+			byte[] bytes = userInstance.photo
+			try {
+				resize(bytes, response.outputStream, width, height)
+			} catch (Exception e) {
+				//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
+				response.outputStream << bytes
+			}
+		}
+		else {
+			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
+		}
+	}
+
+	def uploadPhoto = {
+
+		def userInstance = User.get(params.id);
+		if (userInstance) {
 			def photo = request.getFile("photo");
-			
+
 			// List of OK mime-types
 			def okcontents = [
 				'image/png',
 				'image/jpeg',
 				'image/gif'
 			]
-			
+
 			if (! okcontents.contains(photo.getContentType())) {
 				log.info "Photo is not correct type"
 				flash.message = "Photo must be one of: ${okcontents}"
 				render(view: "changePhoto", model: [userInstance: userInstance])
 				return;
 			}
-			
+
 			if (!photo?.empty && photo.size < 1024*1000) { // not empty AND less than 1MB
-				userInstance.photo = photo.bytes;			
+				userInstance.photo = photo.bytes;
 		        if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
 		            flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
 					sendUserPhotoChanged(userInstance)
@@ -455,48 +455,48 @@ class UserController {
 					return
 		        }
 			}
-			else { 
+			else {
 	            flash.message = "${warehouse.message(code: 'user.photoTooLarge.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
-				
+
 			}
             redirect(action: "edit", id: userInstance.id)
-		} 
-		else { 
+		}
+		else {
 			"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
 		}
 	}
 
-	
+
 	/**
-	 * 
+	 *
 	 * @param userInstance
 	 * @return
 	 */
-	def sendUserStatusChanged(User userInstance) {		
-		try { 
+	def sendUserStatusChanged(User userInstance) {
+		try {
 			// Send notification emails to all administrators
 			def users = userService.findUsersByRoleType(RoleType.ROLE_USER_NOTIFICATION)
 
 			// Include the user whose status has changed
 			users << userInstance;
-			
+
 			def recipients = users.collect { it.email }
             def activatedOrDeactivated = "${userInstance.active ? warehouse.message(code:'user.activated.label') : warehouse.message(code:'user.disabled.label')}"
             def subject = "${warehouse.message(code: 'email.userAccountActivated.message', args: [userInstance.username,activatedOrDeactivated])}"
 			//def subject = "${warehouse.message(code:'email.userAccountChanged.message',args:[userInstance?.email,activatedOrDeactivated])}";
 			def body = "${g.render(template:'/email/userAccountActivated',model:[userInstance:userInstance])}"
 			mailService.sendHtmlMail(subject, body.toString(), recipients);
-			flash.message = "${warehouse.message(code:'email.sent.message',args:[userInstance.email])}"
-		} 
-		catch (Exception e) { 
+			flash.message = "${warehouse.message(code:'email.sent.message')}"
+		}
+		catch (Exception e) {
 			flash.message = "${warehouse.message(code:'email.notSent.message',args:[userInstance.email])}: ${e.message}"
 		}
-		
+
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param userInstance
 	 * @return
 	 */
@@ -505,69 +505,69 @@ class UserController {
 			def subject = "${warehouse.message(code:'email.userPhotoChanged.message',args:[userInstance?.email])}";
 			def body = "${g.render(template:'/email/userPhotoChanged',model:[userInstance:userInstance])}"
 			mailService.sendHtmlMailWithAttachment(userInstance, subject, body.toString(), userInstance.photo, "photo.png", "image/png");
-			flash.message = "${warehouse.message(code:'email.sent.message',args:[userInstance.email])}"
-		} 
-		catch (Exception e) { 
+			flash.message = "${warehouse.message(code:'email.sent.message')}"
+		}
+		catch (Exception e) {
 			flash.message = "${warehouse.message(code:'email.notSent.message',args:[userInstance.email])}: ${e.message}"
-		}		
+		}
 	}
 
 	/**
 	 * Grails 'mail' way to send an email
-	 * 
+	 *
 	 * @param userInstance
 	 * @return
 	 */
 	def sendUserConfirmed(User userInstance) {
-		
+
 		try {
 			sendMail {
 				to "${userInstance.email}"
 				subject	"${warehouse.message(code:'email.userConfirmed.message',args:[userInstance.username])}"
 				html "${g.render(template:"/email/userConfirmed", model:[userInstance:userInstance])}"
 			}
-			flash.message = "${warehouse.message(code:'email.sent.message',args:[userInstance.email])}: ${e.message}"
+			flash.message = "${warehouse.message(code:'email.sent.message')}: ${e.message}"
 			//flash.message = “Confirmation email sent to ${userInstance.emailAddress}”
 		} catch(Exception e) {
 			log.error "Problem sending email $e.message", e
 			flash.message = "${warehouse.message(code:'email.notSent.message',args:[userInstance.email])}: ${e.message}"
 		}
 	}
-		
+
 	//static scale = {
 	//	BufferedImage thumbnail = Scalr.resize(image, 150);
 	//}
-	
+
 	static resize = { bytes, out, maxW, maxH ->
 		AWTImage ai = new ImageIcon(bytes).image
 		int width = ai.getWidth( null )
 		int height = ai.getHeight( null )
-	
+
 		println ("Resize ${width} x ${height} image to ${maxW} x ${maxH}")
-		
+
 		def limits = 0..2000
 		assert limits.contains( width ) && limits.contains( height ) : 'Picture is either too small or too big!'
-	
-		float aspectRatio = width / height 
+
+		float aspectRatio = width / height
 		float requiredAspectRatio = maxW / maxH
-	
+
 		int dstW = 0
 		int dstH = 0
 		if (requiredAspectRatio < aspectRatio) {
-			dstW = maxW 
+			dstW = maxW
 			dstH = Math.round( maxW / aspectRatio)
 		} else {
-			dstH = maxH 
+			dstH = maxH
 			dstW = Math.round(maxH * aspectRatio)
 		}
-	
+
 		BufferedImage bi = new BufferedImage(dstW, dstH,   BufferedImage.TYPE_INT_RGB)
-		Graphics2D g2d = bi.createGraphics() 
+		Graphics2D g2d = bi.createGraphics()
 		//g2d.setComposite(AlphaComposite.Src);
 		g2d.drawImage(ai, 0, 0, dstW, dstH, null, null)
 		g2d.dispose();
-	
+
 		IIO.write( bi, 'JPEG', out )
 	}
-    
+
 }

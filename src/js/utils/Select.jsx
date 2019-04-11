@@ -51,7 +51,7 @@ class Select extends Component {
     const {
       options: selectOptions, value: selectValue = this.state.value,
       objectValue = false, multi = false, delimiter = ';', async = false, showValueTooltip,
-      arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, ...attributes
+      arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, onEnterPress, ...attributes
     } = this.props;
 
     const options = _.map(selectOptions, (value) => {
@@ -151,6 +151,11 @@ class Select extends Component {
                       onTabPress(event);
                     }
                     break;
+                  case 13: /* Enter key */
+                    if (onEnterPress) {
+                      onEnterPress(event);
+                    }
+                    break;
                   default:
                 }
               },
@@ -183,6 +188,7 @@ Select.propTypes = {
   arrowDown: PropTypes.func,
   fieldRef: PropTypes.func,
   onTabPress: PropTypes.func,
+  onEnterPress: PropTypes.func,
 };
 
 Select.defaultProps = {
@@ -200,4 +206,5 @@ Select.defaultProps = {
   arrowDown: null,
   fieldRef: null,
   onTabPress: null,
+  onEnterPress: null,
 };

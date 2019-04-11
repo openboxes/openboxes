@@ -1,10 +1,10 @@
-<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.order.OrderItemStatusCode; org.pih.warehouse.order.OrderTypeCode" %>
 <html>
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:if test="${orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
-            <g:set var="entityName" value="${warehouse.message(code: 'putAways.label', default: 'Put Aways')}" />
+            <g:set var="entityName" value="${warehouse.message(code: 'putAways.label', default: 'Putaways')}" />
         </g:if>
         <g:else>
             <g:set var="entityName" value="${warehouse.message(code: 'orders.label', default: 'Purchase orders')}" />
@@ -34,6 +34,7 @@
 								<tr>
 									<th>${warehouse.message(code: 'default.actions.label')}</th>
 									<th>${warehouse.message(code: 'default.status.label')}</th>
+									<th>${warehouse.message(code: 'default.type.label')}</th>
 									<th>${warehouse.message(code: 'order.orderNumber.label')}</th>
 									<th>${warehouse.message(code: 'default.name.label')}</th>
                                     <g:if test="${orderTypeCode != OrderTypeCode.TRANSFER_ORDER}">
@@ -59,13 +60,18 @@
 								<g:each var="orderInstance" in="${orders}" status="i">
 									<g:set var="totalPrice" value="${totalPrice + (orderInstance.totalPrice()?:0)}"/>
 									<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-										<td class="middle">
+										<td class="middle" width="1%">
 											<div class="action-menu">
 												<g:render template="/order/actions" model="[orderInstance:orderInstance,hideDelete:true]"/>
 											</div>
 										</td>
 										<td class="middle">
-											<format:metadata obj="${orderInstance?.status}"/>
+											<div class="tag">
+												<format:metadata obj="${orderInstance?.status}"/>
+											</div>
+										</td>
+										<td class="middle">
+											<format:metadata obj="${orderInstance?.orderTypeCode}"/>
 										</td>
 										<td class="middle">
 											<g:link action="show" id="${orderInstance.id}">
@@ -85,14 +91,15 @@
                                                 ${fieldValue(bean: orderInstance, field: "destination.name")}
                                             </td>
                                         </g:if>
-                                        <td class="middle center">
+                                        <td class="middle">
                                             ${orderInstance?.orderedBy?.name}
                                         </td>
 										<td class="middle">
 											<format:date obj="${orderInstance?.dateOrdered}"/>
 										</td>
-										<td class="middle center">
-											${orderInstance?.orderItems?.size()?:0}
+										<td class="middle">
+											<g:set var="lineItems" value="${orderInstance?.orderItems?.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }}"/>
+											${lineItems.size()?:0}
 										</td>
 									</tr>
 								</g:each>
@@ -125,9 +132,9 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				$(".clear-all").click(function() {
-					$('#statusStartDate-datepicker').val('');					
+					$('#statusStartDate-datepicker').val('');
 					$('#statusEndDate-datepicker').val('');
-					$('#statusStartDate').val('');					
+					$('#statusStartDate').val('');
 					$('#statusEndDate').val('');
 					$('#totalPrice').val('');
 					$('#description').val('');

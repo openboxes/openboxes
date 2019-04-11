@@ -6,7 +6,7 @@
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- **/ 
+ **/
 package org.pih.warehouse.product
 
 import grails.validation.ValidationException
@@ -30,7 +30,7 @@ class ProductService {
 	def identifierService
 	def userService
 	/**
-	 * 	
+	 *
 	 * @param query
 	 * @return
 	 */
@@ -39,7 +39,7 @@ class ProductService {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	def findNdcProducts(search) {
 		return getNdcResults("search", search.searchTerms?:"")
@@ -102,7 +102,7 @@ class ProductService {
 	 * 		<displayTermsList>
 	 * 			<term></term>
 	 * 		</displayTermsList>
-	 * 	</rxnormdata>	
+	 * 	</rxnormdata>
 	 * @return
 	 */
 
@@ -400,7 +400,7 @@ class ProductService {
      */
 	Category getRootCategory() {
 		def rootCategory = Category.getRootCategory()
-		if (!rootCategory) { 
+		if (!rootCategory) {
 			def categories = Category.findAllByParentCategoryIsNull();
 			if (categories && categories.size() == 1) {
 				rootCategory = categories.get(0);
@@ -527,7 +527,7 @@ class ProductService {
 				or lower(p.productCode) like ?""", [text, text])
 		// products.each{ println it}
 		println " * Search product and product group: " + (System.currentTimeMillis() - startTime) + " ms"
-		
+
 		return products
 	}
 
@@ -547,12 +547,12 @@ class ProductService {
 			if (headerColumns.size() == Constants.EXPORT_PRODUCT_COLUMNS.size()) {
 				return delimiter
 			}
-		}			
+		}
 		throw new RuntimeException("""Invalid file format: File must contain the following columns: ${Constants.EXPORT_PRODUCT_COLUMNS};
             Columns must be separated by a comma (,) or tab (\\t);
             lines must be separated by a linefeed (\\n); If you're using Mac Excel, save the file as Windows Comma Separated (.csv) and upload again.""")
 	}
-	
+
 	/**
      * Get a list of columns for the data set using the default column delimiter.
      *
@@ -563,7 +563,7 @@ class ProductService {
 		def delimiter = getDelimiter(csv)
 		return getColumns(csv, delimiter)
 	}
-	
+
 	/**
      * Get a list of columns for the data set using the given column delimiter.
      *
@@ -591,7 +591,7 @@ class ProductService {
 		def delimiter = getDelimiter(csv)
 		return getExistingProducts(csv, delimiter)
 	}
-	
+
 	/**
 	 * Gets a list of products that already exist in the database.
      *
@@ -601,7 +601,7 @@ class ProductService {
 	 */
 	List<Product> getExistingProducts(String csv, String delimiter) {
 		def products = new ArrayList<Product>()
-		
+
 		// Iterate over each line and either update an existing product or create a new product
 		csv.toCsvReader(['skipLines':1, 'separatorChar':delimiter]).eachLine { tokens ->
 			def product = Product.findByIdOrProductCode(tokens[0], tokens[1])
@@ -621,17 +621,17 @@ class ProductService {
 
 	/**
 	 * Import products from csv
-	 * 
+	 *
 	 * ID,Name,Category,Description,Product Code,Unit of Measure,Manufacturer,Manufacturer Code,Cold Chain,UPC,NDC,Date Created,Date Updated
-	 * 
+	 *
 	 * @param csv
 	 */
 	List validateProducts(String csv) {
 		return validateProducts(csv, getDelimiter(csv))
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param csv
 	 * @param delimiter
 	 * @param saveToDatabase
@@ -650,12 +650,12 @@ class ProductService {
 		if (columns.size() != Constants.EXPORT_PRODUCT_COLUMNS.size()) {
 			throw new RuntimeException("Invalid data format")
 		}
-		
+
 		int rowCount = 1;
 
 		// Iterate over each line and either update an existing product or create a new product
 		csv.toCsvReader(['skipLines':1, 'separatorChar':delimiter]).eachLine { tokens ->
-			
+
 			rowCount++
 			println "Processing line: " + tokens
 			def productId = tokens[0]
@@ -713,7 +713,7 @@ class ProductService {
 
 			// If the user-entered unit price is different from the current unit price validate the user is allowed to make the change
 			if (pricePerUnit) {
-				if (pricePerUnit != product.pricePerUnit) {
+				if (pricePerUnit != product?.pricePerUnit) {
 					userService.assertCurrentUserHasRoleFinance()
 					productProperties.pricePerUnit = pricePerUnit
 				}
@@ -780,7 +780,7 @@ class ProductService {
 		return exportProducts(products)
 	}
 
-	
+
 	/**
 	 * Export given products.
      *
@@ -828,7 +828,7 @@ class ProductService {
 		}
 		return ReportUtil.getCsvForListOfMapEntries(rows)
     }
-	
+
 	/**
 	 * Find or create a category with the given name.
      *
@@ -848,7 +848,7 @@ class ProductService {
 		}
 		return category;
 	}
-	
+
 	/**
 	 * Find all top-level categories (e.g. children of the root category)
      *
@@ -874,9 +874,18 @@ class ProductService {
      *
 	 * @return	all tags
 	 */
-	def getAllTags() { 
+	def getAllTags() {
 		def tags = Tag.findAllByIsActive(true);
         return tags;
+	}
+
+	/**
+	 * Get all active catalogs in the database.
+	 *
+	 * @return	all tags
+	 */
+	def getAllCatalogs() {
+		return ProductCatalog.findAllByActive(true)
 	}
 
 	/**
@@ -887,11 +896,11 @@ class ProductService {
 	def getPopularTags(Integer limit) {
 		def popularTags = [:]
 		String sql = """
-            select tag.id, count(*) as count
+            select tag.id, tag.tag, count(*) as count
             from product_tag
             join tag on tag.id = product_tag.tag_id
             where tag.is_active = true
-            group by tag.tag
+            group by tag.id, tag.tag
             order by count(*) desc
             """
 
@@ -904,9 +913,9 @@ class ProductService {
         def list = sqlQuery.list()
 		list.each {
             Tag tag = Tag.load(it[0])
-			popularTags[tag] = it[1]
+			popularTags[tag] = it[2]
 		}
-		return popularTags		
+		return popularTags
 	}
 
 	def getPopularTags() {
@@ -927,7 +936,7 @@ class ProductService {
             addTagsToProduct(product, tags)
         }
     }
-	
+
 	/**
      * Add the list of tags to the given product.
      *
@@ -978,7 +987,7 @@ class ProductService {
     }
 
 
-	
+
 	/**
 	 * Delete a tag from the given product and delete the tag.
      *
@@ -986,7 +995,7 @@ class ProductService {
 	 * @param tag
 	 * @return
 	 */
-	def deleteTag(product, tag) { 
+	def deleteTag(product, tag) {
 		product.removeFromTags(tag)
 		tag.delete();
 	}
@@ -1002,7 +1011,7 @@ class ProductService {
         def count = Product.executeQuery( "select count(p.productCode) from Product p where productCode = :productCode", [productCode: productCode] );
         return count ? (count[0] == 0) : false
     }
-	
+
 	/**
 	 * Generate a product identifier.
      *
@@ -1028,8 +1037,8 @@ class ProductService {
      *
      * @param url
      */
-	def downloadDocument(url) { 
-		// move code from ProductController		
+	def downloadDocument(url) {
+		// move code from ProductController
 	}
 
     /**
@@ -1043,7 +1052,7 @@ class ProductService {
     }
 
 	/**
-	 * Saves the given product 
+	 * Saves the given product
 	 * @param product
      * @param tags
      *
@@ -1071,7 +1080,7 @@ class ProductService {
 				log.error("Error occurred: " + e.message)
 				throw new ValidationException(e.message, product?.errors)
 			}
-			
+
 			// Handle attributes
 			/*
 			Map existingAtts = new HashMap();
@@ -1110,7 +1119,7 @@ class ProductService {
 				productInstance.categories.removeAll(_toBeDeleted)
 			}
 			*/
-			
+
 			//if (!product.validate()) {
 			//	throw new ValidationException("Product is not valid", product.errors)
 			//}
@@ -1140,7 +1149,7 @@ class ProductService {
      * @param product
      * @return
      */
-	def findSimilarProducts(Product product) { 
+	def findSimilarProducts(Product product) {
 		def similarProducts = []
 		/*
 		def productsInSameProductGroup = ProductGroup.findByProduct(product).products
@@ -1150,7 +1159,7 @@ class ProductService {
 		*/;
 		/*
 		def productsInSameCategory = Product.findByCategory(product.category)
-		if (productsInSameCategory) { 
+		if (productsInSameCategory) {
 			similarProducts.addAll(productsInSameCategory)
 		}*/
 		def searchTerms = product.name.split(",")
@@ -1160,7 +1169,7 @@ class ProductService {
 			similarProducts.addAll(products)
 		}
 		/*
-		if (!similarProducts) { 
+		if (!similarProducts) {
 			searchTerms = product.name.split(" ")
 			searchTerms.each {
 				similarProducts.addAll(Product.findAllByNameLike("%" + it +"%"))
@@ -1170,7 +1179,7 @@ class ProductService {
 		similarProducts.unique()
 
 		similarProducts.remove(product)
-		
+
 		return similarProducts
 	}
 
@@ -1221,6 +1230,9 @@ class ProductService {
 			eq("product", product)
 			if (types) {
 				'in'("code", types)
+			}
+			associatedProduct {
+				eq("active", true)
 			}
 		}
 	}

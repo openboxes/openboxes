@@ -75,8 +75,8 @@
                                 <td>${fieldValue(bean: productSupplierInstance, field: "unitOfMeasure")}</td>
 
                                 <td>
-                                    <g:hasRoleFinance>
-                                        ${g.formatNumber(number: fieldValue(bean: productSupplierInstance, field: "unitPrice"))}
+                                    <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
+                                        ${g.formatNumber(number: productSupplierInstance?.unitPrice?:0.0)}
                                     </g:hasRoleFinance>
                                 </td>
 

@@ -60,6 +60,7 @@ import org.docx4j.wml.TrPr
 class FileService {
 	boolean transactional = false
 
+	def userService
     def grailsApplication
 	
 	File findFile(String filePath){
@@ -145,6 +146,7 @@ class FileService {
             def rowMap = new HashMap()
             rowMap.put("propertyName", key)
             rowMap.put("propertyValue", value)
+			log.info ("${key} = ${value}")
             dataMappingsTable.add(rowMap)
 
         }
@@ -329,8 +331,7 @@ class FileService {
         addTc(thead, "Product", true);
         addTc(thead, "Lot Number", true);
         addTc(thead, "Expires", true);
-        addTc(thead, "Qty", true);
-        addTc(thead, "Units", true);
+        addTc(thead, "Quantity", true);
         table.getContent().add(thead);
 
         int cellWidthTwips = 0
@@ -349,9 +350,8 @@ class FileService {
             }
             addTc(tr, shipmentItem.inventoryItem?.product?.name?:"")
             addTc(tr, shipmentItem?.inventoryItem?.lotNumber?:"")
-            addTc(tr, shipmentItem?.inventoryItem?.expirationDate.toString()?:"")
-            addTc(tr, String.valueOf(shipmentItem?.quantity))
-            addTc(tr, shipmentItem?.inventoryItem?.product?.unitOfMeasure?:"")
+            addTc(tr, shipmentItem?.inventoryItem?.expirationDate?.format("MM-dd-yyyy")?:"")
+            addTc(tr, "${shipmentItem?.quantity} ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:''}")
             previousContainer = shipmentItem?.container;
         }
 
@@ -390,6 +390,9 @@ class FileService {
      * @return
      */
     Map<String,String> getDataMappings(Shipment shipmentInstance) {
+
+		Boolean hasRoleFinance = userService.hasRoleFinance()
+
         // Map of key/value pairs that will be used to hold variables
         def mappings = new HashMap<String, String>();
 
@@ -418,6 +421,7 @@ class FileService {
 
         mappings.remove("ORIGIN.LOGO")
         mappings.remove("DESTINATION.LOGO")
+
         // Causes freeze when opening document
         //addObjectProperties(mappings, "CURRENT_USER", AuthService.currentUser.get(), User.class)
         //addObjectProperties(mappings, "CURRENT_LOCATION", AuthService.currentLocation.get(), Location.class)
@@ -435,24 +439,32 @@ class FileService {
 
         // Add additional properties generated
         def decimalFormatter = new DecimalFormat("\$###,##0.00")
-        String totalValue = decimalFormatter.format(shipmentInstance?.statedValue?:0.0);
+        String totalValue = decimalFormatter.format(shipmentInstance?.calculateTotalValue()?:0.0)
         mappings.put("SHIPMENT.TOTAL_VALUE", totalValue)
         mappings.put("SHIPMENT.STATUS", shipmentInstance?.getStatus())
         mappings.put("SHIPMENT.FREIGHT_FORWARDER", shipmentInstance?.shipmentMethod?.shipper?.name)
         mappings.put("SHIPMENT.ACTUAL_SHIPPING_DATE", shipmentInstance?.getActualShippingDate())
         mappings.put("SHIPMENT.ACTUAL_DELIVERY_DATE", shipmentInstance?.getActualDeliveryDate())
 
+		if (!hasRoleFinance) {
+			def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+			String accessDeniedMessage = "${g.message(code: 'access.accessDenied.label')}"
+			mappings.put("SHIPMENT.TOTAL_VALUE", accessDeniedMessage)
+			mappings.put("SHIPMENT.TOTALVALUE", accessDeniedMessage)
+		}
+
         return mappings;
     }
 
 
     def addObjectProperties(Map dataMappings, String prefix, Object object, Class domainClass) {
+
         if (object) {
             new DefaultGrailsDomainClass(domainClass).persistentProperties.each { property ->
                 if (!property.isAssociation()) {
                     log.info " [included] property " + property.name + " = " + property.naturalName + " " + property.fieldName
-                    String propertyName = prefix ? prefix + "." + property?.fieldName : property?.fieldName
-                    dataMappings.put(propertyName, object.properties[property.name]);
+					String propertyName = prefix ? prefix + "." + property?.fieldName : property?.fieldName
+					dataMappings.put(propertyName, object.properties[property.name]);
                 }
                 else {
                     log.info " [excluded] association " + property.name + " = " + property.naturalName + " " + property.fieldName

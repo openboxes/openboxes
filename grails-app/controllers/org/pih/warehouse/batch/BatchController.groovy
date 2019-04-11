@@ -11,11 +11,19 @@ package org.pih.warehouse.batch
 
 import grails.converters.JSON
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
+import org.pih.warehouse.importer.LocationExcelImporter
+import org.pih.warehouse.importer.PersonExcelImporter
 import org.pih.warehouse.importer.ProductExcelImporter
+import org.pih.warehouse.importer.ProductSupplierExcelImporter
+import org.pih.warehouse.importer.UserExcelImporter
+import org.pih.warehouse.importer.UserLocationExcelImporter
+import org.pih.warehouse.product.ProductSupplier
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
 // import au.com.bytecode.opencsv.CSVReader;
@@ -27,6 +35,8 @@ class BatchController {
     def documentService
 	def inventoryService
 	def importService
+	def grailsApplication
+	def genericApiService
 
 	def index = { }
 
@@ -36,12 +46,6 @@ class BatchController {
         if (request instanceof DefaultMultipartHttpServletRequest) {
             def uploadFile = request.getFile('xlsFile');
             if(!uploadFile.empty){
-                println "Class: ${uploadFile.class}"
-                println "Name: ${uploadFile.name}"
-                println "OriginalFileName: ${uploadFile.originalFilename}"
-                println "Size: ${uploadFile.size}"
-                println "ContentType: ${uploadFile.contentType}"
-
                 def webRootDir = servletContext.getRealPath("/")
                 def userDir = new File(webRootDir, "/uploads/")
                 userDir.mkdirs()
@@ -51,6 +55,19 @@ class BatchController {
         }
     }
 
+
+	def downloadExcel = {
+		println "Download XLS template " + params
+
+		def objects = genericApiService.getList(params.type, [:])
+		def domainClass = genericApiService.getDomainClass(params.type)
+		def data = dataService.transformObjects(objects, domainClass.PROPERTIES)
+
+		response.contentType = "application/vnd.ms-excel"
+		response.setHeader 'Content-disposition', "attachment; filename=\"${params.type}.xls\""
+		documentService.generateExcel(response.outputStream, data)
+		response.outputStream.flush()
+	}
 
     def downloadTemplate = {
         println "Download XLS template " + params
@@ -128,19 +145,33 @@ class BatchController {
 				command.location = Location.get(session.warehouse.id)
 				try { 
 					// Need to choose the right importer 
-					log.info command.type
-					if (command.type == "inventory") {
-						dataImporter = new InventoryExcelImporter(command?.filename);
-                    }
-					else if (command.type == "product") {
-                        dataImporter = new ProductExcelImporter(command?.filename)
-                    }
-					else if (command.type == "inventoryLevel") {
-                        dataImporter = new InventoryLevelExcelImporter(command?.filename)
-                    }
-					else {
-						//throw new RuntimeException("Unable to import data using ${command.type} importer")
-                        command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default:'Please choose a valid import type')}")
+					switch(command.type) {
+						case "inventory":
+							dataImporter = new InventoryExcelImporter(command?.filename);
+							break;
+						case "inventoryLevel":
+							dataImporter = new InventoryLevelExcelImporter(command?.filename)
+							break;
+						case "location":
+							dataImporter = new LocationExcelImporter(command?.filename)
+							break;
+						case "person":
+							dataImporter = new PersonExcelImporter(command?.filename)
+							break;
+						case "product":
+							dataImporter = new ProductExcelImporter(command?.filename)
+							break;
+						case "productSupplier":
+							dataImporter = new ProductSupplierExcelImporter(command?.filename)
+							break;
+						case "user":
+							dataImporter = new UserExcelImporter(command?.filename)
+							break;
+						case "userLocation":
+							dataImporter = new UserLocationExcelImporter(command?.filename)
+							break;
+						default:
+	                        command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default:'Please choose a valid import type')}")
                     }
 				}
 				catch (OfficeXmlFileException e) {

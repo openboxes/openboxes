@@ -60,7 +60,9 @@ class BaseField extends Component {
   render() {
     const {
       fieldName,
-      fieldConfig: { label, getDynamicAttr, attributes = {} },
+      fieldConfig: {
+        label, defaultMessage, getDynamicAttr, attributes = {},
+      },
       arrayField, fieldValue, fieldRef, focusThis, arrowsNavigation,
       ...otherProps
     } = this.props;
@@ -112,6 +114,7 @@ class BaseField extends Component {
         renderInput={this.renderInput}
         attributes={attr}
         label={label}
+        defaultMessage={defaultMessage}
         touched={this.state.touched}
         arrayField={arrayField}
       />

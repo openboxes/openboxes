@@ -17,7 +17,11 @@ import java.text.SimpleDateFormat
 
 
 class StringUtil {
-	
+
+    static String mask(String value) {
+        return mask(value, "*")
+    }
+
 	static String mask(String value, String mask) {
 		return value ? value?.replaceFirst(".*", { match -> return "".padLeft(match.length(), mask)}) : value
 	}

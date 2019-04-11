@@ -149,7 +149,7 @@
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.requisitions.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.requisitions.enabled}">
         <g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -198,7 +198,7 @@
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.inbound.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.inbound.enabled}">
         <g:authorize activity="[ActivityCode.RECEIVE_STOCK]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -206,7 +206,7 @@
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-section">
-                    <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
+                    <g:if test="${megamenuConfig.stockMovement.enabled}">
 
                         <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
 
@@ -232,7 +232,7 @@
                             </g:link>
                         </div>
                     </g:if>
-                    <g:if test="${megamenuConfig.receiving.enabled || isSuperuser}">
+                    <g:if test="${megamenuConfig.receiving.enabled}">
                         <h3><warehouse:message code="receiving.label" default="Receiving" /></h3>
 
                         <div class="mm-menu-item">
@@ -274,7 +274,7 @@
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-section">
-                        <g:if test="${megamenuConfig.stockMovement.enabled || isSuperuser}">
+                        <g:if test="${megamenuConfig.stockMovement.enabled}">
 
                             <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
 
@@ -289,7 +289,7 @@
                                 </g:link>
                             </div>
                         </g:if>
-                        <g:if test="${megamenuConfig.shipping.enabled || isSuperuser}">
+                        <g:if test="${megamenuConfig.shipping.enabled}">
                             <h3><warehouse:message code="shipping.label" default="Shipping" /></h3>
 
                             <div class="mm-menu-item">
@@ -403,13 +403,21 @@
                         <g:link controller="report" action="exportBinLocation" params="[downloadFormat:'csv']" class="">
                             <warehouse:message code="report.exportBinLocations.label" default="Export bin locations"/></g:link>
                     </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="showInventoryByLocationReport" class="">
+                            <warehouse:message code="report.inventoryByLocationReport.label" default="Inventory By Location Report"/></g:link>
+                    </div>
                 </div>
                 <div class="mm-content-section">
 
                     <h3><warehouse:message code="dataExports.label" default="Data Exports" /></h3>
                     <div class="mm-menu-item">
-                        <g:link controller="product" action="exportAsCsv" class="list">
+                        <g:link controller="product" action="exportAsCsv">
                             <warehouse:message code="product.exportAsCsv.label"/></g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="productSupplier" action="export">
+                            <warehouse:message code="default.export.label" args="[g.message(code: 'productSuppliers.label').toLowerCase()]"/></g:link>
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="inventory" action="exportLatestInventoryDate" class="list">
@@ -571,6 +579,27 @@
         </g:authorize>
     </g:if>
 
+    <g:if test="${megamenuConfig.requisitionTemplate.enabled || isSuperuser}">
+        <li class="mm-item">
+            <a href="javascript:void(0)" class="mm-item-link">
+                <warehouse:message code="requisitionTemplates.label" default="Stock Lists" />
+            </a>
+            <div class="mm-item-content">
+                <div class="mm-menu-item">
+                    <g:link controller="requisitionTemplate" action="list">
+                        <warehouse:message code="requisitionTemplates.list.label" default="List stock lists"/>
+                    </g:link>
+                </div>
+                <g:isUserAdmin>
+                    <div class="mm-menu-item">
+                        <g:link controller="requisitionTemplate" action="create">
+                            <warehouse:message code="requisitionTemplates.create.label" default="Create stock list" />
+                        </g:link>
+                    </div>
+                </g:isUserAdmin>
+            </div>
+        </li>
+    </g:if>
 
     <g:if test="${megamenuConfig.configuration.enabled || isSuperuser}">
         <g:isUserAdmin>
@@ -730,6 +759,12 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
+                                <g:link controller="batch" action="importData">
+                                    <warehouse:message code="default.import.label"
+                                                       args="[warehouse.message(code:'default.data.label', default: 'Data')]"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="shipper" action="list" class="shipper">
                                     <warehouse:message code="location.shippers.label" />
                                 </g:link>
@@ -739,12 +774,6 @@
                                     <warehouse:message code="shipmentWorkflows.label" default="Shipment Workflows" />
                                 </g:link>
                             </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="requisitionTemplate" action="list" class="list">
-                                    <warehouse:message code="requisitionTemplates.label" default="Stock lists" />
-                                </g:link>
-                            </div>
-
                         </div>
 
                     </div>

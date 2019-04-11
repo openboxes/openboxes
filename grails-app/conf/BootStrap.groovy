@@ -136,14 +136,9 @@ class BootStrap {
                 hasBinLocationSupport: location.hasBinLocationSupport()
         ]}
 
-        JSON.registerObjectMarshaller(Person) { Person person -> [
-                id: person.id,
-                name: person.name,
-                firstName: person.firstName,
-                lastName: person.lastName,
-                email: person.email,
-                username: null
-        ]}
+        JSON.registerObjectMarshaller(Person) { Person person ->
+            return person.toJson()
+        }
 
 
         JSON.registerObjectMarshaller(Picklist) { Picklist picklist -> [
@@ -178,9 +173,9 @@ class BootStrap {
                 id: product.id,
                 productCode: product.productCode,
                 name: product.name,
-                description: product.description,
-                "category.id": product?.category?.id,
-                "category.name": product?.category?.name
+                description: product.description
+//                "category.id": product?.category?.id,
+//                "category.name": product?.category?.name
         ]}
 
         JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation -> [
@@ -309,14 +304,9 @@ class BootStrap {
         ]}
 
 
-        JSON.registerObjectMarshaller(User) { User user -> [
-                id: user.id,
-                name: user.name,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                username: user.username
-        ]}
+        JSON.registerObjectMarshaller(User) { User user ->
+            return user.toJson()
+        }
 
         // Command objects
 

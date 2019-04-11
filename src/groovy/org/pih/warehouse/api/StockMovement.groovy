@@ -39,6 +39,7 @@ class StockMovement {
     Location origin
     Location destination
     Person requestedBy
+    Person createdBy
     Date dateRequested
 
     // Shipment information
@@ -219,7 +220,7 @@ enum DocumentGroupCode {
     PACKING_LIST('Packing List'),
     CERTIFICATE_OF_DONATION('Certificate of Donation'),
     DELIVERY_NOTE('Delivery Note'),
-    GOODS_RECEIPT_NOTE('Goods Receipt Note')
+    GOODS_RECEIPT_NOTE('Goods Receipt Note'),
 
     final String description
 

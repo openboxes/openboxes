@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="adminuser (generated)" id="1548827127989-1" dbms="mysql">
+        <comment>A bug in the stock movement feature caused quantity approved to be set to null for most items.</comment>
+        <sql>
+            UPDATE requisition_item
+            SET quantity_approved =
+                ifnull(quantity, 0) - ifnull(quantity_canceled, 0)
+            WHERE quantity_approved IS NULL;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
+

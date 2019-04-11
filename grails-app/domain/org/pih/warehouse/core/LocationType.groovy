@@ -91,7 +91,7 @@ class LocationType implements Comparable, Serializable {
         else {
             internalLocationTypesSupportingActivityCodes = internalLocationTypes
         }
-        return internalLocationTypesSupportingActivityCodes.unique()
+        return internalLocationTypesSupportingActivityCodes?.sort()
 
 	}
 

@@ -6,23 +6,23 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.inventory
 
 class InventoryCommand {
 
     def shipment
-	def warehouseInstance;								// warehouseInstance	
-	def searchTerms;									// request-level search terms  
+	def warehouseInstance;								// warehouseInstance
+	def searchTerms;									// request-level search terms
 	def categoryInstance; 								// categoryInstance
 	def subcategoryInstance;							// child category to show within the categoryInstance
-	
+
 	// InventoryItemCommand objects
 	def inventoryItems
-	
+
 	// Product groups
 	def productGroups
-	
+
 	def showHiddenProducts = Boolean.FALSE;				// indicates whether to display hidden products
 	def showUnsupportedProducts = Boolean.FALSE;		// indicates whether unsupported products for the warehouse should be included
 	def showNonInventoryProducts = Boolean.FALSE;		// indicates whether non-inventory products for the warehouse should be included
@@ -36,7 +36,9 @@ class InventoryCommand {
 
 	// Tags
 	List tags
-	
+	// Catalogs
+	List catalogs
+
 	static constraints = {
         shipment(nullable:true)
 		warehouseInstance(nullable:true)

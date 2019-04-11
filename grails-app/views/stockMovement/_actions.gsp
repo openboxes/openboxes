@@ -27,14 +27,16 @@
                 </g:link>
             </div>
             <g:isSuperuser>
-                <hr/>
-                <div class="action-menu-item">
-                    <g:link controller="stockMovement" action="delete" id="${stockMovement?.id}"
-                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
-                        &nbsp;${warehouse.message(code: 'default.delete.label', args:[warehouse.message(code:'stockMovement.label')])}
-                    </g:link>
-                </div>
+                <g:if test="${stockMovement?.shipment?.currentStatus==org.pih.warehouse.shipping.ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus}">
+                    <hr/>
+                    <div class="action-menu-item">
+                        <g:link controller="stockMovement" action="delete" id="${stockMovement?.id}"
+                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
+                            &nbsp;${warehouse.message(code: 'default.delete.label', args:[warehouse.message(code:'stockMovement.label')])}
+                        </g:link>
+                    </div>
+                </g:if>
             </g:isSuperuser>
         </div>
     </span>

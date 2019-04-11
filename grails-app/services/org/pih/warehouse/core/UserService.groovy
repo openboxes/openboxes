@@ -185,22 +185,26 @@ class UserService {
         }
     }
 
+    def findPersons(String [] terms) {
+        return findPersons(terms, [:])
+    }
 
+    def findPersons(String[] terms, params) {
+        def results = Person.createCriteria().list(params) {
 
-
-    def findPersons(String query, Map params) {
-        def criteria = Person.createCriteria()
-        def results = criteria.list (params) {
-            or {
-                ilike("firstName", query)
-                ilike("lastName", query)
-                ilike("email", query)
+            if (terms) {
+                terms.each { term ->
+                    or {
+                        ilike("firstName", "%" + term + "%")
+                        ilike("lastName", "%" + term + "%")
+                        ilike("email", "%" + term + "%")
+                    }
+                }
             }
             order("lastName", "desc")
         }
         return results
     }
-
 
     def findUsers(String query, Map params) {
         println "findUsers: " + query + " : " + params

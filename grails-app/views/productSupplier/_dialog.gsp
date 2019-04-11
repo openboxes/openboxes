@@ -128,6 +128,7 @@
                 <td class="value ">
                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.userNotGrantedPermission.message', args: [session.user.username])}">
                         <g:textField name="unitPrice" size="80" class="medium text" value="${productSupplier?.unitPrice}" />
+                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                     </g:hasRoleFinance>
                 </td>
             </tr>

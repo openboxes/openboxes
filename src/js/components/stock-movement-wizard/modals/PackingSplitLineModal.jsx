@@ -2,7 +2,6 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Translate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import TextField from '../../form-elements/TextField';
@@ -10,7 +9,8 @@ import ArrayField from '../../form-elements/ArrayField';
 import LabelField from '../../form-elements/LabelField';
 import SelectField from '../../form-elements/SelectField';
 import { showSpinner, hideSpinner } from '../../../actions';
-import { debouncedUsersFetch } from '../../../utils/option-utils';
+import { debounceUsersFetch } from '../../../utils/option-utils';
+import Translate from '../../../utils/Translate';
 
 const FIELDS = {
   splitLineItems: {
@@ -26,30 +26,35 @@ const FIELDS = {
           binLocationName: lineItem.binLocationName,
           recipient: lineItem.recipient,
         })}
-      > <Translate id="default.button.addLine.label" />
+      > <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
     type: ArrayField,
     fields: {
       productName: {
         type: LabelField,
-        label: 'stockMovement.productName.label',
+        label: 'react.stockMovement.productName.label',
+        defaultMessage: 'Product name',
       },
       lotNumber: {
         type: LabelField,
-        label: 'stockMovement.lot.label',
+        label: 'react.stockMovement.lot.label',
+        defaultMessage: 'Lot',
       },
       expirationDate: {
         type: LabelField,
-        label: 'stockMovement.expiry.label',
+        label: 'react.stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
       },
       binLocationName: {
         type: LabelField,
-        label: 'stockMovement.binLocation.label',
+        label: 'react.stockMovement.binLocation.label',
+        defaultMessage: 'Bin Location',
       },
       quantityShipped: {
         type: TextField,
-        label: 'stockMovement.quantityShipped.label',
+        label: 'react.stockMovement.quantityShipped.label',
+        defaultMessage: 'Quantity shipped',
         fixedWidth: '150px',
         attributes: {
           type: 'number',
@@ -57,7 +62,8 @@ const FIELDS = {
       },
       recipient: {
         type: SelectField,
-        label: 'stockMovement.recipient.label',
+        label: 'react.stockMovement.recipient.label',
+        defaultMessage: 'Recipient',
         fieldKey: '',
         attributes: {
           async: true,
@@ -65,21 +71,25 @@ const FIELDS = {
           showValueTooltip: true,
           openOnClick: false,
           autoload: false,
-          loadOptions: debouncedUsersFetch,
           cache: false,
           options: [],
           labelKey: 'name',
           filterOptions: options => options,
         },
+        getDynamicAttr: props => ({
+          loadOptions: props.debouncedUsersFetch,
+        }),
       },
       palletName: {
         type: TextField,
-        label: 'stockMovement.pallet.label',
+        label: 'react.stockMovement.pallet.label',
+        defaultMessage: 'Pallet',
         fixedWidth: '150px',
       },
       boxName: {
         type: TextField,
-        label: 'stockMovement.box.label',
+        label: 'react.stockMovement.box.label',
+        defaultMessage: 'Box',
         fixedWidth: '150px',
       },
     },
@@ -107,7 +117,7 @@ class PackingSplitLineModal extends Component {
     return (
       <div>
         <div className="font-weight-bold pb-2">
-          <Translate id="stockMovement.quantityPacked.label" />: {PackingSplitLineModal.calculatePacked(values.splitLineItems)}
+          <Translate id="react.stockMovement.quantityPacked.label" defaultMessage="Qty Packed" />: {PackingSplitLineModal.calculatePacked(values.splitLineItems)}
         </div>
         <hr />
       </div>
@@ -129,6 +139,9 @@ class PackingSplitLineModal extends Component {
     };
     this.onOpen = this.onOpen.bind(this);
     this.validate = this.validate.bind(this);
+
+    this.debouncedUsersFetch =
+      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -171,10 +184,10 @@ class PackingSplitLineModal extends Component {
 
     _.forEach(values.splitLineItems, (item, key) => {
       if (shippedQty !== splitItemsQty) {
-        errors.splitLineItems[key] = { quantityShipped: 'errors.packingQty.label' };
+        errors.splitLineItems[key] = { quantityShipped: 'react.stockMovement.errors.packingQty.label' };
       }
       if (item.quantityShipped < 0) {
-        errors.splitLineItems[key] = { quantityShipped: 'errors.negativeQtyShipped.label' };
+        errors.splitLineItems[key] = { quantityShipped: 'react.stockMovement.errors.negativeQtyShipped.label' };
       }
     });
 
@@ -190,19 +203,29 @@ class PackingSplitLineModal extends Component {
           this.state.attr.onSave(_.filter(values.splitLineItems, item => item.quantityShipped))}
         fields={FIELDS}
         initialValues={this.state.formValues}
-        formProps={{ lineItem: this.state.attr.lineItem }}
+        formProps={{
+          lineItem: this.state.attr.lineItem,
+          debouncedUsersFetch: this.debouncedUsersFetch,
+        }}
         validate={this.validate}
         renderBodyWithValues={PackingSplitLineModal.displayPackedSum}
       >
         <div>
-          <div className="font-weight-bold"><Translate id="stockMovement.totalQuantity.label" />: {this.state.attr.lineItem.quantityShipped} </div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.totalQuantity.label" defaultMessage="Total quantity" />: {this.state.attr.lineItem.quantityShipped}
+          </div>
         </div>
       </ModalWrapper>
     );
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(PackingSplitLineModal);
+const mapStateToProps = state => ({
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(PackingSplitLineModal);
 
 PackingSplitLineModal.propTypes = {
   /** Name of the field */
@@ -215,4 +238,6 @@ PackingSplitLineModal.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
 };

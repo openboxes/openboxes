@@ -155,7 +155,7 @@ class DataService {
 
             // Create inventory level for current location, include bin location
             if (location.inventory) {
-                addInventoryLevelToProduct(product, location.inventory, row.minQuantity, row.reorderQuantity, row.maxQuantity, row.preferredForReorder)
+                addInventoryLevelToProduct(product, location.inventory, row.binLocation, row.minQuantity, row.reorderQuantity, row.maxQuantity, row.preferredForReorder)
             }
 
             // Create product package if UOM and quantity are provided
@@ -186,8 +186,8 @@ class DataService {
      * @param maxQuantity
      * @return
      */
-    def addInventoryLevelToProduct(Product product, Inventory inventory, Double minQuantity, Double reorderQuantity, Double maxQuantity, Boolean preferredForReorder) {
-        findOrCreateInventoryLevel(product, inventory, minQuantity, reorderQuantity, maxQuantity, preferredForReorder)
+    def addInventoryLevelToProduct(Product product, Inventory inventory, String binLocation, Double minQuantity, Double reorderQuantity, Double maxQuantity, Boolean preferredForReorder) {
+        findOrCreateInventoryLevel(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity, preferredForReorder)
     }
 
     /**
@@ -263,7 +263,7 @@ class DataService {
      * @param maxQuantity
      * @return
      */
-    def findOrCreateInventoryLevel(Product product, Inventory inventory, Double minQuantity, Double reorderQuantity, Double maxQuantity, Boolean preferredForReorder) {
+    def findOrCreateInventoryLevel(Product product, Inventory inventory, String binLocation, Double minQuantity, Double reorderQuantity, Double maxQuantity, Boolean preferredForReorder) {
 
         log.info "Product ${product.productCode} inventory ${inventory} preferred ${preferredForReorder}"
 
@@ -276,6 +276,7 @@ class DataService {
             inventory.addToConfiguredProducts(inventoryLevel)
         }
         inventoryLevel.status = InventoryStatus.SUPPORTED
+        inventoryLevel.binLocation = binLocation
         inventoryLevel.minQuantity = minQuantity
         inventoryLevel.reorderQuantity = reorderQuantity
         inventoryLevel.maxQuantity = maxQuantity
@@ -729,7 +730,20 @@ class DataService {
         return sw.toString()
     }
 
+    def transformObjects(List objects, Map includeFields) {
+        objects.collect { object ->
+            return transformObject(object, includeFields)
+        }
+    }
 
+    def transformObject(Object object, Map includeFields) {
+        Map properties = [:]
+        includeFields.each { fieldName, property ->
+            def value = property.tokenize('.').inject(object) {v, k -> v?."$k"}
+            properties[fieldName] = value?:""
+        }
+        return properties
+    }
 
     /**
      * Generic method to generate CSV string based on given csvrows map.

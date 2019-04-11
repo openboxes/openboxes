@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode; org.pih.warehouse.core.RoleType" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
@@ -204,7 +204,8 @@
 
 <div class="clear"></div>
 
-<g:set var="requisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
+<g:set var="sortByCode" value='${requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}'/>
+<g:set var="requisitionItems" value='${requisition?."$sortByCode.methodName"}'/>
 <g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
 <g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
 <g:set var="requisitionItemsControlled" value='${requisitionItems.findAll {it?.product?.controlledSubstance}}'/>

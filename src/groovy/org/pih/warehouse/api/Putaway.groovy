@@ -15,6 +15,9 @@ class Putaway {
     String putawayNumber
     Person putawayAssignee
     Date putawayDate
+    Date dateCreated
+    Person orderedBy
+    String sortBy
 
     PutawayStatus putawayStatus
     List<PutawayItem> putawayItems = []
@@ -28,6 +31,18 @@ class Putaway {
         putawayAssignee(nullable:true)
         putawayDate(nullable:true)
         putawayItems(nullable:true)
+        dateCreated(nullable:true)
+        orderedBy(nullable:true)
+    }
+
+    List<PutawayItem> getPutawayItems() {
+       return putawayItems.sort { a,b ->
+           (sortBy == "currentBins" ? a.currentBins?.toLowerCase() <=> b.currentBins?.toLowerCase() : 0) ?:
+                   (sortBy == "preferredBin" ? a.preferredBin?.toLowerCase() <=> b.preferredBin?.toLowerCase() : 0) ?:
+                           a.product?.category?.name <=> b.product?.category?.name ?:
+                                   a.product?.name <=> b.product?.name ?:
+                                           a.id <=> b.id
+       }
     }
 
     Map toJson() {
@@ -36,8 +51,15 @@ class Putaway {
                 putawayNumber: putawayNumber,
                 putawayStatus: putawayStatus?.name(),
                 putawayDate: putawayDate?.format("MM/dd/yyyy"),
+                dateCreated: dateCreated?.format("MMMM dd, yyyy"),
                 putawayAssignee: putawayAssignee,
-                putawayItems: putawayItems.collect { it?.toJson() }
+                "origin.id": origin?.id,
+                "origin.name": origin?.name,
+                "destination.id": destination?.id,
+                "destination.name": destination?.name,
+                putawayItems:  getPutawayItems().collect { it?.toJson() },
+                orderedBy: orderedBy?.name,
+                sortBy: sortBy
         ]
     }
 
@@ -49,7 +71,9 @@ class Putaway {
                 putawayNumber: order.orderNumber,
                 putawayStatus: Putaway.getPutawayStatus(order.status),
                 putawayAssignee: order.completedBy,
-                putawayDate: order.dateCompleted
+                putawayDate: order.dateCompleted,
+                dateCreated: order.dateOrdered,
+                orderedBy: order.orderedBy
         )
 
 

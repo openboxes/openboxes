@@ -16,7 +16,7 @@ class IdentifierApiController extends NoopApiController {
     def identifierService
 
     def create = {
-        log.info "identifier create " + params
+        log.debug "create " + params
         def identifierType = params.identifierType
         if (!identifierType && !params.identifierFormat) {
             throw new IllegalArgumentException("Must specify identifierType or identifierFormat as a parameter")
@@ -25,7 +25,6 @@ class IdentifierApiController extends NoopApiController {
         String identifier
 
         if (params.identifierFormat) {
-            log.info "1"
             identifier = identifierService.generateIdentifier(params.identifierFormat)
         }
         else {

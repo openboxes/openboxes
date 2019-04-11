@@ -11,11 +11,11 @@ package org.pih.warehouse.reporting
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.report.ChecklistReportCommand
+import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.ProductReportCommand
 import util.ReportUtil
@@ -86,12 +86,7 @@ class ReportController {
         long startTime = System.currentTimeMillis()
         log.info "Export by bin location " + params
 		Location location = Location.get(session.warehouse.id)
-        Location binLocation = (params.binLocation) ? Location.findByParentLocationAndNameLike(location, "%" + params.binLocation + "%") : null
-
-
-
-		List binLocations = inventoryService.getQuantityByBinLocation(location, binLocation)
-
+		List binLocations = inventoryService.getQuantityByBinLocation(location)
         def products = binLocations.collect { it.product.productCode }.unique()
         binLocations = binLocations.collect { [productCode: it.product.productCode,
                                                productName: it.product.name,
@@ -104,8 +99,7 @@ class ReportController {
 
         if (params.downloadFormat == "csv") {
             String csv = ReportUtil.getCsvForListOfMapEntries(binLocations)
-            String binLocationName = binLocation ? binLocation?.name : "All Bins"
-            def filename = "bin-location-report-" + location.name + "-" + binLocationName + ".csv"
+            def filename = "Bin Locations - ${location.name}.csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: csv)
             return
@@ -396,9 +390,57 @@ class ReportController {
 
     }
 
+    def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
+        command.entries = inventoryService.getQuantityOnHandByProductAndLocation(command.locations)
 
+        if (params.button == "download") {
+            def sw = new StringWriter()
 
+            try {
+                if (command.entries) {
+                    sw.append("Code").append(",")
+                    sw.append("Product").append(",")
+                    sw.append("Category").append(",")
+                    sw.append("Formularies").append(",")
+                    sw.append("Tags").append(",")
 
+                    command.locations?.each { location ->
+                        sw.append("QoH ").append(location?.name).append(",")
+                    }
 
+                    sw.append("QoH Total")
+                    sw.append("\n")
+                    command.entries.each { entry ->
+                        if (entry.key) {
+                            def totalQuantity = entry.value?.values()?.sum()
+                            def form = entry.key?.getProductCatalogs()?.collect{ it.name }?.join(",")
+
+                            sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"','""') + '"').append(",")
+                            sw.append('"' + (entry.key?.name ?: "").toString()?.replace('"','""') + '"').append(",")
+                            sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"','""') + '"').append(",")
+                            sw.append('"' + (form ?: "").toString()?.replace('"','""') + '"').append(",")
+                            sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"','""') + '"').append(",")
+
+                            command.locations?.each { location ->
+                                sw.append('"' + (entry.value[location?.id] != null ? entry.value[location?.id] : "").toString() + '"').append(",")
+                            }
+
+                            sw.append('"' + (totalQuantity != null ? totalQuantity : "").toString() + '"')
+                            sw.append("\n")
+                        }
+                    }
+                }
+
+            } catch (RuntimeException e) {
+                log.error (e.message)
+                sw.append(e.message)
+            }
+
+            response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
+        }
+
+        render(view: 'showInventoryByLocationReport', model: [command : command])
+    }
 
 }

@@ -74,8 +74,10 @@
                         <span>
                             <warehouse:message code="shipping.totalValue.label"/>:
                             <label>
-                                <g:formatNumber format="###,###,##0.00" number="${shipmentInstance?.totalValue ?: 0.00 }" />
-                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
+                                    <g:formatNumber format="###,###,##0.00" number="${stockMovement?.shipment?.calculateTotalValue() ?: 0.00 }" />
+                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                </g:hasRoleFinance>
                             </label>
                         </span>
                         <span>

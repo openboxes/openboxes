@@ -19,6 +19,7 @@ class ApiController {
 
     def dataSource
     def userService
+    def localizationService
     def grailsApplication
 
     def login = {
@@ -44,11 +45,21 @@ class ApiController {
         render ([status: 200, text: "User ${session.user} is now logged into ${location.name}"])
     }
 
+    def chooseLocale = {
+        Locale locale = localizationService.getLocale(params.id)
+        if (!locale) {
+            throw new ObjectNotFoundException(params.id, Locale.class.toString())
+        }
+        session.user.locale = locale
+        render ([status: 200, text: "Current language is ${locale}"])
+    }
+
     def getSession = {
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
         boolean isSuperuser = userService.isSuperuser(session?.user)
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
+        def locale = localizationService.getCurrentLocale()
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         def menuConfig = grailsApplication.config.openboxes.megamenu
         render ([
@@ -58,7 +69,8 @@ class ApiController {
                 isSuperuser: isSuperuser,
                 isUserAdmin: isUserAdmin,
                 supportedActivities: supportedActivities,
-                menuConfig: menuConfig]
+                menuConfig: menuConfig,
+                activeLanguage: locale.language]
         ] as JSON)
     }
 

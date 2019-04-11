@@ -9,6 +9,9 @@
 **/ 
 package org.pih.warehouse.core
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import util.StringUtil
+
 // import java.util.Date
 
 class Person implements Comparable, Serializable {
@@ -27,7 +30,7 @@ class Person implements Comparable, Serializable {
 		id generator: 'uuid'
 	}
 
-	static transients = ["name"]
+	static transients = ["name", "lastInitial"]
 	
 	static constraints = { 
 		firstName(blank:false, maxSize: 255)
@@ -46,12 +49,29 @@ class Person implements Comparable, Serializable {
 		return sortOrder;
 
 	}
-	
+
+	String getLastInitial() {
+		lastName?.substring(0, 1)
+	}
+
 	String toString() {
-		return "$firstName $lastName";
+		return "${name}";
 	}
+
 	String getName() {
-		return "$firstName $lastName";
+		boolean anonymize = CH.config.openboxes.anonymize.enabled
+		return "$firstName ${anonymize ? lastInitial : lastName}";
 	}
-	
+
+	Map toJson() {
+		boolean anonymize = CH.config.openboxes.anonymize.enabled
+		return [
+				"id": id,
+				"name": name,
+				"firstName": firstName,
+				"lastName": (anonymize) ? lastInitial : lastName,
+				"email": anonymize ? StringUtil.mask(email) : email,
+				"username": null
+		]
+	}
 }

@@ -66,6 +66,36 @@
                     </g:else>
                 </td>
             </tr>
+            <g:hasRoleFinance>
+                <tr class="prop">
+                    <td class="name">
+                        <label>
+                            <warehouse:message code="requisitionTemplate.totalValue.label" />
+                        </label>
+                    </td>
+                    <td>
+                        <span>
+                            ${g.formatNumber(number: (requisition?.totalCost?:0), format: '###,###,##0.00##')}
+                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                        </span>
+                    </td>
+                </tr>
+            </g:hasRoleFinance>
+            <tr class="prop">
+                <td class="name">
+                    <label><warehouse:message code="requisition.sortByCode.label" /></label>
+                </td>
+                <td class="value">
+                    <g:if test="${requisition?.sortByCode}">
+                        ${requisition?.sortByCode?.friendlyName}
+                    </g:if>
+                    <g:else>
+                        <span class="fade">
+                            ${warehouse.message(code:'default.none.label')}
+                        </span>
+                    </g:else>
+                </td>
+            </tr>
             <tr class="prop">
                 <td class="name">
                     <label for="description">
@@ -129,8 +159,13 @@
                 </td>
                 <td class="value">
                     ${requisition?.updatedBy?.name }
+
+                    <%--
+                        FIXME Kind of a hack, but lastUpdated is not updated in the parent when updating the child association.
+                     --%>
+                    <g:set var="lastUpdated" value="${[requisition?.lastUpdated, requisition?.requisitionItems?.lastUpdated?.max()].max()}"/>
                     <div class="fade">
-                        <g:formatDate date="${requisition?.lastUpdated }"/>
+                        <g:formatDate date="${ lastUpdated}"/>
                     </div>
                 </td>
             </tr>

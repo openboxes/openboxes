@@ -15,13 +15,13 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.requisition.RequisitionItem
 
 class StockMovementItemApiController {
 
     def inventoryService
     def stockMovementService
 
-    
     def list = { 
         StockMovement stockMovement = stockMovementService.getStockMovement(params?.stockMovement?.id)
         if (!stockMovement) {
@@ -29,66 +29,151 @@ class StockMovementItemApiController {
         }
         render ([data:stockMovement.lineItems] as JSON)
     }
-    
+
     def read = {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
         render ([data:stockMovementItem] as JSON)
     }
 
-
-    def update = {
+    def updatePicklist = {
         JSONObject jsonObject = request.JSON
 
-        log.info "JSON " + jsonObject.toString(4)
+        log.debug "JSON " + jsonObject.toString(4)
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
-
-        Boolean createPicklist = jsonObject.createPicklist ?
-                Boolean.parseBoolean(jsonObject.createPicklist):Boolean.FALSE
-
-        Boolean clearPicklist = jsonObject.clearPicklist ?
-                Boolean.parseBoolean(jsonObject.clearPicklist):Boolean.FALSE
 
         stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
 
-        if (createPicklist) {
-            log.info "Auto creating picklist for stock movement item ${stockMovementItem}"
-            stockMovementService.createPicklist(stockMovementItem)
+        log.debug("Updating picklist items")
+        List picklistItems = jsonObject.remove("picklistItems")
+
+        if (!picklistItems) {
+            throw new IllegalArgumentException("Must specifiy picklistItems")
         }
-        else if (clearPicklist) {
-            stockMovementService.clearPicklist(stockMovementItem)
+        picklistItems.each { picklistItemMap ->
+
+            PicklistItem picklistItem = picklistItemMap["id"] ?
+                    PicklistItem.get(picklistItemMap["id"]) : null
+
+            InventoryItem inventoryItem = picklistItemMap["inventoryItem.id"] ?
+                    InventoryItem.get(picklistItemMap["inventoryItem.id"]) : null
+
+            Location binLocation = picklistItemMap["binLocation.id"] ?
+                    Location.get(picklistItemMap["binLocation.id"]) : null
+
+            BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
+                    new BigDecimal(picklistItemMap.quantityPicked) : null
+
+            String reasonCode = picklistItemMap.reasonCode
+            String comment = picklistItemMap.comment
+
+            stockMovementService.createOrUpdatePicklistItem(stockMovementItem, picklistItem, inventoryItem, binLocation,
+                    quantityPicked?.intValueExact(), reasonCode, comment)
         }
-        else {
-            log.info("Updating picklist items")
-            List picklistItems = jsonObject.remove("picklistItems")
 
-            if (!picklistItems) {
-                throw new IllegalArgumentException("Must specifiy picklistItems if autoSuggest is not enabled")
-            }
-            picklistItems.each { picklistItemMap ->
+        RequisitionItem requisitionItem = RequisitionItem.get(params.id)
+        stockMovementService.createMissingShipmentItem(requisitionItem)
 
-                PicklistItem picklistItem = picklistItemMap["id"] ?
-                        PicklistItem.get(picklistItemMap["id"]) : null
+        PickPageItem pickPageItem = stockMovementService.buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
 
-                InventoryItem inventoryItem = picklistItemMap["inventoryItem.id"] ?
-                        InventoryItem.get(picklistItemMap["inventoryItem.id"]) : null
-
-                Location binLocation = picklistItemMap["binLocation.id"] ?
-                        Location.get(picklistItemMap["binLocation.id"]) : null
-
-                BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null) ?
-                        new BigDecimal(picklistItemMap.quantityPicked) : null
-
-                String reasonCode = picklistItemMap.reasonCode
-                String comment = picklistItemMap.comment
-
-                if (quantityPicked != null) {
-                    stockMovementService.createOrUpdatePicklistItem(stockMovementItem, picklistItem, inventoryItem, binLocation,
-                            quantityPicked?.intValueExact(), reasonCode, comment)
-                }
-            }
-        }
-        render ([data:stockMovementItem] as JSON)
-
+        render ([data:pickPageItem] as JSON)
     }
 
+    def createPicklist = {
+        StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
+
+        stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+
+        log.debug "Creating picklist for stock movement item ${stockMovementItem}"
+        stockMovementService.createPicklist(stockMovementItem)
+
+        RequisitionItem requisitionItem = RequisitionItem.get(params.id)
+        stockMovementService.createMissingShipmentItem(requisitionItem)
+
+        PickPageItem pickPageItem = stockMovementService.buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
+
+        render ([data:pickPageItem] as JSON)
+    }
+
+    def clearPicklist = {
+        StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
+
+        stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+
+        log.debug "Clear picklist for stock movement item ${stockMovementItem}"
+        stockMovementService.clearPicklist(stockMovementItem)
+
+        RequisitionItem requisitionItem = RequisitionItem.get(params.id)
+        PickPageItem pickPageItem = stockMovementService.buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
+
+        render ([data:pickPageItem] as JSON)
+    }
+
+    def substituteItem = {
+        JSONObject jsonObject = request.JSON
+
+        log.debug "JSON " + jsonObject.toString(4)
+
+        StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
+
+        List substitutionItems = jsonObject.remove("substitutionItems")
+
+        bindLineItem(stockMovementItem, jsonObject)
+
+        substitutionItems?.each { item ->
+            StockMovementItem subItem = new StockMovementItem()
+
+            bindLineItem(subItem, item)
+
+            stockMovementItem.substitutionItems?.add(subItem)
+        }
+
+        stockMovementService.substituteItem(stockMovementItem)
+
+        EditPageItem editPageItem = stockMovementService.buildEditPageItem(stockMovementItem)
+
+        render ([data:editPageItem] as JSON)
+    }
+
+    def revertItem = {
+        StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
+
+        stockMovementService.revertItem(stockMovementItem)
+
+        EditPageItem editPageItem = stockMovementService.buildEditPageItem(stockMovementItem)
+
+        render ([data:editPageItem] as JSON)
+    }
+
+    def cancelItem = {
+        StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
+
+        stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+
+        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
+
+        log.debug "Item canceled " + requisitionItem.id
+        requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
+        requisitionItem.quantityApproved = 0
+
+        requisitionItem.save()
+
+        stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+
+        render ([data:stockMovementItem] as JSON)
+    }
+
+    def removeItem = {
+        RequisitionItem requisitionItem = RequisitionItem.get(params.id)
+
+        stockMovementService.removeRequisitionItem(requisitionItem)
+
+        render status: 204
+    }
+
+    void bindLineItem(StockMovementItem stockMovementItem, def lineItem) {
+        stockMovementItem.newQuantity = lineItem.newQuantity ? new BigDecimal(lineItem.remove("newQuantity")) : null
+        stockMovementItem.quantityRevised = lineItem.quantityRevised ? new BigDecimal(lineItem.remove("quantityRevised")) : null
+
+        bindData(stockMovementItem, lineItem)
+    }
 }

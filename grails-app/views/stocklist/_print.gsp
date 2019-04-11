@@ -1,9 +1,15 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <style>
 
-        table {border-collapse: collapse; page-break-inside: auto;}
+        table {
+            border-collapse: collapse;
+            page-break-inside: auto;
+            -fs-table-paginate: paginate;
+            border-spacing: 0;
+            margin: 5px;
+        }
         thead {display: table-header-group;}
         tr {page-break-inside: avoid; page-break-after: auto;}
         td {vertical-align: top; }
@@ -30,18 +36,11 @@
 
         .small {font-size: xx-small;}
         .line{border-bottom: 1px solid black}
-        .logo { width: 40px; height: 40px; }
+        .logo { width: 60px; height: 60px; }
         .canceled { text-decoration: line-through; }
         .page-start {
             -fs-page-sequence: start;
             page-break-before: avoid;
-        }
-        table {
-            -fs-table-paginate: paginate;
-            page-break-inside: avoid;
-            border-collapse: collapse;
-            border-spacing: 0;
-            margin: 5px;
         }
 
         .page-content { page-break-after: avoid; }
@@ -55,7 +54,7 @@
             border: 1px solid black;
             vertical-align: middle;
         }
-        .first-line: {
+        .first-line {
             display: flex;
             justify-content: space-between;
         }
@@ -70,6 +69,7 @@
         .w100 { width: 100% !important; }
         .no-wrap { white-space: nowrap; }      
         .gray-background { background-color: #ddd !important; }
+        .fixed-layout { table-layout: fixed; }
     </style>
 
 </head>
@@ -98,7 +98,7 @@
     </div>
 
     <div class="content">
-         <table class="w100">
+         <table class="w100 fixed-layout">
             <tr>
                 <%-- Icon and title --%>
                 <td colspan="2" class="b-0">
@@ -108,7 +108,8 @@
                                 <img class="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg', absolute: true)}"/>
                             </td>
                             <td>
-                                <h3>${warehouse.message(code: 'report.stockRequisition.label')}: ${stocklist?.requisition?.name} ${stocklist?.destination}</h3>
+                                <h3>${warehouse.message(code: 'report.stockRequisition.label')}: ${stocklist?.requisition?.name} </h3>
+                                <h3>${stocklist?.destination}</h3>
                             </td>
                         </tr>
                     </table>
@@ -188,37 +189,14 @@
             </tr>
          </table>
 
-        <%-- Stock list items tables --%>
-        <g:set var="requisitionItems" value='${stocklist?.requisition?.requisitionItems?.sort { it.product.name }}'/>
-        <g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
-        <g:set var="requisitionItemsControlled" value='${requisitionItems.findAll { it?.product?.controlledSubstance }}'/>
-        <g:set var="requisitionItemsHazmat" value='${requisitionItems.findAll { it?.product?.hazardousMaterial }}'/>
-        <g:set var="requisitionItemsOther" value='${requisitionItems.findAll { !it?.product?.hazardousMaterial && !it?.product?.coldChain && !it?.product?.controlledSubstance }}'/>
+        <g:set var="sortByCode" value="${stocklist?.requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}"/>
+
+        <%-- Stock list items table --%>
+        <g:set var="requisitionItems" value='${stocklist?.requisition?."$sortByCode.methodName"}'/>
 
         <div>
-            <g:if test="${requisitionItemsColdChain}">
-                <g:set var="pageTitle">
-                    ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
-                </g:set>
-                <g:render template="/stocklist/itemList" model="[pageTitle: pageTitle, requisitionItems:requisitionItemsColdChain]"/>
-            </g:if>
-            <g:if test="${requisitionItemsControlled}">
-                <g:set var="pageTitle">
-                    ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
-                </g:set>
-                <g:render template="/stocklist/itemList" model="[pageTitle: pageTitle, requisitionItems:requisitionItemsControlled]"/>
-            </g:if>
-            <g:if test="${requisitionItemsHazmat}">
-                <g:set var="pageTitle">
-                    ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
-                </g:set>
-                <g:render template="/stocklist/itemList" model="[pageTitle: pageTitle, requisitionItems:requisitionItemsHazmat]"/>
-            </g:if>
-            <g:if test="${requisitionItemsOther}">
-                <g:set var="pageTitle">
-                    ${warehouse.message(code:'default.otherItems.label', default:'Other items')}
-                </g:set>
-                <g:render template="/stocklist/itemList" model="[pageTitle: pageTitle, requisitionItems:requisitionItemsOther]"/>
+            <g:if test="${requisitionItems}">
+                <g:render template="/stocklist/itemList" model="[requisitionItems:requisitionItems]"/>
             </g:if>
         </div>
     </div>

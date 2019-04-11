@@ -89,36 +89,42 @@
 										</td>
 									</tr>
 									<tr>
-										<td>										
+										<td>
 											<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
-                                            -
+										</td>
+									</tr>
+									<tr>
+										<td>
 											<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
 											
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<label><warehouse:message code="report.options.label"/></label>
-										</td>
-									</tr>
-									<tr>
-										
-										<td>
 											<div>
-												<g:checkBox name="hideInactiveProducts" value="${command?.hideInactiveProducts}" />										
-												<warehouse:message code="report.hideInactiveProducts.label"/>
+												<label>
+													<g:checkBox name="hideInactiveProducts" value="${command?.hideInactiveProducts}" />
+													<warehouse:message code="report.hideInactiveProducts.label"/>
+												</label>
 											</div>
 											<div>
-												<g:checkBox name="showTransferBreakdown" value="${command?.showTransferBreakdown}" />										
-												<warehouse:message code="report.showTransferBreakdown.label"/>
+												<label>
+													<g:checkBox name="showTransferBreakdown" value="${command?.showTransferBreakdown}" />
+													<warehouse:message code="report.showTransferBreakdown.label"/>
+												</label>
 											</div>
 											<div>
-												<g:checkBox name="includeChildren" value="${command?.includeChildren }"/>
-												<warehouse:message code="report.includeChildren.label"/>
+												<label class="fade">
+													<g:checkBox name="includeChildren" value="${command?.includeChildren }" disabled="true" />
+													<warehouse:message code="report.includeChildren.label"/> (disabled for performance reasons)
+
+												</label>
 											</div>
 											<div>
-												<g:checkBox name="insertPageBreakBetweenCategories" value="${command?.insertPageBreakBetweenCategories }"/>
-												<warehouse:message code="report.insertPageBreakBetweenCategories.label"/>
+												<label>
+													<g:checkBox name="insertPageBreakBetweenCategories" value="${command?.insertPageBreakBetweenCategories }"/>
+													<warehouse:message code="report.insertPageBreakBetweenCategories.label"/>
+												</label>
 											</div>
 
 										</td>

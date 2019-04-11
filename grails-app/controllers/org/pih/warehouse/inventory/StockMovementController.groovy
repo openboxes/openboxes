@@ -90,12 +90,13 @@ class StockMovementController {
             stockMovement.description = "%" + params.q + "%"
         }
         stockMovement.requestedBy = requisition.requestedBy
+        stockMovement.createdBy = requisition.createdBy
         stockMovement.origin = requisition.origin
         stockMovement.destination = requisition.destination
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
         stockMovement.receiptStatusCode = params?.receiptStatusCode ? params.receiptStatusCode as ShipmentStatusCode : null
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, max, offset)
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params, max, offset)
         def statistics = requisitionService.getRequisitionStatistics(requisition.destination, requisition.origin, currentUser)
 
         render(view:"list", params:params, model:[stockMovements: stockMovements, statistics:statistics])
@@ -116,27 +117,28 @@ class StockMovementController {
 
 
     def delete = {
-
-        try {
-            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-            Requisition requisition = stockMovement?.requisition
-            if (requisition) {
-                def shipments = stockMovement?.requisition?.shipments
-                shipments.toArray().each { Shipment shipment ->
-                    requisition.removeFromShipments(shipment)
-                    if (!shipment?.events?.empty) {
-                        shipmentService.rollbackLastEvent(shipment)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
+            try {
+                Requisition requisition = stockMovement?.requisition
+                if (requisition) {
+                    def shipments = stockMovement?.requisition?.shipments
+                    shipments.toArray().each { Shipment shipment ->
+                        requisition.removeFromShipments(shipment)
+                        if (!shipment?.events?.empty) {
+                            shipmentService.rollbackLastEvent(shipment)
+                        }
+                        shipmentService.deleteShipment(shipment)
                     }
-                    shipmentService.deleteShipment(shipment)
+                    //requisitionService.rollbackRequisition(requisition)
+                    requisitionService.deleteRequisition(requisition)
                 }
-                //requisitionService.rollbackRequisition(requisition)
-                requisitionService.deleteRequisition(requisition)
+                flash.message = "Successfully deleted stock movement with ID ${params.id}"
+            } catch (Exception e) {
+                log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
+                flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
             }
-            flash.message = "Successfully deleted stock movement with ID ${params.id}"
-        } catch (Exception e) {
-            log.error ("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
-            flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
-        }
+        } else flash.message = "You cannot delete this shipment"
 
         redirect(action: "list")
     }
@@ -162,7 +164,11 @@ class StockMovementController {
     def receipts = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        def receiptItems = shipments*.receipts*.receiptItems?.flatten()
+        def receiptItems = shipments*.receipts*.receiptItems?.flatten()?.sort { a,b ->
+            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
+                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
+                            a?.sortOrder <=> b?.sortOrder
+        }
         render(template: "receipts", model: [receiptItems:receiptItems])
     }
 
@@ -184,6 +190,22 @@ class StockMovementController {
         render ([data: "Document was uploaded successfully"] as JSON)
     }
 
+    def addDocument = {
+        log.info params
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        Shipment shipmentInstance = stockMovement.shipment
+        def documentInstance = Document.get(params?.document?.id);
+        if (!documentInstance) {
+            documentInstance = new Document();
+        }
+        if (!shipmentInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+            redirect(action: "list")
+        }
+        render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
+    }
+
 	def exportCsv = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
@@ -195,13 +217,13 @@ class StockMovementController {
         def lineItems = stockMovement.lineItems.collect {
             [
                     requisitionItemId: it?.id?:"",
-                    productCode: it?.product?.productCode?:"",
+                    "productCode (required)": it?.product?.productCode?:"",
                     productName: it?.product?.name?:"",
                     palletName: it?.palletName?:"",
                     boxName: it?.boxName?:"",
                     lotNumber: it?.lotNumber?:"",
-                    expirationDate: it?.expirationDate?it?.expirationDate?.format("MM/dd/yyyy"):"",
-                    quantity: it?.quantityRequested?:"",
+                    "expirationDate (MM/dd/yyyy)": it?.expirationDate?it?.expirationDate?.format("MM/dd/yyyy"):"",
+                    "quantity (required)": it?.quantityRequested?:"",
                     recipientId: it?.recipient?.id?:""
             ]
         }
@@ -215,7 +237,6 @@ class StockMovementController {
 
         try {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-            Requisition requisition = stockMovement.requisition
 
             def importFile = command.importFile
             if (importFile.isEmpty()) {
@@ -234,7 +255,7 @@ class StockMovementController {
                 stockMovementItem.stockMovement = stockMovement
                 stockMovement.lineItems.add(stockMovementItem)
             }
-            stockMovementService.updateStockMovement(stockMovement, false)
+            stockMovementService.updateItems(stockMovement)
 
         } catch (Exception e) {
             // FIXME The global error handler does not return JSON for multipart uploads

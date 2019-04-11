@@ -1,9 +1,24 @@
 package org.pih.warehouse.core
 
 import grails.test.GrailsUnitTestCase
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 class UserTests extends GrailsUnitTestCase {
+
+
+    @Before
+    void setUp() {
+        super.setUp()
+        mockConfig("openboxes.anonymize.enabled = false")
+    }
+
+    @After
+    void tearDown() {
+        super.tearDown()
+    }
+
 
     @Test
     void testLocationRolePairs() {

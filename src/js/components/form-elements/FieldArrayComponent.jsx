@@ -3,12 +3,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 import { connect } from 'react-redux';
+import { getTranslate } from 'react-localize-redux';
 
 import 'react-tippy/dist/tippy.css';
-import { getTranslate, Translate } from 'react-localize-redux';
 
 import TableBody from './TableBody';
 import TableBodyVirtualized from './TableBodyVirtualized';
+import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 class FieldArrayComponent extends Component {
   constructor(props) {
@@ -38,13 +39,16 @@ class FieldArrayComponent extends Component {
         <div className="text-center border">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1">
             {_.map(fieldsConfig.fields, (config, name) => (
-              <div style={{
-                flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
-                minWidth: 0,
-              }}
+              <div
+                key={name}
+                style={{
+                  flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+                  minWidth: 0,
+                }}
               >
                 <Tooltip
-                  html={(config.label && <div>{this.props.translate(config.label)}</div>)}
+                  html={(config.label &&
+                    <div>{this.props.translate(config.label, config.defaultMessage)}</div>)}
                   theme="transparent"
                   arrow="true"
                   delay="150"
@@ -52,9 +56,9 @@ class FieldArrayComponent extends Component {
                   hideDelay="50"
                 >
                   <div
-                    key={name}
-                    className="mx-1 text-truncate font-size-xs"
-                  >{config.label && <Translate id={config.label} />}
+                    className={`mx-1 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
+                  >{config.label &&
+                    <Translate id={config.label} defaultMessage={config.defaultMessage} />}
                   </div>
                 </Tooltip>
               </div>))}
@@ -97,7 +101,7 @@ class FieldArrayComponent extends Component {
 }
 
 const mapStateToProps = state => ({
-  translate: getTranslate(state.localize),
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 FieldArrayComponent.propTypes = {

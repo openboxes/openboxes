@@ -40,6 +40,10 @@
     <include file="0.8.x/changelog-2018-12-10-1339-alter-table-requisition-add-column-replenishment-period.xml"/>
     <include file="0.8.x/changelog-2018-12-12-2314-update-order-set-name-equal-description.xml"/>
     <include file="0.8.x/changelog-2019-01-04-2346-insert-finance-role.xml"/>
-
+    <include file="0.8.x/changelog-2019-01-26-0842-create-view-demand.xml"/>
+    <include file="0.8.x/changelog-2019-01-29-2345-update-quantity-approved.xml"/>
+    <include file="0.8.x/changelog-2019-02-04-1323-modify-product-supplier-unit-price.xml"/>
+    <include file="0.8.x/changelog-2019-02-04-1623-alter-table-requisition-add-column-sort-by-code.xml"/>
+    <include file="0.8.x/changelog-2019-02-26-0001-add-sort-order-column.xml"/>
 
 </databaseChangeLog>
