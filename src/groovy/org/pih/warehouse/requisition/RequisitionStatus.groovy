@@ -45,9 +45,11 @@ enum RequisitionStatus {
 	}
 
 	static listCompleted() {
-		[ ISSUED, RECEIVED, CANCELED, DELETED ]
+		[ ISSUED, RECEIVED ]
 	}
-
+	static listCanceled() {
+		[ CANCELED, DELETED ]
+	}
     static listAll() {
         [ CREATED, EDITING, VERIFYING, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR ]
     }

@@ -73,7 +73,7 @@
                                 <tr class="prop">
                                     <td></td>
                                     <td>
-                                        <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
+                                        <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true"
                                                        width="100%" styleClass="text"/>
                                     </td>
                                     <td></td>
@@ -212,6 +212,7 @@
                   id: 'delete-' + aData["id"],
                   type: 'button',
                   class: 'button icon trash',
+                  style: 'min-width: 70px',
                   click: function (event) {
                     event.preventDefault();
 

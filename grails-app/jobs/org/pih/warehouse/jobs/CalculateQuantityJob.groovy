@@ -1,13 +1,9 @@
 package org.pih.warehouse.jobs
 
-import grails.plugin.mail.MailService
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.ShipmentItem
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as ConfigHolder
 import org.quartz.JobExecutionContext
 import util.LiquibaseUtil
 
@@ -18,16 +14,21 @@ class CalculateQuantityJob {
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron cronExpression: ConfigHolder.config.openboxes.jobs.calculateQuantityJob.cronExpression
+		cron name: 'calculateQuantityCronTrigger',
+                cronExpression: CH.config.openboxes.jobs.calculateQuantityJob.cronExpression
     }
 
     def execute(JobExecutionContext context) {
+
+        Boolean enabled = CH.config.openboxes.jobs.calculateQuantityJob.enabled
+        if (!enabled) {
+            return
+        }
 
         if (LiquibaseUtil.isRunningMigrations()) {
             log.info "Postponing job execution until liquibase migrations are complete"
             return
         }
-
 
         def startTime = System.currentTimeMillis()
         def date = context.mergedJobDataMap.get('date')

@@ -54,12 +54,14 @@ class StocklistController {
 	}
 
 	def sendMail = {
-		if (!params.recipients || !params.id) {
-			throw new Exception("${warehouse.message(code:'email.noParams.message')}")
+		if (!params.recipients || !params.id || !params.body || !params.subject) {
+			flash.error="${warehouse.message(code:'email.noParams.message')}"
+			redirect(controller: "requisitionTemplate", action: "sendMail", params:[id: params.id])
+		} else {
+			def emailBody = params.body + "\n\n" + "Sent by " + session.user.name
+			stocklistService.sendMail(params.id, params.subject, emailBody, [params.recipients], params.includePdf == "on", params.includeXls == "on")
+			flash.message = "${warehouse.message(code:'email.sent.message')}"
+			redirect(controller: "requisitionTemplate", action: "show", params:[id: params.id])
 		}
-		def emailBody = params.body + "\n\n" + "Sent by " + session.user.name
-		stocklistService.sendMail(params.id, params.subject, emailBody, [params.recipients], params.includePdf == "on", params.includeXls == "on")
-		flash.message = "${warehouse.message(code:'email.sent.message')}"
-		redirect(controller: "requisitionTemplate", action: "show", params:[id: params.id])
 	}
 }
