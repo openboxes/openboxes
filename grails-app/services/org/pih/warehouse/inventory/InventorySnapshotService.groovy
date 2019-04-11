@@ -143,29 +143,15 @@ class InventorySnapshotService {
     def getTransactionDates(Location location, Product product) {
 
         String query = """
-            select distinct(date(transactionDate)) 
-            from TransactionEntry te join Transaction t 
-            where 
+            select distinct(date(t.transactionDate)) 
+            from TransactionEntry as te 
+            join te.transaction as t
+            join te.inventoryItem as ii
+            where ii.product = :product
+            and t.inventory = :inventory
+            order by t.transactionDate desc
         """
-        TransactionEntry.executeQuery()
-
-        def criteria = TransactionEntry.createCriteria()
-        def transactionDates = criteria.list {
-            projections {
-                transaction {
-                    distinct(date("transactionDate"))
-                }
-            }
-
-            transaction {
-                eq("inventory", location.inventory)
-                order("transactionDate", "desc")
-            }
-            inventoryItem {
-                eq("product", product)
-            }
-        }
-        return transactionDates
+        return TransactionEntry.executeQuery(query, [product: product, inventory: location.inventory])
     }
 
     def getDepotLocations() {
