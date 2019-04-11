@@ -1,9 +1,6 @@
 package org.pih.warehouse.jobs
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as ConfigHolder
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
-import org.pih.warehouse.product.Product
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import util.LiquibaseUtil
 
 class DataCleaningJob {
@@ -12,10 +9,16 @@ class DataCleaningJob {
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron cronExpression: ConfigHolder.config.openboxes.jobs.dataCleaningJob.cronExpression
+		cron name:'dataCleaningCronTrigger',
+                cronExpression: CH.config.openboxes.jobs.dataCleaningJob.cronExpression
     }
 
 	def execute(context) {
+
+        Boolean enabled = CH.config.openboxes.jobs.dataCleaningJob.enabled
+        if (!enabled) {
+            return
+        }
 
         if (LiquibaseUtil.isRunningMigrations()) {
             log.info "Postponing job execution until liquibase migrations are complete"

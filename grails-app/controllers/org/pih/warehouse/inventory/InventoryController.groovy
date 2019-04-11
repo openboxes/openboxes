@@ -873,6 +873,8 @@ class InventoryController {
     }
 
     def getCsvForProductMap(map, statusMap) {
+        def hasRoleFinance = userService.hasRoleFinance(session.user)
+
         def csv = "";
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}"  + '"' + ","
@@ -893,8 +895,6 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
         csv += "\n"
-
-        def hasRoleFinance = userService.hasRoleFinance(session.user)
 
         map.sort().each { product, quantity ->
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
@@ -917,7 +917,7 @@ class InventoryController {
             csv += '"' + (inventoryLevel?.binLocation?:"")  + '"' + ","
             csv += '"' + (inventoryLevel?.abcClass?:"")  + '"' + ","
             csv += '"' + (product?.unitOfMeasure?:"")  + '"' + ","
-            csv += hasRoleFinance ? (product?.pricePerUnit?:"") : "" + ","
+            csv += (hasRoleFinance ? (product?.pricePerUnit?:"") : "") + ","
             csv += (inventoryLevel?.minQuantity?:"") + ","
             csv += (inventoryLevel?.reorderQuantity?:"") + ","
             csv += (inventoryLevel?.maxQuantity?:"") + ","

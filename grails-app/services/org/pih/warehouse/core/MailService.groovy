@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder;
@@ -62,9 +62,9 @@ class MailService {
 		println "Add BCC addresses to email: " + bccAddresses
 		if (bccAddresses) {
 			bccAddresses.split(",").each {
-				try { 
+				try {
 					email.addBcc(it)
-				} catch (Exception e) { 
+				} catch (Exception e) {
 					println "Error adding BCC address: " + e.message
 				}
 			}
@@ -77,9 +77,9 @@ class MailService {
 		println "Add CC addresses to email: " + ccAddresses
 		if (ccAddresses && ccAddresses.size()) {
 			ccAddresses.each {
-				try { 
+				try {
 					email.addCc(it)
-				} catch (Exception e) { 
+				} catch (Exception e) {
 					println "Error adding CC address: " + e.message
 				}
 			}
@@ -87,17 +87,17 @@ class MailService {
 	}
 	*/
 
-		
+
 	/**
 	 * @return
 	 */
-	def isMailEnabled() {  
+	def isMailEnabled() {
 		log.info "grailsApplication.config.grails.mail.enabled '" + grailsApplication.config.grails.mail.enabled + "'"
 		Boolean isMailEnabled = grailsApplication.config?.grails?.mail?.enabled?.toBoolean()
-		log.info (isMailEnabled ? "Mail is enabled" : "Mail is disabled") 
+		log.info (isMailEnabled ? "Mail is enabled" : "Mail is disabled")
 		return isMailEnabled
 	}
-	
+
 	/**
 	 * @param subject
 	 * @param msg
@@ -107,7 +107,7 @@ class MailService {
 	def sendMail(String subject, String msg, String to) {
 		sendMail(subject, msg, [to], null)
 	}
-	
+
 	/**
 	 * @param subject
 	 * @param msg
@@ -115,22 +115,22 @@ class MailService {
 	 * @return
 	 */
 	def sendMail(String subject, String msg, Collection to, Integer port) {
-		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)			
-		if (isMailEnabled()) { 			
-			log.info "Sending text email '" + subject + "' to " + to; 
-			try { 
-				//SimpleEmail is the class which will do all the hard work for you				
+		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
+		if (isMailEnabled()) {
+			log.info "Sending text email '" + subject + "' to " + to;
+			try {
+				//SimpleEmail is the class which will do all the hard work for you
 				SimpleEmail email = new SimpleEmail()
 				email.setCharset("UTF-8");
 				email.setHostName(defaultHost)
-				
+
 				// override port
 				email.setSmtpPort(port?:defaultPort)
 
-				to.each { 
-					email.addTo(it) 
+				to.each {
+					email.addTo(it)
 				}
-				
+
 				//addBccAddresses(email)
 				email.setFrom(defaultFrom)
 				email.setSubject("${prefix} " + subject)
@@ -145,32 +145,32 @@ class MailService {
 					email.setAuthentication(username, password)
                 }
 				email.send()
-			} catch (Exception e) { 
+			} catch (Exception e) {
 				log.error("Error sending plaintext email message with subject " + subject + " to " + to, e);
 				throw e;
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	/**
-	 * Send html email 
-	 * 
+	 * Send html email
+	 *
 	 * @param subject
 	 * @param htmlMessage
 	 * @param to
 	 * @return
-	 */	
-	def sendHtmlMail(String subject, String htmlMessage, String [] to) { 
+	 */
+	def sendHtmlMail(String subject, String htmlMessage, String [] to) {
 		log.debug "Sending email to array " + to
 		sendHtmlMail(subject, htmlMessage, to, null)
-		
+
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param subject
 	 * @param htmlMessage
 	 * @param to
@@ -179,8 +179,8 @@ class MailService {
 	def sendHtmlMail(String subject, String htmlMessage, String to) {
 		sendHtmlMail(subject, htmlMessage, [to], null, false)
 	}
-	
-	def sendHtmlMail(String subject, String htmlMessage, String to, Integer port) { 
+
+	def sendHtmlMail(String subject, String htmlMessage, String to, Integer port) {
 		sendHtmlMail(subject, htmlMessage, [to], port, false)
 	}
 
@@ -188,31 +188,31 @@ class MailService {
 		sendHtmlMail(subject, htmlMessage, [to], port, override)
 	}
 
-	
+
 	def sendHtmlMail(String subject, String body, Collection to) {
 		sendHtmlMail(subject, body, to, null, false)
 	}
-	
+
 	/**
 	 * @param subject
 	 * @param body
 	 * @param to
 	 * @return
 	 */
-	def sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) { 	
+	def sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) {
 		log.info "Sending email with subject ${subject} to ${to}"
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
-		if (isMailEnabled() || override) { 		
-			log.info "Sending html email '" + subject + "' to " + to; 
-			try { 			
+		if (isMailEnabled() || override) {
+			log.info "Sending html email '" + subject + "' to " + to;
+			try {
 				// Create the email message
 				HtmlEmail email = new HtmlEmail();
 				email.setCharset("UTF-8");
 				email.setHostName(defaultHost)
-				to.each { 
-					email.addTo(it) 
+				to.each {
+					email.addTo(it)
 				}
-				
+
 				//addBccAddresses(email)
 				email.setFrom(defaultFrom)
 				email.setSmtpPort(port?:defaultPort)
@@ -226,16 +226,16 @@ class MailService {
                 }
 
 				email.send();
-			} catch (Exception e) { 
-				log.error("Error sending HTML email message with subject " + subject + " to " + to, e);	
-				throw e	
+			} catch (Exception e) {
+				log.error("Error sending HTML email message with subject " + subject + " to " + to, e);
+				throw e
 			}
 		}
 	}
 
-	
+
 	/**
-	 * 
+	 *
 	 * @param to
 	 * @param subject
 	 * @param body
@@ -251,7 +251,7 @@ class MailService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param userInstance
 	 * @param subject
 	 * @param body
@@ -260,26 +260,24 @@ class MailService {
 	 * @param mimeType
 	 * @return
 	 */
-	def sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte [] bytes, String name, String mimeType) { 
+	def sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte [] bytes, String name, String mimeType) {
 		sendHtmlMailWithAttachment(userInstance, userInstance?.email, subject, body, bytes, name, mimeType, null)
-	}	
-
-	/**
-	 * 
-	 * @param toList
-	 * @param subject
-	 * @param body
-	 * @param bytes
-	 * @param name
-	 * @param mimeType
-	 * @return
-	 */
-	def sendHtmlMailWithAttachment(Collection toList, String subject, String body, byte [] bytes, String name, String mimeType) {
-		sendHtmlMailWithAttachment(null, toList, [], subject, body, bytes, name, mimeType, null)
 	}
 
 	/**
-	 * 
+	 *
+	 * @param toList
+	 * @param subject
+	 * @param body
+	 * @param attachments
+	 * @return
+	 */
+	def sendHtmlMailWithAttachment(Collection toList, String subject, String body, List<Attachment> attachments) {
+		sendHtmlMailWithAttachment(null, toList, [], subject, body, attachments, null)
+	}
+
+	/**
+	 *
 	 * @param toList
 	 * @param ccList
 	 * @param subject
@@ -308,8 +306,9 @@ class MailService {
         sendHtmlMailWithAttachment(fromUser, toList, ccList, subject, body, bytes, name, mimeType, null)
     }
 
-    /**
-	 * 
+	/**
+	 *
+	 * @param fromUser
 	 * @param toList
 	 * @param ccList
 	 * @param subject
@@ -317,11 +316,29 @@ class MailService {
 	 * @param bytes
 	 * @param name
 	 * @param mimeType
+	 * @params port
 	 * @return
 	 */
 	def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, byte [] bytes, String name, String mimeType, Integer port) {
+		List<Attachment> attachments = []
+		Attachment attachment = new Attachment(name: name, mimeType: mimeType, bytes: bytes)
+		attachments.add(attachment)
+		sendHtmlMailWithAttachment(fromUser, toList, ccList, subject, body, attachments, port)
+	}
+
+    /**
+	 *
+	 * @param toList
+	 * @param ccList
+	 * @param subject
+	 * @param body
+	 * @param attachments
+	 * @param port
+	 * @return
+	 */
+	def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, List<Attachment> attachments, Integer port) {
 		log.info ("Sending email with attachment " + toList)
-		
+
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
 		if (isMailEnabled()) {
 			try {
@@ -329,16 +346,16 @@ class MailService {
 				HtmlEmail email = new HtmlEmail();
 				email.setCharset("UTF-8");
 				email.setHostName(defaultHost);
-				
+
 				// Override smtp port
 				email.setSmtpPort(port?:defaultPort)
 
 				email.setFrom(defaultFrom);
 				toList.each { to -> email.addTo(to) }
-				if (ccList) { 
+				if (ccList) {
 					ccList.each { cc -> email.addCc(cc) }
-				}			
-								
+				}
+
 				//addBccAddresses(email)
 				email.setSubject("${prefix} " + subject);
 				email.setHtmlMsg(body);
@@ -354,7 +371,7 @@ class MailService {
                 }
 
                 //email.setTextMsg(subject);
-			  
+
 				// Create the attachment
 				//EmailAttachment attachment = new EmailAttachment();
 				//attachment.setPath("mypictures/john.jpg");
@@ -362,11 +379,13 @@ class MailService {
 				//attachment.setDescription("Picture of John");
 				//attachment.setName("John");
 				//email.attach(attachment);
-				
+
 				// add the attachment
-				email.attach(new ByteArrayDataSource(bytes, mimeType), 
-					name, name, EmailAttachment.ATTACHMENT);
-				
+				attachments.each {
+					email.attach(new ByteArrayDataSource(it.bytes, it.mimeType),
+							it.name, it.name, EmailAttachment.ATTACHMENT);
+				}
+
 				// send the email
 				email.send();
 			} catch(Exception e) {
@@ -427,13 +446,13 @@ class MailService {
 
 
     /**
-	 * 
+	 *
 	 * @param subject
 	 * @param throwable
 	 * @return
 	 */
 	def sendAlertMail(String subject, Throwable throwable) {
-		
+
 		//def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
 		if (isMailEnabled()) {
 			log.info "Sending HTML email '" + subject;
@@ -457,11 +476,11 @@ class MailService {
 	}
 
 	/*
-	def sendMailWithAttachment(User userInstance) { 
+	def sendMailWithAttachment(User userInstance) {
 		log.info ("Sending email with attachment " + userInstance?.email)
 		if (Boolean.valueOf(grailsApplication.config.grails.mail.enabled)) {
 			try {
-				
+
 				sendMail {
 					multipart true
 					to "${userInstance.email}"
@@ -480,6 +499,6 @@ class MailService {
 		}
 	}
 	*/
-		
-	
+
+
 }

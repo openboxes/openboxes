@@ -66,7 +66,8 @@ class PutAwayCheckPage extends Component {
       location,
     };
 
-    this.confirmPutaway = this.confirmPutaway.bind(this);
+    this.confirmEmptyBin = this.confirmEmptyBin.bind(this);
+    this.confirmLowerQuantity = this.confirmLowerQuantity.bind(this);
     this.save = this.save.bind(this);
   }
 
@@ -201,8 +202,15 @@ class PutAwayCheckPage extends Component {
     const isBinLocationChosen = !_.some(this.props.putAway.putawayItems, putAwayItem =>
       _.isNull(putAwayItem.putawayLocation.id) && _.isEmpty(putAwayItem.splitItems));
 
-    if (!isBinLocationChosen) {
-      this.confirmPutaway();
+    const itemsWithLowerQuantity = _.filter(
+      this.props.putAway.putawayItems,
+      putAwayItem => putAwayItem.quantity < putAwayItem.quantityAvailable,
+    );
+
+    if (!_.isEmpty(itemsWithLowerQuantity)) {
+      this.confirmLowerQuantity(itemsWithLowerQuantity);
+    } else if (!isBinLocationChosen) {
+      this.confirmEmptyBin();
     } else {
       this.save();
     }
@@ -240,13 +248,37 @@ class PutAwayCheckPage extends Component {
    * Shows confirmation dialog on complete if there are items with empty bin location.
    * @public
    */
-  confirmPutaway() {
+  confirmEmptyBin() {
     confirmAlert({
       title: this.props.translate('react.putAway.message.confirmPutAway.label', 'Confirm putaway'),
       message: this.props.translate(
         'react.putAway.confirmPutAway.message',
         'Are you sure you want to putaway? There are some lines with empty bin locations.',
       ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => this.save(),
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
+  /**
+   * Shows confirmation dialog on complete if there are items with quantity in receiving bin
+   * @public
+   */
+  confirmLowerQuantity(items) {
+    confirmAlert({
+      title: this.props.translate('react.putAway.message.confirmPutAway.label', 'Confirm putaway'),
+      message: _.map(items, item =>
+        (
+          <p>Qty {item.quantityAvailable - item.quantity} of item {item.product.name} is
+            still in the receiving bin. Do you want to continue?
+          </p>)),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),

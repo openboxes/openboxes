@@ -19,7 +19,7 @@ import DocumentButton from '../DocumentButton';
 import SelectField from '../form-elements/SelectField';
 import TextField from '../form-elements/TextField';
 import LabelField from '../form-elements/LabelField';
-import { debouncedLocationsFetch } from '../../utils/option-utils';
+import { debounceLocationsFetch } from '../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const SHIPMENT_FIELDS = {
@@ -43,7 +43,7 @@ const SHIPMENT_FIELDS = {
       }
       return <LabelField {...params} />;
     },
-    getDynamicAttr: ({ canBeEdited, hasStockList }) => {
+    getDynamicAttr: ({ canBeEdited, hasStockList, debouncedLocationsFetch }) => {
       if (canBeEdited && !hasStockList) {
         return {
           required: true,
@@ -171,6 +171,9 @@ class SendMovementPage extends Component {
     };
     this.props.showSpinner();
     this.onDrop = this.onDrop.bind(this);
+
+    this.debouncedLocationsFetch =
+      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
   }
 
   componentDidMount() {
@@ -404,12 +407,12 @@ class SendMovementPage extends Component {
 
   /**
    * Saves changes made by user in this step and go back to previous page
-   * @param {object} formValues
+   * @param {object} values
+   * @param {boolean} invalid
    * @public
    */
-  previousPage(values) {
-    const errors = validate(values);
-    if (_.isEmpty(errors)) {
+  previousPage(values, invalid) {
+    if (!invalid) {
       this.saveValues(values)
         .then(() => this.props.previousPage(values));
     } else {
@@ -431,7 +434,7 @@ class SendMovementPage extends Component {
 
   /**
    * Saves changes made by user in this step and redirects to the shipment view page
-   * @param {object} formValues
+   * @param {object} values
    * @public
    */
   saveAndExit(values) {
@@ -466,7 +469,7 @@ class SendMovementPage extends Component {
       <div>
         <hr />
         <Form
-          onSubmit={values => this.submitStockMovement(values)}
+          onSubmit={() => {}}
           validate={validate}
           mutators={{ ...arrayMutators }}
           initialValues={this.state.values}
@@ -479,6 +482,7 @@ class SendMovementPage extends Component {
                       canBeEdited: values.statusCode === 'ISSUED' && values.shipmentStatus !== 'PARTIALLY_RECEIVED' && values.shipmentStatus !== 'RECEIVED',
                       issued: values.statusCode === 'ISSUED',
                       hasStockList: !!_.get(values.stocklist, 'id'),
+                      debouncedLocationsFetch: this.debouncedLocationsFetch,
                     }))}
                 </div>
                 <div className="print-buttons-container col-md-3 flex-grow-1">
@@ -544,15 +548,16 @@ class SendMovementPage extends Component {
               </div>
               <div>
                 <button
-                  type="button"
+                  type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
-                  onClick={() => this.previousPage(values)}
+                  onClick={() => this.previousPage(values, invalid)}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
+                  onClick={() => { this.submitStockMovement(values); }}
                   className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={invalid || values.statusCode === 'ISSUED'}
                 >
@@ -608,14 +613,15 @@ class SendMovementPage extends Component {
                   </tbody>
                 </table>
                 <button
-                  type="button"
+                  type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
                   disabled={values.statusCode === 'ISSUED'}
-                  onClick={() => this.previousPage(values)}
+                  onClick={() => this.previousPage(values, invalid)}
                 > <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
+                  onClick={() => { this.submitStockMovement(values); }}
                   className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={invalid || values.statusCode === 'ISSUED'}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
@@ -633,6 +639,8 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currentLocationId: state.session.currentLocation.id,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -651,4 +659,6 @@ SendMovementPage.propTypes = {
   /** Name of the currently selected location */
   currentLocationId: PropTypes.string.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
 };

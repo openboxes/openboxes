@@ -52,6 +52,10 @@
                             <th><warehouse:message code="category.label"/></th>
                             <th><warehouse:message code="default.quantity.label"/></th>
                             <th><warehouse:message code="unitOfMeasure.label"/></th>
+                            <g:hasRoleFinance>
+                                <th><warehouse:message code="requisitionTemplate.unitCost.label"/></th>
+                                <th><warehouse:message code="requisitionTemplate.totalCost.label"/></th>
+                            </g:hasRoleFinance>
                         </tr>
                         </thead>
                         <tbody>
@@ -76,6 +80,16 @@
                                 <td>
                                     EA/1
                                 </td>
+                                <g:hasRoleFinance>
+                                    <td>
+                                        ${g.formatNumber(number: (requisitionItem?.product?.pricePerUnit?:0), format: '###,###,##0.00##')}
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </td>
+                                    <td>
+                                        ${g.formatNumber(number: (requisitionItem?.totalCost?:0), format: '###,###,##0.00##')}
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </td>
+                                </g:hasRoleFinance>
                             </tr>
                         </g:each>
                         <g:unless test="${requisition?.requisitionItems}">
