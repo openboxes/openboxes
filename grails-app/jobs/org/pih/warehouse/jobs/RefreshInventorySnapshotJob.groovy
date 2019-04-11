@@ -5,11 +5,14 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Product
+import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 import util.LiquibaseUtil
 
+@DisallowConcurrentExecution
 class RefreshInventorySnapshotJob {
 
+    def grailsApplication
     def inventorySnapshotService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
@@ -17,32 +20,21 @@ class RefreshInventorySnapshotJob {
 
     def execute(JobExecutionContext context) {
 
-        def startTime = System.currentTimeMillis()
-        def transactionId = context.mergedJobDataMap.get('transactionId')
-        def transactionEntryId = context.mergedJobDataMap.get('transactionEntryId')
-        if (transactionEntryId) {
-            TransactionEntry transactionEntry = TransactionEntry.get(transactionEntryId)
-            if (transactionEntry) {
-                Product product = transactionEntry.product
-                Location location = Location.findByInventory(transactionEntry.transaction.inventory)
-                Date transactionDate = transactionEntry.transaction.transactionDate
-                log.info "Updating location ${location}, date ${transactionDate}, product ${product}"
-                inventorySnapshotService.populateInventorySnapshots(transactionDate, location, product)
-            }
-        }
-        else if (transactionId) {
-            Transaction transaction = Transaction.get(transactionId)
-            if (transaction) {
-                Location location = Location.findByInventory(transaction.inventory)
-                if (location) {
-                    Date transactionDate = transaction.transactionDate
-                    log.info "Updating location ${location} from date ${transactionDate}"
-                    inventorySnapshotService.populateInventorySnapshots(transactionDate, location)
-                }
-            }
-        }
+        Boolean enabled = grailsApplication.config.openboxes.jobs.refreshInventorySnapshotJob.enabled
 
+        if (enabled) {
+            log.info("Refresh inventory snapshots with data: " + context.mergedJobDataMap)
 
-        log.info "Refreshed inventory snapshot table for transaction transactionEntryId ${transactionEntryId}: ${(System.currentTimeMillis() - startTime)} ms"
+            def startTime = System.currentTimeMillis()
+            def startDate = context.mergedJobDataMap.get('startDate')
+            def locationId = context.mergedJobDataMap.get('location')
+
+            Location location = Location.get(locationId)
+
+            // Refresh inventory snapshot for today
+            inventorySnapshotService.populateInventorySnapshots(new Date(), location)
+
+            log.info "Refreshed inventory snapshot table for location ${location?.name} and start date ${startDate}: ${(System.currentTimeMillis() - startTime)} ms"
+        }
     }
 }

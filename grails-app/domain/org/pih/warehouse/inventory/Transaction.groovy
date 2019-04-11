@@ -53,18 +53,18 @@ class Transaction implements Comparable, Serializable {
         }
     }
 
-	def triggerInventorySnapshotJob = {
-		RefreshInventorySnapshotJob.triggerNow([transactionId: id])
+	def triggerRefreshInventorySnapshotJob = {
+		RefreshInventorySnapshotJob.triggerNow([startDate: transactionDate, location: inventory?.warehouse?.id])
 	}
 
 
 	// ID won't be available until after the record is inserted
-	def afterInsert = triggerInventorySnapshotJob;
+	def afterInsert = triggerRefreshInventorySnapshotJob;
 
-	def afterUpdate = triggerInventorySnapshotJob;
+	def afterUpdate = triggerRefreshInventorySnapshotJob;
 
 	// This probably needs to be "before" since the transaction will not be around after
-	def beforeDelete = triggerInventorySnapshotJob;
+	def afterDelete = triggerRefreshInventorySnapshotJob;
 
 	String id
     TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
