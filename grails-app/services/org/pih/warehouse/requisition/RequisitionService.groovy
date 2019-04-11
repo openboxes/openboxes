@@ -22,6 +22,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.util.DateUtil
 
 class RequisitionService {
@@ -655,6 +656,11 @@ class RequisitionService {
                     if (destination) {
                         eq("destination", destination)
                         'in'("status", [RequisitionStatus.ISSUED])
+                        shipments {
+                            not {
+                                'in'("currentStatus", [ShipmentStatusCode.RECEIVED])
+                            }
+                        }
                     }
                     // Items that are pending from current location
                     if (origin) {
