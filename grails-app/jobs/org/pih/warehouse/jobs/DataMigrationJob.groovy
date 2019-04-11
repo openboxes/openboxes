@@ -7,17 +7,17 @@ class DataMigrationJob {
 
     def migrationService
 
-    //static triggers = {
-	//	cron cronExpression: ConfigHolder.config.openboxes.jobs.dataMigrationJob.cronExpression
-    //}
+    static triggers = { }
 
 	def execute(context) {
-        if (LiquibaseUtil.isRunningMigrations()) {
-            log.info "Postponing job execution until liquibase migrations are complete"
-            return
-        }
 
         if (ConfigHolder.config.openboxes.jobs.dataMigrationJob.enabled?:false) {
+
+            if (LiquibaseUtil.isRunningMigrations()) {
+                log.info "Postponing job execution until liquibase migrations are complete"
+                return
+            }
+
             log.info "Starting data migration job at ${new Date()}"
             def startTime = System.currentTimeMillis()
             migrationService.migrateInventoryTransactions()

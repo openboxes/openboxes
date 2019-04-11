@@ -489,12 +489,8 @@ openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 openboxes.jobs.dataCleaningJob.enabled = true
 openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
 
-
-// Data Migration Job
-// Cron expression means "hypothetically never", but the cronExpression is commented out in the job
-// as this should only be triggered manually
+// Data Migration Job (enabled, but needs to be triggered manually)
 openboxes.jobs.dataMigrationJob.enabled = true
-openboxes.jobs.dataMigrationJob.cronExpression = "0 0 0 1 1 ? 2199"
 
 // LDAP configuration
 openboxes.ldap.enabled = false
