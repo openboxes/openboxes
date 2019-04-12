@@ -26,6 +26,7 @@ class DateDimension {
     static mapping = {
         id generator: 'increment'
         cache true
+        date indexColumn: [name: 'date_dimension_date_idx', unique: true]
     }
 
     static constraints = {

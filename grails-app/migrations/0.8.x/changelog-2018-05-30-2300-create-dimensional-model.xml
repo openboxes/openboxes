@@ -362,24 +362,15 @@
                                  constraintName="FKC73E1616DED5FAE7" deferrable="false" initiallyDeferred="false"
                                  referencedColumnNames="id" referencedTableName="product"/>
     </changeSet>
-
-
-
-    <!--
-    <changeSet author="jmiranda (generated)" id="1546354459620-30">
+    <changeSet author="jmiranda (generated)" id="1546354459620-34">
         <preConditions onFail="MARK_RAN">
             <not>
-                <indexExists indexName="FK1E50D72DCA354381"/>
+                <indexExists indexName="date_dimension_date_idx"/>
             </not>
         </preConditions>
-        <createIndex indexName="idx_value"
-                     tableName="test">
-            <column name="value" type="varchar(255)"/>
-            <column name="othercolumn" type="varchar(255)"/>
+        <createIndex indexName="date_dimension_date_idx" tableName="date_dimension" unique="true">
+            <column name="date"/>
         </createIndex>
     </changeSet>
-    -->
-
-
 
 </databaseChangeLog>
