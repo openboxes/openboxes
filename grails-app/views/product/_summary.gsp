@@ -2,7 +2,7 @@
 <div id="product-summary" productid="${productInstance?.id}" class="summary">
 	<table id="product-summary-table" border="0">
 		<tbody>
-			<tr>						
+			<tr>
 				<td class="middle" style="width: 1%;">
                     <g:if test="${productInstance?.images }">
                         <div class="nailthumb-product">
@@ -19,40 +19,31 @@
 
 
 				<g:if test="${productInstance?.coldChain }">
-					<td style="width: 1%;" class="top">				
-						<img src="${resource(dir: 'images/icons', file: 'coldchain.gif')}" 
+					<td style="width: 1%;" class="top">
+						<img src="${resource(dir: 'images/icons', file: 'coldchain.gif')}"
 							alt="" title="${warehouse.message(code:'product.coldChain.message') }" class="middle"/>
 					</td>
-				</g:if>									
+				</g:if>
 				<td class="top">
-								
+
 					<div id="product-header" style="float: left;">
-						<div>
-							<g:if test="${productInstance?.manufacturer }">
-								<span class="manufacturer">${productInstance?.manufacturer }</span> 
-							</g:if>
-							<g:if test="${productInstance?.manufacturerCode }">
-								<span class="manufacturerCode">Mfr# ${productInstance?.manufacturerCode }</span>
-							</g:if>
-						</div>	
 			            <div id="product-title" class="title">
 			            	<small>${productInstance?.productCode }</small>
 			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
-			                	${productInstance?.name?:productInstance?.manufacturerName?:productInstance?.vendorName }		
-			                </g:link>				
+			                	${productInstance?.name }
+			                </g:link>
 			            </div>
-                        <div class="product-generic fade" style="text-transform:uppercase; line-height: 20px;">
-                            <g:if test="${productInstance?.productGroups }">
-                                ${productInstance?.productGroups?.sort().first()}
-                            </g:if>
-                            <g:else>
-                                ${productInstance?.name }
-                            </g:else>
+                        <div id="product-catalogs">
+                            <g:each var="productCatalog" in="${productInstance?.productCatalogs }">
+								<g:link controller="productCatalog" action="edit" params="['id':productCatalog.id]">
+                                	<span class="tag tag-info" title="${g.message(code: 'productCatalog.label')}">${productCatalog.name }</span>
+								</g:link>
+                            </g:each>
                         </div>
                         <div id="product-tags">
                             <g:each var="tag" in="${productInstance?.tags }">
                                 <g:link controller="inventory" action="browse" params="['tag':tag.tag,'max':params.max]">
-                                    <span class="tag">${tag.tag }</span>
+                                    <span class="tag tag-success" title="${g.message(code: 'tag.label', default: 'Tag')}">${tag.tag }</span>
                                 </g:link>
                             </g:each>
                         </div>
@@ -61,35 +52,9 @@
         		</td>
 				<td class="right" width="1%">
         			<div id="product-status" class="title">
-						<g:if test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED}">
-							<g:if test="${totalQuantity <= 0}">
-								<span class="tag tag-danger"><warehouse:message code="product.noStock.label"/></span>
-							</g:if>
-							<g:elseif test="${totalQuantity <= inventoryLevelInstance?.minQuantity}">
-								<span class="tag tag-warning"><warehouse:message code="product.lowStock.label"/></span>
-							</g:elseif>
-							<g:elseif test="${totalQuantity <= inventoryLevelInstance?.reorderQuantity }">
-								<span class="tag tag-warning"><warehouse:message code="product.reorder.label"/></span>
-							</g:elseif>
-							<g:elseif test="${totalQuantity > inventoryLevelInstance?.maxQuantity}">
-								<span class="tag tag-success"><warehouse:message code="product.overStock.label"/></span>
-							</g:elseif>
-							<g:else>
-								<span class="tag tag-success"><warehouse:message code="product.inStock.label"/></span>
-							</g:else>
-						</g:if>
-						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.NOT_SUPPORTED}">
-							<span class="tag tag-warning">
-								<warehouse:message code="enum.InventoryStatus.NOT_SUPPORTED"/>
-							</span>
-						</g:elseif>
-						<g:elseif test="${inventoryLevelInstance?.status == InventoryStatus.SUPPORTED_NON_INVENTORY}">
-							<span class="tag tag-warning">
-								<warehouse:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/>
-							</span>
-						</g:elseif>
+						<g:productStatus product="${productInstance.id}"/>
         			</div>
-			
+
 				</td>
 			</tr>
 		</tbody>
@@ -103,10 +68,6 @@
             </td>
             <td>
                 <div class="button-container">
-					<g:link controller='inventory' action='browse' class="button">
-						<img src="${resource(dir: 'images/icons/silk', file: 'application_form_magnify.png')}" />&nbsp;
-						${warehouse.message(code: 'inventory.button.browse.label', default: 'Browse inventory')}
-					</g:link>
 					<div class="button-group">
 						<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
@@ -123,6 +84,10 @@
 						<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': productInstance?.id]" class="button">
 							<img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
 							<warehouse:message code="inventory.showLotNumbers.label"/>
+						</g:link>
+						<g:link controller="stocklistManagement" action="index" id="${productInstance?.id}" class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}"/>&nbsp;
+							${warehouse.message(code: 'button.manage.label', default: 'Manage stock lists', args:[warehouse.message(code:'requisitionTemplates.label')])}
 						</g:link>
 					</div>
                 </div>

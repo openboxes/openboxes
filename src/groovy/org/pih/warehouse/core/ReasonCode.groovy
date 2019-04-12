@@ -51,6 +51,8 @@ enum ReasonCode {
     INSUFFICIENT_QUANTITY_RECONDITIONED(19),
     SUBSTITUTION_WITHIN_PRODUCT_GROUP(20),
     SUPPLIED_BY_GOVERNMENT(21),
+    APPROVED_CHANGE(22),
+    EARLIER_EXPIRATION_DATE(23),
     OTHER(100)
 
 
@@ -82,9 +84,19 @@ enum ReasonCode {
                 NOT_ON_STOCK_LIST,
                 INSUFFICIENT_QUANTITY_RECONDITIONED,
                 SUPPLIED_BY_GOVERNMENT,
+                APPROVED_CHANGE,
+                EARLIER_EXPIRATION_DATE,
                 OTHER]
     }
 
+    static listDefault() {
+        return [STOCKOUT, LOW_STOCK, PACKAGE_SIZE, APPROVED_CHANGE, EARLIER_EXPIRATION_DATE, SUPPLIED_BY_GOVERNMENT, COULD_NOT_LOCATE, SUBSTITUTION]
+    }
+
+
+    static listInventoryAdjustmentReasonCodes() {
+        return [EXPIRED, DAMAGED, COULD_NOT_LOCATE, OTHER]
+    }
 
     static listRequisitionQuantityChangeReasonCodes() {
 		[

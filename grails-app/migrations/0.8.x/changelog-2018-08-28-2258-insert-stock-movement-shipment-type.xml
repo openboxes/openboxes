@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda" id="1535515142800-1">
+        <insert tableName="shipment_type">
+            <column name="id" value="5"/>
+            <column name="version" valueNumeric="1"/>
+            <column name="date_created" valueDate="2018-08-28T00:00:00.0"/>
+            <column name="description"/>
+            <column name="last_updated" valueDate="2018-08-28T00:00:00.0"/>
+            <column name="name" value="Stock Movement"/>
+            <column name="sort_order" valueNumeric="5"/>
+        </insert>
+    </changeSet>
+    <changeSet id="1535515142800-2" author="jmiranda">
+        <insert tableName="shipment_workflow">
+            <column name="id" value="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="2018-08-28T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-08-28T00:00:00.0"/>
+            <column name="name" value="Stock movement shipment workflow"/>
+            <column name="shipment_type_id" value="5"/>
+            <column name="excluded_fields"/>
+            <column name="document_template"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1535515142800-3">
+        <sql>
+            UPDATE shipment_type
+            SET name = 'Default'
+            WHERE id = '5' AND name = 'Stock Movement';
+        </sql>
+    </changeSet>
+</databaseChangeLog>

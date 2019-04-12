@@ -23,7 +23,7 @@
         <a href="javascript:window.print()" type="button" id="print-button" onclick="window.print();"  class="button">
             ${warehouse.message(code: "default.button.print.label", default: 'Print')}
         </a>
-        <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" class="button">
+        <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" class="button" params="[sorted: sorted]">
             ${warehouse.message(code: "default.button.download.label", default: 'Download')}
         </g:link>
         <a href="javascript:window.close();" class="button">
@@ -87,18 +87,18 @@
                 </tr>
                 <tr class="header">
                     <td class="name right">
-                        <label><warehouse:message code="requisition.destination.label"/>:</label>
-                    </td>
-                    <td>
-                        ${requisition.destination?.name}
-                    </td>
-                </tr>
-                <tr class="header">
-                    <td class="name right">
                         <label><warehouse:message code="requisition.origin.label"/>:</label>
                     </td>
                     <td>
                         ${requisition.origin?.name}
+                    </td>
+                </tr>
+                <tr class="header">
+                    <td class="name right">
+                        <label><warehouse:message code="requisition.destination.label"/>:</label>
+                    </td>
+                    <td>
+                        ${requisition.destination?.name}
                     </td>
                 </tr>
 
@@ -129,16 +129,16 @@
 
 
 
-<table class="signature-table" border="0">
+<table class="signature-table" style="border: 1px solid lightgrey;">
     <tr class="theader">
-        <td width="15%"></td>
-        <td width="20%"><warehouse:message code="default.name.label"/></td>
-        <td width="40%"><warehouse:message code="default.signature.label"/></td>
-        <td width="15%" class="center"><warehouse:message code="default.date.label"/></td>
-        <td width="10%" class="center"><warehouse:message code="default.time.label"/></td>
+        <th width="15%"></th>
+        <th width="20%"><warehouse:message code="default.name.label"/></th>
+        <th width="40%"><warehouse:message code="default.signature.label"/></th>
+        <th width="15%" class="center"><warehouse:message code="default.date.label"/></th>
+        <th width="10%" class="center"><warehouse:message code="default.time.label"/></th>
     </tr>
     <tr>
-        <td class="right">
+        <td class="middle">
             <label><warehouse:message code="requisition.requestedBy.label"/></label>
         </td>
         <td class="middle">
@@ -155,11 +155,11 @@
         </td>
     </tr>
     <tr>
-        <td class="right middle">
+        <td class="middle">
             <label><warehouse:message code="requisition.createdBy.label"/></label>
         </td>
         <td class="middle">
-            ${requisition?.createdBy?.name?:warehouse.message(code:'default.none.label')}
+            ${requisition?.createdBy?.name}
         </td>
         <td>
 
@@ -172,11 +172,11 @@
         </td>
     </tr>
     <tr>
-        <td class="right">
+        <td class="middle">
             <label><warehouse:message code="requisition.verifiedBy.label"/></label>
         </td>
         <td class="middle">
-            ${requisition?.verifiedBy?.name?:warehouse.message(code:'default.none.label')}
+            ${requisition?.verifiedBy?.name}
         </td>
         <td>
 
@@ -189,11 +189,11 @@
         </td>
     </tr>
     <tr>
-        <td class="right">
+        <td class="middle">
             <label><warehouse:message code="requisition.pickedBy.label"/></label>
         </td>
         <td class="middle">
-            ${picklist?.picker?.name?:warehouse.message(code:'default.none.label')}
+            ${picklist?.picker?.name}
         </td>
         <td>
 
@@ -206,11 +206,11 @@
         </td>
     </tr>
     <tr>
-        <td class="middle right">
+        <td class="middle">
             <label><warehouse:message code="requisition.reviewedBy.label" default="Checked by"/></label>
         </td>
         <td class="middle">
-            ${requisition?.checkedBy?.name?:warehouse.message(code:'default.none.label')}
+            ${requisition?.checkedBy?.name}
         </td>
         <td>
 
@@ -240,14 +240,14 @@
             <img src="${resource(dir: 'images/icons/', file: 'coldchain.gif')}" title="Cold chain"/>&nbsp;
             ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain, location:location, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain, location:location, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
     </g:if>
     <g:if test="${requisitionItemsControlled}">
         <h2>
             <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" title="Controlled substance"/>&nbsp;
             ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled, location:location, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled, location:location, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
     </g:if>
     <g:if test="${requisitionItemsHazmat}">
         <h2>
@@ -255,21 +255,21 @@
             ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
 
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat, location:location, pageBreakAfter: (requisitionItemsOther)?'always':'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat, location:location, pageBreakAfter: (requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
     </g:if>
     <g:if test="${requisitionItemsOther}">
         <h2>
             <img src="${resource(dir: 'images/icons/silk', file: 'pill.png')}" title="Medicines & Consumables"/>&nbsp;
             ${warehouse.message(code:'product.everythingElse.label', default:'Medicines & Consumables')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, location:location, pageBreakAfter:(requisitionItemsCanceled)?'always':'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, location:location, pageBreakAfter:(requisitionItemsCanceled)?'always':'avoid', sorted:sorted]"/>
     </g:if>
     <g:if test="${requisitionItemsCanceled}">
         <h2>
             <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" title="Canceled"/>&nbsp;
             ${warehouse.message(code:'default.canceled.label', default:'Canceled')}
         </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled, location:location, pageBreakAfter: 'avoid']"/>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled, location:location, pageBreakAfter: 'avoid', sorted:sorted]"/>
     </g:if>
 </div>
 

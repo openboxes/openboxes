@@ -79,7 +79,7 @@ class AttributeController {
 		
         if (attributeInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
-            redirect(action: "show", id: attributeInstance.id)
+            redirect(action: "edit", id: attributeInstance.id)
         }
         else {
             render(view: (params.id ? "edit" : "create"), model: [attributeInstance: attributeInstance])
@@ -96,7 +96,7 @@ class AttributeController {
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), params.id])}"
-                redirect(action: "list", id: params.id)
+                redirect(action: "edit", id: params.id)
             }
         }
         else {

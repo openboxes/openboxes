@@ -106,7 +106,7 @@ textarea {
 }
 
 input:focus, select:focus, textarea:focus {
-    /*border: 1px solid #b2d1ff;*/
+    border: 1px solid #b2d1ff;
     /* Causing buttons to change background color ?? when in focus  */
 }
 
@@ -615,7 +615,7 @@ th.desc a {
 
 
 label       { font-weight: normal; white-space: nowrap; }
-fieldset    { padding:0em; margin: 0 0 .2em 0; border: 2px solid lightgrey; }
+fieldset    { padding:0em; margin: 0 0 .2em 0; border-top: 1px solid lightgrey; }
 legend      { font-weight: normal; font-size:1.2em;  margin-left: 10px; margin-right: 10px; }
 /*
 legend span {
@@ -625,6 +625,7 @@ legend span {
 
 /* Form fields
 -------------------------------------------------------------- */
+input{box-sizing:border-box}
 
 input[type=text],
 input[type=password],
@@ -862,9 +863,6 @@ label.error {
     font-weight: bold;
     color: black;
 }
-.ui-datepicker-trigger {
-    position: relative; left: -16px; top: -1px;
-}
 .buttons {
     padding-top: 10px;
     /*border-top: 3px solid lightgrey;*/
@@ -1051,21 +1049,6 @@ button.action-btn, button.previous, button.next {
     padding: 5px;
     text-decoration: none;
 }
-
-.megaButton a,
-.megaButton a:visited {
-    text-decoration: none;
-    padding: 10px;
-    display: block;
-    color: #333;
-}
-
-.megaButton:hover {
-    background-color: lightgrey;
-}
-
-
-.mm-content-base { padding: 0px; margin: 0px; }
 
 /* Flow Header */
 .currentState { font-weight: bold; background-color: #eee; color: blue; }
@@ -1812,7 +1795,27 @@ ul.megamenu {
     margin: 0;
 }
 
+.mm-item-content {
+    min-width: 300px;
+}
 
+.mm-content-section {
+    float: left;
+    min-width: 100px;
+    padding: 10px;
+}
+
+.mm-content-base { padding: 0px; margin: 0px; }
+.mm-menu-item a,
+.mm-menu-item a:visited {
+    text-decoration: none;
+    padding: 7px;
+    display: block;
+    color: #333;
+}
+.mm-menu-item:hover {
+    background-color: lightgrey;
+}
 
 
 
@@ -1944,6 +1947,7 @@ div#dashboard li {
 .inactive { color: red; }
 
 label { display: inline; text-decoration: none;}
+label.none { display: block; text-decoration: none; }
 label.block { display: block;}
 fieldset .prop { margin: 10px; }
 .radio { padding-left: 10px; }
@@ -2050,7 +2054,7 @@ select{ padding: 3px; }
     background-color: #FFCC66;
 }
 .checkbox {
-    border: 1px solid black;
+    margin: 5px;
 }
 .scrollTable {
     border-collapse:collapse;
@@ -2549,7 +2553,7 @@ table.requisition td, table.requisition th { padding: 10px; border-right: 1px so
     -webkit-box-sizing:border-box;
     -moz-box-sizing: border-box;
 }
-fieldset { padding: 5px; }
+fieldset { padding: 0px; margin: 0px; }
 
 
 tr.canceled, tr.canceled a {
@@ -3122,4 +3126,13 @@ input {
     font-family: ‘Trebuchet MS’, Helvetica, sans-serif;
     font-weight:normal;
 
+}
+
+/* Hack to allow Chosen results to display correctly in jQuery dialogs  */
+.ui-dialog .ui-dialog-content { overflow:visible !important; padding: 0; }
+.ui-dialog { overflow: inherit !important; }
+
+
+.blurred {
+    filter: blur(6px);
 }

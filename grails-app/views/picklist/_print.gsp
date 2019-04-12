@@ -111,18 +111,18 @@
             <table class="border">
                 <tr>
                     <td>
-                        <label><warehouse:message code="requisition.depot.label"/>:</label>
+                        <label><warehouse:message code="requisition.origin.label"/>:</label>
                     </td>
                     <td>
-                        ${requisition.destination?.name}
+                        ${requisition.origin?.name}
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <label><warehouse:message code="requisition.ward.label"/>:</label>
+                        <label><warehouse:message code="requisition.destination.label"/>:</label>
                     </td>
                     <td>
-                        ${requisition.origin?.name}
+                        ${requisition.destination?.name}
                     </td>
                 </tr>
 
@@ -260,35 +260,35 @@
                 <%--<img src="${resource(dir: 'images/icons/', file: 'coldchain.gif', absolute: true)}" title="Cold chain"/>--%>
                 ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
             </g:set>
-            <g:render template="page" model="[pageTitle: pageTitle, requisitionItems:requisitionItemsColdChain, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
+            <g:render template="/picklist/page" model="[pageTitle: pageTitle, requisitionItems:requisitionItemsColdChain, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
         </g:if>
         <g:if test="${requisitionItemsControlled}">
             <g:set var="pageTitle">
                 <%--<img src="${resource(dir: 'images/icons/silk', file: 'error.png', absolute: true)}" title="Controlled substance"/>--%>
                 ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
             </g:set>
-            <g:render template="page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsControlled, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
+            <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsControlled, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
         </g:if>
         <g:if test="${requisitionItemsHazmat}">
             <g:set var="pageTitle">
                 <%--<img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png', absolute: true)}" title="Hazardous material"/>--%>
                 ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
             </g:set>
-            <g:render template="page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsHazmat, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsOther)?'always':'avoid']"/>
+            <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsHazmat, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
         </g:if>
         <g:if test="${requisitionItemsOther}">
             <g:set var="pageTitle">
                 <%--<img src="${resource(dir: 'images/icons/silk', file: 'package.png', absolute: true)}" title="Other items"/>--%>
                 ${warehouse.message(code:'default.otherItems.label', default:'Other items')}
             </g:set>
-            <g:render template="page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsOther, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsCanceled)?'always':'avoid']"/>
+            <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsOther, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsCanceled)?'always':'avoid', sorted:sorted]"/>
         </g:if>
         <g:if test="${requisitionItemsCanceled}">
             <g:set var="pageTitle">
             <%--<img src="${resource(dir: 'images/icons/silk', file: 'package.png', absolute: true)}" title="Other items"/>--%>
                 ${warehouse.message(code:'default.canceled.label', default:'Canceled items')}
             </g:set>
-            <g:render template="page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsCanceled, location: location, picklist:picklist, pageBreakAfter: 'avoid']"/>
+            <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsCanceled, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
         </g:if>
     </div>
 </div>

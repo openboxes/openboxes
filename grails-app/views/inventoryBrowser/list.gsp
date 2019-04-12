@@ -12,17 +12,15 @@
     <h2>
         ${session.warehouse.name}
     </h2>
-    <hr/>
+
     <table id="dataTable" class="table table-bordered">
         <thead>
         <tr>
             <th>Product Group ID</th>
             <th>Inventory Level ID</th>
             <th>Status</th>
+            <th>Product Code</th>
             <th>Name</th>
-            <th>Product codes</th>
-            <th>Has Product Group</th>
-            <th>Has Inventory Level</th>
             <th>Minimum</th>
             <th>Reorder</th>
             <th>Maximum</th>
@@ -36,7 +34,7 @@
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="13">
+            <td colspan="11">
                 <span id="processingTime"></span>
                 <span id="totalValue"></span>
             </td>
@@ -53,10 +51,7 @@
 
     $( document ).ready(function() {
 
-        //$("#dataTable").dataTable();
-
         var locationId = $("#currentLocationId").val();
-        console.log(locationId);
         var dataTable = $('#dataTable').dataTable( {
             "bProcessing": true,
             "bServerSide": false,
@@ -108,18 +103,14 @@
                 { "mData": "id", "bSearchable": false, "bVisible": false },
                 { "mData": "inventoryLevelId", "bSearchable": false, "bVisible": false },
                 { "mData": "status" }, // 0
-                { "mData": "name", "sWidth": "50%" }, // 1
                 { "mData": "productCodes" }, // 2
-                { "mData": "hasProductGroup" },  // 8
-                { "mData": "hasInventoryLevel" }, // 9
-                { "mData": "minQuantity" }, // 3
-                { "mData": "reorderQuantity" }, // 4
-                { "mData": "maxQuantity" }, // 5
-                { "mData": "onHandQuantity" }, //6
+                { "mData": "name", "sWidth": "50%" }, // 1
+                { "mData": "minQuantity", "sClass": "right" }, // 3
+                { "mData": "reorderQuantity", "sClass": "right" }, // 4
+                { "mData": "maxQuantity", "sClass": "right" }, // 5
+                { "mData": "onHandQuantity", "sClass": "right" }, //6
                 { "mData": "unitPriceFormatted", "sClass": "right" },
                 { "mData": "totalValueFormatted", "sClass": "right" } // 7
-                //{ "mData": "numProducts" }, // 2
-                //{ "mData": "inventoryStatus" }, // 3
 
             ],
             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
@@ -151,12 +142,12 @@
                         break;
                 }
                 if (aData["id"]) {
-                    $('td:eq(1)', nRow).html('<a href="/openboxes/productGroup/edit/' + aData['id'] + '" target="_blank">' + aData['name'] + '</a>');
+                    %{--$('td:eq(1)', nRow).html('<a href="/openboxes/productGroup/edit/' + aData['id'] + '" target="_blank">' + aData['name'] + '</a>');--}%
                 }
                 if (aData["inventoryLevelId"]) {
-                    $('td:eq(5)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['minQuantity'] + '</a>');
-                    $('td:eq(6)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['reorderQuantity'] + '</a>');
-                    $('td:eq(7)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['maxQuantity'] + '</a>');
+                    %{--$('td:eq(5)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['minQuantity'] + '</a>');--}%
+                    %{--$('td:eq(6)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['reorderQuantity'] + '</a>');--}%
+                    %{--$('td:eq(7)', nRow).html('<a href="/openboxes/inventoryLevel/edit/' + aData['inventoryLevelId'] + '" target="_blank">' + aData['maxQuantity'] + '</a>');--}%
                 }
                 return nRow;
             }
@@ -186,8 +177,6 @@
             event.preventDefault();
             dataTable.fnClearTable();
             dataTable.fnReloadAjax('${request.contextPath}/json/getQuantityOnHandByProductGroup');
-            //console.log(dataTable);
-            //dataTable.fnDraw();
         } );
 
         $('#cancel-btn').click( function (event) {
@@ -211,9 +200,6 @@
                     $("#badge-status-" + key).html(value.numProductGroups);
                     $("#badge-percentage-" + key).html(Math.round(value.percentage * 100) + "%");
                 });
-                //$("#reportContent").html(data);
-                // {"lowStock":103,"reorderStock":167,"overStock":38,"totalStock":1619,"reconditionedStock":54,"stockOut":271,"inStock":1348}
-                //$('#lowStockCount').html(data.lowStock?data.lowStock:0);
                 $("#status-spinner").hide();
             },
             error: function(xhr, status, error) {

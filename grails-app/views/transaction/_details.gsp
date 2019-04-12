@@ -81,6 +81,24 @@
                 </td>
 			</tr>
 		</g:if>
+        <g:if test="${transactionInstance?.order }">
+            <tr class="prop">
+                <td>
+                    <label><warehouse:message
+                            code="order.label" /></label>
+                </td>
+                <td>
+
+                    <div>
+                        <g:link controller="order"
+                                action="show"
+                                id="${transactionInstance?.order?.id }">
+                            ${transactionInstance?.order?.name}
+                        </g:link>
+                    </div>
+                </td>
+            </tr>
+        </g:if>
 		<tr class="prop">
 			<td class=""><label><warehouse:message
 						code="transaction.date.label" /></label>

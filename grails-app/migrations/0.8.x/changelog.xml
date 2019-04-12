@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <include file="0.8.x/changelog-2015-10-04-1209-add-unique-index-to-snapshot-tables.xml"/>
+    <include file="0.8.x/changelog-2016-05-04-2245-create-product-type-table.xml"/>
+    <include file="0.8.x/changelog-2016-05-04-2245-create-product-component-table.xml"/>
+    <include file="0.8.x/changelog-2017-12-10-1250-create-clickstream-tables.xml"/>
+    <include file="0.8.x/changelog-2017-12-10-1250-refactor-generic-product.xml"/>
+    <include file="0.8.x/changelog-2018-03-04-0109-create-product-association.xml"/>
+    <include file="0.8.x/changelog-2018-03-21-2114-add-column-attribute-exportable.xml"/>
+    <include file="0.8.x/changelog-2018-03-22-2137-add-column-unit-cost.xml"/>
+    <include file="0.8.x/changelog-2018-03-22-2341-create-product-catalog.xml"/>
+    <include file="0.8.x/changelog-2018-07-05-1522-add-column-bin-location.xml"/>
+    <include file="0.8.x/changelog-2018-07-07-2338-add-column-shipment-requisition.xml"/>
+    <include file="0.8.x/changelog-2018-07-09-2222-insert-internal-receiving-location-type.xml"/>
+    <include file="0.8.x/changelog-2018-07-15-2301-insert-internal-cross-docking-location-type.xml"/>
+    <include file="0.8.x/changelog-2018-08-28-2258-insert-stock-movement-shipment-type.xml"/>
+    <include file="0.8.x/changelog-2018-08-31-2457-alter-table-shipment-add-column-description.xml"/>
+    <include file="0.8.x/changelog-2018-09-06-2049-alter-table-requisition-add-column-recipient-id.xml"/>
+    <include file="0.8.x/changelog-2018-09-10-2043-alter-table-receipt-item-add-column-quantity-canceled.xml"/>
+    <include file="0.8.x/changelog-2018-09-10-2157-insert-reference-number-type-tracking-number.xml"/>
+    <include file="0.8.x/changelog-2018-09-10-2212-alter-table-add-column-driver-name.xml"/>
+    <include file="0.8.x/changelog-2018-09-10-2302-insert-event-type-partially-received.xml"/>
+    <include file="0.8.x/changelog-2018-09-17-2302-alter-table-requisition-item-add-columns.xml"/>
+    <include file="0.8.x/changelog-2018-09-19-0002-add-transfer-order-columns.xml"/>
+    <include file="0.8.x/changelog-2018-09-21-2000-reverse-requisition-origin-and-destination.xml"/>
+    <include file="0.8.x/changelog-2018-09-27-2257-update-existing-purchase-orders.xml"/>
+    <include file="0.8.x/changelog-2018-10-03-1513-shipment-has-many-receipts.xml"/>
+    <include file="0.8.x/changelog-2018-10-04-1438-alter-table-receipt-add-column-status-and-identifier.xml"/>
+    <include file="0.8.x/changelog-2018-10-17-1003-add-foreign-key-constraint-requisition-item-recipient.xml"/>
+    <include file="0.8.x/changelog-2018-10-17-1001-alter-table-receipt-add-column-is-split-item.xml"/>
+    <include file="0.8.x/changelog-2018-10-25-1318-configure-shipping-templates.xml"/>
+    <include file="0.8.x/changelog-2018-11-06-1434-modify-column-receipt-item-quantity-received.xml"/>
+    <include file="0.8.x/changelog-2018-11-07-1501-alter-table-picklist-item-add-column-sort-order.xml"/>
+    <include file="0.8.x/changelog-2018-11-21-1552-alter-table-requisition-add-column-requisition-template.xml"/>
+    <include file="0.8.x/changelog-2018-12-10-1339-alter-table-requisition-add-column-replenishment-period.xml"/>
+    <include file="0.8.x/changelog-2018-12-12-2314-update-order-set-name-equal-description.xml"/>
+    <include file="0.8.x/changelog-2019-01-04-2346-insert-finance-role.xml"/>
+    <include file="0.8.x/changelog-2019-01-26-0842-create-view-demand.xml"/>
+    <include file="0.8.x/changelog-2019-01-29-2345-update-quantity-approved.xml"/>
+    <include file="0.8.x/changelog-2019-02-04-1323-modify-product-supplier-unit-price.xml"/>
+    <include file="0.8.x/changelog-2019-02-04-1623-alter-table-requisition-add-column-sort-by-code.xml"/>
+    <include file="0.8.x/changelog-2019-02-26-0001-add-sort-order-column.xml"/>
+
+</databaseChangeLog>

@@ -437,7 +437,7 @@
 
                     </td>
                     <td>
-                        <g:selectUnitOfMeasure product="${selectedRequisitionItem?.product}"/>
+                        <g:selectProductPackage product="${selectedRequisitionItem?.product}"/>
                     </td>
                     <td>
                         <g:select name="cancelReasonCode"

@@ -216,7 +216,7 @@ class DocumentController {
                 }
                 else if (orderInstance) {
                     orderInstance.addToDocuments(documentInstance).save(flush:true)
-                    flash.message = "${warehouse.message(code: 'document.successfullySavedToOrder.message', args: [orderInstance?.description])}"
+                    flash.message = "${warehouse.message(code: 'document.successfullySavedToOrder.message', args: [orderInstance?.name])}"
                 }
                 else if (requestInstance) {
                     requestInstance.addToDocuments(documentInstance).save(flush:true)
@@ -345,16 +345,16 @@ class DocumentController {
             // FIXME create a new method in the shipment controller to handle shipment-specific downloads
             if (documentInstance?.documentType?.documentCode == DocumentCode.SHIPPING_TEMPLATE) {
                 Shipment shipmentInstance = Shipment.get(params.shipmentId)
-                // Move this into the service layer and try to pass back a BAOS
+                // FIXME Move this into the service layer and try to pass back a BAOS
                 File tempFile = fileService.renderShippingTemplate(documentInstance, shipmentInstance)
                 def filename = "${documentInstance.name}-${shipmentInstance?.name?.trim()}.docx"
-                response.setHeader("Content-disposition", "attachment; filename='${filename}'");
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"");
                 response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                 response.outputStream << tempFile.readBytes()
                 response.outputStream.flush()
             }
             else {
-                response.setHeader "Content-disposition", "attachment;filename=${documentInstance.filename}"
+                response.setHeader "Content-disposition", "attachment;filename=\"${documentInstance.filename}\""
                 response.contentType = documentInstance.contentType
                 response.outputStream << documentInstance.fileContents
                 response.outputStream.flush()

@@ -6,6 +6,9 @@ before_install:
 - echo sdkman_auto_answer=true > ~/.sdkman/etc/config
 - source "/home/travis/.sdkman/bin/sdkman-init.sh"
 - sdk install grails 1.3.9
+before_script:
+- npm install
+- npm run bundle
 script: 'grails test-app unit: --non-interactive'
 cache:
   directories:

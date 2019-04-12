@@ -13,15 +13,17 @@
 <script>
     $(document).ready(function() {
         $("#${attrs.id}").autocomplete( {
-            //minLength: 0,
+            delay: ${grailsApplication.config.openboxes.typeahead.delay},
+            minLength: ${grailsApplication.config.openboxes.typeahead.minLength},
             source: function(req, resp) {
-                $.getJSON('${attrs.jsonUrl}', req, function(data) {
-                    var suggestions = [];
-                    $.each(data, function(i, item) {
-                        suggestions.push(item);
-                    });
-                    resp(suggestions);
-                });
+
+				$.getJSON('${attrs.jsonUrl}', req, function(data) {
+					var suggestions = [];
+					$.each(data, function(i, item) {
+						suggestions.push(item);
+					});
+					resp(suggestions);
+				})
             },
             select: function(event, ui) {
                 window.location = ui.item.url;

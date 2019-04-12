@@ -16,7 +16,8 @@ enum LocationTypeCode {
 
     // Storage
     DEPOT(10),          // storage location
-    BIN_LOCATION(20),   // sub-location under depot
+    BIN_LOCATION(20),   // @deprecated sub-location under depot
+    INTERNAL(21),       // sub-location under depot
 
     // Consider deprecating these in favor of the more general Consumer location type code
     DISPENSARY(30),     // internal endpoint location where stock is dispensed (limited storage) eg. pharmacy
@@ -41,7 +42,7 @@ enum LocationTypeCode {
     }
 
     static list() {
-        [DEPOT, CONSUMER, DISPENSARY, WARD, BIN_LOCATION, SUPPLIER, DONOR, VIRTUAL, DISPOSAL, DISTRIBUTOR]
+        [DEPOT, CONSUMER, DISPENSARY, WARD, BIN_LOCATION, INTERNAL, SUPPLIER, DONOR, VIRTUAL, DISPOSAL, DISTRIBUTOR]
     }
 
 }

@@ -10,17 +10,13 @@
 package org.pih.warehouse.requisition
 
 import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.Comment;
-import org.pih.warehouse.core.Document;
-import org.pih.warehouse.core.Event;
-
-
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.Person;
 import org.pih.warehouse.core.User;
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.picklist.Picklist;
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.shipping.Shipment;
 
 class Requisition implements Comparable<Requisition>, Serializable {
 
@@ -60,11 +56,13 @@ class Requisition implements Comparable<Requisition>, Serializable {
     RequisitionType type;
     RequisitionStatus status;
     CommodityClass commodityClass
+    Requisition requisitionTemplate
+    RequisitionItemSortByCode sortByCode
 
-    // where the requisition came from
+    // where stock is originating from
     Location origin
 
-    // who the requisition will be fulfilled by
+    // where stock is being issued to
     Location destination
 
     // Person who submitted the initial requisition paper form
@@ -117,10 +115,13 @@ class Requisition implements Comparable<Requisition>, Serializable {
     String monthRequested
     //String yearRequested
 
+    Integer replenishmentPeriod = 0
+
     // Removed comments, documents, events for the time being.
     //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
+    static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
     static hasOne = [picklist: Picklist]
-    static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction]
+    static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
     static mapping = {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
@@ -137,7 +138,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     static constraints = {
         status(nullable: true)
         type(nullable: true)
-        name(nullable: true)
+        name(nullable: false, blank: false)
         description(nullable: true)
         requestNumber(nullable: true, maxSize: 255)
         origin(nullable: false)
@@ -181,18 +182,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
         isTemplate(nullable: true)
         isPublished(nullable: true)
         datePublished(nullable: true)
+        requisitionTemplate(nullable:true)
+        replenishmentPeriod(nullable:true)
+        sortByCode(nullable:true)
     }
-
-    /*
-    def getPicklist() {
-        return Picklist.findByRequisition(this)
-    }
-    */
-
-
-    //def getTransactions() {
-    //    return Transaction.findAllByRequisition(this)
-    //}
 
     def getRequisitionItemCount() {
         return getOriginalRequisitionItems()?.size()
@@ -266,10 +259,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
      */
     int compareTo(Requisition requisition) {
         return origin <=> requisition.origin ?:
-            type <=> requisition.type ?:
-                commodityClass <=> requisition.commodityClass ?:
-                    requisition.dateRequested <=> dateRequested ?:
-                        requisition.dateCreated <=> dateCreated
+                destination <=> requisition.destination ?:
+                        type <=> requisition.type ?:
+                                commodityClass <=> requisition.commodityClass ?:
+                                        requisition.dateRequested <=> dateRequested ?:
+                                                requisition.dateCreated <=> dateCreated
     }
 
     String toString() {
@@ -296,8 +290,75 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     Boolean isRelatedToMe(Integer userId) {
-        return (createdBy?.id == userId || updatedBy?.id == userId || requestedBy?.id == userId)
+        return (createdBy?.id == userId || updatedBy?.id == userId)
     }
+
+    /**
+     * Returns stocklist items in sorted order. Should only be used in stocklist-related operations.
+     * @return
+     */
+    def getSortedStocklistItems() {
+
+        if (!isTemplate) {
+            throw new IllegalStateException("Must only be used with a stocklist")
+        }
+
+        return requisitionItems.sort { a,b ->
+            a.product?.category?.name <=> b.product?.category?.name ?:
+                    a.product?.name <=> b.product?.name ?:
+                            a.orderIndex <=> b.orderIndex
+        }
+    }
+
+    def getRequisitionItemsByDateCreated() {
+        return requisitionItems.sort { a,b ->
+            a.dateCreated <=> b.dateCreated
+        }
+    }
+
+    def getRequisitionItemsByOrderIndex() {
+        return requisitionItems.sort { a,b ->
+            a.orderIndex <=> b.orderIndex
+        }
+    }
+
+    def getRequisitionItemsByCategory() {
+        return requisitionItems.sort { a,b ->
+            a.product?.category?.name <=> b.product?.category?.name ?:
+                    a.product?.name <=> b.product?.name ?:
+                            a.orderIndex <=> b.orderIndex
+        }
+    }
+
+    /**
+     * Return the shipment associated with the requisition.
+     *
+     * @throws IllegalStateException if there are multiple shipments associated with a requisition (might be supported some day)
+     *
+     * @return
+     */
+    Shipment getShipment() {
+        Shipment shipment
+
+        if (shipments) {
+            if (shipments.size() > 1) {
+                throw new IllegalStateException("There are too many shipments associated with requisition ${requestNumber}")
+            }
+            shipment = shipments.iterator().next()
+        }
+        return shipment
+    }
+
+    /**
+     * Return total value of the issued shipment
+     *
+     * @return
+     */
+    BigDecimal getTotalCost() {
+        def itemsWithPrice = requisitionItems?.findAll { it.product.pricePerUnit }
+        return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum()?:0
+    }
+
 
     Map toJson() {
         [
@@ -308,7 +369,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 requestedByName: requestedBy?.name,
                 description: description,
                 dateRequested: dateRequested.format("MM/dd/yyyy"),
-                requestedDeliveryDate: requestedDeliveryDate.format("MM/dd/yyyy"),
+                requestedDeliveryDate: requestedDeliveryDate.format("MM/dd/yyyy HH:mm XXX"),
                 lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
                 status: status?.name(),
                 type: type?.name(),
@@ -317,6 +378,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 destinationId: destination?.id,
                 destinationName: destination?.name,
                 recipientProgram: recipientProgram,
+                requisitionTemplate: requisitionTemplate?.toJson(),
                 requisitionItems: requisitionItems?.sort()?.collect { it?.toJson() }
         ]
     }

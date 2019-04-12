@@ -33,7 +33,7 @@
                     <div>
                         Are you sure you want to place this purchase order with the supplier?
                         <g:link controller="order" action="print" id="${order?.id}" class="button icon log" target="_blank">
-                            ${warehouse.message(code: 'order.print.label', default:"Print purchase order")}
+                            ${warehouse.message(code: 'order.print.label', default:"Print order")}
                         </g:link>
                     </div>
 

@@ -18,7 +18,47 @@
             </div>
 
             <div class="buttons" style="text-align: left">
-                <g:render template="./actionsExpiringStock" />
+
+                <g:link controller="dashboard" action="index" class="button">
+                    <img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" alt="${warehouse.message(code: 'dashboard.label') }" />
+                    &nbsp;<warehouse:message code="dashboard.label"/>
+                </g:link>
+
+                <g:link controller="inventory" action="browse" class="button">
+                    <img src="${createLinkTo(dir:'images/icons/silk',file:'application_form_magnify.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" />
+                    &nbsp;<warehouse:message code="inventory.browse.label"/>
+                </g:link>
+
+                <div class="right">
+
+                    <div class="button-container">
+
+                        <div class="button-group">
+
+                            <a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createExpired")}">
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'hourglass.png')}"/>
+                                &nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
+                            </a>
+
+                            <a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createConsumed")}">
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'package_white.png')}"/>
+                                &nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
+                            </a>
+
+                            <a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createOutboundTransfer")}">
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}"/>
+                                &nbsp;<warehouse:message code="inventory.outgoingTransfer.label"/>
+                            </a>
+
+                        </div>
+
+                        <g:link params="[format:'csv',threshold:params.threshold,category:params.category]" controller="${controllerName}" action="${actionName}"
+                                class="button">
+                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+                            &nbsp;<g:message code="default.button.download.label"/></g:link>
+
+                    </div>
+                </div>
             </div>
 
 
@@ -183,7 +223,22 @@
                     var checked = ($(this).attr("checked") == 'checked');
                     $(".checkbox").attr("checked", checked);
 				});	
-			});	
+
+                $(".button-action").click(function(event) {
+                    var numChecked = $("input.checkbox:checked").length;
+                    if (numChecked <= 0) {
+                        event.stopImmediatePropagation();
+                        alert("${warehouse.message(code: 'inventory.selectAtLeastOneProduct.label')}");
+                    }
+                    else {
+                        var form = $("#inventoryActionForm");
+                        form.attr("action", $(this).data("action"));
+                        form.submit();
+                    }
+                });
+            });
+
+
 		</script>	
 		
 	</body>

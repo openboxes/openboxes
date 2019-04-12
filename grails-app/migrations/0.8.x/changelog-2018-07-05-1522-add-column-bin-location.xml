@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1530822151865-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="picklist_item" columnName="bin_location_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="picklist_item">
+            <column name="bin_location_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1530822151865-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKE7584B1369DB749D"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="bin_location_id" baseTableName="picklist_item"
+                                 constraintName="FKE7584B1369DB749D" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+
+</databaseChangeLog>

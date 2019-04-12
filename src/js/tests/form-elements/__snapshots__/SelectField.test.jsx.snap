@@ -1,0 +1,137 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SelectField component is correctly rendering renders correctly 1`] = `
+<div
+  className="mt-2 form-group mb-0   "
+>
+  <div
+    className="row"
+  >
+    <label
+      className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right"
+      htmlFor="test-field"
+    >
+      test label
+    </label>
+    <div
+      className="col-md-4 col-7"
+    >
+      <div
+        id="select-id_1-container"
+      >
+        <div
+          className=""
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+          tabIndex={undefined}
+          title=" "
+        >
+          <div
+            className="Select select-xs undefined is-clearable is-searchable Select--single"
+            style={undefined}
+          >
+            <div
+              className="Select-control"
+              onKeyDown={[Function]}
+              onMouseDown={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              style={undefined}
+            >
+              <span
+                className="Select-multi-value-wrapper"
+                id="react-select-2--value"
+              >
+                <div
+                  className="Select-placeholder"
+                >
+                  Select...
+                </div>
+                <div
+                  className="Select-input"
+                  style={
+                    Object {
+                      "display": "inline-block",
+                    }
+                  }
+                >
+                  <input
+                    aria-activedescendant="react-select-2--value"
+                    aria-describedby={undefined}
+                    aria-expanded="false"
+                    aria-haspopup="false"
+                    aria-label={undefined}
+                    aria-labelledby={undefined}
+                    aria-owns=""
+                    className={undefined}
+                    id="test-field"
+                    onBlur={[Function]}
+                    onChange={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    required={false}
+                    role="combobox"
+                    style={
+                      Object {
+                        "boxSizing": "content-box",
+                        "width": "5px",
+                      }
+                    }
+                    tabIndex={undefined}
+                    value=""
+                  />
+                  <div
+                    style={
+                      Object {
+                        "height": 0,
+                        "left": 0,
+                        "overflow": "scroll",
+                        "position": "absolute",
+                        "top": 0,
+                        "visibility": "hidden",
+                        "whiteSpace": "pre",
+                      }
+                    }
+                  >
+                    
+                  </div>
+                </div>
+              </span>
+              <span
+                className="Select-arrow-zone"
+                onMouseDown={[Function]}
+              >
+                <span
+                  className="Select-arrow"
+                  onMouseDown={[Function]}
+                />
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;

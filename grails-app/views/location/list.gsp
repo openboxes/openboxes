@@ -15,10 +15,14 @@
            	
            	<div>
 				<div class="buttonBar">            	
-                    <g:link class="button icon search" action="list">
-                        <warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/></g:link>
+                    <g:link class="button" action="list">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
+                        <warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/>
+                    </g:link>
                     <g:isUserAdmin>
-                        <g:link class="button icon add" action="edit"><warehouse:message code="default.create.label"
+                        <g:link class="button" action="edit">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                            <warehouse:message code="default.create.label"
                              args="[warehouse.message(code: 'location.label').toLowerCase()]"/></g:link>
                     </g:isUserAdmin>
                 </div>

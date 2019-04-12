@@ -53,7 +53,7 @@ package org.pih.warehouse.inventory
  * 1/20 PRODUCT_INVENTORY implicitly sets the quantity of *all* inventory items for referenced products to 0.
  * 
  */
-public enum TransactionCode {
+enum TransactionCode {
 
 	DEBIT,
 	CREDIT,

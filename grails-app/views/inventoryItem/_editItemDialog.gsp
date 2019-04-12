@@ -14,12 +14,14 @@
 						<format:product product="${inventoryItem?.product}"/>
 					</td>
 				</tr>
-				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="location.binLocation.label" /></label></td>
-					<td valign="top" class="value">
-						${binLocation?.name}
-					</td>
-				</tr>
+				<g:if test="${binLocation}">
+					<tr class="prop">
+						<td valign="top" class="name"><label><warehouse:message code="location.binLocation.label" /></label></td>
+						<td valign="top" class="value">
+							${binLocation?.name}
+						</td>
+					</tr>
+				</g:if>
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>
 					<td valign="top" class="value">

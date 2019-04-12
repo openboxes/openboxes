@@ -72,9 +72,14 @@
                         &nbsp;${warehouse.message(code: 'requisition.issue.label', default: 'Issue requisition')}
                     </g:link>
                 </div>
+                <hr/>
                 <div class="action-menu-item">
-                    <hr/>
+                    <g:link controller="stockMovement" action="index" id="${requisition?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
+                        &nbsp;${warehouse.message(code: 'stockMovement.edit.label', default: 'Edit Stock Movement')}
+                    </g:link>
                 </div>
+                <hr/>
                 <div class="action-menu-item">
                     <g:link controller="picklist" action="renderPdf" id="${requisition?.id}" target="_blank">
                         <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />
@@ -106,7 +111,7 @@
         </g:link>
     </div>
     --%>
-				<g:if test="${session?.warehouse?.id == requisition?.destination?.id }">
+				<g:if test="${session?.warehouse?.id == requisition?.origin?.id }">
 					<g:isUserManager>
                         <%--
 						<div class="action-menu-item">

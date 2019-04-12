@@ -72,7 +72,7 @@
                                     <th><warehouse:message code="requisition.dateRequested.label"/></th>
                                     <th><warehouse:message code="requisition.requestNumber.label"/></th>
                                     <th><warehouse:message code="requisition.status.label"/></th>
-                                    <th><warehouse:message code="requisition.origin.label"/></th>
+                                    <th><warehouse:message code="requisition.destination.label"/></th>
                                     <th><warehouse:message code="requisitionItem.status.label"/></th>
                                     <th><warehouse:message code="requisitionItem.cancelReasonCode.label"/></th>
                                     <th class="center middle"><warehouse:message code="requisitionItem.quantityRequested.label"/></th>
@@ -117,7 +117,7 @@
                                             ${requisitionItem.requisition.status}
                                         </td>
                                         <td>
-                                            ${requisitionItem.requisition.origin}
+                                            ${requisitionItem.requisition.destination}
                                         </td>
                                         <td>
                                             ${requisitionItem.status}

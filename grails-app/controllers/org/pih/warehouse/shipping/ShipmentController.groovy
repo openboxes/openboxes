@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.shipping
 
 import grails.validation.ValidationException
@@ -21,7 +21,7 @@ import org.pih.warehouse.receiving.ReceiptItem;
 import au.com.bytecode.opencsv.CSVWriter
 
 class ShipmentController {
-	
+
 	def scaffold = Shipment
 	def shipmentService
     def userService
@@ -30,11 +30,11 @@ class ShipmentController {
 	MailService mailService
 
     def barcode4jService
-	
+
 	def dataSource
 	def sessionFactory
 
-	
+
 	def redirect = {
 		redirect(controller: "shipment", action: "showDetails", id: params.id)
 	}
@@ -42,7 +42,7 @@ class ShipmentController {
     def show = {
         redirect(action: "showDetails", params : [ 'id':params.id ])
     }
-	
+
 	def list = {
         def startTime = System.currentTimeMillis()
         println "Get shipments: " + params
@@ -75,10 +75,10 @@ class ShipmentController {
 
         println "List shipments: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		[ 
-			shipments:shipments, 
-			shipmentType:shipmentType?.id, 
-			origin:origin?.id, 
+		[
+			shipments:shipments,
+			shipmentType:shipmentType?.id,
+			origin:origin?.id,
 			destination:destination?.id,
 			status:statusCode?.name,
             lastUpdatedFrom:lastUpdatedFrom,
@@ -86,28 +86,28 @@ class ShipmentController {
 			incoming: incoming
 		]
 	}
-	
+
 
 	def create = {
 		def shipmentInstance = new Shipment()
 		shipmentInstance.properties = params
-		
-		if (params.type == "incoming") { 
+
+		if (params.type == "incoming") {
 			shipmentInstance.destination = session.warehouse;
 		}
-		else if (params.type == "outgoing") { 
+		else if (params.type == "outgoing") {
 			shipmentInstance.origin = session.warehouse;
-		}		
+		}
 		//return [shipmentInstance: shipmentInstance]
 		render(view: "create", model: [ shipmentInstance : shipmentInstance,
 		warehouses : Location.list(), eventTypes : EventType.list()]);
 	}
-	
+
 	def save = {
 		def shipmentInstance = new Shipment(params)
-		
+
 		if (shipmentInstance.save(flush: true)) {
-			
+
 			// Try to add the initial event
 			def eventType = EventType.get(params.eventType.id);
 			if (eventType) {
@@ -123,24 +123,24 @@ class ShipmentController {
 			warehouses : Location.list(), eventTypes : EventType.list()]);
 		}
 	}
-	
-	def update = {	
+
+	def update = {
 		log.info params
-		
+
 		def shipmentInstance = Shipment.get(params.id)
 		if (shipmentInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
-				if (shipmentInstance.version > version) {					
+				if (shipmentInstance.version > version) {
 					shipmentInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'shipment.label', default: 'Shipment')] as Object[], "Another user has updated this Shipment while you were editing")
 					render(view: "editDetails", model: [shipmentInstance: shipmentInstance])
 					return
 				}
-			}			
-			
-			// Bind request parameters 
+			}
+
+			// Bind request parameters
 			shipmentInstance.properties = params
-			
+
 			// -- Processing shipment method  -------------------------
 			log.info "autocomplete shipment method: " + params
 			// Create a new shipment method if one does not exist
@@ -148,16 +148,16 @@ class ShipmentController {
 			if (!shipmentMethod) {
 				shipmentMethod = new ShipmentMethod();
 			}
-			
+
 			// If there's an ID but no name, it means we want to remove the shipper and shipper service
-			if (!params.shipperService.name) { 			
+			if (!params.shipperService.name) {
 				shipmentMethod.shipper = null
 				shipmentMethod.shipperService = null
 			}
 			// Otherwise we set the selected accordingly
-			else if (params.shipperService.id && params.shipperService.name) { 
+			else if (params.shipperService.id && params.shipperService.name) {
 				def shipperService = ShipperService.get(params.shipperService.id);
-				if (shipperService) { 
+				if (shipperService) {
 					shipmentMethod.shipperService = shipperService;
 					shipmentMethod.shipper = shipperService.shipper;
 				}
@@ -166,7 +166,7 @@ class ShipmentController {
 			// that occurs when setting the destination above and saving the shipment method within the shipment
 			shipmentInstance.shipmentMethod = shipmentMethod;
 			shipmentInstance.shipmentMethod.save(flush:true);
-			
+
 			// -- Processing destination  -------------------------
 			// Reset the destination to null
 			if (!params.safeDestination.name) {
@@ -178,32 +178,32 @@ class ShipmentController {
 				if (destination && params.safeDestination.name == destination.name) // if it exists
 				shipmentInstance.destination = destination;
 			}
-			
+
 			// -- Processing carrier  -------------------------
-			// This is necessary because Grails seems to be binding things incorrectly.  If we just let 
+			// This is necessary because Grails seems to be binding things incorrectly.  If we just let
 			// Grails do the binding by itself, it tries to change the ID of the 'carrier' that is already
-			// associated with the shipment, rather than changing the 'carrier' object associated with 
+			// associated with the shipment, rather than changing the 'carrier' object associated with
 			// the shipment.
-			
+
 			// Reset the carrier
 			if (!params.safeCarrier.name) {
 				shipmentInstance.carrier = null;
 			}
 			// else if the person is found and different from the current one, then we use that person
 			else if (params.safeCarrier.id && params.safeCarrier.name) {
-				def safeCarrier = Person.get(params.safeCarrier.id);				
+				def safeCarrier = Person.get(params.safeCarrier.id);
 				if (safeCarrier && safeCarrier?.name != shipmentInstance?.carrier?.name)
 				shipmentInstance.carrier = safeCarrier;
 			}
 			// else if only the name is provided, we need to create a new person
-			else { 
+			else {
 				def safeCarrier = convertStringToPerson(params.safeCarrier.name);
-				if (safeCarrier) { 
+				if (safeCarrier) {
 					safeCarrier.save(flush:true)
 					shipmentInstance.carrier = safeCarrier;
 				}
 			}
-			
+
 			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(action: "showDetails", id: shipmentInstance.id)
@@ -217,9 +217,7 @@ class ShipmentController {
 			redirect(action: "list")
 		}
 	}
-	
-	
-	
+
 	def showDetails = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
@@ -227,6 +225,13 @@ class ShipmentController {
 			redirect(action: "list", params:[type: params.type])
 		}
 		else {
+
+			// Redirect to stock movement details page
+			if (shipmentInstance?.requisition && !params?.override) {
+				redirect(controller: "stockMovement", action: "show", id: shipmentInstance?.requisition?.id)
+				return
+			}
+
 			def eventTypes =  org.pih.warehouse.core.EventType.list();
 			def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
 			[shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, shippingEventTypes : eventTypes]
@@ -243,7 +248,7 @@ class ShipmentController {
         shipmentService.synchronizeTransactions(shipmentInstance)
         redirect(action: "showDetails", id: params.id)
     }
-	
+
 	def editDetails = {
 		log.info params
 		def shipmentInstance = Shipment.get(params.id)
@@ -255,9 +260,9 @@ class ShipmentController {
 			[shipmentInstance: shipmentInstance]
 		}
 	}
-	
+
 	def sendShipment = {
-		def transactionInstance 
+		def transactionInstance
 		// def userInstance = User.get(session.user.id)
 		def shipmentInstance = Shipment.get(params.id)
 		def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
@@ -268,32 +273,32 @@ class ShipmentController {
 		}
 		else {
 			// handle a submit
-			if ("POST".equalsIgnoreCase(request.getMethod())) { 				
+			if ("POST".equalsIgnoreCase(request.getMethod())) {
 				// make sure a shipping date has been specified and that is not the future
-				if (!params.actualShippingDate || Date.parse("MM/dd/yyyy", params.actualShippingDate) > new Date()) {
-					flash.message = "${warehouse.message(code: 'shipping.specifyValidShipmentDate.message')}"	
+				if (!params.actualShippingDate || Date.parse("MM/dd/yyyy HH:mm XXX", params.actualShippingDate) > new Date()) {
+					flash.message = "${warehouse.message(code: 'shipping.specifyValidShipmentDate.message')}"
 					render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
 					return
 				}
-				
+
 				// create the list of email recipients
-				def emailRecipients = new HashSet()				
+				def emailRecipients = new HashSet()
 				params.emailRecipientId?.each ( { emailRecipients = emailRecipients + Person.get(it) } )
-				try { 
+				try {
 					// send the shipment
-					shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse, 
-													Date.parse("MM/dd/yyyy", params.actualShippingDate));
+					shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse,
+													Date.parse("MM/dd/yyyy HH:mm XXX", params.actualShippingDate));
 					//triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
 				}
-				catch (TransactionException e) { 
+				catch (TransactionException e) {
 					transactionInstance = e.transaction
 					shipmentInstance = Shipment.get(params.id)
 					shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
 					render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, transactionInstance: transactionInstance])
 					return;
 				}
-								
-				if (!shipmentInstance?.hasErrors() && !transactionInstance?.hasErrors()) { 
+
+				if (!shipmentInstance?.hasErrors() && !transactionInstance?.hasErrors()) {
 					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 					redirect(action: "showDetails", id: shipmentInstance?.id)
 				}
@@ -303,19 +308,19 @@ class ShipmentController {
 			render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
 		}
 	}
-	
+
 	def refreshCurrentStatus = {
 		shipmentService.refreshCurrentStatus(params.id)
 		redirect(action: "showDetails", id: params?.id)
 	}
 
-	
+
 	def rollbackLastEvent = {
 		def shipmentInstance = Shipment.get(params.id)
 		shipmentService.rollbackLastEvent(shipmentInstance)
 		redirect(action: "showDetails", id: shipmentInstance?.id)
 	}
-	
+
 	def deleteShipment = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
@@ -324,16 +329,9 @@ class ShipmentController {
 			return;
 		}
 		else {
-			if ("POST".equalsIgnoreCase(request.getMethod())) {	
-				//shipmentInstance.shipmentItems.clear();
-				//shipmentInstance.containers.clear();
-				Shipment.withTransaction { tx -> 
-					shipmentInstance.delete();
-					
-					
-					//tx.setRollbackOnly();
-				}
-				
+			if ("POST".equalsIgnoreCase(request.getMethod())) {
+				shipmentService.deleteShipment(shipmentInstance)
+
 				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 				redirect(controller: "dashboard", action: "index")
 				return;
@@ -341,18 +339,35 @@ class ShipmentController {
 		}
 		[shipmentInstance:shipmentInstance]
 	}
-	
+
 	def markAsReceived = {
 		def shipmentInstance = Shipment.get(params.id)
-		
+
 		// actually process the receipt
-		shipmentService.markAsReceived(shipmentInstance, session.warehouse);		
+		shipmentService.markAsReceived(shipmentInstance, session.warehouse);
 		if (!shipmentInstance.hasErrors()) {
 			flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
 		}
 		redirect(controller:"shipment", action : "showDetails", id: shipmentInstance.id)
 	}
 
+
+	def bulkDeleteShipments = {
+		def shipmentIds = params.list("shipment.id")
+
+		log.info "Shipment ids: " + shipmentIds
+		try {
+			shipmentIds.each { shipmentId ->
+				Shipment shipment = Shipment.get(shipmentId)
+				shipmentService.deleteShipment(shipment)
+			}
+			flash.message = "Successfully deleted ${shipmentIds?.size()} shipments"
+
+		} catch (Exception e) {
+			flash.message = "Error occurred while bulk deleting shipments: " + e.message
+		}
+		redirect(action: "list", params:[type:params.type, status: params.status])
+	}
 
 	def bulkReceiveShipments = {
 		def shipmentIds = params.list("shipment.id")
@@ -495,11 +510,9 @@ class ShipmentController {
 	def receiveShipment = { ReceiveShipmentCommand command ->
 		log.info "params: " + params
 		def receiptInstance
-		def shipmentItems
 		def location = Location.get(session.warehouse.id)
 		def shipmentInstance = Shipment.get(params.id)
         def userInstance = User.get(session.user.id)
-		def binLocations = Location.findAllByParentLocation(location)
 
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -515,7 +528,7 @@ class ShipmentController {
             receiptInstance = shipmentInstance.receipt
             if (!receiptInstance) {
                 receiptInstance = new Receipt(params)
-                shipmentInstance.receipt = receiptInstance
+                shipmentInstance.addToReceipts(receiptInstance)
             }
             else {
                 receiptInstance.properties = params
@@ -563,8 +576,8 @@ class ShipmentController {
 
             }
 		}
-		
-		// Display form 
+
+		// Display form
 		else {
 
 			if (shipmentInstance?.destination != location) {
@@ -645,8 +658,8 @@ class ShipmentController {
 			[shipmentInstance: shipmentInstance]
 		}
 	}
-	
-	def downloadPackingList = { 
+
+	def downloadPackingList = {
 		def shipmentInstance = Shipment.get(params.id)
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -670,11 +683,11 @@ class ShipmentController {
 				and shipment_item.container_id = container.id
 				and shipment_item.product_id = product.id 
 				and shipment.id = ${params.id}"""
-			
+
 			StringWriter sw = new StringWriter();
 			CSVWriter writer = new CSVWriter(sw);
-			Sql sql = new Sql(sessionFactory.currentSession.connection())	
-			
+			Sql sql = new Sql(sessionFactory.currentSession.connection())
+
 			String [] colArray = new String[6];
 			colArray.putAt(0, "unit");
 			colArray.putAt(1, "dimensions");
@@ -683,8 +696,8 @@ class ShipmentController {
 			colArray.putAt(4, "item");
 			colArray.putAt(5, "serial number");
 			writer.writeNext(colArray);
-			sql.eachRow(query) { row -> 
-				
+			sql.eachRow(query) { row ->
+
 				def rowArray = new String[6];
 				rowArray.putAt(0, row[0]);
 				rowArray.putAt(1, (row[1])?row[1]:"0" + "x" + (row[2])?row[2]:"0" + "x" + (row[3])?row[3]:"0" + " " + (row[4])?row[4]:"");
@@ -694,73 +707,73 @@ class ShipmentController {
 				rowArray.putAt(5, row[9]);
 				writer.writeNext(rowArray);
 			}
-			
+
 			//writer.writeAll(resultSet, false);
 			log.info "results: " + sw.toString();
-			response.setHeader("Content-disposition", "attachment; filename='PackingList.csv'");
-			render(contentType: "text/csv", text: sw.toString());			
+			response.setHeader("Content-disposition", "attachment; filename=\"PackingList.csv\"");
+			render(contentType: "text/csv", text: sw.toString());
 			sql.close();
 			//resultSet.close();
-			
-			
+
+
 		}
 	}
-	
-	
+
+
 	def editContents = {
 		def shipmentInstance = Shipment.get(params.id)
 		def containerInstance = Container.get(params?.container?.id);
-		
+
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "list", params:[type: params.type])
 		}
 		else {
-			
-			if (!containerInstance && shipmentInstance?.containers) { 
+
+			if (!containerInstance && shipmentInstance?.containers) {
 				containerInstance = shipmentInstance.containers.iterator().next();
 			}
 			[shipmentInstance: shipmentInstance, containerInstance: containerInstance]
 		}
 	}
-	
-	  
-	
-	
-	
-	
-	
-	
-	def editContainer = {		
-		
+
+
+
+
+
+
+
+
+	def editContainer = {
+
 		log.info params
-		
-		def shipmentInstance = Shipment.get(params.shipmentId)		
+
+		def shipmentInstance = Shipment.get(params.shipmentId)
 		def containerInstance = Container.get(params.containerId)
 		if (containerInstance) {
-			
+
 			containerInstance.properties = params
-			
+
 			Iterator iter = containerInstance.shipmentItems.iterator()
 			while (iter.hasNext()) {
 				def item = iter.next()
 				log.info item.product.name + " " + item.quantity;
-				
+
 				if (item.quantity == 0) {
 					item.delete();
 					//containerInstance.removeFromShipmentItems(item);
-					iter.remove();					
+					iter.remove();
 				}
 			}
-			
+
 			// If the user removed the recipient, we need to make sure that the whole object is removed (not just the ID)
-			for (def shipmentItem : containerInstance?.shipmentItems) { 
-				if (!shipmentItem?.recipient?.id) { 
+			for (def shipmentItem : containerInstance?.shipmentItems) {
+				if (!shipmentItem?.recipient?.id) {
 					log.info("item recipient: " + shipmentItem?.recipient?.id)
 					shipmentItem.recipient = null;
 				}
 			}
-			
+
 			if (!containerInstance.hasErrors() && containerInstance.save(flush: true)) {
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'container.label', default: 'Container'), containerInstance.id])}"
 				redirect(action: "editContents", id: shipmentInstance.id, params: ["container.id" : params.containerId])
@@ -777,23 +790,23 @@ class ShipmentController {
 			//redirect(action: "list")
 		}
 	}
-	
-	
-	
-	def copyContainer = { 
-		def container = Container.get(params.id);  
-		def shipment = Shipment.get(params.shipmentId);   	
-		
-		if (container && shipment) { 		
+
+
+
+	def copyContainer = {
+		def container = Container.get(params.id);
+		def shipment = Shipment.get(params.shipmentId);
+
+		if (container && shipment) {
 			def numCopies = (params.copies) ? Integer.parseInt( params.copies ) : 1
 			int index = (shipment?.containers)?(shipment.containers.size()):1;
-			/*try { 
+			/*try {
 			 index = Integer.parseInt(container.name);
 			 } catch (NumberFormatException e) {
 			 log.warn("The given value " + params.name + " is not an integer");
 			 }*/
-			
-			
+
+
 			while ( numCopies-- > 0 ) {
 				def containerCopy = new Container(container.properties);
 				containerCopy.id = null;
@@ -803,8 +816,8 @@ class ShipmentController {
 				//containerCopy.dimensions = container.dimensions;
 				containerCopy.shipmentItems = null;
 				containerCopy.save(flush:true);
-				
-				container.shipmentItems.each { 
+
+				container.shipmentItems.each {
 					// def shipmentItemCopy = new ShipmentItem(
 					//product: it.product,
 					//quantity: it.quantity,
@@ -812,26 +825,26 @@ class ShipmentController {
 					//ontainer: containerCopy);
 					//containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
 					containerCopy.shipment.addToShipmentItems(shipmentItem).save(flush:true);
-				}    		
+				}
 				shipment.addToContainers(containerCopy).save(flush:true);
 			}
 				flash.message = "${warehouse.message(code: 'shipping.copiedContainerSuccessfully.message')}"
-		} else { 
+		} else {
 			flash.message = "${warehouse.message(code: 'shipping.unableToCopyPackage.message')}"
 		}
-		
+
 		redirect(action: 'showDetails', id: params.shipmentId)
-	}    
-	
-	
-	def addDocument = { 
+	}
+
+
+	def addDocument = {
 		log.info params
 		def shipmentInstance = Shipment.get(params.id);
 		def documentInstance = Document.get(params?.document?.id);
-		if (!documentInstance) { 
+		if (!documentInstance) {
 			documentInstance = new Document();
 		}
-		if (!shipmentInstance) { 
+		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
 			redirect(action: "list")
 		}
@@ -851,13 +864,13 @@ class ShipmentController {
 		}
 		render(view: "addDocument", model: [shipmentInstance : shipmentInstance, documentInstance : documentInstance]);
 	}
-	
-	
+
+
 	def addComment = {
 		log.debug params;
 		def shipmentInstance = Shipment.get(params.id)
 		render(view: "addComment", model: [shipmentInstance : shipmentInstance, comment : new Comment()]);
-		
+
 		//def recipient = (params.recipientId) ? User.get(params.recipientId) : null;
 		//def comment = new Comment(comment: params.comment, commenter: session.user, recipient: recipient)
 		//if (shipment) {
@@ -866,70 +879,70 @@ class ShipmentController {
 		//}
 		//redirect(action: 'addComment', id: params.shipmentId)
 	}
-	
+
 	/**
-	 * This action is used to render the form page used to add a 
+	 * This action is used to render the form page used to add a
 	 * new package/container to a shipment.
 	 */
-	def addPackage = {		
+	def addPackage = {
 		def shipmentInstance = Shipment.get(params.id);
-		//def containerType = ContainerType.findByName(params?.containerType?.name); 
-		
+		//def containerType = ContainerType.findByName(params?.containerType?.name);
+
 		def containerName = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance?.containers?.size() + 1) : "1";
 		def containerInstance = new Container(name : containerName);
-		
+
 		render(view: "addPackage", model: [shipmentInstance : shipmentInstance, containerInstance : containerInstance]);
-		
+
 	}
-	
-	
+
+
 	/**
 	 * This closure is used to process the 'add package' form.
 	 */
 	def savePackage = {
-		
+
 		log.info "params " + params;
-		
+
 		def shipmentInstance = Shipment.get(params.shipmentId);
 		def parentContainerInstance = Container.get(params?.parentContainer?.id);
-		
+
 		def containerInstance = new Container(params);
-		if (containerInstance && shipmentInstance) {	
+		if (containerInstance && shipmentInstance) {
 			shipmentInstance.addToContainers(containerInstance);
 			if (!shipmentInstance.hasErrors() && shipmentInstance.save(flush: true)) {
 				flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'container.label', default: 'Container'), containerInstance.id])}"
-				if (parentContainerInstance) { 
+				if (parentContainerInstance) {
 					parentContainerInstance.addToContainers(containerInstance).save(flush: true);
 				}
 				//container.containerType = ContainerType.get(params.containerType.id);
-				//container.name = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance.containers.size() + 1) : "1";			
+				//container.name = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance.containers.size() + 1) : "1";
 				redirect(action: "editContents", id: shipmentInstance.id, params: ["container.id" : containerInstance.id])
 			}
 			else {
-				//flash.message = "Could not save container"				
+				//flash.message = "Could not save container"
 				render(view: "addPackage", model: [shipmentInstance:shipmentInstance, containerInstance:containerInstance])
 			}
-		} else { 		
+		} else {
 			redirect(action: 'showDetails', id: params.shipmentId);
 		}
 	}
-	
-	
-	def saveComment = { 
+
+
+	def saveComment = {
 		def shipmentInstance = Shipment.get(params.shipmentId);
 		def recipient = (params.recipientId) ? User.get(params.recipientId) : null;
 		def comment = new Comment(comment: params.comment, sender: session.user, recipient: recipient)
-		if (shipmentInstance) { 
+		if (shipmentInstance) {
 			shipmentInstance.addToComments(comment).save(flush:true);
 			flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', args: [params.comment,shipmentInstance.name])}"
 		}
 		redirect(action: 'showDetails', id: params.shipmentId);
 	}
-	
-	
-	
-	
-	def editItem = { 
+
+
+
+
+	def editItem = {
 		def item = ShipmentItem.get(params.id);
 		def container = item.getContainer();
 		def shipmentId = container.getShipment().getId();
@@ -944,23 +957,23 @@ class ShipmentController {
 			redirect(action: 'showDetails', id: shipmentId, params: [container.id, container.id])
 		}
 	}
-	
-	
-	def deleteDocument = { 
+
+
+	def deleteDocument = {
 		def document = Document.get(params.id);
 		def shipment = Shipment.get(params.shipmentId);
-		if (shipment && document) { 	    	
+		if (shipment && document) {
 			shipment.removeFromDocuments(document).save(flush:true);
-			document.delete();	    	    	
+			document.delete();
 				flash.message = "${warehouse.message(code: 'shipping.deletedDocumentFromShipment.message', args: [params.id])}"
 		}
-		else { 
+		else {
 			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveDocumentFromShipment.message', args: [params.id])}"
-		}		
+		}
 		redirect(action: 'showDetails', id: params.shipmentId)
 	}
-	
-	def deleteEvent = {		
+
+	def deleteEvent = {
 		def event = Event.get(params.id);
 		def shipment = Shipment.get(params.shipmentId);
 		if (shipment && event) {   // not allowed to delete a "created" event
@@ -974,11 +987,11 @@ class ShipmentController {
 		}
 		redirect(action: 'showDetails', id: params.shipmentId)
 	}
-	
+
 	def deleteContainer = {
 		def container = Container.get(params.id);
 		def shipment = Shipment.get(params.shipmentId);
-		
+
 		if (shipment && container) {
 			container.delete();
 			//shipment.removeFromContainers(container).save(flush:true);
@@ -987,10 +1000,10 @@ class ShipmentController {
 		else {
 			flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveContainerFromShipment.message', args: [params.id])}"
 		}
-		
+
 		redirect(action: 'showDetails', id: params.shipmentId)
 	}
-	
+
 	def deleteItem = {
 		def shipmentItem = ShipmentItem.get(params.id);
 		def container = shipmentItem.getContainer();
@@ -1006,7 +1019,7 @@ class ShipmentController {
 			redirect(action: 'showDetails', id: shipmentId)
 		}
 	}
-	
+
 	def deleteComment = {
 		def comment = Comment.get(params.id);
 		def shipment = Shipment.get(params.shipmentId);
@@ -1021,49 +1034,49 @@ class ShipmentController {
 			redirect(action: 'showDetails', id: params.shipmentId)
 		}
 	}
-	
-	
+
+
 	def editEvent = {
 		def eventInstance = Event.get(params.id)
 		def shipmentInstance = Shipment.get(params.shipmentId)
-		
+
 		if (!eventInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
 			redirect(action: "showDetails", id: params.shipmentId)
 		}
-		
+
 		render(view: "editEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance]);
 	}
-	
-	
-	def addEvent = { 
+
+
+	def addEvent = {
 		def shipmentInstance = Shipment.get(params.id);
-		
+
 		if (!shipmentInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
 			redirect(action: "list")
 		}
-		
+
 		//def event = new Event(eventType:EventType.get(params.eventType.id), eventDate:new Date())
-		def eventInstance = new Event(params);			
+		def eventInstance = new Event(params);
 		render(view: "editEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance]);
 	}
-	
-	def saveEvent = {				
+
+	def saveEvent = {
 		def shipmentInstance = Shipment.get(params.shipmentId);
-		def eventInstance = Event.get(params.eventId) ?: new Event()	
-		
+		def eventInstance = Event.get(params.eventId) ?: new Event()
+
 		bindData(eventInstance, params)
 
 		// check for errors
 		if (eventInstance.hasErrors()) {
 			flash.message = "${warehouse.message(code: 'shipping.unableToEditEvent.message', args: [format.metadata(obj:eventInstance?.eventType)])}"
-			eventInstance?.errors.allErrors.each { 
+			eventInstance?.errors.allErrors.each {
 				log.error it
 			}
 			render(view: "editEvent", model: [shipmentInstance : shipmentInstance, eventInstance : eventInstance])
 		}
-		
+
 		// save (or add) the event
 		if (params.eventId) {
 			eventInstance.save(flush:true)
@@ -1071,38 +1084,38 @@ class ShipmentController {
 		else {
 			shipmentInstance.addToEvents(eventInstance).save(flush:true)
 		}
-		
+
 		redirect(action: 'showDetails', id: shipmentInstance.id)
-	}    
-	
-	def addShipmentItem = { 
+	}
+
+	def addShipmentItem = {
 		log.info "parameters: " + params
-		
-		[shipmentInstance : Shipment.get(params.id), 
+
+		[shipmentInstance : Shipment.get(params.id),
 		containerInstance : Container.get(params?.containerId),
 		itemInstance : new ShipmentItem() ]
 	}
-	
-	def addReferenceNumber = { 		
+
+	def addReferenceNumber = {
 		def referenceNumber = new ReferenceNumber(params);
 		def shipment = Shipment.get(params.shipmentId);
 		shipment.addToReferenceNumbers(referenceNumber);
 		flash.message = "${warehouse.message(code: 'shipping.addedReferenceNumber.message')}"
 		redirect(action: 'show', id: params.shipmentId)
 	}
-	
+
 	def form = {
 		[ shipments : Shipment.list() ]
 	}
-	
+
 	def view = {
 		// pass through to "view shipment" page
 	}
-	
+
 	def generateDocuments = {
 		def shipmentInstance = Shipment.get(params.id)
 		def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
-		
+
 		if (shipmentWorkflow.documentTemplate) {
 			render (view: "templates/$shipmentWorkflow.documentTemplate", model: [shipmentInstance : shipmentInstance])
 		}
@@ -1111,22 +1124,22 @@ class ShipmentController {
 			redirect(action: "showDetails", params : [ 'id':shipmentInstance.id ])
 		}
 	}
-	
-	Person convertStringToPerson(String name) { 
+
+	Person convertStringToPerson(String name) {
 		def person = new Person();
 		if (name) {
 			def nameArray = name.split(" ");
-			nameArray.each { 
-				if (it.contains("@")) { 
+			nameArray.each {
+				if (it.contains("@")) {
 					person.email = it;
 				}
-				else if (!person.firstName) { 
+				else if (!person.firstName) {
 					person.firstName = it;
 				}
-				else if (!person.lastName) { 
+				else if (!person.lastName) {
 					person.lastName = it;
 				}
-				else { 
+				else {
 					person.lastName += " " + it;
 				}
 			}
@@ -1141,72 +1154,72 @@ class ShipmentController {
 		}
 		return person;
 	}
-	
-	
-	
-	
-	def addToShipment = { 
+
+
+
+
+	def addToShipment = {
 
 		// Get product IDs and convert them to String
-		def productIds = params.list('product.id')		
+		def productIds = params.list('product.id')
 		productIds = productIds.collect { String.valueOf(it); }
-		 
+
 		Location location = Location.get(session.warehouse.id)
 		def commandInstance = shipmentService.getAddToShipmentCommand(productIds, location)
-		
+
 		[commandInstance : commandInstance]
 	}
-	
-	
-	def addToShipmentPost = { ItemListCommand command -> 
-		
+
+
+	def addToShipmentPost = { ItemListCommand command ->
+
 		println "add to shipment post " + params.shipmentContainerKey
 
 		if (!params?.shipmentContainerKey) {
 			command.errors.rejectValue("items", "addToShipment.container.invalid")
 			render(view: "addToShipment", model: [commandInstance: command])
 			return;
-		}		
-		
+		}
+
 		def shipmentContainer = params?.shipmentContainerKey?.split(":")
-		if (shipmentContainer) { 
+		if (shipmentContainer) {
 
 			def shipment = Shipment.get(shipmentContainer[0])
 			def container = Container.get(shipmentContainer[1])
 
-			if (!shipment) { 
+			if (!shipment) {
 				command.errors.rejectValue("items", "addToShipment.container.invalid")
 				render(view: "addToShipment", model: [commandInstance: command])
 				return;
 			}
-						
+
 		   command.items.each {
 			   it.shipment = shipment
 			   it.container = container
 		   }
 
-			try { 
+			try {
 				boolean atLeastOneUpdate = shipmentService.addToShipment(command);
-				if (atLeastOneUpdate) { 
+				if (atLeastOneUpdate) {
 				    flash.message = "${warehouse.message(code: 'shipping.shipmentItemsHaveBeenAdded.message')}"
                     redirect(controller:"createShipmentWorkflow", action: "createShipment",
                             id: shipment.id, params: ["skipTo":"Packing", "containerId":container?.id])
 					return;
 				}
-				else { 
+				else {
 					flash.message = "${warehouse.message(code: 'shipping.noShipmentItemsHaveBeenUpdated.message')}"
 				}
-			} catch (ShipmentItemException e) { 
+			} catch (ShipmentItemException e) {
 				flash['errors'] = e.shipmentItem.errors
 				render(view: "addToShipment", model: [commandInstance: command])
 				return;
-			} catch (ValidationException e) { 			
-				flash['errors'] = e.errors 
+			} catch (ValidationException e) {
+				flash['errors'] = e.errors
 				render(view: "addToShipment", model: [commandInstance: command])
 				return;
 			}
 		}
-		
+
 		redirect(controller: "inventory", action: "browse")
 	}
 
@@ -1250,7 +1263,7 @@ class ShipmentController {
 }
 
 class ReceiveShipmentCommand implements Serializable {
-	
+
 	String comments
 	Person recipient
 	Receipt receipt
@@ -1258,7 +1271,7 @@ class ReceiveShipmentCommand implements Serializable {
 	Transaction transaction
 	Boolean creditStockOnReceive = true
 	Date actualDeliveryDate
-	
+
 	static constraints = {
 		receipt(nullable:true)
 		shipment(nullable:false, validator: { value, obj -> obj.shipment.hasShipped() && !obj.shipment.wasReceived() })
@@ -1268,7 +1281,7 @@ class ReceiveShipmentCommand implements Serializable {
 		creditStockOnReceive(nullable:false)
 		actualDeliveryDate(nullable:false) //validator: { value, obj-> value > new Date()}
 	}
-	
+
 }
 
 

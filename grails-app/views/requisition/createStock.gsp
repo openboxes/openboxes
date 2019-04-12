@@ -70,6 +70,29 @@
                                     <format:metadata obj="${requisition.type}"/>
                                 </td>
                             </tr>
+
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="origin.id">
+                                        <warehouse:message code="requisition.origin.label" />
+                                    </label>
+                                </td>
+                                <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
+                                    <g:hiddenField name="origin.id" value="${session?.warehouse?.id}"/>
+                                    ${session?.warehouse?.name }
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="destination.id">
+                                        <warehouse:message code="requisition.destination.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:selectLocation name="destination.id" value="${requisition?.destination?.id}" class="chzn-select-deselect"
+                                                      noSelection="['null':'']"/>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="commodityClass">
@@ -82,28 +105,7 @@
                                                             noSelection="['null':'']"/>
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="destination.id">
-                                        <warehouse:message code="requisition.destination.label" />
-                                    </label>
-                                </td>
-                                <td class="value">
-                                    <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
-                                    ${session?.warehouse?.name }
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="origin.id">
-                                        <warehouse:message code="requisition.origin.label" />
-                                    </label>
-                                </td>
-                                <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                        <g:selectRequestOrigin name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
-                                             noSelection="['null':'']"/>
-                                </td>
-                            </tr>
+
                             <tr class="prop">
                                 <td class="name">
                                     <label><warehouse:message
@@ -114,8 +116,8 @@
                                     <g:hiddenField name="requestedBy.id" value="${requisition?.requestedBy?.id?:session?.user?.id }"/>
                                     ${requisition?.requestedBy?.name?:session?.user?.name }
                                     --%>
-                                    <g:selectPerson name="requestedBy.id" value="${requisition?.requestedBy?.id}" size="60"
-                                        noSelection="['null':'']"/>
+                                    <g:selectPerson name="requestedBy" value="${requisition?.requestedBy?.id}" size="60"
+                                        noSelection="['null':'']" class="chzn-select-deselect"/>
 
 
                                 </td>
@@ -147,7 +149,7 @@
                                 </td>
 
                                 <td class="value">
-                                    <g:textArea name="description" cols="80" rows="5" style="width:100%"
+                                    <g:textArea name="description" cols="80" rows="2" style="width:100%"
                                         placeholder="${warehouse.message(code:'requisition.description.message')}"
                                         class="text large">${requisition.description }</g:textArea>
                                 </td>

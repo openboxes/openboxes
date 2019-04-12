@@ -13,7 +13,8 @@
 <body>
 
     <g:set var="pageParams"
-       value="['origin.id':params?.origin?.id, q:params.q, commodityClass:params.commodityClass, status:params.status,
+       value="['origin.id':params?.origin?.id, 'destination.id':params?.destination?.id, q:params.q,
+               commodityClass:params.commodityClass, status:params.status,
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
                'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order, relatedToMe:params.relatedToMe]"/>
 
@@ -89,16 +90,24 @@
                                 </p>
                             </div>
                             <div class="filter-list-item">
+                                <label><warehouse:message code="requisition.requisitionType.label"/></label>
+                                <p>
+                                    <g:selectRequisitionType name="type" value="${params?.type}"
+                                                               noSelection="['null':'']" class="chzn-select-deselect"/>
+                                </p>
+                            </div>
+                            <div class="filter-list-item">
                                 <label><warehouse:message code="requisition.origin.label"/></label>
                                 <p>
-                                    <g:selectWardOrPharmacy name="origin.id" value="${params?.origin?.id}"
+                                    <g:selectLocation name="origin.id" value="${params?.origin?.id}"
                                                             noSelection="['null':'']" class="chzn-select-deselect"/>
                                 </p>
                             </div>
                             <div class="filter-list-item">
                                 <label><warehouse:message code="requisition.destination.label"/></label>
                                 <p style="line-height: 16px; font-size: 1.2em;">
-                                    <g:select id="destinationId" name="destination.id" value="${session.warehouse.id}" from="${[session.warehouse]}" class="chzn-select" readOnly="readOnly"/>
+                                    <g:selectLocation name="destination.id" value="${params?.destination?.id}"
+                                                      noSelection="['null':'']" class="chzn-select-deselect" />
                                 </p>
                             </div>
 
@@ -113,25 +122,6 @@
                                 <label><warehouse:message code="requisition.dateIssued.label"/></label>
                                 <p>
                                     <g:textField id="issuedDateRange" name="issuedDateRange" style="width:100%" class="daterange text" value="${params.issuedDateRange}"/>
-                                </p>
-                            </div>
-
-                            <div class="filter-list-item">
-                                <label><warehouse:message code="requisition.commodityClass.label"/></label>
-                                <p>
-                                    <g:selectCommodityClass name="commodityClass" value="${params?.commodityClass}"
-                                                            noSelection="['null':'']" class="chzn-select-deselect"/>
-                                </p>
-                                <p>
-                                    <g:checkBox name="commodityClassIsNull" value="${params?.commodityClassIsNull}"/>
-                                    <label><warehouse:message code="requisition.commodityClassIsNull" default="Include if commodity class is empty"/></label>
-                                </p>
-                            </div>
-                            <div class="filter-list-item">
-                                <label><warehouse:message code="requisition.requisitionType.label"/></label>
-                                <p>
-                                    <g:selectRequisitionType name="type" value="${params?.type}"
-                                                            noSelection="['null':'']" class="chzn-select-deselect"/>
                                 </p>
                             </div>
                             <div class="filter-list-item">
@@ -189,11 +179,16 @@
                             <th>
                                 <warehouse:message code="default.numItems.label"/>
                             </th>
+
                             <g:sortableColumn property="status" params="${pageParams}"
                                               title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
 
                             <g:sortableColumn property="requestNumber" params="${pageParams}"
                                               title="${warehouse.message(code: 'requisition.requestNumber.label', default: 'Request number')}" />
+
+                            <th>
+                                <warehouse:message code="requisition.requisitionType.label"/>
+                            </th>
 
                             <th><g:message code="default.name.label"/></th>
 
@@ -269,6 +264,9 @@
                                     <g:link controller="requisition" action="show" id="${requisition.id}">
                                         <strong>${requisition.requestNumber }</strong>
                                     </g:link>
+                                </td>
+                                <td class="middle">
+                                    <format:metadata obj="${requisition?.type}"/>
                                 </td>
                                 <td class="middle">
                                     <g:link controller="requisition" action="show" id="${requisition.id}">

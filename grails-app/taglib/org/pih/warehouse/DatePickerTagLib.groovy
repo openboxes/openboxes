@@ -53,7 +53,7 @@ class DatePickerTagLib {
 		def html = """
 			<input id='${id}' name='${name}' type='hidden' ${dataBind}/>
 			<input id='${id}-datepicker' name='${name}-datepicker' type='text'
-					placeholder='${placeholder}' class='${cssClass} text' size="${size}" ${readOnly?"readonly='readonly'":""}/>
+					placeholder='${placeholder}' class='${cssClass} text large' size="${size}" ${readOnly?"readonly='readonly'":""}/>
 			<script type=\'text/javascript\'>
 
 				jQuery(document).ready(function() {
@@ -67,12 +67,12 @@ class DatePickerTagLib {
 						altFormat: 'mm/dd/yy',
 						dateFormat: 'dd/M/yy',
 						autoSize: ${autoSize},
-						showOn: '${showOn}',
+						//showOn: '${showOn}',
                         numberOfMonths: ${numberOfMonths},
 						changeMonth: ${changeMonthAndYear},
 						changeYear: ${changeMonthAndYear},
-						buttonImageOnly: true,
-						buttonImage: '${request.contextPath}/images/icons/silk/calendar.png',
+						//buttonImageOnly: true,
+						//buttonImage: '${request.contextPath}/images/icons/silk/calendar.png',
 						minDate: ${minDate},
 						maxDate: ${maxDate}
 						//buttonText: '...',
@@ -105,17 +105,6 @@ class DatePickerTagLib {
 				});
 			</script>""";
 
-		if (showTrigger) {
-			html += """
-			<style>
-				.ui-datepicker-trigger {
-					#position: relative; left: -16px; top: -1px;
-				}
-			</style>
-			""";
-		}
-		
-				
 		out << html;
 				
 	}

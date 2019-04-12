@@ -9,11 +9,12 @@
 **/ 
 package org.pih.warehouse.requisition
 
-public enum RequisitionStatus {
+enum RequisitionStatus {
 	CREATED(1),
     EDITING(2),
     VERIFYING(3),
 	PICKING(4),
+    PICKED(5),
 	PENDING(5),
     CHECKING(6),
 	ISSUED(7),
@@ -22,7 +23,6 @@ public enum RequisitionStatus {
     DELETED(10),
     ERROR(11),
     // Removed
-    PICKED(0),
     OPEN(0),
     FULFILLED(0),
     REVIEWING(0),
@@ -37,9 +37,19 @@ public enum RequisitionStatus {
 	}
 	/* remove OPEN, FULFILLED */
 	static list() {
-		[ CREATED, EDITING, VERIFYING, PICKING, PENDING, CHECKING, ISSUED, RECEIVED, CANCELED, DELETED, ERROR ]
+		[ CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED ]
 	}
 
+	static listPending() {
+		[ CREATED, CHECKING, EDITING, PICKED, PICKING, VERIFYING ]
+	}
+
+	static listCompleted() {
+		[ ISSUED, RECEIVED ]
+	}
+	static listCanceled() {
+		[ CANCELED, DELETED ]
+	}
     static listAll() {
         [ CREATED, EDITING, VERIFYING, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR ]
     }

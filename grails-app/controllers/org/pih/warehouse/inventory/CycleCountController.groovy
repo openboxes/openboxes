@@ -31,6 +31,7 @@ class CycleCountController {
                     "Product name"       : it.product.name ?: "",
                     "Generic product"    : it.genericProduct?.name ?: "",
                     "Category"           : StringEscapeUtils.escapeCsv(it.category?.name ?: ""),
+                    "Formularies"        : it.product.productCatalogs.join(", ") ?: "",
                     "Lot number"         : StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber ?: ""),
                     "Expiration date"    : it.inventoryItem.expirationDate ? it.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
                     "ABC classification" : StringEscapeUtils.escapeCsv(it.product.getAbcClassification(location.id) ?: ""),
@@ -46,12 +47,11 @@ class CycleCountController {
                     "Was bin location updated in OpenBoxes?": "",
                     "${StringEscapeUtils.escapeCsv("Was quantity, lot/serial, and expiration date updated in OpenBoxes?")}" : "",
                     "Comment": "",
-
             ]
         }
 
         String csv = dataService.generateCsv(rows)
-        response.setHeader("Content-disposition", "attachment; filename='CycleCountReport-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}.csv'")
+        response.setHeader("Content-disposition", "attachment; filename=\"CycleCountReport-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}.csv\"")
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
         return
     }

@@ -1,5 +1,5 @@
 <%@ page import="org.pih.warehouse.core.*" %>
-<g:set var="adminAndBrowser" value="${[Role.browser(), Role.assistant(), Role.manager()]}" />
+<g:set var="adminAndBrowser" value="${[Role.browser(), Role.assistant(), Role.manager(), Role.admin(), Role.superuser()]}" />
 <g:set var="allRoles" value="${[Role.admin(), Role.browser(), Role.manager()]}" />
 <g:set var="locationRolePairs" value="${userInstance?.locationRolePairs()}" />
 <html>
@@ -43,7 +43,14 @@
 
                                 <table>
                                     <tbody>
-
+                                        <tr class="prop">
+                                            <td valign="top" class="name">
+                                                <label for="active"><warehouse:message code="user.active.label" /></label>
+                                            </td>
+                                            <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'active', 'errors')}">
+                                                <g:checkBox name="active" value="${userInstance?.active}" />
+                                            </td>
+                                        </tr>
                                         <tr class="prop">
                                             <td valign="top" class="name">
                                                 <label for="email"><warehouse:message code="user.email.label" /></label>
@@ -95,14 +102,8 @@
                                                 <label for="locale"><warehouse:message
                                                     code="default.timezone.label" default="Timezone" /></label></td>
                                             <td valign="top" class="value">
-                                                <g:if test="${timezones}">
-                                                    <g:selectTimezone id="timezone" name="timezone" value="${userInstance?.timezone}"
-                                                                      noSelection="['':'']"
-                                                                      class="chzn-select-deselect"/>
-                                                </g:if>
-                                                <g:else>
-                                                    <g:textField name="timezone" value="${userInstance?.timezone}" size="40" class="text medium"/>
-                                                </g:else>
+                                                <g:selectTimezone id="timezone" name="timezone" value="${userInstance?.timezone}"
+                                                                  noSelection="['':'']"/>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -117,7 +118,6 @@
                                                 &nbsp;
                                                 <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
                                             </div>
-
                                         </td>
                                     </tr>
                                     </tfoot>
@@ -186,17 +186,9 @@
                                 <g:hiddenField name="version" value="${userInstance?.version}" />
                                 <g:hiddenField name="updateRoles" value="${true}" />
 
-                                <table style="width:auto;">
+                                <table>
                                     <tbody>
                                         <g:isUserAdmin>
-                                            <tr class="prop">
-                                                <td valign="top" class="name">
-                                                    <label for="active"><warehouse:message code="user.active.label" /></label>
-                                                </td>
-                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'active', 'errors')}">
-                                                    <g:checkBox name="active" value="${userInstance?.active}" />
-                                                </td>
-                                            </tr>
                                             <tr class="prop">
                                                 <td valign="top" class="name">
                                                     <label for="roles"><warehouse:message code="user.roles.label" /></label>
@@ -214,7 +206,7 @@
                                                 <label for="email"><warehouse:message code="user.defaultLocation.label" /></label>
                                             </td>
                                             <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
-                                                <g:select name="warehouse.id" from="${org.pih.warehouse.core.Location.list()?.sort()}"
+                                                <g:select name="warehouse.id" from="${locations}"
                                                           optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['null':'']" class="chzn-select-deselect"/>
 
                                                 <div class="fade">
@@ -230,18 +222,22 @@
                                                     <label><warehouse:message code="user.locationRoles.label"/></label>
                                                 </td>
                                                 <td valign="top">
-                                                    <div id="location-roles" style="overflow-y:auto; max-height:500px;">
+                                                    <div id="location-roles" style="overflow-y:auto; max-height:300px;">
                                                         <table>
                                                             <thead>
                                                             <tr>
+                                                                <th><warehouse:message code="location.locationGroup.label"/></th>
                                                                 <th><warehouse:message code="location.label"/></th>
+                                                                <th><warehouse:message code="location.locationType.label"/></th>
                                                                 <th><warehouse:message code="user.role.label"/></th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
                                                             <g:each var="location" in="${locations}" status="status">
                                                                 <tr class="${status % 2 ? 'even' : 'odd'}">
+                                                                    <td>${location?.locationGroup?.name}</td>
                                                                     <td>${location.name}</td>
+                                                                    <td><format:metadata obj="${location?.locationType}"/></td>
                                                                     <td>
                                                                         <g:set var="defaultLabel"
                                                                                value="${warehouse.message(code: 'default.label')}"/>

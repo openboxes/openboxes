@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1462558005401-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="product_type"/>
+            </not>
+        </preConditions>
+        <createTable tableName="product_type">
+            <column autoIncrement="false" name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_type_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462558005401-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product" columnName="product_type_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product">
+            <column name="product_type_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1462558005401-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKED8DCCEFABD88AC6"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_type_id" baseTableName="product"
+                                 constraintName="FKED8DCCEFABD88AC6" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product_type"/>
+    </changeSet>
+
+
+</databaseChangeLog>

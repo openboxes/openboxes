@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1539788637271-1">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <indexExists indexName="requisition_item_ibfk_1"/>
+        </preConditions>
+        <dropIndex indexName="requisition_item_ibfk_1" tableName="requisition_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1539788637271-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK5358E4D644979D51"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="requisition_item" constraintName="FK5358E4D644979D51" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+</databaseChangeLog>
+
+

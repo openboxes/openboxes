@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1537578091166-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="origin_id_copy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="origin_id_copy" type="CHAR(38)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537578091166-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="destination_id_copy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="destination_id_copy" type="CHAR(38)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537578091166-3">
+        <sql>
+            UPDATE requisition
+            SET origin_id_copy = origin_id, destination_id_copy = destination_id
+            WHERE type != 'DEFAULT';
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537578091166-4">
+        <sql>
+            UPDATE requisition
+            SET origin_id = destination_id_copy, destination_id = origin_id_copy
+            WHERE type != 'DEFAULT';
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537578091166-5">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="requisition" columnName="origin_id_copy"/>
+        </preConditions>
+        <dropColumn tableName="requisition" columnName="origin_id_copy"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537578091166-6">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="requisition" columnName="destination_id_copy"/>
+        </preConditions>
+        <dropColumn tableName="requisition" columnName="destination_id_copy"/>
+    </changeSet>
+</databaseChangeLog>
+
+

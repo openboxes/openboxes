@@ -6,18 +6,25 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.shipping
 
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.*
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.receiving.Receipt
-
+import org.pih.warehouse.requisition.Requisition
 // import java.io.Serializable;
 
 class Shipment implements Comparable, Serializable {
@@ -45,12 +52,13 @@ class Shipment implements Comparable, Serializable {
     }
 
     String id
-	String name 					// user-defined name of the shipment 
+	String name 					// user-defined name of the shipment
+	String description
 	String shipmentNumber			// an auto-generated shipment number
 	Date expectedShippingDate		// the date the origin expects to ship the goods (required)
 	Date expectedDeliveryDate		// the date the destination should expect to receive the goods (optional)
 	Float statedValue
-	Float totalValue				// the total value of all items in the shipment		
+	Float totalValue				// the total value of all items in the shipment
 	String additionalInformation	// any additional information about the shipment (e.g., comments)
 	Float weight											// weight of container
 	String weightUnits  = Constants.DEFAULT_WEIGHT_UNITS	// standard weight unit: kg, lb
@@ -60,19 +68,21 @@ class Shipment implements Comparable, Serializable {
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
-	
+
 	// One-to-one associations
 	Location origin					// the location from which the shipment will depart
 	Location destination			// the location to which the shipment will arrive
 	ShipmentType shipmentType		// the shipment type: Air, Sea Freight, Suitcase
-	ShipmentMethod shipmentMethod	// the shipping carrier and shipping service used	
-	Receipt receipt					// the receipt for this shipment
+	ShipmentMethod shipmentMethod	// the shipping carrier and shipping service used
 	Person carrier 					// the person or organization that actually carries the goods from A to B
-	Person recipient				// the person or organization that is receiving the goods	
+	Person recipient				// the person or organization that is receiving the goods
 	Donor donor						// the information about the donor (OPTIONAL)
+	String driverName				// added for stock movements (should use carrier)
 
 	// One-to-many associations
 	SortedSet events;
+
+	Requisition requisition
 
     Event currentEvent
     ShipmentStatusCode currentStatus
@@ -82,8 +92,11 @@ class Shipment implements Comparable, Serializable {
 	List documents;
 	List comments;
 	List referenceNumbers;
-	
-	static transients = [ 
+
+	SortedSet shipmentItems
+    SortedSet receipts
+
+	static transients = [
 			"allShipmentItems",
 			"unpackedShipmentItems",
 			"containersByType",
@@ -93,30 +106,36 @@ class Shipment implements Comparable, Serializable {
 			"actualDeliveryDate",
 			"recipients",
 			"consignorAddress",
-			"consigneeAddress"
+			"consigneeAddress",
+            "receipt"
     ]
-	
-	static mappedBy = [outgoingTransactions: 'outgoingShipment',
-		incomingTransactions: 'incomingShipment']
-	
-	// Core association mappings
-	static hasMany = [events : Event,
-	                  comments : Comment,
-	                  containers : Container,
-	                  documents : Document, 	                  
-					  shipmentItems : ShipmentItem,
-	                  referenceNumbers : ReferenceNumber,
-					  outgoingTransactions : Transaction,
-					  incomingTransactions : Transaction ]
-	
 
-	
-	// Ran into Hibernate bug HHH-4394 and GRAILS-4089 when trying to order the associations.  This is due to the 
+	static mappedBy = [
+            outgoingTransactions: 'outgoingShipment',
+            incomingTransactions: 'incomingShipment'
+    ]
+
+	// Core association mappings
+	static hasMany = [
+			events : Event,
+			comments : Comment,
+			containers : Container,
+			documents : Document,
+			receipts: Receipt,
+			shipmentItems : ShipmentItem,
+			referenceNumbers : ReferenceNumber,
+			outgoingTransactions : Transaction,
+			incomingTransactions : Transaction
+	]
+
+
+
+	// Ran into Hibernate bug HHH-4394 and GRAILS-4089 when trying to order the associations.  This is due to the
 	// fact that the many side of the association (e.g. 'events') does not have a belongsTo 'shipment'.  So instead
-	// of adding a foreign key reference to the 'event' table, GORM creates a new join table 'shipment_event' to 
+	// of adding a foreign key reference to the 'event' table, GORM creates a new join table 'shipment_event' to
 	// map 'events' to 'shipments' (which is exactly what I want).  However, the events are not 'eagerly' fetched
-	// so the query to pull the data (and sort) only uses the 'shipment_event' table.  So for now, I'm going to 
-	// use a SortedSet for events and have the Event class implement Comparable. 
+	// so the query to pull the data (and sort) only uses the 'shipment_event' table.  So for now, I'm going to
+	// use a SortedSet for events and have the Event class implement Comparable.
 
 	static mapping = {
 		id generator: 'uuid'
@@ -124,38 +143,32 @@ class Shipment implements Comparable, Serializable {
 		additionalInformation type: "text"
 		events cascade: "all-delete-orphan"
 		comments cascade: "all-delete-orphan"
-		//containers cascade: "all-delete-orphan"
 		documents cascade: "all-delete-orphan"
-		//shipmentItems cascade: "all-delete-orphan"
         shipmentItemCount(formula: '(select count(shipment_item.id) from shipment_item where (shipment_item.shipment_id = id))')
 		shipmentMethod cascade: "all-delete-orphan"
 		referenceNumbers cascade: "all-delete-orphan"
-		receipt cascade: "all-delete-orphan"
+		receipts cascade: "all-delete-orphan"
 		containers sort: 'sortOrder', order: 'asc'
-		//shipmentItems sort: 'lotNumber', order: 'asc'
-		//events joinTable:[name:'shipment_event', key:'shipment_id', column:'event_id']
-        //outgoingTransactions cascade: "all-delete-orphan"
-        //incomingTransactions cascade: "all-delete-orphan"
-
 	}
 
 	// Constraints
 	static constraints = {
 		name(nullable:false, blank: false, maxSize: 255)
-		shipmentNumber(nullable:true, maxSize: 255)
-		origin(nullable:false, 
+		description(nullable:true, blank: true)
+		shipmentNumber(nullable:true, blank: false, maxSize: 255)
+		origin(nullable:false,
 			validator: { value, obj -> !value.equals(obj.destination)})
-		destination(nullable:false)		
-		expectedShippingDate(nullable:false, 
-			validator: { value, obj-> !obj.expectedDeliveryDate || value.before(obj.expectedDeliveryDate + 1)})		
-		expectedDeliveryDate(nullable:true)	// optional		
+		destination(nullable:false)
+		expectedShippingDate(nullable:false,
+			validator: { value, obj-> !obj.expectedDeliveryDate || value.before(obj.expectedDeliveryDate + 1)})
+		expectedDeliveryDate(nullable:true)	// optional
 		shipmentType(nullable:false)
 		shipmentMethod(nullable:true)
-		receipt(nullable:true)
 		additionalInformation(nullable:true, maxSize: 2147483646)
 		carrier(nullable:true)
 		recipient(nullable:true)
 		donor(nullable:true)
+		driverName(nullable:true)
 		statedValue(nullable:true, max:99999999F)
 		totalValue(nullable:true, max:99999999F)
 		dateCreated(nullable:true)
@@ -164,62 +177,64 @@ class Shipment implements Comparable, Serializable {
 		weightUnits(nullable:true)
 		// a shipment can't have two reference numbers of the same type (we may want to change this, but UI makes this assumption at this point)
 		referenceNumbers ( validator: { referenceNumbers ->
-        	referenceNumbers?.collect( {it.referenceNumberType?.id} )?.unique( { a, b -> a <=> b } )?.size() == referenceNumbers?.size()        
+        	referenceNumbers?.collect( {it.referenceNumberType?.id} )?.unique( { a, b -> a <=> b } )?.size() == referenceNumbers?.size()
 		} )
 
 		// a shipment can't have two events with the same event code (this should be the case for the current event codes: CREATED, SHIPPED, RECEIVED)
 		// we may want to change this in the future?
 		events ( validator: { events ->
-        	events?.collect( {it.eventType?.eventCode} )?.unique( { a, b -> a <=> b } )?.size() == events?.size()        
+        	events?.collect( {it.eventType?.eventCode} )?.unique( { a, b -> a <=> b } )?.size() == events?.size()
 		} )
-
+		requisition(nullable:true)
+		shipmentItemCount(nullable:true)
         currentStatus(nullable:true)
         currentEvent(nullable:true)
         createdBy(nullable:true)
         updatedBy(nullable:true)
     }
 
+
 	String toString() { return "$name"; }
-	
+
 	/**
 	 * Sort by name
 	 */
-	
+
 	// TODO: is this in descending order for a good reason?
-	int compareTo(obj) { 
-		obj.name <=> name 
+	int compareTo(obj) {
+		obj.name <=> name
 	}
 
-	/** 
+	/**
 	 * Transient method that gets all shipment items two-levels deep.
-	 * 
+	 *
 	 * TODO Need to make this recursive.
-	 * 	
+	 *
 	 * @return
 	 */
-	
-	Collection<ShipmentItem> getAllShipmentItems() { 		
-		List<ShipmentItem> shipmentItems = new ArrayList<ShipmentItem>();	
-		
-		for (shipmentItem in unpackedShipmentItems) { 
+
+	Collection<ShipmentItem> getAllShipmentItems() {
+		List<ShipmentItem> shipmentItems = new ArrayList<ShipmentItem>();
+
+		for (shipmentItem in unpackedShipmentItems) {
 			shipmentItems.add(shipmentItem)
 		}
-			
+
 		for (container in containers) {
-			for (shipmentItem in container?.shipmentItems) { 
-				shipmentItems.add(shipmentItem);				
+			for (shipmentItem in container?.shipmentItems) {
+				shipmentItems.add(shipmentItem);
 			}
-			for (childContainer in container?.containers) { 
-				for (shipmentItem in childContainer?.shipmentItems) { 
+			for (childContainer in container?.containers) {
+				for (shipmentItem in childContainer?.shipmentItems) {
 					shipmentItems.add(shipmentItem);
 				}
 			}
 		}
-		return shipmentItems;		
+		return shipmentItems;
 	}
-	
-	Collection<ShipmentItem> getUnpackedShipmentItems() { 
-		return shipmentItems.findAll { !it.container }  
+
+	Collection<ShipmentItem> getUnpackedShipmentItems() {
+		return shipmentItems.findAll { !it.container }
 	}
 
 	/**
@@ -243,96 +258,111 @@ class Shipment implements Comparable, Serializable {
 
 		return shipmentItems?.sort(shipmentItemComparator)
 	}
-	
+
 	//String getShipmentNumber() {
 	//	return (id) ? "S" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
 	//}
 
 
-	Map<String, List<Container>> getContainersByType() { 
+	Map<String, List<Container>> getContainersByType() {
 		Map<String, List<Container>> containerMap = new HashMap<String,List<Container>>();
-		containers.each { 
-			
+		containers.each {
+
 			def containersByType = containerMap.get(it.containerType.name);
-			if (!containersByType) { 
+			if (!containersByType) {
 				containersByType = new ArrayList<Container>();
 			}
 			containersByType.add(it);
-			containerMap.put(it.containerType.name, containersByType)			
+			containerMap.put(it.containerType.name, containersByType)
 		}
 		return containerMap;
-		
+
 	}
-	
-	Boolean isPending() { 
+
+	Boolean isPending() {
 		return !this.hasShipped() && !this.wasReceived()
 	}
-	
-	
+
+
 	Boolean hasShipped() {
 		return events.any { it.eventType?.eventCode == EventCode.SHIPPED }
 	}
-	
-	Boolean wasReceived() { 
+
+	Boolean wasReceived() {
 		return events.any { it.eventType?.eventCode == EventCode.RECEIVED }
 	}
-	
+
+	Boolean wasPartiallyReceived() {
+		return events.any { it.eventType?.eventCode == EventCode.PARTIALLY_RECEIVED }
+	}
+
 	/*
-	Boolean isIncoming(Location currentLocation) { 
+	Boolean isIncoming(Location currentLocation) {
 		//return destination?.id == currentLocation?.id
 		return true;
 	}
-	
-	Boolean isOutgoing(Location currentLocation) { 
+
+	Boolean isOutgoing(Location currentLocation) {
 		//return origin?.id == currentLocation?.id
 		return false;
 	}
-	
-	Boolean isIncomingOrOutgoing(Location currentLocation) { 
+
+	Boolean isIncomingOrOutgoing(Location currentLocation) {
 		return isIncoming(currentLocation) || isOutgoing(currentLocation)
 	}
-	
-	Boolean isDeleteAllowed(Location currentLocation) { 
+
+	Boolean isDeleteAllowed(Location currentLocation) {
 		return isIncomingOrOutgoing(currentLocation)
 	}
-	
-	Boolean isEditAllowed(Location currentLocation) { 
+
+	Boolean isEditAllowed(Location currentLocation) {
 		return isIncomingOrOutgoing(currentLocation)
 	}
 	*/
 
-	Boolean isReceiveAllowed() { 
+    Boolean isStockMovement() {
+        return requisition != null
+    }
+
+	Boolean isReceiveAllowed() {
 		return hasShipped() && !wasReceived()
 	}
-	
-	Boolean isSendAllowed() { 
+
+    Boolean isPartialReceiveAllowed() {
+        return isReceiveAllowed() && isStockMovement()
+    }
+
+	Boolean isSendAllowed() {
 		return !hasShipped() && !wasReceived()
 	}
-	
-	ReferenceNumber getReferenceNumber(String typeName) { 
+
+    Boolean isFullyReceived() {
+        return shipmentItems?.every { ShipmentItem shipmentItem -> shipmentItem.isFullyReceived() }
+    }
+
+	ReferenceNumber getReferenceNumber(String typeName) {
 		def referenceNumberType = ReferenceNumberType.findByName(typeName);
-		if (referenceNumberType) { 
-			for(referenceNumber in referenceNumbers) { 
-				if (referenceNumber.referenceNumberType == referenceNumberType) { 
+		if (referenceNumberType) {
+			for(referenceNumber in referenceNumbers) {
+				if (referenceNumber.referenceNumberType == referenceNumberType) {
 					return referenceNumber;
 				}
 			}
 		}
 		return null;
-		
 	}
 
-	
-	Date getActualShippingDate() { 
-		for (event in events) { 
-			if (event?.eventType?.eventCode == EventCode.SHIPPED) { 
+
+	Date getActualShippingDate() {
+		for (event in events) {
+			if (event?.eventType?.eventCode == EventCode.SHIPPED) {
 				return event?.eventDate;
 			}
 		}
 		return null;
 	}
 
-	Date getActualDeliveryDate() { 
+	Date getActualDeliveryDate() {
 		for (event in events) {
 			if (event?.eventType?.eventCode == EventCode.RECEIVED) {
 				return event?.eventDate;
@@ -340,52 +370,62 @@ class Shipment implements Comparable, Serializable {
 		}
 		return null;
 	}
-		
-	
-	Event getMostRecentEvent() { 		
+
+
+	Event getMostRecentEvent() {
 		if (events && events.size() > 0) {
 			return events.iterator().next();
 		}
 		return null;
 	}
-	
-	ShipmentStatus getStatus() { 		
+
+	ShipmentStatus getStatus() {
 		if (this.wasReceived()) {
-			return new ShipmentStatus( [ code:ShipmentStatusCode.RECEIVED, 
+			return new ShipmentStatus( [ code:ShipmentStatusCode.RECEIVED,
 			                             date:this.getActualDeliveryDate(),
 			                             location:this.destination] )
 		}
+        else if (wasPartiallyReceived()) {
+            return new ShipmentStatus( [ code:ShipmentStatusCode.PARTIALLY_RECEIVED,
+                                         date:this.getActualDeliveryDate(),
+                                         location:this.destination] )
+        }
 		else if (this.hasShipped()) {
 			return new ShipmentStatus( [ code:ShipmentStatusCode.SHIPPED,
 			                             date:this.getActualShippingDate(),
 			                             location:this.origin] )
 		}
 		else {
-			return new ShipmentStatus( [ code:ShipmentStatusCode.PENDING, 
+			return new ShipmentStatus( [ code:ShipmentStatusCode.PENDING,
 			                             date:null,
 			                             location:null] )
 		}
 	}
-		
+
 	/**
 	 * Adds a new container to the shipment of the specified type
 	 */
 	Container addNewContainer (ContainerType containerType) {
 		def sortOrder = (this.containers) ? this.containers.size() : 0
-		
+
 		def container = new Container(
-			containerType: containerType, 
+			containerType: containerType,
 			shipment: this,
 			recipient: this.recipient,
 			sortOrder: sortOrder
 		)
-		
+
 		addToContainers(container)
-			
+
 		return container
 	}
 
-
+    Receipt getReceipt() {
+        if (receipts?.size()>1) {
+            throw new IllegalStateException("Multiple receipts not supported on existing inbound shipments")
+        }
+        return receipts ? receipts.first() : null
+    }
 
     /**
      * Get all recipients for this shipment
@@ -411,11 +451,11 @@ class Shipment implements Comparable, Serializable {
     }
 
     String getConsigneeAddress() {
-        return destination.address.description?:destination?.locationGroup.address?.description
+        return destination?.address?.description?:destination?.locationGroup?.address?.description
     }
 
     String getConsignorAddress() {
-        return origin.address.description?:origin?.locationGroup.address?.description
+        return origin?.address?.description?:origin?.locationGroup?.address?.description
     }
 
 	/**
@@ -424,7 +464,7 @@ class Shipment implements Comparable, Serializable {
 	void cloneContainer(Container container, Integer quantity) {
 		// def newContainer = new Container()
 	}
-	
+
 	Float totalWeightInKilograms() {
 		return containers.findAll { it.parentContainer == null }.collect { it.totalWeightInKilograms() }.sum()
 	}
@@ -433,6 +473,10 @@ class Shipment implements Comparable, Serializable {
 		return containers.findAll { it.parentContainer == null }.collect { it.totalWeightInPounds() }.sum()
 	}
 
+	Float calculateTotalValue() {
+		return shipmentItems?.findAll { it.product.pricePerUnit }.
+				collect { it?.quantity?:0 * it.product.pricePerUnit }.sum()?:0
+	}
 
 	Collection findAllParentContainers() {
 		return containers.findAll { !it.parentContainer }
@@ -446,13 +490,24 @@ class Shipment implements Comparable, Serializable {
 		return containers.find { it.name.equalsIgnoreCase(name) }
 	}
 
-	Container addNewPallet(palletName) {
-		ContainerType palletType = ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID)
-		Container pallet = addNewContainer(palletType)
-		pallet.name = palletName
-		return pallet;
+    Container findContainerByNameAndContainerType(String name, ContainerType containerType) {
+        return containers.find { it.name.equalsIgnoreCase(name) && it.containerType.equals(containerType) }
+    }
+
+
+    Container addNewPallet(String name) {
+		return addNewContainer(name, ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID))
 	}
 
+    Container addNewBox(String name) {
+        return addNewContainer(name, ContainerType.findById(Constants.BOX_CONTAINER_TYPE_ID))
+    }
+
+    Container addNewContainer(String name, ContainerType containerType) {
+        Container container = addNewContainer(containerType)
+        container.name = name
+        return container
+    }
 
 	Container findOrCreatePallet(String palletName) {
 		Container pallet = findContainerByName(palletName)
@@ -462,7 +517,16 @@ class Shipment implements Comparable, Serializable {
 		return pallet
 	}
 
-	ShipmentItem getNextShipmentItem(String currentShipmentItemId) {
+    Container findOrCreateContainer(String containerName, ContainerType containerType) {
+        Container container = findContainerByNameAndContainerType(containerName, containerType)
+        if (!container) {
+            container = addNewContainer(containerName, containerType)
+        }
+        return container
+    }
+
+
+    ShipmentItem getNextShipmentItem(String currentShipmentItemId) {
 		def nextIndex
 		def shipmentItems = sortShipmentItems()
 		def shipmentItemIndex = shipmentItems.findIndexOf { it.id == currentShipmentItemId }

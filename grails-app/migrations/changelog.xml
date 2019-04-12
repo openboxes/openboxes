@@ -7,5 +7,6 @@
 	<include file="0.5.x/changelog.xml"/>
     <include file="0.6.x/changelog.xml"/>
     <include file="0.7.x/changelog.xml"/>
+    <include file="0.8.x/changelog.xml"/>
 
 </databaseChangeLog>

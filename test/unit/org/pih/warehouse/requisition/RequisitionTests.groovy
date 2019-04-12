@@ -1,12 +1,25 @@
 package org.pih.warehouse.requisition
 
 import grails.test.GrailsUnitTestCase
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.pih.warehouse.core.*
 import org.pih.warehouse.picklist.PicklistItem
 
 
 class RequisitionTests extends GrailsUnitTestCase {
+
+    @Before
+    void setUp() {
+        super.setUp()
+        mockConfig("openboxes.anonymize.enabled = false")
+    }
+
+    @After
+    void tearDown() {
+        super.tearDown()
+    }
 
     @Test
     void calculatePercentageCompleted_shouldBeNotCompleted() {
@@ -96,7 +109,7 @@ class RequisitionTests extends GrailsUnitTestCase {
        //tomorrow.clearTime()
        def today = new Date()
 	   today.clearTime()
-	   
+
 	   assert requisition.requestedDeliveryDate >= today
     }
 
@@ -218,7 +231,7 @@ class RequisitionTests extends GrailsUnitTestCase {
       assert json.requestedById == peter.id
       assert json.requestedByName == peter.getName()
       assert json.dateRequested == today.format("MM/dd/yyyy")
-      assert json.requestedDeliveryDate == tomorrow.format("MM/dd/yyyy")
+      assert json.requestedDeliveryDate == tomorrow.format("MM/dd/yyyy HH:mm XXX")
       assert json.name == requisition.name
       assert json.version == requisition.version
       assert json.lastUpdated == requisition.lastUpdated.format("dd/MMM/yyyy hh:mm a")

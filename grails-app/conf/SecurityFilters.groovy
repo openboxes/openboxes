@@ -7,16 +7,22 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/
+
+import org.apache.http.auth.AuthenticationException
 import org.apache.http.client.utils.URIBuilder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.util.RequestUtil
 
 class SecurityFilters {
 	
-  static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
-  static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo']
-  static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
+	static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
+	static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation']
+
+	static ArrayList controllersWithLocationNotRequired = ['categoryApi','productApi','genericApi', 'api']
+	static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
+
 	def authService 
 	def filters = {
 		loginCheck(controller:'*', action:'*') {
@@ -26,14 +32,13 @@ class SecurityFilters {
 				AuthService.currentUser.set(null)
 				AuthService.currentLocation.set(null)
 			}
-			before = {	
-				
+			before = {
+
 				// Set the current user (if there's on in the session)
 				if (session.user) { 
 					if (!AuthService.currentUser) {  
 						AuthService.currentUser = new ThreadLocal<User>()
 					}
-                    //println "Setting current user " + session.warehouse.id
 					AuthService.currentUser.set(User.get(session.user.id))
 				}
 				
@@ -41,10 +46,7 @@ class SecurityFilters {
 					if (!AuthService.currentLocation) { 
 						AuthService.currentLocation = new ThreadLocal<Location>()
 					}
-					
-					//println "Setting current location " + session.warehouse.id
 					AuthService.currentLocation.set(Location.get(session.warehouse.id))
-					//println "Getting currentLocation " + AuthService.currentLocation.get()
 				}
 				
 				// Need to bypass security filter when generating a PDF report, otherwise the 
@@ -54,7 +56,6 @@ class SecurityFilters {
 				//	log.info ("Location: " + session.location)
 				//	return true;
 				//}
-
 
 				// This allows requests for the health monitoring endpoint to pass through without a user
 				if (controllerName.equals("api") && actionName.equals("status")) {
@@ -87,34 +88,6 @@ class SecurityFilters {
                         if (request.queryString)
                             targetUri += "?" + request.queryString
                     }
-                    /*
-                    // Handle post
-                    else {
-                        try {
-                            log.info "Using referer as targetUri "
-                            URIBuilder builder = new URIBuilder(request.getHeader("referer"))
-                            //def queryString = builder.getQueryParams().collectEntries{[it.name, it.val]}.inject([]) { result, entry ->
-                            //    result << "${entry.key}=${URLEncoder.encode(entry.value.toString())}"
-                            //}.join('&')
-
-                            def params = builder.getQueryParams().inject([:]) {map, param ->
-                                map << [(param.name): param.value]
-                            }
-
-                            def queryString = params.inject([]) { result, entry ->
-                                result << "${entry.key}=${URLEncoder.encode(entry.value.toString())}"
-                            }
-                            targetUri = (builder.getPath() - request.contextPath);
-                            targetUri += "?" + queryString.join("&")
-
-                            println "targetUri: " + targetUri
-
-                        } catch (Exception e) {
-                            log.error("Error building targetUri based on referer: " + e.message, e)
-                            targetUri = "/dashboard/index?error=true"
-                        }
-                    }
-                    */
 
                     // Prevent user from being redirected to invalid pages after re-authenticating
                     if (!targetUri.contains("/dashboard/status") && !targetUri.contains("logout")) {
@@ -128,56 +101,37 @@ class SecurityFilters {
                         log.info "Not saving targetUri " + targetUri
                     }
 
+                    if (RequestUtil.isAjax(request)) {
+                        throw new AuthenticationException("Request requires authentication [${controllerName}:${actionName}]")
+                    }
 
                     redirect(controller: 'auth', action:'login')
 					return false;
 				}
 					
-				// When a user has an authenticated, we want to check if they have an active account
+				// When a user has been authenticated, we want to check if they have an active account
 				if (session?.user && !session?.user?.active) { 
 					session.user = null;
-					// FIXME cannot use warehouse tag lib here
-					// MissingPropertyException: No such property: warehouse for class: SecurityFilters
-					//flash.message = "${warehouse.message(code: 'auth.accountRequestUnderReview.message')}"
-					//flash.message = "auth.accountRequestUnderReview.message"
-					redirect(controller: 'auth', action:'login')
+
+                    if (RequestUtil.isAjax(request)) {
+                        throw new AuthenticationException("Request requires authentication [${controllerName}:${actionName}]")
+                    }
+
+                    redirect(controller: 'auth', action:'login')
 					return false;
 				}
 				
 				// When a user has not selected a warehouse and they are requesting an action that requires one, 
 				// we redirect to the choose warehouse page.
-				if (!session.warehouse && !(actionsWithLocationNotRequired.contains(actionName))) {						
-					//def targetUri = (request.forwardURI - request.contextPath);
-					//if (request.queryString)
-					//	targetUri += "?" + request.queryString
+				if (!session.warehouse && !(actionsWithLocationNotRequired.contains(actionName) ||
+                        controllersWithLocationNotRequired.contains(controllerName) || controllerName.endsWith("Api"))) {
 
-						
-					if (session?.warehouseStillNotSelected) { 
-						// FIXME cannot use warehouse tag lib here
-						// MissingPropertyException: No such property: warehouse for class: SecurityFilters
-						//flash.message = "${warehouse.message(code: 'warehouse.chooseLocationToManage.message')}"
-						//flash.message = "warehouse.chooseLocationToManage.message"
-					}
-					
 					session.warehouseStillNotSelected = true;
-					log.info "Location has not been selected, redirecting to chooseLocation ..."
-					//redirect(controller: 'dashboard', action: 'chooseLocation', params: ['targetUri': targetUri])
+					log.info "Request ${controllerName}:${actionName} requires location, redirecting to chooseLocation ..."
 					redirect(controller: 'dashboard', action: 'chooseLocation')
 					return false;
 				}
 			}
 		}
-	
-		/*
-		shipmentAccess(controller:'shipment', action:'*') {
-			before = {
-				def user = session.user;
-				log.info "\n\n\nshipmentAccess: " + user;
-				render(view: "/errors/accessDenied");
-				return false;
-				
-			}
-		}*/
-
 	}
 }

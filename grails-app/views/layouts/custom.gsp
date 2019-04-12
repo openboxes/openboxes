@@ -15,10 +15,10 @@
     <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${createLinkTo(dir:'js/chosen',file:'chosen.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.min.css" type="text/css">
+    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footable.css')}" type="text/css" media="all" />
+
     <%--<link rel="stylesheet" href="${createLinkTo(dir:'js/feedback',file:'feedback.css')}" type="text/css" media="all" />--%>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.css" type="text/css" media="all" />
-
-
     <!-- Include javascript files -->
     <g:javascript library="application"/>
 
@@ -44,6 +44,8 @@
     <g:layoutHead />
 
     <g:render template="/common/customCss"/>
+    <g:render template="/common/fullstory"/>
+    <g:render template="/common/hotjar"/>
 
     <ga:trackPageview />
     <r:layoutResources/>
@@ -62,15 +64,28 @@
 </g:if>
  --%>
 
+    <g:if test="${session.impersonateUserId}">
+        <div class="notice center">
+            <g:message code="user.impersonate.message" args="[session.user.username]" default="You are impersonating user {0}."/>
+            <g:link controller="auth" action="logout" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'door_out.png')}"/>&nbsp;
+                ${g.message(code:'default.logout.label', default: "Logout")}
+            </g:link>
+        </div>
+    </g:if>
     <g:if test="${session.useDebugLocale}">
 
-        <div id="debug-header" class="notice box" style="margin-bottom: 0px;">
-            You are in DEBUG mode.
-            <g:link controller="localization" action="list" class="button icon log">Show all localizations</g:link>
-            <g:link controller="localization" action="create" class="button icon add">Create new localization</g:link>
+        <div id="debug-header" class="notice" style="margin: 10px;">
+            <warehouse:message code="localization.custom.message"/>
+            <g:link controller="localization" action="list" class="button">
+                <warehouse:message code="default.list.label" args="[message(code: 'localizations.label')]"/>
+            </g:link>
+            <g:link controller="localization" action="create" class="button">
+                <warehouse:message code="default.add.label" args="[message(code: 'localization.label')]"/>
+            </g:link>
             <div class="right">
-                <g:link controller="user" action="disableDebugMode">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" class="middle"/>
+                <g:link controller="user" action="disableLocalizationMode" class="button">
+                    <warehouse:message code="localization.disable.label"/>
                 </g:link>
             </div>
             <div id="localizations">
@@ -132,7 +147,11 @@
         </div>
     </g:if>
 </div>
-
+<div id="dlgShowDialog" class="dialog hidden">
+    <div id="dlgShowDialogContent" class="empty center">
+        Loading ...
+    </div>
+</div>
 <!-- Include other plugins -->
 <script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
@@ -157,6 +176,7 @@
 <script src="${createLinkTo(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
+<script src="${createLinkTo(dir:'js/footable/', file:'footable.js')}" type="text/javascript" ></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.js" type="text/javascript"></script>
 <!-- JIRA Issue Collector -->
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.jira.issue.collector.enabled)}">
@@ -307,6 +327,53 @@
     </script>
 </g:if>
 
+<g:javascript>
+    $(document).ready(function() {
+
+        $(".btn-show-dialog").live("click", function (event) {
+            var url = $(this).data("url");
+            var title = $(this).data("title");
+            var target = $(this).data("target") || "#dlgShowDialog";
+            var width = $(this).data("width") || "800";
+            var position = {
+                my: "center center",
+                at: "center center",
+                of: window
+            };
+
+            $(target).attr("title", title);
+            $(target).dialog({
+                title: title,
+                autoOpen: true,
+                modal: true,
+                width: width,
+                autoResize:true,
+                resizable: true,
+                minHeight:"auto",
+                position: position,
+                open: function(event, ui) {
+                    $(this).html("Loading...");
+                    $(this).load(url, function(response, status, xhr) {
+                        if (xhr.status !== 200) {
+                            $(this).text("");
+                            $("<p></p>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
+                            var error = JSON.parse(response);
+                            var stack = $("<div></div>").addClass("stack empty").appendTo($(this));
+                            $("<code></code>").text(error.errorMessage).appendTo(stack)
+                        }
+                    });
+                }
+            }).dialog('open');
+        });
+
+        $(".btn-close-dialog").live("click", function () {
+            $("#dlgShowDialog").dialog( "close" );
+        });
+
+	});
+
+
+</g:javascript>
 <script type="text/javascript">
     $(document).ready(function() {
 

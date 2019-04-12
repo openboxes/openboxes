@@ -5,42 +5,27 @@
         <div class="box">
             <h2><warehouse:message code="default.filters.label"/></h2>
             <table>
-                <%--
-                <tr>
-                    <td>
-                        <label class="block">${warehouse.message(code:'default.searchTerms.label', default: "Search terms")}</label>
-                        <div>
-                            <g:textField name="terms"
-                                         value="${params.terms}"
-                                         style="width: 100%;"
-                                         placeholder="${warehouse.message(code:'order.searchTerms.label', default: 'Search by PO number, description, item name')}"
-                                         class="text medium"/>
-                        </div>
-                    </td>
-                </tr>
-
                 <tr class="prop">
                     <td>
                         <label class="block">${warehouse.message(code: 'order.orderNumber.label')}</label>
                         <div>
-                            <g:textField class="text" id="orderNumber" name="orderNumber" value="${params.orderNumber}" readonly="readonly" style="width: 100%;"
-                                         onclick="alert('This filter is not currently supported.');"/>
+                            <g:textField class="text" id="orderNumber" name="orderNumber" value="${params.orderNumber}" style="width:100%"/>
 
                         </div>
                     </td>
                 </tr>
-                --%>
-                <%--
                 <tr class="prop">
                     <td>
-                        <label>Total price</label>
+                        <label class="block">${warehouse.message(code: 'order.orderTypeCode.label')}</label>
                         <div>
-                            <g:textField class="text" id="totalPrice" name="totalPrice" value="${params.totalPrice}" style="width: 100%;"
-                                         readonly="readonly" size="10" onclick="alert('This filter is not currently supported.')"/>
+                            <g:select id="orderTypeCode" name="orderTypeCode"
+                                      from="${org.pih.warehouse.order.OrderTypeCode.list()}" class="chzn-select-deselect"
+                                      optionValue="${{ format.metadata(obj: it) }}" value="${params.orderTypeCode}"
+                                      noSelection="['': warehouse.message(code: 'default.all.label')]"/>
+
                         </div>
                     </td>
                 </tr>
-                --%>
 
                 <tr class="prop">
                     <td>
@@ -57,26 +42,25 @@
 
                 <tr class="prop">
                     <td>
-                        <label><warehouse:message code="order.destination.label"/></label>
+                        <label><warehouse:message code="order.origin.label"/></label>
                         <div>
-                            <g:select id="destination" name="destination" class="chzn-select-deselect"
-                                      from="${[session.warehouse]}"
-                                      optionKey="id" optionValue="name" value="${session.warehouse.id}"/>
+                            <g:selectLocation id="origin" name="origin" class="chzn-select-deselect"
+                                      optionKey="id" optionValue="name" value="${params.origin}" noSelection="['':'']" />
                         </div>
                     </td>
                 </tr>
 
                 <tr class="prop">
                     <td>
-                        <label><warehouse:message code="order.origin.label"/></label>
+                        <label><warehouse:message code="order.destination.label"/></label>
                         <div>
-                            <g:select id="origin" name="origin" class="chzn-select-deselect"
-                                      from="${suppliers}"
-                                      optionKey="id" optionValue="name" value="${origin}"
-                                      noSelection="['': warehouse.message(code: 'default.all.label')]"/>
+                            <g:selectLocation id="destination" name="destination" class="chzn-select-deselect"
+                                      optionKey="id" optionValue="name"
+                                      value="${params.destination?:session?.warehouse?.id}" noSelection="['':'']" />
                         </div>
                     </td>
                 </tr>
+
 
                 <tr class="prop">
                     <td>
@@ -99,10 +83,11 @@
                             <g:jqueryDatePicker id="statusStartDate" name="statusStartDate" placeholder="Start date"
                                                 size="40" numberOfMonths="2" changeMonthAndYear="false"
                                                 value="${statusStartDate}" format="MM/dd/yyyy"/>
+                            <a href="javascript:void(0);" id="clearStartDate">Clear</a>
                         </div>
-                        <a href="javascript:void(0);" id="clearStartDate">clear</a>
                     </td>
                 </tr>
+
                 <tr class="prop">
                     <td>
                         <label class="block">${warehouse.message(code: 'default.lastUpdatedBefore.label', default: 'Last updated before')}</label>
@@ -110,14 +95,10 @@
                             <g:jqueryDatePicker id="statusEndDate" name="statusEndDate" placeholder="End date" size="40"
                                                 numberOfMonths="2" changeMonthAndYear="true"
                                                 value="${statusEndDate}" format="MM/dd/yyyy"/>
+                            <a href="javascript:void(0);" id="clearEndDate">Clear</a>
                         </div>
-                        <a href="javascript:void(0);" id="clearEndDate">clear</a>
-
                     </td>
                 </tr>
-
-
-
 
                 <tr class="prop">
                     <td colspan="2">
@@ -137,10 +118,3 @@
         </div>
     </g:form>
 </div>
-
-
-
-
-
-
-

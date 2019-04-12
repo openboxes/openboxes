@@ -40,11 +40,9 @@ class ProductGroupTests extends GrailsUnitTestCase {
 		//mockForConstraintsTests(ProductGroup, [productGroup])
 
 		assertFalse productGroup.validate()
-		assertEquals 2, productGroup.errors.errorCount
-		assertEquals "nullable", productGroup.errors["description"]
-		assertEquals "nullable", productGroup.errors["category"]
-		//assertEquals "nullable", productGroup.errors["name"]
-		
+		assertEquals 1, productGroup.errors.errorCount
+		assertEquals "nullable", productGroup.errors["name"]
+
 		productGroup = new ProductGroup(name: "Name", description: "Description", category: category)
 	}
 	

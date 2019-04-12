@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1542836845508-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="requisition_template_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="requisition_template_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda (generated)" id="1542836845508-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1799509C2BDD17B3"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint constraintName="FK1799509C2BDD17B3"
+                                 baseTableName="requisition" baseColumnNames="requisition_template_id"
+                                 referencedTableName="requisition" referencedColumnNames="id" />
+
+    </changeSet>
+
+</databaseChangeLog>
+
+

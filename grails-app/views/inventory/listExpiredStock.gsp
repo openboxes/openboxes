@@ -27,6 +27,34 @@
                     <img src="${createLinkTo(dir:'images/icons/silk',file:'application_form_magnify.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" />
                     &nbsp;<warehouse:message code="inventory.browse.label"/>
                 </g:link>
+
+				<div class="right">
+					<div class="button-container">
+						<div class="button-group">
+							<a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createOutboundTransfer")}">
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}"/>
+								&nbsp;<g:message code="inventory.outgoingTransfer.label" />
+							</a>
+
+							<a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createExpired")}">
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'hourglass.png')}"/>
+								&nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
+							</a>
+
+							<a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createConsumed")}">
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'package_white.png')}" />
+								&nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
+							</a>
+						</div>
+
+						<g:link params="[format:'csv',category:params.category]" controller="${controllerName}" action="${actionName}" class="button">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="${warehouse.message(code: 'default.button.download.label') }" style="vertical-align: middle"/>
+							&nbsp; <g:message code="default.button.downloadAsCsv.label" default="Download as CSV"/>
+						</g:link>
+					</div>
+				</div>
+
+
             </div>
 
             <div class="yui-gf">
@@ -65,10 +93,6 @@
                         <h2>
                             <warehouse:message code="inventoryItems.expired.label" default="Expired inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
                         </h2>
-                        <div class="buttons" style="text-align: left">
-                            <g:render template="./actionsExpiredStock" />
-
-                        </div>
 
 
                         <div class="dialog">
@@ -175,7 +199,24 @@
 				$(".toggleCheckbox").click(function(event) {
                     $(':checkbox').not(this).prop('checked', this.checked);
 				});
-			});	
-		</script>	
+
+				$(".button-action").click(function(event) {
+					var numChecked = $("input.checkbox:checked").length;
+					if (numChecked <= 0) {
+						event.stopImmediatePropagation();
+						alert("${warehouse.message(code: 'inventory.selectAtLeastOneProduct.label')}");
+					}
+					else {
+						var form = $("#inventoryActionForm");
+						form.attr("action", $(this).data("action"));
+						form.submit();
+					}
+				});
+			});
+
+
+		</script>
+
+
 	</body>
 </html>

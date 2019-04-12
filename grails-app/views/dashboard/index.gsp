@@ -4,12 +4,12 @@
         <meta name="layout" content="custom" />
         <title>${warehouse.message(code: 'default.dashboard.label', default: 'Dashboard')}</title>
     </head>
-    <body>        
-		<div class="body">		
-		
+    <body>
+		<div class="body">
+
 			<g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
-            </g:if>		
+            </g:if>
 	    	<div id="dashboard">
 	    		<table>
 					<tr>
@@ -75,15 +75,21 @@
                                 </g:each>
                             </g:if>
                             <g:else>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.newsSummary.enabled}">
+                                    <g:render template="newsSummary"/>
+                                </g:if>
                                 <g:if test="${grailsApplication.config.openboxes.dashboard.activitySummary.enabled}">
                                     <g:render template="activitySummary"/>
                                 </g:if>
                                 <g:if test="${grailsApplication.config.openboxes.dashboard.tagSummary.enabled}">
                                     <g:render template="tagSummary" model="[tags:tags]"/>
                                 </g:if>
+                                <g:if test="${grailsApplication.config.openboxes.dashboard.catalogsSummary.enabled}">
+                                    <g:render template="catalogsSummary" model="[catalogs:catalogs]"/>
+                                </g:if>
                             </g:else>
 						</td>
-					
+
 					</tr>
 				</table>
 	    	</div>
@@ -96,10 +102,23 @@
                 $(".spinner").click(function() {
                     $(this).hide();
                 });
+
+              $(".tagcloud a").tagcloud(
+                {
+                size: {
+                  start:1.0,
+                  end: 2.0,
+                  unit: 'em'
+                },
+                color: {
+                  start: "#aaa", // "#CDE"
+                  end: "#F52"//"#FS2"
+                }
+              });
             });
 
         </script>
-		
+
     </body>
 </html>
 

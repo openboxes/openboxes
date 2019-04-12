@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TextField component is correctly rendering renders correctly 1`] = `
+<div
+  className="mt-2 form-group mb-0   "
+>
+  <div
+    className="row"
+  >
+    <label
+      className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right"
+      htmlFor="test-field"
+    >
+      test label
+    </label>
+    <div
+      className="col-md-4 col-7"
+    >
+      <input
+        className="form-control form-control-xs "
+        id="test-field"
+        onBlur={[Function]}
+        onChange={[Function]}
+        onKeyDown={[Function]}
+        onKeyPress={[Function]}
+        type="text"
+        value={undefined}
+      />
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;

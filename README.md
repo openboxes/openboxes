@@ -1,6 +1,6 @@
 [![Stories in Ready](https://badge.waffle.io/openboxes/openboxes.png?label=ready&title=Ready)](https://waffle.io/openboxes/openboxes)
-[![Build Status](https://travis-ci.org/openboxes/openboxes.svg?branch=master)](https://travis-ci.org/openboxes/openboxes)
-[![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=latest)](https://readthedocs.org/projects/openboxes/?badge=latest)
+[![Build Status](https://travis-ci.org/openboxes/openboxes.svg?branch=develop)](https://travis-ci.org/openboxes/openboxes)
+[![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
 [![Slack Signup](http://slack-signup.openboxes.com/badge.svg)](http://slack-signup.openboxes.com)
 
 OpenBoxes
@@ -24,39 +24,53 @@ You must not remove this notice, or any other, from this software.
 
 #### Install Dependencies
 
-* [Eclipse IDE for Java EE Developers](http://www.eclipse.org/downloads)
-* Java 1.6
-* [Grails 1.3.7](http://grails.org/download/archive/Grails)
+Required
+* Java 7
 * MySQL 5.5+
-* Tomcat 6 or 7 (optional for dev envrionment)
- 
+* [SDK Man] (http://sdkman.io/install.html)
+* [Grails 1.3.9](http://grails.org/download/archive/Grails)
+* NPM
+
+Optional
+* [IntelliJ IDEA 14.1] (https://www.jetbrains.com/idea/download/)
 
 #### Basic setup instructions for developers
 
-These instructions are for developers only.  If you are a user/implementer, please check out our [Installation](https://github.com/openboxes/openboxes/wiki/Installation) page.
+These instructions are for developers only.  If you are a user/implementer, please check out our [Installation](http://docs.openboxes.com/en/latest/installation/) documentation.
 
-##### 1. Install dependencies
+##### 1. Install Dependencies
+Install dependencies above
 
-* Install dependencies above
-* Install latest version of GVM (http://gvmtool.net/)
-* Install Grails 1.3.7
+##### 2. Install Grails
+Check that you have SDK Man installed properly (otherwise follow instructions on the skdman install page).
 ```
-gvm install grails 1.3.7
+$ sdk version
+SDKMAN 3.1.0
 ```
 
-##### 2. Clone repository 
+Install Grails 1.3.9
+```
+$ sdk install grails 1.3.9
+```
+
+##### 3. Clone repository 
 * If you are a not core contributor, fork [openboxes git repository](https://github.com/openboxes/openboxes)
 * If you are a core contributor:
 ```
 git clone git@github.com:openboxes/openboxes.git      
 ```
 Otherwise, replace git url with the one of your forked repository
+```
+git clone git@github.com:<gitusername>/openboxes.git      
+```
 
-##### 3. Create openboxes database 
+##### 4. Create database 
+Create openboxes database
 ```
 mysql -u root -p -e 'create database openboxes default charset utf8;'
 ```
-##### 4. Create openboxes user 
+
+Create openboxes user 
 ```
 mysql -u root -p -e 'grant all on openboxes.* to "openboxes"@"localhost" identified by "openboxes";'
 ```
@@ -70,12 +84,15 @@ Edit `$HOME/.grails/openboxes-config.properties`
 # If you want to run $ grails test-app you should comment out the dataSource.url below and create a new 
 # openboxes_test database.  Eventually, we will move to an in-memory H2 database for testing, but we're 
 # currently stuck with MySQL because I'm using some MySQL-specific stuff in the Liquibase changesets.  My bad.
+# 
+# MySQL 5.5 required a few extra parameters but these are no longer needed if using MySQL 5.7
+# ?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
 
-dataSource.url=jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
+dataSource.url=jdbc:mysql://localhost:3306/openboxes
 dataSource.username=openboxes
 dataSource.password=openboxes
 
-# OpenBoxes mail settings - disabled by default
+# OpenBoxes mail settings (disabled by default)
 grails.mail.enabled=false
 
 # OpenBoxes > Inventory Browser > Quick categories
@@ -111,7 +128,24 @@ instruct the application to not setup test fixtures automatically by uncommentin
 openboxes.fixtures.enabled=false
 ```
 
-##### 6. Upgrade the project to the currently installed grails version 
+##### 6. Install NPM dependencies
+```    
+npm install
+```
+
+##### 7. Build React frontend
+You can build React frontend with this command, but it will be automatically build when starting the application.
+```    
+npm run bundle
+```
+
+##### 8. React frontend Hot-Reload
+When using this command React fronted will be rebuild automatically after any change, you just need to refresh the browser to see the effect.
+```    
+npm run watch
+```
+
+##### 9. Upgrade the project to the currently installed grails version 
 Either of the following actions (upgrade, compile, run-app) should generate the all important Spring configuration (`/WEB-INF/applicationContext.xml`) and start the dependency resolution process.  
 
 ```    
@@ -131,22 +165,56 @@ If you see any errors, run the command again.
 
 Once the dependency resolution phase has completed, all dependencies will be stored in a local ivy cache (usually under `$USER_HOME/.grails/ivy-cache`).  You do not have to worry about this, just know that the dependencies are now on your machine and Grails will attempt to find them there before it tries to resolve them in a remote repository. 
 
-##### 7. Start application in development mode
+##### 10. Start application in development mode
 The application can be run in development mode.  This starts the application running in an instance of Tomcat within the Grails console.
 You may need to run 'grails run-app' several times in order to download all dependencies.
 ```
 grails run-app
 ```
 
-##### 8. Open application in Google Chrome 
+##### 11. Open application in Google Chrome 
 ```
 http://localhost:8080/openboxes
 ```
 
-##### 9. Log into OpenBoxes 
+##### 12. Log into OpenBoxes 
 You can use the default accounts (manager:password OR admin:password).  Once you are logged in as an admin, you can create own account.  Or you can use the signup form to create a new account.
 
+##### 13. React tests
+To run new frontend (React) tests type:
+```
+npm test
+```
+##### 13. React documentation
+Start a style guide dev server:
+```
+npm run styleguide
+```
+View your style guide in the browser:
+```
+http://localhost:6060
+```
+
 ### Troubleshooting
+
+#### How to Debug 
+* Run Grails in debug mode
+    ```
+    grails-debug run-app
+    ```
+* In Intellij navigate to Run > Edit Configurations
+* Create a new Remote Debug Configuration
+    * Name: openboxes-debug
+    * Transport: Socket
+    * Debugger mode: Attach
+    * Host: localhost
+    * Port: 5005
+* Command line arguments should look something like this: 
+    ```
+    -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+    ```
+
+
 #### Problem
 ```
 Caused by: java.io.FileNotFoundException: Could not open ServletContext resource [/WEB-INF/applicationContext.xml]

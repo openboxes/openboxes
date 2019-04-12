@@ -91,6 +91,8 @@
                                 <th class="center"><g:message code="inventoryItem.expirationDate.label"/></th>
                                 <th class="center"><g:message code="default.quantity.label"/></th>
                                 <th class="center"><g:message code="default.uom.label"/></th>
+                                <th class="center"><g:message code="productSupplier.unitCost.label"/></th>
+                                <th class="center"><g:message code="product.totalValue.label"/></th>
                             </tr>
                         </thead>
                     </table>
@@ -106,7 +108,7 @@
         $('#binLocationReportTable').dataTable( {
             "bProcessing": true,
             "sServerMethod": "GET",
-            "iDisplayLength": 25,
+            "iDisplayLength": 15,
             "bSearch": false,
             "bScrollCollapse": true,
             "bJQueryUI": true,
@@ -133,13 +135,6 @@
                     "error": handleAjaxError // this sets up jQuery to give me errors
                 } );
             },
-//            "fnServerData": function ( sSource, aoData, fnCallback ) {
-//                console.log("fnServerData");
-//                $.getJSON( sSource, aoData, function (json) {
-//                    console.log(json);
-//                    fnCallback(json);
-//                });
-//            },
             "oLanguage": {
                 "sZeroRecords": "No records found",
                 "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> <br/><br/> Loading... "
@@ -147,12 +142,10 @@
             //"fnInitComplete": fnInitComplete,
             //"iDisplayLength" : -1,
             "aLengthMenu": [
-                [5, 10, 25, 100, 1000, -1],
-                [5, 10, 25, 100, 1000, "All"]
+                [5, 15, 25, 100, 1000, -1],
+                [5, 15, 25, 100, 1000, "All"]
             ],
             "aoColumns": [
-
-                //{ "mData": "id", "sWidth": "1%" },
                 { "mData": "status", "sWidth": "1%" },
                 { "mData": "productCode", "sWidth": "1%" },
                 { "mData": "productName", "sWidth": "20%" },
@@ -160,16 +153,14 @@
                 { "mData": "lotNumber", "sWidth": "5%"  },
                 { "mData": "expirationDate", "sWidth": "5%"  },
                 { "mData": "quantity", "sWidth": "5%"  },
-                { "mData": "unitOfMeasure", "sWidth": "1%" }
+                { "mData": "unitOfMeasure", "sWidth": "1%" },
+                { "mData": "unitCost", "sWidth": "1%" },
+                { "mData": "totalValue", "sWidth": "1%", "sType":"currency" }
 
             ],
             "bUseRendered": false,
             "aaSorting": [[ 3, "desc" ], [4, "desc"]],
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                //console.log(nRow);
-                //console.log(aData);
-                //console.log(iDisplayIndex);
-
                 //$('td:eq(2)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
                 //    aData["productName"] + '</a>');
                 return nRow;
@@ -187,9 +178,6 @@
             //$('#binLocationReportTable').dataTable();
             //dataTable.fnDraw();
         });
-
-
-
     });
 
     function handleAjaxError( xhr, status, error ) {
@@ -204,8 +192,6 @@
                 return;
             }
             alert("An error occurred on the server.  Please contact your system administrator.");
-
-
 //            if (xhr.responseText) {
 //                var error = eval("(" + xhr.responseText + ")");
 //                alert("An error occurred on the server.  Please contact your system administrator.\n\n" + error.errorMessage);

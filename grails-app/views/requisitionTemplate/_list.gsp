@@ -1,32 +1,34 @@
 <table>
 	<thead>
 		<tr>
-			<th>
-				<warehouse:message code="default.actions.label"/>
-			</th>
+            <g:isUserAdmin>
+                <th>
+                    <warehouse:message code="default.actions.label"/>
+                </th>
+            </g:isUserAdmin>
 
             <%--
 			<g:sortableColumn property="status"
 				title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
-				
-				
+
+
 			<g:sortableColumn property="requestNumber"
 				title="${warehouse.message(code: 'requisition.requestNumber.label', default: 'Request number')}" />
-				
-				
+
+
 			<g:sortableColumn property="description"
 				title="${warehouse.message(code: 'default.description.label', default: 'Description')}" />
 			--%>
             <th>
                 <warehouse:message code="requisition.isPublished.label"/>
             </th>
+            <th>
+                <warehouse:message code="default.name.label"/>
+            </th>
 			<g:sortableColumn property="type"
 				title="${warehouse.message(code: 'default.type.label', default: 'Type')}" />
             <g:sortableColumn property="type"
                 title="${warehouse.message(code: 'commodityClass.label', default: 'Commodity Class')}" />
-            <th>
-                <warehouse:message code="default.name.label"/>
-            </th>
             <th>
                 <warehouse:message code="requisition.origin.label"/>
             </th>
@@ -58,35 +60,36 @@
 	<tbody>
         <g:unless test="${requisitions}">
            	<tr class="prop odd">
-           		<td colspan="12" class="center">
+           		<td colspan="13" class="center">
                     <div class="empty">
            			    <warehouse:message code="requisition.noRequisitionsMatchingCriteria.message"/>
                     </div>
 	           	</td>
-			</tr>     
-		</g:unless>	
+			</tr>
+		</g:unless>
 		<g:each in="${requisitions}" status="i" var="requisition">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-				<td>			
-					<g:render template="/requisitionTemplate/actions" model="[requisition:requisition]"/>
-				</td>
-                <%--
-				<td>
-					<label class="status"><format:metadata obj="${requisition?.status}"/></label>
-				</td>
-				<td>
-					${requisition.requestNumber }
-				</td>
-				<td>
-					<g:link action="show" id="${requisition.id}">						
-						${fieldValue(bean: requisition, field: "name")}
-					</g:link>
-				</td>
-				--%>
+                <g:isUserAdmin>
+                    <td>
+                        <g:render template="/requisitionTemplate/actions" model="[requisition:requisition]"/>
+                    </td>
+                </g:isUserAdmin>
                 <td>
-                    <span class="${(requisition?.isPublished)?'active':'inactive'}">
-                        <format:metadata obj="${requisition?.isPublished}"/>
-                    </span>
+                    <g:if test="${requisition.isPublished}">
+                        <div class="tag tag-alert">
+                            <warehouse:message code="default.published.label" default="Published"/>
+                        </div>
+                    </g:if>
+                    <g:else>
+                        <div class="tag tag-danger">
+                            <warehouse:message code="default.draft.label" default="Draft"/>
+                        </div>
+                    </g:else>
+                </td>
+                <td>
+                    <g:link action="show" id="${requisition?.id}">
+                        <format:metadata obj="${requisition?.name}"/>
+                    </g:link>
                 </td>
 				<td>
 					<format:metadata obj="${requisition?.type}"/>
@@ -95,16 +98,13 @@
                     <format:metadata obj="${requisition?.commodityClass}"/>
                 </td>
                 <td>
-                    <format:metadata obj="${requisition?.name}"/>
-                </td>
-                <td>
                     <format:metadata obj="${requisition?.origin?.name}"/>
                 </td>
                 <td>
                     <format:metadata obj="${requisition?.destination?.name}"/>
                 </td>
 				<td>
-
+                    ${requisition?.requisitionItems?.size()}
 				</td>
 				<td>${requisition.requestedBy}</td>
 

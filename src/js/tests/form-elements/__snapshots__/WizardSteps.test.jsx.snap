@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WizardSteps renders correctly 1`] = `
+<div
+  className="wizard-box container-fluid d-print-none"
+>
+  <div
+    className="row"
+  >
+    <div
+      className="wizard-steps d-flex flex-wrap"
+    >
+      <div
+        className="
+               
+              completed-step 
+              disabled-step "
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+        >
+          Create
+        </a>
+      </div>
+      <div
+        className="
+              active-step 
+               
+              disabled-step "
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+        >
+          Add items
+        </a>
+      </div>
+      <div
+        className="
+               
+               
+              disabled-step "
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+        >
+          Edit
+        </a>
+      </div>
+      <div
+        className="
+               
+               
+              disabled-step "
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+        >
+          Pick
+        </a>
+      </div>
+      <div
+        className="
+               
+               
+              disabled-step "
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+        >
+          Send
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+`;

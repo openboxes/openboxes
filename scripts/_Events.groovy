@@ -88,6 +88,22 @@ eventRunAppStart = {
 	metadata.'app.buildDate' = new java.text.SimpleDateFormat("d MMM yyyy hh:mm:ss a").format(new java.util.Date());
 	metadata.'app.buildNumber' = buildNumber.toString()
 	//metadata.persist()
+
+    println "Building React frontend"
+    def command = """npm run bundle"""
+    def proc = command.execute()
+    proc.waitFor()
+    println "${proc.in.text}"
+    if (proc.exitValue() == 1) {
+        event("ReactBuildFailed", ["React build FAILED"])
+    } else {
+        println "React build finished"
+    }
+}
+
+eventReactBuildFailed = { msg ->
+    println msg
+    System.exit(1)
 }
 
 eventCreateWarStart = { warName, stagingDir ->
@@ -113,26 +129,23 @@ eventCreateWarStart = { warName, stagingDir ->
 	}
 }
 
-
 eventTestPhaseStart = {name ->
     if (name == "unit") {
-//        println "Starting Jasmine Tests"
-//        def command = """phantomjs spec/lib/run_jasmine_test.coffee spec/TestRunner.html"""
-//        def proc = command.execute()
-//        proc.waitFor()
-//        println "${proc.in.text}"
-//        if (proc.exitValue() == 1) {
-//            event("JasminFailed", ["Tests FAILED"])
-//        } else {
-//            println "Tests PASSED"
-//        }
-    }
-    if (name == "functional"){
-       ant.delete(dir:"${basedir}/target/geb-reports")
+        println "Starting React Tests"
+        def command = """npm run test"""
+        def proc = command.execute()
+        proc.waitFor()
+        println "${proc.in.text}"
+        println "${proc.err.text}"
+        if (proc.exitValue() == 1) {
+            event("ReactTestsFailed", ["Tests FAILED"])
+        } else {
+            println "Tests PASSED"
+        }
     }
 }
 
-eventJasminFailed = { msg ->
+eventReactTestsFailed = { msg ->
     println msg
     System.exit(1)
 }

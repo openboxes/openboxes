@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.order
 
 import org.apache.commons.lang.StringEscapeUtils
@@ -31,18 +31,21 @@ class OrderController {
     }
 
     def list = {
-		
+
 		def suppliers = orderService.getSuppliers().sort();
 
-		def destination = Location.get(session.warehouse.id)
+		def name = params.name
+		def orderNumber = params.orderNumber
+		def orderTypeCode = params.orderTypeCode ? params.orderTypeCode as OrderTypeCode : null
 		def origin = params.origin ? Location.get(params.origin) : null
+		def destination = params.destination ? Location.get(params.destination) : Location.get(session?.warehouse?.id)
 		def status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
 		def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
 		def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
         def orderedBy = params.orderedById ? User.get(params.orderedById) : null
-				
-		def orders = orderService.getOrdersPlacedByLocation(destination, origin, orderedBy, status, statusStartDate, statusEndDate)
-		
+
+		def orders = orderService.getOrders(name, orderNumber, destination, origin, orderedBy, orderTypeCode, status, statusStartDate, statusEndDate)
+
 		// sort by order date
 		orders = orders.sort( { a, b ->
 			return b.dateOrdered <=> a.dateOrdered
@@ -57,15 +60,16 @@ class OrderController {
 
 		[ orders:orders, origin:origin?.id, destination:destination?.id,
 		  status:status, statusStartDate:statusStartDate, statusEndDate:statusEndDate,
-		  suppliers : suppliers, totalPrice:totalPrice, orderedByList: orderedByList
+		  suppliers : suppliers, totalPrice:totalPrice, orderedByList: orderedByList,
+		  orderTypeCode: orderTypeCode
 		]
     }
 
-	def listOrderItems = { 
-		def orderItems = OrderItem.getAll().findAll { !it.isCompletelyFulfilled() } ;		
-		return [orderItems : orderItems]		
+	def listOrderItems = {
+		def orderItems = OrderItem.getAll().findAll { !it.isCompletelyFulfilled() } ;
+		return [orderItems : orderItems]
 	}
-	
+
     def create = {
 		redirect(controller: 'purchaseOrderWorkflow', action: 'index');
     }
@@ -80,7 +84,7 @@ class OrderController {
             render(view: "create", model: [orderInstance: orderInstance])
         }
     }
-	
+
     def show = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
@@ -122,14 +126,14 @@ class OrderController {
 
 
 
-	
+
     def update = {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             if (params.version) {
                 def version = params.version.toLong()
                 if (orderInstance.version > version) {
-                    
+
                     orderInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'order.label', default: 'Order')] as Object[], "Another user has updated this Order while you were editing")
                     render(view: "edit", model: [orderInstance: orderInstance])
                     return
@@ -151,18 +155,18 @@ class OrderController {
     }
 
 
-	
-	
+
+
     def delete = {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             try {
-                orderInstance.delete(flush: true)
-                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+				orderService.deleteOrder(orderInstance)
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
                 redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
                 redirect(action: "list", id: params.id)
             }
         }
@@ -171,11 +175,11 @@ class OrderController {
             redirect(action: "list")
         }
     }
-	
-	
 
-	
-	def addComment = { 
+
+
+
+	def addComment = {
         def orderInstance = Order.get(params?.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -185,7 +189,7 @@ class OrderController {
             return [orderInstance: orderInstance, commentInstance: new Comment()]
         }
 	}
-	
+
 	def editComment = {
 		def orderInstance = Order.get(params?.order?.id)
 		if (!orderInstance) {
@@ -201,8 +205,8 @@ class OrderController {
 			render(view: "addComment", model: [orderInstance: orderInstance, commentInstance: commentInstance])
 		}
 	}
-	
-	def deleteComment = { 
+
+	def deleteComment = {
 		def orderInstance = Order.get(params.order.id)
 		if (!orderInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
@@ -214,7 +218,7 @@ class OrderController {
 				flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), params.id])}"
 				redirect(action: "show", id: orderInstance?.id)
 			}
-			else { 
+			else {
 				orderInstance.removeFromComments(commentInstance);
 				if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
 					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
@@ -224,16 +228,16 @@ class OrderController {
 					render(view: "show", model: [orderInstance: orderInstance])
 				}
 			}
-		}		
+		}
 	}
-	
-	def saveComment = { 
+
+	def saveComment = {
 		log.info(params)
-		
+
 		def orderInstance = Order.get(params?.order?.id)
-		if (orderInstance) { 
+		if (orderInstance) {
 			def commentInstance = Comment.get(params?.id)
-			if (commentInstance) { 
+			if (commentInstance) {
 				commentInstance.properties = params
 				if (!commentInstance.hasErrors() && commentInstance.save(flush: true)) {
 					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
@@ -243,7 +247,7 @@ class OrderController {
 					render(view: "addComment", model: [orderInstance: orderInstance, commentInstance: commentInstance])
 				}
 			}
-			else { 
+			else {
 				commentInstance = new Comment(params)
 				orderInstance.addToComments(commentInstance);
 				if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
@@ -254,12 +258,12 @@ class OrderController {
 					render(view: "addComment", model: [orderInstance: orderInstance, commentInstance:commentInstance])
 				}
 			}
-		}	
-		else { 
+		}
+		else {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
 			redirect(action: "list")
 		}
-		
+
 	}
 
 	def addDocument = {
@@ -272,7 +276,7 @@ class OrderController {
 			return [orderInstance: orderInstance]
 		}
 	}
-	
+
 	def editDocument = {
 		def orderInstance = Order.get(params?.order?.id)
 		if (!orderInstance) {
@@ -288,7 +292,7 @@ class OrderController {
 			render(view: "addDocument", model: [orderInstance: orderInstance, documentInstance: documentInstance])
 		}
 	}
-	
+
 	def deleteDocument = {
 		def orderInstance = Order.get(params.order.id)
 		if (!orderInstance) {
@@ -313,40 +317,40 @@ class OrderController {
 			}
 		}
 	}
-	
-	def receive = {		
+
+	def receive = {
 		def orderCommand = orderService.getOrder(params.id, session.user.id)
 		if (!orderCommand.order) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
 			redirect(action: "list")
 		}
-		else { 
+		else {
 			return [orderCommand: orderCommand]
 		}
 	}
-	
-	def saveOrderShipment = { OrderCommand command ->	
-		bindData(command, params)		
+
+	def saveOrderShipment = { OrderCommand command ->
+		bindData(command, params)
 		def orderInstance = Order.get(params?.order?.id);
 		command.order = orderInstance;
-		
+
 		orderService.saveOrderShipment(command)
-		
+
 		// If the shipment was saved, let's redirect back to the order received page
 		if (!command?.shipment?.hasErrors() && command?.shipment?.id) {
 			redirect(controller: "order", action: "receive", id: params?.order?.id)
 		}
-		
+
 		// Otherwise, we want to display the errors, so we need to render the page.
 		render(view: "receive", model: [orderCommand: command])
 	}
 
 	/*
-	def addOrderShipment = {  
+	def addOrderShipment = {
 		def orderCommand = orderService.getOrder(params.id, session.user.id)
 		int index = Integer.valueOf(params?.index)
 		def orderItemToCopy = orderCommand?.orderItems[index]
-		if (orderItemToCopy) { 
+		if (orderItemToCopy) {
 			def orderItemToAdd = new OrderItemCommand();
 			orderItemToAdd.setPrimary(false)
 			orderItemToAdd.setType(orderItemToCopy.type)
@@ -355,14 +359,14 @@ class OrderController {
 			orderItemToAdd.setOrderItem(orderItemToCopy.orderItem)
 			orderItemToAdd.setProductReceived(orderItemToCopy.productReceived)
 			orderItemToAdd.setQuantityOrdered(orderItemToCopy.quantityOrdered)
-			
+
 			orderCommand?.orderItems?.add(index+1, orderItemToAdd);
 		}
 		render(view: "receive", model: [orderCommand: orderCommand])
 		//redirect(action: "receive")
 	}
 
-	def removeOrderShipment = { 
+	def removeOrderShipment = {
 		log.info("Remove order shipment " + params)
 		def orderCommand = session.orderCommand
 		int index = Integer.valueOf(params?.index)
@@ -385,37 +389,37 @@ class OrderController {
 		}
 	}
 
-	def addOrderItemToShipment = { 
-		
+	def addOrderItemToShipment = {
+
 		def orderInstance = Order.get(params?.id)
 		def orderItem = OrderItem.get(params?.orderItem?.id)
 		def shipmentInstance = Shipment.get(params?.shipment?.id)
-		
-		if (orderItem) { 
+
+		if (orderItem) {
 			def shipmentItem = new ShipmentItem(orderItem.properties)
 			shipmentInstance.addToShipmentItems(shipmentItem);
-			if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush:true)) { 
-				
+			if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush:true)) {
+
 	//			def orderShipment = OrderShipment.link(orderItem, shipmentItem);
 				/*
-				if (!orderShipment.hasErrors() && orderShipment.save(flush:true)) { 
+				if (!orderShipment.hasErrors() && orderShipment.save(flush:true)) {
 					flash.message = "success"
 				}
-				else { 
+				else {
 					flash.message = "order shipment error(s)"
 					render(view: "fulfill", model: [orderShipment: orderShipment, orderItemInstance: orderItem, shipmentInstance: shipmentInstance])
 					return;
 				}*/
 			}
-			else { 
+			else {
 				flash.message = "${warehouse.message(code: 'order.shipmentItemErrors.message')}"
 				render(view: "fulfill", model: [orderItemInstance: orderItem, shipmentInstance: shipmentInstance])
 				return;
 			}
 		}
-		
+
 		redirect(action: "fulfill", id: orderInstance?.id)
-		
+
 	}
 
 	def download = {
@@ -429,10 +433,10 @@ class OrderController {
 		else {
 
 			def date = new Date();
-			response.setHeader("Content-disposition", "attachment; filename='PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv'")
+			response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance?.orderNumber?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv\"")
 			response.contentType = "text/csv"
 			def csv = "PO Number,${orderInstance?.orderNumber}\n" +
-					"Description,${StringEscapeUtils.escapeCsv(orderInstance?.description)}\n" +
+					"Description,${StringEscapeUtils.escapeCsv(orderInstance?.name)}\n" +
 					"Vendor,${StringEscapeUtils.escapeCsv(orderInstance?.origin.name)}\n" +
 					"Ship to,${orderInstance?.destination?.name}\n" +
 					"Ordered by,${orderInstance?.orderedBy?.name} ${orderInstance?.orderedBy?.email}\n" +
@@ -484,7 +488,7 @@ class OrderController {
 		else {
 
 			def date = new Date();
-			response.setHeader("Content-disposition", "attachment; filename='PO${orderInstance.orderNumber}-${orderInstance?.description?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv'")
+			response.setHeader("Content-disposition", "attachment; filename='\"${orderInstance.orderNumber}-${date.format("MM-dd-yyyy")}.csv\"")
 			response.contentType = "text/csv"
 			def csv = ""
 
@@ -630,7 +634,7 @@ class OrderController {
 
 	}
 
-	
-	
-		
+
+
+
 }

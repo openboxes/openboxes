@@ -20,15 +20,23 @@
             <table class="dataTable">
                 <thead>
                 <tr class="prop">
+                    <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
                     <th><g:message code="location.binLocation.label" default="Bin Location"/></th>
                     <th><g:message code="location.locationType.label"/></th>
-                    <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
                     <th><g:message code="default.actions.label"></g:message></th>
                 </tr>
                 </thead>
 
                 <g:each in="${binLocations}" var="binLocation" status="status">
                     <tr>
+                        <td>
+                            <g:if test="${binLocation.active}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />
+                            </g:if>
+                            <g:else>
+                                <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" />
+                            </g:else>
+                        </td>
                         <td>
                             <a href="${request.contextPath}/location/edit/${binLocation?.id}" fragment="location-details-tab">
                                 ${binLocation.name}
@@ -38,9 +46,6 @@
                             ${binLocation?.locationType?.name}
                         </td>
 
-                        <td>
-                            ${binLocation.active}
-                        </td>
                         <td>
                             <a href="javascript:void(-1)" class="btnShowContents button" data-id="${binLocation?.id}" fragment="location-details-tab">
                                 ${g.message(code: 'default.button.show.label')}

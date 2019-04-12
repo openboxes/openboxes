@@ -2,7 +2,7 @@
 <input id="${attrs.id}-id" class="value" type="hidden" name="${attrs.name}.id" value="${attrs.valueId}" ${attrs.valueDataBind}/>
 <input id="${attrs.id}-value" class="value" type="hidden" name="${attrs.name}.value" value="${attrs.valueId}" ${attrs.valueDataBind }/>
 <input id="${attrs.id}-suggest" type="text" ${attrs.textDataBind}
-       class="autocomplete text ${attrs.styleClass}" name="${attrs.name}.name" placeholder="${attrs.placeholder}" value="${attrs.valueName}"
+       class="autocomplete text ${attrs.styleClass}" name="${attrs.name}-name" placeholder="${attrs.placeholder}" value="${attrs.valueName}"
        style="width: ${attrs.width}px; display: ${attrs.suggestDisplay};" size="${attrs.size}">
 
 <script language="javascript">
@@ -21,19 +21,27 @@
         });
 
         $("#${attrs.id}-suggest").autocomplete({
-            delay: ${attrs.delay?:300},
-            minLength: ${attrs.minLength?:1},
+            delay: ${attrs.delay},
+            minLength: ${attrs.minLength},
             dataType: 'json',
             //define callback to format results
             source: function(req, add){
+                var $element = $(this.element);
+                var previous_request = $element.data( "jqXHR" );
+                if (previous_request) {
+                    previous_request.abort();
+                }
+
                 var currentLocationId = $("#currentLocationId").val();
-                $.getJSON('${attrs.jsonUrl}', { term: req.term, warehouseId: currentLocationId }, function(data) {
-                    var items = [];
-                        $.each(data, function(i, item) {
-                        items.push(item);
-                    });
-                    add(items);
-                });
+
+                $element.data( "jqXHR",
+                    $.getJSON('${attrs.jsonUrl}', { term: req.term, warehouseId: currentLocationId }, function(data) {
+                        var items = [];
+                            $.each(data, function(i, item) {
+                            items.push(item);
+                        });
+                        add(items);
+                    }));
             },
             focus: function(event, ui) {
                 return false;

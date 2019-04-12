@@ -17,17 +17,33 @@ import util.InventoryUtil;
 class InventoryLevel {
 	
 	String id
+
+	Product product;
+
 	InventoryStatus status = InventoryStatus.SUPPORTED;
-	//Boolean supported = Boolean.TRUE;
-    Boolean preferred = Boolean.FALSE
-	Product product;	
-	Integer minQuantity;			// Should warn user when quantity is below this value
-	Integer reorderQuantity;		// Should reorder product when quantity falls below this value
-	//Integer lowQuantity;			// Should alert user when quantity is below this value (emergency)
-	//Integer idealQuantity;			// Should warn user when the quantity is below this value
-	Integer maxQuantity;			// Should warn user when quantity is above this value
-	String binLocation
-	String abcClass                 // ABC analysis class
+
+	Boolean preferred = Boolean.FALSE
+
+	// Should warn user when quantity is below this value
+	Integer minQuantity;
+
+	// Should reorder product when quantity falls below this value
+	Integer reorderQuantity;
+
+	// Should alert user when quantity is below this value (emergency)
+	//Integer lowQuantity;
+
+	// Should warn user when the quantity is below this value
+	//Integer idealQuantity;
+
+	// Should warn user when quantity is above this value
+	Integer maxQuantity;
+
+    // Bin location where item is stored
+    String binLocation
+
+	// ABC analysis class
+	String abcClass
 	
 	// Auditing
 	Date dateCreated;

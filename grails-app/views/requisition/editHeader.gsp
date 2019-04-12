@@ -85,20 +85,13 @@
                                 </td>
                             </tr>
                             <tr class="prop">
-                                <td class="name"><label><warehouse:message
-                                            code="requisition.commodityClass.label" /></label></td>
-                                <td class="value">
-                                    <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass }" noSelection="['':'']" class="chzn-select-deselect"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
                                 <td class="name">
                                     <label for="origin.id">
                                         <warehouse:message code="requisition.origin.label" />
                                     </label>
                                 </td>
                                 <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                    <g:selectRequestOrigin name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
+                                    <g:selectLocation name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
                                                             noSelection="['null':'']"/>
                                 </td>
                             </tr>
@@ -109,22 +102,24 @@
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:isUserAdmin>
-                                        <g:selectDepot name="destination.id" value="${requisition?.destination?.id}" class="chzn-select-deselect"
-                                                       noSelection="['null':'']"/>
-                                    </g:isUserAdmin>
-                                    <g:isUserNotInRole roles="[RoleType.ROLE_ADMIN]">
-                                        ${requisition?.destination?.name}
-                                    </g:isUserNotInRole>
+                                    <g:selectLocation name="destination.id" value="${requisition?.destination?.id}"
+                                                      class="chzn-select-deselect" noSelection="['null':'']"/>
 
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name"><label><warehouse:message
+                                        code="requisition.commodityClass.label" /></label></td>
+                                <td class="value">
+                                    <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass }" noSelection="['':'']" class="chzn-select-deselect"/>
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td class="name"><label><warehouse:message
                                         code="requisition.requestedBy.label" /></label></td>
                                 <td class="value">
-                                    <g:selectPerson name="requestedBy" value="${requisition?.requestedBy}"
-                                                    noSelection="['null':'']" size="40"/>
+                                    <g:selectPerson name="requestedBy" value="${requisition?.requestedBy?.id}"
+                                                    noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
 
                                 </td>
                             </tr>
@@ -132,8 +127,8 @@
                                 <td class="name"><label><warehouse:message
                                         code="requisition.verifiedBy.label" /></label></td>
                                 <td class="value">
-                                    <g:selectPerson name="verifiedBy" value="${requisition?.verifiedBy}"
-                                                    noSelection="['null':'']" size="40"/>
+                                    <g:selectPerson name="verifiedBy" value="${requisition?.verifiedBy?.id}"
+                                                    noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
 
                                 </td>
                             </tr>
@@ -142,8 +137,8 @@
                                     <td class="name"><label><warehouse:message
                                             code="picklist.picker.label" /></label></td>
                                     <td class="value">
-                                        <g:selectPerson name="picklist.picker" value="${requisition?.picklist?.picker}"
-                                                        noSelection="['null':'']" size="40"/>
+                                        <g:selectPerson name="picklist.picker" value="${requisition?.picklist?.picker?.id}"
+                                                        noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
 
                                     </td>
                                 </tr>
@@ -152,8 +147,8 @@
                                 <td class="name"><label><warehouse:message
                                         code="requisition.checkedBy.label" /></label></td>
                                 <td class="value">
-                                    <g:selectPerson name="checkedBy" value="${requisition?.checkedBy}"
-                                                    noSelection="['null':'']" size="40"/>
+                                    <g:selectPerson name="checkedBy" value="${requisition?.checkedBy?.id}"
+                                                    noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
 
                                 </td>
                             </tr>
@@ -162,8 +157,8 @@
                                 <td class="name"><label><warehouse:message
                                         code="requisition.deliveredBy.label" /></label></td>
                                 <td class="value">
-                                    <g:selectPerson name="deliveredBy" value="${requisition?.deliveredBy}"
-                                                    noSelection="['null':'']" size="40"/>
+                                    <g:selectPerson name="deliveredBy" value="${requisition?.deliveredBy?.id}"
+                                                    noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
 
                                 </td>
                             </tr>
@@ -172,8 +167,8 @@
                                 <td class="name"><label><warehouse:message
                                         code="requisition.receivedBy.label" /></label></td>
                                 <td class="value">
-                                    <g:selectPerson name="receivedBy" value="${requisition?.receivedBy}"
-                                                    noSelection="['null':'']" size="40"/>
+                                    <g:selectPerson name="receivedBy" value="${requisition?.receivedBy?.id}"
+                                                    noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
 
                                 </td>
                             </tr>

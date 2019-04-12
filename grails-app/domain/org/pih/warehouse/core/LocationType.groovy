@@ -34,7 +34,9 @@ class LocationType implements Comparable, Serializable {
 		supportedActivities lazy: false
 		cache true
 	}
-	
+
+    static transients = ["defaultInternalLocationType", "internalLocationTypes"]
+
 	static constraints = { 
 		name(nullable:false, maxSize: 255)
         locationTypeCode(nullable:true)
@@ -63,7 +65,36 @@ class LocationType implements Comparable, Serializable {
    Boolean supports(String activity) {
 		return supportedActivities?.any {a -> activity == a.toString() };
    }
-	
+
+    static LocationType getDefaultInternalLocationType() {
+        def locationTypes = internalLocationTypes
+        return locationTypes ? locationTypes[0] : null
+    }
+
+	static List<LocationType> getInternalLocationTypes() {
+		return getInternalLocationTypes(null)
+	}
+
+	static List<LocationType> getInternalLocationTypes(ActivityCode[] activityCodes) {
+        def internalLocationTypesSupportingActivityCodes = []
+		def internalLocationTypes = LocationType.createCriteria().list {
+			'in'("locationTypeCode", [LocationTypeCode.BIN_LOCATION, LocationTypeCode.INTERNAL])
+		}
+
+        if (activityCodes) {
+            activityCodes.each { activityCode ->
+                internalLocationTypesSupportingActivityCodes << internalLocationTypes.findAll { internalLocationType ->
+                    internalLocationType.supports(activityCode)
+                }
+            }
+        }
+        else {
+            internalLocationTypesSupportingActivityCodes = internalLocationTypes
+        }
+        return internalLocationTypesSupportingActivityCodes?.sort()
+
+	}
+
 	
 	String toString() {
         return "${name}"

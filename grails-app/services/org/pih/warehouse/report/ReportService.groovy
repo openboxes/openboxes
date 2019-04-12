@@ -40,7 +40,9 @@ class ReportService implements ApplicationContextAware {
 	def shipmentService
 	def localizationService
 	def grailsApplication
-	
+	def userService
+
+
 	ApplicationContext applicationContext
 	
 	boolean transactional = true
@@ -112,8 +114,11 @@ class ReportService implements ApplicationContextAware {
 	 * 
 	 * @param command
 	 */
-	public void generateTransactionReport(InventoryReportCommand command) { 
-		
+	void generateTransactionReport(InventoryReportCommand command) {
+
+		// Ensure that the includeChildren flag is disabled
+		command?.includeChildren = false
+
 		def products = 
 			//inventoryService.getProductsByNestedCategory(command.category)
 			(command?.includeChildren) ? inventoryService.getProductsByNestedCategory(command.category) : 
@@ -180,7 +185,7 @@ class ReportService implements ApplicationContextAware {
 			def inventoryItem = it?.inventoryItem
 			def transactionType = it?.transaction?.transactionType
 			
-			log.info "transactionEntry -> " + it.transaction.transactionType.name + " = " + it.quantity
+			log.debug "transactionEntry -> " + it.transaction.transactionType.name + " = " + it.quantity
 			
 			def productEntry = command.entries[inventoryItem.product]
 			if (productEntry) { 
@@ -348,20 +353,21 @@ class ReportService implements ApplicationContextAware {
         def items = []
         def startTime = System.currentTimeMillis()
         def location = Location.get(locationId)
-        //def quantityMap = inventoryService.getQuantityByProductMap(session.warehouse.id)
-        def quantityMap = inventoryService.getInventoryStatusAndLevel(location)
 
-        quantityMap.each { product, map ->
+        def quantityMap = inventoryService.getInventoryStatusAndLevel(location)
+		def hasRoleFinance = userService.hasRoleFinance()
+
+        quantityMap.each { Product product, Map map ->
 
             def status = map.status
             def onHandQuantity = map.onHandQuantity
             def inventoryLevel = map.inventoryLevel
+			def unitPrice = hasRoleFinance? product?.pricePerUnit : null
+			def totalValue = hasRoleFinance ? ((product.pricePerUnit?:0) * (onHandQuantity?:0)) : null
 
-            println product.name + " = " + status
+			def imageUrl = (product.thumbnail)?'/openboxes/product/renderImage/${product?.thumbnail?.id}':''
 
-            //def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
-            def imageUrl = (product.thumbnail)?'/openboxes/product/renderImage/${product?.thumbnail?.id}':''
-            items << [
+			items << [
                     id:product.id,
                     name: product.name,
                     status: status,
@@ -375,10 +381,9 @@ class ReportService implements ApplicationContextAware {
                     minQuantity: inventoryLevel?.minQuantity?:0,
                     maxQuantity: inventoryLevel?.maxQuantity?:0,
                     reorderQuantity: inventoryLevel?.reorderQuantity?:0,
-                    unitPrice: product.pricePerUnit?:0.0,
-                    //onHandQuantity:value?:0.0,
+                    unitPrice: unitPrice?:0,
                     onHandQuantity:onHandQuantity,
-                    totalValue: (product.pricePerUnit?:0) * (onHandQuantity?:0)
+                    totalValue: totalValue?:0
             ]
         }
 

@@ -8,6 +8,9 @@
 * You must not remove this notice, or any other, from this software.
 **/ 
 package org.pih.warehouse.core
+
+import grails.orm.PagedResultList
+
 // import org.pih.warehouse.core.Location;
 import org.pih.warehouse.inventory.InventoryService;
 
@@ -31,6 +34,17 @@ class LocationControllerTests extends ControllerUnitTestCase {
 		])
 		mockDomain(LocationType, [depot, ward])
 		mockDomain(LocationGroup, [boston, mirebalais])
+
+		def locationServiceMock = mockFor(LocationService)
+		locationServiceMock.demand.getLocations { locationType, locationGroup, query, max, offset ->
+            println "Get locations"
+            if (query=="Bos") {
+                return new PagedResultList([Location.get(1)], 1)
+            }
+			return new PagedResultList(Location.list(), 4)
+		}
+
+		controller.locationService = locationServiceMock.createMock()
 		
 		depot = LocationType.get("1")
 		assertNotNull depot

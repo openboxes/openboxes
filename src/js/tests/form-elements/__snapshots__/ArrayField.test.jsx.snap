@@ -1,0 +1,580 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ArrayField component is correctly rendering with Add button 1`] = `
+<div
+  className="d-flex flex-column"
+>
+  <div
+    className="text-center border"
+  >
+    <div
+      className="d-flex flex-row border-bottom font-weight-bold py-1"
+<<<<<<< 49c2a247524fee233bef76472217177df25971f9
+    />
+=======
+    >
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        Name
+      </div>
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        Name
+      </div>
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        undefined
+      </div>
+    </div>
+>>>>>>> OBPIH-882 Update snapshots
+  </div>
+  <div
+    className="text-center border mb-1 flex-grow-1"
+    style={
+      Object {
+        "maxHeight": "calc(100vh - 400px)",
+        "overflowY": "scroll",
+      }
+    }
+  >
+    <div
+      className="table-row even-row "
+    >
+      <div
+        className="d-flex flex-row border-bottom table-inner-row"
+      >
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
+        />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[0].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
+        />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[0].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <button
+            className="btn btn-xs btn btn-outline-danger"
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      className="table-row  "
+    >
+      <div
+        className="d-flex flex-row border-bottom table-inner-row"
+      >
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
+        />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[1].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
+        />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[1].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <button
+            className="btn btn-xs btn btn-outline-danger"
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="text-center"
+  >
+    <button
+      className="btn btn-outline-success btn-xs"
+      onClick={[Function]}
+      type="button"
+    >
+      Add item
+    </button>
+  </div>
+</div>
+`;
+
+exports[`ArrayField component is correctly rendering with no Add button 1`] = `
+<div
+  className="d-flex flex-column"
+>
+  <div
+    className="text-center border"
+  >
+    <div
+      className="d-flex flex-row border-bottom font-weight-bold py-1"
+<<<<<<< 49c2a247524fee233bef76472217177df25971f9
+    />
+=======
+    >
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        Name
+      </div>
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        Name
+      </div>
+      <div
+        className="mx-1 text-truncate font-size-xs"
+        style={
+          Object {
+            "flex": "12 1 0",
+            "minWidth": 0,
+          }
+        }
+      >
+        undefined
+      </div>
+    </div>
+>>>>>>> OBPIH-882 Update snapshots
+  </div>
+  <div
+    className="text-center border mb-1 flex-grow-1"
+    style={
+      Object {
+        "maxHeight": "calc(100vh - 400px)",
+        "overflowY": "scroll",
+      }
+    }
+  >
+    <div
+      className="table-row even-row "
+    >
+      <div
+        className="d-flex flex-row border-bottom table-inner-row"
+      >
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
+        />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[0].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
+        />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[0].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <button
+            className="btn btn-xs btn btn-outline-danger"
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      className="table-row  "
+    >
+      <div
+        className="d-flex flex-row border-bottom table-inner-row"
+      >
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
+        />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[1].textField"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+<<<<<<< 7e731f820b329f1f95159934426a9348137b345b
+        />
+=======
+        >
+          <div
+            className=""
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+            tabIndex={undefined}
+            title={
+              <Translate
+                id={undefined}
+              />
+            }
+          >
+            <div
+              className="form-group mb-0   "
+            >
+              <input
+                className="form-control form-control-xs "
+                id="test-field[1].textField2"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                type="text"
+                value={undefined}
+              />
+            </div>
+          </div>
+        </div>
+>>>>>>> OBPIH-882 Update array field snapshot
+        <div
+          className="align-self-center mx-1"
+          style={
+            Object {
+              "flex": "12 1 0",
+              "minWidth": 0,
+            }
+          }
+        >
+          <button
+            className="btn btn-xs btn btn-outline-danger"
+            onClick={[Function]}
+            type="button"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

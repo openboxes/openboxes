@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1512927334382-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="click_stream"/>
+            </not>
+        </preConditions>
+        <createTable tableName="click_stream">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hostname" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="referrer" type="VARCHAR(255)"/>
+            <column name="session_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="click_stream_request"/>
+            </not>
+        </preConditions>
+        <createTable tableName="click_stream_request">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="click_stream_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="port" type="INT"/>
+            <column name="protocol" type="VARCHAR(8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="query" type="VARCHAR(255)"/>
+            <column name="server" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uri" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="person" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1512927334382-20">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKFD8E50671A43AB29"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="click_stream_id"
+                                 baseTableName="click_stream_request"
+                                 constraintName="FKFD8E50671A43AB29"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="click_stream"/>
+    </changeSet>
+
+</databaseChangeLog>

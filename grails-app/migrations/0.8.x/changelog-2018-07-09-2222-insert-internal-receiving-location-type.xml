@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1531192976274-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*)
+                FROM location_type
+                WHERE location_type_code = 'INTERNAL'
+                AND name = 'Receiving';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="location_type">
+            <column name="id" value="ff8081816482352b01648249e8cc0001"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Receiving"/>
+            <column name="description" value="Default receiving location type"/>
+            <column name="location_type_code" value="INTERNAL"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="date_created" valueDate="2018-07-09 00:00:00"/>
+            <column name="last_updated" valueDate="2018-07-09 00:00:00"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1531192976274-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*)
+                FROM location_type_supported_activities
+                WHERE location_type_id = 'ff8081816482352b01648249e8cc0001'
+                AND supported_activities_string = 'RECEIVE_STOCK';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" value="ff8081816482352b01648249e8cc0001"/>
+            <column name="supported_activities_string" value="RECEIVE_STOCK"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1531192976274-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*)
+                FROM location_type_supported_activities
+                WHERE location_type_id = 'ff8081816482352b01648249e8cc0001'
+                AND supported_activities_string = 'PUTAWAY_STOCK';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" value="ff8081816482352b01648249e8cc0001"/>
+            <column name="supported_activities_string" value="PUTAWAY_STOCK"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1531192976274-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*)
+                FROM location_type_supported_activities
+                WHERE location_type_id = 'ff8081816482352b01648249e8cc0001'
+                AND supported_activities_string = 'PICK_STOCK';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" value="ff8081816482352b01648249e8cc0001"/>
+            <column name="supported_activities_string" value="PICK_STOCK"/>
+        </insert>
+    </changeSet>
+
+
+    <changeSet author="jmiranda" id="1531192976274-5">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*)
+                FROM location_type_supported_activities
+                WHERE location_type_id = 'cab2b4f35ba2d867015ba2e17e390001'
+                AND supported_activities_string = 'PUTAWAY_STOCK';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" value="cab2b4f35ba2d867015ba2e17e390001"/>
+            <column name="supported_activities_string" value="PUTAWAY_STOCK"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="1531192976274-6">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*)
+                FROM location_type_supported_activities
+                WHERE location_type_id = 'cab2b4f35ba2d867015ba2e17e390001'
+                AND supported_activities_string = 'PICK_STOCK';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" value="cab2b4f35ba2d867015ba2e17e390001"/>
+            <column name="supported_activities_string" value="PICK_STOCK"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

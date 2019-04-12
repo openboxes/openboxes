@@ -6,19 +6,18 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.Inventory;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.picklist.PicklistItem;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
 
@@ -39,8 +38,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     String id
-	String description	
-	
+	String description
+
 	// Requested item or product
     Product product
     Category category
@@ -60,18 +59,24 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 	String cancelComments
 
 	// Miscellaneous information
-	Float unitPrice	
+	Float unitPrice
 	Person requestedBy	// the person who actually requested the item
 	Boolean substitutable = false
-    String recipient
     String comment
     Integer orderIndex = 0
+
+    // Used only with supplier stock movements
+    String palletName
+    String boxName
+    String lotNumber
+    Date expirationDate
 
 	// Parent requisition item
 	RequisitionItem parentRequisitionItem
     RequisitionItem substitutionItem
     RequisitionItem modificationItem
 
+    Person recipient
 
 	// Audit fields
 	Date dateCreated
@@ -80,11 +85,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     User updatedBy
 
 
-    static transients = [ "type" ]
-	
-	static belongsTo = [ requisition: Requisition ]	
+    static transients = [ "type", "substitutionItems", "monthlyDemand", 'totalCost']
+
+	static belongsTo = [ requisition: Requisition ]
 	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
-	
+
 	static mapping = {
 		id generator: 'uuid'
         picklistItems cascade: "all-delete-orphan", sort: "id"
@@ -102,7 +107,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         productPackage(nullable:true)
         inventoryItem(nullable:true)
         requestedBy(nullable:true)
-        quantity(nullable:false, min:1)
+        quantity(nullable:false, min:0)
         quantityApproved(nullable: true)
         quantityCanceled(nullable:true,
             validator: { value, obj->
@@ -120,6 +125,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         substitutable(nullable:false)
         comment(nullable:true)
         recipient(nullable:true)
+        palletName(nullable:true)
+        boxName(nullable:true)
+        lotNumber(nullable:true)
+        expirationDate(nullable:true)
         orderIndex(nullable: true)
 		parentRequisitionItem(nullable:true)
         createdBy(nullable: true)
@@ -300,7 +309,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         substitutionItem.productPackage = newProductPackage?:productPackage
         substitutionItem.quantity = newQuantity
         substitutionItem.quantityApproved = newQuantity
-        substitutionItem.parentRequisitionItem = this
+        addToRequisitionItems(substitutionItem)
         substitutionItem.orderIndex = orderIndex
         substitutionItem.save(flush: true, failOnError: true)
     }
@@ -325,7 +334,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
         // Remove all picklist items
         def picklistItems = getPicklistItems()
-        picklistItems.each {
+        picklistItems?.toArray()?.each {
             removeFromPicklistItems(it)
             it.picklist.removeFromPicklistItems(it)
             it.delete()
@@ -506,6 +515,18 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return quantityPicked?:0
     }
 
+
+
+    def calculateQuantityRevised() {
+        return modificationItem ? modificationItem?.quantity :
+                quantityCanceled ? (quantity - quantityCanceled) : null
+    }
+
+    def calculateQuantityRequired() {
+        return modificationItem ? modificationItem?.quantity :
+                quantityCanceled ? (quantity - quantityCanceled) : quantity
+    }
+
 	def calculateQuantityRemaining() {
         long startTime = System.currentTimeMillis()
 		def quantityRemaining = totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())
@@ -529,6 +550,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return picklistItems
     }
 
+    def retrievePicklistItemsSortedByBinName() {
+        def picklistItems = PicklistItem.findAllByRequisitionItem(this)
+        picklistItems.sort { a,b ->
+            a.binLocation?.name <=> b.binLocation?.name
+        }
+        return picklistItems
+    }
+
     def availableInventoryItems() {
         return InventoryItem.findAllByProduct(product)
     }
@@ -547,6 +576,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def calculatePercentageRemaining() {
         return totalQuantity()?(totalQuantityRemaining()/totalQuantity())*100:0
+    }
+
+    Integer getMonthlyDemand() {
+        return requisition?.replenishmentPeriod ? Math.ceil(((Double) quantity) / requisition.replenishmentPeriod * 30) : null
+    }
+
+    BigDecimal getTotalCost() {
+        return product.pricePerUnit ? quantity * product?.pricePerUnit : null
     }
 
     def next() {
@@ -568,6 +605,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return new RequisitionItem()
     }
 
+    Set<RequisitionItem> getSubstitutionItems() {
+        return requisitionItems.findAll { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
+    }
+
+
     /**
      * Sort by sort order, name
      *
@@ -577,6 +619,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return orderIndex <=> requisitionItem.orderIndex ?:
             requisitionItemType <=> requisitionItem?.requisitionItemType ?:
                 id <=> requisitionItem?.id
+    }
+
+    String toString() {
+        return "${product.productCode}:${status}:${requisitionItemType}:${quantity}"
     }
 
 
@@ -610,5 +656,30 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         ]
     }
 
+    Map toStockListDetailsJson() {
+        [
+                id: id,
+                quantity: quantity,
+                monthlyDemand: monthlyDemand,
+                productPackageId: productPackage?.id,
+                totalCost: totalCost ?: 0,
+                product: [
+                        id: product.id,
+                        productCode: product.productCode,
+                        name: product.name,
+                        category: product.category?.name,
+                        unitOfMeasure: product.unitOfMeasure,
+                        pricePerUnit: product.pricePerUnit ?: 0,
+                        packages: product.packages?.collect { [
+                                id: it.id,
+                                quantity: it.quantity,
+                                uom: [
+                                        code: it.uom?.code,
+                                        name: it.uom?.name
+                                ]
+                        ] }
+                ]
+        ]
+    }
 
 }

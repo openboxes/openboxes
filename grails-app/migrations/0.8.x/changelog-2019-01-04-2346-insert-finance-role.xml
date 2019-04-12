@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="adminuser (generated)" id="1546667174939-1">
+        <insert tableName="role">
+            <column name="id" value="ff808181681c757c01681c89c4960001"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Finance"/>
+            <column name="description" value="Allow user to view and modify financial information"/>
+            <column name="role_type" value="ROLE_FINANCE"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

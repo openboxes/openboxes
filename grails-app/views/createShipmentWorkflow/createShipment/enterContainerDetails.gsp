@@ -518,10 +518,15 @@
                     </td>
                 </tr>
                 </tbody>
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td>
+                        <g:submitButton name="importPackingList" value="Import Packing List" class="button icon add"></g:submitButton>
+                    </td>
+                </tr>
+                </tfoot>
             </table>
-            <div class="buttons">
-                <g:submitButton name="importPackingList" value="Import Packing List" class="button icon add"></g:submitButton>
-            </div>
         </g:uploadForm>
     </div>
 </div>

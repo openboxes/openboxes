@@ -10,7 +10,7 @@
                         <g:userPhoto user="${userInstance}"/>
                     </div>
                 </td>
-                <td width="50%">
+                <td>
                     <div class="title">
                         <g:link action="edit" id="${userInstance?.id}">
                             ${fieldValue(bean: userInstance, field: "firstName")} ${fieldValue(bean: userInstance, field: "lastName")}
@@ -47,17 +47,28 @@
     </div>
 </g:else>
 <div class="button-bar">
-    <g:link class="button icon search" action="list" controller="user">
-        <warehouse:message code="default.list.label" args="[g.message(code: 'users.label')]" />
+    <g:link class="button" action="list" controller="user">
+        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}"/>
+        <g:message code="default.list.label" args="[g.message(code: 'users.label')]" />
     </g:link>
-    <g:link class="button icon add" action="create" controller="user">
-        <warehouse:message code="default.create.label" args="[g.message(code: 'user.label')]" />
+    <g:link class="button" action="create" controller="user">
+        <img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}"/>
+        <g:message code="default.create.label" args="[g.message(code: 'user.label')]" />
     </g:link>
     <g:if test="${userInstance}">
-        <g:link class="button icon edit" action="edit" controller="user" id="${userInstance?.id}">
-            <warehouse:message code="default.edit.label" args="[g.message(code: 'user.label')]" />
+        <g:link class="button" action="edit" controller="user" id="${userInstance?.id}">
+            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}"/>
+            <g:message code="default.edit.label" args="[g.message(code: 'user.label')]" />
         </g:link>
     </g:if>
+    <g:isSuperuser>
+        <g:if test="${userInstance}">
+            <g:link class="button" action="impersonate" controller="user" id="${userInstance?.id}" target="_blank">
+                <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_switch.png')}"/>
+                <g:message code="user.impersonate.label" args="[g.message(code: 'user.label')]" />
+            </g:link>
+        </g:if>
+    </g:isSuperuser>
 </div>
 
 

@@ -9,6 +9,9 @@
 **/ 
 package org.pih.warehouse.order
 
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Party
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
@@ -21,16 +24,25 @@ import org.pih.warehouse.shipping.ShipmentItem
 class OrderItem implements Serializable {
 	
 	String id
-	String description	
+	String description
 	Category category
 	Product product
 	InventoryItem inventoryItem
 	Integer quantity
-	Float unitPrice
-	
+	BigDecimal unitPrice
+    String currencyCode
+
 	User requestedBy	// the person who actually requested the item
-	
-	
+    Person recipient
+
+    OrderItemStatusCode orderItemStatusCode = OrderItemStatusCode.PENDING
+    //OrderItem parentOrderItem
+
+	// Transfer order
+	Location originBinLocation
+	Location destinationBinLocation
+
+
 	// Audit fields
 	Date dateCreated
 	Date lastUpdated
@@ -41,9 +53,9 @@ class OrderItem implements Serializable {
 	
 	static transients = [ "orderItemType" ]
 	
-	static belongsTo = [ order : Order ]
+	static belongsTo = [ order : Order, parentOrderItem: OrderItem ]
 	
-	static hasMany = [ orderShipments : OrderShipment ]
+	static hasMany = [ orderShipments : OrderShipment, orderItems: OrderItem ]
 
     static constraints = {
     	description(nullable:true)
@@ -53,6 +65,12 @@ class OrderItem implements Serializable {
 		requestedBy(nullable:true)
 		quantity(nullable:false, min:1)
 		unitPrice(nullable:true)
+        orderItemStatusCode(nullable:true)
+        parentOrderItem(nullable:true)
+		originBinLocation(nullable:true)
+		destinationBinLocation(nullable:true)
+		recipient(nullable:true)
+		currencyCode(nullable:true)
 	}
 
 	

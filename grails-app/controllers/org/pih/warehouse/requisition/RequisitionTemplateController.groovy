@@ -12,13 +12,6 @@ package org.pih.warehouse.requisition
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem;
-
-import grails.converters.JSON
-import grails.validation.ValidationException;
-
-import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product;
 
 class RequisitionTemplateController {
@@ -26,6 +19,7 @@ class RequisitionTemplateController {
     def requisitionService
     def inventoryService
 	def productService
+    def userService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -37,8 +31,8 @@ class RequisitionTemplateController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         def requisitionCriteria = new Requisition()
         requisitionCriteria.name = "%" + params.q + "%"
-        requisitionCriteria.destination = Location.get(session.warehouse.id)
-        requisitionCriteria.origin = params?.originId ? Location.get(params?.originId): null
+        requisitionCriteria.origin = params?.origin?.id ? Location.get(params?.origin?.id): null
+        requisitionCriteria.destination = params?.destination?.id ? Location.get(params?.destination?.id): null
         requisitionCriteria.commodityClass = params.commodityClass?:null
         requisitionCriteria.type = params.requisitionType?:null
         requisitionCriteria.isTemplate = true
@@ -53,7 +47,7 @@ class RequisitionTemplateController {
 		def requisition = new Requisition(status: RequisitionStatus.CREATED)
         requisition.type = params.type as RequisitionType
         requisition.isTemplate = true
-		
+		requisition.origin = Location.get(session?.warehouse?.id)
         [requisition:requisition]
     }
 
@@ -69,6 +63,17 @@ class RequisitionTemplateController {
 	}
 
     def editHeader = {
+        def requisition = Requisition.get(params.id)
+        if (!requisition) {
+            flash.message = "Could not find requisition with ID ${params.id}"
+            redirect(action: "list")
+        }
+        else {
+            [requisition: requisition];
+        }
+    }
+
+    def sendMail = {
         def requisition = Requisition.get(params.id)
         if (!requisition) {
             flash.message = "Could not find requisition with ID ${params.id}"
@@ -99,7 +104,7 @@ class RequisitionTemplateController {
             requisition.isPublished = true
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action:"list")
+                redirect(action: "show", id: requisition.id)
             }
             else {
                 render(view: "edit", model: [requisition: requisition])
@@ -117,7 +122,7 @@ class RequisitionTemplateController {
             requisition.isPublished = false
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action:"list")
+                redirect(action: "show", id: requisition.id)
             }
             else {
                 render(view: "edit", model: [requisition: requisition])
@@ -131,6 +136,8 @@ class RequisitionTemplateController {
 
 
     def update = {
+        String viewName = params?.viewName ?: "edit"
+
         def requisition = Requisition.get(params.id)
         if (requisition) {
             if (params.version) {
@@ -139,18 +146,21 @@ class RequisitionTemplateController {
                     requisition.errors.rejectValue("version", "default.optimistic.locking.failure", [
                             warehouse.message(code: 'requisition.label', default: 'Requisition')] as Object[],
                             "Another user has updated this requisition while you were editing")
-                    render(view: "edit", model: [requisition: requisition])
+                    render(view: viewName, model: [requisition: requisition])
                     return
                 }
             }
             requisition.properties = params
+            requisition.lastUpdated = new Date()
+            requisition.updatedBy = session.user
+
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
-                redirect(action: "edit", id: requisition.id)
+                redirect(action: "show", id: requisition.id)
                 //redirect(action:"list")
             }
             else {
-                render(view: "edit", model: [requisition: requisition])
+                render(view: viewName, model: [requisition: requisition])
             }
         }
         else {
@@ -159,10 +169,10 @@ class RequisitionTemplateController {
         }
     }
 
-	
+
 	def show = {
         def requisition = Requisition.get(params.id)
-		
+
         if (!requisition) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
             redirect(action: "list")
@@ -203,7 +213,8 @@ class RequisitionTemplateController {
         else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
         }
-        redirect(action: "list", id:params.id)
+
+        redirect(action: "show", id:params.id)
     }
 
     def clone = {
@@ -271,8 +282,9 @@ class RequisitionTemplateController {
                         requisitionItem.quantity = 1;
                         requisitionItem.substitutable = false
                         requisitionItem.orderIndex = count + index
+                        requisition.updatedBy = session.user
                         requisition.addToRequisitionItems(requisitionItem)
-                        requisition.save(flush: true, failOnError: true)
+                        requisition.save()
                         processedProductCodes << productCode
                     }
                     else {
@@ -282,17 +294,10 @@ class RequisitionTemplateController {
                 else {
                     ignoredProductCodes << productCode
                 }
-
             }
             flash.message = "Added requisition item with product codes " + processedProductCodes?:"none" + " (ignored: " + ignoredProductCodes + ")"
-
-
-
         }
-
         redirect(action: "edit", id: requisition.id)
-
-
     }
 
 
@@ -303,6 +308,8 @@ class RequisitionTemplateController {
             def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
             if (requisitionItem) {
                 requisition.removeFromRequisitionItems(requisitionItem)
+                requisition.lastUpdated = new Date()
+                requisition.updatedBy = session.user
                 requisition.save()
             }
         }
@@ -313,6 +320,8 @@ class RequisitionTemplateController {
 
     def export = {
         def requisition = Requisition.get(params.id)
+        def hasRoleFinance = userService.hasRoleFinance(session?.user)
+
         if (requisition) {
             def date = new Date();
             def sw = new StringWriter()
@@ -322,19 +331,30 @@ class RequisitionTemplateController {
                 "Product Name" {it.productName}
                 "Quantity" {it.quantity}
                 "UOM" {it.unitOfMeasure}
+                hasRoleFinance ? "Unit cost" { it.unitCost } : null
+                hasRoleFinance ? "Total cost" { it.totalCost } : null
             })
 
-            requisition.requisitionItems.each { requisitionItem ->
-                csv << [
-                        productCode: requisitionItem.product.productCode,
-                        productName:  StringEscapeUtils.escapeCsv(requisitionItem.product.name),
-                        quantity: requisitionItem.quantity,
-                        unitOfMeasure: "EA/1"
+            if (requisition.requisitionItems) {
+                RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
+
+                requisition."${sortByCode.methodName}".each { requisitionItem ->
+                    csv << [
+                            productCode  : requisitionItem.product.productCode,
+                            productName  : StringEscapeUtils.escapeCsv(requisitionItem.product.name),
+                            quantity     : requisitionItem.quantity,
+                            unitOfMeasure: "EA/1",
+                            unitCost     : hasRoleFinance ? formatNumber(number: requisitionItem.product.pricePerUnit?:0, format: '###,###,##0.00##') : null,
+                            totalCost    : hasRoleFinance ? formatNumber(number: requisitionItem.totalCost?:0, format: '###,###,##0.00##') : null
                     ]
+                }
+            }
+            else {
+                csv << [productCode:"", productName: "", quantity: "", unitOfMeasure: "", unitCost: "", totalCost: ""]
             }
 
             response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename='Stock List - ${requisition.origin.name} - ${date.format("yyyyMMdd-hhmmss")}.csv'")
+            response.setHeader("Content-disposition", "attachment; filename=\"Stock List - ${requisition?.destination?.name} - ${date.format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType:"text/csv", text: csv.writer.toString())
             return;
         }
@@ -382,15 +402,32 @@ class RequisitionTemplateController {
     }
 
     def importAsFile = {
-        def requisition = Requisition.get(params.id)
 
+        def skipLines = params.skipLines?:0
+        def delimiter = params.delimiter?:","
+        def requisition = Requisition.get(params.id)
+        def data = []
         if (requisition) {
             def file = request.getFile('file')
-            def lines = file.inputStream.toCsvReader().readAll()
 
-            println lines
-            render lines
+            if (!file) {
+                throw new IllegalArgumentException("Must specify a file")
+            }
+
+            file.inputStream.toCsvReader('separatorChar':delimiter,'skipLines':skipLines).eachLine { tokens ->
+                println "line: " + tokens + " delimiter=" + delimiter
+                println "ROW " + tokens
+                if (tokens) {
+                    data << tokens[0..3]
+                }
+            }
+
+            log.info "Data: " + data
+
         }
+        session.data = data
+        render (view: "batch", model: [requisition:requisition,data:data])
+
     }
 
     def doImport = {
@@ -474,15 +511,15 @@ class RequisitionTemplateController {
 	private List<Location> getWardsPharmacies() {
 		def current = Location.get(session.warehouse.id)
 		def locations = []
-		if (current) { 
+		if (current) {
 			if(current?.locationGroup == null) {
 				locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort { it.name }
 			} else {
 				locations = Location.list().findAll { location -> location.locationGroup?.id == current.locationGroup?.id }.findAll {location -> location.isWardOrPharmacy()}.sort { it.name }
 			}
-		}				
+		}
 		return locations
 	}
 
-	
+
 }

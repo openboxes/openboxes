@@ -12,7 +12,7 @@
                     <g:else>
                         ${warehouse.message(code:'location.new.label', default: "New location")}
                     </g:else>
-                    <small>(<format:metadata obj="${locationInstance?.locationType}"/>)</small>
+                    <small><format:metadata obj="${locationInstance?.locationType}"/></small>
 				</span>
                 <g:if test="${locationInstance?.parentLocation}">
                     <g:link controller="location" action="edit" id="${locationInstance?.parentLocation?.id}">Back to ${locationInstance?.parentLocation?.name}</g:link>
@@ -34,20 +34,23 @@
                     </span>
                 </div>
 
-			
+
 			</td>
 		</tr>
 	</table>
 </div>
 <div class="button-bar">
-    <g:link class="button icon search" action="list" controller="location">
+    <g:link class="button" action="list" controller="location">
+        <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
         <warehouse:message code="default.list.label" args="[g.message(code: 'locations.label')]" />
     </g:link>
-    <g:link class="button icon add" action="create" controller="location">
+    <g:link class="button" action="edit" controller="location">
+        <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
         <warehouse:message code="default.create.label" args="[g.message(code: 'location.label')]" />
     </g:link>
     <g:if test="${locationInstance}">
-        <g:link class="button icon edit" action="edit" controller="location" id="${locationInstance?.id}">
+        <g:link class="button" action="edit" controller="location" id="${locationInstance?.id}">
+            <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
             <warehouse:message code="default.edit.label" args="[g.message(code: 'location.label')]" />
         </g:link>
     </g:if>

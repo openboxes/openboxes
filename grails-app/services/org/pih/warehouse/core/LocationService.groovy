@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import org.apache.commons.collections.comparators.NullComparator
@@ -16,19 +16,100 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import util.ConfigHelper
 
-import javax.xml.bind.ValidationException;
-
+import javax.xml.bind.ValidationException
 // import java.text.DecimalFormat
 // import java.text.SimpleDateFormat
 
 class LocationService {
-	
+
 	def grailsApplication
 	boolean transactional = true
-	
-	
+
+
+	Location findInternalLocation(Location parentLocation, String[] names) {
+		return Location.createCriteria().get {
+			eq("parentLocation", parentLocation)
+			'in'("name", names)
+		}
+	}
+
+	Location findOrCreateInternalLocation(String shipmentNumber, String locationNumber, LocationType locationType, Location parentLocation) {
+		log.info "find or create internal location name=${shipmentNumber}, type=${locationType}"
+		if (!shipmentNumber || !locationNumber || !locationType || !parentLocation) {
+			throw new IllegalArgumentException("Must specify name, location number, location type, and parent location in order to create internal location")
+		}
+
+		String name = getReceivingLocationName(shipmentNumber)
+		String[] receivingLocationNames = [name, "Receiving ${shipmentNumber}"]
+		Location location = findInternalLocation(parentLocation, receivingLocationNames)
+		if (!location) {
+			log.info "creating internal location name=${name}, type=${locationType}"
+			location = new Location()
+			location.name = name
+			location.locationNumber = locationNumber
+			location.locationType = locationType
+			location.parentLocation = parentLocation
+			location.save(failOnError: true)
+		}
+		return location
+	}
+
+
+
 	def getAllLocations() {
-		return Location.findAllByActiveAndParentLocationIsNull(true);
+		return getLocations(null, [:])
+	}
+
+	def getLocations(String [] fields, Map params) {
+
+		LocationTypeCode locationTypeCode = params.locationTypeCode?:null
+
+		def locations = Location.createCriteria().list() {
+			if (fields) {
+				projections {
+					fields.each { field ->
+						property(field)
+					}
+				}
+			}
+
+			if (params.name) {
+				ilike("name", "%" + params.name + "%")
+			}
+
+			if (params.locationTypeCode) {
+				locationType {
+					eq("locationTypeCode", locationTypeCode)
+				}
+			}
+
+			eq("active", Boolean.TRUE)
+			isNull("parentLocation")
+		}
+		return locations
+	}
+
+	def getLocations(String [] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation) {
+
+		def locations = new HashSet()
+		locations += getLocations(fields, params)
+
+		if (!isSuperuser) {
+			if (direction == "INBOUND") {
+				return locations.findAll { it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER }
+			}
+			if (direction == "OUTBOUND") {
+				return locations.findAll { (it.locationGroup == currentLocation.locationGroup) ||
+						(it.locationGroup != currentLocation.locationGroup && it.supports(ActivityCode.MANAGE_INVENTORY) && it.supports(ActivityCode.RECEIVE_STOCK)) }
+			}
+		}
+
+		if (params.locationTypeCode) {
+			LocationTypeCode locationTypeCode = params.locationTypeCode as LocationTypeCode
+			return locations.findAll { it.locationType.locationTypeCode == locationTypeCode }
+		}
+
+		return locations
 	}
 
 	def getLocations(LocationType locationType, LocationGroup locationGroup, String query, Integer max, Integer offset) {
@@ -74,52 +155,128 @@ class LocationService {
 		if (requiredActivities) {
 			requiredActivities.each { activity ->
 				locations += getAllLocations()?.findAll { it.supports(activity) }
-			}			
+			}
 		}
 		return locations
 	}
 
 
-	Map getLoginLocationsMap(Location currentLocation) {
-        log.info "Get login locations map (currentLocation=${currentLocation?.name})"
+	Map getLoginLocationsMap(User user, Location currentLocation) {
+        log.info "Get login locations for user ${user} and location ${currentLocation})"
         def locationMap = [:]
         def nullHigh = new NullComparator(true)
         def locations = getLoginLocations(currentLocation)
         if (locations) {
+			locations = locations.findAll { Location location -> user.getEffectiveRoles(location) }
+			locations = locations.collect { Location location ->
+				[
+						id           : location?.id,
+						name         : location?.name,
+						locationType : location.locationType?.name,
+						locationGroup: location?.locationGroup?.name,
 
-			locations = locations.collect { [id: it?.id, name: it?.name, locationType: it.locationType?.name, locationGroup: it?.locationGroup?.name,  ]}
+				]
+			}
             locationMap = locations.groupBy { it?.locationGroup }
             locationMap = locationMap.sort { a, b -> nullHigh.compare(a?.key, b?.key) }
         }
         return locationMap;
-        //return getLoginLocations(currentLocation).sort { it?.locationGroup }.reverse().groupBy { it?.locationGroup }
 	}
-	
-	List getDepots() {
+
+	List getInternalLocations(Location parentLocation) {
+		return getInternalLocations(parentLocation, null)
+	}
+
+	List getInternalLocations(Location parentLocation, ActivityCode[] activityCodes) {
+		return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL] as LocationTypeCode[], activityCodes)
+	}
+
+	List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes) {
+		return getInternalLocations(parentLocation, locationTypeCodes, activityCodes, null)
+	}
+
+	List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes, String[] locationNames) {
+
+		List<Location> internalLocationsSupportingActivityCodes = []
+
+		if (parentLocation.hasBinLocationSupport()) {
+			log.info "Get internal locations for parent ${parentLocation} with activity codes ${activityCodes} and location type codes ${locationTypeCodes}"
+			List<Location> internalLocations = Location.createCriteria().list() {
+				eq("active", Boolean.TRUE)
+				eq("parentLocation", parentLocation)
+				or {
+					locationType {
+						'in'("locationTypeCode", locationTypeCodes)
+					}
+					if (locationNames) {
+						'in'("name", locationNames)
+					}
+				}
+			}
+
+			// Filter by activity code
+			if (activityCodes) {
+				activityCodes.each { activityCode ->
+					internalLocations = internalLocations.findAll { internalLocation ->
+						internalLocation.supports(activityCode) || (locationNames && internalLocation.name in locationNames)
+					}
+					internalLocationsSupportingActivityCodes.addAll(internalLocations)
+				}
+			} else {
+				internalLocationsSupportingActivityCodes.addAll(internalLocations)
+			}
+
+			// Sort locations by sort order, then name
+			internalLocationsSupportingActivityCodes =
+					internalLocationsSupportingActivityCodes.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
+
+			internalLocationsSupportingActivityCodes = internalLocationsSupportingActivityCodes.unique()
+		}
+
+		return internalLocationsSupportingActivityCodes
+	}
+
+	List getPutawayLocations(Location parentLocation) {
+        return getInternalLocations(parentLocation, [ActivityCode.PUTAWAY_STOCK])
+	}
+
+    List getPickingLocations(Location parentLocation) {
+        return getInternalLocations(parentLocation, [ActivityCode.PICK_STOCK])
+    }
+
+    List getReceivingLocations(Location parentLocation) {
+        return getInternalLocations(parentLocation, [ActivityCode.RECEIVE_STOCK])
+    }
+
+    List getCrossDockingLocations(Location parentLocation) {
+        return getInternalLocations(parentLocation, [ActivityCode.CROSS_DOCKING])
+    }
+
+    List getDepots() {
 		return getAllLocations()?.findAll { it.supports(ActivityCode.MANAGE_INVENTORY) }
 	}
 
-	List getNearbyLocations(Location currentLocation) { 
+	List getNearbyLocations(Location currentLocation) {
 		return Location.findAllByActiveAndLocationGroup(true, currentLocation.locationGroup)
 	}
-	
-	List getExternalLocations() { 
-		return getAllLocations()?.findAll { it.supports(ActivityCode.EXTERNAL) } 
+
+	List getExternalLocations() {
+		return getAllLocations()?.findAll { it.supports(ActivityCode.EXTERNAL) }
 	}
-	
-	List getDispensaries(Location currentLocation) { 
-		return getNearbyLocations(currentLocation)?.findAll { it.supports(ActivityCode.RECEIVE_STOCK) && !it.supports(ActivityCode.EXTERNAL) } 
+
+	List getDispensaries(Location currentLocation) {
+		return getNearbyLocations(currentLocation)?.findAll { it.supports(ActivityCode.RECEIVE_STOCK) && !it.supports(ActivityCode.EXTERNAL) }
 	}
-	
-	List getLocationsSupportingActivity(ActivityCode activity) { 
+
+	List getLocationsSupportingActivity(ActivityCode activity) {
 		return getAllLocations()?.findAll { it.supports(activity) }
-		
+
 	}
-	
-	List getShipmentOrigins() { 
+
+	List getShipmentOrigins() {
 		return getLocationsSupportingActivity(ActivityCode.SEND_STOCK)
 	}
-	
+
 	List getShipmentDestinations() {
 		return getLocationsSupportingActivity(ActivityCode.RECEIVE_STOCK)
 	}
@@ -133,30 +290,30 @@ class LocationService {
 	}
 
 	List getRequestDestinations(Location currentLocation) {
-		return getLocationsSupportingActivity(ActivityCode.FULFILL_REQUEST)// - currentLocation
+		return getLocationsSupportingActivity(ActivityCode.RECEIVE_STOCK)// - currentLocation
 	}
 
-	List getTransactionSources(Location currentLocation) { 
+	List getTransactionSources(Location currentLocation) {
 		return getLocationsSupportingActivity(ActivityCode.SEND_STOCK) - currentLocation
 	}
-	
-	List getTransactionDestinations(Location currentLocation) { 
-		// Always get nearby locations		
-		def locations = getNearbyLocations(currentLocation);		
-		
-		// Get all external locations (if supports external) 
-		if (currentLocation.supports(ActivityCode.EXTERNAL)) { 			
-			locations += getExternalLocations();			
+
+	List getTransactionDestinations(Location currentLocation) {
+		// Always get nearby locations
+		def locations = getNearbyLocations(currentLocation);
+
+		// Get all external locations (if supports external)
+		if (currentLocation.supports(ActivityCode.EXTERNAL)) {
+			locations += getExternalLocations();
 		}
 
 		// Of those locations remaining, we need to return only locations that can receive stock
 		locations = locations.findAll { it.supports(ActivityCode.RECEIVE_STOCK) }
-		
+
 		// Remove current location from list
 		locations = locations?.unique() - currentLocation
 
 		return locations
-		
+
 	}
 
 	boolean importBinLocations(String locationId, InputStream inputStream) {
@@ -258,6 +415,9 @@ class LocationService {
 		return value?.trim()
 	}
 
-
+	String getReceivingLocationName(String identifier) {
+		String receivingLocationPrefix = grailsApplication.config.openboxes.receiving.receivingLocation.prefix
+		return "${receivingLocationPrefix}-${identifier}"
+	}
 
 }

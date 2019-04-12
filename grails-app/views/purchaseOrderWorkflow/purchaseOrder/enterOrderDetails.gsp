@@ -28,6 +28,8 @@
 			</g:hasErrors>
 		</g:each>
 		<g:form action="purchaseOrder" method="post">
+
+            <g:hiddenField name="orderTypeCode" value="PURCHASE_ORDER"/>
 			<div class="dialog">
                 <g:render template="/order/summary" model="[orderInstance:order,currentState:'editOrder']"/>
                 <div class="box">
@@ -35,12 +37,12 @@
                     <table>
                         <tbody>
                             <tr class='prop'>
-                                <td class='name top'><label for='description'>
+                                <td class='name top'><label for='name'>
                                     <warehouse:message code="default.name.label"/></label>
                                 </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'description','errors')}'>
-                                    <g:textField type="text" id="description" name='description'
-                                                 placeholder="${warehouse.message(code:'order.description.placeholder')}" size="100" class="text large" value="${order?.description?.encodeAsHTML()}"/>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'name','errors')}'>
+                                    <g:textField type="text" id="name" name='name'
+                                                 placeholder="${warehouse.message(code:'order.description.placeholder')}" size="100" class="text large" value="${order?.name?.encodeAsHTML()}"/>
 
                                 </td>
                             </tr>

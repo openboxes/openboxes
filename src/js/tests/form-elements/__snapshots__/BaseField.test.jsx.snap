@@ -1,0 +1,123 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BaseField component is correctly rendering attributes 1`] = `
+<div
+  className="mt-2 form-group mb-0 required d-none "
+>
+  <div
+    className="row"
+  >
+    <label
+      className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right"
+      htmlFor="test"
+    >
+      test label
+    </label>
+    <div
+      className="col-md-4 col-7"
+    >
+      <input
+        dynamicAttr="dynamic property"
+        fieldRef={null}
+        id="test"
+        onBlur={[Function]}
+        onChange={[Function]}
+        testAttr={true}
+        value={undefined}
+      />
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BaseField component is correctly rendering component label 1`] = `
+<div
+  className="mt-2 form-group mb-0   "
+>
+  <div
+    className="row"
+  >
+    <span>
+      test
+    </span>
+    <div
+      className="col-md-4 col-7"
+    >
+      <input />
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BaseField component is correctly rendering text label 1`] = `
+<div
+  className="mt-2 form-group mb-0   "
+>
+  <div
+    className="row"
+  >
+    <label
+      className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right"
+      htmlFor="test"
+    >
+      test label
+    </label>
+    <div
+      className="col-md-4 col-7"
+    >
+      <input />
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;

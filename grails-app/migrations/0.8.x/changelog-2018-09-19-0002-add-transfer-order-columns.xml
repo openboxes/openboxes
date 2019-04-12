@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1537333265049-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order" columnName="completed_by_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order">
+            <column name="completed_by_id" type="CHAR(38)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order" columnName="date_completed"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order">
+            <column name="date_completed" type="DATETIME">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order" columnName="name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order">
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order" columnName="order_type_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order">
+            <column name="order_type_code" type="VARCHAR(100)" defaultValue="PURCHASE_ORDER">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order_item" columnName="order_item_status_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order_item">
+            <column name="order_item_status_code" type="VARCHAR(100)" defaultValue="PENDING">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order_item" columnName="parent_order_item_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order_item">
+            <column name="parent_order_item_id" type="CHAR(38)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order_item" columnName="recipient_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order_item">
+            <column name="recipient_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order_item" columnName="destination_bin_location_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order_item">
+            <column name="destination_bin_location_id" type="CHAR(38)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order_item" columnName="origin_bin_location_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order_item">
+            <column name="origin_bin_location_id" type="CHAR(38)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537377870794-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="transaction" columnName="order_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="transaction">
+            <column name="order_id" type="CHAR(38)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537377870794-17">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order" columnName="currency_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order">
+            <column name="currency_code" type="CHAR(3)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537377870794-18">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order_item" columnName="currency_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="order_item">
+            <column name="currency_code" type="CHAR(3)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+
+    <changeSet author="jmiranda (generated)" id="1537333265049-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK651874E41B7275F"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="completed_by_id" baseTableName="order" constraintName="FK651874E41B7275F" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK2D110D64605326C"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="destination_bin_location_id" baseTableName="order_item" constraintName="FK2D110D64605326C" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK2D110D6418D76D84"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="origin_bin_location_id" baseTableName="order_item" constraintName="FK2D110D6418D76D84" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-14">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK2D110D6451A9416E"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="parent_order_item_id" baseTableName="order_item" constraintName="FK2D110D6451A9416E" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-15">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK2D110D6444979D51"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="order_item" constraintName="FK2D110D6444979D51" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="person"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1537333265049-16">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7FA0D2DED08EDBE6"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="order_id" baseTableName="transaction" constraintName="FK7FA0D2DED08EDBE6" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order"/>
+    </changeSet>
+
+
+</databaseChangeLog>
+
+

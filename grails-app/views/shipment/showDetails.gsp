@@ -437,14 +437,13 @@
                                         <th class="center"><warehouse:message code="default.expires.label"/></th>
                                         <th class="center"><warehouse:message code="shipping.shipped.label"/></th>
                                         <g:if test="${shipmentInstance?.wasReceived()}">
-                                            <th class="center"><warehouse:message code="shipping.received.label"/></th>
-                                        <%--
-                                        <th class="center"><warehouse:message code="shipping.totalReceived.label"/></th>
-                                        --%>
+                                            <th class="center"><warehouse:message code="shipmentItem.quantityReceived.label" default="Received"/></th>
+                                            <th class="center"><warehouse:message code="shipmentItem.quantityCanceled.label" default="Canceled"/></th>
                                         </g:if>
                                         <th><warehouse:message code="product.uom.label"/></th>
                                         <th><warehouse:message code="shipping.recipient.label"/></th>
                                         <th class="left"><warehouse:message code="default.comment.label"/></th>
+                                        <th><warehouse:message code="shipmentItem.isFullyReceived.label" default="Received?"/></th>
                                     </tr>
                                     <g:if test="${shipmentInstance.shipmentItems}">
                                         <g:set var="count" value="${0 }"/>
@@ -508,9 +507,11 @@
 
                                                 </td>
                                                 <g:if test="${shipmentInstance?.wasReceived()}">
-                                                    <g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>
                                                     <td class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}">
-                                                        <g:formatNumber number="${shipmentItem?.totalQuantityReceived()}" format="###,##0"/>
+                                                        <g:formatNumber number="${shipmentItem?.quantityReceived()}" format="###,##0"/>
+                                                    </td>
+                                                    <td class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}">
+                                                        <g:formatNumber number="${shipmentItem?.quantityCanceled()}" format="###,##0"/>
                                                     </td>
 
                                                 </g:if>
@@ -535,6 +536,9 @@
                                                     <g:else>
                                                         <div class="fade"><g:message code="default.empty.label"/></div>
                                                     </g:else>
+                                                </td>
+                                                <td>
+                                                    ${shipmentItem?.isFullyReceived()}
                                                 </td>
                                             </tr>
                                             <g:set var="previousContainer" value="${shipmentItem.container }"/>
@@ -564,7 +568,9 @@
                                         <th><g:message code="location.binLocation.label"/></th>
                                         <th><g:message code="inventoryItem.lotNumber.label"/></th>
                                         <th><g:message code="inventoryItem.expirationDate.label"/></th>
-                                        <th><g:message code="default.quantity.label"/></th>
+                                        <th><g:message code="receiptItem.quantityShipped.label" default="Shipped"/></th>
+                                        <th><g:message code="receiptItem.quantityReceived.label" default="Received"/></th>
+                                        <th><g:message code="receiptItem.quantityCanceled.label" default="Canceled"/></th>
                                     </tr>
 
                                     <g:each var="receiptItem" in="${shipmentInstance?.receipt?.receiptItems?.sort()}" status="status">
@@ -585,7 +591,13 @@
                                                 <g:expirationDate date="${receiptItem?.inventoryItem?.expirationDate}"/>
                                             </td>
                                             <td>
-                                                ${receiptItem?.quantityReceived} out of ${receiptItem?.quantityShipped}
+                                                ${receiptItem?.quantityShipped?:0}
+                                            </td>
+                                            <td>
+                                                ${receiptItem?.quantityReceived?:0}
+                                            </td>
+                                            <td>
+                                                ${receiptItem?.quantityCanceled?:0}
                                             </td>
                                         </tr>
                                     </g:each>

@@ -39,23 +39,165 @@
 --%>
 
 <g:render template="summary" model="[requisition:requisition]"/>
-<%--
-    <div class="buttonBar">
-        <g:link class="button icon log" controller="requisitionTemplate" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/></g:link>
-        <g:isUserAdmin>
-            <g:link class="button icon add" controller="requisitionTemplate" action="create" params="[type:'STOCK']"><warehouse:message code="default.add.label" args="[warehouse.message(code:'requisitionTemplate.label').toLowerCase()]"/></g:link>
-        </g:isUserAdmin>
-    </div>
---%>
+
 <div class="yui-gd">
     <div class="yui-u first">
         <g:render template="header" model="[requisition:requisition]"/>
 
     </div>
     <div class="yui-u">
-        <div class="box">
-            <h2>${warehouse.message(code:'requisitionTemplate.addRequisitionItems.label', default: "Copy-and-paste CSV/TSV")}</h2>
-            <g:if test="${data}">
+
+
+        <div class="tabs">
+            <ul>
+                <li>
+                    <a href="#importAsFile">
+                        ${warehouse.message(code:'requisitionTemplate.importAsFile.label', default: "Import as file")}
+                    </a>
+                </li>
+                <li>
+                    <a href="#importAsString">
+                        ${warehouse.message(code:'requisitionTemplate.importAsString.label', default: "Import as string")}
+                    </a>
+                </li>
+                <li>
+                    <a href="#addToRequisitionItems">
+                        ${warehouse.message(code:'requisitionTemplate.bulkAddByProductCodes.label', default: "Bulk add by product codes")}
+                    </a>
+
+                </li>
+            </ul>
+
+
+
+            <div id="importAsFile">
+
+                <div class="box">
+                    <h2>${warehouse.message(code:'requisitionTemplate.addRequisitionItems.label', default: "Upload CSV/TSV")}</h2>
+                    <g:uploadForm controller="requisitionTemplate" action="importAsFile">
+                        <g:hiddenField name="id" value="${requisition?.id}" />
+                        <g:hiddenField name="version" value="${requisition?.version}" />
+                        <table>
+                            <tbody>
+                            <tr class="prop">
+                                <td valign="top" class="name"><label><warehouse:message
+                                        code="document.selectFile.label" /></label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <input name="file" type="file" />
+                                    &nbsp;
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="top name">
+                                    <label>${warehouse.message(code:'requisitionTemplate.delimiter.label', default: 'Column delimiter')}</label>
+                                </td>
+                                <td class="middle">
+                                    <g:radio name="delimiter" value="," checked="${params.delimiter.equals(',')||!params.delimiter}"/> Comma
+                                    <g:radio name="delimiter" value="\t" checked="${params.delimiter.equals('\t')}"/> Tab
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="top name">
+                                    <label>${warehouse.message(code:'requisitionTemplate.skipLines.label', default: 'Skip lines')}</label>
+                                </td>
+                                <td class="middle">
+                                    <g:textField name="skipLines" value="${params.skipLines?:1}" class="text"/>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
+                                    <button type="submit" class="button">
+                                        ${warehouse.message(code:'default.button.upload.label')}</button>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </g:uploadForm>
+                </div>
+            </div>
+
+            <div id="importAsString">
+                <div class="box">
+
+                    <h2>${warehouse.message(code:'requisitionTemplate.addRequisitionItems.label', default: "Copy-and-paste CSV/TSV")}</h2>
+                    <g:form method="post" controller="requisitionTemplate" action="importAsString">
+                        <g:hiddenField name="id" value="${requisition?.id}" />
+                        <g:hiddenField name="version" value="${requisition?.version}" />
+                        <table>
+                            <tbody>
+                                <tr class="prop">
+                                    <td class="top name">
+                                        <label>${warehouse.message(code:'requisitionTemplate.delimiter.label', default: 'Column delimiter')}</label>
+                                    </td>
+                                    <td class="middle">
+                                        <g:radio name="delimiter" value="," checked="${params.delimiter.equals(',')||!params.delimiter}"/> Comma
+                                        <g:radio name="delimiter" value="\t" checked="${params.delimiter.equals('\t')}"/> Tab
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td class="top name">
+                                        <label>${warehouse.message(code:'requisitionTemplate.skipLines.label', default: 'Skip lines')}</label>
+                                    </td>
+                                    <td class="middle">
+                                        <g:textField name="skipLines" value="${params.skipLines?:1}" class="text"/>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td class="name">
+                                        <label>${warehouse.message(code:'requisitionTemplate.data.label', default: 'Data')}</label>
+                                    </td>
+                                    <td class="value">
+                                        <g:textArea name="csv" rows="10" class="large">Product Code,Product Name,Quantity,Unit of Measure</g:textArea>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td class="left" colspan="4">
+                                        <button class="button">
+                                            ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Import')}
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </g:form>
+                </div>
+            </div>
+            <div id="addToRequisitionItems">
+                <div class="box">
+                    <h2>${warehouse.message(code:'requisitionTemplate.bulkAddByProductCodes.label', default: "Bulk add by product codes")}</h2>
+
+                    <g:form method="post" controller="requisitionTemplate" action="addToRequisitionItems">
+                        <g:hiddenField name="id" value="${requisition?.id}" />
+                        <g:hiddenField name="version" value="${requisition?.version}" />
+                        <table>
+                            <tr>
+                                <td width="75%">
+                                    <g:textField id="productCodesInput" name="multipleProductCodes" value="" class="text large"/>
+                                </td>
+                                <td class="left">
+                                    <button class="button icon add">
+                                        ${warehouse.message(code:'requisitionTemplate.addToProducts.label', default: 'Add to products')}
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                    </g:form>
+                </div>
+            </div>
+        </div>
+        <g:if test="${data}">
+            <div class="box">
+                <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.data.label')]"/></h2>
+
                 <g:form method="post" controller="requisitionTemplate" action="doImport">
                     <g:hiddenField name="id" value="${requisition?.id}" />
                     <g:hiddenField name="version" value="${requisition?.version}" />
@@ -70,22 +212,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <g:each var="row" in="${data}" status="count">
-                                <tr class="${count%2?'even':'odd'}">
-                                    <td>${count+1}</td>
-                                    <g:each var="column" in="${row}">
-                                        <td>${column}</td>
-                                    </g:each>
-                                </tr>
-                            </g:each>
+                        <g:each var="row" in="${data}" status="count">
+                            <tr class="${count%2?'even':'odd'}">
+                                <td>${count+1}</td>
+                                <g:each var="column" in="${row}">
+                                    <td>${column}</td>
+                                </g:each>
+                            </tr>
+                        </g:each>
                         </tbody>
                         <tfoot>
-                            <tr >
-                                <td></td>
-                                <td class="left" colspan="4">
-                                    <g:link controller="requisitionTemplate" action="batch" id="${requisition.id}" class="button icon arrowleft">
-                                        ${warehouse.message(code:'default.button.back.label')}
-                                    </g:link>
+                            <tr>
+                                <td class="center" colspan="5">
                                     <button class="button icon approve">
                                         ${warehouse.message(code:'requisitionTemplate.save.label', default: 'Save')}
                                     </button>
@@ -94,82 +232,8 @@
                         </tfoot>
                     </table>
                 </g:form>
-            </g:if>
-            <g:else>
-
-                <g:form method="post" controller="requisitionTemplate" action="importAsString">
-                    <g:hiddenField name="id" value="${requisition?.id}" />
-                    <g:hiddenField name="version" value="${requisition?.version}" />
-                    <table>
-                        <tbody>
-                            <tr class="prop">
-                                <td class="top name">
-                                    <label>${warehouse.message(code:'requisitionTemplate.delimiter.label', default: 'Column delimiter')}</label>
-                                </td>
-                                <td class="middle">
-                                    <g:radio name="delimiter" value="\t" checked="${params.delimiter.equals('\t')||!params.delimiter}"/> Tab
-                                    <g:radio name="delimiter" value="," checked="${params.delimiter.equals(',')}"/> Comma
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="top name">
-                                    <label>${warehouse.message(code:'requisitionTemplate.skipLines.label', default: 'Skip lines')}</label>
-                                </td>
-                                <td class="middle">
-                                    <g:textField name="skipLines" value="${params.skipLines?:0}" class="text"/>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label>${warehouse.message(code:'requisitionTemplate.data.label', default: 'Data')}</label>
-                                </td>
-                                <td class="value">
-                                    <g:textArea name="csv" rows="10" style="width:100%"></g:textArea>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td></td>
-                                <td class="left" colspan="4">
-                                    <g:link controller="requisitionTemplate" action="edit" id="${requisition.id}" class="button icon arrowleft">
-                                        ${warehouse.message(code:'default.button.back.label')}
-                                    </g:link>
-                                    <button class="button icon add">
-                                        ${warehouse.message(code:'requisitionTemplate.process.label', default: 'Import')}
-                                    </button>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </g:form>
-            </g:else>
-        </div>
-        <%--
-        <div class="box">
-            <h2>${warehouse.message(code:'requisitionTemplate.addRequisitionItems.label', default: "Upload CSV/TSV")}</h2>
-            <g:uploadForm controller="requisitionTemplate" action="importAsFile">
-                <g:hiddenField name="id" value="${requisition?.id}" />
-                <g:hiddenField name="version" value="${requisition?.version}" />
-                <table>
-                    <tr class="prop">
-                        <td valign="top" class="name"><label><warehouse:message
-                                code="document.selectFile.label" /></label>
-                        </td>
-                        <td valign="top" class="value">
-                            <input name="file" type="file" />
-                            &nbsp;
-                            <!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
-                            <button type="submit" class="button icon approve">
-                                ${warehouse.message(code:'default.button.upload.label')}</button>
-                        </td>
-                    </tr>
-                </table>
-            </g:uploadForm>
-        </div>
-        --%>
-
-
+            </div>
+        </g:if>
         <%--
         <div class="box">
             <h2>${warehouse.message(code:'requisitionTemplate.requisitionItems.label')}</h2>
@@ -278,7 +342,14 @@
 </div>
 <script>
     $(document).ready(function() {
-
+        $(".tabs").tabs(
+            {
+                cookie: {
+                    // store cookie for a day, without, it would be a session cookie
+                    expires: 1
+                }
+            }
+        );
 
         $(".sortable tbody").sortable({
             handle : '.sorthandle',

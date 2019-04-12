@@ -17,7 +17,7 @@ import java.text.MessageFormat;
 import org.pih.warehouse.core.Localization;
 
 class MessageTagLib {
-   
+
 	static namespace = "warehouse"
     def grailsApplication
 	def messageSource
@@ -38,16 +38,23 @@ class MessageTagLib {
 
     //@Cacheable("messageCache")
     def message = { attrs, body ->
-        long startTime = System.currentTimeMillis()
+
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
+
+        boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.custom.enabled
+        if (!databaseStoreEnabled) {
+            Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
+            out << defaultTagLib.message.call(attrs)
+            return
+        }
+
 
         // Checks the database to see if there's a localization property for the given code
         if (session.user) {
-
-            def localization = null; //Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
+            def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
             if (localization) {
-                println "Querying database for translation " + attrs.code + " " + session?.user?.locale
-                //println "Arguments: " + attrs?.args + ":" + attrs?.args?.class
+
                 def message = localization.text
 
                 // If there are arguments, we need to get the
@@ -73,7 +80,6 @@ class MessageTagLib {
 									data-args="${attrs.args}" 
 									data-localized="" 
 									src="${createLinkTo(dir: 'images/icons/silk', file: 'database.png')}"/>
-							
 							"""
                     return;
                 } else {

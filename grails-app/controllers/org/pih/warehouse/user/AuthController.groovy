@@ -130,14 +130,18 @@ class AuthController {
 	/**
 	 * Allows user to log out of the system
 	 */
-	def logout = { 
-		session.targetUri = null    	
-		session.user = null;
-        session.userName = null
-		session.locale = null;
-		session.warehouse = null;
-		flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message')}"	
-		redirect(action:'login')
+	def logout = {
+		if (session.impersonateUserId) {
+			session.user = User.get(session.activeUserId)
+			session.impersonateUserId = null
+			session.activeUserId = null
+			redirect(controller: "dashboard", action: "index")
+		}
+		else {
+			flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message')}"
+			session.invalidate()
+			redirect(action: 'login')
+		}
 	}    
 
 	

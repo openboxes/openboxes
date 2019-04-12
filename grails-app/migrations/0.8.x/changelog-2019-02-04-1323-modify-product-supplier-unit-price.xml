@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="adminuser (generated)" id="1549308370576-1">
+        <modifyColumn tableName="product_supplier">
+            <column name="unit_price" type="DECIMAL(19,4)"/>
+        </modifyColumn>
+    </changeSet>
+</databaseChangeLog>
+

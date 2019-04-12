@@ -6,12 +6,11 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import com.unboundid.ldap.sdk.BindRequest
 import com.unboundid.ldap.sdk.BindResult
-import com.unboundid.ldap.sdk.Control
 import com.unboundid.ldap.sdk.DN
 import com.unboundid.ldap.sdk.DNEntrySource
 import com.unboundid.ldap.sdk.DereferencePolicy
@@ -25,15 +24,11 @@ import com.unboundid.ldap.sdk.SearchResult
 import com.unboundid.ldap.sdk.SearchResultEntry
 import com.unboundid.ldap.sdk.SearchScope
 import com.unboundid.ldap.sdk.SimpleBindRequest
-import com.unboundid.ldap.sdk.controls.PasswordExpiredControl
-import com.unboundid.ldap.sdk.controls.PasswordExpiringControl
-import com.unboundid.util.ssl.SSLUtil
-import com.unboundid.util.ssl.TrustAllTrustManager
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
 import org.pih.warehouse.auth.AuthService
-import sun.security.x509.X500Name
+
 import util.StringUtil
 
 import javax.net.SocketFactory
@@ -52,7 +47,7 @@ class UserService {
 
     def updateUser(String userId, String currentUserId, Map params) {
 
-        def userInstance = User.load(userId)
+        def userInstance = User.get(userId)
 
         // Password in the db is different from the one specified
         // so the user must have changed the password.  We need
@@ -120,7 +115,7 @@ class UserService {
         if (u) {
             def user = User.get(u.id)
             def roles = [RoleType.ROLE_SUPERUSER]
-            return effectRoles(user).any { roles.contains(it.roleType) }
+            return getEffectiveRoles(user).any { roles.contains(it.roleType) }
         }
         return false;
     }
@@ -129,7 +124,7 @@ class UserService {
         if (u) {
             def user = User.get(u.id)
             def roles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
-            return effectRoles(user).any { roles.contains(it.roleType) }
+            return getEffectiveRoles(user).any { roles.contains(it.roleType) }
         }
         return false;
     }
@@ -138,7 +133,7 @@ class UserService {
         if (u) {
             def user = User.get(u.id)
             def roles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_ASSISTANT]
-            return effectRoles(user).any { roles.contains(it.roleType) }
+            return getEffectiveRoles(user).any { roles.contains(it.roleType) }
         }
         return false;
     }
@@ -147,7 +142,16 @@ class UserService {
         if (u) {
             def user = User.get(u.id)
             def roles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER, RoleType.ROLE_ASSISTANT]
-            return effectRoles(user).any { roles.contains(it.roleType) }
+            return getEffectiveRoles(user).any { roles.contains(it.roleType) }
+        }
+        return false;
+    }
+
+    Boolean hasRoleFinance(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roleTypes = [RoleType.ROLE_FINANCE]
+            return getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
         }
         return false;
     }
@@ -158,26 +162,49 @@ class UserService {
         return isSuperuser(currentUser) || (currentUser.getHighestRole(location) >= otherUser.getHighestRole(location))
     }
 
+
     Boolean isUserInRole(String userId, Collection roleTypes) {
         Collection acceptedRoleTypes = RoleType.expand(roleTypes)
         User user = getUser(userId)
-        return effectRoles(user).any { acceptedRoleTypes.contains(it.roleType) }
+        return getEffectiveRoles(user).any { Role role ->
+            boolean acceptedRoleType = acceptedRoleTypes.contains(role.roleType)
+            log.info "${role.name} ${role.roleType} = ${acceptedRoleType}"
+            return acceptedRoleType
+        }
     }
 
+    boolean hasRoleFinance() {
+        User user = AuthService.currentUser.get()
+        return hasRoleFinance(user)
+    }
 
-    def findPersons(String query, Map params) {
-        def criteria = Person.createCriteria()
-        def results = criteria.list (params) {
-            or {
-                like("firstName", query)
-                like("lastName", query)
-                like("email", query)
+    void assertCurrentUserHasRoleFinance() {
+        User user = AuthService.currentUser.get()
+        if (!hasRoleFinance(user)) {
+            throw new IllegalStateException("User ${user.username} must have ROLE_FINANCE role")
+        }
+    }
+
+    def findPersons(String [] terms) {
+        return findPersons(terms, [:])
+    }
+
+    def findPersons(String[] terms, params) {
+        def results = Person.createCriteria().list(params) {
+
+            if (terms) {
+                terms.each { term ->
+                    or {
+                        ilike("firstName", "%" + term + "%")
+                        ilike("lastName", "%" + term + "%")
+                        ilike("email", "%" + term + "%")
+                    }
+                }
             }
             order("lastName", "desc")
         }
         return results
     }
-
 
     def findUsers(String query, Map params) {
         println "findUsers: " + query + " : " + params
@@ -242,12 +269,11 @@ class UserService {
         return user.getRolesByCurrentLocation(currentLocation)
     }
 
-    private def effectRoles(User user){
+    private def getEffectiveRoles(User user){
         def currentLocation = AuthService.currentLocation?.get()
-
         return user.getEffectiveRoles(currentLocation)
     }
-	
+
 
     def getAllAdminUsers() {
         def recipients = []

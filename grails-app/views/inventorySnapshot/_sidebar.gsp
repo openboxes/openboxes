@@ -61,16 +61,18 @@
 <hr/>
 <h2>Re-indexing</h2>
 <p>If data is stale or does not exist, you can run a background process that re-indexes the quantity on hand values for the current location and selected date.</p>
-
 <div class="form-group">
     <label><i class="icon icon-map-marker"></i> <warehouse:message code="default.location.label" default="Location"/></label>
-    <div class="btn-group" data-toggle="buttons">
-        <label class="btn btn-primary active">
-            <input type="radio" name="location" id="currentLocation" autocomplete="off" checked> ${session?.warehouse?.name}
-        </label>
-        <label class="btn btn-primary">
-            <input type="radio" name="location" id="allLocations" autocomplete="off"> All locations
-        </label>
+    <div>
+
+        <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-primary">
+                <input type="radio" name="location" id="allLocations" autocomplete="off"> All locations
+            </label>
+            <label class="btn btn-primary active">
+                <input type="radio" name="location" id="currentLocation" autocomplete="off" checked> ${session?.warehouse?.name}
+            </label>
+        </div>
     </div>
 </div>
 <div class="form-group">

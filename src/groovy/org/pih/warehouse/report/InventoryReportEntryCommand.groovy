@@ -61,9 +61,6 @@ class InventoryReportEntryCommand {
 	InventoryReportEntryCommand getTotals() { 		
 		def totals = new InventoryReportEntryCommand()			
 		entries.values().each {
-			println "adjusted = " + it.quantityAdjusted
-			println "xfer in = " + it.quantityTransferredIn
-			println "xfer out = " + it.quantityTransferredOut
 			totals.quantityAdjusted += it.quantityAdjusted;
 			totals.quantityTransferredIn += it.quantityTransferredIn;
 			totals.quantityTransferredOut += it.quantityTransferredOut;
@@ -80,18 +77,12 @@ class InventoryReportEntryCommand {
 			totals.quantityTotalOut += it.quantityTotalOut		
 			
 			it?.quantityTransferredInByLocation?.each { key, value->
-				println "transfer in -> " + key + " = " + value 
-				println totals
-				println totals.quantityTransferredOutByLocation
-				if (!totals.quantityTransferredInByLocation[key]) { 
+				if (!totals.quantityTransferredInByLocation[key]) {
 					totals.quantityTransferredInByLocation[key] = 0;
 				}
 				totals.quantityTransferredInByLocation[key] += value
 			}
 			it?.quantityTransferredOutByLocation?.each { key, value->
-				println "transfer out -> " + key + " = " + value 
-				println totals
-				println totals.quantityTransferredOutByLocation
 				if (!totals.quantityTransferredOutByLocation[key]) {
 					totals.quantityTransferredOutByLocation[key] = 0;
 				}

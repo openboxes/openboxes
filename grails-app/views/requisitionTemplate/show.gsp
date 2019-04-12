@@ -1,4 +1,4 @@
-<%@ page import="grails.converters.JSON; org.pih.warehouse.core.RoleType"%>
+<%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode; grails.converters.JSON; org.pih.warehouse.core.RoleType"%>
 <%@ page import="org.pih.warehouse.requisition.RequisitionType"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
@@ -25,20 +25,9 @@
         <g:renderErrors bean="${requisition}" as="list" />
     </div>
 </g:hasErrors>
-<%--
-<g:render template="summary" model="[requisition:requisition]"/>
---%>
 
 <g:render template="summary" model="[requisition:requisition]"/>
-<%--
-    <div class="buttonBar">
-        <g:link class="button icon log" controller="requisitionTemplate" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'requisitionTemplates.label').toLowerCase()]"/></g:link>
-        <g:isUserAdmin>
-            <g:link class="button icon add" controller="requisitionTemplate" action="create" params="[type:'STOCK']"><warehouse:message code="default.add.label" args="[warehouse.message(code:'requisitionTemplate.label').toLowerCase()]"/></g:link>
-        </g:isUserAdmin>
-    </div>
---%>
-<div class="yui-gd">
+<div class="yui-gf">
     <div class="yui-u first">
         <g:render template="header" model="[requisition:requisition]"/>
 
@@ -54,19 +43,25 @@
                 <g:hiddenField name="id" value="${requisition.id}"/>
                 <g:hiddenField name="version" value="${requisition.version}"/>
 
-                <div>
+                <div class="dialog list">
                     <table class="sortable" data-update-url="${createLink(controller:'json', action:'sortRequisitionItems')}">
                         <thead>
                         <tr>
                             <th><warehouse:message code="product.productCode.label" default="#"/></th>
                             <th><warehouse:message code="product.label"/></th>
+                            <th><warehouse:message code="category.label"/></th>
                             <th><warehouse:message code="default.quantity.label"/></th>
                             <th><warehouse:message code="unitOfMeasure.label"/></th>
-                            <th><warehouse:message code="requisitionItem.orderIndex.label" default="Sort order"/></th>
+                            <g:hasRoleFinance>
+                                <th><warehouse:message code="requisitionTemplate.unitCost.label"/></th>
+                                <th><warehouse:message code="requisitionTemplate.totalCost.label"/></th>
+                            </g:hasRoleFinance>
                         </tr>
                         </thead>
                         <tbody>
-                        <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
+                        <g:set var="sortByCode" value='${requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}'/>
+                        <g:set var="requisitionItems" value='${requisition?."$sortByCode.methodName"}'/>
+                        <g:each var="requisitionItem" in="${requisitionItems}" status="i">
                             <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
                                 <td>
                                     ${requisitionItem?.product?.productCode}
@@ -77,14 +72,24 @@
                                     </g:link>
                                 </td>
                                 <td>
+                                    <format:metadata obj="${requisitionItem?.product?.category}"/>
+                                </td>
+                                <td>
                                     ${requisitionItem?.quantity}
                                 </td>
                                 <td>
                                     EA/1
                                 </td>
-                                <td>
-                                    ${requisitionItem?.orderIndex}
-                                </td>
+                                <g:hasRoleFinance>
+                                    <td>
+                                        ${g.formatNumber(number: (requisitionItem?.product?.pricePerUnit?:0), format: '###,###,##0.00##')}
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </td>
+                                    <td>
+                                        ${g.formatNumber(number: (requisitionItem?.totalCost?:0), format: '###,###,##0.00##')}
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </td>
+                                </g:hasRoleFinance>
                             </tr>
                         </g:each>
                         <g:unless test="${requisition?.requisitionItems}">
@@ -102,9 +107,6 @@
                         <tr>
                             <td colspan="7">
                                 <div class="buttons">
-                                    <g:link controller="requisitionTemplate" action="list" class="button icon arrowleft">
-                                        <warehouse:message code="default.button.back.label"/>
-                                    </g:link>
                                 </div>
                             </td>
                         </tr>

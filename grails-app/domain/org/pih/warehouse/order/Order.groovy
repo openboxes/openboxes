@@ -9,20 +9,25 @@
 **/ 
 package org.pih.warehouse.order
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.*
 
 class Order implements Serializable {
 	
 	String id
-	OrderStatus status 
-	String description 		// a user-defined, searchable name for the order 
+	OrderStatus status
+	OrderTypeCode orderTypeCode
+	String name
+	String description 		// a user-defined, searchable name for the order
 	String orderNumber 		// an auto-generated shipment number
 	Location origin			// the vendor
 	Location destination 	// the customer location 
 	Person recipient
 	Person orderedBy
 	Date dateOrdered
-	
+	Person completedBy
+	Date dateCompleted
+
 	
 	// Audit fields
 	Date dateCreated
@@ -40,13 +45,17 @@ class Order implements Serializable {
 	
 	static constraints = { 
 		status(nullable:true)
-		description(nullable:false, blank: false, maxSize: 255)
+		orderTypeCode(nullable:false)
+		name(nullable:false)
+		description(nullable:true, maxSize: 255)
 		orderNumber(nullable:true, maxSize: 255)
 		origin(nullable:false)
 		destination(nullable:false)
 		recipient(nullable:true)
 		orderedBy(nullable:false)
 		dateOrdered(nullable:true)
+        completedBy(nullable:true)
+        dateCompleted(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
 	}	
@@ -91,7 +100,7 @@ class Order implements Serializable {
 	 * @return	a boolean indicating whether the order has been placed
 	 */
 	Boolean isPlaced() { 
-		return (status in [OrderStatus.PLACED, OrderStatus.PARTIALLY_RECEIVED, OrderStatus.RECEIVED])
+		return (status == OrderStatus.PLACED)
 	}
 	
 	/**
@@ -111,6 +120,14 @@ class Order implements Serializable {
 	Boolean isReceived() { 
 		return (status == OrderStatus.RECEIVED)
 	}
+
+	Boolean isCompleted() {
+		return (status == OrderStatus.COMPLETED)
+	}
+
+	Boolean isCanceled() {
+		return (status == OrderStatus.CANCELED)
+	}
 	
 	def listShipments() {
 		return orderItems.collect { it.listShipments() }.flatten().unique() { it?.id }
@@ -125,5 +142,17 @@ class Order implements Serializable {
 		def totalPrice = orderItems.collect { it.totalPrice() }.sum();
 		return totalPrice ?: 0
 	}
-	
+
+
+	String generateName() {
+		final String separator =
+				ConfigurationHolder.config.openboxes.generateName.separator?: Constants.DEFAULT_NAME_SEPARATOR
+
+		String name = "${orderNumber}"
+		if (dateCompleted) name += "${separator}${dateCompleted?.format("MMMMM d, yyyy")}"
+		if (completedBy) name += "${separator}${completedBy.name}"
+		return name
+	}
+
+
 }

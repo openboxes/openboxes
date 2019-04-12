@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-	<changeSet author="jmiranda (generated)" id="1383077886142-1">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<tableExists tableName="synonym"/>
-			</not>
-		</preConditions>
-		<createTable tableName="synonym">
-			<column name="id" type="CHAR(38)">
-				<constraints nullable="false" primaryKey="true" />
-			</column>
+    <changeSet author="jmiranda (generated)" id="1383077886142-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="synonym"/>
+            </not>
+        </preConditions>
+        <createTable tableName="synonym">
+            <column name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
             <column name="version" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="product_id" type="CHAR(38)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
-			<column name="date_created" type="DATETIME">
-				<constraints nullable="false" />
-			</column>
-			<column name="last_updated" type="DATETIME">
-				<constraints nullable="false" />
-			</column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
             <column name="created_by_id" type="CHAR(38)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
-			<column name="updated_by_id" type="CHAR(38)">
-				<constraints nullable="true" />
-			</column>
-		</createTable>
-	</changeSet>
+            <column name="updated_by_id" type="CHAR(38)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
 
     <!--
     <changeSet author="jmiranda (generated)" id="1383077886142-2">
@@ -52,31 +52,70 @@
         </createTable>
     </changeSet>
     -->
-    <changeSet author="jmiranda (generated)" id="1383077886142-3">
+    <changeSet author="jmiranda (generated)" id="1383077886142-3" failOnError="false">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="FK98293BFB217F5972"/>
+            </not>
+        </preConditions>
         <createIndex indexName="FK98293BFB217F5972" tableName="synonym" unique="false">
             <column name="created_by_id"/>
         </createIndex>
     </changeSet>
+
     <changeSet author="jmiranda (generated)" id="1383077886142-4">
-        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="synonym" constraintName="FK98293BFB217F5972" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK98293BFB217F5972"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="synonym"
+                                 constraintName="FK98293BFB217F5972" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
     </changeSet>
 
     <changeSet author="jmiranda (generated)" id="1383077886142-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="FK98293BFB426DD105"/>
+            </not>
+        </preConditions>
         <createIndex indexName="FK98293BFB426DD105" tableName="synonym" unique="false">
             <column name="updated_by_id"/>
         </createIndex>
     </changeSet>
+
     <changeSet author="jmiranda (generated)" id="1383077886142-6">
-        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="synonym" constraintName="FK98293BFB426DD105" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK98293BFB426DD105"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="synonym"
+                                 constraintName="FK98293BFB426DD105" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="user"/>
     </changeSet>
 
     <changeSet author="jmiranda (generated)" id="1383077886142-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="FK299E50ABDED5FAE7"/>
+            </not>
+        </preConditions>
         <createIndex indexName="FK299E50ABDED5FAE7" tableName="synonym" unique="false">
             <column name="product_id"/>
         </createIndex>
     </changeSet>
+
     <changeSet author="jmiranda (generated)" id="1383077886142-8">
-        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="synonym" constraintName="FK299E50ABDED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK299E50ABDED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="synonym"
+                                 constraintName="FK299E50ABDED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
     </changeSet>
 
     <!--

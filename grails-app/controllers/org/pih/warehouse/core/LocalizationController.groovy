@@ -9,9 +9,11 @@
 **/ 
 package org.pih.warehouse.core
 
+import org.springframework.web.multipart.MultipartFile
+
 class LocalizationController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [save: "POST", update: "POST", delete: "POST", upload: "POST"]
 
     def index = {
         redirect(action: "list", params: params)
@@ -19,7 +21,29 @@ class LocalizationController {
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [localizationInstanceList: Localization.list(params), localizationInstanceTotal: Localization.count()]
+
+        def localizationInstanceList
+        def localizationInstanceTotal
+
+        if (params.q || params.locale) {
+            localizationInstanceList = Localization.createCriteria().list(params) {
+                if (params.locale) {
+                    eq("locale", params.locale)
+                }
+                or {
+                    ilike("code", params.q + "%")
+                    ilike("text", "%" + params.q + "%")
+                }
+            }
+            localizationInstanceTotal = localizationInstanceList.totalCount
+        }
+        else {
+            localizationInstanceList = Localization.list(params)
+            localizationInstanceTotal = Localization.count()
+
+        }
+
+        [localizationInstanceList: localizationInstanceList, localizationInstanceTotal: localizationInstanceTotal]
     }
 
     def create = {
@@ -130,5 +154,68 @@ class LocalizationController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"
             redirect(action: "list")
         }
+    }
+
+
+    def export = {
+        log.info ("Locale: " + session.user.locale)
+        Locale locale = session.user.locale
+        def filename = locale.language == 'en' ? "messages.properties" : "messages_${locale.language}.properties"
+        def localizationInstanceList = Localization.findAllByLocale(locale.language)
+        response.setHeader("Content-disposition","attachment; filename=\"${filename}\"")
+        response.contentType = "text/plan"
+        String output = localizationInstanceList.sort { it.code }.collect { it.code + " = " + it?.text?.trim() }.join("\n")
+        output = "# ${filename} for ${locale.displayName}\n" +
+                "# Exported ${new Date()}\n" + output
+        render output
+    }
+
+    def upload = { LocalizationCommand command ->
+
+        try {
+
+            if (command.messageProperties.empty) {
+                command.errors.rejectValue("messageProperties", "default.invalid.file.message")
+            }
+
+            if (command.validate() && !command.hasErrors()) {
+                Properties properties = new Properties()
+                properties.load(command.messageProperties.inputStream)
+                properties.stringPropertyNames().each { String property ->
+                    String text = properties.getProperty(property)
+                    log.info "Property " + property + " = " + text
+                    Localization localization = Localization.findByCodeAndLocale(property, command.locale.language)
+                    if (!localization) {
+                        localization = new Localization(code: property, locale: command.locale.language, text: text)
+                    }
+                    localization.text = text
+                    localization.save(flush:true)
+
+                }
+                flash.message = "${warehouse.message(code: 'default.uploaded.message', args: [warehouse.message(code: 'localizations.label')])}"
+            }
+            else {
+                chain(action: "list", model: [command:command])
+                return
+            }
+
+        } catch (Exception e) {
+            log.error("Failed to import message.properties due to the following error: " + e.message, e)
+            flash.message = "Failed to import message.properties due to the following error: " + e.message
+        }
+        redirect(action: "list")
+    }
+
+}
+
+class LocalizationCommand {
+
+    Locale locale
+    MultipartFile messageProperties
+
+
+    static constraints = {
+        locale(nullable: false)
+        messageProperties(nullable:false)
     }
 }

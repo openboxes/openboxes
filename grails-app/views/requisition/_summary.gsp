@@ -103,10 +103,10 @@
                 </div>
             </g:if>
         </div>
-    </div>
-</g:if>
-<g:if test="${requisition?.destination?.id && requisition?.destination?.id != session?.warehouse?.id}">
-    <div class="error">
-        <warehouse:message code="requisition.wrongLocation.message" default="CAUTION: You appear to be logged into the wrong location! Making any changes to this requisition within this location may cause it to become invalid."/>
+        <g:if test="${!(requisition?.origin == session?.warehouse || requisition?.destination == session?.warehouse)}">
+            <div class="error">
+                <warehouse:message code="requisition.wrongLocation.message" default="CAUTION: You appear to be logged into the wrong location! Making any changes to this requisition within this location may cause it to become invalid."/>
+            </div>
+        </g:if>
     </div>
 </g:if>

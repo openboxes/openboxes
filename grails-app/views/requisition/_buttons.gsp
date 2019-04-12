@@ -28,7 +28,7 @@
                 &nbsp;${warehouse.message(code: 'requisition.print.label', default: 'Print requisition')}
             </g:link>
             --%>
-            <g:if test="${session?.warehouse?.id == requisition?.destination?.id }">
+            <g:if test="${session?.warehouse?.id == requisition?.origin?.id }">
                 <g:link class="button ${'pick'.equals(actionName)?'active':'' }" controller="requisition" action="pick" id="${requisition?.id}" name="processRequisition">
                     <img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" />
                     4.&nbsp;${warehouse.message(code: 'default.button.pick.label', default: 'Pick')}
@@ -58,7 +58,7 @@
         </div>
 
 
-        <g:if test="${session?.warehouse?.id == requisition?.destination?.id && false }">
+        <g:if test="${session?.warehouse?.id == requisition?.origin?.id }">
             <g:isUserAdmin>
                 <div class="button-group">
                     <g:link class="button" controller="requisition" action="cancel" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.cancel.confirm.message', default: 'Are you sure?')}');">

@@ -11,13 +11,14 @@ package org.pih.warehouse.reporting
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.report.ChecklistReportCommand
+import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.ProductReportCommand
+import util.ReportUtil
 
 class ReportController {
 	
@@ -27,69 +28,8 @@ class ReportController {
 	def reportService
     def messageService
 
-    def getCsv(list) {
-        println list
-
-        def csv = "";
-
-        csv+= "Status,"
-        csv+= "Product group,"
-        csv+= "Product codes,"
-        csv+= "Min,"
-        csv+= "Reorder,"
-        csv+= "Max,"
-        csv+= "QoH,"
-        csv+= "Value"
-        csv+= "\n"
-
-                //StringEscapeUtils.escapeCsv(product?.name?:"")
-        // "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"
-        list.each { row ->
-            csv += row.status + ","
-            csv += StringEscapeUtils.escapeCsv(row.name) + ","
-            csv += StringEscapeUtils.escapeCsv(row.productCodes.join(",")) + ","
-            csv += row.minQuantity + ","
-            csv += row.reorderQuantity + ","
-            csv += row.maxQuantity + ","
-            csv += row.onHandQuantity + ","
-            csv += row.totalValue + ","
-            csv += "\n"
-        }
-
-        return csv;
-    }
-
-    def getCsvForListOfMapEntries(List list) {
-        def csv = ""
-        if (list) {
-            list[0].eachWithIndex { k, v, index ->
-                csv += StringEscapeUtils.escapeCsv(k) + ","
-            }
-            csv+= "\n"
-
-            list.each { entry ->
-                entry.eachWithIndex { k, v, index ->
-                    csv += StringEscapeUtils.escapeCsv(v ? v.toString() : "") + ","
-                }
-                csv += "\n"
-            }
-        }
-        return csv
-    }
 
 
-    def getCsvForListOfMapEntries(List list, Closure csvHeader, Closure csvRow) {
-        def csv = ""
-        if (list) {
-
-            csv += csvHeader(list[0])
-
-            list.each { entry ->
-                csv += csvRow(entry)
-            }
-        }
-        return csv
-    }
 
     def binLocationCsvHeader = { binLocation ->
         String csv = ""
@@ -133,12 +73,7 @@ class ReportController {
         long startTime = System.currentTimeMillis()
         log.info "Export by bin location " + params
 		Location location = Location.get(session.warehouse.id)
-        Location binLocation = (params.binLocation) ? Location.findByParentLocationAndNameLike(location, "%" + params.binLocation + "%") : null
-
-
-
-		List binLocations = inventoryService.getQuantityByBinLocation(location, binLocation)
-
+		List binLocations = inventoryService.getQuantityByBinLocation(location)
         def products = binLocations.collect { it.product.productCode }.unique()
         binLocations = binLocations.collect { [productCode: it.product.productCode,
                                                productName: it.product.name,
@@ -150,10 +85,9 @@ class ReportController {
         long elapsedTime = System.currentTimeMillis() - startTime
 
         if (params.downloadFormat == "csv") {
-            String csv = getCsvForListOfMapEntries(binLocations)
-            String binLocationName = binLocation ? binLocation?.name : "All Bins"
-            def filename = "Bin location report - " + location.name + " - " + binLocationName + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+            String csv = ReportUtil.getCsvForListOfMapEntries(binLocations)
+            def filename = "Bin Locations - ${location.name}.csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: csv)
             return
         }
@@ -176,8 +110,8 @@ class ReportController {
         }
 
         def filename = "Stock report - " + location.name + ".csv"
-        response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
-        render(contentType: "text/csv", text:getCsv(map))
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+        render(contentType: "text/csv", text: ReportUtil.getCsv(map))
         return;
     }
 
@@ -231,7 +165,7 @@ class ReportController {
 
         //render sw.toString()
 
-        response.setHeader("Content-disposition", "attachment; filename='Inventory-sampling-${new Date().format("yyyyMMdd-hhmmss")}.csv'")
+        response.setHeader("Content-disposition", "attachment; filename=\"Inventory-sampling-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
         render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
 
     }
@@ -419,9 +353,9 @@ class ReportController {
                     binLocations = binLocations.findAll { it.status == params.status }
                 }
 
-                String csv = getCsvForListOfMapEntries(binLocations, binLocationCsvHeader, binLocationCsvRow)
+                String csv = ReportUtil.getCsvForListOfMapEntries(binLocations, binLocationCsvHeader, binLocationCsvRow)
                 def filename = "Bin Location Report - ${location?.name} - ${params.status?:'All'}.csv"
-                response.setHeader("Content-disposition", "attachment; filename='" + filename + "'")
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
                 render(contentType: "text/csv", text: csv)
                 return
             }
@@ -443,9 +377,57 @@ class ReportController {
 
     }
 
+    def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
+        command.entries = inventoryService.getQuantityOnHandByProductAndLocation(command.locations)
 
+        if (params.button == "download") {
+            def sw = new StringWriter()
 
+            try {
+                if (command.entries) {
+                    sw.append("Code").append(",")
+                    sw.append("Product").append(",")
+                    sw.append("Category").append(",")
+                    sw.append("Formularies").append(",")
+                    sw.append("Tags").append(",")
 
+                    command.locations?.each { location ->
+                        sw.append("QoH ").append(location?.name).append(",")
+                    }
 
+                    sw.append("QoH Total")
+                    sw.append("\n")
+                    command.entries.each { entry ->
+                        if (entry.key) {
+                            def totalQuantity = entry.value?.values()?.sum()
+                            def form = entry.key?.getProductCatalogs()?.collect{ it.name }?.join(",")
+
+                            sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"','""') + '"').append(",")
+                            sw.append('"' + (entry.key?.name ?: "").toString()?.replace('"','""') + '"').append(",")
+                            sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"','""') + '"').append(",")
+                            sw.append('"' + (form ?: "").toString()?.replace('"','""') + '"').append(",")
+                            sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"','""') + '"').append(",")
+
+                            command.locations?.each { location ->
+                                sw.append('"' + (entry.value[location?.id] != null ? entry.value[location?.id] : "").toString() + '"').append(",")
+                            }
+
+                            sw.append('"' + (totalQuantity != null ? totalQuantity : "").toString() + '"')
+                            sw.append("\n")
+                        }
+                    }
+                }
+
+            } catch (RuntimeException e) {
+                log.error (e.message)
+                sw.append(e.message)
+            }
+
+            response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
+        }
+
+        render(view: 'showInventoryByLocationReport', model: [command : command])
+    }
 
 }

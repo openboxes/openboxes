@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DateField component is correctly rendering renders correctly 1`] = `
+<div
+  className="mt-2 form-group mb-0   "
+>
+  <div
+    className="row"
+  >
+    <label
+      className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right"
+      htmlFor="test-field"
+    >
+      test label
+    </label>
+    <div
+      className="col-md-4 col-7"
+    >
+      <div
+        className="date-field"
+      >
+        <div>
+          <div
+            className="react-datepicker-wrapper"
+          >
+            <div
+              className="react-datepicker__input-container"
+            >
+              <input
+                autoComplete={undefined}
+                autoFocus={undefined}
+                className="form-control form-control-xs "
+                disabled={false}
+                id="test-field"
+                name={undefined}
+                onBlur={[Function]}
+                onChange={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                placeholder={undefined}
+                readOnly={false}
+                required={undefined}
+                tabIndex={undefined}
+                title={undefined}
+                type="text"
+                value=""
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-2"
+    />
+    <div
+      className="help-block col-md-4"
+      style={
+        Object {
+          "float": "left",
+        }
+      }
+    >
+      
+    </div>
+  </div>
+</div>
+`;

@@ -31,10 +31,10 @@ class PersonTests extends GrailsUnitTestCase {
         mockDomain(Person)
 
         def person1 = new Person(id: 1, firstName: "Rene", lastName: "Merida", email: "")
-        assert !person1.validate()
+        assert person1.validate()
 
         def person2 = new Person(id: 2, firstName: "Levi", lastName: "Bermudez", email: null)
-        assert !person2.validate()
+        assert person2.validate()
 
         def person3 = new Person(id: 2, firstName: "Kendra", lastName: "Nishioka", email: "email@something")
         assert !person3.validate()

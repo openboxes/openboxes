@@ -13,6 +13,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -36,63 +37,34 @@ class ConsumptionController {
     InventoryService inventoryService
 
     def show = { ShowConsumptionCommand command ->
-        log.info "Consumption " + params
+
         if (command.hasErrors()) {
             render(view: "show", model: [command:command])
             return;
         }
 
-        List selectedLocations = [] //= session.invoiceList
-        params.each {
-            if (it.key.contains("selectedLocation_")){
-                if (it.value.contains("on")){
-                    //InvoiceItem invoiceItem = invoiceList.get((it.key - "invoiceItem_") as Integer)
-                    Location location = Location.get((it.key - "selectedLocation_"))
-                    if (location) {
-                        selectedLocations << location
-                    }
-                }
-            }
-        }
 
         // Hack to fix PIMS-2728
-        println "selectedProperties: " + command.selectedProperties
         if (command.selectedProperties) {
             if (command.selectedProperties instanceof java.lang.String) {
-                println "instance of string"
                 command.selectedProperties = [command.selectedProperties]
             }
-        }
-
-
-        command.selectedLocations = selectedLocations
-
-        if (!command.fromLocations && !command.toLocations) {
-            flash.message = "${g.message(code: 'consumption.selectAtLeastOneLocation.message', default: 'It is recommended that you choose at least one source or destination')}"
-            //command.fromLocations << Location.load(session.warehouse.id)
-        }
-
-        def fromLocations = []
-        command.fromLocations.each {
-            fromLocations << it
         }
 
         def tags = command.selectedTags.collect { it.tag}.asList()
         def products = tags ? inventoryService.getProductsByTags(tags) : null
 
         // Add an entire day to account for the 24 hour period on the end date
-        def endDate
-        if (command.toDate) {
-            endDate = command.toDate + 1
-        }
+        Date endDate = command.toDate ? command.toDate + 1 : null
 
         // Get all transactions
-        command.debits = inventoryService.getDebitsBetweenDates(fromLocations, selectedLocations, command.fromDate, endDate)
-        command.credits = inventoryService.getCreditsBetweenDates(selectedLocations, fromLocations, command.fromDate, endDate)
+        command.debits = inventoryService.getDebitsBetweenDates(command.fromLocations,
+                command.selectedLocations, command.fromDate, endDate,
+                command.selectedTransactionTypes)
 
         def transactions = []
         transactions.addAll(command.debits)
-        transactions.addAll(command.credits)
+        //transactions.addAll(command.credits)
 
         // Sort transaction by date ascending
         transactions = transactions.sort { it.transactionDate }
@@ -101,19 +73,18 @@ class ConsumptionController {
         // which occurs if there are no toLocations selected
         boolean toLocationsEmpty = command.toLocations.empty
         boolean fromLocationsEmpty = command.fromLocations.empty
+        boolean transactionTypesEmpty = command.transactionTypes.empty
+
+        // Some transactions don't have a destination (e.g. expired, consumed, etc)
+        if (toLocationsEmpty) {
+            command.toLocations = transactions.findAll { it.destination != null }.collect { it.destination }
+        }
+
+        // Keep track of all the transaction types (we may want to select a subset of these)
+        command.transactionTypes = transactions*.transactionType
 
         // Iterate over all transactions
         transactions.each { transaction ->
-
-            if (toLocationsEmpty) {
-                // Some transactions don't have a destination (e.g. expired, consumed, etc)
-                if (transaction.destination) {
-                    command.toLocations << transaction.destination
-                }
-            }
-
-            // Keep track of all the transaction types (we may want to select a subset of these)
-            command.transactionTypes << transaction.transactionType
 
             // Iterate over all transaction entries
             transaction.transactionEntries.each { transactionEntry ->
@@ -160,6 +131,10 @@ class ConsumptionController {
                     // Add to the total transfer out per location
                     command.rows[product].transferInMap[transaction.source] += transactionEntry.quantity
                 }
+                else {
+                    command.rows[product].otherQuantity += transactionEntry.quantity
+                    command.rows[product].otherTransactions << transaction
+                }
 
 
                 String dateKey = transaction.transactionDate.format("yyyy-MM")
@@ -185,12 +160,6 @@ class ConsumptionController {
 
                 // All transactions
                 command.rows[product].transactions << transaction
-
-                //def currentProductQuantity = command.productMap[transactionEntry.inventoryItem.product]
-                //if (!currentProductQuantity) {
-                //    command.productMap[transactionEntry.inventoryItem.product] = 0
-                //}
-                //command.productMap[transactionEntry.inventoryItem.product] += transactionEntry.quantity
             }
         }
 
@@ -258,23 +227,13 @@ class ConsumptionController {
             command.selectedLocations = command.toLocations
         }
 
+        if (!command?.selectedTransactionTypes) {
+            command.selectedTransactionTypes = command.transactionTypes
+        }
+
         // Export as CSV
         if (params.format == "csv") {
 
-            /*
-            def csvWriter = new CSVWriter(sw, {
-                "Product code" { it.productCode }
-                "Name" { it.name }
-                "Category" { it.category }
-                "Unit of Measure" { it.unitOfMeasure }
-                "Total" { it.transferOutQuantity }
-                "Monthly" { it.monthlyQuantity }
-                "Weekly" { it.weeklyQuantity }
-                "Daily" { it.dailyQuantity }
-                "On hand quantity" { it.onHandQuantity }
-                "Months left" { it.numberOfMonthsRemaining }
-            })
-            */
             def csvrows = []
             command.rows.each { key, row ->
                 def csvrow =  [
@@ -323,12 +282,10 @@ class ConsumptionController {
 
                 csvrows << csvrow
 
-                //println csvRow
-                //csvWriter << csvRow
             }
 
             def csv = dataService.generateCsv(csvrows)
-            response.setHeader("Content-disposition", "attachment; filename='Consumption-${new Date().format("dd MMM yyyy hhmmss")}.csv'")
+            response.setHeader("Content-disposition", "attachment; filename=\"Consumption-${new Date().format("dd MMM yyyy hhmmss")}.csv\"")
             render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
             return
         }
@@ -337,6 +294,12 @@ class ConsumptionController {
 
             [command:command]
         }
+    }
+
+
+    def product = {
+        Product product = Product.get(params.id)
+        render (template: "product", model: [product:product])
     }
 
 }
@@ -357,6 +320,7 @@ class ShowConsumptionCommand {
     List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<TransactionType> transactionTypes = []
+    List<TransactionType> selectedTransactionTypes = []
     List <String> selectedDates = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class));
     List<Location> selectedLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Category> selectedCategories = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class));
@@ -414,6 +378,7 @@ class ShowConsumptionRowCommand {
     Integer transferOutQuantity = 0
     Integer expiredQuantity = 0
     Integer damagedQuantity = 0
+    Integer otherQuantity = 0
     Integer debitQuantity = 0;
 
     Set<Transaction> transferOutTransactions = []
@@ -421,7 +386,7 @@ class ShowConsumptionRowCommand {
     Set<Transaction> damagedTransactions = []
     Set<Transaction> transactions = []
     Set<Transaction> transferInTransactions = []
-
+    Set<Transaction> otherTransactions = []
 
     // Location breakdown
     Map<Location, Integer> transferInMap = new TreeMap<Location, Integer>();

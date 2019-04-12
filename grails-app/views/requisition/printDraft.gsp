@@ -25,7 +25,7 @@
     <div  style="float: left;">
   
 	    <div class="header">
-	        <label><warehouse:message code="requisition.ward.label"/>:</label> ${requisition.origin?.name}
+	        <label><warehouse:message code="requisition.origin.label"/>:</label> ${requisition.origin?.name}
 	    </div>
 	    <div class="header">
 	        <label><warehouse:message code="requisition.date.label"/>:</label> <g:formatDate date="${requisition?.dateRequested}" format="MMMMM dd, yyyy"/>

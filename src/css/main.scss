@@ -1,0 +1,673 @@
+$white-alpha: #EFECEC;
+
+$gray-alpha: #CCC;
+$gray-beta: #999;
+$gray-gamma: #888;
+$gray-delta: #777;
+$gray-epsilon: #737373;
+$gray-zeta: #666;
+$gray-eta: #EEE;
+
+$red-alpha: #843534;
+$red-beta: #a94442;
+$red-gamma: #ce8483;
+
+$blue-alpha: #163038;
+$blue-beta: #0c769e;
+$blue-gamma: #3bafda;
+$blue-delta: #4fc1e9;
+$blue-epsilon: #bce7f7;
+
+body {
+  overflow-x: hidden;
+}
+
+.brand-name {
+  padding-left: 10px;
+  font-size: 1.5em !important;
+  font-weight: bold;
+  color: $gray-zeta !important;
+  font-family: "Trebuchet MS",Trebuchet,Calibri,Tahoma,Segoe;
+  text-transform: lowercase;
+}
+
+.menu-container {
+  border-top: 1px solid $gray-gamma;
+  border-bottom: 1px solid $gray-zeta;
+  background-color: $gray-gamma;
+  color: white;
+  line-height: 1.2;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.nav-link {
+  padding: 7px 15px !important;
+  color: white !important;
+  font-size: 14px;
+}
+
+.dropdown:hover {
+  background-color: white;
+  .nav-link {
+    color: black !important;
+  }
+}
+
+.nav-link:hover {
+  background-color: white;
+  color: black !important;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+  color: black !important;
+}
+
+.dropdown-toggle::after {
+  display: none !important;
+}
+
+.dropdown-menu {
+  margin: 0 !important;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.dropdown-item:hover, .dropdown-item:active {
+  background-color: lightgrey !important;
+  color: black;
+}
+
+.dropdown-item {
+  font-size: 14px;
+}
+
+.bradcrumbs-container {
+  padding-left: 10px;
+  width: 100%;
+  height: 30px;
+  background-image: linear-gradient(white, $white-alpha);
+  justify-content: flex-start;
+  align-items: center;
+  line-height: 30px;
+  color: $gray-beta;
+  border-bottom: solid 1px $gray-alpha;
+}
+
+#footer > div > a, #footer > div > b > a {
+  color: $gray-delta;
+}
+
+.footer {
+  font-size: 12px;
+  color: $gray-delta;
+  background-color: white;
+  position: sticky;
+  bottom: 0;
+}
+
+.language-selector {
+  border-radius: 0.25rem;
+  border: 2px solid lightgrey;
+  background-color: lightgrey;
+}
+
+.global-search {
+  font-size: 16px;
+  width: 400px;
+}
+
+.form-group {
+  font-size: .885rem;
+  &.required {
+    .col-form-label:after {
+      content: "*";
+      color: red;
+    }
+  }
+}
+
+.create-form {
+  border: 1px solid $gray-alpha;
+  padding-top: 50px;
+  padding-bottom: 30px;
+
+  .form-group {
+    margin-left: 30%;
+    overflow-x: hidden;
+  }
+  .btn {
+    margin: 40px 0px 20px 0px;
+  }
+}
+
+.create-form {
+  border: 1px solid $gray-alpha;
+  padding-top: 50px;
+  padding-bottom: 30px;
+
+  .btn {
+    margin: 40px 10px 20px 0px;
+  }
+}
+
+.btn-form {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+
+.font-size-label {
+  font-size: .8rem;
+}
+
+.font-size-xs {
+  font-size: .875rem;
+  &.required::after {
+      content: "*";
+      color: red;
+  }
+}
+
+.btn-xs {
+  padding: 0 .5rem;
+  font-size: .875rem;
+  border-radius: .2rem;
+}
+
+.form-control-xs {
+  height: calc(1.5rem + 2px);
+  padding: .0rem .5rem;
+  font-size: .875rem;
+  border-radius: .2rem;
+}
+
+.col-form-label-xs {
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: .875rem;
+  line-height: 1.5;
+}
+
+.select-xs {
+  font-size: .875rem;
+  border-radius: .2rem;
+
+  .Select-control {
+    height: 26px;
+
+    .Select-value {
+      line-height: 26px !important;
+    }
+
+    .Select-placeholder {
+      line-height: 26px;
+    }
+
+    .Select-input {
+      height: 24px;
+
+      input {
+        padding: 0;
+        line-height: 26px;
+      }
+    }
+  }
+}
+
+.table-xs th, .table-xs td {
+  padding: 0.3rem;
+  font-size: 0.875rem;
+}
+
+.movement-number {
+  height: auto;
+  margin-bottom: 10px;
+  line-height: 36px;
+  list-style: none;
+  font-size: 25px;
+  color: $blue-alpha;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+
+.help-block {
+  display: block;
+  color: $gray-epsilon;
+}
+
+.has-error .help-block,
+.has-error .col-form-label {
+  color: $red-beta;
+}
+
+.has-error .form-control,
+.has-error .Select-control {
+  border: 2px solid $red-beta;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+}
+
+.has-error .form-control:focus {
+  border-color: $red-alpha;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px $red-gamma;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px $red-gamma;
+}
+
+.text-disabled {
+  color: $gray-delta;
+}
+
+/* = WIZARD STEPS CONTAINER
+----------------------------*/
+
+.wizard-box {
+  border-bottom: 1px solid $gray-alpha;
+  width: 100%;
+  overflow: hidden;
+}
+
+.wizard-steps {
+  height: 35px;
+  padding: 0;
+  line-height: 36px;
+  list-style: none;
+}
+
+/* = DEFAULT STEPS
+----------------------------*/
+.wizard-steps div {
+  padding-bottom: 2px;
+}
+
+.wizard-steps div, .wizard-steps div a, .wizard-steps div span {
+  display: inline-block;
+  vertical-align: top
+}
+
+.wizard-steps div a, .wizard-steps div:not(:first-child) span {
+  height: 35px;
+  padding: 0 10px 0 25px;
+  line-height: 36px
+}
+
+.wizard-steps div:first-child a {
+  padding: 0 10px;
+}
+
+.wizard-steps div a {
+  position: relative;
+  text-decoration: none;
+  background-color: $blue-epsilon;
+  color: $blue-alpha;
+  border-left: none;
+  border-right: none;
+  font-size: 1.2em;
+  width: 10vw;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+.wizard-steps div:first-child a {
+  padding-left: 10px
+}
+
+.wizard-steps div a:after, .wizard-steps div a:before {
+  position: absolute;
+  top: -1px;
+  width: 0;
+  height: 0;
+  content: '';
+  border-top: 17px solid transparent;
+  border-bottom: 20px solid transparent
+}
+
+.wizard-steps div a:before {
+  right: -10px;
+  z-index: 3;
+  border-left: 11px solid $blue-epsilon;
+}
+
+.wizard-steps div a:after {
+  right: -11px;
+  z-index: 2;
+  border-left: 11px solid $blue-beta
+}
+
+.wizard-steps div a:focus, .wizard-steps div a:hover {
+  background-color: $blue-delta;
+  border: 1px solid $blue-delta
+}
+
+.wizard-steps div a:focus:before, .wizard-steps div a:hover:before {
+  border-left-color: $blue-delta
+}
+
+/* = COMPLETED STEPS
+----------------------------*/
+
+.wizard-steps .completed-step a {
+  background-color: $blue-gamma;
+}
+
+.wizard-steps .completed-step a:before {
+  border-left-color: $blue-gamma;
+}
+
+.wizard-steps .completed-step a:after {
+  border-left-color: $blue-beta
+}
+
+/* = CURRENT STEP
+----------------------------*/
+
+.wizard-steps .active-step a {
+  background-color: $blue-alpha;
+  color: white;
+}
+
+.wizard-steps .active-step a:before {
+  border-left-color: $blue-alpha
+}
+
+.wizard-steps .active-step a:after {
+  border-left-color: $blue-beta
+}
+
+/* = DISABLED STEPS
+----------------------------*/
+
+.wizard-steps .disabled-step {
+  cursor: default;
+}
+
+.wizard-steps .disabled-step a {
+  pointer-events: none;
+}
+
+/* MODALS
+----------------------------*/
+
+.ReactModalPortal .ReactModal__Overlay--after-open {
+  z-index: 100 !important;
+}
+
+.react-confirm-alert-overlay {
+  z-index: 110 !important;
+}
+
+.modal-content-custom {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  border: 1px solid $gray-alpha;
+  background: white;
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  max-height: 80vh;
+}
+
+/* PRINT STYLING
+----------------------------*/
+
+@media print {
+  .print-mt {
+    margin-top: 40px;
+  }
+}
+
+.clickable-row:hover {
+  cursor: pointer;
+  background-color: $gray-eta !important;
+}
+
+/* TABLE - ROW STRIKETROUGH
+----------------------------*/
+
+table {
+  border-collapse: collapse;
+}
+
+td {
+  position: relative;
+}
+
+tr.crossed-out td:before {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  border-bottom: 2px solid $red-beta;
+  width: 100%;
+}
+
+.print-buttons-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.print-buttons-container a span {
+  white-space: normal;
+}
+
+.spinner-container > div {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(255,255,255, 0.8);
+  z-index: 110;
+}
+
+.spinner-container > div > div {
+  top: 40%;
+}
+
+.ReactTable .-pagination .-btn {
+  height: 5% !important;
+}
+
+.even-row {
+  background-color: $white-alpha;
+}
+
+.table-row {
+  height: 28px;
+}
+
+.table-inner-row {
+  position: relative;
+  height: 28px;
+}
+
+div.crossed-out .table-inner-row:before {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  border-bottom: 2px solid $red-beta;
+  width: 100%;
+  z-index: 99 !important;
+}
+
+.force-on-top {
+  z-index: 9999 !important;
+}
+
+.Select-loading-zone {
+  display: none !important;
+}
+
+.dropzone {
+  border: 2px dashed $gray-zeta;
+  border-radius: 5px;
+  a {
+    color: $gray-zeta;
+  }
+}
+
+.dropzone:hover {
+  a {
+    color: $white-alpha;
+  }
+}
+
+.dropzone > div {
+  border: none !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+.chosen-file {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.remove-button {
+  width: 20px;
+  margin-left: 10px;
+}
+
+.remove-button:hover {
+  color: $red-beta !important;
+}
+
+#stockMovementInfo {
+  flex-grow: 2;
+}
+
+/* CUSTOM CHECKBOX
+----------------------------*/
+
+.custom-checkbox input[type=checkbox] { display:none; }
+.custom-checkbox input[type=checkbox] + label {
+  margin: 0;
+}
+
+.custom-checkbox input[type=checkbox] + label:before {
+  font-family: FontAwesome;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.custom-checkbox input[type=checkbox] + label:before {
+  content: "\f068";
+  color: $red-beta;
+}
+
+.custom-checkbox input[type=checkbox]:checked + label:before {
+  content: "\f0e2";
+  color: $blue-gamma;
+}
+
+.strike-through {
+  text-decoration: line-through;
+}
+
+/* LOCATION CHOOSER
+----------------------------*/
+
+.react-tabs {
+  -webkit-tap-highlight-color: transparent;
+  margin: 0 0 10px;
+  display: flex;
+
+  &__tab-list {
+    margin: 0;
+    padding: 0;
+    background-color: $gray-gamma;
+    border: 1px solid $gray-gamma;
+    border-radius: 5px 0 0 5px;
+    border-right: none;
+    flex: 0 0 auto;
+  }
+
+  &__tab {
+    list-style: none;
+    color: black;
+    cursor: pointer;
+    border: 1px solid $gray-alpha;
+    border-radius: 5px 0 0 5px;
+    padding: 6px 12px;
+    margin: 6px 0 6px 6px;
+    background-color: $gray-alpha;
+
+    &--selected {
+      background-color: white;
+      border-color: white;
+    }
+
+    &--disabled {
+      color: $gray-delta;
+      cursor: default;
+    }
+  }
+
+  &__tab-panel {
+    display: none;
+
+    &--selected {
+      display: block;
+    }
+  }
+}
+
+.tabs-panel-container {
+  border: 1px solid $gray-gamma;
+  border-radius: 0 5px 5px 0;
+  border-left: none;
+  padding: 6px 12px;
+  flex: 1 1 auto;
+}
+
+.main-container {
+  height: calc(100vh - 110px - 65px - 20px); // 108 = header + menu + breadcrumbs; 65 = footer; 40 = marginY
+  margin: 10px 10px;
+}
+
+.stocklist-select {
+  width: 300px;
+}
+
+.stocklist-category {
+  background-color: $blue-epsilon;
+  color: $blue-beta;
+}
+
+.rt-noData {
+  margin-top: 50px;
+}
+
+.w-space-normal {
+  white-space: normal !important;
+}
+
+/* LOGIN MODAL
+----------------------------*/
+
+.login-modal-container {
+  width: 500px;
+  background-color: white;
+  border: 1px solid $gray-gamma;
+  border-radius: 5px;
+}
+
+.login-modal-header {
+  background-color: $gray-eta;
+  border-bottom: 1px solid $gray-gamma;
+  border-radius: 5px 5px 0 0;
+}

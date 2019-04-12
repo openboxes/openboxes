@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="print" />
-    <title><warehouse:message code="order.print.label" default="Print purchase order" /></title>
+    <title><warehouse:message code="order.print.label" default="Print order" /></title>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
     <style>
         table.order-items{ border-collapse:collapse; }
@@ -17,7 +17,7 @@
 
 <div id="print-button">
     <h2>
-        <warehouse:message code="order.print.label" default="Print purchase order"/>
+        <warehouse:message code="order.print.label" default="Print order"/>
         <div  class="right">
             <button type="button" onclick="window.print()">
                 <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />

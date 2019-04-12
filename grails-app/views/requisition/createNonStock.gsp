@@ -24,6 +24,7 @@
 		<div class="yui-u first">
 			<g:form name="requisitionForm" method="post" action="save" useToken="true">
                 <g:hiddenField name="status" value="${org.pih.warehouse.requisition.RequisitionStatus.CREATED}"/>
+                <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
 
 				<div id="requisition-template-details" class="dialog ui-validation box">
 
@@ -83,13 +84,14 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name">
-                                    <label for="commodityClass">
-                                        <warehouse:message code="requisition.commodityClass.label" />
+                                    <label for="origin.id">
+                                        <warehouse:message code="requisition.origin.label" />
                                     </label>
                                 </td>
-                                <td class="value ${hasErrors(bean: requisition, field: 'commodityClass', 'errors')}">
-                                    <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['':'']"
-                                        style="width:300px" class="chzn-select-deselect"/>
+                                <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
+                                    <g:hiddenField name="origin.id" value="${requisition?.origin?.id?:session?.warehouse?.id}"/>
+                                    ${requisition?.origin?.name?:session?.warehouse?.name }
+
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -99,19 +101,19 @@
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
-                                    ${session?.warehouse?.name }
+                                    <g:selectLocation name="destination.id" value="${requisition?.destination?.id}"
+                                                      class="chzn-select-deselect" noSelection="['null':'']"/>
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td class="name">
-                                    <label for="origin.id">
-                                        <warehouse:message code="requisition.origin.label" />
+                                    <label for="commodityClass">
+                                        <warehouse:message code="requisition.commodityClass.label" />
                                     </label>
                                 </td>
-                                <td class="value ${hasErrors(bean: requisition, field: 'origin', 'errors')}">
-                                    <g:selectRequestOrigin name="origin.id" value="${requisition?.origin?.id}" class="chzn-select-deselect"
-                                            style="width:500px" noSelection="['null':'']"/>
+                                <td class="value ${hasErrors(bean: requisition, field: 'commodityClass', 'errors')}">
+                                    <g:selectCommodityClass name="commodityClass" value="${requisition?.commodityClass}" noSelection="['':'']"
+                                                            style="width:300px" class="chzn-select-deselect"/>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -124,23 +126,10 @@
                                     <g:hiddenField name="requestedBy.id" value="${requisition?.requestedBy?.id?:session?.user?.id }"/>
                                     ${requisition?.requestedBy?.name?:session?.user?.name }
                                     --%>
-                                    <g:selectPerson name="requestedBy.id" value="${requisition?.requestedBy}"
-                                        noSelection="['null':'']" size="40"/>
+                                    <g:selectPerson name="requestedBy" value="${requisition?.requestedBy?.id}"
+                                        noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
 
 
-                                </td>
-                            </tr>
-
-
-
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message
-                                            code="requisition.createdBy.label" /></label>
-                                </td>
-                                <td class="value">
-                                    <g:hiddenField name="createdBy.id" value="${requisition?.createdBy?.id?:session?.user?.id }"/>
-                                    ${requisition?.createdBy?.name?:session?.user?.name }
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -151,31 +140,21 @@
                                 </td>
 
                                 <td class="value">
-                                    <g:textArea name="description" cols="80" rows="5"
+                                    <g:textArea name="description" cols="80" rows="2"
                                         placeholder="${warehouse.message(code:'requisition.description.message')}"
                                         class="text">${requisition.description }</g:textArea>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>
-
-                                </td>
-                                <td>
-                                    <div class="buttons left">
-                                        <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
-                                        &nbsp;
-                                        <g:link controller="requisitionTemplate" action="list">
-                                            <warehouse:message code="default.button.cancel.label"/>
-                                        </g:link>
-                                    </div>
-
-                                </td>
-                            </tr>
-
                         </tbody>
                     </table>
-
 				</div>
+                <div class="buttons center">
+                    <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
+                    &nbsp;
+                    <g:link controller="requisitionTemplate" action="list">
+                        <warehouse:message code="default.button.cancel.label"/>
+                    </g:link>
+                </div>
 			</g:form>
 		</div>
 	</div>

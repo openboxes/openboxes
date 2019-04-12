@@ -63,8 +63,8 @@
                                 </g:if>
                             </h2>
                             <div id="tabs-1" style="padding: 0px;">
-					            <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
-					                <table id="inventory-browser-table" border="0"> 
+					            <form id="inventoryBrowserForm" method="POST">
+					                <table id="inventoryBrowserTable" border="0">
 										<thead> 
 				           					<tr>
 				           						<th>

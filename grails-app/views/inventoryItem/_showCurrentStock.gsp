@@ -1,5 +1,8 @@
 <div class="box">
-    <h2>${session.warehouse.name}</h2>
+    <h2>
+        <g:message code="inventory.currentStock.label" default="Current Stock"/>
+        <small>${session.warehouse.name}</small>
+    </h2>
     <table >
         <thead>
             <tr class="odd">
@@ -88,40 +91,8 @@
         </tfoot>
     </table>
 </div>
-
-<%-- title="${warehouse.message(code: 'inventory.transferStock.label')}" --%>
-<div id="dlgShowDialog" style="display: none;">
-    <div id="dlgShowDialogContent">
-        <!-- dynamically generated content -->
-    </div>
-</div>
-
 <g:javascript>
     $(document).ready(function() {
-        $(".btn-show-dialog").click(function(event) {
-            var url = $(this).data("url");
-            var title = $(this).data("title");
-            $("#dlgShowDialog").attr("title", title);
-            $("#dlgShowDialog").dialog({
-                autoOpen: true,
-                modal: true,
-                width: 800,
-                open: function(event, ui) {
-                    $("#dlgShowDialogContent").html("Loading...")
-                    $('#dlgShowDialogContent').load(url, function(response, status, xhr) {
-                        if (xhr.status != 200) {
-                            $(this).text("")
-                            $("<p/>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
-                            var error = JSON.parse(response);
-                            var stack = $("<div/>").addClass("stack empty").appendTo($(this));
-                            $("<code/>").text(error.errorMessage).appendTo(stack)
-
-                        }
-                    });
-                }
-            });
-        });
-
         $(".trigger-change").live('change', function(event) {
             var url = $(this).data("url");
             var target = $(this).data("target");

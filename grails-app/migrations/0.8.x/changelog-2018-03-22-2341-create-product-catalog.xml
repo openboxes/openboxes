@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1521820146168-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="product_catalog"/>
+            </not>
+        </preConditions>
+        <createTable tableName="product_catalog">
+            <column name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BIT"/>
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="LONGTEXT"/>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1521820146168-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="product_catalog_item"/>
+            </not>
+        </preConditions>
+        <createTable tableName="product_catalog_item">
+            <column name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="CHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_catalog_id" type="CHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1521820146168-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="code_idx"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="code_idx" tableName="product_catalog" unique="true">
+            <column name="code"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1521820146168-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK187E54C9FB5E604E"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_catalog_id" baseTableName="product_catalog_item" constraintName="FK187E54C9FB5E604E" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product_catalog"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1521820146168-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK187E54C9DED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_catalog_item" constraintName="FK187E54C9DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+
+</databaseChangeLog>

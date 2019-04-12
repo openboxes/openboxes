@@ -12,7 +12,7 @@
                     <format:product product="${selectedRequisitionItem?.product}"/>
                 </td>
                 <td>
-                    <g:selectUnitOfMeasure product="${selectedRequisitionItem?.product}"/>
+                    <g:selectProductPackage product="${selectedRequisitionItem?.product}"/>
                 </td>
                 <td>
                     <g:textField name="quantityChange" value="${selectedRequisitionItem?.quantity}" class="text center" size="5"/>

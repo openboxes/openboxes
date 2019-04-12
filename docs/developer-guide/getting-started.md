@@ -7,6 +7,7 @@
 * MySQL 5.5+
 * [SDK Man] (http://sdkman.io/install.html)
 * [Grails 1.3.9](http://grails.org/download/archive/Grails)
+* NPM
 
 NOTE: We are in the process of upgrading to Grails 2.5.5 [(see this feature branch).](https://github.com/openboxes/openboxes/tree/feature/94-upgrade-to-grails-2.5.x) Once that is complete you will be able to use Java 8. 
 
@@ -101,7 +102,24 @@ If you want a more elegant approach, you can add all boolean properties to `open
 #openboxes.fixtures.enabled=true
 ```
 
-### 6. Grails Upgrade or Grails Compile 
+### 6. Install NPM dependencies
+```    
+npm install
+```
+
+### 7. Build React frontend
+You can build React frontend with this command, but it will be automatically build when starting the application.
+```    
+npm run bundle
+```
+
+### 8. React frontend Hot-Reload
+When using this command React fronted will be rebuild automatically after any change, you just need to refresh the browser to see the effect.
+```    
+npm run watch
+```
+
+### 9. Grails Upgrade or Grails Compile 
 Either of the following actions (upgrade, compile, run-app) should generate the all important Spring configuration (`/WEB-INF/applicationContext.xml`) and start the dependency resolution process.  
 ```    
 grails upgrade
@@ -120,17 +138,23 @@ If you see any errors, run the command again.
 
 Once the dependency resolution phase has completed, all dependencies will be stored in a local ivy cache (usually under `$USER_HOME/.grails/ivy-cache`).  You do not have to worry about this, just know that the dependencies are now on your machine and Grails will attempt to find them there before it tries to resolve them in a remote repository. 
 
-### 7. Start application in development mode
+### 10. Start application in development mode
 The application can be run in development mode.  This starts the application running in an instance of Tomcat within the Grails console.
 You may need to run 'grails run-app' several times in order to download all dependencies.
 ```
 grails run-app
 ```
 
-### 8. Open application in Google Chrome 
+### 11. Open application in Google Chrome 
 ```
 http://localhost:8080/openboxes
 ```
 
-### 9. Log into OpenBoxes 
+### 12. Log into OpenBoxes 
 You can use the default accounts (manager:password OR admin:password).  Once you are logged in as an admin, you can create own account.  Or you can use the signup form to create a new account.
+
+##### 13. React tests
+To run new frontend (React) tests type:
+```
+npm test
+```

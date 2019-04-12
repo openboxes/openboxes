@@ -6,4 +6,5 @@
     <include file="0.6.x/modify-column-order-unit-price.xml"/>
     <include file="0.6.x/create-table-inventory-item-snapshot.xml"/>
     <include file="0.6.x/add-column-user-timezone.xml"/>
+
 </databaseChangeLog>

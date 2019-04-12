@@ -15,6 +15,7 @@ target
 target-eclipse/
 web-app/WEB-INF/
 .classpath
+.settings
 .project
 .DS_Store
 openboxes.ipr
@@ -28,3 +29,11 @@ tags
 site/
 .slcache
 build/
+node_modules
+npm-debug.log
+/web-app/js/*bundle*
+/web-app/css/*bundle*
+/web-app/fonts/*
+/web-app/js/fonts/*
+grails-app/views/partialReceiving/_create.gsp
+grails-app/views/common/_react.gsp

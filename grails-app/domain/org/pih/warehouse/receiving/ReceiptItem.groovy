@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.receiving
 
 import org.pih.warehouse.core.Location
@@ -18,7 +18,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 // import java.util.Date
 
 class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
-	
+
 	String id
 	Product product		    			// Specific product that we're tracking
 	String lotNumber					// Loose coupling to the inventory lot
@@ -26,27 +26,31 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 
 	Integer quantityShipped				// Quantity that was shipped
 	Integer quantityReceived			// Quantity could be a class on its own
-	
+	Integer quantityCanceled 			// Quantity canceled
 	//Integer quantityAccepted
 	//Integer quantityRejected
 	//String rejectionReason
 	//String description				// Item description (for one-off items)
 	String comment 						// Comment about the item quality
-	
+
 	ShipmentItem shipmentItem
 	InventoryItem inventoryItem
 	Location binLocation
-		
-	Person recipient 					// Recipient of an item	
-	
+
+	Boolean isSplitItem = Boolean.FALSE
+
+	Person recipient 					// Recipient of an item
+
 	Date dateCreated;
 	Date lastUpdated;
-	
+
+	Integer sortOrder
+
 	static mapping = {
 		id generator: 'uuid', sqlType: "char(38)"
 	}
-	
-	static belongsTo = [ receipt : Receipt ]
+
+	static belongsTo = [ receipt : Receipt, shipmentItem: ShipmentItem ]
 	static constraints = {
 		product(nullable:false)
 		lotNumber(nullable:true, maxSize: 255)
@@ -55,13 +59,16 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 		inventoryItem(nullable:true)
 		binLocation(nullable:true)
 		quantityShipped(range: 0..2147483646, nullable:false)
-		quantityReceived(range: 0..2147483646, nullable:false)		
+		quantityReceived(nullable:true)
+		quantityCanceled(nullable:true)
 		recipient(nullable:true)
+		isSplitItem(nullable:true)
 		comment(nullable:true, maxSize: 255)
+		sortOrder(nullable:true)
 	}
-	
+
 	//int compareTo(obj) { product.name.compareTo(obj.product.name) }
-	
+
 	/**
 	* Sorts receipt items in the same order as shipment items.
 	*/
@@ -77,5 +84,5 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
     String toString() {
         return "${id}:${product.name}:${inventoryItem.lotNumber}:${quantityShipped}:${quantityReceived}:${comment}"
     }
-	
+
 }

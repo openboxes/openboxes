@@ -10,6 +10,7 @@ h5 { font-size: 17px; }
 h6 { font-size: 14px; }
 */
 h1 { font-size: 17px;font-weight: bold; }
+h2 { border-top: 1px solid lightgrey; }
 h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
 
 .header{
@@ -28,9 +29,6 @@ h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
 	background: #fff; !important;
 }
 
-.theader td {
-    font-weight: bold;
-}
 
 #logo {
     width: 20px;
@@ -49,10 +47,9 @@ h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
     width: 100%;
     margin: auto;
     margin-bottom: 20px;
-    margin-top: 20px;
+    margin-top: 100px;
 }
-.signature-table tr, .signature-table td { border: 1px solid lightgrey; height: 30px; }
-
+.signature-table tr, .signature-table td { border-top: 1px solid lightgrey; height: 60px; }
 
 #details-table{
     width: 100%;

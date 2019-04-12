@@ -1,6 +1,5 @@
 <div>
 	<g:form method="GET" controller="shipment" action="list">
-        <g:hiddenField name="type" value="${params.type}"/>
 		<div class="box">
             <h2><warehouse:message code="default.filters.label"/></h2>
 			<table>
@@ -18,26 +17,6 @@
                         </div>
 					</td>
 				</tr>
-                <%-- working on this - can't get the translation to work correctly because there's no way to pass number of days or weeks as an argument --%>
-                <%--
-                <tr class="prop">
-                    <td>
-                        <div>
-                            <div>
-                                <label>${warehouse.message(code: 'shipping.lastUpdated.label')}</label>
-                            </div>
-                            <div>
-                                <g:select name="lastUpdated" class="chzn-select-deselect"
-                                          from="${[1:'default.lastUpdated.day.label', 7:'default.lastUpdated.week.label', 30: 'default.lastUpdated.month.label', 365:'default.lastUpdated.year.label' ]}"
-                                          optionKey="key"
-                                          optionValue="${{warehouse.message(code:it.value, args:[1])}}"
-                                          value="${params.statusChanged}"
-                                          noSelection="['':warehouse.message(code:'default.all.label')]" />
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                --%>
                 <tr class="prop">
                     <td>
                         <div>
@@ -51,6 +30,17 @@
                                           value="${status}"
                                           noSelection="['':warehouse.message(code:'default.all.label')]" />
                             </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td>
+                        <div>
+                            <label>${warehouse.message(code:'shipment.directionType.label', default: "Direction Type")}</label>
+                        </div>
+                        <div>
+                            <g:select name="type" from="['outgoing':'Outbound', 'incoming': 'Inbound']" class="chzn-select-deselect"
+                                      optionKey="key" optionValue="value" value="${params.type}"/>
                         </div>
                     </td>
                 </tr>

@@ -145,7 +145,7 @@
                                                             ${requisitionItemInstance?.product?.name }
                                                         </td>
                                                         <td class="prop">
-                                                            <g:selectUnitOfMeasure product="${requisitionItemInstance.product}" noSelection="['null':'']"/>
+                                                            <g:selectProductPackage product="${requisitionItemInstance.product}" noSelection="['null':'']"/>
 
                                                         </td>
                                                         <td class="prop">

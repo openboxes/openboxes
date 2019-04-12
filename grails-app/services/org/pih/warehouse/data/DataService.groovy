@@ -9,24 +9,24 @@
 **/ 
 package org.pih.warehouse.data
 
+import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
-import org.apache.commons.lang.StringUtils
 import org.grails.plugins.csv.CSVWriter
 import org.grails.plugins.excelimport.ExcelImportUtils
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.core.UnitOfMeasureType
+import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
+import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductPackage
@@ -34,18 +34,12 @@ import org.pih.warehouse.product.ProductPackage
 import java.text.SimpleDateFormat
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.hssf.usermodel.*
-//import org.jopendocument.dom.spreadsheet.*
-//import org.jopendocument.dom.ODPackage
-//import org.apache.poi.xssf.usermodel.*
-//import org.apache.poi.POIXMLDocument
-import org.apache.poi.hssf.usermodel.*
-
-import static org.pih.warehouse.core.UnitOfMeasureType.AREA
 
 class DataService {
 
     def productService
     def sessionFactory
+    def userService
 
     def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
@@ -170,7 +164,7 @@ class DataService {
             }
 
             // Save product
-            product.merge()
+            product.save()
 
             // Clean up session after 50 products
             if (index % 50 == 0) {
@@ -192,7 +186,7 @@ class DataService {
      * @param maxQuantity
      * @return
      */
-    def addInventoryLevelToProduct(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity, preferredForReorder) {
+    def addInventoryLevelToProduct(Product product, Inventory inventory, String binLocation, Double minQuantity, Double reorderQuantity, Double maxQuantity, Boolean preferredForReorder) {
         findOrCreateInventoryLevel(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity, preferredForReorder)
     }
 
@@ -269,28 +263,28 @@ class DataService {
      * @param maxQuantity
      * @return
      */
-    def findOrCreateInventoryLevel(product, inventory, binLocation, minQuantity, reorderQuantity, maxQuantity, preferredForReorder) {
+    def findOrCreateInventoryLevel(Product product, Inventory inventory, String binLocation, Double minQuantity, Double reorderQuantity, Double maxQuantity, Boolean preferredForReorder) {
 
-        println "Product ${product.productCode} " + preferredForReorder
+        log.info "Product ${product.productCode} inventory ${inventory} preferred ${preferredForReorder}"
 
         def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
         if (!inventoryLevel) {
             inventoryLevel = new InventoryLevel();
+            inventoryLevel.product = product
             inventoryLevel.lastUpdated = new Date()
             inventoryLevel.dateCreated = new Date()
             inventory.addToConfiguredProducts(inventoryLevel)
         }
         inventoryLevel.status = InventoryStatus.SUPPORTED
-        inventoryLevel.product = product
-        //inventoryLevel.binLocation = binLocation
+        inventoryLevel.binLocation = binLocation
         inventoryLevel.minQuantity = minQuantity
         inventoryLevel.reorderQuantity = reorderQuantity
         inventoryLevel.maxQuantity = maxQuantity
         inventoryLevel.preferred = Boolean.valueOf(preferredForReorder)
 
-        inventoryLevel = inventoryLevel.merge()
-
-        log.info "findOrCreateInventoryLevel: ${inventoryLevel}"
+        if(inventoryLevel.hasErrors()||!inventoryLevel.save()) {
+            throw new ValidationException("Inventory level is invalid", inventoryLevel.errors)
+        }
         return inventoryLevel
     }
 
@@ -430,11 +424,13 @@ class DataService {
         if (row.vendorCode){
             product.vendorCode = row.vendorCode
         }
-//        if (row.unitOfMeasure) {
-//            product.unitOfMeasure = row.unitOfMeasure
-//        }
+        // If the user-entered unit price is different from the current unit price validate the user is allowed to make the change
         if (row.pricePerUnit) {
-            product.pricePerUnit = getFloat(row.pricePerUnit)
+            Float pricePerUnit = getFloat(row.pricePerUnit)
+            if (pricePerUnit != product.pricePerUnit) {
+                userService.assertCurrentUserHasRoleFinance()
+                product.pricePerUnit = pricePerUnit
+            }
         }
     }
 
@@ -606,8 +602,8 @@ class DataService {
             "Type" { it.type }
             "Class" { it.commodityClass }
             "Name" { it.name }
-            "Requesting ward" { it.origin }
-            "Processing depot" { it.destination }
+            "Origin" { it.origin }
+            "Destination" { it.destination }
 
             "Requested by" { it?.requestedBy?.name?:"" }
             "Date Requested" { it.dateRequested }
@@ -686,8 +682,8 @@ class DataService {
             "Type" { it.type }
             "Class" { it.commodityClass }
             "Name" { it.name }
-            "Requesting ward" { it.origin }
-            "Processing depot" { it.destination }
+            "Origin" { it.origin }
+            "Destination" { it.destination }
             "Requested by" { it?.requestedBy?.name }
             "Date Requested" { it.dateRequested }
             "Product code" { it.productCode }
@@ -734,7 +730,29 @@ class DataService {
         return sw.toString()
     }
 
+    def transformObjects(List objects, List includeFields) {
+        Map includeFieldsMap = includeFields.inject([:]) { result, includeField ->
+            result[includeField] = includeField
+            return result
+        }
 
+        transformObjects(objects, includeFieldsMap)
+    }
+
+    def transformObjects(List objects, Map includeFields) {
+        objects.collect { object ->
+            return transformObject(object, includeFields)
+        }
+    }
+
+    def transformObject(Object object, Map includeFields) {
+        Map properties = [:]
+        includeFields.each { fieldName, property ->
+            def value = property.tokenize('.').inject(object) {v, k -> v?."$k"}
+            properties[fieldName] = value?:""
+        }
+        return properties
+    }
 
     /**
      * Generic method to generate CSV string based on given csvrows map.

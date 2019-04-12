@@ -5,8 +5,6 @@
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
 		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
 		<table>
-
-
             <tr class="prop">
                 <td class="name">
                     <label><warehouse:message code="transaction.transactionType.label"/></label>
@@ -53,7 +51,10 @@
                 </td>
             </tr>
 			<tr class="prop">
-				<td style="padding: 0px;" colspan="2">
+				<td class="name">
+					<label><g:message code="transaction.transactionEntries.label"/></label>
+				</td>
+				<td style="padding: 0px;">
 					<div class="list">
 						<table id="inventoryConsumedTable">
 							<thead>
@@ -149,8 +150,9 @@
 				</td>
 			</tr>		
 			<tr class="prop">
-				<td colspan="7">
-					<div class="center">
+				<td></td>
+				<td>
+					<div class="left">
 						<button type="submit" name="save" class="button icon approve">
 							<warehouse:message code="default.button.save.label"/>
 						</button>

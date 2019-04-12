@@ -46,7 +46,7 @@
 										</td>
 										<td>		
 											<g:link controller="order" action="show" id="${orderItem?.order?.id}">	
-												${fieldValue(bean: orderItem, field: "order.description")}
+												${fieldValue(bean: orderItem, field: "order.name")}
 											</g:link>
 										</td>
 										<td>
