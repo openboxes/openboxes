@@ -53,15 +53,15 @@ import java.text.SimpleDateFormat
 
 class ReportService implements ApplicationContextAware {
 
-  def dataSource
-  def sessionFactory
+    def dataSource
+    def sessionFactory
 	def productService
 	def inventoryService
 	def shipmentService
 	def localizationService
 	def grailsApplication
-  def persistenceInterceptor
-  def propertyInstanceMap = DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+    def persistenceInterceptor
+    def propertyInstanceMap = DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 	def userService
 
 
@@ -572,16 +572,41 @@ class ReportService implements ApplicationContextAware {
     }
 
     void buildDimensions() {
-        destroyTransactionFact()
+        truncateFacts()
+        truncateDimensions()
         buildDateDimension()
         buildProductDimension()
         buildLocationDimension()
         buildTransactionTypeDimension()
         buildLotDimension()
-        buildTransactionFact()
     }
 
-	void executeStatements(List dmlStatements) {
+    void buildFacts() {
+        truncateFacts()
+        buildTransactionFact()
+        buildConsumptionFact()
+    }
+
+    def truncateFacts() {
+        executeStatements(["SET FOREIGN_KEY_CHECKS = 0",
+                           "truncate transaction_fact",
+                           "truncate consumption_fact",
+                           "SET FOREIGN_KEY_CHECKS = 1"])
+    }
+
+    def truncateDimensions() {
+        executeStatements([
+                "SET FOREIGN_KEY_CHECKS = 0",
+                "truncate date_dimension",
+                "truncate location_dimension",
+                "truncate lot_dimension",
+                "truncate product_dimension",
+                "truncate transaction_type_dimension",
+                "SET FOREIGN_KEY_CHECKS = 1"])
+}
+
+
+    void executeStatements(List dmlStatements) {
 		Sql sql = new Sql(dataSource)
 
 		dmlStatements.each { String dmlStatement ->
@@ -657,12 +682,6 @@ class ReportService implements ApplicationContextAware {
         }
     }
     
-    def destroyTransactionFact() {
-        String deleteStatement = "truncate transaction_fact"
-        executeStatements([deleteStatement])
-    }
-
-
     def buildTransactionFact() {
         String insertStatement = """
             insert into transaction_fact (version, 
@@ -700,339 +719,49 @@ class ReportService implements ApplicationContextAware {
     }
 
 
-    List buildTransactionFactOld() {
-        def dateList = []
-        def startTime = System.currentTimeMillis()
-        Integer deletedRecords = TransactionFact.executeUpdate("delete TransactionFact tf")
-        log.info "Deleted ${deletedRecords} records in ${System.currentTimeMillis()-startTime} ms"
-        def dates = inventoryService.getTransactionDates()
-
-        log.info ("Refresh transaction fact table for ${dates.size()} dates")
-        GParsPool.withPool {
-            dates.eachWithIndexParallel { Date date, int index ->
-                refreshTransactionFactData(date)
-            }
-        }
-
-        return dateList
-    }
-
-
-
-    def refreshTransactionFactData(Date date) {
-        List transactionFacts = []
-        long startTime = System.currentTimeMillis()
-
-        // Delete all transaction facts for the given location
-        //Integer deletedRecords = TransactionFact.executeUpdate("delete TransactionFact tf where location.id = :locationId", [locationId: location?.id])
-        //log.info "Deleted ${deletedRecords} records in ${System.currentTimeMillis()-startTime} ms"
-
-        //log.info ("Processing transaction facts for date ${date}")
-        persistenceInterceptor.init()
-        try {
-            Date startDate = date
-            Date endDate = date + 1
-            List transactionEntries = getTransactionEntriesViaSql(startDate, endDate)
-            if (transactionEntries) {
-                long saveStartTime = System.currentTimeMillis()
-                transactionFacts = transactionEntries
-                saveTransactionEntryMaps(transactionEntries)
-                log.info("Saved ${transactionEntries.size()} transaction fact records for ${date} in ${System.currentTimeMillis() - saveStartTime} ms")
-            }
-            persistenceInterceptor.flush()
-        } catch (Exception e) {
-            log.error("Error processing ${transactionFacts?.size()} transaction facts for ${date}: " + e.message, e)
-        }
-        finally {
-            persistenceInterceptor.destroy()
-        }
-        //def responseTime = System.currentTimeMillis() - startTime
-        //return [date: date, responseTime: responseTime, count: transactionFacts?.size()]
-
-        return date
-    }
-
-    void saveTransactionFacts(List<TransactionFact> transactionFacts) {
-        Session session = sessionFactory.openSession();
-        org.hibernate.Transaction tx = session.beginTransaction();
-        transactionFacts.eachWithIndex { transactionFact, index ->
-            session.save(transactionFact)
-            // Flush and clear the session every 100 records
-            if(index.mod(100)==0) {
-//                session.flush();
-//                session.clear();
-                cleanUpGorm()
-            }
-        }
-        tx.commit();
-        session.close();
-    }
-
-
-    void saveTransactionEntryMaps(List transactionEntryMaps) {
-
-        String dateFormat = "yyyy-MM-dd hh:mm:ss"
-        String timestamp = new Date().format(dateFormat)
-
-        Sql sql = new Sql(dataSource)
-        sql.withBatch(1024) { ps ->
-            transactionEntryMaps.eachWithIndex { map, index ->
-                //map.expirationDate = map.expirationDate ? map.expirationDate.format(dateFormat) : null
-                //map.transactionDate = map.transactionDate ? map.transactionDate.format(dateFormat) : null
-
-                // Debits should be negative so we can use sum aggregation
-                map.quantity = (map.transactionCode=='DEBIT') ? -map.quantity : map.quantity
-
-                String statement = "insert into transaction_fact (" +
-                        "id, " +
-                        "version, " +
-                        "transaction_entry_id, " +
-                        "transaction_code, " +
-                        "transaction_date, " +
-                        "transaction_number, " +
-                        "transaction_type, " +
-                        "year, " +
-                        "week, " +
-                        "month, " +
-                        "day, " +
-                        "month_year, " +
-                        "generic_product_id, " +
-                        "product_id, " +
-                        "product_code, " +
-                        "product_name, " +
-                        "category_id, " +
-                        "category_name, " +
-                        "unit_cost, " +
-                        "unit_price, " +
-                        "inventory_item_id, " +
-                        "lot_number, " +
-                        "expiration_date, " +
-                        "location_id, " +
-                        "location_name, " +
-                        "location_type, " +
-                        "location_group, " +
-                        "quantity, " +
-                        "quantity_canceled, " +
-                        "quantity_consumed, " +
-                        "quantity_demand, " +
-                        "quantity_expired, " +
-                        "quantity_issued, " +
-                        "quantity_modified, " +
-                        "quantity_requested, " +
-                        "quantity_substituted, " +
-                        "reason_code, " +
-                        "modified, " +
-                        "canceled, " +
-                        "substituted, " +
-                        "date_created, " +
-                        "last_updated) " +
-                        "values (" +
-                        "'${map.transactionEntryId}', " +
-                        "0, " +
-                        "'${map.transactionEntryId}', " +
-                        "'${StringEscapeUtils.escapeSql(map.transactionCode)}', " +
-                        "'${map.transactionDate}', " +
-                        "'${StringEscapeUtils.escapeSql(map.transactionNumber)}', " +
-                        "'${StringEscapeUtils.escapeSql(map.transactionType)}', " +
-                        "${map.year?:0}, " +
-                        "${map.week?:0}, " +
-                        "${map.month?:0}, " +
-                        "${map.day?:0}, " +
-                        "${map.monthYear?:0}, " +
-                        (map.genericProductId ? "'${map.genericProductId?:''}', " : "null, ") +
-                        "'${map.productId}', " +
-                        "'${StringEscapeUtils.escapeSql(map.productCode)}', " +
-                        "'${StringEscapeUtils.escapeSql(map.productName)}', " +
-                        (map.categoryId ? "'${map.categoryId?:''}', " : "null, ") +
-                        "'${StringEscapeUtils.escapeSql(map.categoryName)}', " +
-                        "${map.unitCost ?: 0}, " +
-                        "${map.unitPrice ?: 0}, " +
-                        "'${map.inventoryItemId}', " +
-                        (map.lotNumber ? "'${StringEscapeUtils.escapeSql(map.lotNumber)}', " : "null, ") +
-                        (map.expirationDate ? "'${map.expirationDate?:''}', " : "null, ") +
-                        (map.locationId ? "'${map.locationId?:''}', " : "null, ") +
-                        "'${StringEscapeUtils.escapeSql(map.locationName)}', " +
-                        "'${StringEscapeUtils.escapeSql(map.locationType)}', " +
-                        "'${StringEscapeUtils.escapeSql(map.locationGroup)}', " +
-                        "${map.quantity ?: 0}, " +
-                        "${map.quantityCanceled?:0}, " +
-                        "${map.quantityConsumed ?: 0}, " +
-                        "${map.quantityDemand ?: 0}, " +
-                        "${map.quantityExpired ?: 0}, " +
-                        "${map.quantityIssued ?: 0}, " +
-                        "${map.quantityModified ?: 0}, " +
-                        "${map.quantityRequested ?: 0}, " +
-                        "${map.quantitySubstituted ?: 0}, " +
-                        "'${StringEscapeUtils.escapeSql(map.reasonCode?:'')}', " +
-                        "${map.modified ?: false}, " +
-                        "${map.canceled ?: false}, " +
-                        "${map.substituted ?: false}, " +
-                        "'${timestamp}', " +
-                        "'${timestamp}')"
-
-                //log.debug "Statement ${statement}"
-
-                ps.addBatch(statement)
-            }
-        }
-    }
-
-    TransactionFact createTransactionFact(Map transactionEntryMap) {
-
-        if (transactionEntryMap) {
-            def transactionFact = new TransactionFact(
-                    product: transactionEntryMap.product,
-                    //genericProduct: transactionEntry.inventoryItem.product?.genericProduct,
-                    productId: transactionEntryMap.product?.id,
-                    productCode: transactionEntryMap.productCode,
-                    productName: transactionEntryMap.productName,
-
-                    categoryId: transactionEntryMap.category?.id,
-                    categoryName: transactionEntryMap?.categoryName,
-                    unitCost: transactionEntryMap.unitCost,
-                    unitPrice: transactionEntryMap.unitPrice,
-
-                    inventoryItem: transactionEntryMap.inventoryItem,
-                    lotNumber: transactionEntryMap?.lotNumber,
-                    expirationDate: transactionEntryMap?.expirationDate,
-
-                    quantityIssued: transactionEntryMap.quantity,
-                    quantityCanceled: 0,
-                    quantityDemand: 0,
-                    quantityRequested: 0,
-                    quantitySubstituted: 0,
-                    quantityModified: 0,
-
-                    transaction: transactionEntryMap.transaction,
-                    transactionEntryId: transactionEntryMap.transactionEntryId,
-                    transactionNumber: transactionEntryMap.transactionNumber,
-                    transactionCode: transactionEntryMap.transactionCode,
-                    transactionType: transactionEntryMap.transactionType,
-
-                    canceled: false,
-                    substituted: false,
-                    modified: false,
-
-                    reasonCode: "None",
-
-                    locationId: transactionEntryMap.location?.id,
-                    locationName: transactionEntryMap.locationName,
-                    locationType: transactionEntryMap.locationType,
-                    locationGroup: transactionEntryMap.locationGroup,
-
-                    transactionDate: transactionEntryMap.transactionDate,
-                    week: Constants.weekFormat.format(transactionEntryMap.transactionDate),
-                    month: Constants.monthFormat.format(transactionEntryMap.transactionDate),
-                    day: Constants.dayFormat.format(transactionEntryMap.transactionDate),
-                    year: Constants.yearFormat.format(transactionEntryMap.transactionDate),
-                    monthYear: Constants.yearMonthFormat.format(transactionEntryMap.transactionDate)
-            )
-            return transactionFact
-        }
-
-
-    }
-
-
-
-    List <TransactionEntry> getTransactionEntries(Location location) {
-        def transactionEntries = TransactionEntry.createCriteria().list {
-//            fetchMode 'transaction', FetchMode.JOIN
-//            fetchMode 'transaction.transactionType', FetchMode.JOIN
-//            fetchMode 'transaction.outboundTransfer', FetchMode.JOIN
-//            fetchMode 'transaction.inboundTransfer', FetchMode.JOIN
-//            fetchMode 'inventoryItem', FetchMode.JOIN
-//            fetchMode 'inventoryItem.product', FetchMode.JOIN
-//            fetchMode 'inventoryItem.product.productGroups', FetchMode.JOIN
-            transaction {
-                eq("inventory", location.inventory)
-            }
-        }
-        return transactionEntries;
-    }
-
-    List getTransactionEntriesViaSql(Date startDate, Date endDate) {
-
-        def transactionEntries
-        Sql sql = new Sql(dataSource)
-		String query = """
+    def buildConsumptionFact() {
+        String insertStatement = """
+            insert into consumption_fact (version, 
+                transaction_number, 
+                transaction_code,
+                transaction_type,
+                product_key_id, 
+                lot_key_id, 
+                location_key_id, 
+                transaction_date_key_id, 
+                quantity, 
+                unit_cost,
+                unit_price,
+                date_created, 
+                last_updated)
             select  
-                transaction_entry.id as transaction_entry_id,
-                product.id as product_id,             
-                product.product_code,   
-                product.name as product_name,
-                product.cost_per_unit as unit_cost,
-                product.price_per_unit as unit_price,
-                category.id as category_id,
-                category.name as category_name,
-                inventory_item.id as inventory_item_id,
-                inventory_item.lot_number,
-                inventory_item.expiration_date,
-                location.id as location_id,
-                location.name as location_name,
-                location.location_number as location_code,
-                location_type.name as location_type,
-                location_group.name as location_group,
-                requisition.id as requisition_id,
-                requisition.request_number,
-                transaction.id as transction_id,
-                transaction.transaction_date,
-                transaction.transaction_number,
+                0, 
                 transaction_type.transaction_code,
-                transaction_type.name as transaction_type,              
-                transaction_entry.quantity
+                transaction_type.name,
+                transaction.transaction_number,
+                product_dimension.id as product_key,             
+                lot_dimension.id as lot_key,
+                location_dimension.id as location_key,
+                transaction_date_dimension.id as transaction_date_key,
+                transaction_entry.quantity,
+                0.0,
+                0.0,
+                now(),
+                now()
             from transaction_entry 
             join transaction on transaction.id = transaction_entry.transaction_id
             join inventory on transaction.inventory_id = inventory.id 
             join location on location.inventory_id = transaction.inventory_id
-            join location_type on location.location_type_id = location_type.id
-            left outer join location_group on location.location_group_id = location_group.id
             join transaction_type on transaction_type.id = transaction.transaction_type_id 
             join inventory_item on inventory_item.id = transaction_entry.inventory_item_id
-            join product on product.id = inventory_item.product_id
-            join category on category.id = product.category_id
-            left outer join requisition on transaction.requisition_id = requisition.id
-            where transaction.transaction_date >= :startDate 
-            and transaction.transaction_date < :endDate
-            """
-
-        def rows = sql.rows(query, [startDate: startDate, endDate: endDate])
-
-        transactionEntries = rows.collect {
-            [
-                    //product: Product.load(it[0]),
-                    transactionEntryId: it[0],
-                    productId         : it[1],
-                    productCode       : it[2],
-                    productName       : it[3],
-                    unitCost          : it[4],
-                    unitPrice         : it[5],
-                    categoryId        : it[6],
-                    categoryName      : it[7],
-                    //inventoryItem: InventoryItem.load(it[3]),
-                    inventoryItemId   : it[8],
-                    lotNumber         : it[9],
-                    expirationDate    : it[10],
-                    //requisition: Requisition.load(it[6]),
-                    locationId        : it[11],
-                    locationName      : it[12],
-                    locationNumber    : it[13],
-                    locationType      : it[14],
-                    locationGroup     : it[15],
-                    requisitionId     : it[16],
-                    requisitionNumber : it[17],
-                    //transaction: Transaction.load(it[8]),
-                    transactionId     : it[18],
-                    transactionDate   : it[19],
-                    transactionNumber : it[20],
-                    transactionCode   : it[21],
-                    transactionType   : it[22],
-                    quantity          : it[23]
-            ]
-        }
-        return transactionEntries
-
-
+            join lot_dimension on lot_dimension.inventory_item_id = transaction_entry.inventory_item_id
+            join product_dimension on product_dimension.product_id = inventory_item.product_id
+            join location_dimension on location_dimension.location_id = location.id
+            join date_dimension transaction_date_dimension on transaction_date_dimension.date = date(transaction.transaction_date)
+            WHERE transaction_type.transaction_code = 'DEBIT'
+        """
+        executeStatements([insertStatement])
     }
+
 
 }

@@ -85,7 +85,8 @@
                     <td>Date Dimension</td>
                     <td>${dateDimensionCount}</td>
                     <td rowspan="4">
-                        <g:link controller="report" action="buildDimensions" class="button">Build Dimensions</g:link>
+                        <g:link controller="report" action="buildDimensions" class="button">Build</g:link>
+                        <g:link controller="report" action="truncateDimensions" class="button">Truncate</g:link>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -106,17 +107,14 @@
                 <tr class="prop">
                     <td>Transaction Fact</td>
                     <td>${transactionFactCount}</td>
-                    <td>
-                        <g:link controller="report" action="buildTransactionFact" class="button">Build</g:link>
+                    <td rowspan="2">
+                        <g:link controller="report" action="buildFacts" class="button">Build</g:link>
+                        <g:link controller="report" action="truncateFacts" class="button">Truncate</g:link>
                     </td>
                 </tr>
                 <tr class="prop">
                     <td>Consumption Fact</td>
                     <td>${consumptionFactCount}</td>
-                    <td>
-                        <g:link controller="consumption" action="refresh" class="button">Build</g:link>
-                        <g:link controller="consumption" action="delete" class="button">Delete</g:link>
-                    </td>
                 </tr>
 
 
