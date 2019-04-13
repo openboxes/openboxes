@@ -30,6 +30,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.report.ConsumptionService
+import org.pih.warehouse.report.ReportService
 import org.pih.warehouse.requisition.Requisition
 
 import java.text.SimpleDateFormat
@@ -37,6 +38,7 @@ import java.text.SimpleDateFormat
 class ConsumptionController {
 
     def dataService
+    ReportService reportService
     ProductService productService
     InventoryService inventoryService
     ConsumptionService consumptionService
@@ -309,7 +311,6 @@ class ConsumptionController {
 
     def delete = {
         long startTime = System.currentTimeMillis()
-
         Integer deletedRecords = consumptionService.deleteConsumptionRecords()
         flash.message = "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis()-startTime}"
         log.info "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis()-startTime}"
@@ -317,11 +318,7 @@ class ConsumptionController {
     }
 
     def refresh = { ConsumptionCommand command ->
-        long startTime = System.currentTimeMillis()
-        def records = consumptionService.refreshConsumptionData()
-        long duration = System.currentTimeMillis() - startTime
-        flash.message = "Refreshed ${records.size()} consumption records in ${duration} ms"
-        redirect(controller: "consumption", action: "list")
+        reportService.buildConsumptionFact()
     }
 
 
@@ -367,7 +364,7 @@ class ConsumptionController {
             def crosstab = consumptionService.generateCrossTab(data, command.startDate, command.endDate, null)
             log.info "crosstab " + crosstab
             String csv = dataService.generateCsv(crosstab)
-            response.setHeader("Content-disposition", "attachment; filename='Consumption-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}.csv'")
+            response.setHeader("Content-disposition", "attachment; filename=Consumption-${location.name}-${new Date().format("dd-MMM-yyyy-hhmmss")}.csv")
             render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
             return
         }

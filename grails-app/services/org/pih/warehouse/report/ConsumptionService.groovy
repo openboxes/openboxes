@@ -26,6 +26,7 @@ import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.reporting.LocationDimension
 import org.pih.warehouse.reporting.LotDimension
 import org.pih.warehouse.reporting.ProductDimension
+import org.springframework.transaction.annotation.Transactional
 
 import java.text.DateFormat
 import java.text.NumberFormat
@@ -35,149 +36,9 @@ class ConsumptionService {
 
     def dataService
     def sessionFactory
-    def persistenceInterceptor
-    //boolean transactional = false
-
-    List refreshConsumptionData(Location location) {
-        long startTime = System.currentTimeMillis()
-
-        log.info ("Processing consumption for location ${location?.name}")
-        persistenceInterceptor.init()
-
-        def transactionEntries = getTransactionEntries(TransactionCode.DEBIT, location)
-        if (transactionEntries) {
-            log.info("Processing ${transactionEntries.size()} transactions for location ${location?.name}")
-            try {
-                List consumptionRecords = []
-
-                transactionEntries.each { transactionEntry ->
-                    def consumptionRecord = calculateConsumption(transactionEntry)
-                    consumptionRecords.add(consumptionRecord)
-                }
-                long saveStartTime = System.currentTimeMillis()
-                saveConsumptionRecords(consumptionRecords)
-                log.info("Saved ${consumptionRecords.size()} consumption records in ${System.currentTimeMillis()-saveStartTime} ms")
-
-                persistenceInterceptor.flush()
-            } catch (Exception e) {
-                log.error("Error calculating consumption data " + e.message, e)
-
-            } finally {
-                persistenceInterceptor.destroy()
-            }
-        }
-        log.info("Refreshing consumption data took ${System.currentTimeMillis()-startTime} ms")
-        return [location]
-    }
-
-
-    List refreshConsumptionData() {
-        long startTime = System.currentTimeMillis()
-
-        def locationList
-        // FIXME What we really want is all locations that have consumption data
-        List<Location> locations = Location.findAllByParentLocationIsNull()
-        log.info ("Calculating consumption based on ${locations.size()} transactions")
-        GParsPool.withPool {
-            locationList = locations.collectParallel { Location location ->
-                return refreshConsumptionData(location)
-            }
-        }
-        log.info "Calculated consumption for ${locationList?.size()} locations"
-
-        log.info "Persisting ${locationList.size()} consumption records"
-
-
-        return locationList
-    }
-
 
     Integer deleteConsumptionRecords() {
         return ConsumptionFact.executeUpdate("""delete ConsumptionFact c""")
-    }
-
-    void saveConsumptionRecords(List consumptionRecords) {
-        Session session = sessionFactory.openSession();
-        org.hibernate.Transaction tx = session.beginTransaction();
-        consumptionRecords.eachWithIndex { consumption, index ->
-            session.save(consumption)
-            // Flush and clear the session every 100 records
-            if(index.mod(100)==0) {
-                session.flush();
-                session.clear();
-            }
-        }
-        tx.commit();
-        session.close();
-    }
-
-
-    List<Transaction> getTransactions(Location location) {
-        def transactions = Transaction.createCriteria().list {
-            transactionType {
-                eq("transactionCode", TransactionCode.DEBIT)
-            }
-            eq("inventory", location.inventory)
-        }
-        return transactions;
-    }
-
-    List <TransactionEntry> getTransactionEntries(TransactionCode transactionCode, Location location) {
-        def transactionEntries = TransactionEntry.createCriteria().list {
-            fetchMode 'transaction', FetchMode.JOIN
-            //fetchMode 'transaction.outboundTransfer', FetchMode.JOIN
-            //fetchMode 'transaction.inboundTransfer', FetchMode.JOIN
-            fetchMode 'inventoryItem', FetchMode.JOIN
-            fetchMode 'inventoryItem.product', FetchMode.JOIN
-            fetchMode 'inventoryItem.product.productGroups', FetchMode.JOIN
-            transaction {
-                if (transactionCode) {
-                    transactionType {
-                        eq("transactionCode", transactionCode)
-                    }
-                }
-                if (location) {
-                    eq("inventory", location.inventory)
-                }
-            }
-        }
-        return transactionEntries;
-    }
-
-
-    ConsumptionFact calculateConsumption(TransactionEntry transactionEntry) {
-
-        if (transactionEntry) {
-            Transaction transaction = transactionEntry.transaction
-            String productId = transactionEntry?.inventoryItem?.product?.id
-            String inventoryItemId = transactionEntry?.inventoryItem?.id
-            String locationId = transaction?.inventory?.warehouse?.id
-            Date transactionDate = transaction?.transactionDate
-            transactionDate?.clearTime()
-
-            log.info "Create consumption record ${locationId} ${inventoryItemId} ${productId}"
-
-            LocationDimension locationDimension = LocationDimension.findByLocationId(locationId)
-            ProductDimension productDimension = ProductDimension.findByProductId(productId)
-            LotDimension lotDimension = LotDimension.findByInventoryItemId(inventoryItemId)
-            DateDimension dateDimension = DateDimension.findByDate(transactionDate)
-
-            def consumptionFact = new ConsumptionFact(
-                    productKey: productDimension,
-                    lotKey: lotDimension,
-                    locationKey: locationDimension,
-                    transactionDateKey: dateDimension,
-                    quantity: transactionEntry.quantity,
-                    unitCost: transactionEntry?.inventoryItem?.product?.pricePerUnit?:0.0,
-                    unitPrice: 0.0,
-                    transactionNumber: transaction.transactionNumber,
-                    transactionCode: transaction.transactionType.transactionCode.toString(),
-                    transactionType: transaction.transactionType.name)
-            //consumption.save(failOnError: true)
-            return consumptionFact
-        }
-
-
     }
 
 
@@ -230,8 +91,6 @@ class ConsumptionService {
                 order("productName", "asc")
             }
         }
-
-        log.info "list consumption: " + results
 
         return results
     }

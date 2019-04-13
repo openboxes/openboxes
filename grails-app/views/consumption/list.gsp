@@ -159,10 +159,10 @@
         });
 
         function refreshPivotTable() {
-            let location = $("#location").val();
-            let category = $("#category").val();
-            let startDate = $("#startDate").val();
-            let endDate = $("#endDate").val();
+            var location = $("#location").val();
+            var category = $("#category").val();
+            var startDate = $("#startDate").val();
+            var endDate = $("#endDate").val();
             drawPivotTable(location, category, startDate, endDate);
         }
 
