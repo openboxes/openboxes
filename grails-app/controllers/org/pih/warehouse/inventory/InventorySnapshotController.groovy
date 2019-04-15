@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.jobs.CalculateQuantityJob
+import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.product.Product
 import org.springframework.http.HttpStatus
 
@@ -83,7 +84,7 @@ class InventorySnapshotController {
     def triggerCalculateQuantityOnHandJob = {
         println "triggerCalculateQuantityOnHandJob: " + params
 
-        def results = CalculateQuantityJob.triggerNow([productId:params.product.id,locationId:params.location.id,includeAllDates:true])
+        def results = CalculateQuantityJob.triggerNow([productId:params.product.id, locationId:params.location.id, includeAllDates:true])
 
         render ([started:true, results:results] as JSON)
 
@@ -161,6 +162,18 @@ class InventorySnapshotController {
             return;
         }
 
+    }
+
+    def transactionDates = {
+
+        Product product = Product.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+
+        def transactionDates = (product) ?
+                inventorySnapshotService.getTransactionDates(location, product) :
+                inventorySnapshotService.transactionDates
+
+        render([dates: transactionDates] as JSON)
     }
 
 }

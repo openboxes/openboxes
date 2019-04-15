@@ -13,6 +13,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
@@ -51,7 +52,20 @@ class Transaction implements Comparable, Serializable {
             updatedBy = currentUser
         }
     }
-	
+
+	def triggerRefreshInventorySnapshotJob = {
+		RefreshInventorySnapshotJob.triggerNow([startDate: transactionDate, location: inventory?.warehouse?.id])
+	}
+
+
+	// ID won't be available until after the record is inserted
+	def afterInsert = triggerRefreshInventorySnapshotJob;
+
+	def afterUpdate = triggerRefreshInventorySnapshotJob;
+
+	// This probably needs to be "before" since the transaction will not be around after
+	def afterDelete = triggerRefreshInventorySnapshotJob;
+
 	String id
     TransactionType transactionType 	// Detailed transaction type (e.g. Order, Transfer, Stock Count)
     Date transactionDate	    		// Date entered into the warehouse

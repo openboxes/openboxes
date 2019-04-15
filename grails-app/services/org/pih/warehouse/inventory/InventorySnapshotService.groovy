@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
+import org.grails.datastore.mapping.query.api.Criteria
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.springframework.transaction.annotation.Transactional
@@ -37,12 +38,19 @@ class InventorySnapshotService {
         }
     }
 
+
     def populateInventorySnapshots(Date date) {
+        def startTime = System.currentTimeMillis()
         def locations = getDepotLocations()
         locations.each { location ->
             log.debug "Creating or updating inventory snapshot for date ${date}, location ${location.name} ..."
             populateInventorySnapshots(date, location)
         }
+        log.info "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
+    }
+
+    def populateInventorySnapshots(Location location) {
+        populateInventorySnapshots(new Date(), location)
     }
 
     def populateInventorySnapshots(Date date, Location location) {
@@ -57,6 +65,13 @@ class InventorySnapshotService {
         saveInventorySnapshots(date, location, binLocations)
         def writeTime = System.currentTimeMillis()-startTime
         log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${readTime}ms/${writeTime}ms"
+    }
+
+    def calculateBinLocations(Location location, Product product) {
+        def binLocations = product ? inventoryService.getProductQuantityByBinLocation(location, product) :
+                inventoryService.getBinLocationDetails(location)
+        binLocations = transformBinLocations(binLocations)
+        return binLocations
     }
 
     def deleteInventorySnapshots(Date date) {
@@ -87,13 +102,6 @@ class InventorySnapshotService {
         InventorySnapshot.executeUpdate(deleteStmt, params)
     }
 
-    def calculateBinLocations(Location location, Product product) {
-        def binLocations = product ? inventoryService.getProductQuantityByBinLocation(location, product) : inventoryService.getBinLocationDetails(location)
-        binLocations = transformBinLocations(binLocations)
-        return binLocations
-    }
-
-
     def transformBinLocations(List binLocations) {
         return binLocations.collect {
             [
@@ -114,6 +122,8 @@ class InventorySnapshotService {
                 // Clear time in case caller did not
                 date.clearTime()
                 String dateString = date.format("yyyy-MM-dd HH:mm:ss")
+
+                // Execute inventory snapshot insert/update in batches
                 sql.withBatch(1000) { stmt ->
                     binLocations.eachWithIndex { entry, index ->
 
@@ -145,40 +155,26 @@ class InventorySnapshotService {
                 log.error("Error executing batch update for location ${location.name}" + e.message, e)
             }
         }
+        log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${System.currentTimeMillis()-startTime}ms"
     }
 
+    def getTransactionDates() {
+        return Transaction.executeQuery("select distinct(date(transactionDate)) from Transaction order by transactionDate desc")
+    }
+
+
     def getTransactionDates(Location location, Product product) {
-        def transactionDates = []
-        def startDate = new Date() - 365 * 5
-        def endDate = new Date()
-        (endDate..startDate).each {
-            it.clearTime()
-            transactionDates.add(it)
-        }
-        println "transactionDates: " + transactionDates
-        /*
-        def criteria = TransactionEntry.createCriteria()
-        def results = criteria.list {
-            projections {
-                transaction {
-                    distinct ("transactionDate")
-                }
-            }
 
-            transaction {
-                eq("inventory", location.inventory)
-            }
-            inventoryItem {
-                eq("product", product)
-            }
-        }
-        results.each { date ->
-            date.clearTime()
-            transactionDates << date
-        }
-        */
-
-        return transactionDates
+        String query = """
+            select distinct(date(t.transactionDate)) 
+            from TransactionEntry as te 
+            join te.transaction as t
+            join te.inventoryItem as ii
+            where ii.product = :product
+            and t.inventory = :inventory
+            order by t.transactionDate desc
+        """
+        return TransactionEntry.executeQuery(query, [product: product, inventory: location.inventory])
     }
 
     def getDepotLocations() {

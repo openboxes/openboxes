@@ -472,6 +472,9 @@ openboxes.scannerDetection.enabled = false
 openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
+// Refresh inventory snapshots
+openboxes.jobs.refreshInventorySnapshotJob.enabled = true
+
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
 openboxes.jobs.assignIdentifierJob.cronExpression = "0 0 0 * * ?" // every day at midnight
