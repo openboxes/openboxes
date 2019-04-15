@@ -12,6 +12,12 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
+import groovy.sql.Sql
+import groovy.time.TimeCategory
+import org.apache.commons.lang.StringEscapeUtils
+import org.hibernate.FetchMode
+import org.hibernate.annotations.Cache
+import org.pih.warehouse.core.*
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
@@ -44,6 +50,8 @@ import java.text.SimpleDateFormat
 
 class JsonController {
 
+    def dataSource
+    def dashboardService
 	def inventoryService
 	def productService
 	def localizationService
@@ -52,6 +60,7 @@ class JsonController {
 	def messageSource
     def consoleService
     def userService
+    def inventorySnapshotService
 
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
@@ -396,7 +405,7 @@ class JsonController {
     @Cacheable("dashboardCache")
     def getDashboardAlerts = {
         def location = Location.get(session?.warehouse?.id)
-        def dashboardAlerts = inventoryService.getDashboardAlerts(location)
+        def dashboardAlerts = dashboardService.getDashboardAlerts(location)
 
         render dashboardAlerts as JSON
     }
@@ -404,16 +413,16 @@ class JsonController {
     @Cacheable("dashboardCache")
     def getDashboardExpiryAlerts = {
         def location = Location.get(session?.warehouse?.id)
-        def map = inventoryService.getExpirationSummary(location)
+        def map = dashboardService.getExpirationSummary(location)
         render map as JSON
     }
 
     @Cacheable("dashboardCache")
     def getTotalStockValue = {
         def location = Location.get(session?.warehouse?.id)
-        def result = inventoryService.getTotalStockValue(location)
+        def result = dashboardService.getTotalStockValue(location)
         def totalValue = g.formatNumber(number: result.totalStockValue)
-        def lastUpdated = inventoryService.getLastUpdatedInventorySnapshotDate()
+        def lastUpdated = inventorySnapshotService.getLastUpdatedInventorySnapshotDate()
         if (lastUpdated) {
             lastUpdated = "Last updated " + prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) + "."
         }
@@ -432,7 +441,7 @@ class JsonController {
 
     def getStockValueByProduct = {
         def location = Location.get(session?.warehouse?.id)
-        def result = inventoryService.getTotalStockValue(location)
+        def result = dashboardService.getTotalStockValue(location)
         def hasRoleFinance = userService.hasRoleFinance(session?.user)
 
         def stockValueByProduct = []
@@ -461,21 +470,21 @@ class JsonController {
     @Cacheable("dashboardCache")
     def getReconditionedStockCount = {
         def location = Location.get(params?.location?.id)
-        def results = inventoryService.getReconditionedStock(location)
+        def results = dashboardService.getReconditionedStock(location)
         render (results?.keySet()?.size()?:"0")
     }
 
     @Cacheable("dashboardCache")
     def getTotalStockCount = {
         def location = Location.get(params?.location?.id)
-        def results = inventoryService.getTotalStock(location)
+        def results = dashboardService.getTotalStock(location)
         render (results?.keySet()?.size()?:"0")
     }
 
     @Cacheable("dashboardCache")
     def getInStockCount = {
         def location = Location.get(params?.location?.id)
-        def results = inventoryService.getInStock(location)
+        def results = dashboardService.getInStock(location)
         //println "in stock: " + results
         render (results?.keySet()?.size()?:"0")
     }
@@ -483,21 +492,21 @@ class JsonController {
     @Cacheable("dashboardCache")
     def getOutOfStockCount = {
         def location = Location.get(params?.location?.id)
-        def results = inventoryService.getOutOfStock(location)
+        def results = dashboardService.getOutOfStock(location)
         render (results?.keySet()?.size()?:"0")
     }
 
     @Cacheable("dashboardCache")
     def getOverStockCount = {
         def location = Location.get(params?.location?.id)
-        def results = inventoryService.getOverStock(location)
+        def results = dashboardService.getOverStock(location)
         render (results?.keySet()?.size()?:"0")
     }
 
     @Cacheable("dashboardCache")
     def getLowStockCount = {
 		def location = Location.get(params?.location?.id)
-		def results = inventoryService.getLowStock(location)
+		def results = dashboardService.getLowStock(location)
         //println "low: " + results
 		render (results?.keySet()?.size()?:"0")
 	}
@@ -505,7 +514,7 @@ class JsonController {
     @Cacheable("dashboardCache")
 	def getReorderStockCount = {
 		def location = Location.get(params?.location?.id)
-		def results = inventoryService.getReorderStock(location)
+		def results = dashboardService.getReorderStock(location)
         //println "reorder: " + results
 		render (results?.keySet()?.size()?:"0")
 	}
@@ -514,7 +523,7 @@ class JsonController {
 	def getExpiringStockCount = {
 		def daysUntilExpiry = Integer.valueOf(params.daysUntilExpiry)
 		def location = Location.get(params?.location?.id)
-		def results = inventoryService.getExpiringStock(null, location, daysUntilExpiry)
+		def results = dashboardService.getExpiringStock(null, location, daysUntilExpiry)
 		render ((results)?results?.size():"0")
 	}
 
@@ -522,7 +531,7 @@ class JsonController {
 	def getExpiredStockCount = {
 		//println "expired stock count " + params
 		def location = Location.get(params?.location?.id)
-		def results = inventoryService.getExpiredStock(null, location)
+		def results = dashboardService.getExpiredStock(null, location)
 		render ((results)?results.size():"0")
 	}
 
@@ -530,7 +539,7 @@ class JsonController {
     def getInventorySnapshots = {
 
         def location = Location.get(params?.location?.id)
-        def results = inventoryService.findInventorySnapshotByLocation(location)
+        def results = inventorySnapshotService.findInventorySnapshotByLocation(location)
 
         def inStockCount = results.findAll { it.quantityOnHand > 0 && it.status == InventoryStatus.SUPPORTED }.size()
         def lowStockCount = results.findAll { it.quantityOnHand > 0 && it.quantityOnHand <= it.minQuantity && it.status == InventoryStatus.SUPPORTED }.size()
@@ -1581,7 +1590,7 @@ class JsonController {
             date.clearTime()
         }
         def location = Location.get(params?.location?.id?:session?.warehouse?.id)
-        def data = inventoryService.getFastMovers(location, date, params.max as int)
+        def data = dashboardService.getFastMovers(location, date, params.max as int)
 
         render ([aaData: data?.results?:[]] as JSON)
     }
@@ -1674,139 +1683,5 @@ class JsonController {
         def count = shipmentService.fixShipmentsWithInvalidStatus()
         render ([count: count] as JSON)
     }
-
-    def getDashboardActivity = {
-
-        List activityList = []
-        def currentUser = User.get(session?.user?.id)
-        def location = Location.get(session.warehouse.id)
-        def daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):7
-
-        // Find recent requisition activity
-        def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where (r.isTemplate = false or r.isTemplate is null) and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
-                ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination': location])
-        requisitions.each {
-            def link = "${createLink(controller: 'requisition', action: 'show', id: it.id)}"
-            def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
-            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-            def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
-            activityType = "${warehouse.message(code: activityType)}"
-            activityList << [
-                    type: "basket",
-                    label: "${warehouse.message(code:'dashboard.activity.requisition.label', args: [link, it.name, activityType, username])}",
-                    url: link,
-                    dateCreated: it.dateCreated,
-                    lastUpdated: it.lastUpdated,
-                    requisition: it]
-        }
-
-        // Add recent shipments
-        def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
-			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location] );
-        shipments.each {
-            def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
-            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-            activityType = "${warehouse.message(code: activityType)}"
-            activityList << [
-                    type: "lorry",
-                    label: "${warehouse.message(code:'dashboard.activity.shipment.label', args: [link, it.name, activityType])}",
-                    url: link,
-                    dateCreated: it.dateCreated,
-                    lastUpdated: it.lastUpdated,
-                    shipment: it]
-        }
-        //order by e.createdDate desc
-        //[max:params.max.toInteger(), offset:params.offset.toInteger ()]
-        def shippedShipments = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'SHIPPED'", ['eventDate':new Date()-daysToInclude])
-        shippedShipments.each {
-            def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
-            def activityType = "dashboard.activity.shipped.label"
-            activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.destination.name])}"
-            activityList << [
-                    type: "lorry_go",
-                    label: activityType,
-                    url: link,
-                    dateCreated: it.dateCreated,
-                    lastUpdated: it.lastUpdated,
-                    shipment: it]
-        }
-        def receivedShipment = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'RECEIVED'", ['eventDate':new Date()-daysToInclude])
-        receivedShipment.each {
-            def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
-            def activityType = "dashboard.activity.received.label"
-            activityType = "${warehouse.message(code: activityType, args: [link, it.name, activityType, it.origin.name])}"
-            activityList << [
-                    type: "lorry_stop",
-                    label: activityType,
-                    url: link,
-                    dateCreated: it.dateCreated,
-                    lastUpdated: it.lastUpdated,
-                    shipment: it]
-        }
-
-        def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude] );
-        products.each {
-            def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
-            def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it.updatedBy
-            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-            activityType = "${warehouse.message(code: activityType)}"
-            def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
-            activityList << [
-                    type: "package",
-                    label: "${warehouse.message(code:'dashboard.activity.product.label', args: [link, it.name, activityType, username])}",
-                    url: link,
-                    dateCreated: it.dateCreated,
-                    lastUpdated: it.lastUpdated,
-                    product: it]
-        }
-
-        // If the current location has an inventory, add recent transactions associated with that location to the activity list
-        if (location?.inventory) {
-            def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
-				t.inventory = :inventory", ['lastUpdated':new Date()-daysToInclude, 'inventory':location?.inventory] );
-
-            transactions.each {
-                def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
-                def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it?.updatedBy
-                def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-                activityType = "${warehouse.message(code: activityType)}"
-                def label = LocalizationUtil.getLocalizedString(it)
-                def username = user?.name ?: "${warehouse.message(code: 'default.nobody.label', default: 'nobody')}"
-                activityList << [
-                        type: "arrow_switch_bluegreen",
-                        label: "${warehouse.message(code:'dashboard.activity.transaction.label', args: [link, label, activityType, username])}",
-                        url: link,
-                        dateCreated: it.dateCreated,
-                        lastUpdated: it.lastUpdated,
-                        transaction: it]
-            }
-        }
-
-        def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude], [max: 10] );
-        users.each {
-            def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
-            def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
-            if (it.lastUpdated == it.lastLoginDate) {
-                activityType = "dashboard.activity.loggedIn.label"
-            }
-            activityType = "${warehouse.message(code: activityType)}"
-            activityList << [
-                    type: "user",
-                    label: "${warehouse.message(code:'dashboard.activity.user.label', args: [link, it?.name, activityType])}",
-                    url: link,
-                    dateCreated: it.dateCreated,
-                    lastUpdated: it.lastUpdated,
-                    user: it]
-        }
-
-
-        def aaData = activityList.collect {
-            [type: it.type, label: it.label, lastUpdated:it.lastUpdated?.format('MMM d hh:mma')]
-        }
-
-
-        render ([aaData:aaData] as JSON)
-    }
-
 
 }
