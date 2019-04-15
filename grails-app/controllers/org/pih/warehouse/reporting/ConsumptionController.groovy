@@ -10,6 +10,7 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
+import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
@@ -319,25 +320,16 @@ class ConsumptionController {
 
     def refresh = { ConsumptionCommand command ->
         reportService.buildConsumptionFact()
+        redirect(controller: "consumption", action: "list")
     }
 
 
     def pivot = { ConsumptionCommand command ->
 
-        Location location = Location.get(session?.warehouse?.id)
-
-        def dateFormat = new SimpleDateFormat("ddMMyyyy")
-        //def dateKeys = inventoryService.getConsumptionDateKeys()
-        def calendar = Calendar.instance
-
-        // Set end date to user-entered date or the end of the current month
-        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        command.endDate = command?.endDate?:calendar.getTime()
-
-        // Set start date to user-entered date or the first of the year
-        calendar.set(Calendar.DAY_OF_YEAR,  calendar.getActualMinimum(Calendar.DAY_OF_YEAR));
-        command.startDate = command?.startDate?:calendar.getTime()
-
+        use(TimeCategory) {
+            command.endDate = command?.endDate?:new Date()
+            command.startDate = command?.startDate?:new Date() - 6.months
+        }
 
         [ command: command]
     }
@@ -349,15 +341,10 @@ class ConsumptionController {
 
         Location location = Location.get(session?.warehouse?.id)
 
-        Calendar calendar = Calendar.instance
-
-        // Set end date to user-entered date or the end of the current month
-        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        command.endDate = command?.endDate?:calendar.getTime()
-
-        // Set start date to user-entered date or the first of the year
-        calendar.set(Calendar.DAY_OF_YEAR,  calendar.getActualMinimum(Calendar.DAY_OF_YEAR));
-        command.startDate = command?.startDate?:calendar.getTime()
+        use(TimeCategory) {
+            command.endDate = command?.endDate?:new Date()
+            command.startDate = command?.startDate?:new Date() - 6.months
+        }
 
         if (command.download) {
             def data = consumptionService.listConsumption(command.location, command.category, command.startDate, command.endDate)
@@ -376,20 +363,13 @@ class ConsumptionController {
     def aggregate = { ConsumptionCommand command ->
 
         String locationId = command?.location?.id?:session?.warehouse?.id
-
         Location location = Location.get(locationId)
 
-        def dateFormat = new SimpleDateFormat("ddMMyyyy")
-        //def dateKeys = inventoryService.getConsumptionDateKeys()
-        def calendar = Calendar.instance
+        use(TimeCategory) {
+            command.endDate = command?.endDate?:new Date()
+            command.startDate = command?.startDate?:new Date() - 6.months
+        }
 
-        // Set end date to user-entered date or the end of the current month
-        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        command.endDate = command?.endDate?:calendar.getTime()
-
-        // Set start date to user-entered date or the first of the year
-        calendar.set(Calendar.DAY_OF_YEAR,  calendar.getActualMinimum(Calendar.DAY_OF_YEAR));
-        command.startDate = command?.startDate?:calendar.getTime()
 
         List <ConsumptionFact> results = consumptionService.listConsumption(location, command?.category, command.startDate, command.endDate)
 

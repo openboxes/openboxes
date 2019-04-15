@@ -21,7 +21,7 @@
         </g:link>
         <g:link controller="consumption" action="pivot" class="button">
             <img src="${resource(dir:'images/icons/silk',file:'report_edit.png')}" style="vertical-align: middle"/>
-            <warehouse:message code="consumption.report.edit.label" default="Design Consumption Report"/>
+            <warehouse:message code="consumption.report.edit.label" default="Edit Consumption Report"/>
         </g:link>
         <div class="right">
             <g:link controller="consumption" action="refresh" class="button">
@@ -34,67 +34,6 @@
 
     <div class="box">
         <h2><g:message code="consumption.label"/></h2>
-
-        <g:form action="list" method="get">
-            <table border="0">
-                <tr>
-                    <th><warehouse:message code="consumption.location.label" default="Location"/></th>
-                    <th><warehouse:message code="consumption.dateRange.label" default="Date Range"/></th>
-                    <th><warehouse:message code="consumption.groupBy.label"/></th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <td>
-                        <g:selectLocation class="chzn-select-deselect"
-                                          name="location.id" noSelection="['':'']"
-                                          value="${command?.location?.id?:session?.warehouse?.id}"/>
-                    </td>
-
-                    <td>
-                        <g:jqueryDatePicker
-                                id="startDate"
-                                name="startDate"
-                                changeMonthAndYear="true"
-                                size="20"
-                                value="${command?.startDate }"
-                                format="MM/dd/yyyy"
-                                showTrigger="false"
-                        />
-
-                        <g:jqueryDatePicker
-                                id="endDate"
-                                name="endDate"
-                                changeMonthAndYear="true"
-                                size="20"
-                                value="${command?.endDate }"
-                                format="MM/dd/yyyy"
-                                showTrigger="false"
-                        />
-                    </td>
-                    <td>
-                        <g:select name="groupBy" class="chzn-select-deselect"
-                                  from="[	'daily': warehouse.message(code:'consumption.daily.label'),
-                                             'weekly': warehouse.message(code:'consumption.weekly.label'),
-                                             'monthly': warehouse.message(code:'consumption.monthly.label'),
-                                             'yearly': warehouse.message(code:'consumption.annually.label')]"
-                                  optionKey="key" optionValue="value" value="${command?.groupBy}"
-                                  noSelection="['default': warehouse.message(code:'default.label')]" />
-                    </td>
-                    <td class="right">
-                        <button id="btn-run" name="filter" class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'lightning.png')}"/>
-                            &nbsp;<warehouse:message code="default.button.run.label"/> </button>
-
-
-                        <g:link controller="consumption" action="pivot" class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh_small.png')}"/>
-                            <g:message code="default.button.clear.label"/>
-                        </g:link>
-                    </td>
-                </tr>
-            </table>
-        </g:form>
-
         <div id="output">
             <div class="loading">Loading...</div>
 
@@ -117,9 +56,9 @@
     );
     $.getJSON('${request.contextPath}/consumption/aggregate', {}, function(data) {
         $("#output").pivotUI(data, {
-            cols: ["Monthly"],
-            rows: ["Category Name", "Product Name"],
-            vals: ["Issued"],
+            cols: ["year", "month"],
+            rows: ["productName"],
+            vals: ["quantity"],
             aggregatorName: "Sum",
             hiddenAttributes: [],
             renderers: renderers

@@ -25,7 +25,7 @@
                 </g:link>
 				<g:link controller="consumption" action="pivot" class="button">
 					<img src="${resource(dir:'images/icons/silk',file:'report_edit.png')}" style="vertical-align: middle"/>
-					<warehouse:message code="consumption.report.configure.label" default="Configure Consumption Report"/>
+					<warehouse:message code="consumption.report.edit.label" default="Edit Consumption Report"/>
 				</g:link>
 
                 <g:isSuperuser>
@@ -46,28 +46,20 @@
                         <h2><g:message code="default.filters.label"/></h2>
 
                         <g:form action="list" method="get">
-                            <table border="0">
-                                <tr>
-                                    <td>
+                            <div class="filter-list-item">
                                         <label>${g.message(code: 'location.label')}</label>
                                         <g:selectDepot id="location" class="chzn-select-deselect filter"
                                                        name="location" noSelection="['':'']"
                                                        value="${command?.location?.id?:session?.warehouse?.id}"/>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
+                            </div>
+                            <div class="filter-list-item">
                                         <label>${g.message(code: 'category.label')}</label>
                                         <g:selectCategory id="category" class="chzn-select-deselect filter"
                                                           name="category" noSelection="['':'']"
                                                           value="${command?.category?.id}"
                                         />
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
+                            </div>
+                            <div class="filter-list-item">
                                         <label>${g.message(code: 'consumption.startDate.label')}</label>
                                         <g:jqueryDatePicker
                                                 id="startDate"
@@ -79,10 +71,8 @@
                                                 format="MM/dd/yyyy"
                                                 showTrigger="false"
                                         />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
+                            </div>
+                            <div class="filter-list-item">
                                         <label>${g.message(code: 'consumption.endDate.label')}</label>
                                         <g:jqueryDatePicker
                                                 id="endDate"
@@ -94,15 +84,12 @@
                                                 format="MM/dd/yyyy"
                                                 showTrigger="true"
                                         />
-                                    </td>
-                                </tr>
-
-                            <tr>
-                                <td>
+                            </div>
+                            <div class="filter-list-item">
 
                                     <button id="btn-execute" name="execute" class="button">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'lightning.png')}"/>
-                                        &nbsp;<warehouse:message code="default.button.execute.label"/> </button>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>
+                                        &nbsp;<warehouse:message code="default.button.view.label"/> </button>
 
                                     <button id="btn-download" name="download" class="button" value="true">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}"/>
@@ -113,11 +100,7 @@
                                         <g:message code="default.button.clear.label"/>
                                     </g:link>
 
-                                </td>
-
-                            </tr>
-
-                            </table>
+                            </div>
                         </g:form>
                     </div>
                 </div>
@@ -181,7 +164,7 @@
             }, function (data) {
                 $("#results").pivot(
                     data, {
-                        rows: ["categoryName", "productName"],
+                        rows: ["productName"],
                         cols: ["year", "month"],
                         aggregator: sum(intFormat)(["quantity"])
                     });
