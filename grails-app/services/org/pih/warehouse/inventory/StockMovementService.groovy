@@ -157,11 +157,14 @@ class StockMovementService {
     }
 
     def getStockMovements(Integer maxResults, Integer offset) {
-        return getStockMovements(null, maxResults, offset)
+        return getStockMovements(null, [:], maxResults, offset)
     }
 
+    def getStockMovements(Map params, Integer maxResults, Integer offset) {
+        return getStockMovements(null, params, maxResults, offset)
+    }
 
-    def getStockMovements(StockMovement stockMovement, Integer maxResults, Integer offset) {
+    def getStockMovements(StockMovement stockMovement, Map params, Integer maxResults, Integer offset) {
         log.info "Get stock movements: " + stockMovement.toJson()
 
         log.info "Stock movement: ${stockMovement?.shipmentStatusCode}"
@@ -217,9 +220,12 @@ class StockMovementService {
                 eq("createdBy", stockMovement.createdBy)
             }
 
-            //if (offset) firstResult(offset)
-            //if (maxResults) maxResults(maxResults)
-            order("dateCreated", "desc")
+            if (params.sort && params.order) {
+                order(params.sort, params.order)
+            }
+            else {
+                order("dateCreated", "desc")
+            }
         }
 
 
@@ -1365,8 +1371,6 @@ class StockMovementService {
         Shipment shipment = stockMovement?.requisition?.shipment
         if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
             shipmentService.rollbackLastEvent(shipment)
-        }
-        else if (requisition) {
             requisitionService.rollbackRequisition(requisition)
         }
     }

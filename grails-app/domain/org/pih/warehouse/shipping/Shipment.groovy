@@ -259,6 +259,19 @@ class Shipment implements Comparable, Serializable {
 		return shipmentItems?.sort(shipmentItemComparator)
 	}
 
+	List sortShipmentItemsBySortOrder() {
+		def shipmentItemComparator = { a, b ->
+			def sortOrder =
+					a?.container?.parentContainer?.sortOrder <=> b?.container?.parentContainer?.sortOrder ?:
+							a?.container?.sortOrder <=> b?.container?.sortOrder ?:
+									a?.requisitionItem?.orderIndex <=> b?.requisitionItem?.orderIndex ?:
+											a?.sortOrder <=> b?.sortOrder
+			return sortOrder
+		}
+
+		return shipmentItems?.sort(shipmentItemComparator)
+	}
+
 	//String getShipmentNumber() {
 	//	return (id) ? "S" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
 	//}

@@ -10,15 +10,13 @@
 package org.pih.warehouse
 
 import grails.plugin.springcache.annotations.Cacheable
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.ReasonCode
-import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
@@ -27,14 +25,13 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductCatalog
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionStatus;
-import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.requisition.CommodityClass
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipper
 import org.springframework.beans.SimpleTypeConverter
@@ -262,6 +259,13 @@ class SelectTagLib {
         attrs.from = Person.list().sort { it.firstName }
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+
+    def selectRecipient = { attrs, body ->
+        attrs.from = User.findAllByEmailIsNotNull().sort { it.firstName }
+        attrs.optionKey = 'email'
+        attrs.optionValue = { it.name + " (" + it.username + ")"}
         out << g.select(attrs)
     }
 

@@ -18,23 +18,33 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.hibernate.FetchMode
 import org.hibernate.annotations.Cache
 import org.pih.warehouse.core.*
+import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Localization
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.reporting.Indicator
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
-import org.springframework.transaction.annotation.Transactional
-import util.InventoryUtil
+import org.pih.warehouse.util.LocalizationUtil
+
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
@@ -78,9 +88,11 @@ class JsonController {
         def requisition = Requisition.get(params?.requisition?.id)
         def product = Product.get(params?.product?.id);
         if (!requisition) {
+            response.status = 400
             json = [success: false, errors: ["Unable to find requisition with ID ${params?.requisition?.id}"]]
         }
         else if (!product) {
+            response.status = 400
             json = [success: false, errors: ["Unable to find product with ID ${params?.product?.id}"]]
         }
         else {
@@ -95,11 +107,78 @@ class JsonController {
                 requisition.updatedBy = session.user
                 requisition.addToRequisitionItems(requisitionItem)
                 if (requisition.validate() && requisition.save(flush: true)) {
-                    json = [success: true, data: requisition]
+                    json = [success: true, data: requisitionItem.toStockListDetailsJson()]
                 } else {
+                    response.status = 400
                     json = [success: false, errors: requisitionItem.errors]
                 }
             }
+        }
+        log.info(json as JSON)
+        render json as JSON
+    }
+
+    def getRequisitionItems = {
+        log.info "getRequisitionItems: ${params} "
+        def json
+        def requisition = Requisition.get(params?.id)
+        if (!requisition) {
+            json = [success: false, errors: ["Unable to find requisition with ID ${params?.id}"]]
+        }
+        else {
+            RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
+            def requisitionItems = requisition."${sortByCode.methodName}"?.collect { it.toStockListDetailsJson() }
+            json = [aaData: requisitionItems]
+        }
+        log.info(json as JSON)
+        render json as JSON
+    }
+
+    def updateRequisitionItems = {
+        log.info "updateRequisitionItems: ${params} "
+
+        JSONObject jsonObject = request.JSON
+
+        def requisition = Requisition.get(params?.id)
+        if (!requisition) {
+            response.status = 400
+            render ([success: false, errors: ["Unable to find requisition with ID ${params?.id}"]] as JSON)
+        }
+        else {
+            def items = jsonObject.get("items")
+
+            items?.each { item ->
+                RequisitionItem requisitionItem = requisition.requisitionItems.find { it.id == item.id }
+
+                if (requisitionItem) {
+                    requisitionItem.quantity = item.quantity ? new Integer(item.quantity) : null
+                    requisitionItem.productPackage = item.productPackageId ? ProductPackage.get(item.productPackageId) : null
+                }
+            }
+
+            requisition.updatedBy = session.user
+
+            if (requisition.validate() && requisition.save(flush: true)) {
+                forward(action: "getRequisitionItems")
+            } else {
+                response.status = 400
+                render ([success: false, errors: requisition.errors] as JSON)
+            }
+        }
+    }
+
+    def removeRequisitionItem = {
+        log.info "removeRequisitionItem: ${params} "
+        def json
+        def requisitionItem = RequisitionItem.get(params?.id)
+        if (!requisitionItem) {
+            response.status = 400
+            json = [success: false, errors: ["Unable to find requisition item with ID ${params?.id}"]]
+        }
+        else {
+            requisitionItem.requisition.removeFromRequisitionItems(requisitionItem)
+            requisitionItem.delete()
+            json = [success: true]
         }
         log.info(json as JSON)
         render json as JSON
@@ -344,10 +423,14 @@ class JsonController {
         def result = dashboardService.getTotalStockValue(location)
         def totalValue = g.formatNumber(number: result.totalStockValue)
         def lastUpdated = inventorySnapshotService.getLastUpdatedInventorySnapshotDate()
-        lastUpdated = "Last updated " + prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) + "."
+        if (lastUpdated) {
+            lastUpdated = "Last updated " + prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) + "."
+        }
+        else {
+            lastUpdated = "No data available"
+        }
         def data = [
                 lastUpdated: lastUpdated,
-                anotherAttr: "anotherValue",
                 totalStockValue:result.totalStockValue,
                 hitCount: result.hitCount,
                 missCount: result.missCount,
@@ -881,51 +964,40 @@ class JsonController {
 
 		log.info("find products by name " + params)
 		def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT);
-		def products = new TreeSet();
+		def products = new TreeSet()
 
 		if (params.term) {
-			// Match full name
+            def terms = params.term.split(" ")
 
-            products = Product.withCriteria {
-                ilike("productCode", params.term + "%")
-            }
-            if (!products) {
-                products = Product.withCriteria {
-                    ilike("name", "%" + params.term + "%")
+            // Get all products that match terms
+            products = productService.searchProducts(terms, [])
+
+            products = products.unique()
+
+            if (terms) {
+                products = products.sort() {
+                    a, b ->
+                        (terms.any { a?.productCode?.contains(it) ? a.productCode : null }) <=> (terms.any { b?.productCode?.contains(it) ? b.productCode : null }) ?:
+                                (terms.any { a?.name?.contains(it) ? a.name : null }) <=> (terms.any { b?.name?.contains(it) ? b.name : null })
                 }
+                products = products.reverse()
             }
 		}
 
-		def location = Location.get(params.warehouseId);
-		log.info ("warehouse: " + location);
-		def quantityMap = [:]
-
-        if (false) {
-		    quantityMap = inventoryService.getQuantityForInventory(location?.inventory)
-        }
-
-		// FIXME Needed to create a new map with inventory item id as the index
-		// in order to get the quantity below.  For some reason, the inventory item
-		// object was getting toString()'d when used below as a key and therefore
-		// the keys were mismatched and the quantity was always null.
-		def idQuantityMap = [:]
-		quantityMap.keySet().each {
-			idQuantityMap[it.id] = quantityMap[it]
-		}
-
+		boolean skipQuantity = params.boolean("skipQuantity") ?: false
 		// Convert from products to json objects
 		if (products) {
 			// Make sure items are unique
 			//products.unique();
 			products = products.collect() { product ->
-				def productQuantity = 0;
+				def productQuantity = 0
 				// We need to check to make sure this is a valid product
 				def inventoryItemList = []
-				if (product.id) {
-					def inventoryItems = InventoryItem.findAllByProduct(product);
+				if (product.id && !skipQuantity) {
+					def inventoryItems = InventoryItem.findAllByProduct(product)
 					inventoryItemList = inventoryItems.collect() { inventoryItem ->
 						// FIXME Getting the quantity from the inventory map does not work at the moment
-						def quantity = idQuantityMap[inventoryItem.id]?:0;
+						def quantity = 0
 
 						// Create inventory items object
 						//if (quantity > 0) {
@@ -1144,7 +1216,7 @@ class JsonController {
 	def globalSearch = {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
-        if (params.name && params.name.size()<minLength) {
+        if (params.term && params.term.size()<minLength) {
             render([:] as JSON)
             return
         }
@@ -1152,13 +1224,15 @@ class JsonController {
 		def terms = params.term?.split(" ")
         def location = Location.get(session.warehouse.id)
 
+        // FIXME Should replace this with an elasticsearch implementation
         // Get all products that match terms
         def products = productService.searchProducts(terms, [])
 
         products = products.unique()
 
+        // FIXME Need to add quantity once we improve inventory snapshot feature (OBPIH-1602 and OBPIH-1890)
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
-        def quantityMap = products ? getQuantityByProductMapCached(location, products) : [:]
+        def quantityMap = [:]//products ? getQuantityByProductMapCached(location, products) : [:]
 
         if (terms) {
             products = products.sort() {
@@ -1172,15 +1246,21 @@ class JsonController {
         def items = []
         items.addAll(products)
 		items.unique{ it.id }
-		def json = items.collect {
+		def json = items.collect { Product product ->
             def quantity = quantityMap[it] ?: 0
-            def type = it.class.simpleName.toLowerCase()
+            if (quantityMap.containsKey(it)) {
+                quantity = " [" + quantity + " " + (product?.unitOfMeasure ?: "EA") + "]"
+            }
+            else {
+                quantity = ""
+            }
+            def type = product.class.simpleName.toLowerCase()
             [
-                    id   : it.id,
-                    type : it.class,
-                    url  : request.contextPath + "/" + type + "/redirect/" + it.id,
-                    value: it.name,
-                    label: it.productCode + " " + it.name + " x " + quantity + " " + (it?.unitOfMeasure ?: "EA")
+                    id   : product.id,
+                    type : product.class,
+                    url  : request.contextPath + "/" + type + "/redirect/" + product.id,
+                    value: product.name,
+                    label: product.productCode + " " + product.name + " " + quantity
             ]
         }
 		render json as JSON
@@ -1602,12 +1682,6 @@ class JsonController {
     def fixShipmentsWithInvalidStatus = {
         def count = shipmentService.fixShipmentsWithInvalidStatus()
         render ([count: count] as JSON)
-    }
-
-    // TODO The following method should be removed before merge
-    def getLocation = {
-        List locations = Location.list([max:10])
-        render ([status: "OK", locations: locations] as JSON)
     }
 
 }

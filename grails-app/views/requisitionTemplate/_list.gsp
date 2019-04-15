@@ -87,7 +87,7 @@
                     </g:else>
                 </td>
                 <td>
-                    <g:link action="edit" id="${requisition?.id}">
+                    <g:link action="show" id="${requisition?.id}">
                         <format:metadata obj="${requisition?.name}"/>
                     </g:link>
                 </td>

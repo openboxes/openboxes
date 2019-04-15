@@ -96,7 +96,7 @@ class StockMovementController {
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
         stockMovement.receiptStatusCode = params?.receiptStatusCode ? params.receiptStatusCode as ShipmentStatusCode : null
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, max, offset)
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params, max, offset)
         def statistics = requisitionService.getRequisitionStatistics(requisition.destination, requisition.origin, currentUser)
 
         render(view:"list", params:params, model:[stockMovements: stockMovements, statistics:statistics])
@@ -164,7 +164,11 @@ class StockMovementController {
     def receipts = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        def receiptItems = shipments*.receipts*.receiptItems?.flatten()
+        def receiptItems = shipments*.receipts*.receiptItems?.flatten()?.sort { a,b ->
+            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
+                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
+                            a?.sortOrder <=> b?.sortOrder
+        }
         render(template: "receipts", model: [receiptItems:receiptItems])
     }
 

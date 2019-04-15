@@ -20,10 +20,16 @@ import java.sql.BatchUpdateException
 
 class InventorySnapshotService {
 
-    //boolean transactional = true
+    boolean transactional = true
 
     def dataSource
     def inventoryService
+
+    def refreshInventorySnapshots(Date date) {
+        deleteInventorySnapshots(date)
+        populateInventorySnapshots(date)
+    }
+
 
     def populateInventorySnapshots() {
         def transactionDates = getTransactionDates()
@@ -31,6 +37,7 @@ class InventorySnapshotService {
             populateInventorySnapshots(date)
         }
     }
+
 
     def populateInventorySnapshots(Date date) {
         def startTime = System.currentTimeMillis()
@@ -43,41 +50,57 @@ class InventorySnapshotService {
     }
 
     def populateInventorySnapshots(Location location) {
-        def binLocations = getBinLocations(location)
-        saveInventorySnapshots(new Date(), location, binLocations)
+        populateInventorySnapshots(new Date(), location)
     }
 
-
     def populateInventorySnapshots(Date date, Location location) {
-        def binLocations = getBinLocations(date, location)
-        saveInventorySnapshots(date, location, binLocations)
+        populateInventorySnapshots(date, location, null)
     }
 
     def populateInventorySnapshots(Date date, Location location, Product product) {
-        def binLocations = getBinLocations(location, product)
+        def startTime = System.currentTimeMillis()
+        def binLocations = calculateBinLocations(location, product)
+        def readTime = (System.currentTimeMillis()-startTime)
+        startTime = System.currentTimeMillis()
         saveInventorySnapshots(date, location, binLocations)
+        def writeTime = System.currentTimeMillis()-startTime
+        log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${readTime}ms/${writeTime}ms"
     }
 
-    def getBinLocations(Date date, Location location) {
-        def transactionEntries = inventoryService.getTransactionEntriesBeforeDate(location, date)
-        def binLocations = inventoryService.getQuantityByBinLocation(transactionEntries)
-        return transformBinLocations(binLocations)
-    }
-
-
-    def getBinLocations(Location location) {
-        def binLocations = inventoryService.getBinLocationDetails(location)
+    def calculateBinLocations(Location location, Product product) {
+        def binLocations = product ? inventoryService.getProductQuantityByBinLocation(location, product) :
+                inventoryService.getBinLocationDetails(location)
         binLocations = transformBinLocations(binLocations)
         return binLocations
     }
 
-
-    def getBinLocations(Location location, Product product) {
-        def binLocations = inventoryService.getProductQuantityByBinLocation(location, product)
-        binLocations = transformBinLocations(binLocations)
-        return binLocations
+    def deleteInventorySnapshots(Date date) {
+        deleteInventorySnapshots(date, null, null)
     }
 
+    def deleteInventorySnapshots(Date date, Location location) {
+        deleteInventorySnapshots(date, location, null)
+    }
+
+
+    def deleteInventorySnapshots(Date date, Location location, Product product) {
+        Map params = [:]
+
+        String deleteStmt = """delete from InventorySnapshot snapshot where snapshot.date = :date"""
+        params.put("date", date)
+
+        if (location) {
+            deleteStmt + " and snapshot.location = :location"
+            params.put("location", location)
+        }
+
+        if (product) {
+            deleteStmt + " and snapshot.product = :product"
+            params.put("product", product)
+        }
+
+        InventorySnapshot.executeUpdate(deleteStmt, params)
+    }
 
     def transformBinLocations(List binLocations) {
         return binLocations.collect {
@@ -182,6 +205,7 @@ class InventorySnapshotService {
                     and i.date = :date
                     and i.product = product
                     and i.product.category = category
+                    group by i.date, i.location.name, product
                     """, [location:location, date: date])
 
             // group by i.date, i.location.name, product

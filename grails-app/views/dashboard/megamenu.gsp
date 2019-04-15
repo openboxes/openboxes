@@ -33,6 +33,13 @@
                         </g:link>
 
                     </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="consumption" action="list" class="list">
+                            <warehouse:message code="consumption.report.label" default="Consumption report" />
+                            <span class="beta">Beta</span>
+                        </g:link>
+
+                    </div>
                 </div>
             </li>
         </g:isUserAdmin>
@@ -405,8 +412,12 @@
 
                     <h3><warehouse:message code="dataExports.label" default="Data Exports" /></h3>
                     <div class="mm-menu-item">
-                        <g:link controller="product" action="exportAsCsv" class="list">
+                        <g:link controller="product" action="exportAsCsv">
                             <warehouse:message code="product.exportAsCsv.label"/></g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="productSupplier" action="export">
+                            <warehouse:message code="default.export.label" args="[g.message(code: 'productSuppliers.label').toLowerCase()]"/></g:link>
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="inventory" action="exportLatestInventoryDate" class="list">
@@ -570,9 +581,23 @@
 
     <g:if test="${megamenuConfig.requisitionTemplate.enabled || isSuperuser}">
         <li class="mm-item">
-            <g:link controller="requisitionTemplate" action="list" class="list">
-                <warehouse:message code="requisitionTemplates.list.label" default="Stock lists" />
-            </g:link>
+            <a href="javascript:void(0)" class="mm-item-link">
+                <warehouse:message code="requisitionTemplates.label" default="Stock Lists" />
+            </a>
+            <div class="mm-item-content">
+                <div class="mm-menu-item">
+                    <g:link controller="requisitionTemplate" action="list">
+                        <warehouse:message code="requisitionTemplates.list.label" default="List stock lists"/>
+                    </g:link>
+                </div>
+                <g:isUserAdmin>
+                    <div class="mm-menu-item">
+                        <g:link controller="requisitionTemplate" action="create">
+                            <warehouse:message code="requisitionTemplates.create.label" default="Create stock list" />
+                        </g:link>
+                    </div>
+                </g:isUserAdmin>
+            </div>
         </li>
     </g:if>
 

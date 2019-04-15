@@ -68,9 +68,18 @@ class InventorySnapshotController {
             log.error("An error occurred while attempting to trigger inventory snapshot update: " + e.message, e)
             render([error:e.class.name, message:e.message]as JSON)
         }
-
-
     }
+
+    def trigger = {
+        Date date = new Date()
+        date.clearTime()
+        Product product = Product.get(params.productId)
+        Location location = Location.get(session.warehouse.id)
+        inventorySnapshotService.deleteInventorySnapshots(date, location, product)
+        inventorySnapshotService.populateInventorySnapshots(date, location, product)
+        render ([status: "OK"] as JSON)
+    }
+
 
     def triggerCalculateQuantityOnHandJob = {
         println "triggerCalculateQuantityOnHandJob: " + params

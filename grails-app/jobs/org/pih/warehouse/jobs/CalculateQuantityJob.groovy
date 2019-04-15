@@ -1,27 +1,29 @@
 package org.pih.warehouse.jobs
 
-import grails.plugin.mail.MailService
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.ShipmentItem
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as ConfigHolder
 import org.quartz.JobExecutionContext
 import util.LiquibaseUtil
 
 class CalculateQuantityJob {
 
-    def mailService
     def inventorySnapshotService
+    def mailService
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron cronExpression: ConfigHolder.config.openboxes.jobs.calculateQuantityJob.cronExpression
+		cron name: 'calculateQuantityCronTrigger',
+                cronExpression: CH.config.openboxes.jobs.calculateQuantityJob.cronExpression
     }
 
     def execute(JobExecutionContext context) {
+
+        Boolean enabled = CH.config.openboxes.jobs.calculateQuantityJob.enabled
+        if (!enabled) {
+            return
+        }
 
         if (LiquibaseUtil.isRunningMigrations()) {
             log.info "Postponing job execution until liquibase migrations are complete"
@@ -67,15 +69,13 @@ class CalculateQuantityJob {
             else if (date) {
                 log.info "Triggered calculate quantity job for all locations and products on ${date}"
                 inventorySnapshotService.populateInventorySnapshots(date)
-            }
-            else {
+            } else {
                 log.info "Triggered calculate quantity job for all dates, locations, products"
                 def transactionDates = inventorySnapshotService.getTransactionDates()
-                log.info "Transaction dates: " + transactionDates
-                //transactionDates.each { transactionDate ->
-                //    log.info "Triggered calculate quantity job for all products at all locations on date ${date}"
-                //    inventorySnapshotService.populateInventorySnapshots(transactionDate)
-                //}
+                transactionDates.each { transactionDate ->
+                    log.info "Triggered calculate quantity job for all products at all locations on date ${date}"
+                    inventorySnapshotService.populateInventorySnapshots(transactionDate)
+                }
             }
         }
 

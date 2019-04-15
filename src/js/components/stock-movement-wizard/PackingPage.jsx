@@ -19,7 +19,7 @@ import SelectField from '../form-elements/SelectField';
 import apiClient, { flattenRequest } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import PackingSplitLineModal from './modals/PackingSplitLineModal';
-import { debouncedUsersFetch } from '../../utils/option-utils';
+import { debounceUsersFetch } from '../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const FIELDS = {
@@ -84,12 +84,14 @@ const FIELDS = {
           showValueTooltip: true,
           openOnClick: false,
           autoload: false,
-          loadOptions: debouncedUsersFetch,
           cache: false,
           options: [],
           labelKey: 'name',
           filterOptions: options => options,
         },
+        getDynamicAttr: props => ({
+          loadOptions: props.debouncedUsersFetch,
+        }),
       },
       palletName: {
         type: TextField,
@@ -139,6 +141,9 @@ class PackingPage extends Component {
     };
 
     this.saveSplitLines = this.saveSplitLines.bind(this);
+
+    this.debouncedUsersFetch =
+      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.props.showSpinner();
   }
@@ -340,6 +345,7 @@ class PackingPage extends Component {
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 onSave: this.saveSplitLines,
                 formValues: values,
+                debouncedUsersFetch: this.debouncedUsersFetch,
               }))}
               <div>
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.savePackingData(values.packPageItems).then(() => this.props.previousPage(values))}>
@@ -362,6 +368,8 @@ const mapStateToProps = state => ({
   recipientsFetched: state.users.fetched,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
 });
 
 export default (connect(mapStateToProps, {
@@ -384,4 +392,6 @@ PackingPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
 };
