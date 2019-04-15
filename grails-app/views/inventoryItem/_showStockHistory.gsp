@@ -93,7 +93,9 @@
                     </td>
                     <td>
                         <g:if test="${stockHistoryEntry?.showDetails}">
-                            ${stockHistoryEntry?.transaction?.createdBy?.name}
+                            <div title="${stockHistoryEntry?.transaction?.dateCreated}">
+                                ${stockHistoryEntry?.transaction?.createdBy?.name?:g.message(code:'default.unknown.label')}
+                            </div>
                         </g:if>
                     </td>
                     <td class="middle">
@@ -211,7 +213,7 @@
                         </span>
                     </td>
                     <td class="border-right center middle">
-                        <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode in [org.pih.warehouse.inventory.TransactionCode.INVENTORY, org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY] }">
+                        <g:if test="${stockHistoryEntry?.transactionCode in [org.pih.warehouse.inventory.TransactionCode.INVENTORY, org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY] }">
                             <span class="balance">
                                 <g:formatNumber number="${stockHistoryEntry?.quantity?:0 }" format="###,###.#" maxFractionDigits="1"/>
                             </span>
@@ -219,7 +221,7 @@
                     </td>
 
                     <td class="border-right center middle">
-                        <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
+                        <g:if test="${stockHistoryEntry.isCredit}">
                             <span class="credit">
                                 <g:formatNumber number="${stockHistoryEntry?.quantity?:0 }" format="###,###.#" maxFractionDigits="1"/>
                             </span>
@@ -227,7 +229,7 @@
                         </g:if>
                     </td>
                     <td  class="border-right center middle">
-                        <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
+                        <g:if test="${stockHistoryEntry.isDebit}">
                             <span class="debit"><g:formatNumber number="${stockHistoryEntry?.quantity?:0 }" format="###,###.#" maxFractionDigits="1"/></span>
                         </g:if>
                     </td>

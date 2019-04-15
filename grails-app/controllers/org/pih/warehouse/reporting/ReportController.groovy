@@ -23,13 +23,39 @@ import util.ReportUtil
 class ReportController {
 	
 	def documentService
+    def dataService
 	def inventoryService
 	def productService
 	def reportService
     def messageService
 
+    def buildFacts = {
+        def startTime = System.currentTimeMillis()
+        def results = reportService.buildFacts()
+        def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
+        render ([responseTime: responseTime, results: results, groovyVersion: GroovySystem.version] as JSON)
+    }
 
+    def truncateFacts = {
+        def startTime = System.currentTimeMillis()
+        reportService.truncateFacts()
+        def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
+        render ([responseTime: responseTime] as JSON)
+    }
 
+    def buildDimensions = {
+        def startTime = System.currentTimeMillis()
+        reportService.buildDimensions()
+        def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
+        render ([responseTime: responseTime] as JSON)
+    }
+
+    def truncateDimensions = {
+        def startTime = System.currentTimeMillis()
+        reportService.truncateDimensions()
+        def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
+        render ([responseTime: responseTime] as JSON)
+    }
 
     def binLocationCsvHeader = { binLocation ->
         String csv = ""

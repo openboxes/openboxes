@@ -67,7 +67,7 @@
 													<label for="product"><warehouse:message code="location.binLocation.label" default="Bin Location" /></label>
 												</td>
 												<td valign="top" class="value">
-													<g:selectBinLocation name="binLocation.id" value="${transactionEntryInstance?.binLocation?.id}" noSelection="['':'']" class="chzn-select-deselect"/>
+													<g:selectBinLocation name="binLocation" value="${transactionEntryInstance?.binLocation?.id}" noSelection="['':'']" class="chzn-select-deselect"/>
 												</td>
 											</tr>
 

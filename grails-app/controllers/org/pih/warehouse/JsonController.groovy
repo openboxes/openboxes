@@ -414,10 +414,14 @@ class JsonController {
         def result = inventoryService.getTotalStockValue(location)
         def totalValue = g.formatNumber(number: result.totalStockValue)
         def lastUpdated = inventoryService.getLastUpdatedInventorySnapshotDate()
-        lastUpdated = "Last updated " + prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) + "."
+        if (lastUpdated) {
+            lastUpdated = "Last updated " + prettytime.display([date: lastUpdated, showTime: true, capitalize: false]) + "."
+        }
+        else {
+            lastUpdated = "No data available"
+        }
         def data = [
                 lastUpdated: lastUpdated,
-                anotherAttr: "anotherValue",
                 totalStockValue:result.totalStockValue,
                 hitCount: result.hitCount,
                 missCount: result.missCount,

@@ -32,7 +32,6 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
-import org.pih.warehouse.reporting.Consumption
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -1937,7 +1936,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return	get quantity by location and product
 	 */
 	Integer getQuantityOnHand(Location location, Product product) {
-		log.info "quantity on hand for location " + location + " product " + product
+		log.debug "quantity on hand for location " + location + " product " + product
 		def quantityMap = getQuantityForProducts(location.inventory, [product.id])
         log.debug "quantity map " + quantityMap;
 		def quantity = quantityMap[product.id]
@@ -2636,10 +2635,6 @@ class InventoryService implements ApplicationContextAware {
             command.errors.rejectValue("quantity","adjustStock.invalid.quantity.message")
         }
 
-        log.info "command " + command.validate()
-        log.info "command has errors: " + command.hasErrors()
-        log.info "command errors: " + command.errors
-
         if (command.validate() && !command.hasErrors()) {
             def transaction = new Transaction();
             // Need to create a transaction if we want the inventory item to show up in the stock card
@@ -2662,6 +2657,50 @@ class InventoryService implements ApplicationContextAware {
             }
         }
         return command
+	}
+
+
+	def createStockSnapshot(Location location, Product product) {
+		List lineItems = getProductQuantityByBinLocation(location, product)
+
+		// If there's no stock we should record that as well
+		if (!lineItems || lineItems?.empty) {
+			InventoryItem inventoryItem = findOrCreateInventoryItem(product, null, null)
+			lineItems << [binLocation: null, inventoryItem: inventoryItem, quantity: 0]
+		}
+
+
+		recordStock(location, lineItems)
+	}
+
+
+	def recordStock(Location location, List lineItems) {
+
+		if (!location || !location.inventory) {
+			throw new IllegalArgumentException("Record stock transactions require a location")
+		}
+
+		Transaction transaction = new Transaction();
+		transaction.transactionDate = new Date();
+		transaction.inventory = location.inventory;
+		transaction.transactionNumber = generateTransactionNumber()
+		transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+
+		lineItems.each { lineItem ->
+			// Add transaction entry to transaction
+			TransactionEntry transactionEntry = new TransactionEntry()
+			transactionEntry.binLocation = lineItem.binLocation
+			transactionEntry.inventoryItem = lineItem.inventoryItem;
+			transactionEntry.quantity = lineItem.quantity
+			transactionEntry.comments = lineItem.comments
+			transaction.addToTransactionEntries(transactionEntry);
+		}
+
+		if (!transaction.hasErrors() && transaction.save()) {
+			log.info("Transaction saved: " + transaction)
+		}
+
+		return transaction;
 	}
 
 
@@ -2937,43 +2976,6 @@ class InventoryService implements ApplicationContextAware {
 		}
 
 		return mirroredTransaction
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	def getConsumptionTransactionsBetween(Date startDate, Date endDate) {
-		log.debug("startDate = " + startDate + " endDate = " + endDate)
-		def criteria = Consumption.createCriteria()
-		def results = criteria.list {
-			if (startDate && endDate) {
-				between('transactionDate', startDate, endDate)
-			}
-		}
-
-		return results
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	def getConsumptions(Date startDate, Date endDate, String groupBy) {
-		log.debug("startDate = " + startDate + " endDate = " + endDate)
-		def criteria = Consumption.createCriteria()
-		def results = criteria.list {
-			if (startDate && endDate) {
-				between('transactionDate', startDate, endDate)
-			}
-			projections {
-				sum('quantity')
-				groupProperty('product')
-				groupProperty('transactionDate')
-			}
-		}
-
-		return results
 	}
 
 	/**
@@ -3429,9 +3431,7 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 	public Map<String, Integer> getQuantityForProducts(Inventory inventory, ArrayList<String> productIds) {
-        log.debug "inventory " + inventory + " " + ", productIds: " + productIds
 		def ids = productIds.collect{ "'${it}'"}.join(",")
-        log.debug "ids: " + ids
 		def result =[:]
 		if (ids) {
             //
@@ -3622,7 +3622,7 @@ class InventoryService implements ApplicationContextAware {
         def transactionEntries = []
         if (date) {
             def products = tagIds ? getProductsByTagId(tagIds) : []
-            log.info "Get products by tag ${tagIds}: " + products.toString()
+            log.debug "Get products by tag ${tagIds}: " + products.toString()
             transactionEntries = criteria.list {
                 if (products) {
                     inventoryItem {
@@ -3662,7 +3662,7 @@ class InventoryService implements ApplicationContextAware {
 //            }
 
 
-            log.info "Get transaction entries before date: " + (System.currentTimeMillis() - startTime) + " ms"
+            log.debug "Get transaction entries before date: " + (System.currentTimeMillis() - startTime) + " ms"
         }
         return transactionEntries;
     }
@@ -3968,19 +3968,33 @@ class InventoryService implements ApplicationContextAware {
     }
 
     def getTransactionDates() {
-        //return Transaction.executeQuery('select distinct transactionDate from Transaction')
         def transactionDates = []
-        //def results = Transaction.executeQuery("select distinct year(transactionDate), month(transactionDate), day(transactionDate) from Transaction where inventory = :inventory",
-        //        [inventory:location.inventory])
-
-        def results = Transaction.executeQuery("select transactionDate from Transaction")
+        def results = Transaction.executeQuery(
+                "select transactionDate " +
+                        "from Transaction " +
+                        "order by transactionDate desc")
 
         results.each { date ->
-            //def date = new Date().updated([year: it[0], month: it[1], day: it[2]])
             date.clearTime()
             transactionDates << date
         }
-        return transactionDates.unique().sort().reverse()
+        return transactionDates.unique()
+    }
+
+
+    def getTransactionDates(Date onOrAfterDate) {
+        def transactionDates = []
+        def results = Transaction.executeQuery(
+				        "select transactionDate " +
+                        "from Transaction " +
+                        "where transactionDate >= :onOrAfterDate " +
+                        "order by transactionDate desc", [onOrAfterDate:onOrAfterDate])
+
+        results.each { date ->
+            date.clearTime()
+            transactionDates << date
+        }
+        return transactionDates.unique()
     }
 
 
@@ -4193,8 +4207,8 @@ class InventoryService implements ApplicationContextAware {
 						log.error("Error executing batch update for location ${location.name} " + e.message, e)
 					}
 				}
-				log.info ("Time to execute batch statements " + (System.currentTimeMillis() - startTime2) + " ms")
-                log.info "Saved ${products?.size()} snapshots for products=ALL, location=${location}, date=${date.format("MMM-dd-yyyy")} in ${(System.currentTimeMillis() - startTime)} ms"
+				log.debug ("Time to execute batch statements " + (System.currentTimeMillis() - startTime2) + " ms")
+                log.info "Saved ${products?.size()} product snapshots for products=ALL, location=${location}, date=${date.format("MMM-dd-yyyy")} in ${(System.currentTimeMillis() - startTime)} ms"
 			}
         } catch (Exception e) {
             log.error("Unable to complete snapshot process", e)

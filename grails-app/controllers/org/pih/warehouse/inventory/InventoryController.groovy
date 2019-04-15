@@ -10,23 +10,19 @@
 
 package org.pih.warehouse.inventory
 
-import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
-import org.apache.commons.collections.ListUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.reporting.Consumption
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
@@ -1015,150 +1011,6 @@ class InventoryController {
 
 	}
 
-
-	def showConsumption = { ConsumptionCommand command ->
-
-		def consumptions = inventoryService.getConsumptionTransactionsBetween(command?.startDate, command?.endDate)
-		def consumptionMap = consumptions.groupBy { it.product };
-
-		//def products = Product.list()
-		def products = consumptions*.product.unique();
-		//products = products.findAll { consumptionMap[it] > 0 }
-		def productMap = products.groupBy { it.category };
-		def dateFormat = new SimpleDateFormat("ddMMyyyy")
-		//def dateKeys = inventoryService.getConsumptionDateKeys()
-		def startDate = command?.startDate?:(new Date()-7)
-		def endDate = command?.endDate?:new Date()
-
-		def calendar = Calendar.instance
-		def dateKeys = (startDate..endDate).collect { date ->
-			calendar.setTime(date);
-			[
-				date: date,
-				day: calendar.get(Calendar.DAY_OF_MONTH),
-				week: calendar.get(Calendar.WEEK_OF_YEAR),
-				month: calendar.get(Calendar.MONTH),
-				year: calendar.get(Calendar.YEAR),
-				key: dateFormat.format(date)
-			]
-		}.sort { it.date }
-
-
-		def groupBy = command?.groupBy;
-		log.debug("groupBy = " + groupBy)
-		def daysBetween = (groupBy!="default") ? -1 : endDate - startDate
-		if (daysBetween > 365 || groupBy.equals("yearly")) {
-			groupBy = "yearly"
-			dateFormat = new SimpleDateFormat("yyyy")
-		}
-		else if ((daysBetween > 61 && daysBetween < 365) || groupBy.equals("monthly")) {
-			groupBy = "monthly"
-			dateFormat = new SimpleDateFormat("MMM")
-		}
-		else if (daysBetween > 14 && daysBetween < 60 || groupBy.equals("weekly")) {
-			groupBy = "weekly"
-			dateFormat = new SimpleDateFormat("'Week' w")
-		}
-		else if (daysBetween > 0 && daysBetween <= 14 || groupBy.equals("daily")) {
-			groupBy = "daily"
-			dateFormat = new SimpleDateFormat("MMM dd")
-		}
-		dateKeys = dateKeys.collect { dateFormat.format(it.date) }.unique()
-
-
-		log.debug("consumption " + consumptionMap)
-		def consumptionProductDateMap = [:]
-		consumptions.each {
-			def dateKey = it.product.id + "_" + dateFormat.format(it.transactionDate)
-			def quantity = consumptionProductDateMap[dateKey];
-			if (!quantity) quantity = 0;
-			quantity += it.quantity?:0
-			consumptionProductDateMap[dateKey] = quantity;
-
-			def totalKey = it.product.id + "_Total"
-			def totalQuantity = consumptionProductDateMap[totalKey];
-			if (!totalQuantity) totalQuantity = 0;
-			totalQuantity += it.quantity?:0
-			consumptionProductDateMap[totalKey] = totalQuantity;
-
-		}
-
-
-
-
-		/*
-		def today = new Date();
-		def warehouse = Location.get(session.warehouse.id)
-
-		// Get all transactions from the past week
-		def transactions = inventoryService.getConsumptionTransactions(today-7, today);
-		def transactionEntries = []
-		transactions.each { transaction ->
-			transaction.transactionEntries.each { transactionEntry ->
-				transactionEntries << transactionEntry
-			}
-		}
-
-		def consumptionMap = [:]
-		log.debug "Products " + products.size();
-
-		def transactionEntryMap = transactionEntries.groupBy { it.inventoryItem.product }
-		transactionEntryMap.each { key, value ->
-			def consumed = value.sum { it.quantity }
-			log.debug("key="+key + ", value = " + value + ", total consumed=" + consumed);
-			consumptionMap[key] = consumed;
-		}
-		*/
-
-
-
-
-
-
-		[
-			command: command,
-			productMap : productMap,
-			consumptionMap: consumptionMap,
-			consumptionProductDateMap: consumptionProductDateMap,
-			productKeys: products,
-			results: inventoryService.getConsumptions(command?.startDate, command?.endDate, command?.groupBy),
-			dateKeys: dateKeys]
-	}
-
-	def refreshConsumptionData = {
-		def consumptionType = TransactionType.get(2)
-		def transactions = Transaction.findAllByTransactionType(consumptionType)
-
-		// Delete all consumption rows
-		Consumption.executeUpdate("delete Consumption c")
-
-		// Reset auto increment counter to 0
-		// ALTER TABLE consumption AUTO_INCREMENT=0
-
-		transactions.each { xact ->
-			xact.transactionEntries.each { entry ->
-				def consumption = new Consumption(
-					product: entry.inventoryItem.product,
-					inventoryItem: entry.inventoryItem,
-					quantity: entry.quantity,
-					transactionDate: entry.transaction.transactionDate,
-					location: entry.transaction.inventory.warehouse,
-					month: entry.transaction.transactionDate.month,
-					day: entry.transaction.transactionDate.day,
-					year: entry.transaction.transactionDate.year+1900);
-
-				if (!consumption.hasErrors() && consumption.save()) {
-
-				}
-				else {
-					flash.message = "error saving Consumption " + consumption.errors
-				}
-			}
-		}
-		redirect(controller: "inventory", action: "showConsumption")
-	}
-
-
 	/**
 	 * Used to create default inventory items.
 	 * @return
@@ -1701,7 +1553,7 @@ class InventoryController {
         def products = transactionInstance?.transactionEntries.collect { it.inventoryItem.product }
 		def inventoryItems = InventoryItem.findAllByProductInList(products)
 		def model = [
-			inventoryItemsMap: inventoryItems.groupBy { it.product } ,
+			inventoryItemsMap: inventoryItems.groupBy { it.product?.id } ,
 			transactionInstance: transactionInstance?:new Transaction(),
 			transactionTypeList: TransactionType.list(),
 			locationInstanceList: Location.findAllByParentLocationIsNull(),
@@ -1785,15 +1637,6 @@ class InventoryController {
 
 }
 
-class ConsumptionCommand {
-		String groupBy
-		Date startDate
-		Date endDate
-
-		static constraints = {
-
-		}
-	}
 
 class QuantityOnHandReportCommand {
     //Location location
