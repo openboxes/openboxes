@@ -9,6 +9,8 @@
  * */
 package org.pih.warehouse.reporting
 
+import grails.converters.JSON
+import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
@@ -28,13 +30,19 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductService
+import org.pih.warehouse.report.ConsumptionService
+import org.pih.warehouse.report.ReportService
 import org.pih.warehouse.requisition.Requisition
+
+import java.text.SimpleDateFormat
 
 class ConsumptionController {
 
     def dataService
+    ReportService reportService
     ProductService productService
     InventoryService inventoryService
+    ConsumptionService consumptionService
 
     def show = { ShowConsumptionCommand command ->
 
@@ -297,6 +305,94 @@ class ConsumptionController {
     }
 
 
+    def index = {
+        redirect(action: "list")
+    }
+
+
+    def delete = {
+        long startTime = System.currentTimeMillis()
+        Integer deletedRecords = consumptionService.deleteConsumptionRecords()
+        flash.message = "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis()-startTime}"
+        log.info "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis()-startTime}"
+        redirect(controller: "consumption", action: "list")
+    }
+
+    def refresh = { ConsumptionCommand command ->
+        reportService.buildConsumptionFact()
+        redirect(controller: "consumption", action: "list")
+    }
+
+
+    def pivot = { ConsumptionCommand command ->
+
+        use(TimeCategory) {
+            command.endDate = command?.endDate?:new Date()
+            command.startDate = command?.startDate?:new Date() - 6.months
+        }
+
+        [ command: command]
+    }
+
+
+    def list = { ConsumptionCommand command ->
+
+        log.info "Params: " + params
+
+        Location location = Location.get(session?.warehouse?.id)
+
+        use(TimeCategory) {
+            command.endDate = command?.endDate?:new Date()
+            command.startDate = command?.startDate?:new Date() - 6.months
+        }
+
+        if (command.download) {
+            def data = consumptionService.listConsumption(command.location, command.category, command.startDate, command.endDate)
+            def crosstab = consumptionService.generateCrossTab(data, command.startDate, command.endDate, null)
+            log.info "crosstab " + crosstab
+            String csv = dataService.generateCsv(crosstab)
+            response.setHeader("Content-disposition", "attachment; filename=Consumption-${location.name}-${new Date().format("dd-MMM-yyyy-hhmmss")}.csv")
+            render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+            return
+        }
+
+        [ command: command ]
+    }
+
+
+    def aggregate = { ConsumptionCommand command ->
+
+        String locationId = command?.location?.id?:session?.warehouse?.id
+        Location location = Location.get(locationId)
+
+        use(TimeCategory) {
+            command.endDate = command?.endDate?:new Date()
+            command.startDate = command?.startDate?:new Date() - 6.months
+        }
+
+
+        List <ConsumptionFact> results = consumptionService.listConsumption(location, command?.category, command.startDate, command.endDate)
+
+        results = results.collect { [
+                id: it.id,
+                productCode: it?.productKey?.productCode,
+                productName: it.productKey?.productName,
+                categoryName: it?.productKey?.categoryName,
+                year: it?.transactionDateKey?.year,
+                month: it?.transactionDateKey?.month,
+                day: it?.transactionDateKey?.dayOfMonth,
+                quantity: it?.quantity,
+                unitCost: it?.unitCost,
+                unitPrice: it?.unitPrice
+        ]}
+
+
+        render results as JSON
+    }
+
+
+
+
     def product = {
         Product product = Product.get(params.id)
         render (template: "product", model: [product:product])
@@ -436,4 +532,25 @@ class ShowConsumptionRowCommand {
         return transferOutLocations
     }
 
+}
+
+class ConsumptionCommand {
+
+    Category category
+    Location location
+    String groupBy
+    Date startDate
+    Date endDate
+
+    Boolean aggregate = Boolean.FALSE
+    Boolean download = Boolean.FALSE
+
+    static constraints = {
+        category(nullable:true)
+        location(nullable:true)
+        startDate(nullable:true)
+        endDate(nullable:true)
+        groupBy(nullable:true)
+
+    }
 }

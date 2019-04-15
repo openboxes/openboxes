@@ -5,25 +5,93 @@
     <changeSet author="adminuser (generated)" id="1546667174939-1" runOnChange="true" failOnError="false">
         <createView viewName="product_demand" replaceIfExists="true">
             SELECT
-                NULL AS request_status,
-                NULL AS request_number,
-                NULL AS date_requested,
-                NULL AS origin_id,
-                NULL AS origin_name,
-                NULL AS destination_id,
-                NULL AS destination_name,
-                NULL AS product_id,
-                NULL AS product_code,
-                NULL AS product_name,
-                NULL AS quantity_requested,
-                NULL AS quantity_canceled,
-                NULL AS quantity_approved,
-                NULL AS quantity_change_approved,
-                NULL AS quantity_substitution_approved,
-                NULL AS quantity_demand,
-                NULL AS cancel_reason_code
-            FROM requisition
-            WHERE 1=0;
+            request_status,
+            request_number,
+            date_requested,
+            origin_id,
+            origin_name,
+            destination_id,
+            destination_name,
+            product_id,
+            product_code,
+            product_name,
+            quantity_requested,
+            quantity_canceled,
+            quantity_approved,
+            quantity_change_approved,
+            quantity_substitution_approved,
+            IF(quantity_approved = 0,
+            quantity_canceled,
+            quantity_approved) AS quantity_demand,
+            cancel_reason_code
+            FROM
+            (SELECT
+            request_status,
+            request_number,
+            date_requested,
+            origin_id,
+            origin_name,
+            destination_id,
+            destination_name,
+            product_id,
+            product_code,
+            product_name,
+            quantity_requested,
+            quantity_canceled,
+            IFNULL(quantity_change_approved, IFNULL(quantity_substitution_approved, quantity_approved)) AS quantity_approved,
+            quantity_change_approved,
+            quantity_substitution_approved,
+            cancel_reason_code
+            FROM
+            (SELECT
+            requisition.status AS request_status,
+            requisition.request_number,
+            requisition.date_requested AS date_requested,
+            origin.id AS origin_id,
+            origin.name AS origin_name,
+            destination.id AS destination_id,
+            destination.name AS destination_name,
+            requisition_item_type,
+            product.id AS product_id,
+            product.product_code,
+            product.name AS product_name,
+            cancel_reason_code,
+            cancel_comments,
+            quantity AS quantity_requested,
+            IF(requisition_item.cancel_reason_code IN ('SUBSTITUTION' , 'STOCKOUT', 'LOW_STOCK', 'EXPIRED', 'COULD_NOT_LOCATE'), quantity_canceled, 0) AS quantity_canceled,
+            IF(quantity_canceled IS NOT NULL, 0, quantity) AS quantity_approved,
+            (SELECT
+            SUM(quantity_approved)
+            FROM
+            requisition_item child
+            WHERE
+            child.parent_requisition_item_id = requisition_item.id
+            AND requisition_item_type = 'SUBSTITUTION'
+            AND requisition_item.cancel_reason_code IN ('SUBSTITUTION' , 'STOCKOUT', 'LOW_STOCK')) AS quantity_substitution_approved,
+            (SELECT
+            SUM(quantity_approved)
+            FROM
+            requisition_item child
+            WHERE
+            child.parent_requisition_item_id = requisition_item.id
+            AND requisition_item_type = 'QUANTITY_CHANGE') AS quantity_change_approved,
+            IFNULL((SELECT
+            SUM(quantity)
+            FROM
+            requisition_item child
+            WHERE
+            child.parent_requisition_item_id = requisition_item.id
+            AND requisition_item.cancel_reason_code IN ('STOCKOUT' , 'LOW_STOCK')), 0) AS quantity_substituted
+            FROM
+            requisition_item
+            JOIN product ON product.id = requisition_item.product_id
+            JOIN requisition ON requisition.id = requisition_item.requisition_id
+            JOIN location destination ON destination.id = requisition.destination_id
+            JOIN location origin ON origin.id = requisition.origin_id
+            WHERE
+            1 = 1
+            AND requisition_item.requisition_item_type = 'ORIGINAL'
+            AND requisition.status = 'ISSUED') AS tmp1) AS tmp2
         </createView>
     </changeSet>
 </databaseChangeLog>

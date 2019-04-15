@@ -468,19 +468,29 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 openboxes.scannerDetection.enabled = false
 
 
-// Default min length for typeahead
+// Default delay and min length for typeahead components
+openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
+// Assign identifier job
+openboxes.jobs.assignIdentifierJob.enabled = true
+openboxes.jobs.assignIdentifierJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+
 // Calculate current quantity on hand
+openboxes.jobs.calculateQuantityJob.enabled = true
 openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 
 // Calculate historical quantity on hand
 openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
-openboxes.jobs.calculateHistoricalQuantityJob.cronExpression = "0 * * * * ?" // every minute
+openboxes.jobs.calculateHistoricalQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 
 // Data Cleaning Job
+openboxes.jobs.dataCleaningJob.enabled = true
 openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
+
+// Data Migration Job (enabled, but needs to be triggered manually)
+openboxes.jobs.dataMigrationJob.enabled = true
 
 // LDAP configuration
 openboxes.ldap.enabled = false

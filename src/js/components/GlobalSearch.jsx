@@ -1,32 +1,9 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import Select from '../utils/Select';
-import apiClient from '../utils/apiClient';
-
-const debouncedGlobalSearch = _.debounce((searchTerm, callback) => {
-  if (searchTerm) {
-    apiClient.get(`/openboxes/json/globalSearch?term=${searchTerm}`)
-      .then(result => callback(
-        null,
-        {
-          complete: true,
-          options: _.map(result.data, obj => (
-            {
-              value: {
-                url: obj.url,
-              },
-              label: obj.label,
-            }
-          )),
-        },
-      ))
-      .catch(error => callback(error, { options: [] }));
-  } else {
-    callback(null, { options: [] });
-  }
-}, 500);
-
+import { debounceGlobalSearch } from '../utils/option-utils';
 
 class GlobalSearch extends Component {
   constructor(props) {
@@ -37,6 +14,9 @@ class GlobalSearch extends Component {
     };
 
     this.onInputChange = this.onInputChange.bind(this);
+
+    this.debouncedGlobalSearch =
+      debounceGlobalSearch(this.props.debounceTime, this.props.minSearchLength);
   }
 
   onInputChange(inputValue) {
@@ -51,7 +31,7 @@ class GlobalSearch extends Component {
         <Select
           async
           placeholder="Search..."
-          loadOptions={debouncedGlobalSearch}
+          loadOptions={this.debouncedGlobalSearch}
           cache={false}
           options={[]}
           showValueTooltip
@@ -70,4 +50,14 @@ class GlobalSearch extends Component {
   }
 }
 
-export default GlobalSearch;
+const mapStateToProps = state => ({
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
+});
+
+export default connect(mapStateToProps)(GlobalSearch);
+
+GlobalSearch.propTypes = {
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
+};

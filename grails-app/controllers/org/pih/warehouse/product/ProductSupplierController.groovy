@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 class ProductSupplierController {
 
+    def dataService
     def identifierService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -151,4 +152,12 @@ class ProductSupplierController {
         render(template: "dialog", model: [productSupplier: productSupplier])
     }
 
+    def export = {
+        def productSuppliers = ProductSupplier.list()
+        def data = productSuppliers ? dataService.transformObjects(productSuppliers, ProductSupplier.PROPERTIES) : [[:]]
+        response.setHeader("Content-disposition",
+                "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+        response.contentType = "text/csv"
+        render dataService.generateCsv(data)
+    }
 }

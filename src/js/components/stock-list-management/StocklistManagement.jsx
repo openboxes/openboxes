@@ -240,6 +240,7 @@ class StocklistManagement extends Component {
           showPagination={false}
           minRows={0}
           sortable={false}
+          style={{ maxHeight: 'calc(100vh - 250px)' }}
           collapseOnDataChange={false}
           resolveData={values => values.map((row) => {
             if (!_.get(row, 'locationGroup.name')) {
@@ -489,37 +490,46 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <div className="d-flex">
-                    <button
-                      className="btn btn-outline-primary btn-xs mx-1"
-                      disabled={original.edit || original.new || !this.props.isUserAdmin}
-                      onClick={() => this.editItem(index)}
-                    ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
-                    </button>
-                    <button
-                      className="btn btn-outline-primary btn-xs mr-1"
-                      disabled={(!original.edit && !original.new) || !original.stocklistId
-                      || _.isNil(original.maxQuantity) || original.maxQuantity === '' || !this.props.isUserAdmin}
-                      onClick={() => this.saveItem(index, original)}
-                    ><Translate id="react.default.button.save.label" defaultMessage="Save" />
-                    </button>
-                    <button
-                      className="btn btn-outline-danger btn-xs mr-1"
-                      disabled={!this.props.isUserAdmin}
-                      onClick={() => this.deleteItem(index)}
-                    ><Translate id="react.default.button.delete.label" defaultMessage="Delete" />
-                    </button>
+                  <div className="d-flex flex-wrap">
+                    {this.props.isUserAdmin ?
+                      <div>
+                        <button
+                          className="btn btn-outline-primary btn-xs mr-1"
+                          disabled={original.edit || original.new || !this.props.isUserAdmin}
+                          onClick={() => this.editItem(index)}
+                        ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
+                        </button>
+                        <button
+                          className="btn btn-outline-primary btn-xs mr-1"
+                          disabled={(!original.edit && !original.new) || !original.stocklistId
+                          || _.isNil(original.maxQuantity) || original.maxQuantity === '' || !this.props.isUserAdmin}
+                          onClick={() => this.saveItem(index, original)}
+                        ><Translate id="react.default.button.save.label" defaultMessage="Save" />
+                        </button>
+                        <button
+                          className="btn btn-outline-danger btn-xs mr-1"
+                          disabled={!this.props.isUserAdmin}
+                          onClick={() => this.deleteItem(index)}
+                        ><Translate id="react.default.button.delete.label" defaultMessage="Delete" />
+                        </button>
+                      </div> : null
+                    }
                     <a
                       className="btn btn-outline-secondary btn-xs mr-1"
                       disabled={original.edit || original.new}
                       href={`/openboxes/stocklist/renderPdf/${original.stocklistId}`}
-                    ><Translate id="react.default.button.print.label" defaultMessage="Print" />
+                    ><Translate id="react.default.button.printPdf.label" defaultMessage="Print PDF" />
+                    </a>
+                    <a
+                      className="btn btn-outline-secondary btn-xs mr-1"
+                      disabled={original.edit || original.new}
+                      href={`/openboxes/stocklist/generateCsv/${original.stocklistId}`}
+                    ><Translate id="react.default.button.printCsv.label" defaultMessage="Print XLS" />
                     </a>
                     <EmailModal
                       stocklistId={original.stocklistId}
                       users={this.state.users}
                       manager={original.manager}
-                      isUserAdmin={this.props.isUserAdmin}
                     />
                   </div>
                 );

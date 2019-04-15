@@ -6,7 +6,7 @@
     <meta name="layout" content="custom" />
     <g:set var="entityName" value="${warehouse.message(code: 'stockMovements.label', default: 'Stock Movements')}" />
     <title>
-        ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
+        ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
     </title>
     <content tag="pageTitle">${entityName}</content>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.16.1/daterangepicker.min.css" />
@@ -27,7 +27,7 @@
 
     <div class="summary">
         <div class="title">
-            ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
+            ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
         </div>
     </div>
 

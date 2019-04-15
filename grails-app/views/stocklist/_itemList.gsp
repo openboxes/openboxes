@@ -33,7 +33,7 @@
                 <tr>
                     <td class="b-t0 b-r0">${requisitionItem?.product?.productCode}</td>
                     <td class="b-t0 b-r0">${requisitionItem?.product?.name}</td>
-                    <td class="b-t0 b-r0">${requisitionItem?.product?.defaultUom}</td>
+                    <td class="b-t0 b-r0">${requisitionItem?.productPackage ? requisitionItem.productPackage.uom?.code + "/" + requisitionItem.productPackage.quantity + " -- " + requisitionItem.productPackage.uom?.name : 'EA/1'}</td>
                     <td class="b-t0 b-r0">${requisitionItem.quantity}</td>
                     <td class="b-t0 b-r0"></td>
                     <td class="b-t0 b-r0"></td>

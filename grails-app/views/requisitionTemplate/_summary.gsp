@@ -77,12 +77,11 @@
 	</g:isUserAdmin>
 
 	<div class="right">
-
-		<g:link controller="requisitionTemplate" action="show" id="${requisition?.id}" class="button">
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'application_side_boxes.png')}" />&nbsp;
-			${warehouse.message(code: 'default.show.label', args: [warehouse.message(code:'requisitionTemplate.label')])}
-		</g:link>
 		<g:isUserAdmin>
+			<g:link controller="requisitionTemplate" action="show" id="${requisition?.id}" class="button">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'application_side_boxes.png')}" />&nbsp;
+				${warehouse.message(code: 'default.show.label', args: [warehouse.message(code:'requisitionTemplate.label')])}
+			</g:link>
 			<g:link controller="requisitionTemplate" action="editHeader" id="${requisition?.id}" class="button">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />&nbsp;
 				${warehouse.message(code: 'requisitionTemplate.editHeader.label', default: 'Edit stock list')}
@@ -112,19 +111,31 @@
 					&nbsp;${warehouse.message(code: 'requisitionTemplate.unpublish.label', default: 'Unpublish stock list')}
 				</g:link>
 			</g:else>
-			<g:link
-					controller="stocklist"
-					action="sendMail"
-					params="['id':requisition.id,'subject':'STOCK LIST UPDATE','body':'STOCK LIST UPDATE','recipients':requisition.requestedBy?.email]"
-					class="button"
-			>
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" />&nbsp;
-				${warehouse.message(code: 'default.button.email.label')}
-			</g:link>
 		</g:isUserAdmin>
-		<g:link controller="stocklist" action="renderPdf" id="${requisition?.id}" class="button">
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}" />&nbsp;
-			${warehouse.message(code: 'default.button.download.label')}
+		<g:link controller="requisitionTemplate" action="sendMail" id="${requisition?.id}" class="button">
+			<img src="${createLinkTo(dir:'images/icons/silk',file:'email.png')}" />
+			${warehouse.message(code: 'default.button.email.label')}
 		</g:link>
+		<span class="action-menu" style="margin-left: 15px">
+			<button class="action-btn button">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}" />&nbsp;
+				${warehouse.message(code: 'default.button.download.label')}
+				<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+			</button>
+			<div class="actions">
+				<div class="action-menu-item">
+					<g:link controller="stocklist" action="renderPdf" id="${requisition?.id}">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}" />&nbsp;
+						${warehouse.message(code: 'default.button.downloadPdf.label')}
+					</g:link>
+				</div>
+				<div class="action-menu-item">
+					<g:link controller="stocklist" action="generateCsv" id="${requisition?.id}">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}" />&nbsp;
+						${warehouse.message(code: 'default.button.downloadXls.label')}
+					</g:link>
+				</div>
+			</div>
+		</span>
 	</div>
 </div>
