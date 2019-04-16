@@ -3,7 +3,7 @@
         <td width="1%">
             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
                 <div class="print-logo nailthumb-container" style="float: left;">
-                    <img src="${grailsApplication.config.openboxes.logoSquare.url}"/>
+                    <img src="${shipment?.origin?.logo ? createLink(controller:'location', action:'viewLogo', id:shipment?.origin?.id) : grailsApplication.config.openboxes.logoSquare.url}"/>
                 </div>
             </div>
         </td>
