@@ -60,9 +60,17 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1552802756393-6">
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="inventory_snapshot_key"/>
+        </preConditions>
         <dropUniqueConstraint constraintName="inventory_snapshot_key" tableName="inventory_snapshot"/>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1552802756393-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="inventory_snapshot_key"/>
+            </not>
+        </preConditions>
         <addUniqueConstraint constraintName="inventory_snapshot_key"
                              tableName="inventory_snapshot"
                              columnNames="date, location_id, product_code, lot_number, bin_location_name"/>
