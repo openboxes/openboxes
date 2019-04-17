@@ -80,7 +80,7 @@ class PutawayApiController {
             putawayItem.availableItems =
                     inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
             putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
-            putawayItem.quantityAvailable = putawayItem.quantity
+            putawayItem.quantityAvailable = inventoryService.getQuantity(putawayItem.currentFacility.inventory, putawayItem.currentLocation, putawayItem.inventoryItem)
         }
 
         render ([data:putaway?.toJson()] as JSON)
