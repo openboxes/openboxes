@@ -461,6 +461,8 @@ class PutAwaySecondPage extends Component {
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary align-self-end btn-xs"
+            disabled={_.some(this.props.putAway.putawayItems, putawayItem =>
+              putawayItem.quantity > putawayItem.quantityAvailable)}
           ><Translate id="react.default.button.next.label" defaultMessage="Next" />
           </button>
         </div>
