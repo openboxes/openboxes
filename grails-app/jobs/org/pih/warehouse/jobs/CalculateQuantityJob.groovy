@@ -4,9 +4,11 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
+import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 import util.LiquibaseUtil
 
+@DisallowConcurrentExecution
 class CalculateQuantityJob {
 
     def inventorySnapshotService
