@@ -20,6 +20,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1552802756393-2">
+        <validCheckSum>fab8d7d9ba1320fb5b47cbb6a9b2a8</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="inventory_snapshot" columnName="product_code"/>
@@ -32,6 +33,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1552802756393-3">
+        <validCheckSum>d673c812e68dba1b451546882c35c272</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="inventory_snapshot" columnName="lot_number"/>
@@ -56,6 +58,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1552802756393-5">
+        <validCheckSum>48bb51ba14eb7aea3429a43c714e3e3</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="inventory_snapshot" columnName="bin_location_name"/>
