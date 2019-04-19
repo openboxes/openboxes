@@ -132,8 +132,10 @@ class PartialReceivingApiController {
                 PartialReceiptItem partialReceiptItem = partialReceiptItems.find { receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId }
 
                 if ((expirationDate && Constants.EXPIRATION_DATE_FORMATTER.parse(expirationDate).format(Constants.EXPIRATION_DATE_FORMAT) != partialReceiptItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT))
-                    || (recipientId && recipientId != partialReceiptItem?.recipient?.id) || (lotNumber && lotNumber != partialReceiptItem.lotNumber) || (binLocation && binLocation != partialReceiptItem.binLocation.name)
-                    || (code && code != partialReceiptItem.product.productCode)) {
+                    || ((recipientId && recipientId != partialReceiptItem?.recipient?.id) || (!recipientId && partialReceiptItem.recipient))
+                    || ((lotNumber && lotNumber != partialReceiptItem.lotNumber) || (!lotNumber && partialReceiptItem.lotNumber))
+                    || ((binLocation && binLocation != partialReceiptItem.binLocation.name) || (!binLocation && partialReceiptItem.binLocation))
+                    || ((code && code != partialReceiptItem.product.productCode) || (!code && partialReceiptItem.product.productCode))) {
                     throw new IllegalArgumentException("You can only import the Receiving Now and the Comment fields. To make other changes, please use the edit line feature. You can then export and import the template again.")
                 }
 

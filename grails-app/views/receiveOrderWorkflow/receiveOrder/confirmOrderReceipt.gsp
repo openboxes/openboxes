@@ -1,4 +1,4 @@
-
+<%@ page defaultCodec="html" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -34,7 +34,7 @@
 				<g:renderErrors bean="${order}" as="list" />
 			</div>
 		</g:hasErrors>
-		
+
 		<g:form action="receiveOrder" method="post">
 			<g:render template="../order/summary" model="[orderInstance:order,currentState:'confirmOrderReceipt']"/>
 
@@ -48,7 +48,7 @@
 									<label for='summary'><warehouse:message code="default.summary.label"/></label>
 								</td>
 								<td valign='top'class='value'>
-									<warehouse:message code="order.youAreAboutToCreateANewShipment.message" 
+									<warehouse:message code="order.youAreAboutToCreateANewShipment.message"
 										args="[format.metadata(obj:orderCommand?.shipmentType), orderCommand?.order?.origin?.name?.encodeAsHTML(),
 										orderCommand?.order?.destination?.name?.encodeAsHTML(),format.date(obj:orderCommand?.deliveredOn)]"/>
 								</td>
@@ -64,7 +64,7 @@
 									</g:else>
 								</td>
 							</tr>
-							
+
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='source'>Order from:</label></td>
 								<td valign='top' class='value'>
@@ -77,8 +77,8 @@
 									${orderCommand?.order?.destination?.name?.encodeAsHTML()}
 								</td>
 							</tr>
-							
-							
+
+
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='orderedBy'>Shipment type</label>
@@ -87,15 +87,15 @@
 									${orderCommand?.shipmentType?.name}
 								</td>
 							</tr>
-							
+
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='shippedOn'>Shipped on</label>
 								</td>
-								<td valign='top'class='value'>									
+								<td valign='top'class='value'>
 									<format:date obj="${orderCommand?.shippedOn}"/>
 								</td>
-							</tr>								
+							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='deliveredOn'>Delivered on</label>
@@ -183,30 +183,30 @@
 
 
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<span class="formButton"> 
+						<span class="formButton">
 							<g:submitButton name="back" value="${warehouse.message(code:'default.button.back.label')}" class="button"></g:submitButton>
 							<g:submitButton name="submit" value="${warehouse.message(code:'default.button.finish.label')}" class="button"></g:submitButton>
 
 						</span>
 					</div>
 				</fieldset>
-			</div>				
-				
-				
+			</div>
+
+
 		</g:form>
 	</div>
-	
+
 		<script>
 			$(document).ready(function() {
 				jQuery.fn.alternateRowColors = function() {
 					$('tbody tr:odd', this).removeClass('odd').addClass('even');
 					$('tbody tr:even', this).removeClass('even').addClass('odd');
 					return this;
-				};				
+				};
 
 				$("table #orderItems").alternateRowColors();
-		    	
+
 	    	});
-	    </script>	
+	    </script>
 </body>
 </html>

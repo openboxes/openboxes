@@ -1,8 +1,9 @@
+<%@ page defaultCodec="html" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="${params.print?'print':'custom' }" />
-        <title><warehouse:message code="report.showShippingReport.label" /></title>    
+        <title><warehouse:message code="report.showShippingReport.label" /></title>
         <style media="print">
         	body, td, th, div { font-family: 'Times New Roman'; }
         </style>
@@ -17,10 +18,10 @@
         	.spacer { width: 10%; }
         	th { border-bottom: 1px solid black; }
         	td { padding: 10px; }
-        	table { -fs-table-paginate: paginate; }	
-        	
+        	table { -fs-table-paginate: paginate; }
+
         </style>
-    </head>    
+    </head>
     <body>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
@@ -33,11 +34,11 @@
 	   	<g:if test="${!params.print}">
 			<div class="dialog box" >
 				<g:form controller="report" action="showShippingReport" method="GET">
-					<%-- 
+					<%--
 					<span class="filter">
 						<label>Location</label>
 						<g:selectLocation class="filter" name="location.id" noSelection="['null':'']" value="${command?.location?.id}"/>
-					</span>	
+					</span>
 					--%>
 					<table>
 						<tr>
@@ -47,11 +48,11 @@
 								</label>
 								<g:selectShipment class="filter" name="shipment.id" noSelection="['null':'']" value="${command?.shipment?.id}"/>
 							</td>
-							<%-- 
+							<%--
 							<span class="filter">
 								<label>Start date</label>
 								<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
-							</span>					
+							</span>
 							<span class="filter">
 								<label>End date</label>
 								<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
@@ -60,19 +61,19 @@
 								<button type="submit" class="btn">Run Report</button>
 							</span>
 							--%>
-						</tr>	
+						</tr>
 				    	<tr class="prop">
 				    		<td>
 								<label><warehouse:message code="report.exportAs.label"/></label>
 								<g:if test="${command?.shipment }">
 						   			<g:link target="_blank" controller="report" action="showShippingReport" params="[print:'true','shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.html.label"/>
-						   			</g:link> 
+						   			</g:link>
 						   			|
 						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.pdf.label"/>
 						   			</g:link>
-						   			<%-- 
+						   			<%--
 						   			|
 						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.docx.label"/>
@@ -82,12 +83,12 @@
 						   		<g:else>
 						   			<warehouse:message code="report.selectShipment.label"/>
 						   		</g:else>
-						   		
+
 					   		</td>
 						</tr>
 					</table>
-					
-				</g:form>				
+
+				</g:form>
 			</div>
 		</g:if>
 		<g:else>
@@ -101,30 +102,30 @@
 							<img src="${createLinkTo(dir:'images/icons/logos/',file:'pih_logo.jpg')}"  width="34" height="50"/>
 						</td>
 						<td class="center">
-							<div class="title">			
-								<warehouse:message code="report.shippingReport.heading"/>	
-							</div>								
+							<div class="title">
+								<warehouse:message code="report.shippingReport.heading"/>
+							</div>
 							<div class="subtitle">
 								${session?.warehouse?.name }
 							</div>
 							<div class="subtitle">
 								${command?.shipment?.name?.encodeAsHTML() }
 								--
-								<warehouse:message code="report.shippingReport.title"/>	
+								<warehouse:message code="report.shippingReport.title"/>
 							</div>
-						</td>			
+						</td>
 						<td class="right">
 							<img src="${createLinkTo(dir:'images/icons/logos/',file:'pih_logo.jpg')}" width="34" height="50" />
-						</td>				
+						</td>
 					</tr>
 				</table>
-				
-				
+
+
 				<hr/>
-				
+
 				<%--
 				<table>
-					<tr>				
+					<tr>
 						<td class="label">
 							<label>
 								<warehouse:message code="report.containerNumber.label"/>
@@ -136,7 +137,7 @@
 							</span>
 						</td>
 						<td class="spacer">
-						
+
 						</td>
 						<td class="label">
 							<label>
@@ -144,20 +145,20 @@
 							</label>
 						</td>
 						<td class="value underline">
-							<span class="value">${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }</span>						
+							<span class="value">${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }</span>
 						</td>
 					</tr>
 					<tr>
 						<td class="label">
 							<label>
 								<warehouse:message code="report.origin.label"/>
-							</label>				
+							</label>
 						</td>
 						<td class="value underline">
-							<span class="value">${command?.shipment?.origin?.name?.encodeAsHTML() }</span>							
+							<span class="value">${command?.shipment?.origin?.name?.encodeAsHTML() }</span>
 						</td>
 						<td class="spacer">
-						
+
 						</td>
 						<td class="label">
 							<label>
@@ -174,9 +175,9 @@
 		   			<g:set var="status" value="${0 }"/>
 			    	<g:set var="packingListByContainer" value="${command?.checklistReportEntryList?.groupBy { it?.shipmentItem?.container } }"/>
 		   			<g:each var="packingListEntry" in="${packingListByContainer}">
-		   			
+
 		   				<div class="page" style="page-break-after: always;">
-			   			
+
 				    		<table border="1" style="width: 99%;" class="fs-repeat-header">
 				    			<thead>
 				    				<tr>
@@ -215,22 +216,22 @@
 				 						</th>
 				    				</tr>
 				    			</thead>
-				    		
+
 				    			<tbody>
 				    				<g:each var="checklistEntry" in="${packingListEntry?.value }" status="i">
 										<tr>
 											<td>
-												${i+1 }							
+												${i+1 }
 											</td>
-											<td>	   
-												<format:product product="${checklistEntry?.shipmentItem?.product}"/> 	
+											<td>
+												<format:product product="${checklistEntry?.shipmentItem?.product}"/>
 											</td>
 											<td>
 												${checklistEntry?.shipmentItem?.lotNumber?.encodeAsHTML()  }
-											</td>							
+											</td>
 											<td>
-												<format:expirationDate obj="${checklistEntry?.shipmentItem?.expirationDate }"/>												
-											</td>												
+												<format:expirationDate obj="${checklistEntry?.shipmentItem?.expirationDate }"/>
+											</td>
 											<td>
 												<g:if test="${checklistEntry?.shipmentItem?.recipient }">
 													${checklistEntry?.shipmentItem?.recipient?.name?.encodeAsHTML()  }
@@ -243,7 +244,7 @@
 												</g:elseif>
 											</td>
 											<td>
-			
+
 											</td>
 											<td class="center">
 												${checklistEntry?.shipmentItem?.quantity }
@@ -251,7 +252,7 @@
 										</tr>
 									</g:each>
 								</tbody>
-							</table>								
+							</table>
 							<div style="margin: 10px;">
 								<label class="block">
 									<warehouse:message code="default.comments.label"/>
@@ -261,15 +262,15 @@
 								</div>
 							</div>
 						</div>
-						
+
 					</g:each>
-				</div>		
+				</div>
 			</div>
 		</g:if>
-		
+
 	    <script>
 			$(document).ready(function() {
-				$(".filter").change(function() { 
+				$(".filter").change(function() {
 					$(this).closest("form").submit();
 				});
 			});

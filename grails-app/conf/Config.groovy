@@ -472,6 +472,9 @@ openboxes.scannerDetection.enabled = false
 openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
+// Refresh inventory snapshots
+openboxes.jobs.refreshInventorySnapshotJob.enabled = true
+
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
 openboxes.jobs.assignIdentifierJob.cronExpression = "0 0 0 * * ?" // every day at midnight
@@ -488,6 +491,9 @@ openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 // Data Cleaning Job
 openboxes.jobs.dataCleaningJob.enabled = true
 openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
+
+// Data Migration Job (enabled, but needs to be triggered manually)
+openboxes.jobs.dataMigrationJob.enabled = true
 
 // LDAP configuration
 openboxes.ldap.enabled = false

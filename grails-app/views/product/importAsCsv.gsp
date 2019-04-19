@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.product.Product"%>
+<%@ page import="org.pih.warehouse.product.Product" defaultCodec="html" %>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -11,10 +11,10 @@
 		<script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
 	</head>
 	<body>
-		<div class="body">	
+		<div class="body">
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
-			</g:if> 
+			</g:if>
 			<g:hasErrors bean="${command}">
 				<div class="errors"><g:renderErrors bean="${command}" as="list" /></div>
 			</g:hasErrors>
@@ -310,7 +310,7 @@
             </div>
 
         </div>
-			
+
 		<script type="text/javascript">
 			$(function() {
 
@@ -375,7 +375,7 @@
 
 		</script>
 
-		
-			
+
+
 	</body>
 </html>

@@ -100,7 +100,7 @@ class LocationService {
 			}
 			if (direction == "OUTBOUND") {
 				return locations.findAll { (it.locationGroup == currentLocation.locationGroup) ||
-						(it.locationGroup != currentLocation.locationGroup && it.supports(ActivityCode.MANAGE_INVENTORY) && it.supports(ActivityCode.RECEIVE_STOCK)) }
+						(it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT) }
 			}
 		}
 

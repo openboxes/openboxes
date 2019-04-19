@@ -1,5 +1,5 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" defaultCodec="html" %>
 <html>
 <head>
     <meta name="layout" content="print"/>
@@ -54,7 +54,7 @@
                         <td width="1%">
                             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
                                 <div class="print-logo nailthumb-container" style="float: left;">
-                                    <img src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>
+                                    <img src="${requisition?.origin?.logo ? createLink(controller:'location', action:'viewLogo', id:requisition?.origin?.id) : createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>
                                 </div>
                             </div>
                         </td>

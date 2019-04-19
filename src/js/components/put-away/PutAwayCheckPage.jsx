@@ -388,7 +388,7 @@ class PutAwayCheckPage extends Component {
                   expanded: this.state.expanded,
                 })}
                 className="btn btn-outline-primary float-right mr-2 my-2 btn-xs"
-              >Edit
+              ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
               </button>
             </div>
         }

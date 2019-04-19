@@ -487,8 +487,7 @@ class Shipment implements Comparable, Serializable {
 	}
 
 	Float calculateTotalValue() {
-		return shipmentItems?.findAll { it.product.pricePerUnit }.
-				collect { it?.quantity?:0 * it.product.pricePerUnit }.sum()?:0
+		return shipmentItems?.findAll { it.product.pricePerUnit }?.collect { it?.quantity * it?.product?.pricePerUnit }?.sum()?:0
 	}
 
 	Collection findAllParentContainers() {

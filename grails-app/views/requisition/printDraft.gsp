@@ -1,5 +1,5 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" defaultCodec="html"  %>
 <html>
 <head>
     <meta name="layout" content="print" />
@@ -23,7 +23,7 @@
     </h2>
     <div class="clear"></div>
     <div  style="float: left;">
-  
+
 	    <div class="header">
 	        <label><warehouse:message code="requisition.origin.label"/>:</label> ${requisition.origin?.name}
 	    </div>
@@ -33,20 +33,20 @@
 	    <div class="header">
 	        <label><warehouse:message code="requisition.requisitionNumber.label"/>:</label> ${requisition?.requestNumber }
 	    </div>
-        
-        
+
+
     </div>
     <div class="requisition-number" style="float: right; text-align: center; margin: 5px;" >
     	<g:if test="${requisition.requestNumber }">
 	    	<img src="${createLink(controller:'product',action:'barcode',params:[data:requisition?.requestNumber,width:200,height:60,format:'CODE_128']) }"/>
 	    	<br/>
-	    	
+
 	    	${requisition?.requestNumber }
     	</g:if>
     </div>
-    
+
     <div class="clear"></div>
-    
+
     <table id="signature-table">
         <tr class="theader">
             <td></td>
@@ -101,14 +101,14 @@
 							<g:if test="${requisitionItem?.product?.images }">
 								<div class="nailthumb-container">
 									<g:set var="image" value="${requisitionItem?.product?.images?.sort()?.first()}"/>
-									<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" />		
+									<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" />
 								</div>
 							</g:if>
 							<g:else>
 								<div class="nailthumb-container">
-									<img src="${resource(dir: 'images', file: 'default-product.png')}" />		
+									<img src="${resource(dir: 'images', file: 'default-product.png')}" />
 								</div>
-							</g:else>                        
+							</g:else>
                         </td>
                         <td>
                         	${requisitionItem?.product?.productCode}
@@ -140,9 +140,9 @@
 <script>
 	$(document).ready(function() {
 		$('.nailthumb-container').nailthumb({ width : 60, height : 60 });
-    	$('.nailthumb-container-100').nailthumb({ width : 100, height : 100 });    	
-	});	
-</script>				    
-    
+    	$('.nailthumb-container-100').nailthumb({ width : 100, height : 100 });
+	});
+</script>
+
 </body>
 </html>

@@ -1,12 +1,13 @@
+<%@ page defaultCodec="html" %>
 <html>
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="print" />
 	    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
-        <title><warehouse:message code="report.showShippingReport.label" /></title>    
-        
-    </head>    
+        <title><warehouse:message code="report.showShippingReport.label" /></title>
+
+    </head>
     <body>
 
 		<div id="print-button">
@@ -181,23 +182,23 @@
 						</table>
 					</div>
 				</div>
-				
+
 				<table id="signature-table">
 					<tr>
 						<td class="label">
 							<label><warehouse:message code="report.preparedBy.label"/></label><!--  Préparé par, Prepared by -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 						<td class="spacer">
-						
-						</td>						
+
+						</td>
 						<td class="label">
 							<label><warehouse:message code="report.receivedBy.label"/></label><!-- Reçu par, Received by -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 					</tr>
 					<tr>
@@ -205,16 +206,16 @@
 							<label><warehouse:message code="report.deliveredBy.label"/></label><!-- Livré par, Delivered/supplied by -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 						<td class="spacer">
-						
-						</td>						
+
+						</td>
 						<td class="label">
 							<label><warehouse:message code="report.receivedOn.label"/></label><!-- Reçu le, Received on -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 					</tr>
 					<tr>
@@ -222,16 +223,16 @@
 							<label><warehouse:message code="report.deliveredOn.label"/></label><!-- Livré le, Delivered/supplied on -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 						<td class="spacer">
-						
-						</td>						
+
+						</td>
 						<td class="label">
 							<label><warehouse:message code="report.verifiedOn.label"/></label><!-- Vérifié le, Verified on -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 					</tr>
 					<tr>
@@ -239,26 +240,26 @@
 							<label><warehouse:message code="report.transportedBy.label"/></label><!-- Transporté, Carrier -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 						<td class="spacer">
-						
-						</td>						
+
+						</td>
 						<td class="label">
 							<label><warehouse:message code="report.verifiedBy.label"/></label><!-- Vérifié par, Verified by -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 					</tr>
 
 				</table>
 			</div>
 		</g:if>
-		
+
 	    <script>
 			$(document).ready(function() {
-				$(".filter").change(function() { 
+				$(".filter").change(function() {
 					$(this).closest("form").submit();
 				});
 			});

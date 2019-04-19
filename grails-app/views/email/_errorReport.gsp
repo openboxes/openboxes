@@ -1,3 +1,4 @@
+<%@ page defaultCodec="html" %>
 <html>
 <head>
     <title>OpenBoxes Bug Report</title>

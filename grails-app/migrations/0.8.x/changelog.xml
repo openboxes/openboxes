@@ -12,6 +12,8 @@
     <include file="0.8.x/changelog-2018-03-21-2114-add-column-attribute-exportable.xml"/>
     <include file="0.8.x/changelog-2018-03-22-2137-add-column-unit-cost.xml"/>
     <include file="0.8.x/changelog-2018-03-22-2341-create-product-catalog.xml"/>
+    <include file="0.8.x/changelog-2018-05-30-2300-create-dimensional-model.xml"/>
+    <include file="0.8.x/changelog-2018-05-30-2315-insert-party-type-data.xml"/>
     <include file="0.8.x/changelog-2018-07-05-1522-add-column-bin-location.xml"/>
     <include file="0.8.x/changelog-2018-07-07-2338-add-column-shipment-requisition.xml"/>
     <include file="0.8.x/changelog-2018-07-09-2222-insert-internal-receiving-location-type.xml"/>
@@ -43,5 +45,6 @@
     <include file="0.8.x/changelog-2019-02-04-1323-modify-product-supplier-unit-price.xml"/>
     <include file="0.8.x/changelog-2019-02-04-1623-alter-table-requisition-add-column-sort-by-code.xml"/>
     <include file="0.8.x/changelog-2019-02-26-0001-add-sort-order-column.xml"/>
+    <include file="0.8.x/changelog-2019-03-17-0104-consolidate-inventory-snapshot-tables.xml"/>
 
 </databaseChangeLog>

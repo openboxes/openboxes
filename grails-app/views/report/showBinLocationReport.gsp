@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" defaultCodec="html" %>
 <html>
 <head>
     <title><g:message code="report.binLocationReport.label" default="Bin Location Report"/></title>

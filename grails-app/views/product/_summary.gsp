@@ -51,10 +51,14 @@
         			</div>
         		</td>
 				<td class="right" width="1%">
-        			<div id="product-status" class="title">
-						<g:productStatus product="${productInstance.id}"/>
-        			</div>
-
+					<div id="product-status" class="title">
+						<g:if test="${productInstance?.active}">
+							<g:productStatus product="${productInstance.id}"/>
+						</g:if>
+						<g:else>
+							<span class="tag tag-danger"><g:message code="default.inactive.label"/></span>
+						</g:else>
+					</div>
 				</td>
 			</tr>
 		</tbody>
@@ -90,6 +94,25 @@
 							${warehouse.message(code: 'button.manage.label', default: 'Manage stock lists', args:[warehouse.message(code:'requisitionTemplates.label')])}
 						</g:link>
 					</div>
+
+					<g:isSuperuser>
+						<div class="button-group">
+							<g:link controller="product" action="createProductSnapshot" id="${productInstance?.id}" class="button"
+									onclick="return confirm('${warehouse.message(code: 'default.button.confirm.message', default: 'Are you sure?')}');">
+								<img src="${resource(dir: 'images/icons/silk', file: 'camera.png')}"/>&nbsp;
+								<warehouse:message code="product.createSnapshot.label" default="Create Snapshot"/>
+							</g:link>
+							<g:link controller="migration" action="migrateProduct" id="${productInstance?.id}" class="button"
+									onclick="return confirm('${warehouse.message(code: 'default.button.confirm.message', default: 'Are you sure?')}');">
+								<img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch_bluegreen.png')}"/>&nbsp;
+								<warehouse:message code="product.migrateInventoryTransactions.label" default="Migrate Inventory Transactions"/>
+							</g:link>
+							<g:link controller="migration" action="nextInventoryTransaction" params="[max:1]" class="button">
+								<img src="${resource(dir: 'images/icons/silk', file: 'resultset_next.png')}"/>&nbsp;
+								<g:message code="default.button.next.label" default="Next"/>
+							</g:link>
+						</div>
+					</g:isSuperuser>
                 </div>
             </td>
         </tr>
