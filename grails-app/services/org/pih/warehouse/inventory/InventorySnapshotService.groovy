@@ -490,4 +490,39 @@ class InventorySnapshotService {
         return quantityMap
     }
 
+    List getQuantityOnHandByBinLocation(Location location) {
+        def data = []
+        Date date = getMostRecentInventorySnapshotDate()
+        if (location && date) {
+            def results = InventorySnapshot.executeQuery("""
+						select 
+						    iis.product, 
+						    ii,
+						    iis.binLocation,
+						    iis.quantityOnHand
+						from InventorySnapshot iis
+						left outer join iis.inventoryItem ii
+						left outer join iis.binLocation bl
+						where iis.location = :location
+						and iis.date = :date
+						""", [location: location, date: date])
+            //data = results
+            def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
+            data = results.collect {
+                def product = it[0]
+                def inventoryItem = it[1]
+                def binLocation = it[2]
+                def quantity = it[3]
+
+                [
+                        status        : status(quantity),
+                        product       : product,
+                        inventoryItem : inventoryItem,
+                        binLocation   : binLocation,
+                        quantity      : quantity
+                ]
+            }
+        }
+        return data
+    }
 }

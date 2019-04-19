@@ -108,7 +108,7 @@
         $('#binLocationReportTable').dataTable( {
             "bProcessing": true,
             "sServerMethod": "GET",
-            "iDisplayLength": 15,
+            "iDisplayLength": 25,
             "bSearch": false,
             "bScrollCollapse": true,
             "bJQueryUI": true,

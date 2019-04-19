@@ -248,6 +248,10 @@ class DashboardController {
         redirect(action: "index")
     }
 
+	def triggerCalculateQuantityJob = {
+		CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
+	}
+
     @CacheFlush(["megamenuCache"])
     def flushMegamenu = {
         flash.message = "${g.message(code:'dashboard.cacheFlush.message', args: [g.message(code: 'dashboard.megamenu.label')])}"

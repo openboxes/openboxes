@@ -1538,29 +1538,25 @@ class JsonController {
         render "${CalculateHistoricalQuantityJob.enabled?'enabled':'disabled'}"
     }
 
-    def pendingShipments = {
-        def location = Location.get(session?.warehouse?.id)
-        def shipments = shipmentService.getPendingShipments(location)
-        render ([count: shipments.size(), shipments:shipments] as JSON)
-    }
-
-    @Cacheable("binLocationSummaryCache")
     def getBinLocationSummary = {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
-        def binLocationReport = inventoryService.getBinLocationReport(location)
+        def binLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
 
-        render(binLocationReport["summary"] as JSON)
+        def data = inventoryService.getBinLocationSummary(binLocations)
+        render(data as JSON)
+
+        //def binLocationReport = inventoryService.getBinLocationReport(location)
+        //render(binLocationReport["summary"] as JSON)
+
     }
 
-    //@Cacheable("binLocationReportCache")
     def getBinLocationReport = {
         log.info "binLocationReport: " + params
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
-        def binLocationReport = inventoryService.getBinLocationReport(location)
+        def data = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
 
-        def data = binLocationReport["data"]
         if (params.status) {
             data = data.findAll { it.status == params.status }
         }

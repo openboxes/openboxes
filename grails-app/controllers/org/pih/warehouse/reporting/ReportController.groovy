@@ -28,6 +28,7 @@ class ReportController {
 	def productService
 	def reportService
     def messageService
+    def inventorySnapshotService
 
     def buildFacts = {
         def startTime = System.currentTimeMillis()
@@ -357,11 +358,7 @@ class ReportController {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
 
-        def quantityMap = [:]
-        List binLocations = []
-        List statuses = ["inStock", "outOfStock"]
-
-        statuses = statuses.collect { status ->
+        List statuses = ["inStock", "outOfStock"].collect { status ->
             String messageCode = "binLocationSummary.${status}.label"
             String label = messageService.getMessage(messageCode)
             [status: status, label: label]
@@ -369,10 +366,7 @@ class ReportController {
 
         try {
             if (params.button == "download") {
-                def binLocationReport = inventoryService.getBinLocationReport(location)
-
-                binLocations = binLocationReport.data
-                statuses = binLocationReport.summary
+                def binLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
 
                 // Filter on status
                 if (params.status) {
@@ -396,8 +390,6 @@ class ReportController {
         [
                 location: location,
                 elapsedTime: (System.currentTimeMillis() - startTime),
-                quantityMap: quantityMap,
-                binLocations: binLocations,
                 statuses: statuses
         ]
 
