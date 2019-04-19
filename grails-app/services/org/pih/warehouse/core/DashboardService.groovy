@@ -23,6 +23,19 @@ class DashboardService {
     def inventorySnapshotService
 
     /**
+     * Get the most recent quantity on hand from inventory item snapshot table. If there are no
+     * records in the inventory item snapshot table then we calculate the QoH from transactions.
+     *
+     * @param location
+     * @return
+     */
+    Map<InventoryItem, Integer> getQuantityByLocation(Location location) {
+        Map<InventoryItem, Integer> quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
+        return quantityMap;
+    }
+
+
+    /**
      * Get fast moving items based on requisition data.
      *
      * @param location
@@ -106,7 +119,6 @@ class DashboardService {
         def expirationAlerts = []
         def today = new Date()
         def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
-
         quantityMap.each { key, value ->
             if (value > 0) {
                 def daysToExpiry = key.expirationDate ? (key.expirationDate - today) : null
@@ -139,7 +151,8 @@ class DashboardService {
 
         log.debug expiredStock
 
-        Map<InventoryItem, Integer> quantityMap = getQuantityByLocation(location)
+        Map<InventoryItem, Integer> quantityMap =
+                inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
 
         // FIXME poor man's filter
@@ -350,7 +363,12 @@ class DashboardService {
         def inventoryStatusMap = [:]
         quantityMap.each { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryStatusMap[product] = inventoryLevel?.statusMessage(quantity)?:"${inventoryLevel?.id}"
+            if (inventoryLevel) {
+                inventoryStatusMap[product] = inventoryLevel?.statusMessage(quantity)?:"${inventoryLevel?.id}"
+            }
+            else {
+                inventoryStatusMap[product] = quantity > 0 ? "IN_STOCK" : "STOCK_OUT"
+            }
 
         }
         return inventoryStatusMap
