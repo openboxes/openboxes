@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.validation.Validateable
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
@@ -43,7 +44,7 @@ class PutawayItem {
     String getCurrentBins() {
         String currentBins = ""
         if (availableItems) {
-            currentBins = availableItems?.collect { it?.binLocation?.name }?.sort()?.join(", ")
+            currentBins = availableItems?.findAll { !it?.binLocation?.supports(ActivityCode.RECEIVE_STOCK) }?.collect { it?.binLocation?.name }?.unique()?.sort()?.join(", ")
         }
         return currentBins
     }
