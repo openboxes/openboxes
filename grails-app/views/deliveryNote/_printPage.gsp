@@ -1,3 +1,4 @@
+<%@ page defaultCodec="html" %>
 <div class="page dialog" style="page-break-after: ${pageBreakAfter};">
     <table id="requisition-items">
         <thead>

@@ -1,15 +1,16 @@
+<%@ page defaultCodec="html" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="${params.print?'print':'custom' }" />
-        <title><warehouse:message code="report.showTransactionReport.label" /></title>    
+        <title><warehouse:message code="report.showTransactionReport.label" /></title>
         <style>
         	.title { text-align: center; padding: 15px; }
         	.total { border-right: 2px solid lightgrey; }
         	.parameters { width:30%; margin-left: auto; margin-right: auto;  }
         	.filter { padding-right: 15px; }
         </style>
-    </head>    
+    </head>
     <body>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
@@ -19,12 +20,12 @@
 				<g:renderErrors bean="${command}" as="list" />
 			</div>
 		</g:hasErrors>
-		
+
 		<table>
 			<tr>
 				<g:if test="${!params.print}">
 					<td style="width: 250px;">
-						<%-- 
+						<%--
 						<div class="">
 							<span style="border: 1px solid lightgrey; background-color: #f7f7f7; padding: 5px; margin: 5px; width: 100px;">
 								<a id="hideParameters" class="toggleParameters" href="javascript:void(0);">
@@ -134,35 +135,35 @@
 											<button type="submit" class="btn">
 												<warehouse:message code="report.runReport.label"/>
 											</button>
-											
+
 										</td>
 									</tr>
 								</table>
-							</g:form>		
-						</div>			
+							</g:form>
+						</div>
 						<g:if test="${!command?.product }">
 					    	<div style="padding: 5px;">
 								<label><warehouse:message code="report.exportAs.label"/></label>
 					   			<g:link target="_blank" controller="report" action="generateTransactionReport" params="[print:'true','location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts]">
 					   				<warehouse:message code="report.exportAs.html.label"/>
-					   			</g:link> 
+					   			</g:link>
 					   			&nbsp;|&nbsp;
 					   			<g:link target="_blank" controller="report" action="downloadTransactionReport" params="[url:request.forwardURI,'location.id':command.location?.id,'category.id':command?.category?.id,'startDate':params.startDate,'endDate':params.endDate,'showTransferBreakdown':command.showTransferBreakdown,'includeChildren':command?.includeChildren,'hideInactiveProducts':command?.hideInactiveProducts,'insertPageBreakBetweenCategories':command?.insertPageBreakBetweenCategories]">
 					   				<warehouse:message code="report.exportAs.pdf.label"/>
 					   			</g:link>
 							</div>
-						</g:if>	
+						</g:if>
 					</td>
 				</g:if>
 
 
 			<g:else>
-				<div class="title">	
+				<div class="title">
 					<warehouse:message code="report.transactionReport.title"/>
-				</div>		
+				</div>
 				<table>
-					<tr>	
-						<td class="right">			
+					<tr>
+						<td class="right">
 							<label>
 								<warehouse:message code="report.location.label"/>
 							</label>
@@ -178,7 +179,7 @@
 							</label>
 						</td>
 						<td>
-							<format:category category="${command?.category}"/>					
+							<format:category category="${command?.category}"/>
 						</td>
 					</tr>
 					<tr>
@@ -192,10 +193,10 @@
 						</td>
 					</tr>
 				</table>
-			</g:else>			
+			</g:else>
 
-							
-			
+
+
 				<td>
 					<g:if test="${command.product }">
 						<style>
@@ -208,7 +209,7 @@
 						</style>
 						<g:set var="i" value='${0 }'/>
 						<g:each var="entry" in="${command?.entries }">
-							<g:if test="${command?.product == entry?.value?.product}">									
+							<g:if test="${command?.product == entry?.value?.product}">
 
                                 <div class="box">
 
@@ -310,8 +311,8 @@
                                         <br/>
                                     </g:each>
                                 </div>
-							</g:if>	
-						</g:each>	
+							</g:if>
+						</g:each>
 					</g:if>
 					<g:else>
 				    	<div class="box">
@@ -351,7 +352,7 @@
 							    				</th>
 							    				<th rowspan="2" class="center bottom total start">
 													<warehouse:message code="report.initialQuantity.label"/>
-							    				</th>							    				
+							    				</th>
 							    				<td colspan="${(command.showTransferBreakdown) ? 3 + (transferInLocations?.size?:0) : 3}" class="center total">
 							    					<label>
 							    						<warehouse:message code="report.incomingQuantity.label"/>
@@ -364,9 +365,9 @@
 												</td>
 												<th rowspan="2" class="center bottom total end">
 													<warehouse:message code="report.finalQuantity.label"/>
-												</th>    				
+												</th>
 							    			</tr>
-							    		
+
 								    		<tr style="border-top: 1px solid lightgrey;">
 												<th class="right">
 													<warehouse:message code="report.incomingTransferQuantity.label"/>
@@ -378,10 +379,10 @@
 												</g:if>
 												<th class="right nowrap">
 													<warehouse:message code="report.adjustedInQuantity.label"/>
-												</th>	
+												</th>
 												<th class="right total">
 													<warehouse:message code="report.incomingTotalQuantity.label"/>
-												</th>	
+												</th>
 												<th class="right">
 													<warehouse:message code="report.outgoingTransferQuantity.label"/>
 												</th>
@@ -413,10 +414,10 @@
 												<tr class="${j%2 ? 'even' : 'odd' }">
 													<td class="left" style="width: 35%">
 														<g:if test="${!params.print }">
-															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]" fragment="inventory">   	
+															<g:link controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]" fragment="inventory">
 																<format:product product="${product }"/>
-												    		</g:link>											    		
-												    		
+												    		</g:link>
+
 															<g:link controller="report" action="generateTransactionReport" params="['product.id':product?.id,'category.id':category?.id,'location.id':command?.location?.id,startDate:params.startDate,endDate:params.endDate,includeChildren:command?.includeChildren,pageBreak:params.pageBreak]">
 																<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" class="middle"/>
 															</g:link>
@@ -426,31 +427,31 @@
 															<format:product product="${product }"/>
 											    		</g:else>
 										    		</td>
-													<td class="right total start nowrap">	    	
+													<td class="right total start nowrap">
 											    		<span class="${(entry?.quantityInitial>=0)?'credit':'debit'}">
 											    			${entry?.quantityInitial ?: 0}
 											    		</span>
-										    		</td>										
-										    		<td class="right nowrap">	    	
+										    		</td>
+										    		<td class="right nowrap">
 											    		<span class="${(entry?.quantityTransferredIn>=0)?'credit':'debit'}">
 												    		${entry?.quantityTransferredIn ?: 0}
 												    	</span>
-												    	<g:if test="${command.showTransferBreakdown && !params.print }">														
+												    	<g:if test="${command.showTransferBreakdown && !params.print }">
 												    		<img src="${createLinkTo(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
 												    		<div class="hidden details">
 												    			<g:if test="${entry.quantityTransferredInByLocation }">
 												    				<h2>
-													    				<table>	
+													    				<table>
 													    					<tr class="unhighlight">
 													    						<td class="">
 												    								<format:product product="${product }"/>
 													    						</td>
 													    						<td class="right middle">
-															    					<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>										    						
+															    					<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>
 													    						</td>
 													    					</tr>
 													    				</table>
-												    				</h2>												    			
+												    				</h2>
 													    			<table>
 													    				<thead>
 													    					<tr>
@@ -467,7 +468,7 @@
 															    				<tr class="${xinStatus%2?'even':'odd' }">
 															    					<td>
 																	    				${xferInMapEntry.key }
-																	    				
+
 																	    			</td>
 																	    			<td class="right">
 																		    			${xferInMapEntry.value }
@@ -478,7 +479,7 @@
 														    			<tfoot>
 														    				<tr>
 														    					<td>
-														    						
+
 														    					</td>
 														    					<td class="right">
 														    						${entry?.quantityTransferredIn?:0}
@@ -492,17 +493,17 @@
 												    			</g:unless>
 												    		</div>
 												    	</g:if>
-												    	
+
 													</td>
-													<td class="right nowrap">	    	
+													<td class="right nowrap">
 											    		<span class="${(entry?.quantityFound>=0)?'credit':'debit'}">${entry?.quantityFound ?: 0}</span>
 													</td>
-													<td class="right total nowrap">	    	
+													<td class="right total nowrap">
 											    		<span class="${(entry?.quantityTotalIn>=0)?'credit':'debit'}">
 											    			${entry?.quantityTotalIn ?: 0}
 											    		</span>
 													</td>
-													
+
 										    		<g:if test="${command.showTransferBreakdown }">
 														<g:each var="location" in="${transferOutLocations }">
 															<td class="center nowrap">
@@ -510,14 +511,14 @@
 															</td>
 														</g:each>
 													</g:if>
-													<td class="right nowrap">	    	
+													<td class="right nowrap">
 														<span class="${(entry?.quantityTransferredOut>0)?'debit':'credit'}">${entry?.quantityTransferredOut?:0}</span>
-												    	<g:if test="${command.showTransferBreakdown && !params.print }">														
+												    	<g:if test="${command.showTransferBreakdown && !params.print }">
 												    		<img src="${createLinkTo(dir:'images/icons/silk',file:'magnifier.png')}" class="show-details middle"/>
 												    		<div class="hidden details">
 												    			<g:if test="${entry.quantityTransferredOutByLocation }">
 												    				<h2>
-													    				<table>	
+													    				<table>
 													    					<tr class="unhighlight">
 													    						<td class="left middle">
 													    							<label>
@@ -525,11 +526,11 @@
 														    						</label>
 													    						</td>
 													    						<td class="right middle">
-															    					<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>										    						
+															    					<img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" class="close-details middle"/>
 													    						</td>
 													    					</tr>
 													    				</table>
-												    				</h2>											    			
+												    				</h2>
 													    			<table>
 													    				<thead>
 													    					<tr>
@@ -546,7 +547,7 @@
 															    				<tr class="${xoutStatus%2?'even':'odd' }">
 															    					<td>
 																	    				${xferOutMapEntry.key }
-																	    				
+
 																	    			</td>
 																	    			<td class="right">
 																		    			${xferOutMapEntry.value }
@@ -571,16 +572,16 @@
 												    		</div>
 												    	</g:if>
 													</td>
-													<td class="right nowrap">	    	
+													<td class="right nowrap">
 											    		<span class="${(entry?.quantityExpired>0)?'debit':'credit'}">${entry?.quantityExpired ?: 0}</span>
 													</td>
-													<td class="right nowrap">	    	
+													<td class="right nowrap">
 											    		<span class="${(entry?.quantityConsumed>0)?'debit':'credit'}">${entry?.quantityConsumed ?: 0}</span>
 													</td>
-													<td class="right nowrap">	    	
+													<td class="right nowrap">
 											    		<span class="${(entry?.quantityDamaged>0)?'debit':'credit'}">${entry?.quantityDamaged ?: 0}</span>
 													</td>
-													<td class="right nowrap">	    	
+													<td class="right nowrap">
 											    		<span class="${(entry?.quantityLost>=0)?'credit':'debit'}">${entry?.quantityLost ?: 0}</span>
 													</td>
 													<td class="right total nowrap">
@@ -596,9 +597,9 @@
 								</div>
 								<br/>
 							</g:each>
-				    	</div>			
-				    	
-				    </g:else>	
+				    	</div>
+
+				    </g:else>
 				</td>
 			</tr>
 		</table>
@@ -607,21 +608,21 @@
 		    function showDetails() {
 				//$(this).children(".actions").show();
 			}
-			
-			function hideDetails() { 
+
+			function hideDetails() {
 				$(this).parent().children(".details").hide();
-			}	    
-			
+			}
+
 			$(document).ready(function() {
 
-				/*  
+				/*
 				$(".details").hoverIntent({
 					sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
 					interval: 5,   // number = milliseconds for onMouseOver polling interval
 					over: showActions,     // function = onMouseOver callback (required)
 					timeout: 100,   // number = milliseconds delay before onMouseOut
 					out: hideActions       // function = onMouseOut callback (required)
-				});  
+				});
 				*/
 				/*
 				$(".show-details").mouseout(function() {
@@ -632,27 +633,27 @@
 				});
 				*/
 
-				$(".close-details").click(function(event) { 
+				$(".close-details").click(function(event) {
 					$(".details").hide();
 				});
-				
-				
+
+
 				$(".show-details").click(function(event) {
 					//show the menu directly over the placeholder
 					var details = $(this).parent().children(".details");
 
-					// Need to toggle before setting the position 
+					// Need to toggle before setting the position
 					details.toggle();
 
 					// Set the position for the actions menu
 				    details.position({
 						my: "left top",
-						at: "left bottom",				  
+						at: "left bottom",
 						of: $(this).closest(".show-details"),
 						//offset: "0 0"
 						collision: "flip"
 					});
-					
+
 					// To prevent the action button from POST'ing to the server
 					event.preventDefault();
 				});
@@ -664,11 +665,11 @@
 					over: showDetails,     // function = onMouseOver callback (required)
 					timeout: 100,   // number = milliseconds delay before onMouseOut
 					out: hideDetails       // function = onMouseOut callback (required)
-				});  
+				});
 
-			    // Open / Close Panel According to Cookie //    
+			    // Open / Close Panel According to Cookie //
 			    /*
-			    if ($.cookie('panel') == 'open'){    
+			    if ($.cookie('panel') == 'open'){
 			        $('#parameters').slideDown('fast'); // Show on Page Load / Refresh with Animation
 			        $('#parameters').show(); // Show on Page Load / Refresh without Animation
 			        $("#hideParameters").show();
@@ -680,7 +681,7 @@
 			        $("#showParameters").show();
 			    }
 				*/
-				function toggleParameters() { 
+				function toggleParameters() {
 					$('#parameters').slideToggle('fast', function(){
 			            if ($(this).is(':hidden')) {
 			                $.cookie('panel', 'closed');
@@ -689,15 +690,15 @@
 			            }
 			        });
 				}
-				
-			    
+
+
 			    // Toggle Panel and Set Cookie //
-			    $('.toggleParameters').click(function(){        
+			    $('.toggleParameters').click(function(){
 			        toggleParameters();
 			        $(".toggleParameters").toggle();
-			        
+
 			    });
-				
+
 			});
 
 	    </script>
