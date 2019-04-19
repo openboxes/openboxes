@@ -26,7 +26,7 @@
             </not>
         </preConditions>
         <addColumn tableName="inventory_snapshot">
-            <column name="product_code" type="VARCHAR(100)">
+            <column name="product_code" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
@@ -38,7 +38,7 @@
             </not>
         </preConditions>
         <addColumn tableName="inventory_snapshot">
-            <column name="lot_number" type="VARCHAR(100)" defaultValue="DEFAULT">
+            <column name="lot_number" type="VARCHAR(255)" defaultValue="DEFAULT">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
@@ -62,7 +62,7 @@
             </not>
         </preConditions>
         <addColumn tableName="inventory_snapshot">
-            <column name="bin_location_name" type="VARCHAR(100)" defaultValue="DEFAULT">
+            <column name="bin_location_name" type="VARCHAR(255)" defaultValue="DEFAULT">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
