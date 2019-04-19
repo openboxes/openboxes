@@ -46,11 +46,6 @@ class DashboardService {
                     between("dateRequested", date-30, date)
                 }
                 projections {
-                    //product {
-                    //    groupProperty('id')
-                    //    groupProperty('name')
-                    //    groupProperty('productCode')
-                    //}
                     groupProperty("product")
                     countDistinct('id', "occurrences")
                     sum("quantity", "quantity")
@@ -61,7 +56,6 @@ class DashboardService {
             }
 
             def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-            //println "quantityMap: " + quantityMap
 
             def count = 1;
             data.results = results.collect {
@@ -72,8 +66,6 @@ class DashboardService {
                         id: it[0].id,
                         productCode: it[0].productCode,
                         name: it[0].name,
-                        //genericProduct: it[0]?.genericProduct?.name?:"",
-                        category: it[0]?.category?.name?:"",
                         requisitionCount: it[1],
                         quantityRequested: it[2],
                         quantityOnHand: quantityOnHand,
@@ -95,8 +87,11 @@ class DashboardService {
         def expirationAlerts = getExpirationAlerts(location)
         expirationAlerts.groupBy { it?.inventoryItem?.expires }.each { key, value ->
             expirationSummary[key] = value.size()
-
         }
+
+        // FIXME Clean this up a bit
+        expirationSummary["totalExpiring"] = expirationSummary.findAll { it.key != "never" }.values().sum()
+
         return expirationSummary
     }
 
@@ -106,7 +101,6 @@ class DashboardService {
         def expirationAlerts = []
         def today = new Date()
         def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
-
         quantityMap.each { key, value ->
             if (value > 0) {
                 def daysToExpiry = key.expirationDate ? (key.expirationDate - today) : null
@@ -139,7 +133,8 @@ class DashboardService {
 
         log.debug expiredStock
 
-        Map<InventoryItem, Integer> quantityMap = getQuantityByLocation(location)
+        Map<InventoryItem, Integer> quantityMap =
+                inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
 
         // FIXME poor man's filter
@@ -159,21 +154,22 @@ class DashboardService {
      * @param threshold the threshold filter
      * @return a list of inventory items
      */
-    List getExpiringStock(Category category, Location location, Integer threshold) {
+    List getExpiringStock(Category category, Location location, String expirationStatus) {
         long startTime = System.currentTimeMillis()
 
         def today = new Date();
-
         // Get all stock expiring ever (we'll filter later)
         def expiringStock = InventoryItem.findAllByExpirationDateGreaterThan(today + 1, [sort: 'expirationDate', order: 'asc']);
-        def quantityMap = getQuantityByLocation(location)
+        def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
         if (category) {
             expiringStock = expiringStock.findAll { item -> item?.product?.category == category }
         }
 
-        if (threshold) {
-            expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshold) }
+        if (expirationStatus) {
+            expiringStock = expiringStock.findAll { inventoryItem ->
+                (inventoryItem.expirationStatus == expirationStatus)
+            }
         }
         log.debug "Get expiring stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return expiringStock
@@ -350,7 +346,12 @@ class DashboardService {
         def inventoryStatusMap = [:]
         quantityMap.each { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryStatusMap[product] = inventoryLevel?.statusMessage(quantity)?:"${inventoryLevel?.id}"
+            if (inventoryLevel) {
+                inventoryStatusMap[product] = inventoryLevel?.statusMessage(quantity)?:"${inventoryLevel?.id}"
+            }
+            else {
+                inventoryStatusMap[product] = quantity > 0 ? "IN_STOCK" : "STOCK_OUT"
+            }
 
         }
         return inventoryStatusMap

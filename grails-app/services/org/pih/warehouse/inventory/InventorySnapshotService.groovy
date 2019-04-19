@@ -11,12 +11,11 @@ package org.pih.warehouse.inventory
 
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
-import org.grails.datastore.mapping.query.api.Criteria
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
-import org.springframework.transaction.annotation.Transactional
-
 import java.sql.BatchUpdateException
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class InventorySnapshotService {
 
@@ -116,37 +115,46 @@ class InventorySnapshotService {
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
         def startTime = System.currentTimeMillis()
+        def batchSize = 1000
         def sql = new Sql(dataSource)
         if (sql) {
             try {
                 // Clear time in case caller did not
                 date.clearTime()
                 String dateString = date.format("yyyy-MM-dd HH:mm:ss")
-
+                DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 // Execute inventory snapshot insert/update in batches
-                sql.withBatch(1000) { stmt ->
+                sql.withBatch(batchSize) { stmt ->
                     binLocations.eachWithIndex { entry, index ->
 
                         def onHandQuantity = entry.quantity
                         String productId = "${StringEscapeUtils.escapeSql(entry.product?.id)}"
                         String productCode = "${StringEscapeUtils.escapeSql(entry.product?.productCode)}"
-                        String lotNumber = "${StringEscapeUtils.escapeSql(entry?.inventoryItem?.lotNumber)}" ?: "DEFAULT"
-                        String expirationDate = entry?.inventoryItem?.expirationDate ? "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.expirationDate.format("yyyy-MM-dd HH:mm:ss"))}'" : "NULL"
-                        String inventoryItemId = entry?.inventoryItem?.id ? "${StringEscapeUtils.escapeSql(entry?.inventoryItem?.id)}" : "NULL"
-                        String binLocationId = entry?.binLocation?.id ? "${StringEscapeUtils.escapeSql(entry?.binLocation?.id)}" : "NULL"
-                        String binLocationName = "${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}" ?: "DEFAULT"
+                        String lotNumber = entry?.inventoryItem?.lotNumber ?
+                                "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.lotNumber)}'" : "'DEFAULT'"
+                        String expirationDate = entry?.inventoryItem?.expirationDate ?
+                                "'${DATE_FORMAT.format(entry?.inventoryItem?.expirationDate)}'" : "NULL"
+                        String inventoryItemId = entry?.inventoryItem?.id ?
+                                "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.id)}'" : "NULL"
+                        String binLocationId = entry?.binLocation?.id ?
+                                "'${StringEscapeUtils.escapeSql(entry?.binLocation?.id)}'" : "NULL"
+                        String binLocationName = entry?.binLocation?.name ?
+                                "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
 
+                        // '${UUID.randomUUID().toString()}',
                         def insertStmt =
-                                "insert into inventory_snapshot(id, version, date, location_id, product_id, product_code," +
+                                "insert into inventory_snapshot(version, date, location_id, product_id, product_code," +
                                         "inventory_item_id, lot_number, expiration_date, bin_location_id, bin_location_name, " +
                                         "quantity_on_hand, date_created, last_updated) " +
-                                        "values ('${UUID.randomUUID().toString()}', 0, '${dateString}', '${location?.id}', " +
+                                        "values (0, '${dateString}', '${location?.id}', " +
                                         "'${productId}', '${productCode}', " +
-                                        "'${inventoryItemId}', '${lotNumber}', ${expirationDate}, " +
-                                        "'${binLocationId}', '${binLocationName}', ${onHandQuantity}, now(), now()) " +
+                                        "${inventoryItemId}, ${lotNumber}, ${expirationDate}, " +
+                                        "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) " +
                                         "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, version=version+1, last_updated=now()"
 
+
                         //log.info ("insertStmt: ${insertStmt}")
+
                         stmt.addBatch(insertStmt)
                     }
                     stmt.executeBatch()
@@ -155,7 +163,6 @@ class InventorySnapshotService {
                 log.error("Error executing batch update for location ${location.name}" + e.message, e)
             }
         }
-        log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${System.currentTimeMillis()-startTime}ms"
     }
 
     def getTransactionDates() {
@@ -408,26 +415,17 @@ class InventorySnapshotService {
     Map<Product, Integer> getQuantityOnHandByProduct(Location location, Date date) {
         def quantityMap = [:]
         if (date && location) {
-            log.info "getQuantityOnHandByProduct " + location + " " + date
-            def startTime = System.currentTimeMillis()
             def results = InventorySnapshot.executeQuery("""
-						select i.date, product, category.name, i.quantityOnHand
-						from InventorySnapshot i, Product product, Category category
+						select i.date, i.product, sum(i.quantityOnHand)
+						from InventorySnapshot i
+						inner join i.product
 						where i.location = :location
 						and i.date = :date
-						and i.product = product
-						and i.product.category = category
+						group by i.product
 						""", [location: location, date: date])
-
-            log.info "Results: " + results.size()
-            log.info "Query response time: " + (System.currentTimeMillis() - startTime)
-            startTime = System.currentTimeMillis()
-
-
             results.each {
-                quantityMap[it[1]] = it[3]
+                quantityMap[it[1]] = it[2]
             }
-            log.debug "Post-processing response time: " + (System.currentTimeMillis() - startTime)
         }
 
         return quantityMap
@@ -439,12 +437,10 @@ class InventorySnapshotService {
      * @param location
      * @return
      */
-    Map<Product, Map<Location, Integer>> getQuantityOnHandByProductAndLocation(Location[] locations) {
+    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations) {
         def quantityMap = [:]
         if (locations) {
             Date date = getMostRecentInventorySnapshotDate()
-            log.info "getQuantityOnHandByProductAndLocation " + locations + " " + date
-            def startTime = System.currentTimeMillis()
             def results = InventorySnapshot.executeQuery("""
 						select i.date, product, i.location, category.name, i.quantityOnHand
 						from InventorySnapshot i, Product product, Category category
@@ -454,31 +450,17 @@ class InventorySnapshotService {
 						and i.product.category = category
 						""", [locations: locations, date: date])
 
-            log.info "Results: " + results.size()
-            log.info "Query response time: " + (System.currentTimeMillis() - startTime)
-            startTime = System.currentTimeMillis()
-
-
             results.each {
                 if (!quantityMap[it[1]]) {
                     quantityMap[it[1]] = [:]
                 }
                 quantityMap[it[1]][it[2]?.id] = it[4]
             }
-            log.debug "Post-processing response time: " + (System.currentTimeMillis() - startTime)
         }
 
         return quantityMap
     }
 
-    /**
-     * Get the most recent date from the inventory item snapshot table.
-     *
-     * @return
-     */
-    Date getMostRecentInventoryItemSnapshotDate() {
-        return InventoryItemSnapshot.executeQuery('select max(date) from InventoryItemSnapshot')[0]
-    }
 
     /**
      * Get quantity on hand by inventory item for the given location and date.
@@ -487,44 +469,58 @@ class InventorySnapshotService {
      * @return
      */
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location) {
-        def startTime = System.currentTimeMillis()
         def quantityMap = [:]
-        Date date = getMostRecentInventoryItemSnapshotDate()
+        Date date = getMostRecentInventorySnapshotDate()
         if (location && date) {
-            def results = InventoryItemSnapshot.executeQuery("""
-						select iis.date, ii, product.category.name, iis.quantityOnHand
-						from InventoryItemSnapshot iis, Product product, Category category, InventoryItem ii
+            def results = InventorySnapshot.executeQuery("""
+						select ii, sum(iis.quantityOnHand)
+						from InventorySnapshot iis, InventoryItem ii
 						where iis.location = :location
 						and iis.date = :date
-						and iis.product = product
 						and iis.inventoryItem = ii
-						and iis.product.category = category
+						group by ii
 						""", [location: location, date: date])
 
-            log.info "Results: " + results.size()
-            log.info "Query response time: " + (System.currentTimeMillis() - startTime)
-            startTime = System.currentTimeMillis()
-
             results.each {
-                quantityMap[it[1]] = it[3]
+                quantityMap[it[0]] = it[1]
             }
-            log.info "Post-processing response time: " + (System.currentTimeMillis() - startTime)
         }
         return quantityMap
     }
 
-    def getInventoryItemSnapshot(Location location, Integer daysToExpiry) {
-        def results = InventoryItemSnapshot.executeQuery("""
-            SELECT a.inventoryItem, a.quantityOnHand, DATEDIFF(a.inventoryItem.expirationDate, current_date) as daysToExpiry
-            FROM InventoryItemSnapshot a
-            WHERE a.date = (select max(b.date) from InventoryItemSnapshot b)
-            AND a.location = :location
-            AND a.quantityOnHand > 0
-            AND DATEDIFF(a.inventoryItem.expirationDate, current_date) <= :daysToExpiry
-            ORDER BY a.inventoryItem.expirationDate ASC
-            """, [location:location, daysToExpiry:daysToExpiry])
-        return results
+    List getQuantityOnHandByBinLocation(Location location) {
+        def data = []
+        Date date = getMostRecentInventorySnapshotDate()
+        if (location && date) {
+            def results = InventorySnapshot.executeQuery("""
+						select 
+						    iis.product, 
+						    ii,
+						    iis.binLocation,
+						    iis.quantityOnHand
+						from InventorySnapshot iis
+						left outer join iis.inventoryItem ii
+						left outer join iis.binLocation bl
+						where iis.location = :location
+						and iis.date = :date
+						""", [location: location, date: date])
+            //data = results
+            def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
+            data = results.collect {
+                def product = it[0]
+                def inventoryItem = it[1]
+                def binLocation = it[2]
+                def quantity = it[3]
+
+                [
+                        status        : status(quantity),
+                        product       : product,
+                        inventoryItem : inventoryItem,
+                        binLocation   : binLocation,
+                        quantity      : quantity
+                ]
+            }
+        }
+        return data
     }
-
-
 }

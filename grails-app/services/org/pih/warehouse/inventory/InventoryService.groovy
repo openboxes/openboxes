@@ -1436,21 +1436,6 @@ class InventoryService implements ApplicationContextAware {
 		return quantityOnHand;
 	}
 
-    /**
-     * Get the most recent quantity on hand from inventory item snapshot table. If there are no
-     * records in the inventory item snapshot table then we calculate the QoH from transactions.
-     *
-     * @param location
-     * @return
-     */
-    Map<InventoryItem, Integer> getQuantityByLocation(Location location) {
-        Map<InventoryItem, Integer> quantityMap = getMostRecentInventoryItemSnapshot(location)
-        if (!quantityMap) {
-            quantityMap = getQuantityForInventory(location?.inventory)
-        }
-        return quantityMap;
-    }
-
 	/**
 	 * Calculate quantity on hand values for all available inventory items at the given inventory.
 	 *

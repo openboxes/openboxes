@@ -76,7 +76,6 @@
 
 
 				</tbody>
-                <%--
                 <tfoot>
                 <tr>
                     <th class="center" style="width: 1%">
@@ -93,7 +92,6 @@
                     </th>
                 </tr>
                 </tfoot>
-                --%>
             </table>
 		</div>
 	</div>
@@ -120,14 +118,14 @@
                 var lowStockCount = data.lowStock?data.lowStock:0;
                 var reorderStockCount = data.reorderStock?data.reorderStock:0;
                 var overStockCount = data.overStock?data.overStock:0;
-                //var totalStockCount = data.totalStock?data.totalStock:0;
+                var totalStockCount = data.totalStock?data.totalStock:0;
                 var onHandQuantityZeroCount = data.onHandQuantityZero?data.onHandQuantityZero:0;
 
                 $('#inStockCount').html("<a href='${request.contextPath}/inventory/listInStock' target='_blank'>" + inStockCount + "</a>");
                 $('#lowStockCount').html("<a href='${request.contextPath}/inventory/listLowStock' target='_blank'>" + lowStockCount + "</a>");
                 $('#reorderStockCount').html("<a href='${request.contextPath}/inventory/listReorderStock' target='_blank'>" + reorderStockCount + "</a>");
                 $('#overStockCount').html("<a href='${request.contextPath}/inventory/listOverStock' target='_blank'>" + overStockCount + "</a>");
-                //$('#totalStockCount').html("<a href='${request.contextPath}/inventory/listTotalStock' target='_blank'>" + totalStockCount + "</a>");
+                $('#totalStockCount').html("<a href='${request.contextPath}/inventory/listTotalStock' target='_blank'>" + totalStockCount + "</a>");
                 $('#onHandQuantityZeroCount').html("<a href='${request.contextPath}/inventory/listQuantityOnHandZero' target='_blank'>" + onHandQuantityZeroCount + "</a>");
 
             },
