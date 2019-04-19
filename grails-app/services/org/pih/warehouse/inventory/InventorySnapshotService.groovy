@@ -13,8 +13,6 @@ import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.Category
-
 import java.sql.BatchUpdateException
 import java.text.DateFormat
 import java.text.SimpleDateFormat

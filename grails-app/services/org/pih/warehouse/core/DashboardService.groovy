@@ -23,19 +23,6 @@ class DashboardService {
     def inventorySnapshotService
 
     /**
-     * Get the most recent quantity on hand from inventory item snapshot table. If there are no
-     * records in the inventory item snapshot table then we calculate the QoH from transactions.
-     *
-     * @param location
-     * @return
-     */
-    Map<InventoryItem, Integer> getQuantityByLocation(Location location) {
-        Map<InventoryItem, Integer> quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
-        return quantityMap;
-    }
-
-
-    /**
      * Get fast moving items based on requisition data.
      *
      * @param location
@@ -59,11 +46,6 @@ class DashboardService {
                     between("dateRequested", date-30, date)
                 }
                 projections {
-                    //product {
-                    //    groupProperty('id')
-                    //    groupProperty('name')
-                    //    groupProperty('productCode')
-                    //}
                     groupProperty("product")
                     countDistinct('id', "occurrences")
                     sum("quantity", "quantity")
@@ -74,7 +56,6 @@ class DashboardService {
             }
 
             def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-            //println "quantityMap: " + quantityMap
 
             def count = 1;
             data.results = results.collect {
@@ -85,8 +66,6 @@ class DashboardService {
                         id: it[0].id,
                         productCode: it[0].productCode,
                         name: it[0].name,
-                        //genericProduct: it[0]?.genericProduct?.name?:"",
-                        //category: it[0]?.category?.name?:"",
                         requisitionCount: it[1],
                         quantityRequested: it[2],
                         quantityOnHand: quantityOnHand,
@@ -188,7 +167,6 @@ class DashboardService {
         }
 
         if (expirationStatus) {
-            //expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshold) }
             expiringStock = expiringStock.findAll { inventoryItem ->
                 (inventoryItem.expirationStatus == expirationStatus)
             }

@@ -1545,10 +1545,6 @@ class JsonController {
 
         def data = inventoryService.getBinLocationSummary(binLocations)
         render(data as JSON)
-
-        //def binLocationReport = inventoryService.getBinLocationReport(location)
-        //render(binLocationReport["summary"] as JSON)
-
     }
 
     def getBinLocationReport = {
@@ -1607,7 +1603,7 @@ class JsonController {
         List activityList = []
         def currentUser = User.get(session?.user?.id)
         def location = Location.get(session.warehouse.id)
-        def daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):5
+        def daysToInclude = params.daysToInclude?Integer.parseInt(params.daysToInclude):7
 
         // Find recent requisition activity
         def requisitions = Requisition.executeQuery("""select distinct r from Requisition r where (r.isTemplate = false or r.isTemplate is null) and r.lastUpdated >= :lastUpdated and (r.origin = :origin or r.destination = :destination)""",
@@ -1737,14 +1733,5 @@ class JsonController {
 
         render ([aaData:activityList] as JSON)
     }
-
-
-    def getQuantityOnHandByInventoryItem = {
-        Location location = Location.get(session.warehouse.id)
-        def data = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
-
-        render ([count: data.size(), data: data] as JSON)
-    }
-
 
 }

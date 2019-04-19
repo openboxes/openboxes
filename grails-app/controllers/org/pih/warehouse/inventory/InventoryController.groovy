@@ -780,7 +780,7 @@ class InventoryController {
 		def categorySelected = (params.category) ? Category.get(params.category) : null;
 		def inventoryItems = dashboardService.getExpiredStock(categorySelected, location);
 		def categories = inventoryItems?.collect { it.product.category }?.unique()
-		def quantityMap = dashboardService.getQuantityByLocation(location)
+		def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         def expiredStockMap = [:]
 		inventoryItems.each { inventoryItem ->
             expiredStockMap[inventoryItem] = quantityMap[inventoryItem]
@@ -802,7 +802,7 @@ class InventoryController {
 		def category = (params.category) ? Category.get(params.category) : null;
 		def inventoryItems = dashboardService.getExpiringStock(category, location, expirationStatus)
 		def categories = inventoryItems?.collect { it?.product?.category }?.unique().sort { it.name } ;
-		def quantityMap = dashboardService.getQuantityByLocation(location)
+		def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         def expiringStockMap = [:]
 		inventoryItems.each { inventoryItem ->
             expiringStockMap[inventoryItem] = quantityMap[inventoryItem]
