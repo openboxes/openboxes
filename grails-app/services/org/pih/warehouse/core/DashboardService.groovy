@@ -108,8 +108,11 @@ class DashboardService {
         def expirationAlerts = getExpirationAlerts(location)
         expirationAlerts.groupBy { it?.inventoryItem?.expires }.each { key, value ->
             expirationSummary[key] = value.size()
-
         }
+
+        // FIXME Clean this up a bit
+        expirationSummary["totalExpiring"] = expirationSummary.findAll { it.key != "never" }.values().sum()
+
         return expirationSummary
     }
 
@@ -172,21 +175,23 @@ class DashboardService {
      * @param threshold the threshold filter
      * @return a list of inventory items
      */
-    List getExpiringStock(Category category, Location location, Integer threshold) {
+    List getExpiringStock(Category category, Location location, String expirationStatus) {
         long startTime = System.currentTimeMillis()
 
         def today = new Date();
-
         // Get all stock expiring ever (we'll filter later)
         def expiringStock = InventoryItem.findAllByExpirationDateGreaterThan(today + 1, [sort: 'expirationDate', order: 'asc']);
-        def quantityMap = getQuantityByLocation(location)
+        def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
         if (category) {
             expiringStock = expiringStock.findAll { item -> item?.product?.category == category }
         }
 
-        if (threshold) {
-            expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshold) }
+        if (expirationStatus) {
+            //expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshold) }
+            expiringStock = expiringStock.findAll { inventoryItem ->
+                (inventoryItem.expirationStatus == expirationStatus)
+            }
         }
         log.debug "Get expiring stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return expiringStock

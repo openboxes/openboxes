@@ -797,10 +797,10 @@ class InventoryController {
 
 
 	def listExpiringStock = {
-		def threshold = (params.threshold) ? params.threshold as int : 0;
+        def expirationStatus = params.status
+        def location = Location.get(session.warehouse.id)
 		def category = (params.category) ? Category.get(params.category) : null;
-		def location = Location.get(session.warehouse.id)
-		def inventoryItems = dashboardService.getExpiringStock(category, location, threshold)
+		def inventoryItems = dashboardService.getExpiringStock(category, location, expirationStatus)
 		def categories = inventoryItems?.collect { it?.product?.category }?.unique().sort { it.name } ;
 		def quantityMap = dashboardService.getQuantityByLocation(location)
         def expiringStockMap = [:]
@@ -816,7 +816,7 @@ class InventoryController {
         }
 
 		[inventoryItems:inventoryItems, quantityMap:quantityMap, categories:categories,
-			categorySelected:category, thresholdSelected:threshold ]
+			categorySelected:category, expirationStatus:expirationStatus ]
 	}
 
 
