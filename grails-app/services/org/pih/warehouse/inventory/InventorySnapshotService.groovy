@@ -418,15 +418,15 @@ class InventorySnapshotService {
         def quantityMap = [:]
         if (date && location) {
             def results = InventorySnapshot.executeQuery("""
-						select i.date, product, category.name, i.quantityOnHand
-						from InventorySnapshot i, Product product, Category category
+						select i.date, i.product, sum(i.quantityOnHand)
+						from InventorySnapshot i
+						inner join i.product
 						where i.location = :location
 						and i.date = :date
-						and i.product = product
-						and i.product.category = category
+						group by i.product
 						""", [location: location, date: date])
             results.each {
-                quantityMap[it[1]] = it[3]
+                quantityMap[it[1]] = it[2]
             }
         }
 

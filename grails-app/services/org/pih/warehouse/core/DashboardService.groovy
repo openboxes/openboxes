@@ -86,7 +86,7 @@ class DashboardService {
                         productCode: it[0].productCode,
                         name: it[0].name,
                         //genericProduct: it[0]?.genericProduct?.name?:"",
-                        category: it[0]?.category?.name?:"",
+                        //category: it[0]?.category?.name?:"",
                         requisitionCount: it[1],
                         quantityRequested: it[2],
                         quantityOnHand: quantityOnHand,
