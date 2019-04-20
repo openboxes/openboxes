@@ -119,7 +119,6 @@ grails.project.dependency.resolution = {
 
         // Moved from application.properties
         compile(":bubbling:2.1.4")
-        compile(":clickstream:0.2.0")
         compile(":codenarc:0.17")
         compile(":console:1.1")
         compile(":csv:0.3.1")

@@ -634,11 +634,6 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="admin" action="clickstream" class="list">
-                                    <g:message code="default.clickstream.label" default="Clickstream" />
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
                                 <g:link controller="admin" action="sendMail" class="list">
                                     <g:message code="config.sendMail.label" default="Email"/>
                                 </g:link>

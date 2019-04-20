@@ -209,7 +209,6 @@ log4j = {
             'org.apache.ddlutils'
 
 	info    'org.liquibase',
-            'com.opensymphony.clickstream',
             'org.codehaus.groovy.grails.web.pages',		// GSP			'com.mchange',
             'org.springframework',
 			'org.hibernate',

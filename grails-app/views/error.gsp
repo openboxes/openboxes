@@ -141,22 +141,9 @@
                         </td>
                     </tr>
 
-
-                    <g:hiddenField name="clickstream" value="${util.ClickstreamUtil.getClickstreamAsString(session.clickstream)}"/>
                     <g:hiddenField name="stacktrace" value="${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}"/>
 
                     <%--
-                    <tr class="prop">
-                        <td class="name">
-                            <label><warehouse:message code="error.clickstream.label" default="Clickstream"/></label>
-                        </td>
-                        <td class="value">
-                            <g:if test="${session.clickstream}">
-                                <g:textArea id="clickstream" name="clickstream" cols="120" rows="5"
-                                        placeholder="${warehouse.message(code:'error.clickstream.message')}">${util.ClickstreamUtil.getClickstreamAsString(session.clickstream)}</g:textArea>
-                            </g:if>
-                        </td>
-                    </tr>
                     <tr class="prop">
                         <td class="name">
                             <label><warehouse:message code="error.stacktrace.label" default="Stacktrace"/></label>
