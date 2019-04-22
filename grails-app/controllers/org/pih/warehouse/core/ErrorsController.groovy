@@ -10,13 +10,8 @@
 package org.pih.warehouse.core
 
 import grails.converters.JSON
-import org.apache.catalina.util.Base64
-import org.apache.commons.io.FileUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.pih.warehouse.user.DashboardController
 import org.pih.warehouse.util.RequestUtil
 import org.springframework.validation.BeanPropertyBindingResult
-import util.ClickstreamUtil
 import util.ConfigHelper;
 
 class ErrorsController {
@@ -160,17 +155,11 @@ class ErrorsController {
             }
 
             def dom = params.remove("dom")
-            def sessionId = session?.id
             def stacktrace = params.remove("stacktrace")
-            def clickstream = params.remove("clickstream")
-            def serverUrl = ConfigurationHolder.config.grails.serverURL
-            def clickstreamUrl = "${serverUrl}/stream/view/${sessionId}"
             def subject = "${params.summary?:warehouse.message(code: 'email.errorReportSubject.message')}"
-            def body = "${g.render(template:'/email/errorReport', model:[stacktrace:stacktrace, clickstream:clickstream, clickstreamUrl:clickstreamUrl], params:params)}"
+            def body = "${g.render(template:'/email/errorReport', model:[stacktrace:stacktrace], params:params)}"
 
-            //def clickstreamAsCsv = ClickstreamUtil.getClickstreamAsCsv(session.clickstream)
             mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html");
-            //mailService.sendHtmlMailWithAttachment(reportedBy, toList, ccList, subject, body.toString(), clickstreamAsCsv, "clickstream.csv", "text/csv");
             flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [recipients])}"
         }
         else {

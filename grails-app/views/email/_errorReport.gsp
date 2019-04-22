@@ -11,20 +11,11 @@
     ${stacktrace}
 </pre>
 
-<h3>Clickstream</h3>
-<pre>
-    ${clickstream}
-</pre>
-
 <h3>Properties</h3>
 <table>
     <tr>
         <th>session</th>
         <td>${session?.id}</td>
-    </tr>
-    <tr>
-        <th>clickstream</th>
-        <td>${clickstreamUrl}</td>
     </tr>
     <tr>
         <th>user</th>

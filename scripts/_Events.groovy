@@ -151,8 +151,4 @@ eventReactTestsFailed = { msg ->
 }
 
 eventCompileEnd = {
-    println "classesDirPath: " + classesDirPath
-    ant.copy(todir:classesDirPath) {
-        fileset(file:"${basedir}/grails-app/conf/clickstream.xml")
-    }
 }
