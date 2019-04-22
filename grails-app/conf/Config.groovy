@@ -7,14 +7,9 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/
-import it.openutils.log4j.AlternateSMTPAppender;
 import grails.util.GrailsUtil
-import org.apache.log4j.AsyncAppender
-import org.apache.log4j.Level
-import org.apache.log4j.net.SMTPAppender
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.ReasonCode
-import org.pih.warehouse.log4j.net.DynamicSubjectSMTPAppender
 
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
