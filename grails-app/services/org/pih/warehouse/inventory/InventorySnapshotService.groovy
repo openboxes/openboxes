@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import groovy.sql.Sql
+import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
@@ -23,6 +24,7 @@ class InventorySnapshotService {
 
     def dataSource
     def inventoryService
+    def persistenceInterceptor
 
     def refreshInventorySnapshots(Date date) {
         deleteInventorySnapshots(date)
@@ -41,9 +43,15 @@ class InventorySnapshotService {
     def populateInventorySnapshots(Date date) {
         def startTime = System.currentTimeMillis()
         def locations = getDepotLocations()
-        locations.each { location ->
-            log.debug "Creating or updating inventory snapshot for date ${date}, location ${location.name} ..."
-            populateInventorySnapshots(date, location)
+        GParsPool.withPool {
+            locations.eachParallel { Location location ->
+                persistenceInterceptor.init()
+                location = Location.get(location.id)
+                log.debug "Creating or updating inventory snapshot for date ${date}, location ${location.name} ..."
+                populateInventorySnapshots(date, location)
+                persistenceInterceptor.flush()
+                persistenceInterceptor.destroy()
+            }
         }
         log.info "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
     }
@@ -114,7 +122,6 @@ class InventorySnapshotService {
     }
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
-        def startTime = System.currentTimeMillis()
         def batchSize = 1000
         def sql = new Sql(dataSource)
         if (sql) {
