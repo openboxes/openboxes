@@ -292,7 +292,7 @@ class InventoryService implements ApplicationContextAware {
 		products = products?.sort() { map1, map2 -> map1.category <=> map2.category ?: map1.name <=> map2.name };
         log.info "Sort products " + (System.currentTimeMillis() - startTime) + " ms"
 
-		def inventoryLevelMap = InventoryLevel.findAllByInventory(commandInstance?.warehouseInstance?.inventory)?.groupBy { it.product }
+		def inventoryLevelMap = InventoryLevel.findAllByInventory(commandInstance?.warehouseInstance?.inventory)?.groupBy { it.productId }
         log.debug "Get inventory level map: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 
@@ -300,7 +300,7 @@ class InventoryService implements ApplicationContextAware {
 
 		products.each { product ->
 			def innerStartTime = System.currentTimeMillis()
-			def inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
+			def inventoryLevel = (inventoryLevelMap[product.id])?inventoryLevelMap[product.id][0]:null
 			if (inventoryLevel && inventoryLevel instanceof ArrayList) {
 				throw new Exception("Cannot have multiple inventory levels for a single product [" + product.productCode + ":" + product.name + "]: " + inventoryLevel)
 			}
