@@ -7,13 +7,14 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import fileDownload from 'js-file-download';
 import update from 'immutability-helper';
+import Alert from 'react-s-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import ArrayField from '../form-elements/ArrayField';
 import LabelField from '../form-elements/LabelField';
 import { renderFormField } from '../../utils/form-utils';
-import AdjustInventoryModal from './modals/AdjustInventoryModal';
+
 import EditPickModal from './modals/EditPickModal';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../actions';
 import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
@@ -111,26 +112,15 @@ const FIELDS = {
       },
       buttonAdjustInventory: {
         label: 'react.stockMovement.adjustInventory.label',
-        defaultMessage: 'Adjust inventory',
-        type: AdjustInventoryModal,
+        buttonLabel: 'react.stockMovement.adjustInventory.label',
+        buttonDefaultMessage: 'Adjust inventory',
+        type: ButtonField,
         fieldKey: '',
         flexWidth: '1.3',
         attributes: {
-          title: 'react.stockMovement.adjustInventory.label',
+          onClick: () => Alert.error('This feature is not available yet. Please adjust stock on the electronic stock card page.'),
+          className: 'btn btn-outline-primary',
         },
-        getDynamicAttr: ({
-          fieldValue, subfield, stockMovementId, fetchAdjustedItems, bins, locationId,
-        }) => ({
-          fieldValue: flattenRequest(fieldValue),
-          subfield,
-          stockMovementId,
-          btnOpenText: fieldValue.hasAdjustedInventory ? '' : 'react.stockMovement.adjust.label',
-          btnOpenDefaultText: fieldValue.hasAdjustedInventory ? '' : 'Adjust',
-          btnOpenClassName: fieldValue.hasAdjustedInventory ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
-          onResponse: fetchAdjustedItems,
-          bins,
-          locationId,
-        }),
       },
       revert: {
         type: ButtonField,
