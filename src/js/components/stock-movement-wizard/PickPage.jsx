@@ -111,9 +111,10 @@ const FIELDS = {
         }),
       },
       buttonAdjustInventory: {
-        label: 'react.stockMovement.adjustInventory.label',
-        buttonLabel: 'react.stockMovement.adjustInventory.label',
-        buttonDefaultMessage: 'Adjust inventory',
+        label: 'react.stockMovement.adjustStock.label',
+        defaultMessage: 'Adjust stock',
+        buttonLabel: 'react.stockMovement.adjustStock.label',
+        buttonDefaultMessage: 'Adjust stock',
         type: ButtonField,
         fieldKey: '',
         flexWidth: '1.3',
@@ -121,6 +122,9 @@ const FIELDS = {
           onClick: () => Alert.error('This feature is not available yet. Please adjust stock on the electronic stock card page.'),
           className: 'btn btn-outline-primary',
         },
+        getDynamicAttr: ({ subfield }) => ({
+          hidden: subfield,
+        }),
       },
       revert: {
         type: ButtonField,
