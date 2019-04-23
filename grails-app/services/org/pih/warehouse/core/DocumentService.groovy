@@ -22,25 +22,16 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
 import javax.xml.bind.JAXBException
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
-import org.apache.poi.hssf.usermodel.HSSFPatriarch
-import org.apache.poi.hssf.usermodel.HSSFPicture
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.CreationHelper
-import org.apache.poi.ss.usermodel.ClientAnchor
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-
 //import org.apache.poi.hssf.util.CellReference
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
@@ -174,31 +165,6 @@ class DocumentService {
 		convertToPdf(outputStream);
 	}
 
-	void renderLogo(workbook, sheet, object, defaultLogo, firstRow, lastRow, firstColumn, lastColumn, imagePositionX) {
-		int logoId =  null
-		if(object?.origin?.logo) {
-			logoId = workbook.addPicture(object?.origin?.logo, Workbook.PICTURE_TYPE_PNG)
-		} else {
-			def appContext = ApplicationHolder.application.parentContext
-			BufferedImage image2 = ImageIO.read(appContext.getResource(defaultLogo).getFile())
-			ByteArrayOutputStream baos = new ByteArrayOutputStream()
-			ImageIO.write(image2, "png", baos)
-			byte[] bytes = baos.toByteArray()
-			logoId = workbook.addPicture(bytes, Workbook.PICTURE_TYPE_PNG)
-		}
-
-		HSSFPatriarch drawing = sheet.createDrawingPatriarch()
-		ClientAnchor anchor = new HSSFClientAnchor()
-
-		anchor.setCol1(firstRow)
-		anchor.setCol2(lastRow)
-		anchor.setRow1(firstColumn)
-		anchor.setRow2(lastColumn)
-		anchor.setDx1(imagePositionX)
-		anchor.setDx2(imagePositionX)
-
-		HSSFPicture drawLogo = drawing.createPicture(anchor, logoId)
-	}
 
 	/**
 	 * Generate the Checklist from a template.
@@ -934,9 +900,6 @@ class DocumentService {
 			timestampStyle.setAlignment(CellStyle.ALIGN_RIGHT);
 			timestampStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
 
-			// LOGO
-			renderLogo(workbook, sheet, shipmentInstance, '/images/logo/logo-512x512.png', 5, 6, 0, 9, 0)
-
 			// SHIPMENT NAME
 			int counter = 0;
 			Row row = sheet.createRow((short)counter++);
@@ -1207,7 +1170,7 @@ class DocumentService {
 			CreationHelper createHelper = workbook.getCreationHelper();
 			Sheet sheet = workbook.createSheet();
 			sheet.setColumnWidth((short)0, (short) ((50 * 5) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)1, (short) ((50 * 5) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)1, (short) ((50 * 3) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)2, (short) ((50 * 7) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)3, (short) ((50 * 3) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)4, (short) ((50 * 3) / ((double) 1 / 20)))
@@ -1297,38 +1260,32 @@ class DocumentService {
 			// EMPTY ROW
 			row = sheet.createRow((short)counter++);
 
-			// LOGO
-			renderLogo(workbook, sheet, shipmentInstance, '/images/logo/logo-512x512.png', 0, 1, 2, 5, 500)
-
 			// SHIPMENT NUMBER
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(30.0)
-			row.createCell(2).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentNumber.label'))
-			row.getCell(2).setCellStyle(labelStyle)
-			row.createCell(3).setCellValue(shipmentInstance?.shipmentNumber)
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentNumber.label'))
+			row.getCell(0).setCellStyle(labelStyle)
+			row.createCell(1).setCellValue(shipmentInstance?.shipmentNumber)
 
 			// ORIGIN
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(30.0)
-			row.createCell(2, Cell.CELL_TYPE_STRING).setCellValue("" + getMessageTagLib().message(code:'shipping.origin.label'));
-			row.getCell(2).setCellStyle(labelStyle);
-			row.createCell(3).setCellValue(shipmentInstance?.origin?.name);
+			row.createCell(0, Cell.CELL_TYPE_STRING).setCellValue("" + getMessageTagLib().message(code:'shipping.origin.label'));
+			row.getCell(0).setCellStyle(labelStyle);
+			row.createCell(1).setCellValue(shipmentInstance?.origin?.name);
 
 			// DESTINATION
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(30.0)
-			row.createCell(2).setCellValue("" + getMessageTagLib().message(code:'shipping.destination.label'));
-			row.getCell(2).setCellStyle(labelStyle);
-			row.createCell(3).setCellValue(shipmentInstance?.destination?.name);
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.destination.label'));
+			row.getCell(0).setCellStyle(labelStyle);
+			row.createCell(1).setCellValue(shipmentInstance?.destination?.name);
 
 			// EMPTY ROW
 			row = sheet.createRow((short)counter++);
 
 			sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 8)) // Commercial Invoice
 			sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 8)) // Empty row
-			sheet.addMergedRegion(new CellRangeAddress(2, 2, 3, 5)) // Shipment number
-			sheet.addMergedRegion(new CellRangeAddress(3, 3, 3, 5)) // Origin
-			sheet.addMergedRegion(new CellRangeAddress(4, 4, 3, 5)) // Destination
+			sheet.addMergedRegion(new CellRangeAddress(2, 2, 1, 4)) // Shipment number
+			sheet.addMergedRegion(new CellRangeAddress(3, 3, 1, 4)) // Origin
+			sheet.addMergedRegion(new CellRangeAddress(4, 4, 1, 4)) // Destination
 
 			int CELL_INDEX = 0;
 
@@ -1541,7 +1498,7 @@ class DocumentService {
 			Sheet sheet = workbook.createSheet();
 			sheet.setColumnWidth((short)0, (short) ((50 * 4) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)1, (short) ((50 * 6) / ((double) 1 / 20)))
-			sheet.setColumnWidth((short)2, (short) ((50 * 4) / ((double) 1 / 20)))
+			sheet.setColumnWidth((short)2, (short) ((50 * 2) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)3, (short) ((50 * 4) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)4, (short) ((50 * 6) / ((double) 1 / 20)))
 			sheet.setColumnWidth((short)5, (short) ((50 * 6) / ((double) 1 / 20)))
@@ -1620,16 +1577,13 @@ class DocumentService {
 			tableDataDateStyle.setBorderTop((short)1);
 			tableDataDateStyle.setDataFormat(createHelper.createDataFormat().getFormat("MMMM dd, yyyy"));
 
-			// LOGO
-			renderLogo(workbook, sheet, stocklistInstance, '/images/hands.jpg', 0, 1, 0, 2, 500)
-
 			// SHIPMENT NUMBER
 			int counter = 0;
 			Row row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(35.0)
-			row.createCell(2).setCellValue("" + getMessageTagLib().message(code:'report.stockRequisition.label'))
-			row.getCell(2).setCellStyle(labelStyle)
-			row.createCell(3).setCellValue(stocklistInstance?.requisition?.name)
+			row.setHeightInPoints(20.0)
+			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'report.stockRequisition.label'))
+			row.getCell(0).setCellStyle(labelStyle)
+			row.createCell(1).setCellValue(stocklistInstance?.requisition?.name)
 
 			// For warehouse use
 			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'report.forWarehouseUse.label'))
@@ -1640,9 +1594,9 @@ class DocumentService {
 
 			// Destination
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(35.0)
-			row.createCell(2).setCellValue(stocklistInstance?.destination?.name)
-			row.getCell(2).setCellStyle(labelStyle)
+			row.setHeightInPoints(20.0)
+			row.createCell(0).setCellValue(stocklistInstance?.destination?.name)
+			row.getCell(0).setCellStyle(labelStyle)
 
 			// Approved by
 			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'deliveryNote.approvedBy.label'))
@@ -1652,7 +1606,7 @@ class DocumentService {
 
 			// Signature
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(30.0)
+			row.setHeightInPoints(20.0)
 			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'default.signature.label'))
 			row.getCell(6).setCellStyle(tableDataLeftStyle);
 			row.createCell(7).setCellValue("");
@@ -1660,7 +1614,7 @@ class DocumentService {
 
 			// Date
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(30.0)
+			row.setHeightInPoints(20.0)
 			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'default.date.label'))
 			row.getCell(6).setCellStyle(tableDataLeftStyle);
 			row.createCell(7).setCellValue("");
@@ -1668,7 +1622,7 @@ class DocumentService {
 
 			// Processed by
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(30.0)
+			row.setHeightInPoints(20.0)
 			row.createCell(6).setCellValue("" + getMessageTagLib().message(code:'requisition.processedBy.label'))
 			row.getCell(6).setCellStyle(tableDataLeftStyle);
 			row.createCell(7).setCellValue("");
@@ -1676,7 +1630,7 @@ class DocumentService {
 
 			// Date
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(30.0)
+			row.setHeightInPoints(20.0)
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'default.date.label'))
 			row.getCell(0).setCellStyle(tableDataLeftStyle);
 			row.createCell(1).setCellValue("");
@@ -1696,7 +1650,7 @@ class DocumentService {
 
 			// Requested by
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(30.0)
+			row.setHeightInPoints(20.0)
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'requisition.requestedBy.label'))
 			row.getCell(0).setCellStyle(tableDataLeftStyle);
 			row.createCell(1).setCellValue("");
@@ -1716,7 +1670,7 @@ class DocumentService {
 
 			// Signature
 			row = sheet.createRow((short)counter++);
-			row.setHeightInPoints(30.0)
+			row.setHeightInPoints(20.0)
 			row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'default.signature.label'))
 			row.getCell(0).setCellStyle(tableDataLeftStyle);
 			row.createCell(1).setCellValue("");
