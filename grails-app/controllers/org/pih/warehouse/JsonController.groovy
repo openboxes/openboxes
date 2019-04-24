@@ -1214,7 +1214,7 @@ class JsonController {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getQuantityByProductMap(session.warehouse.id)
-        def inventoryStatusMap = inventoryService.getInventoryStatusAndLevel(location)
+        def inventoryStatusMap = dashboardService.getInventoryStatusAndLevel(location)
         quantityMap.each { Product product, value ->
             def inventoryLevel = inventoryStatusMap[product]?.inventoryLevel
             def status = inventoryStatusMap[product]?.inventoryStatus
