@@ -396,7 +396,7 @@ class ReportController {
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        command.entries = inventoryService.getQuantityOnHandByProductAndLocation(command.locations)
+        command.entries = inventorySnapshotService.getQuantityOnHandByProduct(command.locations)
 
         if (params.button == "download") {
             def sw = new StringWriter()
