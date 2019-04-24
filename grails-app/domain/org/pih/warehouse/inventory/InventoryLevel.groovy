@@ -72,7 +72,7 @@ class InventoryLevel {
         preferred(nullable: true)
 	}
 
-    def statusMessage(Integer currentQuantity) {
+    def statusMessage(Long currentQuantity) {
         return InventoryUtil.getStatusMessage(status, minQuantity, reorderQuantity, maxQuantity, currentQuantity)
     }
 
