@@ -41,91 +41,9 @@
                                 <warehouse:message code="inventory.backToDashboard.label"/>
                             </g:link>
                         </div>
-%{--                        <div class="button-group">--}%
-%{--                            <div class="action-menu">--}%
-%{--                                <button class="action-btn button">--}%
-%{--                                    <img src="${resource(dir: 'images/icons/silk', file: 'table.png')}" />--}%
-%{--                                    <warehouse:message code="inventory.${actionName}.label"/>--}%
-%{--                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>--}%
-%{--                                </button>--}%
-%{--                                <div class="actions">--}%
-%{--                                    <div class="action-menu-item">--}%
-%{--                                        <g:link controller="inventory" action="listTotalStock" class="${'listTotalStock'.equals(actionName)?'active':''}">--}%
-%{--                                            <warehouse:message code="inventory.listTotalStock.label"/>--}%
-%{--                                        </g:link>--}%
-%{--                                    </div>--}%
-%{--                                    <div class="action-menu-item">--}%
-%{--                                        <g:link controller="inventory" action="listInStock" class="${'listInStock'.equals(actionName)?'active':''}">--}%
-%{--                                            <warehouse:message code="inventory.listInStock.label"/>--}%
-%{--                                        </g:link>--}%
-%{--                                    </div>--}%
-%{--                                    <div class="action-menu-item">--}%
-%{--                                        <g:link controller="inventory" action="listQuantityOnHandZero" class="${'listQuantityOnHandZero'.equals(actionName)?'active':''}">--}%
-%{--                                            <warehouse:message code="inventory.listQuantityOnHandZero.label"/>--}%
-%{--                                        </g:link>--}%
-%{--                                    </div>--}%
-%{--                                    <div class="action-menu-item">--}%
-%{--                                        <g:link controller="inventory" action="listOutOfStock" class="${'listOutOfStock'.equals(actionName)?'active':''}">--}%
-%{--                                            <warehouse:message code="inventory.listOutOfStock.label"/>--}%
-%{--                                        </g:link>--}%
-%{--                                    </div>--}%
-%{--                                    <div class="action-menu-item">--}%
-%{--                                        <g:link controller="inventory" action="listLowStock" class="${'listLowStock'.equals(actionName)?'active':''}">--}%
-%{--                                            <warehouse:message code="inventory.listLowStock.label"/>--}%
-%{--                                        </g:link>--}%
-%{--                                    </div>--}%
-%{--                                    <div class="action-menu-item">--}%
-%{--                                        <g:link controller="inventory" action="listReorderStock" class="${'listReorderStock'.equals(actionName)?'active':''}">--}%
-%{--                                            <warehouse:message code="inventory.listReorderStock.label"/>--}%
-%{--                                        </g:link>--}%
-%{--                                    </div>--}%
-%{--                                    <div class="action-menu-item">--}%
-%{--                                        <g:link controller="inventory" action="listOverStock" class="${'listOverStock'.equals(actionName)?'active':''}">--}%
-%{--                                            <warehouse:message code="inventory.listOverStock.label"/>--}%
-%{--                                        </g:link>--}%
-%{--                                    </div>--}%
-%{--                                    <div class="action-menu-item">--}%
-%{--                                        <g:link controller="inventory" action="listReconditionedStock" class="${'listReconditionedStock'.equals(actionName)?'active':''}">--}%
-%{--                                            <warehouse:message code="inventory.listReconditionedStock.label"/>--}%
-%{--                                        </g:link>--}%
-%{--                                    </div>--}%
-%{--                                </div>--}%
-%{--                            </div>--}%
-%{--                        </div>--}%
-%{--                        <div class="button-group">--}%
-%{--                            <div id="columnChooser" class="action-menu">--}%
-%{--                                <button class="action-btn button">--}%
-%{--                                    <img src="${resource(dir: 'images/icons/silk', file: 'table_column.png')}" style="vertical-align: middle"/>--}%
-%{--                                    Toggle Columns--}%
-%{--                                </button>--}%
-%{--                                <div class="actions left" style="padding: 5px;">--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="0" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.status.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="1" class="toggle-visibility" checked="true"><warehouse:message code="product.productCode.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="2" class="toggle-visibility" checked="true"><warehouse:message code="product.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="3" class="toggle-visibility" checked="true"><warehouse:message code="product.genericProduct.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="4" class="toggle-visibility" checked="true"><warehouse:message code="category.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="5" class="toggle-visibility" checked="true"><warehouse:message code="product.manufacturer.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="6" class="toggle-visibility" checked="true"><warehouse:message code="product.vendor.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="7" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.binLocation.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="8" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="9" class="toggle-visibility" checked="true"><warehouse:message code="product.unitOfMeasure.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="10" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="11" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="12" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="13" class="toggle-visibility" checked="true"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="14" class="toggle-visibility" checked="true"><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></label></div>--}%
-%{--                                    <div class="action-menu-item"><label><input type="checkbox" data-column="15" class="toggle-visibility" checked="true"><warehouse:message code="product.totalValue.label" default="Total Value"/></label></div>--}%
-
-%{--                                </div>--}%
-%{--                            </div>--}%
-%{--                        </div>--}%
-
                     </div>
 
                     <g:set var="totalStockValue" value="${0.00}"/>
-
-
-
                     <div class="box">
                         <h2>
                             <warehouse:message code="${controllerName}.${actionName}.label"/> -
@@ -154,7 +72,7 @@
                                 <g:each var="entry" in="${quantityMap.sort()}" status="i">
                                     <g:set var="product" value="${entry.key}"/>
                                     <g:set var="quantity" value="${entry.value}"/>
-                                    <g:set var="inventoryLevel" value="${inventoryLevelMap ? inventoryLevelMap[product?.id] : null}"/>
+                                    <g:set var="inventoryLevel" value="${entry?.key?.getInventoryLevel(session.warehouse.id)}"/>
                                     <tr>
                                         <td>
                                             <g:set var="status" value="${statusMap[product]}"/>

@@ -409,7 +409,6 @@ class JsonController {
         render map as JSON
     }
 
-    @Cacheable("dashboardCache")
     def getTotalStockValue = {
         def location = Location.get(session?.warehouse?.id)
         def result = dashboardService.getTotalStockValue(location)
@@ -1188,18 +1187,6 @@ class JsonController {
 		render json as JSON
 	}
 
-    /**
-     * Caches the quantity on hand values indexed by product.
-     *
-     * @param location
-     * @param products
-     * @return
-     */
-    //@Cacheable("dashboardCache")
-    Map<Product, Integer> getQuantityByProductMapCached(Location location, List<Product> products) {
-        return inventoryService.getQuantityByProductMap(location.inventory, products)
-    }
-
     @CacheFlush("quantityOnHandCache")
     def flushQuantityOnHandCache = {
         redirect(controller:"inventory", action: "analyze")
@@ -1214,7 +1201,7 @@ class JsonController {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
         def quantityMap = inventoryService.getQuantityByProductMap(session.warehouse.id)
-        def inventoryStatusMap = inventoryService.getInventoryStatusAndLevel(location)
+        def inventoryStatusMap = dashboardService.getInventoryStatusAndLevel(location)
         quantityMap.each { Product product, value ->
             def inventoryLevel = inventoryStatusMap[product]?.inventoryLevel
             def status = inventoryStatusMap[product]?.inventoryStatus
@@ -1498,12 +1485,6 @@ class JsonController {
         render ([label: "${product?.name}", location: "${location.name}", data:newData] as JSON);
     }
 
-
-
-    /**
-     * Dashboard > Fast movers
-     */
-    @Cacheable("fastMoversCache")
     def getFastMovers = {
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         def date = new Date()
@@ -1516,7 +1497,6 @@ class JsonController {
 
         render ([aaData: data?.results?:[]] as JSON)
     }
-
 
     def getOrderItem = {
         def orderItem = OrderItem.get(params.id)

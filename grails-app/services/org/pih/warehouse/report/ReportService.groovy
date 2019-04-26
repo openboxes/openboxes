@@ -57,6 +57,7 @@ class ReportService implements ApplicationContextAware {
     def sessionFactory
 	def productService
 	def inventoryService
+	def dashboardService
 	def shipmentService
 	def localizationService
 	def grailsApplication
@@ -384,7 +385,7 @@ class ReportService implements ApplicationContextAware {
         def startTime = System.currentTimeMillis()
         def location = Location.get(locationId)
 
-        def quantityMap = inventoryService.getInventoryStatusAndLevel(location)
+        def quantityMap = dashboardService.getInventoryStatusAndLevel(location)
 		def hasRoleFinance = userService.hasRoleFinance()
 
         quantityMap.each { Product product, Map map ->

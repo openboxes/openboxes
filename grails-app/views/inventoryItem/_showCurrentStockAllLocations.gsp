@@ -33,7 +33,7 @@
                         <g:each in="${locations}" var="locationEntry">
                             <tr class="prop">
                                 <td class="middle">
-                                    <g:link controller="dashboard" action="chooseLocation" id="${it?.location?.id}" class="button">
+                                    <g:link controller="dashboard" action="chooseLocation" id="${locationEntry?.location?.id}" class="button">
                                         <g:message code="default.button.show.label"/>
                                     </g:link>
                                 </td>
