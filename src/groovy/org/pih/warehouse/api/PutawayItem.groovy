@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.validation.Validateable
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
@@ -26,6 +27,7 @@ class PutawayItem {
     Location putawayLocation
     Person recipient
     BigDecimal quantity
+    Integer quantityAvailable
     List<AvailableItem> availableItems
     PutawayStatus putawayStatus
     Transaction transaction
@@ -35,10 +37,14 @@ class PutawayItem {
     Boolean delete = Boolean.FALSE
     List<PutawayItem> splitItems = []
 
+    static constrants = {
+        quantityAvailable(nullable:true)
+    }
+
     String getCurrentBins() {
         String currentBins = ""
         if (availableItems) {
-            currentBins = availableItems?.collect { it?.binLocation?.name }?.sort()?.join(", ")
+            currentBins = availableItems?.findAll { !it?.binLocation?.supports(ActivityCode.RECEIVE_STOCK) }?.collect { it?.binLocation?.name }?.unique()?.sort()?.join(", ")
         }
         return currentBins
     }
@@ -114,6 +120,7 @@ class PutawayItem {
                 "putawayLocation.id": putawayLocation?.id,
                 "putawayLocation.name": putawayLocation?.name,
                 quantity: quantity,
+                quantityAvailable: quantityAvailable,
                 splitItems: splitItems.collect { it?.toJson() }
         ]
     }

@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1546354459620-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="consumption_fact"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="consumption_fact">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_key_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_key_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_key_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="DECIMAL(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_date_key_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_cost" type="DECIMAL(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_price" type="DECIMAL(19,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="date_dimension"/>
+            </not>
+        </preConditions>
+        <createTable tableName="date_dimension">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="day_of_month" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="day_of_week" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="month" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="month_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="month_year" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="week" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weekday_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="location_dimension"/>
+            </not>
+        </preConditions>
+        <createTable tableName="location_dimension">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_group_name" type="VARCHAR(255)"/>
+            <column name="location_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_number" type="VARCHAR(255)"/>
+            <column name="location_type_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_type_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_location_name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lot_dimension"/>
+            </not>
+        </preConditions>
+        <createTable tableName="lot_dimension">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiration_date" type="DATETIME"/>
+            <column name="inventory_item_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_number" type="VARCHAR(255)"/>
+            <column name="product_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="product_dimension"/>
+            </not>
+        </preConditions>
+        <createTable tableName="product_dimension">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="abc_class" type="VARCHAR(255)"/>
+            <column name="active" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="generic_product" type="VARCHAR(255)"/>
+            <column name="product_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_cost" type="DECIMAL(19,2)"/>
+            <column name="unit_price" type="DECIMAL(19,2)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="transaction_fact"/>
+            </not>
+        </preConditions>
+        <createTable tableName="transaction_fact">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_key_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_key_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_key_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="DECIMAL(19,2)"/>
+            <column name="transaction_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_date_key_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_type_key_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="transaction_type_dimension"/>
+            </not>
+        </preConditions>
+        <createTable tableName="transaction_type_dimension">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_type_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_type_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-20">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKA8B7A490A27827C2"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="location_key_id" baseTableName="consumption_fact"
+                                 constraintName="FKA8B7A490A27827C2" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location_dimension"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-21">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKA8B7A490D1F27172"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="lot_key_id" baseTableName="consumption_fact"
+                                 constraintName="FKA8B7A490D1F27172" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="lot_dimension"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-22">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKA8B7A49072882836"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_key_id" baseTableName="consumption_fact"
+                                 constraintName="FKA8B7A49072882836" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product_dimension"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-23">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKA8B7A490CA32CFEF"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="transaction_date_key_id" baseTableName="consumption_fact"
+                                 constraintName="FKA8B7A490CA32CFEF" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="date_dimension"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-26">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1E50D72DA27827C2"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="location_key_id" baseTableName="transaction_fact"
+                                 constraintName="FK1E50D72DA27827C2" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location_dimension"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-27">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1E50D72DD1F27172"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="lot_key_id" baseTableName="transaction_fact"
+                                 constraintName="FK1E50D72DD1F27172" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="lot_dimension"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-28">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1E50D72D72882836"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_key_id" baseTableName="transaction_fact"
+                                 constraintName="FK1E50D72D72882836" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product_dimension"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-29">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1E50D72DCA32CFEF"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="transaction_date_key_id" baseTableName="transaction_fact"
+                                 constraintName="FK1E50D72DCA32CFEF" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="date_dimension"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-30">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1E50D72DCA354381"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="transaction_type_key_id" baseTableName="transaction_fact"
+                                 constraintName="FK1E50D72DCA354381" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="transaction_type_dimension"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-31">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1143A95C8ABEBD5"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="location_id" baseTableName="location_dimension"
+                                 constraintName="FK1143A95C8ABEBD5" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-32">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK1E50D72DCA354381"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="lot_dimension"
+                                 constraintName="FKD2EAD9F8AA992CED" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-33">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKC73E1616DED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_dimension"
+                                 constraintName="FKC73E1616DED5FAE7" deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-34">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="date_dimension_date_idx"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="date_dimension_date_idx" tableName="date_dimension" unique="true">
+            <column name="date"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

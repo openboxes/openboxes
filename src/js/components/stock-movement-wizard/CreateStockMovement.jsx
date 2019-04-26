@@ -16,7 +16,7 @@ import DateField from '../form-elements/DateField';
 import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
-import { debouncedUsersFetch, debouncedLocationsFetch } from '../../utils/option-utils';
+import { debounceUsersFetch, debounceLocationsFetch } from '../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 function validate(values) {
@@ -59,12 +59,12 @@ const FIELDS = {
       showValueTooltip: true,
       openOnClick: false,
       autoload: false,
-      loadOptions: debouncedLocationsFetch,
       cache: false,
       options: [],
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
+      loadOptions: props.debouncedLocationsFetch,
       onChange: (value) => {
         if (value && props.destination && props.destination.id) {
           props.fetchStockLists(value, props.destination);
@@ -83,12 +83,12 @@ const FIELDS = {
       showValueTooltip: true,
       openOnClick: false,
       autoload: false,
-      loadOptions: debouncedLocationsFetch,
       cache: false,
       options: [],
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
+      loadOptions: props.debouncedLocationsFetch,
       onChange: (value) => {
         if (value && props.origin && props.origin.id) {
           props.fetchStockLists(props.origin, value);
@@ -118,12 +118,14 @@ const FIELDS = {
       showValueTooltip: true,
       openOnClick: false,
       autoload: false,
-      loadOptions: debouncedUsersFetch,
       cache: false,
       options: [],
       labelKey: 'name',
       filterOptions: options => options,
     },
+    getDynamicAttr: props => ({
+      loadOptions: props.debouncedUsersFetch,
+    }),
   },
   dateRequested: {
     type: DateField,
@@ -147,6 +149,12 @@ class CreateStockMovement extends Component {
       values: this.props.initialValues,
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
+
+    this.debouncedUsersFetch =
+      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
+
+    this.debouncedLocationsFetch =
+      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
   }
 
   componentDidMount() {
@@ -335,7 +343,7 @@ class CreateStockMovement extends Component {
             utils.changeValue(state, 'stocklist', () => null);
           },
         }}
-        render={({ mutators, handleSubmit, values }) => (
+        render={({ form: { mutators }, handleSubmit, values }) => (
           <form className="create-form" onSubmit={handleSubmit}>
             {_.map(
               FIELDS,
@@ -346,6 +354,8 @@ class CreateStockMovement extends Component {
                 origin: values.origin,
                 destination: values.destination,
                 isSuperuser: this.props.isSuperuser,
+                debouncedUsersFetch: this.debouncedUsersFetch,
+                debouncedLocationsFetch: this.debouncedLocationsFetch,
               }),
             )}
             <div>
@@ -364,6 +374,8 @@ const mapStateToProps = state => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -410,4 +422,6 @@ CreateStockMovement.propTypes = {
   /** Return true if current user is superuser */
   isSuperuser: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
 };

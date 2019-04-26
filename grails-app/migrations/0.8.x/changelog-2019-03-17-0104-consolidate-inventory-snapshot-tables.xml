@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1552802756393-0">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="inventory_snapshot" />
+        </preConditions>
+        <sql>
+            ALTER TABLE inventory_snapshot ENGINE = InnoDB;
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_snapshot" columnName="bin_location_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_snapshot">
+            <column name="bin_location_id" type="CHAR(38)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-2">
+        <validCheckSum>fab8d7d9ba1320fb5b47cbb6a9b2a8</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_snapshot" columnName="product_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_snapshot">
+            <column name="product_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-3">
+        <validCheckSum>d673c812e68dba1b451546882c35c272</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_snapshot" columnName="lot_number"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_snapshot">
+            <column name="lot_number" type="VARCHAR(255)" defaultValue="DEFAULT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_snapshot" columnName="expiration_date"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_snapshot">
+            <column name="expiration_date" type="DATETIME">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-5">
+        <validCheckSum>48bb51ba14eb7aea3429a43c714e3e3</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_snapshot" columnName="bin_location_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_snapshot">
+            <column name="bin_location_name" type="VARCHAR(255)" defaultValue="DEFAULT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-6">
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="inventory_snapshot_key"/>
+        </preConditions>
+        <dropUniqueConstraint constraintName="inventory_snapshot_key" tableName="inventory_snapshot"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="inventory_snapshot_key"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint constraintName="inventory_snapshot_key"
+                             tableName="inventory_snapshot"
+                             columnNames="date, location_id, product_code, lot_number, bin_location_name"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-8">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="FK740B547AA992CED"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="inventory_snapshot" constraintName="FK740B547AA992CED"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-9">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="FK740B5478ABEBD5"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="inventory_snapshot" constraintName="FK740B5478ABEBD5"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1552802756393-10">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="FK740B547DED5FAE7"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="inventory_snapshot" constraintName="FK740B547DED5FAE7"/>
+    </changeSet>
+
+</databaseChangeLog>

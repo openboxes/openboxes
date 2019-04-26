@@ -60,13 +60,17 @@ dataSource {
 // Hibernate caching properties
 hibernate {
     generate_statistics=false
-    cache.use_second_level_cache=true
+    cache.use_second_level_cache=false
     cache.use_query_cache=false
-    cache.provider_class='org.hibernate.cache.EhCacheProvider'
-    //default_batch_fetch_size = 16
-    //jdbc.batch_size = 10
-	//order_inserts = true
-	//order_updates = true
+	cache.use_minimal_puts=true
+	cache.provider_class='org.hibernate.cache.EhCacheProvider'
+	//cache.provider_class='net.sf.ehcache.hibernate.EhCacheProvider'
+
+	default_batch_fetch_size = 25
+	jdbc.fetch_size = 25
+    jdbc.batch_size = 15
+	order_inserts = true
+	order_updates = true
 	//jdbc.batch_versioned_data = true
     //max_fetch_depth = 5
 }

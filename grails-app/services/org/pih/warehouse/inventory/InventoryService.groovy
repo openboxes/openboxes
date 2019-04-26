@@ -32,12 +32,12 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
-import org.pih.warehouse.reporting.Consumption
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Errors
 
 import java.sql.BatchUpdateException
@@ -60,6 +60,8 @@ class InventoryService implements ApplicationContextAware {
     def messageService
 	def locationService
 	//def authService
+
+	static transactional = true
 
 	ApplicationContext applicationContext
 
@@ -290,7 +292,7 @@ class InventoryService implements ApplicationContextAware {
 		products = products?.sort() { map1, map2 -> map1.category <=> map2.category ?: map1.name <=> map2.name };
         log.info "Sort products " + (System.currentTimeMillis() - startTime) + " ms"
 
-		def inventoryLevelMap = InventoryLevel.findAllByInventory(commandInstance?.warehouseInstance?.inventory)?.groupBy { it.product }
+		def inventoryLevelMap = InventoryLevel.findAllByInventory(commandInstance?.warehouseInstance?.inventory)?.groupBy { it.productId }
         log.debug "Get inventory level map: " + (System.currentTimeMillis() - startTime) + " ms"
 		startTime = System.currentTimeMillis()
 
@@ -298,7 +300,7 @@ class InventoryService implements ApplicationContextAware {
 
 		products.each { product ->
 			def innerStartTime = System.currentTimeMillis()
-			def inventoryLevel = (inventoryLevelMap[product])?inventoryLevelMap[product][0]:null
+			def inventoryLevel = (inventoryLevelMap[product.id])?inventoryLevelMap[product.id][0]:null
 			if (inventoryLevel && inventoryLevel instanceof ArrayList) {
 				throw new Exception("Cannot have multiple inventory levels for a single product [" + product.productCode + ":" + product.name + "]: " + inventoryLevel)
 			}
@@ -562,444 +564,6 @@ class InventoryService implements ApplicationContextAware {
 		}
 		return inventoryItemQuantity;
 	}
-
-
-    def getExpirationSummary(location) {
-        def expirationSummary = [:]
-        def expirationAlerts = getExpirationAlerts(location)
-        expirationAlerts.groupBy { it?.inventoryItem?.expires }.each { key, value ->
-            expirationSummary[key] = value.size()
-
-        }
-        return expirationSummary
-    }
-
-    def getExpirationAlerts(location) {
-        def startTime = System.currentTimeMillis()
-
-        def expirationAlerts = []
-        def today = new Date()
-        def quantityMap = getQuantityOnHandByInventoryItem(location)
-
-        quantityMap.each { key, value ->
-            if (value > 0) {
-                def daysToExpiry = key.expirationDate ? (key.expirationDate - today) : null
-                expirationAlerts << [ id:  key.id, lotNumber: key.lotNumber, quantity: value,
-                    expirationDate: key.expirationDate, daysToExpiry: daysToExpiry,
-                    product: key.product.toJson(), inventoryItem: key.toJson()
-                ]
-            }
-        }
-
-        log.info "Expiration alerts: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        return expirationAlerts
-
-    }
-
-
-	def getInventoryItemSnapshot(Location location, Integer daysToExpiry) {
-        def results = InventoryItemSnapshot.executeQuery("""
-            SELECT a.inventoryItem, a.quantityOnHand, DATEDIFF(a.inventoryItem.expirationDate, current_date) as daysToExpiry
-            FROM InventoryItemSnapshot a
-            WHERE a.date = (select max(b.date) from InventoryItemSnapshot b)
-            AND a.location = :location
-            AND a.quantityOnHand > 0
-            AND DATEDIFF(a.inventoryItem.expirationDate, current_date) <= :daysToExpiry
-            ORDER BY a.inventoryItem.expirationDate ASC
-            """, [location:location, daysToExpiry:daysToExpiry])
-        return results
-	}
-
-
-	/**
-	 * Get all expired inventory items for the given category and location.
-	 *
-	 * @param category
-	 * @param location
-	 * @return
-	 */
-	List getExpiredStock(Category category, Location location) {
-
-		long startTime = System.currentTimeMillis()
-
-		// Stock that has already expired
-		def expiredStock = InventoryItem.findAllByExpirationDateLessThan(new Date(), [sort: 'expirationDate', order: 'desc']);
-
-		log.debug expiredStock
-
-		Map<InventoryItem, Integer> quantityMap = getQuantityByLocation(location)
-		expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
-
-		// FIXME poor man's filter
-		if (category) {
-			expiredStock = expiredStock.findAll { item -> item?.product?.category == category }
-		}
-
-        log.debug "Get expired stock: " + (System.currentTimeMillis() - startTime) + " ms"
-		return expiredStock
-
-	}
-
-	/**
-	 * Get all inventory items that are expiring within the given threshold.
-	 *
-	 * @param category the category filter
-	 * @param threshold the threshold filter
-	 * @return a list of inventory items
-	 */
-	List getExpiringStock(Category category, Location location, Integer threshold) {
-		long startTime = System.currentTimeMillis()
-
-		def today = new Date();
-
-		// Get all stock expiring ever (we'll filter later)
-		def expiringStock = InventoryItem.findAllByExpirationDateGreaterThan(today + 1, [sort: 'expirationDate', order: 'asc']);
-		def quantityMap = getQuantityByLocation(location)
-		expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
-		if (category) {
-			expiringStock = expiringStock.findAll { item -> item?.product?.category == category }
-		}
-
-		if (threshold) {
-			expiringStock = expiringStock.findAll { item -> (item?.expirationDate && (item?.expirationDate - today) <= threshold) }
-		}
-        log.debug "Get expiring stock: " + (System.currentTimeMillis() - startTime) + " ms"
-		return expiringStock
-	}
-
-
-    def getReconditionedStock(Location location) {
-        long startTime = System.currentTimeMillis()
-        def quantityMap = getCurrentInventory(location)
-        def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
-        log.debug "Get reconditioned stock: " + (System.currentTimeMillis() - startTime) + " ms"
-        return reconditionedStock
-    }
-
-
-    def getTotalStock(Location location) {
-        long startTime = System.currentTimeMillis()
-        def quantityMap = getCurrentInventory(location)
-        log.debug "Get total stock: " + (System.currentTimeMillis() - startTime) + " ms"
-        return quantityMap
-    }
-
-    def getInStock(Location location) {
-        long startTime = System.currentTimeMillis()
-        def quantityMap = getCurrentInventory(location)
-        def inStock = quantityMap.findAll { it.value > 0 }
-        log.debug "Get in stock: " + (System.currentTimeMillis() - startTime) + " ms"
-        return inStock
-    }
-
-
-    def getTotalStockValue(Location location) {
-        def hitCount = 0;
-        def missCount = 0;
-        def totalCount = 0;
-        def totalStockValue = 0.0
-		def stockValueByProduct = [:]
-        if (location.inventory) {
-            def quantityMap = getCurrentInventory(location)
-            quantityMap.each { product, quantity ->
-                if (product.pricePerUnit) {
-                    def stockValueForProduct = product.pricePerUnit * quantity
-					if (stockValueForProduct > 0) {
-						stockValueByProduct[product] = stockValueForProduct
-						totalStockValue += stockValueForProduct
-					}
-                    hitCount++
-                }
-                else {
-                    missCount++
-                }
-            }
-            totalCount = quantityMap?.keySet()?.size()
-        }
-        return [totalStockValue:totalStockValue, hitCount: hitCount, missCount: missCount, totalCount:totalCount, stockValueByProduct:stockValueByProduct]
-
-    }
-
-
-    def getDashboardAlerts(Location location) {
-		log.info "Dashboard alerts for ${location}"
-
-        long startTime = System.currentTimeMillis()
-        def quantityMap = getCurrentInventory(location)
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        log.info inventoryLevelMap.keySet().size()
-
-        def totalStock = quantityMap
-        def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
-        def onHandQuantityZero = quantityMap.findAll { it.value <= 0 }
-        def inStock = quantityMap.findAll { it.value > 0 }
-
-        //def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
-        def outOfStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
-        }
-
-        def lowStock = quantityMap.findAll { product,quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity > 0 && quantity <= minQuantity
-        }
-
-        def reorderStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
-            def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && minQuantity > 0 && quantity <= reorderQuantity
-        }
-
-        def healthyStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
-            def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity > reorderQuantity && quantity <= maxQuantity
-        }
-
-
-        def overStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && maxQuantity && quantity > maxQuantity
-        }
-
-        def outOfStockClassA = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == "A"
-        }
-
-        def outOfStockClassB = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == "B"
-        }
-
-        def outOfStockClassC = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == "C"
-        }
-
-        def outOfStockClassNone = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == null
-        }
-
-
-
-        //println lowStock.keySet().size()
-        log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
-        //return lowStock
-
-        [   lowStock: lowStock.keySet().size(),
-                lowStockCost: getTotalCost(lowStock),
-            reorderStock: reorderStock.keySet().size(),
-                reorderStockCost: getTotalCost(reorderStock),
-            overStock: overStock.keySet().size(),
-                overStockCost: getTotalCost(overStock),
-            totalStock: totalStock.keySet().size(),
-                totalStockCost: getTotalCost(totalStock),
-            reconditionedStock: reconditionedStock.keySet().size(),
-                reconditionedStockCost: getTotalCost(reconditionedStock),
-            healthyStock: healthyStock.keySet().size(),
-                healthyStockCost: getTotalCost(healthyStock),
-            outOfStock:outOfStock.keySet().size(),
-                outOfStockCost: getTotalCost(outOfStock),
-            outOfStockClassA:outOfStockClassA.keySet().size(),
-                outOfStockCostClassA: getTotalCost(outOfStockClassA),
-            outOfStockClassB:outOfStockClassB.keySet().size(),
-                outOfStockCostClassB: getTotalCost(outOfStockClassB),
-            outOfStockClassC:outOfStockClassC.keySet().size(),
-                outOfStockCostClassC: getTotalCost(outOfStockClassC),
-            outOfStockClassNone:outOfStockClassNone.keySet().size(),
-                outOfStockCostClassNone: getTotalCost(outOfStockClassNone),
-
-            onHandQuantityZero:onHandQuantityZero.keySet().size(),
-                onHandQuantityZeroCost: getTotalCost(onHandQuantityZero),
-            inStock:inStock.keySet().size(),
-                inStockCost: getTotalCost(inStock),
-        ]
-    }
-
-
-    def getTotalCost(quantityMap) {
-        def totalCost = 0;
-        quantityMap.each { k,v ->
-            totalCost += k.pricePerUnit?:0 * v?:0
-        }
-        return totalCost;
-    }
-
-    def getInventoryStatus(Location location) {
-        def quantityMap = getCurrentInventory(location)
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        def inventoryStatusMap = [:]
-        quantityMap.each { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryStatusMap[product] = inventoryLevel?.statusMessage(quantity)?:"${inventoryLevel?.id}"
-
-        }
-        return inventoryStatusMap
-    }
-
-    /**
-     * Get inventory status, inventory level and quantity on hand for all products.
-     *
-     * @param location
-     * @return
-     */
-    def getInventoryStatusAndLevel(Location location) {
-        def quantityMap = getCurrentInventory(location)
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        def inventoryStatusMap = [:]
-        quantityMap.each { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def status = inventoryLevel?.statusMessage(quantity)?:"NONE"
-            inventoryStatusMap[product] = [inventoryLevel:inventoryLevel,status:status,onHandQuantity:quantity]
-        }
-        return inventoryStatusMap
-    }
-
-    /**
-     * Get inventory status for a single inventory level
-     *
-     * @param inventoryLevel
-     * @param quantity
-     * @return
-     */
-    /*
-    def getInventoryStatus(inventoryLevel, quantity) {
-        def status = ""
-        if (inventoryLevel?.status >= InventoryStatus.SUPPORTED  || !inventoryLevel?.status) {
-            if (quantity <= 0) {
-                status = "STOCK_OUT"
-            }
-            else if (inventoryLevel?.minQuantity && quantity <= inventoryLevel?.minQuantity) {
-                status = "LOW_STOCK"
-            }
-            else if (inventoryLevel?.reorderQuantity && quantity <= inventoryLevel?.reorderQuantity ) {
-                status = "REORDER"
-            }
-            else if (inventoryLevel?.maxQuantity && quantity > inventoryLevel?.maxQuantity && inventoryLevel?.maxQuantity > 0) {
-                status = "OVERSTOCK"
-            }
-            else {
-                status = "IN_STOCK"
-            }
-        }
-        else if (inventoryLevel?.status == InventoryStatus.NOT_SUPPORTED) {
-            status = "NOT_SUPPORTED"
-        }
-        else if (inventoryLevel?.status == InventoryStatus.SUPPORTED_NON_INVENTORY) {
-            status = "SUPPORTED_NON_INVENTORY"
-        }
-        else {
-            status = "UNAVAILABLE"
-        }
-        return status
-    }*/
-
-
-    def getQuantityOnHandZero(Location location) {
-        long startTime = System.currentTimeMillis()
-        def quantityMap = getCurrentInventory(location)
-        //def stockOut = quantityMap.findAll { it.value <= 0 }
-
-        //def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        def stockOut = quantityMap.findAll { product, quantity ->
-            //def inventoryLevel = inventoryLevelMap[product]?.first()
-            quantity <= 0
-        }
-
-        log.info "Get quantity on hand zero: " + (System.currentTimeMillis() - startTime) + " ms"
-        return stockOut
-
-    }
-
-    def getOutOfStock(Location location, String abcClass) {
-        long startTime = System.currentTimeMillis()
-        def quantityMap = getCurrentInventory(location)
-        //def stockOut = quantityMap.findAll { it.value <= 0 }
-
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        def stockOut = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            if (abcClass)
-                inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && (abcClass == inventoryLevel.abcClass)
-            else
-                inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
-        }
-
-        log.info "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
-        return stockOut
-    }
-
-
-    def getLowStock(Location location) {
-		long startTime = System.currentTimeMillis()
-		def quantityMap = getCurrentInventory(location)
-        log.info ("getQuantityByProductMap: " + (System.currentTimeMillis() - startTime) + " ms")
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        log.info ("getInventoryLevelMap: " + (System.currentTimeMillis() - startTime) + " ms")
-        log.info inventoryLevelMap.keySet().size()
-		//def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
-        def lowStock = quantityMap.findAll { product,quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity <= minQuantity
-        }
-        log.info "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
-		return lowStock
-	}
-
-	def getReorderStock(Location location) {
-		long startTime = System.currentTimeMillis()
-		def quantityMap = getCurrentInventory(location)
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-		def reorderStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && quantity <= reorderQuantity
-        }
-        log.info "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
-		return reorderStock
-	}
-
-    def getOverStock(Location location) {
-        long startTime = System.currentTimeMillis()
-        def quantityMap = getCurrentInventory(location)
-        //def overStock = quantityMap.findAll { it.value > it?.key?.getInventoryLevel(location?.id)?.maxQuantity }
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        def overStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && maxQuantity && quantity > maxQuantity
-        }
-        log.info "Get over stock: " + (System.currentTimeMillis() - startTime) + " ms"
-        return overStock
-    }
-
-    def getHealthyStock(Location location) {
-        long startTime = System.currentTimeMillis()
-        def quantityMap = getCurrentInventory(location)
-        //def overStock = quantityMap.findAll { it.value > it?.key?.getInventoryLevel(location?.id)?.maxQuantity }
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-
-
-        def healthyStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
-            def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity > reorderQuantity && quantity <= maxQuantity
-        }
-        log.info "Get healthy stock: " + (System.currentTimeMillis() - startTime) + " ms"
-        return healthyStock
-    }
-
-
 
     /**
      * Get all products matching the given terms and categories.
@@ -1500,7 +1064,7 @@ class InventoryService implements ApplicationContextAware {
 		return binLocationMap
 	}
 
-
+	//@Transactional(readOnly = true)
     List getQuantityByBinLocation(Location location) {
         def startTime = System.currentTimeMillis()
         List binLocations
@@ -1592,7 +1156,6 @@ class InventoryService implements ApplicationContextAware {
                                 status        : status(quantity),
                                 value         : value,
                                 category      : product.category,
-                                genericProduct: product.genericProduct,
                                 product       : product,
                                 inventoryItem : inventoryItem,
                                 binLocation   : binLocation,
@@ -1660,162 +1223,6 @@ class InventoryService implements ApplicationContextAware {
 
 		return quantityMap
 	}
-
-    /**
-     * FIXME Remove once I've replaced all references with method below.
-     *
-     * @param location
-     * @return
-     */
-    Map<Product, Integer> getCurrentInventory(Location location) {
-        return getQuantityOnHandByProduct(location)
-    }
-
-    /**
-     * Get the most recent date in the inventory snapshot table.
-     *
-     * @return
-     */
-    Date getMostRecentInventorySnapshotDate() {
-        return InventorySnapshot.executeQuery('select max(date) from InventorySnapshot')[0]
-    }
-
-    /**
-     * Get the most recent date in the inventory snapshot table.
-     *
-     * @return
-     */
-    Date getLastUpdatedInventorySnapshotDate() {
-        return InventorySnapshot.executeQuery('select max(lastUpdated) from InventorySnapshot')[0]
-    }
-
-
-    /**
-     * Get the quantity on hand by product for the given location.
-     *
-     * @param location
-     * @return
-     */
-    Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
-        Date date = getMostRecentInventorySnapshotDate()
-
-        return getQuantityOnHandByProduct(location, date)
-    }
-
-    /**
-     * Get quantity on hand by product for the given location and date.
-	 *
-     * @param location
-     * @param date
-     * @return
-     */
-    Map<Product, Integer> getQuantityOnHandByProduct(Location location, Date date) {
-		def quantityMap = [:]
-		if (date && location) {
-			log.info "getQuantityOnHandByProduct " + location + " " + date
-			def startTime = System.currentTimeMillis()
-			def results = InventorySnapshot.executeQuery("""
-						select i.date, product, category.name, i.quantityOnHand
-						from InventorySnapshot i, Product product, Category category
-						where i.location = :location
-						and i.date = :date
-						and i.product = product
-						and i.product.category = category
-						""", [location: location, date: date])
-
-			log.info "Results: " + results.size()
-			log.info "Query response time: " + (System.currentTimeMillis() - startTime)
-			startTime = System.currentTimeMillis()
-
-
-			results.each {
-				quantityMap[it[1]] = it[3]
-			}
-			log.debug "Post-processing response time: " + (System.currentTimeMillis() - startTime)
-		}
-
-        return quantityMap
-    }
-
-	/**
-	 * Get quantity on hand by product for the given locations.
-	 *
-	 * @param location
-	 * @return
-	 */
-	Map<Product, Map<Location, Integer>> getQuantityOnHandByProductAndLocation(Location[] locations) {
-		def quantityMap = [:]
-		if (locations) {
-			Date date = getMostRecentInventorySnapshotDate()
-			log.info "getQuantityOnHandByProductAndLocation " + locations + " " + date
-			def startTime = System.currentTimeMillis()
-			def results = InventorySnapshot.executeQuery("""
-						select i.date, product, i.location, category.name, i.quantityOnHand
-						from InventorySnapshot i, Product product, Category category
-						where i.location in (:locations)
-						and i.date = :date
-						and i.product = product
-						and i.product.category = category
-						""", [locations: locations, date: date])
-
-			log.info "Results: " + results.size()
-			log.info "Query response time: " + (System.currentTimeMillis() - startTime)
-			startTime = System.currentTimeMillis()
-
-
-			results.each {
-				if (!quantityMap[it[1]]) {
-					quantityMap[it[1]] = [:]
-				}
-				quantityMap[it[1]][it[2]?.id] = it[4]
-			}
-			log.debug "Post-processing response time: " + (System.currentTimeMillis() - startTime)
-		}
-
-		return quantityMap
-	}
-
-    /**
-     * Get the most recent date from the inventory item snapshot table.
-     *
-     * @return
-     */
-    Date getMostRecentInventoryItemSnapshotDate() {
-        return InventoryItemSnapshot.executeQuery('select max(date) from InventoryItemSnapshot')[0]
-    }
-
-	/**
-     * Get quantity on hand by inventory item for the given location and date.
-	 *
-	 * @param location
-	 * @return
-     */
-    Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location) {
-        def startTime = System.currentTimeMillis()
-		def quantityMap = [:]
-        Date date = getMostRecentInventoryItemSnapshotDate()
-		if (location && date) {
-			def results = InventoryItemSnapshot.executeQuery("""
-						select iis.date, ii, product.category.name, iis.quantityOnHand
-						from InventoryItemSnapshot iis, Product product, Category category, InventoryItem ii
-						where iis.location = :location
-						and iis.date = :date
-						and iis.product = product
-						and iis.inventoryItem = ii
-						and iis.product.category = category
-						""", [location: location, date: date])
-
-			log.info "Results: " + results.size()
-			log.info "Query response time: " + (System.currentTimeMillis() - startTime)
-			startTime = System.currentTimeMillis()
-
-			results.each {
-				quantityMap[it[1]] = it[3]
-			}
-			log.info "Post-processing response time: " + (System.currentTimeMillis() - startTime)
-		}
-        return quantityMap
-    }
 
     /**
      * Get a list of products that have an assocation with the given an inventory.
@@ -1937,7 +1344,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @return	get quantity by location and product
 	 */
 	Integer getQuantityOnHand(Location location, Product product) {
-		log.info "quantity on hand for location " + location + " product " + product
+		log.debug "quantity on hand for location " + location + " product " + product
 		def quantityMap = getQuantityForProducts(location.inventory, [product.id])
         log.debug "quantity map " + quantityMap;
 		def quantity = quantityMap[product.id]
@@ -2028,21 +1435,6 @@ class InventoryService implements ApplicationContextAware {
 
 		return quantityOnHand;
 	}
-
-    /**
-     * Get the most recent quantity on hand from inventory item snapshot table. If there are no
-     * records in the inventory item snapshot table then we calculate the QoH from transactions.
-     *
-     * @param location
-     * @return
-     */
-    Map<InventoryItem, Integer> getQuantityByLocation(Location location) {
-        Map<InventoryItem, Integer> quantityMap = getMostRecentInventoryItemSnapshot(location)
-        if (!quantityMap) {
-            quantityMap = getQuantityForInventory(location?.inventory)
-        }
-        return quantityMap;
-    }
 
 	/**
 	 * Calculate quantity on hand values for all available inventory items at the given inventory.
@@ -2522,6 +1914,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryInstance
 	 * @return
 	 */
+	//@Transactional(readOnly = true)
 	List getTransactionEntriesByInventory(Inventory inventory) {
         def startTime = System.currentTimeMillis()
 		def criteria = TransactionEntry.createCriteria();
@@ -2543,6 +1936,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryInstance
 	 * @return
 	 */
+	//@Transactional(readOnly = true)
 	List getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
 		def criteria = TransactionEntry.createCriteria();
 		def transactionEntries = criteria.list {
@@ -2564,6 +1958,7 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryInstance
      * @return
      */
+	//@Transactional(readOnly = true)
     List getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
         def criteria = TransactionEntry.createCriteria();
         def transactionEntries = criteria.list {
@@ -2587,6 +1982,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param inventoryItem
 	 * @param inventory
 	 */
+	//@Transactional(readOnly = true)
 	List getTransactionEntriesByInventoryAndInventoryItem(Inventory inventory, InventoryItem item) {
 		return TransactionEntry.createCriteria().list() {
             eq("inventoryItem", item)
@@ -2605,6 +2001,7 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryItem
      * @param inventory
      */
+	//@Transactional(readOnly = true)
     List getTransactionEntriesByInventoryAndInventoryItems(Inventory inventory, List<InventoryItem> inventoryItems) {
         return TransactionEntry.createCriteria().list() {
             'in'("inventoryItem", inventoryItems)
@@ -2636,10 +2033,6 @@ class InventoryService implements ApplicationContextAware {
             command.errors.rejectValue("quantity","adjustStock.invalid.quantity.message")
         }
 
-        log.info "command " + command.validate()
-        log.info "command has errors: " + command.hasErrors()
-        log.info "command errors: " + command.errors
-
         if (command.validate() && !command.hasErrors()) {
             def transaction = new Transaction();
             // Need to create a transaction if we want the inventory item to show up in the stock card
@@ -2662,6 +2055,50 @@ class InventoryService implements ApplicationContextAware {
             }
         }
         return command
+	}
+
+
+	def createStockSnapshot(Location location, Product product) {
+		List lineItems = getProductQuantityByBinLocation(location, product)
+
+		// If there's no stock we should record that as well
+		if (!lineItems || lineItems?.empty) {
+			InventoryItem inventoryItem = findOrCreateInventoryItem(product, null, null)
+			lineItems << [binLocation: null, inventoryItem: inventoryItem, quantity: 0]
+		}
+
+
+		recordStock(location, lineItems)
+	}
+
+
+	def recordStock(Location location, List lineItems) {
+
+		if (!location || !location.inventory) {
+			throw new IllegalArgumentException("Record stock transactions require a location")
+		}
+
+		Transaction transaction = new Transaction();
+		transaction.transactionDate = new Date();
+		transaction.inventory = location.inventory;
+		transaction.transactionNumber = generateTransactionNumber()
+		transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+
+		lineItems.each { lineItem ->
+			// Add transaction entry to transaction
+			TransactionEntry transactionEntry = new TransactionEntry()
+			transactionEntry.binLocation = lineItem.binLocation
+			transactionEntry.inventoryItem = lineItem.inventoryItem;
+			transactionEntry.quantity = lineItem.quantity
+			transactionEntry.comments = lineItem.comments
+			transaction.addToTransactionEntries(transactionEntry);
+		}
+
+		if (!transaction.hasErrors() && transaction.save()) {
+			log.info("Transaction saved: " + transaction)
+		}
+
+		return transaction;
 	}
 
 
@@ -2941,43 +2378,6 @@ class InventoryService implements ApplicationContextAware {
 
 	/**
 	 *
-	 * @return
-	 */
-	def getConsumptionTransactionsBetween(Date startDate, Date endDate) {
-		log.debug("startDate = " + startDate + " endDate = " + endDate)
-		def criteria = Consumption.createCriteria()
-		def results = criteria.list {
-			if (startDate && endDate) {
-				between('transactionDate', startDate, endDate)
-			}
-		}
-
-		return results
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	def getConsumptions(Date startDate, Date endDate, String groupBy) {
-		log.debug("startDate = " + startDate + " endDate = " + endDate)
-		def criteria = Consumption.createCriteria()
-		def results = criteria.list {
-			if (startDate && endDate) {
-				between('transactionDate', startDate, endDate)
-			}
-			projections {
-				sum('quantity')
-				groupProperty('product')
-				groupProperty('transactionDate')
-			}
-		}
-
-		return results
-	}
-
-	/**
-	 *
 	 */
 	def getQuantity(Product product, Location location, Date beforeDate) {
 		def quantity = 0;
@@ -3063,6 +2463,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param endDate
 	 * @return
 	 */
+	//@Transactional(readOnly = true)
 	def getTransactionEntries(Product product, Location location, Date startDate, Date endDate) {
 		def criteria = TransactionEntry.createCriteria();
 		def transactionEntries = criteria.list {
@@ -3095,6 +2496,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param endDate
 	 * @return
 	 */
+	//@Transactional(readOnly = true)
 	def getTransactionEntriesBeforeDate(InventoryItem inventoryItem, Location location, Date beforeDate) {
 		def transactionEntries = []
 		if (beforeDate) {
@@ -3122,6 +2524,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param endDate
 	 * @return
 	 */
+	//@Transactional(readOnly = true)
 	def getTransactionEntriesBeforeDate(Product product, Location location, Date beforeDate) {
 		def criteria = TransactionEntry.createCriteria();
 		def transactionEntries = []
@@ -3150,6 +2553,7 @@ class InventoryService implements ApplicationContextAware {
 	 * @param endDate
 	 * @return
 	 */
+	//@Transactional(readOnly = true)
 	def getTransactionEntries(Location location, Category category, Date startDate, Date endDate) {
 		def categories = []
 		categories << category
@@ -3158,6 +2562,7 @@ class InventoryService implements ApplicationContextAware {
 
 	}
 
+	//@Transactional(readOnly = true)
 	def getTransactionEntries(Location location, List categories, Date startDate, Date endDate) {
 		def criteria = TransactionEntry.createCriteria();
 		def transactionEntries = criteria.list {
@@ -3429,9 +2834,7 @@ class InventoryService implements ApplicationContextAware {
 	}
 
 	public Map<String, Integer> getQuantityForProducts(Inventory inventory, ArrayList<String> productIds) {
-        log.debug "inventory " + inventory + " " + ", productIds: " + productIds
 		def ids = productIds.collect{ "'${it}'"}.join(",")
-        log.debug "ids: " + ids
 		def result =[:]
 		if (ids) {
             //
@@ -3608,61 +3011,43 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
+	//@Transactional(readOnly = true)
     def getTransactionEntriesBeforeDate(Location location, Date date) {
         return getTransactionEntriesBeforeDate(location, date, null)
     }
 
+	//@Transactional(readOnly = true)
     def getTransactionEntriesBeforeDate(Location location, Date date, Tag tag) {
         return getTransactionEntriesBeforeDate(location, date, [tag.id] as List)
     }
 
-    def getTransactionEntriesBeforeDate(Location location, Date date, List tagIds) {
+	//@Transactional(readOnly = true)
+	def getTransactionEntriesBeforeDate(Location location, Date date, List tagIds) {
+
         def startTime = System.currentTimeMillis()
-        def criteria = TransactionEntry.createCriteria();
         def transactionEntries = []
         if (date) {
             def products = tagIds ? getProductsByTagId(tagIds) : []
-            log.info "Get products by tag ${tagIds}: " + products.toString()
-            transactionEntries = criteria.list {
-                if (products) {
-                    inventoryItem {
-                        'in'("product", products)
-                    }
-                }
-                transaction {
-                    // All transactions before given date
-                    lt("transactionDate", date)
-                    eq("inventory", location?.inventory)
-                    order("transactionDate", "asc")
-                    order("dateCreated", "asc")
 
-                }
-            }
-            // Show several other queries to achieve the same thing, but none of these improve query performance
-//            transactionEntries = TransactionEntry.findAll("from TransactionEntry as te " +
-//                    "where te.transaction.transactionDate < :date " +
-//                    "and te.transaction.inventory = :inventory " +
-//                    "order by te.transaction.transactionDate asc, te.transaction.dateCreated asc",
-//                    [date: date, inventory: location.inventory])
+			log.info "Get products by tag ${tagIds}: " + products.toString()
+			def criteria = TransactionEntry.createCriteria();
+			transactionEntries = criteria.list {
+				if (products) {
+					inventoryItem {
+						'in'("product", products)
+					}
+				}
+				transaction {
+					// All transactions before given date
+					lt("transactionDate", date)
+					eq("inventory", location?.inventory)
+					order("transactionDate", "asc")
+					order("dateCreated", "asc")
 
-//            transactionEntries = TransactionEntry.createCriteria().list {
-//                createAlias('transaction', 't', CriteriaSpecification.INNER_JOIN)
-//                and {
-//                    if (products) {
-//                        inventoryItem {
-//                            'in'("product", products)
-//                        }
-//                    }
-//                    // All transactions before given date
-//                    lt("t.transactionDate", date)
-//                    eq("t.inventory", location?.inventory)
-//                }
-//                order("t.transactionDate", "asc")
-//                order("t.dateCreated", "asc")
-//            }
+				}
+			}
 
-
-            log.info "Get transaction entries before date: " + (System.currentTimeMillis() - startTime) + " ms"
+            log.debug "Get transaction entries before date: " + (System.currentTimeMillis() - startTime) + " ms"
         }
         return transactionEntries;
     }
@@ -3967,369 +3352,8 @@ class InventoryService implements ApplicationContextAware {
         return data
     }
 
-    def getTransactionDates() {
-        //return Transaction.executeQuery('select distinct transactionDate from Transaction')
-        def transactionDates = []
-        //def results = Transaction.executeQuery("select distinct year(transactionDate), month(transactionDate), day(transactionDate) from Transaction where inventory = :inventory",
-        //        [inventory:location.inventory])
-
-        def results = Transaction.executeQuery("select transactionDate from Transaction")
-
-        results.each { date ->
-            //def date = new Date().updated([year: it[0], month: it[1], day: it[2]])
-            date.clearTime()
-            transactionDates << date
-        }
-        return transactionDates.unique().sort().reverse()
-    }
 
 
-
-    def getTransactionDates(location, product) {
-        def transactionDates = []
-        def startDate = new Date() - 365 * 5
-        def endDate = new Date()
-        (endDate..startDate).each {
-            it.clearTime()
-            transactionDates.add(it)
-        }
-
-        /*
-        Calendar.with {
-            (2010..2014).each { year ->
-                (JANUARY..DECEMBER).each { month ->
-                    def calendar = instance
-                    calendar[YEAR] = year
-                    calendar[MONTH] = month
-                    calendar[DAY_OF_MONTH] = 1
-                    def date = calendar.getTime()
-                    date.clearTime()
-                    transactionDates.add(date)
-                }
-            }
-        }
-        */
-
-        println "transactionDates: " + transactionDates
-        /*
-        def criteria = TransactionEntry.createCriteria()
-        def results = criteria.list {
-            projections {
-                transaction {
-                    distinct ("transactionDate")
-                }
-            }
-
-            transaction {
-                eq("inventory", location.inventory)
-            }
-            inventoryItem {
-                eq("product", product)
-            }
-        }
-        results.each { date ->
-            date.clearTime()
-            transactionDates << date
-        }
-        */
-
-        return transactionDates
-    }
-
-    def getDepotLocations() {
-        def locations = Location.findAll("from Location as l where l.inventory is not null")
-        return locations.findAll { it.isWarehouse() }
-
-    }
-
-    //@Cacheable("inventorySnapshotCache")
-    /*
-	def findInventorySnapshotByDateAndLocation(Date date, Location location) {
-        def data = []
-        if (location && date) {
-            //def quantityMap = inventoryService.getQuantityByProductMap(location.inventory)
-            def inventorySnapshots = InventorySnapshot.findAllByLocationAndDate(location, date)
-            inventorySnapshots.each {
-                data << [   date           : it.date,
-                            location       : it.location.name,
-                            category       : it.product?.category?.name,
-                            productCode    : it.product.productCode,
-                            product        : it.product.name,
-                            productGroup   : null, //it?.product?.genericProduct?.name,
-                            quantityOnHand : it.quantityOnHand,
-                            tags           : it.product.tagsToString(),
-                            unitOfMeasure  : it?.product?.unitOfMeasure?:"EA"
-                ]
-            }
-        }
-        return data;
-	}
-	*/
-
-
-
-    def findInventorySnapshotByLocation(Location location) {
-        def date = getMostRecentInventorySnapshotDate()
-        return findInventorySnapshotByDateAndLocation(date, location)
-    }
-
-    def findInventorySnapshotByDateAndLocation(Date date, Location location) {
-        def data = []
-        if (location && date) {
-
-            long startTime = System.currentTimeMillis()
-
-            //, productGroups, tags
-            //left outer join fetch product.productGroups as productGroups
-            //left outer join fetch product.tags as tags
-            //
-            def results = InventorySnapshot.executeQuery("""
-                    select i.date, i.location.name as location, product, category.name, i.quantityOnHand
-                    from InventorySnapshot i, Product product, Category category
-                    where i.location = :location
-                    and i.date = :date
-                    and i.product = product
-                    and i.product.category = category
-                    group by i.date, i.location.name, product
-                    """, [location:location, date: date])
-
-            // group by i.date, i.location.name, product
-
-
-            def inventoryLevelsByProduct = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product.id }
-
-            log.info "Results: " + results.size()
-            log.info "Query response time: " + (System.currentTimeMillis() - startTime)
-            startTime = System.currentTimeMillis()
-
-            results.each {
-                Product product = it[2]
-                InventoryLevel inventoryLevel = inventoryLevelsByProduct[product.id] ? inventoryLevelsByProduct[product.id][0] : null
-                data << [
-                        date                : it[0],
-                        location            : it[1],
-                        category            : it[3],
-                        productCode         : product.productCode,
-                        product             : product.name,
-                        productGroup        : product?.genericProduct?.name,
-                        tags                : product.tagsToString(),
-                        //productGroup        : it[5]*.description?.join(":")?:"", //product?.genericProduct?.name,
-                        //tags                : it[6]*.tag?.join(","),
-                        status              : inventoryLevel?.status,
-                        quantityOnHand      : it[4],
-                        minQuantity         : inventoryLevel?.minQuantity?:0,
-                        maxQuantity         : inventoryLevel?.maxQuantity?:0,
-                        reorderQuantity     : inventoryLevel?.reorderQuantity?:0,
-                        unitOfMeasure       : product?.unitOfMeasure?:"EA"
-                ]
-            }
-            log.info "Post-processing response time: " + (System.currentTimeMillis() - startTime)
-        }
-        return data
-    }
-
-    /**
-     * Create inventory snapshots for all dates and locations.
-     *
-     * @return
-     */
-	def createOrUpdateInventorySnapshot() {
-		def startTime = System.currentTimeMillis()
-		def transactionDates = getTransactionDates()
-		transactionDates.each { Date transactionDate ->
-			transactionDate.clearTime()
-			def locations = getDepotLocations()
-			locations.each { location ->
-				log.debug "Creating or updating inventory snapshot for date ${transactionDate}, location ${location.name} ..."
-				createOrUpdateInventorySnapshot(transactionDate, location)
-			}
-			log.info "Created inventory snapshot for all locations and products on ${transactionDate} in " + (System.currentTimeMillis() - startTime) + " ms"
-		}
-	}
-
-
-    def createOrUpdateInventorySnapshot(Date date) {
-        def startTime = System.currentTimeMillis()
-        date.clearTime()
-        def locations = getDepotLocations()
-        locations.each { location ->
-			log.debug "Creating or updating inventory snapshot for date ${date}, location ${location.name} ..."
-			createOrUpdateInventorySnapshot(date, location)
-        }
-
-        log.info "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
-    }
-
-
-    def createOrUpdateInventorySnapshot(Date date, Location location) {
-        try {
-			log.debug "Create or update inventory snapshot for location ${location.name} on date ${date}"
-			// Only process locations with inventory
-			if (location?.inventory) {
-                def startTime = System.currentTimeMillis()
-
-                String dateString = date.format("yyyy-MM-dd HH:mm:ss")
-				//def productQuantityMap = getQuantityByProductMap(location.inventory)
-				def quantityMap = getQuantityOnHandAsOfDate(location, date)
-				def products = quantityMap.keySet();
-
-				log.debug "Calculated quantity on hand for ${products?.size()} products in ${System.currentTimeMillis()-startTime} ms"
-                def startTime2 = System.currentTimeMillis()
-				def sql = new Sql(dataSource)
-				if (sql) {
-					try {
-						sql.withBatch(1000) { stmt ->
-							products.eachWithIndex { product, index ->
-								//log.info "Saving inventory snapshot for product[${index}]: " + product
-								def onHandQuantity = quantityMap[product]
-								def insertStmt = "insert into inventory_snapshot(id,version,date,location_id,product_id,inventory_item_id,quantity_on_hand,date_created,last_updated) " +
-										"values ('${UUID.randomUUID().toString()}', 0,'${dateString}','${location?.id}','${product?.id}',NULL,${onHandQuantity},now(),now()) " +
-										"ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity},last_updated=now()"
-								stmt.addBatch(insertStmt)
-							}
-							stmt.executeBatch()
-						}
-					} catch (BatchUpdateException e) {
-						log.error("Error executing batch update for location ${location.name} " + e.message, e)
-					}
-				}
-				log.info ("Time to execute batch statements " + (System.currentTimeMillis() - startTime2) + " ms")
-                log.info "Saved ${products?.size()} snapshots for products=ALL, location=${location}, date=${date.format("MMM-dd-yyyy")} in ${(System.currentTimeMillis() - startTime)} ms"
-			}
-        } catch (Exception e) {
-            log.error("Unable to complete snapshot process", e)
-        }
-    }
-
-    def createOrUpdateInventorySnapshot(Location location, Product product) {
-        try {
-            def dates = getTransactionDates(location, product)
-            dates.each { date ->
-                def quantity = getQuantity(product, location, date)
-                log.info "Create or update snapshot for product ${product} at location ${location.name} on date ${date} = ${quantity} ${product.unitOfMeasure}"
-				createOrUpdateInventorySnapshot(date, product, location, quantity)
-            }
-			log.info "Saved snapshot for product=${product.productCode}, location=${location}, dates=ALL"
-        } catch (Exception e) {
-            log.error("Unable to complete snapshot process", e)
-        }
-    }
-
-
-
-    def createOrUpdateInventorySnapshot(Date date, Location location, Product product) {
-        try {
-            def inventorySnapshots = InventorySnapshot.countByDateAndLocation(date, location)
-            log.debug "Date ${date}, location ${location}: " + inventorySnapshots
-            if (inventorySnapshots == 0) {
-                log.debug "Create or update snapshot for location ${location.name} on date ${date}"
-                def quantity = getQuantity(product, location, date)
-				createOrUpdateInventorySnapshot(date, product, location, quantity)
-            }
-			log.debug "Saved snapshot for product=${product.productCode}, location=${location}, date=${date}"
-        } catch (Exception e) {
-            log.error("Unable to complete snapshot process", e)
-        }
-    }
-
-
-    def createOrUpdateInventorySnapshot(Date date, Product product, Location location, Integer onHandQuantity) {
-        log.info "Updating snapshot for product " + product.name + " @ " + location.name
-        try {
-			def inventorySnapshot = InventorySnapshot.findWhere(date: date, location: location, product:product)
-            if (!inventorySnapshot) {
-                inventorySnapshot = new InventorySnapshot(date: date, location: location, product: product)
-            }
-            //def pendingQuantity = calculatePendingQuantity(product, location)
-            inventorySnapshot.quantityOnHand = onHandQuantity?:0
-            //inventorySnapshot.quantityInbound = pendingQuantity[0]?:0
-            //inventorySnapshot.quantityOutbound = pendingQuantity[1]?:0
-            //inventorySnapshot.lastUpdated = new Date()
-            inventorySnapshot.save(flush:true)
-        }
-        catch (Exception e) {
-            log.error("Error saving snapshot for product " + product.name + " and location " + location.name, e)
-            throw e;
-        }
-    }
-
-
-
-
-	def createOrUpdateInventoryItemSnapshot(Date date) {
-		def startTime = System.currentTimeMillis()
-		date.clearTime()
-		def locations = getDepotLocations()
-		locations.each { location ->
-			log.debug "Creating or updating item snapshot for date ${date} and location ${location.name} ..."
-			createOrUpdateInventoryItemSnapshot(date, location)
-		}
-		println "Created item snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
-	}
-
-
-
-    def createOrUpdateInventoryItemSnapshot(Date date, Location location) {
-
-        try {
-            def inventoryItemSnapshots = InventoryItemSnapshot.countByDateAndLocation(date, location)
-            log.debug "Date ${date}, location ${location}: " + inventoryItemSnapshots
-            log.debug "Create or update snapshot for location ${location.name} on date ${date}"
-            // Only process locations with inventory
-            if (location.inventory) {
-
-				// Get quantity on hand for all products at a given location
-				def onHandQuantityMap = getQuantityForInventory(location.inventory)
-				def inventoryItems = onHandQuantityMap.keySet();
-				log.debug "Saving item snapshots for ${inventoryItems?.size()} inventory items"
-
-				def startTime = System.currentTimeMillis()
-				def sql = new Sql(dataSource)
-				if (sql) {
-					String dateString = date.format("yyyy-MM-dd HH:mm:ss")
-					sql.withBatch(1000) { stmt ->
-						inventoryItems.eachWithIndex { inventoryItem, index ->
-							//log.info "Saving snapshot for product[${index}]: " + product
-							def onHandQuantity = onHandQuantityMap[inventoryItem]
-
-							String inventoryItemId = StringEscapeUtils.escapeSql(inventoryItem?.id)
-							//stmt.addBatch(date:date.format("yyyy-MM-dd hh:mm:ss"), locationId:location.id, productId:product.id, inventoryItemId:null, quantityOnHand:onHandQuantity)
-							def insertStmt = "insert into inventory_item_snapshot(id,version,date,location_id,product_id,inventory_item_id,quantity_on_hand,date_created,last_updated) " +
-									"values ('${UUID.randomUUID().toString()}', 0,'${dateString}','${location?.id}','${inventoryItem?.product?.id}','${inventoryItemId}',${onHandQuantity},now(),now()) " +
-									"ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity},last_updated=now()"
-							stmt.addBatch(insertStmt)
-						}
-						stmt.executeBatch()
-					}
-				}
-				log.debug ("Time to execute batch statements " + (System.currentTimeMillis() - startTime) + " ms")
-                log.info "Saved item snapshot for products: ALL, location=${location.name}, date=${date.format("MMM/dd/yyyy")}" + ": " + (System.currentTimeMillis() - startTime) + " ms"
-
-            }
-        } catch (Exception e) {
-            log.error("Unable to complete snapshot process", e)
-        }
-    }
-
-	def createOrUpdateInventoryItemSnapshot(Date date, InventoryItem inventoryItem, Location location, Integer quantityOnHand) {
-		log.info "Updating snapshot for product " + inventoryItem?.product?.name + " at location " + location.name
-		try {
-			def inventoryItemSnapshot = InventoryItemSnapshot.findWhere(date: date, location: location, product:inventoryItem?.product, inventoryItem: inventoryItem)
-			if (!inventoryItemSnapshot) {
-				inventoryItemSnapshot = new InventoryItemSnapshot(date: date, location: location, product: inventoryItem?.product, inventoryItem: inventoryItem)
-			}
-			//def pendingQuantity = calculatePendingQuantity(product, location)
-			inventoryItemSnapshot.quantityOnHand = quantityOnHand?:0
-			//inventorySnapshot.quantityInbound = pendingQuantity[0]?:0
-			//inventorySnapshot.quantityOutbound = pendingQuantity[1]?:0
-			//inventorySnapshot.lastUpdated = new Date()
-			inventoryItemSnapshot.save()
-		}
-		catch (Exception e) {
-			log.error("Error saving snapshot for inventory item " + inventoryItem + " and location " + location.name, e)
-			throw e;
-		}
-	}
 
 	/**
 	 * Calculate pending quantity for a given product and location.
@@ -4704,78 +3728,9 @@ class InventoryService implements ApplicationContextAware {
         return statusMessage
     }
 
-    /**
-     * Get fast moving items based on requisition data.
-     *
-     * @param location
-     * @param date
-     * @param max
-     * @return
-     */
-    def getFastMovers(location, date, max) {
-        def startTime = System.currentTimeMillis()
-        def data = [:]
-        try {
-            data.location = location.id
-            data.startDate = date-30
-            data.endDate = date
-
-            def criteria = RequisitionItem.createCriteria()
-            def results = criteria.list {
-                requisition {
-                    eq("origin", location)
-                    between("dateRequested", date-30, date)
-                }
-                projections {
-                    //product {
-                    //    groupProperty('id')
-                    //    groupProperty('name')
-                    //    groupProperty('productCode')
-                    //}
-                    groupProperty("product")
-                    countDistinct('id', "occurrences")
-                    sum("quantity", "quantity")
-                }
-                order('occurrences','desc')
-                order('quantity','desc')
-                if (max) { maxResults(max) }
-            }
-
-            def quantityMap = getCurrentInventory(location)
-            //println "quantityMap: " + quantityMap
-
-            def count = 1;
-            data.results = results.collect {
-
-                def quantityOnHand = quantityMap[it[0]]?:0
-                [
-                        rank: count++,
-                        id: it[0].id,
-                        productCode: it[0].productCode,
-                        name: it[0].name,
-                        //genericProduct: it[0]?.genericProduct?.name?:"",
-                        category: it[0]?.category?.name?:"",
-                        requisitionCount: it[1],
-                        quantityRequested: it[2],
-                        quantityOnHand: quantityOnHand,
-                ]
-            }
-            data.responseTime = (System.currentTimeMillis() - startTime) + " ms"
-
-
-        } catch (Exception e) {
-            log.error("Error occurred while getting requisition items " + e.message, e)
-            data = e.message
-        }
-        return data
-    }
-
     Map getBinLocationReport(Location location) {
-
         Map binLocationReport = [:]
-
-        final List transactionEntries = getTransactionEntriesWithAssociations(location)
-        List binLocations = getQuantityByBinLocation(transactionEntries, true)
+		def binLocations = getBinLocationDetails(location)
 
         binLocationReport.data = binLocations
         binLocationReport.summary = getBinLocationSummary(binLocations)
@@ -4783,6 +3738,11 @@ class InventoryService implements ApplicationContextAware {
         return binLocationReport
     }
 
+
+	List getBinLocationDetails(Location location) {
+		List transactionEntries = getTransactionEntriesByLocation(location)
+		return getQuantityByBinLocation(transactionEntries, true)
+	}
 
     List getBinLocationSummary(List binLocations) {
 
@@ -4807,31 +3767,48 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    List getTransactionEntriesWithAssociations(Location location) {
+	//@Transactional(readOnly = true)
+    List getTransactionEntriesByLocation(Location location) {
         def startTime = System.currentTimeMillis()
 
         if (!location?.inventory) {
             throw new RuntimeException("Location must have an inventory")
         }
 
-        def criteria = TransactionEntry.createCriteria();
-        def transactionEntries = criteria.list {
+        def transactions = Transaction.createCriteria().list {
             // eager fetch transaction and transaction type
-			fetchMode("transaction", org.hibernate.FetchMode.JOIN)
-            fetchMode("transaction.transactionType", org.hibernate.FetchMode.JOIN)
+			fetchMode("transactionType", org.hibernate.FetchMode.JOIN)
+			fetchMode("inboundTransfer", org.hibernate.FetchMode.JOIN)
+			fetchMode("outboundTransfer", org.hibernate.FetchMode.JOIN)
 
-            transaction {
-                eq("inventory", location.inventory)
-                order("transactionDate", "asc")
-                order("dateCreated", "asc")
-            }
+			eq("inventory", location.inventory)
+			order("transactionDate", "asc")
+			order("dateCreated", "asc")
         }
 
-		log.info "transactionEntries " + transactionEntries.size()
+//		def transactionEntries = TransactionEntry.executeQuery(
+//				'select te from TransactionEntry te ' +
+//						'left join fetch te.transaction ' +
+//						'left join fetch te.transaction.inboundTransfer ' +
+//						'left join fetch te.transaction.outboundTransfer ' +
+//						'left join fetch te.transaction.transactionType ' +
+//						'where te.transaction.inventory = :inventory ' +
+//						'order by te.transaction.transactionDate asc ' +
+//						'order by te.transaction.dateCreated asc'
+//				, [inventory: location.inventory])
+//
+//		def results = Transaction.executeQuery(
+//				'select t from Transaction t ' +
+//						//'left join fetch t.transactionEntries te ' +
+//						'left join fetch t.inboundTransfer ' +
+//						'left join fetch t.outboundTransfer ' +
+//						'where t.inventory = :inventory ' +
+//						'order by t.transactionDate asc ' +
+//						'order by t.dateCreated asc'
+//				, [inventory: location.inventory])
+//
 
-        log.info "getTransactionEntriesByInventory(): " + (System.currentTimeMillis() - startTime) + " ms"
-
-        return transactionEntries;
+        return transactions*.transactionEntries.flatten();
     }
 
 

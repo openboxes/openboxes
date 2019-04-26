@@ -1,4 +1,0 @@
-<clickstream>
-    <logger class="com.opensymphony.clickstream.logger.NullClickstreamLogger"/>
-    <!--<logger class="com.opensymphony.clickstream.logger.SimpleClickstreamLogger"/>-->
-</clickstream>

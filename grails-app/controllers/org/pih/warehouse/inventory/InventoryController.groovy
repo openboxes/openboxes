@@ -10,13 +10,11 @@
 
 package org.pih.warehouse.inventory
 
-import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
-import org.apache.commons.collections.ListUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Constants
@@ -26,7 +24,6 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.reporting.Consumption
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
@@ -39,8 +36,10 @@ class InventoryController {
 
 	def dataSource
     def productService
+    def dashboardService
 	def inventoryService
     def requisitionService
+    def inventorySnapshotService
     def userService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"];
@@ -451,7 +450,7 @@ class InventoryController {
         println "search " + command.location + " " + command.startDate
         def quantityMap = inventoryService.getQuantityOnHandAsOfDate(command.location, command.startDate, command.tags)
         if (quantityMap) {
-            def statusMap = inventoryService.getInventoryStatus(command.location)
+            def statusMap = dashboardService.getInventoryStatus(command.location)
             def filename = "Stock report - " +
                     (command?.tag?command?.tag?.tag:"All Products") + " - " +
                     command?.location?.name + " - " +
@@ -613,17 +612,24 @@ class InventoryController {
     def list = {
         println "List " + params
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getCurrentInventory(location)
-        def statusMap = inventoryService.getInventoryStatus(location)
-        println "QuantityMap: " + quantityMap
-        [quantityMap:quantityMap,statusMap: statusMap]
+        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def statusMap = dashboardService.getInventoryStatus(location)
+        if (params.format == "csv") {
+            def filename = "${location.name} - ${status}.csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            return;
+        }
+
+        [quantityMap:quantityMap, statusMap: statusMap]
     }
+
 
 
     def listReconditionedStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getReconditionedStock(location)
-        def statusMap = inventoryService.getInventoryStatus(location)
+        def quantityMap = dashboardService.getReconditionedStock(location)
+        def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Reconditioned stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
@@ -636,8 +642,8 @@ class InventoryController {
 
     def listTotalStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getTotalStock(location);
-        def statusMap = inventoryService.getInventoryStatus(location)
+        def quantityMap = dashboardService.getTotalStock(location);
+        def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Total stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
@@ -651,8 +657,8 @@ class InventoryController {
 
     def listInStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getInStock(location);
-        def statusMap = inventoryService.getInventoryStatus(location)
+        def quantityMap = dashboardService.getInStock(location);
+        def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "In stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
@@ -664,30 +670,23 @@ class InventoryController {
 
     }
 
-    @Cacheable("dashboardCache")
     def listLowStock = {
-
-        def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getLowStock(location);
-        println ("Took " + (System.currentTimeMillis() - startTime) + " ms")
-        def statusMap = inventoryService.getInventoryStatus(location)
-        println ("Took " + (System.currentTimeMillis() - startTime) + " ms")
+        def quantityMap = dashboardService.getLowStock(location);
+        def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Low stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text:getCsvForProductMap(quantityMap, statusMap))
             return;
         }
-
-        //[inventoryItems:lowStock, quantityMap:quantityMap]
         render (view: "list", model: [quantityMap:quantityMap, statusMap: statusMap])
     }
 
     def listReorderStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getReorderStock(location);
-        def statusMap = inventoryService.getInventoryStatus(location)
+        def quantityMap = dashboardService.getReorderStock(location);
+        def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Reorder stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
@@ -701,8 +700,8 @@ class InventoryController {
 
     def listQuantityOnHandZero = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getQuantityOnHandZero(location);
-        def statusMap = inventoryService.getInventoryStatus(location)
+        def quantityMap = dashboardService.getQuantityOnHandZero(location);
+        def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Out of stock  - all - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
@@ -716,8 +715,8 @@ class InventoryController {
 
     def listHealthyStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getHealthyStock(location)
-        def statusMap = inventoryService.getInventoryStatus(location)
+        def quantityMap = dashboardService.getHealthyStock(location)
+        def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Overstock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
@@ -732,8 +731,8 @@ class InventoryController {
 
     def listOverStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getOverStock(location)
-        def statusMap = inventoryService.getInventoryStatus(location)
+        def quantityMap = dashboardService.getOverStock(location)
+        def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Overstock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
@@ -747,8 +746,8 @@ class InventoryController {
 
     def listOutOfStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventoryService.getOutOfStock(location, params.abcClass);
-        def statusMap = inventoryService.getInventoryStatus(location)
+        def quantityMap = dashboardService.getOutOfStock(location, params.abcClass);
+        def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "Out of stock - supported - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
@@ -763,9 +762,9 @@ class InventoryController {
 	def listExpiredStock = {
 		def location = Location.get(session.warehouse.id)
 		def categorySelected = (params.category) ? Category.get(params.category) : null;
-		def inventoryItems = inventoryService.getExpiredStock(categorySelected, location);
+		def inventoryItems = dashboardService.getExpiredStock(categorySelected, location);
 		def categories = inventoryItems?.collect { it.product.category }?.unique()
-		def quantityMap = inventoryService.getQuantityByLocation(location)
+		def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         def expiredStockMap = [:]
 		inventoryItems.each { inventoryItem ->
             expiredStockMap[inventoryItem] = quantityMap[inventoryItem]
@@ -782,12 +781,12 @@ class InventoryController {
 
 
 	def listExpiringStock = {
-		def threshold = (params.threshold) ? params.threshold as int : 0;
+        def expirationStatus = params.status
+        def location = Location.get(session.warehouse.id)
 		def category = (params.category) ? Category.get(params.category) : null;
-		def location = Location.get(session.warehouse.id)
-		def inventoryItems = inventoryService.getExpiringStock(category, location, threshold)
+		def inventoryItems = dashboardService.getExpiringStock(category, location, expirationStatus)
 		def categories = inventoryItems?.collect { it?.product?.category }?.unique().sort { it.name } ;
-		def quantityMap = inventoryService.getQuantityByLocation(location)
+		def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         def expiringStockMap = [:]
 		inventoryItems.each { inventoryItem ->
             expiringStockMap[inventoryItem] = quantityMap[inventoryItem]
@@ -801,7 +800,7 @@ class InventoryController {
         }
 
 		[inventoryItems:inventoryItems, quantityMap:quantityMap, categories:categories,
-			categorySelected:category, thresholdSelected:threshold ]
+			categorySelected:category, expirationStatus:expirationStatus ]
 	}
 
 
@@ -1014,150 +1013,6 @@ class InventoryController {
 
 
 	}
-
-
-	def showConsumption = { ConsumptionCommand command ->
-
-		def consumptions = inventoryService.getConsumptionTransactionsBetween(command?.startDate, command?.endDate)
-		def consumptionMap = consumptions.groupBy { it.product };
-
-		//def products = Product.list()
-		def products = consumptions*.product.unique();
-		//products = products.findAll { consumptionMap[it] > 0 }
-		def productMap = products.groupBy { it.category };
-		def dateFormat = new SimpleDateFormat("ddMMyyyy")
-		//def dateKeys = inventoryService.getConsumptionDateKeys()
-		def startDate = command?.startDate?:(new Date()-7)
-		def endDate = command?.endDate?:new Date()
-
-		def calendar = Calendar.instance
-		def dateKeys = (startDate..endDate).collect { date ->
-			calendar.setTime(date);
-			[
-				date: date,
-				day: calendar.get(Calendar.DAY_OF_MONTH),
-				week: calendar.get(Calendar.WEEK_OF_YEAR),
-				month: calendar.get(Calendar.MONTH),
-				year: calendar.get(Calendar.YEAR),
-				key: dateFormat.format(date)
-			]
-		}.sort { it.date }
-
-
-		def groupBy = command?.groupBy;
-		log.debug("groupBy = " + groupBy)
-		def daysBetween = (groupBy!="default") ? -1 : endDate - startDate
-		if (daysBetween > 365 || groupBy.equals("yearly")) {
-			groupBy = "yearly"
-			dateFormat = new SimpleDateFormat("yyyy")
-		}
-		else if ((daysBetween > 61 && daysBetween < 365) || groupBy.equals("monthly")) {
-			groupBy = "monthly"
-			dateFormat = new SimpleDateFormat("MMM")
-		}
-		else if (daysBetween > 14 && daysBetween < 60 || groupBy.equals("weekly")) {
-			groupBy = "weekly"
-			dateFormat = new SimpleDateFormat("'Week' w")
-		}
-		else if (daysBetween > 0 && daysBetween <= 14 || groupBy.equals("daily")) {
-			groupBy = "daily"
-			dateFormat = new SimpleDateFormat("MMM dd")
-		}
-		dateKeys = dateKeys.collect { dateFormat.format(it.date) }.unique()
-
-
-		log.debug("consumption " + consumptionMap)
-		def consumptionProductDateMap = [:]
-		consumptions.each {
-			def dateKey = it.product.id + "_" + dateFormat.format(it.transactionDate)
-			def quantity = consumptionProductDateMap[dateKey];
-			if (!quantity) quantity = 0;
-			quantity += it.quantity?:0
-			consumptionProductDateMap[dateKey] = quantity;
-
-			def totalKey = it.product.id + "_Total"
-			def totalQuantity = consumptionProductDateMap[totalKey];
-			if (!totalQuantity) totalQuantity = 0;
-			totalQuantity += it.quantity?:0
-			consumptionProductDateMap[totalKey] = totalQuantity;
-
-		}
-
-
-
-
-		/*
-		def today = new Date();
-		def warehouse = Location.get(session.warehouse.id)
-
-		// Get all transactions from the past week
-		def transactions = inventoryService.getConsumptionTransactions(today-7, today);
-		def transactionEntries = []
-		transactions.each { transaction ->
-			transaction.transactionEntries.each { transactionEntry ->
-				transactionEntries << transactionEntry
-			}
-		}
-
-		def consumptionMap = [:]
-		log.debug "Products " + products.size();
-
-		def transactionEntryMap = transactionEntries.groupBy { it.inventoryItem.product }
-		transactionEntryMap.each { key, value ->
-			def consumed = value.sum { it.quantity }
-			log.debug("key="+key + ", value = " + value + ", total consumed=" + consumed);
-			consumptionMap[key] = consumed;
-		}
-		*/
-
-
-
-
-
-
-		[
-			command: command,
-			productMap : productMap,
-			consumptionMap: consumptionMap,
-			consumptionProductDateMap: consumptionProductDateMap,
-			productKeys: products,
-			results: inventoryService.getConsumptions(command?.startDate, command?.endDate, command?.groupBy),
-			dateKeys: dateKeys]
-	}
-
-	def refreshConsumptionData = {
-		def consumptionType = TransactionType.get(2)
-		def transactions = Transaction.findAllByTransactionType(consumptionType)
-
-		// Delete all consumption rows
-		Consumption.executeUpdate("delete Consumption c")
-
-		// Reset auto increment counter to 0
-		// ALTER TABLE consumption AUTO_INCREMENT=0
-
-		transactions.each { xact ->
-			xact.transactionEntries.each { entry ->
-				def consumption = new Consumption(
-					product: entry.inventoryItem.product,
-					inventoryItem: entry.inventoryItem,
-					quantity: entry.quantity,
-					transactionDate: entry.transaction.transactionDate,
-					location: entry.transaction.inventory.warehouse,
-					month: entry.transaction.transactionDate.month,
-					day: entry.transaction.transactionDate.day,
-					year: entry.transaction.transactionDate.year+1900);
-
-				if (!consumption.hasErrors() && consumption.save()) {
-
-				}
-				else {
-					flash.message = "error saving Consumption " + consumption.errors
-				}
-			}
-		}
-		redirect(controller: "inventory", action: "showConsumption")
-	}
-
 
 	/**
 	 * Used to create default inventory items.
@@ -1701,7 +1556,7 @@ class InventoryController {
         def products = transactionInstance?.transactionEntries.collect { it.inventoryItem.product }
 		def inventoryItems = InventoryItem.findAllByProductInList(products)
 		def model = [
-			inventoryItemsMap: inventoryItems.groupBy { it.product } ,
+			inventoryItemsMap: inventoryItems.groupBy { it.product?.id } ,
 			transactionInstance: transactionInstance?:new Transaction(),
 			transactionTypeList: TransactionType.list(),
 			locationInstanceList: Location.findAllByParentLocationIsNull(),
@@ -1785,15 +1640,6 @@ class InventoryController {
 
 }
 
-class ConsumptionCommand {
-		String groupBy
-		Date startDate
-		Date endDate
-
-		static constraints = {
-
-		}
-	}
 
 class QuantityOnHandReportCommand {
     //Location location

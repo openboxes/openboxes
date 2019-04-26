@@ -157,7 +157,8 @@
 							<g:form action="saveTransaction">
 								<g:hiddenField name="id" value="${transactionInstance?.id}"/>
 								<g:hiddenField name="inventory.id" value="${transactionInstance?.inventory?.id}"/>
-							
+
+
 								<div style="">
 									<table id="transaction-entries-table" border="0" style="margin: 0; padding: 0; border: 0px solid lightgrey; background-color: white;">
 										<thead>
@@ -183,9 +184,9 @@
 			                                    	<td class="center">
 			                                    		<g:select name="transactionEntries[${i }].inventoryItem.id"
 																  value="${transactionEntry?.inventoryItem?.id }" class="chzn-select-deselect"
-			                                    			from="${inventoryItemsMap[transactionEntry?.inventoryItem?.product]}" noSelection="['null':'']"
-			                                    			optionKey="id" optionValue="lotNumber" /> 
-			                                    	</td>
+			                                    			from="${inventoryItemsMap[transactionEntry?.inventoryItem?.product?.id]}" noSelection="['null':'']"
+			                                    			optionKey="id" optionValue="lotNumber" />
+													</td>
 			                                    	<td class="center">
 			                                    		<g:if test="${transactionEntry?.inventoryItem?.expirationDate }">
 				                                    		<format:date obj="${transactionEntry?.inventoryItem?.expirationDate }"/>

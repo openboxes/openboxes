@@ -23,13 +23,40 @@ import util.ReportUtil
 class ReportController {
 	
 	def documentService
+    def dataService
 	def inventoryService
 	def productService
 	def reportService
     def messageService
+    def inventorySnapshotService
 
+    def buildFacts = {
+        def startTime = System.currentTimeMillis()
+        def results = reportService.buildFacts()
+        def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
+        render ([responseTime: responseTime, results: results, groovyVersion: GroovySystem.version] as JSON)
+    }
 
+    def truncateFacts = {
+        def startTime = System.currentTimeMillis()
+        reportService.truncateFacts()
+        def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
+        render ([responseTime: responseTime] as JSON)
+    }
 
+    def buildDimensions = {
+        def startTime = System.currentTimeMillis()
+        reportService.buildDimensions()
+        def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
+        render ([responseTime: responseTime] as JSON)
+    }
+
+    def truncateDimensions = {
+        def startTime = System.currentTimeMillis()
+        reportService.truncateDimensions()
+        def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
+        render ([responseTime: responseTime] as JSON)
+    }
 
     def binLocationCsvHeader = { binLocation ->
         String csv = ""
@@ -331,11 +358,7 @@ class ReportController {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
 
-        def quantityMap = [:]
-        List binLocations = []
-        List statuses = ["inStock", "outOfStock"]
-
-        statuses = statuses.collect { status ->
+        List statuses = ["inStock", "outOfStock"].collect { status ->
             String messageCode = "binLocationSummary.${status}.label"
             String label = messageService.getMessage(messageCode)
             [status: status, label: label]
@@ -343,10 +366,7 @@ class ReportController {
 
         try {
             if (params.button == "download") {
-                def binLocationReport = inventoryService.getBinLocationReport(location)
-
-                binLocations = binLocationReport.data
-                statuses = binLocationReport.summary
+                def binLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
 
                 // Filter on status
                 if (params.status) {
@@ -370,15 +390,13 @@ class ReportController {
         [
                 location: location,
                 elapsedTime: (System.currentTimeMillis() - startTime),
-                quantityMap: quantityMap,
-                binLocations: binLocations,
                 statuses: statuses
         ]
 
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        command.entries = inventoryService.getQuantityOnHandByProductAndLocation(command.locations)
+        command.entries = inventorySnapshotService.getQuantityOnHandByProduct(command.locations)
 
         if (params.button == "download") {
             def sw = new StringWriter()

@@ -1,14 +1,15 @@
+<%@ page defaultCodec="html" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title><warehouse:message code="report.showProductReport.label" /></title>    
+        <title><warehouse:message code="report.showProductReport.label" /></title>
         <style>
         	.filter { }
         	th { text-transform: uppercase; }
         	.product { font-weight: bold; }
         </style>
-    </head>    
+    </head>
     <body>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
@@ -17,13 +18,13 @@
 			<div class="errors">
 				<g:renderErrors bean="${command}" as="list" />
 			</div>
-		</g:hasErrors>    
+		</g:hasErrors>
 		<div class="buttonBar">
 			<g:link class="list" controller="report" action="showTransactionReport" params="['location.id':command.location?.id,'category.id':command?.product?.category.id,'startDate':command.startDate,'endDate':command.endDate]">
 	    		&lsaquo; Back to Transaction Report
 	    	</g:link>
 	    </div>
-	    
+
 		<div class="form box">
 			<g:form controller="report" action="showProductReport" method="GET">
 				<span class="filter">
@@ -34,11 +35,11 @@
 				<span class="filter">
 					<label>Location</label>
 					<g:selectLocation name="location.id" noSelection="['null':'']" value="${command?.location?.id}" class="filter"/>
-				</span>	
+				</span>
 				<span class="filter">
 					<label>Start date</label>
 					<g:jqueryDatePicker id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy" class="filter"/>
-				</span>					
+				</span>
 				<span class="filter">
 					<label>End date</label>
 					<g:jqueryDatePicker id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy" class="filter"/>
@@ -46,14 +47,14 @@
 				<span class="filter">
 					<button type="submit" class="btn">Run Report</button>
 				</span>
-			</g:form>		
-		
+			</g:form>
+
 		</div>
-		
+
     	<div class="list">
 	    	<table>
 	    		<thead>
-	    			<th>Transaction Date</th>	    			
+	    			<th>Transaction Date</th>
 	    			<th>Transaction Type</th>
 	    			<th>Lot Number</th>
 	    			<th>Expires</th>
@@ -61,7 +62,7 @@
 	    			<th class="center">Quantity</th>
 	    			<th class="center">Balance</th>
 	    		</thead>
-				<tbody>	    	
+				<tbody>
 					<tr>
 						<td></td>
 						<td>Initial inventory</td>
@@ -76,7 +77,7 @@
 			    		<tr class="${i%2 ? 'even' : 'odd' }">
 			    			<td>
 			    				<format:date obj="${transactionEntry?.transaction?.transactionDate }"/>
-			    				
+
 			    			</td>
 			    			<td>
 			    				<format:metadata obj="${transactionEntry?.transaction?.transactionType}"/>
@@ -86,11 +87,11 @@
 			    			</td>
 			    			<td>
 			    				<format:expirationDate obj="${transactionEntry?.inventoryItem?.expirationDate }"/>
-			    				
+
 			    			</td>
 			    			<td class="center">
 				    			${transactionEntry?.transaction?.transactionType?.transactionCode }
-			    			</td>			    			
+			    			</td>
 			    			<td class="center">
 			    				<span class="${transactionEntry?.transaction?.transactionType?.transactionCode?.equals("DEBIT")?'debit':'credit' }">
 			    					${transactionEntry?.quantity }
@@ -98,8 +99,8 @@
 			    			</td>
 			    			<td class="center">
 			    				<span class="${productReportEntry?.balance>=0?'credit':'debit' }">
-									${productReportEntry?.balance }			    			
-								</span>	
+									${productReportEntry?.balance }
+								</span>
 			    			</td>
 			    		</tr>
 			    	</g:each>
@@ -117,10 +118,10 @@
     	</div>
 	    <script>
 			$(document).ready(function() {
-				$(".filter").change(function() { 
+				$(".filter").change(function() {
 					$(this).closest("form").submit();
 				});
 			});
-	    </script>    	
-    </body>    
+	    </script>
+    </body>
 </html>

@@ -79,26 +79,20 @@
 							</div>
 							<div class="filter-list-item">
 		           				<label><warehouse:message code="inventory.expiresWithin.label"/></label>
-				           		<g:select name="threshold" class="chzn-select-deselect"
-									from="['7': warehouse.message(code:'default.week.oneWeek.label'),
-                                            '14': warehouse.message(code:'default.week.twoWeeks.label'),
-										    '30': warehouse.message(code:'default.month.oneMonth.label'),
-                                            '60': warehouse.message(code:'default.month.twoMonths.label'),
-										    '90': warehouse.message(code:'default.month.threeMonths.label'),
-                                            '120': warehouse.message(code:'default.month.fourMonths.label'),
-                                            '150': warehouse.message(code:'default.month.fiveMonths.label'),
-                                            '180': warehouse.message(code:'default.month.sixMonths.label'),
-                                            '210': warehouse.message(code:'default.month.sevenMonths.label'),
-                                            '240': warehouse.message(code:'default.month.eightMonths.label'),
-                                            '270': warehouse.message(code:'default.month.nineMonths.label'),
-                                            '300': warehouse.message(code:'default.month.tenMonths.label'),
-                                            '330': warehouse.message(code:'default.month.elevenMonths.label'),
-                                            '365': warehouse.message(code:'default.year.oneYear.label'),
-                                            '730': warehouse.message(code:'default.year.twoYears.label'),
-                                            '1095': warehouse.message(code:'default.year.threeYears.label'),
-                                            '1460': warehouse.message(code:'default.year.fourYears.label'),
-                                            '1825': warehouse.message(code:'default.year.fiveYears.label')]"
-									optionKey="key" optionValue="value" value="${thresholdSelected}" 
+				           		<g:select name="status" class="chzn-select-deselect"
+									from="[
+										    'within30Days':
+                                                    warehouse.message(code:'inventory.listExpiringStock.label', args: [30]),
+										    'within90Days':
+                                                    warehouse.message(code:'inventory.listExpiringStock.label', args: [90]),
+                                            'within180Days':
+                                                    warehouse.message(code:'inventory.listExpiringStock.label', args: [180]),
+                                            'within365Days':
+                                                    warehouse.message(code:'inventory.listExpiringStock.label', args: [365]),
+                                            'greaterThan365Days':
+                                                    warehouse.message(code:'inventory.listGreaterThan365Days.label',
+                                                            args: [365], default: 'Expires after {0} days')]"
+									optionKey="key" optionValue="value" value="${expirationStatus}"
 									noSelection="['': warehouse.message(code:'default.all.label')]" />   
 				           	</div>
 

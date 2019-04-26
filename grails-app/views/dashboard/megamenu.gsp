@@ -33,6 +33,13 @@
                         </g:link>
 
                     </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="consumption" action="list" class="list">
+                            <warehouse:message code="consumption.report.label" default="Consumption report" />
+                            <span class="beta">Beta</span>
+                        </g:link>
+
+                    </div>
                 </div>
             </li>
         </g:isUserAdmin>
@@ -624,11 +631,6 @@
                             <div class="mm-menu-item">
                                 <g:link controller="admin" action="cache" class="list">
                                     <g:message code="default.cache.label" default="Cache" />
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="admin" action="clickstream" class="list">
-                                    <g:message code="default.clickstream.label" default="Clickstream" />
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">

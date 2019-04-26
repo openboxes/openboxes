@@ -13,28 +13,16 @@ import grails.util.GrailsUtil
 import net.sf.ehcache.Cache
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.MailService
-import org.pih.warehouse.jobs.DataCleaningJob
 import org.springframework.web.multipart.MultipartFile
-import util.ClickstreamUtil
 
 import javax.print.Doc
 import javax.print.DocFlavor
 import javax.print.DocPrintJob
 import javax.print.PrintService
 import javax.print.SimpleDoc
-import javax.print.attribute.Attribute
 import java.awt.print.PrinterJob
 
-//import java.net.HttpURLConnection;
-//import java.net.URLConnection;
 import java.util.concurrent.FutureTask;
-
-// import javax.swing.text.html.HTML;
-
-// import grails.converters.XML;
-// import org.pih.warehouse.util.FileUtil;
-
-import sun.misc.BASE64Encoder;
 
 class AdminController {
 
@@ -69,14 +57,6 @@ class AdminController {
 
     def cache = {
         [cacheStatistics: sessionFactory.getStatistics()]
-    }
-    def clickstream = {
-        if (params.format == "csv") {
-            def filename = "Clickstream - ${session.user.name}.csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: ClickstreamUtil.getClickstreamAsCsv(session.clickstream))
-            return;
-        }
     }
 
     def plugins = { } 

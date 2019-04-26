@@ -34,8 +34,8 @@ class SentryFilters {
                                 timezone   : user.timezone,
                                 locale     : session?.user?.locale?.toString() ?: "No locale",
                                 sessionId  : session?.id,
-                                server     : serverUrl ?: "No server URL",
-                                clickstream: session?.id ? "${serverUrl}/stream/view/${session?.id}" : "No clickstream"
+                                server     : serverUrl ?: "No server URL"
+
                         ]
                         ravenClient.setUserData(userData)
                     } catch (Exception e) {
