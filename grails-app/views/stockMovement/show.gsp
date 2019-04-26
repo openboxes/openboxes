@@ -94,20 +94,21 @@
                 <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                 <warehouse:message code="default.button.receive.label" />
             </g:link>
-
-            <g:isSuperuser>
+            <g:isUserAdmin>
                 <g:if test="${showRollbackLastReceiptButton}">
                     <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                         <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                     </g:link>
                 </g:if>
-                <g:else>
+                <g:elseif test="${stockMovement?.requisition?.status == RequisitionStatus.ISSUED}">
                     <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>
-                </g:else>
+                </g:elseif>
+            </g:isUserAdmin>
+            <g:isSuperuser>
                 <g:if test="${hasBeenPending || !stockMovement?.shipment?.currentStatus}">
                     <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
                             onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">

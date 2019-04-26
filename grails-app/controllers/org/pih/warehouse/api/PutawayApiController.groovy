@@ -48,6 +48,7 @@ class PutawayApiController {
             putawayItem.availableItems =
                     inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
             putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
+            putawayItem.quantityAvailable = inventoryService.getQuantity(putawayItem.currentFacility.inventory, putawayItem.currentLocation, putawayItem.inventoryItem)
         }
         render ([data:putaway?.toJson()] as JSON)
     }
@@ -79,6 +80,7 @@ class PutawayApiController {
             putawayItem.availableItems =
                     inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
             putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
+            putawayItem.quantityAvailable = inventoryService.getQuantity(putawayItem.currentFacility.inventory, putawayItem.currentLocation, putawayItem.inventoryItem)
         }
 
         render ([data:putaway?.toJson()] as JSON)
@@ -113,9 +115,6 @@ class PutawayApiController {
                 bindData(splitItem, splitItemMap)
                 putawayItem.splitItems.add(splitItem)
             }
-
-            putawayItem.availableItems =
-                    inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
 
             putaway.putawayItems.add(putawayItem)
         }

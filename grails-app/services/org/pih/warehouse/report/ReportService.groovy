@@ -9,20 +9,37 @@
 **/ 
 package org.pih.warehouse.report
 
+import groovy.sql.Sql
+import groovyx.gpars.GParsPool
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer
+import org.hibernate.FetchMode
+import org.hibernate.classic.Session
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.reporting.ConsumptionFact
+import org.pih.warehouse.reporting.DateDimension
+import org.pih.warehouse.reporting.LocationDimension
+import org.pih.warehouse.reporting.LotDimension
+import org.pih.warehouse.reporting.ProductDimension
+import org.pih.warehouse.reporting.TransactionFact
+import org.pih.warehouse.reporting.TransactionTypeDimension
+import org.pih.warehouse.requisition.Requisition
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.w3c.dom.Document
@@ -32,22 +49,36 @@ import util.InventoryUtil
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 
 class ReportService implements ApplicationContextAware {
-	
+
+    def dataSource
+    def sessionFactory
 	def productService
 	def inventoryService
+	def dashboardService
 	def shipmentService
 	def localizationService
 	def grailsApplication
+    def persistenceInterceptor
+    def propertyInstanceMap = DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 	def userService
 
 
 	ApplicationContext applicationContext
 	
-	boolean transactional = true
+	boolean transactional = false
 
-	public void generateShippingReport(ChecklistReportCommand command) {		
+    def cleanUpGorm() {
+        def session = sessionFactory.currentSession
+        session.flush()
+        session.clear()
+        propertyInstanceMap.get().clear()
+    }
+
+
+    public void generateShippingReport(ChecklistReportCommand command) {
 		def shipmentItems = command?.shipment?.shipmentItems?.sort()
 		shipmentItems.each { shipmentItem -> 
 			command.checklistReportEntryList << new ChecklistReportEntryCommand(shipmentItem: shipmentItem)
@@ -354,7 +385,7 @@ class ReportService implements ApplicationContextAware {
         def startTime = System.currentTimeMillis()
         def location = Location.get(locationId)
 
-        def quantityMap = inventoryService.getInventoryStatusAndLevel(location)
+        def quantityMap = dashboardService.getInventoryStatusAndLevel(location)
 		def hasRoleFinance = userService.hasRoleFinance()
 
         quantityMap.each { Product product, Map map ->
@@ -541,52 +572,197 @@ class ReportService implements ApplicationContextAware {
         ]
     }
 
-    /*
-    def getStatusMessage(InventoryLevel inventoryLevel, Integer currentQuantity) {
-
-        def statusMessage = "UNKNOWN"
-        if (inventoryLevel) {
-            if (inventoryLevel.status == InventoryStatus.SUPPORTED  || !inventoryLevel.status) {
-                if (currentQuantity <= 0) {
-                    statusMessage = "STOCK_OUT"
-                }
-                else if (inventoryLevel.minQuantity && currentQuantity <= inventoryLevel.minQuantity && inventoryLevel.minQuantity > 0) {
-                    statusMessage = "LOW_STOCK"
-                }
-                else if (inventoryLevel.reorderQuantity && currentQuantity <= inventoryLevel.reorderQuantity && inventoryLevel.reorderQuantity > 0) {
-                    statusMessage = "REORDER"
-                }
-                else if (inventoryLevel.maxQuantity && currentQuantity > inventoryLevel.maxQuantity && inventoryLevel.maxQuantity > 0) {
-                    statusMessage = "OVERSTOCK"
-                }
-                else if (inventoryLevel.maxQuantity && currentQuantity > inventoryLevel.reorderQuantity && currentQuantity <= inventoryLevel.maxQuantity && inventoryLevel.maxQuantity > 0 ) {
-                    statusMessage = "IDEAL_STOCK"
-                }
-                else {
-                    statusMessage = "IN_STOCK"
-                }
-            }
-            else if (inventoryLevel.status == InventoryStatus.NOT_SUPPORTED) {
-                statusMessage = "NOT_SUPPORTED"
-            }
-            else if (inventoryLevel.status == InventoryStatus.SUPPORTED_NON_INVENTORY) {
-                statusMessage = "SUPPORTED_NON_INVENTORY"
-            }
-            else {
-                statusMessage = "UNAVAILABLE"
-            }
-        }
-        else {
-            if (currentQuantity <= 0) {
-                statusMessage = "NOT_STOCKED"
-            }
-            else if (currentQuantity > 0 ) {
-                statusMessage = "IN_STOCK"
-            }
-        }
-
-        return statusMessage
+    void buildDimensions() {
+        truncateFacts()
+        truncateDimensions()
+        buildDateDimension()
+        buildProductDimension()
+        buildLocationDimension()
+        buildTransactionTypeDimension()
+        buildLotDimension()
     }
-    */
+
+    void buildFacts() {
+        truncateFacts()
+        buildTransactionFact()
+        buildConsumptionFact()
+    }
+
+    def truncateFacts() {
+        executeStatements(["SET FOREIGN_KEY_CHECKS = 0",
+                           "truncate transaction_fact",
+                           "truncate consumption_fact",
+                           "SET FOREIGN_KEY_CHECKS = 1"])
+    }
+
+    def truncateDimensions() {
+        executeStatements([
+                "SET FOREIGN_KEY_CHECKS = 0",
+                "truncate date_dimension",
+                "truncate location_dimension",
+                "truncate lot_dimension",
+                "truncate product_dimension",
+                "truncate transaction_type_dimension",
+                "SET FOREIGN_KEY_CHECKS = 1"])
+}
+
+
+    void executeStatements(List dmlStatements) {
+		Sql sql = new Sql(dataSource)
+
+		dmlStatements.each { String dmlStatement ->
+            def startTime = System.currentTimeMillis()
+            log.info "Executing statement: " + dmlStatement
+			sql.execute(dmlStatement)
+            log.info("Executed in ${(System.currentTimeMillis()-startTime)} ms")
+		}
+	}
+
+	void buildTransactionTypeDimension() {
+		String deleteStatement = "delete from transaction_type_dimension;"
+		String insertStatement = """
+            INSERT into transaction_type_dimension (version, transaction_code, transaction_type_name, transaction_type_id)
+            SELECT 0, transaction_type.transaction_code, transaction_type.name, transaction_type.id
+            FROM transaction_type
+        """
+        executeStatements([deleteStatement, insertStatement])
+	}
+
+	void buildLotDimension() {
+		String deleteStatement = "delete from lot_dimension;"
+		String insertStatement = """
+            INSERT INTO lot_dimension (version, product_code, lot_number, expiration_date, inventory_item_id)
+            SELECT 0, product.product_code, inventory_item.lot_number, inventory_item.expiration_date, inventory_item.id
+            FROM inventory_item
+            JOIN product ON product.id = inventory_item.product_id;
+        """
+        executeStatements([deleteStatement, insertStatement])
+	}
+
+    void buildProductDimension() {
+        String deleteStatement = "delete from product_dimension"
+		String insertStatement = """
+            INSERT INTO product_dimension (version, product_id, active, product_code, product_name, generic_product, category_name, abc_class, unit_cost, unit_price)
+            SELECT 0, product.id, product.active, product.product_code, product.name, NULL, category.name, product.abc_class, product.cost_per_unit, product.price_per_unit
+            FROM product
+            JOIN category ON category.id = product.category_id
+        """
+        executeStatements([deleteStatement, insertStatement])
+    }
+
+    void buildLocationDimension() {
+        String deleteStatement = "delete from location_dimension"
+        String insertStatement = """
+            INSERT INTO location_dimension (version, location_name, location_number, location_type_code, location_type_name, location_group_name, parent_location_name, location_id)
+            SELECT 0, location.name, location.location_number, location_type.location_type_code, location_type.name, location_group.name, parent_location.name, location.id
+            FROM location
+            JOIN location_type ON location_type.id = location.location_type_id
+            LEFT JOIN location_group ON location_group.id = location.location_group_id
+            LEFT JOIN location parent_location ON parent_location.id = location.parent_location_id;        """
+        executeStatements([deleteStatement, insertStatement])
+    }
+
+    void buildDateDimension() {
+        DateDimension.executeUpdate("delete from DateDimension ")
+        def minTransactionDate = Transaction.minTransactionDate.list()
+        log.info ("minTransactionDate: " + minTransactionDate)
+        Date today = new Date()
+        (minTransactionDate..today).each { Date date ->
+            date.clearTime()
+            DateDimension dateDimension = new DateDimension()
+            dateDimension.date = date
+            dateDimension.dayOfMonth = date[Calendar.DAY_OF_MONTH]
+			dateDimension.dayOfWeek = date[Calendar.DAY_OF_WEEK]
+            dateDimension.month = date[Calendar.MONTH]+1
+            dateDimension.year = date[Calendar.YEAR]
+            dateDimension.week = date[Calendar.WEEK_OF_YEAR]
+            dateDimension.monthName = date.format("MMMMM")
+            dateDimension.monthYear = date.format("MM-yyyy")
+            dateDimension.weekdayName = date.format("EEEEE")
+            dateDimension.save()
+        }
+    }
+    
+    def buildTransactionFact() {
+        String insertStatement = """
+            insert into transaction_fact (version, 
+                transaction_number, 
+                product_key_id, 
+                lot_key_id, 
+                location_key_id, 
+                transaction_date_key_id, 
+                transaction_type_key_id,
+                transaction_date, 
+                quantity)
+            select  
+                0, 
+                transaction.transaction_number,
+                product_dimension.id as product_key,             
+                lot_dimension.id as lot_key,
+                location_dimension.id as location_key,
+                transaction_date_dimension.id as transaction_date_key,
+                transaction_type_dimension.id as transaction_type_key,
+                transaction.transaction_date,
+                transaction_entry.quantity
+            from transaction_entry 
+            join transaction on transaction.id = transaction_entry.transaction_id
+            join inventory on transaction.inventory_id = inventory.id 
+            join location on location.inventory_id = transaction.inventory_id
+            join transaction_type on transaction_type.id = transaction.transaction_type_id 
+            join inventory_item on inventory_item.id = transaction_entry.inventory_item_id
+            join lot_dimension on lot_dimension.inventory_item_id = transaction_entry.inventory_item_id
+            join product_dimension on product_dimension.product_id = inventory_item.product_id
+            join location_dimension on location_dimension.location_id = location.id
+            join date_dimension transaction_date_dimension on transaction_date_dimension.date = date(transaction.transaction_date)
+            join transaction_type_dimension on transaction_type_dimension.transaction_type_id = transaction_type.id
+        """
+        executeStatements([insertStatement])
+    }
+
+
+    def buildConsumptionFact() {
+        String insertStatement = """
+            insert into consumption_fact (version, 
+                transaction_number, 
+                transaction_code,
+                transaction_type,
+                product_key_id, 
+                lot_key_id, 
+                location_key_id, 
+                transaction_date_key_id, 
+                quantity, 
+                unit_cost,
+                unit_price,
+                date_created, 
+                last_updated)
+            select  
+                0, 
+                transaction_type.transaction_code,
+                transaction_type.name,
+                transaction.transaction_number,
+                product_dimension.id as product_key,             
+                lot_dimension.id as lot_key,
+                location_dimension.id as location_key,
+                transaction_date_dimension.id as transaction_date_key,
+                transaction_entry.quantity,
+                0.0,
+                0.0,
+                now(),
+                now()
+            from transaction_entry 
+            join transaction on transaction.id = transaction_entry.transaction_id
+            join inventory on transaction.inventory_id = inventory.id 
+            join location on location.inventory_id = transaction.inventory_id
+            join transaction_type on transaction_type.id = transaction.transaction_type_id 
+            join inventory_item on inventory_item.id = transaction_entry.inventory_item_id
+            join lot_dimension on lot_dimension.inventory_item_id = transaction_entry.inventory_item_id
+            join product_dimension on product_dimension.product_id = inventory_item.product_id
+            join location_dimension on location_dimension.location_id = location.id
+            join date_dimension transaction_date_dimension on transaction_date_dimension.date = date(transaction.transaction_date)
+            WHERE transaction_type.transaction_code = 'DEBIT'
+        """
+        executeStatements([insertStatement])
+    }
+
 
 }

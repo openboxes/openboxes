@@ -40,30 +40,21 @@
             </column>
         </createTable>
     </changeSet>
-
-    <!--
     <changeSet author="jmiranda (generated)" id="1520147365111-2">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName=""/>
+                <foreignKeyConstraintExists foreignKeyName="FKED441931C8653BC0"/>
             </not>
         </preConditions>
-        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_association"
-                                 constraintName="" deferrable="false" initiallyDeferred="false"
-                                 referencedColumnNames="id" referencedTableName="product"/>
+        <addForeignKeyConstraint baseColumnNames="associated_product_id" baseTableName="product_association" constraintName="FKED441931C8653BC0" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
     </changeSet>
-
-
     <changeSet author="jmiranda (generated)" id="1520147365111-3">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName=""/>
+                <foreignKeyConstraintExists foreignKeyName="FKED441931DED5FAE7"/>
             </not>
         </preConditions>
-        <addForeignKeyConstraint baseColumnNames="associated_product_id" baseTableName="product_association"
-                                 constraintName="" deferrable="false" initiallyDeferred="false"
-                                 referencedColumnNames="id" referencedTableName="product"/>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_association" constraintName="FKED441931DED5FAE7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product"/>
     </changeSet>
-    -->
 
 </databaseChangeLog>

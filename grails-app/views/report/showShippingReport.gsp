@@ -1,13 +1,14 @@
+<%@ page defaultCodec="html" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="${params.print?'print':'custom' }" />
-        <title><warehouse:message code="report.showShippingReport.label" /></title>    
+        <title><warehouse:message code="report.showShippingReport.label" /></title>
         <style media="print">
         	body, td, th, div { font-family: 'Times New Roman'; }
         </style>
         <style>
-			table { -fs-table-paginate: paginate; }			
+			table { -fs-table-paginate: paginate; }
 			.filter { padding-right: 30px; border-right: 1px solid lightgrey; }
         	/*th { text-transform: uppercase; }*/
         	.title { text-align: center; padding: 5px; font-size: 3em; }
@@ -19,9 +20,9 @@
         	th { border-bottom: 1px solid black; }
         	td { padding: 5px; }
         	table { margin-left: auto; margin-right: auto; }
-        	
+
         </style>
-    </head>    
+    </head>
     <body>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
@@ -34,11 +35,11 @@
 	   	<g:if test="${!params.print}">
 			<div class="form box" >
 				<g:form controller="report" action="showShippingReport" method="GET">
-					<%-- 
+					<%--
 					<span class="filter">
 						<label>Location</label>
 						<g:selectLocation class="filter" name="location.id" noSelection="['null':'']" value="${command?.location?.id}"/>
-					</span>	
+					</span>
 					--%>
 					<table>
 						<tr>
@@ -48,11 +49,11 @@
 								</label>
 								<g:selectShipment class="filter" name="shipment.id" noSelection="['null':'']" value="${command?.shipment?.id}"/>
 							</td>
-							<%-- 
+							<%--
 							<span class="filter">
 								<label>Start date</label>
 								<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
-							</span>					
+							</span>
 							<span class="filter">
 								<label>End date</label>
 								<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
@@ -61,19 +62,19 @@
 								<button type="submit" class="btn">Run Report</button>
 							</span>
 							--%>
-						</tr>	
+						</tr>
 				    	<tr class="prop">
 				    		<td>
 								<label><warehouse:message code="report.exportAs.label"/></label>
 								<g:if test="${command?.shipment }">
 						   			<g:link target="_blank" controller="report" action="showShippingReport" params="[print:'true','shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.html.label"/>
-						   			</g:link> 
+						   			</g:link>
 						   			|
 						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.pdf.label"/>
 						   			</g:link>
-						   			<%-- 
+						   			<%--
 						   			|
 						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.docx.label"/>
@@ -83,12 +84,12 @@
 						   		<g:else>
 						   			<warehouse:message code="report.selectShipment.label"/>
 						   		</g:else>
-						   		
+
 					   		</td>
 						</tr>
 					</table>
-					
-				</g:form>				
+
+				</g:form>
 			</div>
 		</g:if>
 		<g:else>
@@ -102,27 +103,27 @@
 							<img src="${createLinkTo(dir:'images/icons/logos/',file:'pih_logo.jpg')}"  width="34" height="50"/>
 						</td>
 						<td class="center">
-							<div class="title">			
-								<warehouse:message code="report.shippingReport.heading"/>	
-							</div>								
+							<div class="title">
+								<warehouse:message code="report.shippingReport.heading"/>
+							</div>
 							<div class="subtitle">
 								<div style="line-height: 24px">
 									${session?.warehouse?.name }
 								</div>
 								<div style="line-height: 24px">
-									<warehouse:message code="report.shippingReport.title"/>	
+									<warehouse:message code="report.shippingReport.title"/>
 								</div>
-							</div>							
-						</td>			
+							</div>
+						</td>
 						<td class="right">
 							<img src="${createLinkTo(dir:'images/icons/logos/',file:'pih_logo.jpg')}" width="34" height="50" />
-						</td>				
+						</td>
 					</tr>
 				</table>
 				<hr/>
-				
+
 				<table>
-					<tr>				
+					<tr>
 						<td class="label">
 							<label>
 								<warehouse:message code="report.containerNumber.label"/>
@@ -134,7 +135,7 @@
 							</span>
 						</td>
 						<td class="spacer">
-						
+
 						</td>
 						<td class="label">
 							<label>
@@ -142,20 +143,20 @@
 							</label>
 						</td>
 						<td class="value underline">
-							<span class="value">${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }</span>						
+							<span class="value">${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }</span>
 						</td>
 					</tr>
 					<tr>
 						<td class="label">
 							<label>
 								<warehouse:message code="report.origin.label"/>
-							</label>				
+							</label>
 						</td>
 						<td class="value underline">
-							<span class="value">${command?.shipment?.origin?.name }</span>							
+							<span class="value">${command?.shipment?.origin?.name }</span>
 						</td>
 						<td class="spacer">
-						
+
 						</td>
 						<td class="label">
 							<label>
@@ -188,7 +189,7 @@
 					    					<th rowspan="2" class="center bottom">
 					    						<warehouse:message code="report.expirationDate.label"/><!-- Exp, Expiration date -->
 					    					</th>
-					    					<%-- 
+					    					<%--
 					    					<th rowspan="2" class="center bottom">
 					    						<warehouse:message code="report.quantityPerBox.label"/><!-- Qté en caisse, Qty in case -->
 					    					</th>
@@ -215,38 +216,38 @@
 					 						</th>
 					    				</tr>
 					    			</thead>
-					    		
+
 					    			<tbody>
-					    			
+
 									    <g:set var="previousContainer"/>
 										<g:set var="shipmentItemsByContainer" value="${command?.checklistReportEntryList?.groupBy { it?.shipmentItem?.container } }"/>
 								    	<g:each var="checklistEntry" in="${command?.checklistReportEntryList }" status="i">
 										    <g:set var="rowspan" value="${shipmentItemsByContainer[checklistEntry?.shipmentItem?.container]}"/>
 											<tr class="noborder">
 												<td class="center">
-													${i+1 }							
+													${i+1 }
 												</td>
-												<td class="center" rowspan="${rowspan }">	
+												<td class="center" rowspan="${rowspan }">
 													<g:if test="${checklistEntry?.shipmentItem?.container != previousContainer }">
 														<g:if test="${checklistEntry?.shipmentItem?.container }">
-															${checklistEntry?.shipmentItem?.container?.name} 	
+															${checklistEntry?.shipmentItem?.container?.name}
 														</g:if>
 														<g:else>
 															<warehouse:message code="shipping.unpacked.label"/>
 														</g:else>
 													</g:if>
 												</td>
-												<td>	   
-													<format:product product="${checklistEntry?.shipmentItem?.product}"/> 	
+												<td>
+													<format:product product="${checklistEntry?.shipmentItem?.product}"/>
 												</td>
 												<td>
 													${checklistEntry?.shipmentItem?.lotNumber }
-												</td>							
+												</td>
 												<td>
 													<format:expirationDate obj="${checklistEntry?.shipmentItem?.expirationDate }"/>
-													
-												</td>	
-												<%-- 						
+
+												</td>
+												<%--
 												<td>
 
 												</td>
@@ -276,16 +277,16 @@
 							<label><warehouse:message code="report.preparedBy.label"/></label><!--  Préparé par, Prepared by -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 						<td class="spacer">
-						
-						</td>						
+
+						</td>
 						<td class="label">
 							<label><warehouse:message code="report.receivedBy.label"/></label><!-- Reçu par, Received by -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 					</tr>
 					<tr>
@@ -293,16 +294,16 @@
 							<label><warehouse:message code="report.deliveredBy.label"/></label><!-- Livré par, Delivered/supplied by -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 						<td class="spacer">
-						
-						</td>						
+
+						</td>
 						<td class="label">
 							<label><warehouse:message code="report.receivedOn.label"/></label><!-- Reçu le, Received on -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 					</tr>
 					<tr>
@@ -310,16 +311,16 @@
 							<label><warehouse:message code="report.deliveredOn.label"/></label><!-- Livré le, Delivered/supplied on -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 						<td class="spacer">
-						
-						</td>						
+
+						</td>
 						<td class="label">
 							<label><warehouse:message code="report.verifiedOn.label"/></label><!-- Vérifié le, Verified on -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 					</tr>
 					<tr>
@@ -327,26 +328,26 @@
 							<label><warehouse:message code="report.transportedBy.label"/></label><!-- Transporté, Carrier -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 						<td class="spacer">
-						
-						</td>						
+
+						</td>
 						<td class="label">
 							<label><warehouse:message code="report.verifiedBy.label"/></label><!-- Vérifié par, Verified by -->
 						</td>
 						<td class="value underline">
-						
+
 						</td>
 					</tr>
 
 				</table>
 			</div>
 		</g:if>
-		
+
 	    <script>
 			$(document).ready(function() {
-				$(".filter").change(function() { 
+				$(".filter").change(function() {
 					$(this).closest("form").submit();
 				});
 			});

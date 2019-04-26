@@ -9,7 +9,9 @@
 **/ 
 package org.pih.warehouse.data
 
+import grails.converters.JSON
 import grails.validation.ValidationException
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
@@ -19,15 +21,135 @@ import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
+import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.jobs.DataMigrationJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.reporting.ConsumptionFact
+import org.pih.warehouse.reporting.DateDimension
+import org.pih.warehouse.reporting.LocationDimension
+import org.pih.warehouse.reporting.LotDimension
+import org.pih.warehouse.reporting.ProductDimension
+import org.pih.warehouse.reporting.TransactionFact
 import org.springframework.validation.Errors
+import util.ReportUtil
 
 class MigrationController {
 
+    def dataService
     def migrationService
+    def inventoryService
 
-    def index = { }
+    def index = {
+
+        def organizations = migrationService.getSuppliersForMigration()
+
+        def productSuppliers = migrationService.getProductsForMigration()
+
+        TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
+        def inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
+
+        [
+                organizationCount: organizations.size(),
+                inventoryTransactionCount:inventoryTransactionCount,
+                productSupplierCount: productSuppliers.size(),
+                transactionFactCount: TransactionFact.count(),
+                consumptionFactCount: ConsumptionFact.count(),
+                locationDimensionCount: LocationDimension.count(),
+                productDimensionCount: ProductDimension.count(),
+                lotDimensionCount: LotDimension.count(),
+                dateDimensionCount: DateDimension.count(),
+
+
+        ]
+    }
+
+    def downloadCurrentInventory = {
+        def startTime = System.currentTimeMillis()
+        def location = Location.get(session.warehouse.id)
+
+        def data = migrationService.getCurrentInventory([location])
+        if (params.format == "csv") {
+            def csv = dataService.generateCsv(data)
+            response.setHeader("Content-disposition", "attachment; filename='CurrentInventory_${location.name}.csv'");
+            render(contentType: "text/csv", text: csv);
+            return
+        }
+        render ([responseTime: (System.currentTimeMillis()-startTime), count: data.size(), results:data] as JSON)
+    }
+
+    def locationsWithInventoryTransactions = {
+        def locations = migrationService.getLocationsWithTransactions([TransactionCode.INVENTORY])
+        //locations = locations.collect { [id: it.locationId, name:  }
+        render ([count: locations.size(), locations:locations] as JSON)
+    }
+
+
+    def productsWithInventoryTransactions = {
+        def location = Location.get(session.warehouse.id)
+        def products = migrationService.getProductsWithTransactions(location, [TransactionCode.INVENTORY])
+        products = products.collect { [productCode: it.productCode]}
+        render ([products:products] as JSON)
+    }
+
+    def nextInventoryTransaction = {
+        def location = Location.get(session.warehouse.id)
+        def products = migrationService.getProductsWithTransactions(location, [TransactionCode.INVENTORY])
+        def product = products[0]
+        if (product) {
+            redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
+        }
+        else {
+            render "No inventory transactions"
+        }
+    }
+
+    def migrateProduct = {
+        def location = Location.get(session.warehouse.id)
+        Product product = Product.get(params.id)
+        try {
+            def results = migrationService.migrateInventoryTransactions(location, product, true)
+            flash.message = "Migrated product ${product.productCode}"
+            log.info ("Results: " + results)
+        } catch (Exception e) {
+            log.error("Unable to migrate product ${product.productCode} due to error: " + e.message, e)
+            flash.message = "Unable to migrate product ${product.productCode} due to error: " + e.message
+        }
+        redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
+    }
+
+    def migrateAllInventoryTransactions = {
+        DataMigrationJob.triggerNow([:])
+        flash.message = "Triggered data migration job in background"
+        redirect(controller: "migration")
+    }
+
+    def migrateInventoryTransactions = {
+        def startTime = System.currentTimeMillis()
+        def location = Location.get(session.warehouse.id)
+
+        params.max = params.max ? params.int('max') : 1
+
+        boolean performMigration = params.boolean("performMigration") ?: false
+        def results = migrationService.migrateInventoryTransactions(location, performMigration)
+
+        def responseTime = System.currentTimeMillis() - startTime
+        log.info "Migrated in ${(responseTime)} ms"
+
+        if (params.format == "csv") {
+            results.remove("stockHistory")
+            def data = dataService.generateCsv(results)
+            response.setHeader("Content-disposition", "attachment; filename='MigrateInventoryTransactions.csv'");
+            render(contentType: "text/csv", text: data);
+            return
+        }
+
+        render ([responseTime: responseTime, count: results.size(), results:results] as JSON)
+
+    }
+
 
 
     def migrateProductSuppliers = { MigrationCommand command ->

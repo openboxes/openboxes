@@ -259,6 +259,19 @@ class Shipment implements Comparable, Serializable {
 		return shipmentItems?.sort(shipmentItemComparator)
 	}
 
+	List sortShipmentItemsBySortOrder() {
+		def shipmentItemComparator = { a, b ->
+			def sortOrder =
+					a?.container?.parentContainer?.sortOrder <=> b?.container?.parentContainer?.sortOrder ?:
+							a?.container?.sortOrder <=> b?.container?.sortOrder ?:
+									a?.requisitionItem?.orderIndex <=> b?.requisitionItem?.orderIndex ?:
+											a?.sortOrder <=> b?.sortOrder
+			return sortOrder
+		}
+
+		return shipmentItems?.sort(shipmentItemComparator)
+	}
+
 	//String getShipmentNumber() {
 	//	return (id) ? "S" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
 	//}
@@ -474,8 +487,7 @@ class Shipment implements Comparable, Serializable {
 	}
 
 	Float calculateTotalValue() {
-		return shipmentItems?.findAll { it.product.pricePerUnit }.
-				collect { it?.quantity?:0 * it.product.pricePerUnit }.sum()?:0
+		return shipmentItems?.findAll { it.product.pricePerUnit }?.collect { it?.quantity * it?.product?.pricePerUnit }?.sum()?:0
 	}
 
 	Collection findAllParentContainers() {
