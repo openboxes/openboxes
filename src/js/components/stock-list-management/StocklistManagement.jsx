@@ -6,6 +6,7 @@ import ReactTable from 'react-table';
 import update from 'immutability-helper';
 import { getTranslate } from 'react-localize-redux';
 import { Tooltip } from 'react-tippy';
+import Alert from 'react-s-alert';
 
 import 'react-table/react-table.css';
 
@@ -526,11 +527,18 @@ class StocklistManagement extends Component {
                       href={`/openboxes/stocklist/generateCsv/${original.stocklistId}`}
                     ><Translate id="react.default.button.printCsv.label" defaultMessage="Print XLS" />
                     </a>
-                    <EmailModal
-                      stocklistId={original.stocklistId}
-                      users={this.state.users}
-                      manager={original.manager}
-                    />
+                    {original.manager ?
+                      <EmailModal
+                        stocklistId={original.stocklistId}
+                        users={this.state.users}
+                        manager={original.manager}
+                      /> :
+                      <button
+                        className="btn btn-outline-secondary btn-xs mr-1"
+                        onClick={() => Alert.error(this.props.translate('react.stockListManagement.alert.noManagerAssociated.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
+                      ><Translate id="react.default.button.email.label" defaultMessage="Email" />
+                      </button>
+                    }
                   </div>
                 );
               },
