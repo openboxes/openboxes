@@ -535,7 +535,7 @@ class StocklistManagement extends Component {
                       /> :
                       <button
                         className="btn btn-outline-secondary btn-xs mr-1"
-                        onClick={() => Alert.error(this.props.translate('react.stockListManagement.alert.noManager.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
+                        onClick={() => Alert.error(this.props.translate('react.stockListManagement.alert.noManagerAssociated.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
                       ><Translate id="react.default.button.email.label" defaultMessage="Email" />
                       </button>
                     }

@@ -51,7 +51,7 @@ class ModalWrapper extends Component {
           <Translate id={this.props.btnOpenText} defaultMessage={this.props.btnOpenDefaultText} />
         </button>
         <Modal
-          isOpen={this.state.showModal}
+          isOpen={this.props.showModal || this.state.showModal}
           onRequestClose={this.closeModal}
           className="modal-content-custom"
           shouldCloseOnOverlayClick={false}
@@ -174,6 +174,7 @@ ModalWrapper.propTypes = {
   ]),
   fields: PropTypes.shape({}),
   formProps: PropTypes.shape({}),
+  showModal: PropTypes.bool,
 };
 
 ModalWrapper.defaultProps = {
@@ -211,4 +212,5 @@ ModalWrapper.defaultProps = {
   initialValues: [],
   fields: {},
   formProps: {},
+  showModal: false,
 };
