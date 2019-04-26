@@ -387,7 +387,7 @@ class PutAwayPage extends Component {
 
     return (
       <div className="main-container">
-        <h1><Translate id="react.putAway.label" defaultMessage="Putaway" /></h1>
+        <h1><Translate id="react.putAway.createPutAway.label" defaultMessage="Create Putaway" /></h1>
         <div className="d-flex justify-content-between mb-2">
           <div>
             <Translate id="react.putAway.showBy.label" defaultMessage="Show by" />:
