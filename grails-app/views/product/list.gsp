@@ -17,14 +17,26 @@
             <div>
             
 				<div class="button-bar">
-                    <g:link class="button" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'product.label')]"/></g:link>
-	            	<g:isUserAdmin>
-                        <g:link class="button" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label')]"/></g:link>
-	                </g:isUserAdmin>
-                    <g:link controller="product" action="exportProducts" params="['product.id': flash.productIds]" class="button">
-                        ${warehouse.message(code:'default.downloadAsCsv.label', default: "Download as CSV")}
+                    <g:link class="button" action="list">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
+                        <warehouse:message code="default.list.label" args="[warehouse.message(code:'products.label')]"/>
                     </g:link>
-                    <g:link controller="product" action="importAsCsv" class="button"><warehouse:message code="product.importAsCsv.label"/></g:link>
+	            	<g:isUserAdmin>
+                        <g:link class="button" action="create">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                            <warehouse:message code="default.add.label" args="[warehouse.message(code:'product.label')]"/>
+                        </g:link>
+	                </g:isUserAdmin>
+                    <g:link controller="product" action="exportAsCsv" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'database_go.png')}" />&nbsp;
+                        <warehouse:message code="product.exportAsCsv.label"/>
+                    </g:link>
+                    <g:isUserAdmin>
+                        <g:link controller="product" action="importAsCsv" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'database_refresh.png')}" />&nbsp;
+                            <warehouse:message code="product.importAsCsv.label"/>
+                        </g:link>
+                    </g:isUserAdmin>
                 </div>
 
                 <div class="yui-gf">
@@ -34,6 +46,8 @@
                             <g:form action="list" method="get">
                                 <g:hiddenField name="sort" value="${params.sort}"/>
                                 <g:hiddenField name="order" value="${params.order}"/>
+                                <g:hiddenField name="offset" value="${params.offset}"/>
+
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="product.name.label"/></label>
                                     <p>
@@ -90,12 +104,15 @@
                                 </div>
 
                                 <div class="filter-list-item center middle">
-                                    <button type="submit" class="button icon search">
-                                        ${warehouse.message(code: 'default.button.find.label')}
+                                    <button type="submit" class="button">
+                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'find.png')}" />&nbsp;
+                                        ${warehouse.message(code: 'default.button.search.label')}
                                     </button>
 
-
-
+                                    <button type="submit" name="format" value="csv" class="button">
+                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}"/>&nbsp;
+                                        ${warehouse.message(code: 'default.button.downloadFiltered.label', default: 'Download results')}
+                                    </button>
                                 </div>
 
                             </g:form>
@@ -115,15 +132,10 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <%--
-                                            <th></th>
-                                            --%>
                                             <th>${warehouse.message(code:'product.active.label')}</th>
                                             <th>${warehouse.message(code:'product.productCode.label')}</th>
                                             <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" params="${params}"/>
                                             <g:sortableColumn property="category" title="${warehouse.message(code: 'category.label')}" params="${params}"/>
-                                            <g:sortableColumn property="manufacturer" title="${warehouse.message(code: 'product.manufacturer.label')}" params="${params}"/>
-                                            <g:sortableColumn property="manufacturerCode" title="${warehouse.message(code: 'product.manufacturerCode.label')}" params="${params}" />
                                             <g:sortableColumn property="updatedBy" title="${warehouse.message(code: 'default.updatedBy.label')}" params="${params}"/>
                                             <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'default.lastUpdated.label')}" params="${params}"/>
                                         </tr>
@@ -131,14 +143,6 @@
                                     <tbody>
                                         <g:each in="${productInstanceList}" status="i" var="productInstance">
                                             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                                                <%--
-                                                <td align="center">
-                                                    <span title="${productInstance?.description }">
-                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'information.png')}" class="middle" alt="Information" />
-                                                    </span>
-                                                </td>
-                                                --%>
-
                                                 <td align="center">
                                                     ${(productInstance.active) ? g.message(code:"default.active.label") : g.message(code:"default.inactive.label")}
                                                 </td>
@@ -156,12 +160,6 @@
                                                     <format:category category="${productInstance?.category }"/>
                                                 </td>
                                                 <td align="center">
-                                                    ${productInstance?.manufacturer }
-                                                </td>
-                                                <td align="center">
-                                                    ${productInstance?.manufacturerCode }
-                                                </td>
-                                                <td align="center">
                                                     ${productInstance?.updatedBy }
                                                 </td>
                                                 <td align="center">
@@ -175,12 +173,10 @@
                                     </tbody>
                                 </table>
                             </div>
-
+                            <div class="paginateButtons">
+                                <g:paginate total="${productInstanceTotal}" params="${params }" />
+                            </div>
                         </div>
-                        <div class="paginateButtons">
-                            <g:paginate total="${productInstanceTotal}" params="${params }" />
-                        </div>
-
                     </div>
                 </div>
             </div>
