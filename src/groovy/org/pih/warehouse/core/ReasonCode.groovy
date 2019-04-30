@@ -53,6 +53,11 @@ enum ReasonCode {
     SUPPLIED_BY_GOVERNMENT(21),
     APPROVED_CHANGE(22),
     EARLIER_EXPIRATION_DATE(23),
+    CONSUMED(24),
+    RETURNED(25),
+    FOUND(26),
+    MISSING(27),
+    STOLEN(28),
     OTHER(100)
 
 
@@ -86,16 +91,36 @@ enum ReasonCode {
                 SUPPLIED_BY_GOVERNMENT,
                 APPROVED_CHANGE,
                 EARLIER_EXPIRATION_DATE,
-                OTHER]
+                OTHER
+        ]
     }
 
     static listDefault() {
-        return [STOCKOUT, LOW_STOCK, PACKAGE_SIZE, APPROVED_CHANGE, EARLIER_EXPIRATION_DATE, SUPPLIED_BY_GOVERNMENT, COULD_NOT_LOCATE, SUBSTITUTION]
+        return [
+                STOCKOUT,
+                LOW_STOCK,
+                PACKAGE_SIZE,
+                APPROVED_CHANGE,
+                EARLIER_EXPIRATION_DATE,
+                SUPPLIED_BY_GOVERNMENT,
+                COULD_NOT_LOCATE,
+                SUBSTITUTION
+        ]
     }
 
 
     static listInventoryAdjustmentReasonCodes() {
-        return [EXPIRED, DAMAGED, COULD_NOT_LOCATE, OTHER]
+        return [
+                CONSUMED,
+                DAMAGED,
+                DATA_ENTRY_ERROR,
+                EXPIRED,
+                FOUND,
+                MISSING,
+                RETURNED,
+                STOLEN,
+                OTHER
+        ]
     }
 
     static listRequisitionQuantityChangeReasonCodes() {
