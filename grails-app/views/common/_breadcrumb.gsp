@@ -7,6 +7,7 @@
         </g:link>
     </li>
     <g:if test="${session?.user && session?.warehouse}">
+        <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
         <li>
             <a class="btn-show-dialog"
                data-title="${g.message(code:'dashboard.chooseLocation.label')}"
