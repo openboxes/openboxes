@@ -364,7 +364,6 @@ class JsonController {
     def getDashboardAlerts = {
         def location = Location.get(session?.warehouse?.id)
         def dashboardAlerts = dashboardService.getDashboardAlerts(location)
-
         render dashboardAlerts as JSON
     }
 

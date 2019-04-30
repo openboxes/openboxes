@@ -31,8 +31,8 @@ class RefreshInventorySnapshotJob {
 
             Location location = Location.get(locationId)
 
-            // Refresh inventory snapshot for today
-            inventorySnapshotService.populateInventorySnapshots(new Date(), location)
+            // Refresh inventory snapshot for tomorrow
+            inventorySnapshotService.populateInventorySnapshots(location)
 
             log.info "Refreshed inventory snapshot table for location ${location?.name} and start date ${startDate}: ${(System.currentTimeMillis() - startTime)} ms"
         }
