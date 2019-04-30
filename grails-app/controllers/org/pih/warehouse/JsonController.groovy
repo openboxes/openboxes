@@ -1107,7 +1107,6 @@ class JsonController {
         }
 
 		def terms = params.term?.split(" ")
-        def location = Location.get(session.warehouse.id)
 
         // FIXME Should replace this with an elasticsearch implementation
         // Get all products that match terms
@@ -1115,9 +1114,9 @@ class JsonController {
 
         products = products.unique()
 
-        // FIXME Need to add quantity once we improve inventory snapshot feature (OBPIH-1602 and OBPIH-1890)
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
-        def quantityMap = [:]//products ? getQuantityByProductMapCached(location, products) : [:]
+        def location = Location.get(session.warehouse.id)
+        def quantityMap = inventorySnapshotService.getQuantityOnHandByProduct(location)
 
         if (terms) {
             products = products.sort() {
@@ -1132,13 +1131,8 @@ class JsonController {
         items.addAll(products)
 		items.unique{ it.id }
 		def json = items.collect { Product product ->
-            def quantity = quantityMap[it] ?: 0
-            if (quantityMap.containsKey(it)) {
-                quantity = " [" + quantity + " " + (product?.unitOfMeasure ?: "EA") + "]"
-            }
-            else {
-                quantity = ""
-            }
+            def quantity = quantityMap[product] ?: 0
+            quantity = " [" + quantity + " " + (product?.unitOfMeasure ?: "EA") + "]"
             def type = product.class.simpleName.toLowerCase()
             [
                     id   : product.id,
