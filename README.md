@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/openboxes/openboxes.svg?branch=develop)](https://travis-ci.org/openboxes/openboxes)
 [![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
 [![Slack Signup](http://slack-signup.openboxes.com/badge.svg)](http://slack-signup.openboxes.com)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 OpenBoxes
 =========
