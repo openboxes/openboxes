@@ -1589,8 +1589,8 @@ h2 {
     font-size: 2em;
     font-weight: bold;
     line-height: 30px;
-    font-family: "Trebuchet MS",Trebuchet,Calibri,Tahoma,Segoe;
-    text-transform: lowercase;
+    height: 100%;
+    max-height: 30px;
 }
 .logo a, .logo a:hover, .logo a:visited {
     color: #666;

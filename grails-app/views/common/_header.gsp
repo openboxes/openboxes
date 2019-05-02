@@ -1,20 +1,20 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <!-- Block which includes the logo and login banner -->
 <div id="header" class="yui-b">
-	<div class="yui-gf">				
+	<div class="yui-g">
 		<div id="banner">
-		    <div id="bannerLeft" class="yui-u first" >
+		    <div class="yui-u first" >
 				<div class="logo">
                     <g:displayLogo location="${session?.warehouse?.id}"/>
 
 				</div>
 		    </div>
 		    
-		    <div id="bannerRight" class="yui-u">
+		    <div class="yui-u">
 		    	<div id="loggedIn">
 					<ul>
                         <li>
-                            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms" size="600"
+                            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms" size="300"
                                             jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
                         </li>
 					    <g:if test="${session.user}">
