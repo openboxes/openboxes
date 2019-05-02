@@ -936,7 +936,7 @@ class InventoryController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"MostRecentStockCount-${date.format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
-            render inventoryService.exportLatestInventoryDate(location)
+            render dashboardService.exportLatestInventoryDate(location)
         }
         else {
             //render(text: 'No products found', status: 404)
