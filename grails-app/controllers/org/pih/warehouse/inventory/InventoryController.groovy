@@ -813,22 +813,19 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.genericProduct.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryItem.lotNumber.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryItem.expirationDate.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'category.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default:'Tags')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.manufacturer.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.manufacturerCode.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.vendorCode.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.forecastQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.totalValue.label')}"  + '"'
         csv += "\n"
 
         def hasRoleFinance = userService.hasRoleFinance(session.user)
@@ -837,31 +834,28 @@ class InventoryController {
 
             def product = inventoryItem?.product
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
-            def status = statusMap[product]
-            if (!status) {
-                status = product?.getStatus(session.warehouse.id, quantity?:0 as int)
+            def totalValue = (product?.pricePerUnit?:0) * (quantity?:0)
+            def statusMessage = inventoryLevel?.statusMessage(quantity?:0)
+            if (!statusMessage) {
+                def status = quantity > 0 ? "IN_STOCK" : "STOCKOUT"
+                statusMessage = "${warehouse.message(code:'enum.InventoryLevelStatusCsv.'+status)}"
             }
-            def statusMessage = "${warehouse.message(code:'enum.InventoryLevelStatusCsv.'+status)}"
-            def expirationDate = formatDate(date: inventoryItem?.expirationDate, format: "dd/MMM/yyyy");
             csv += '"' + (statusMessage?:"")  + '"' + ","
             csv += '"' + (product.productCode?:"")  + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name?:"") + ","
-            csv += StringEscapeUtils.escapeCsv(product?.genericProduct?.name?:"") + ","
-            csv += '"' + (inventoryItem?.lotNumber?:"")  + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber?:"") + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy')  + '"' + ","
-            csv += '"' + (product?.category?.name?:"")  + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(product?.category?.name?:"") + ","
             csv += '"' + (product?.tagsToString()?:"")  + '"' + ","
-            csv += '"' + (product?.manufacturer?:"")  + '"' + ","
-            csv += '"' + (product?.manufacturerCode?:"")  + '"' + ","
-            csv += '"' + (product?.vendor?:"") + '"' + ","
-            csv += '"' + (product?.vendorCode?:"") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation?:"") + '"' + ","
             csv += '"' + (product?.unitOfMeasure?:"") + '"' + ","
-            csv += hasRoleFinance?(product?.pricePerUnit?:""):"" + ","
             csv += (inventoryLevel?.minQuantity?:"") + ","
             csv += (inventoryLevel?.reorderQuantity?:"") + ","
             csv += (inventoryLevel?.maxQuantity?:"")+ ","
+            csv += (inventoryLevel?.forecastQuantity?:"")+ ","
             csv += '' + (quantity?:"0")  + '' + ","
+            csv += (hasRoleFinance ? (product?.pricePerUnit?:"") : "") + ","
+            csv += (hasRoleFinance ? (totalValue?:""):"")
             csv += "\n"
         }
         return csv
@@ -878,49 +872,40 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.genericProduct.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'category.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default:'Tags')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.manufacturer.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.manufacturerCode.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.vendor.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.vendorCode.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.abcClass.label', default: 'ABC Class')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}"  + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.forecastQuantity.label')}"  + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}"  + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.totalValue.label')}"  + '"'
         csv += "\n"
 
         map.sort().each { product, quantity ->
-            def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
+            InventoryLevel inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
             def status = statusMap[product]
-            if (!status) {
-                status = product?.getStatus(session.warehouse.id, quantity?:0 as int)
-            }
-
+            def totalValue = (product?.pricePerUnit?:0) * (quantity?:0)
             def statusMessage = "${warehouse.message(code:'enum.InventoryLevelStatusCsv.'+status)}"
             csv += '"' + (statusMessage?:"")  + '"' + ","
             csv += '"' + (product.productCode?:"")  + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name) + ","
-            csv += '"' + (product?.genericProduct?.name?:"")  + '"' + ","
             csv += '"' + (product?.category?.name?:"")  + '"' + ","
             csv += '"' + (product?.tagsToString()?:"")  + '"' + ","
-            csv += '"' + (product?.manufacturer?:"")  + '"' + ","
-            csv += '"' + (product?.manufacturerCode?:"")  + '"' + ","
-            csv += '"' + (product?.vendor?:"") + '"' + ","
-            csv += '"' + (product?.vendorCode?:"") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation?:"")  + '"' + ","
             csv += '"' + (inventoryLevel?.abcClass?:"")  + '"' + ","
             csv += '"' + (product?.unitOfMeasure?:"")  + '"' + ","
-            csv += (hasRoleFinance ? (product?.pricePerUnit?:"") : "") + ","
             csv += (inventoryLevel?.minQuantity?:"") + ","
             csv += (inventoryLevel?.reorderQuantity?:"") + ","
             csv += (inventoryLevel?.maxQuantity?:"") + ","
+            csv += (inventoryLevel?.forecastQuantity?:"") + ","
             csv += (quantity?:"0") + ","
+            csv += (hasRoleFinance ? (product?.pricePerUnit?:"") : "") + ","
+            csv += (hasRoleFinance ? (totalValue?:""):"")
             csv += "\n"
         }
         return csv
@@ -943,76 +928,6 @@ class InventoryController {
             response.sendError(404)
         }
     }
-
-
-
-    /*
-	def listLowStock = {
-		def warehouse = Location.get(session.warehouse.id)
-		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory, params.showUnsupportedProducts ? true : false)
-
-		Map inventoryLevelByProduct = new HashMap();
-		inventoryService.getInventoryLevelsByInventory(warehouse.inventory).each {
-			inventoryLevelByProduct.put(it.product, it);
-		}
-
-		// Set of categories that we can filter by
-		def categories = [] as Set
-		categories.addAll(results['reorderProductsQuantityMap']?.keySet().collect { it.category })
-		categories.addAll(results['minimumProductsQuantityMap']?.keySet().collect { it.category })
-		categories = categories.findAll { it != null }
-
-		// poor man's filter
-		def categorySelected = (params.category) ? Category.get(params.category) : null;
-		log.debug "categorySelected: " + categorySelected
-		if (categorySelected) {
-			results['reorderProductsQuantityMap'] = results['reorderProductsQuantityMap'].findAll { it.key?.category == categorySelected }
-			results['minimumProductsQuantityMap'] = results['minimumProductsQuantityMap'].findAll { it.key?.category == categorySelected }
-		}
-
-		[reorderProductsQuantityMap: results['reorderProductsQuantityMap'], minimumProductsQuantityMap: results['minimumProductsQuantityMap'],
-			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts, inventoryLevelByProduct: inventoryLevelByProduct]
-	}
-    */
-    /*
-	def listReorderStock = {
-
-		def warehouse = Location.get(session.warehouse.id)
-
-		def results = inventoryService.getProductsBelowMinimumAndReorderQuantities(warehouse.inventory, params.showUnsupportedProducts ? true : false)
-
-
-		Map inventoryLevelByProduct = new HashMap();
-		//inventoryService.getInventoryLevelsByInventory(warehouse.inventory).each {
-		//	inventoryLevelByProduct.put(it.product, it);
-		//}
-
-		// Set of categories that we can filter by
-		def categories = [] as Set
-		categories.addAll(results['reorderProductsQuantityMap']?.keySet().collect { it.category })
-		categories.addAll(results['minimumProductsQuantityMap']?.keySet().collect { it.category })
-		categories = categories.findAll { it != null }
-
-		// poor man's filter
-		def categorySelected = (params.category) ? Category.get(params.category) : null;
-		log.debug "categorySelected: " + categorySelected
-		if (categorySelected) {
-			results['reorderProductsQuantityMap'] = results['reorderProductsQuantityMap'].findAll { it.key?.category == categorySelected }
-			results['minimumProductsQuantityMap'] = results['minimumProductsQuantityMap'].findAll { it.key?.category == categorySelected }
-		}
-
-		[reorderProductsQuantityMap: results['reorderProductsQuantityMap'], minimumProductsQuantityMap: results['minimumProductsQuantityMap'],
-			categories: categories, categorySelected: categorySelected, showUnsupportedProducts: params.showUnsupportedProducts, inventoryLevelByProduct: inventoryLevelByProduct]
-	}
-	*/
-
-	def searchRecall = {
-
-		log.info "searchRecall " + params
-
-
-
-	}
 
 	/**
 	 * Used to create default inventory items.
