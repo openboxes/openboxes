@@ -9,12 +9,17 @@
 **/ 
 package org.pih.warehouse.core
 
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
+import org.pih.warehouse.inventory.TransactionCode
+import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.requisition.RequisitionItem
 import org.springframework.transaction.annotation.Transactional
+
+import java.text.SimpleDateFormat
 
 class DashboardService {
 
@@ -226,6 +231,70 @@ class DashboardService {
         }
         return [totalStockValue:totalStockValue, hitCount: hitCount, missCount: missCount, totalCount:totalCount, stockValueByProduct:stockValueByProduct]
 
+    }
+
+    String exportLatestInventoryDate(location) {
+        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+        def sw = new StringWriter()
+
+
+        def quantityMap = getTotalStock(location);
+        def statusMap = getInventoryStatus(location)
+        def products = quantityMap.keySet()
+
+        def latestInventoryDates = TransactionEntry.executeQuery("""
+                select ii.product.id, max(t.transactionDate)
+                from TransactionEntry as te
+                left join te.inventoryItem as ii
+                left join te.transaction as t
+                where t.inventory = :inventory
+                and t.transactionType.transactionCode in (:transactionCodes)
+                group by ii.product
+                """,
+                [inventory: location.inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]])
+
+
+        // Convert to map
+        def latestInventoryDateMap = [:]
+        latestInventoryDates.each {
+            latestInventoryDateMap[it[0]] = it[1]
+        }
+
+        def inventoryLevelMap = [:]
+        def inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
+        inventoryLevels.each { inventoryLevel ->
+            inventoryLevelMap[inventoryLevel.product] = inventoryLevel
+        }
+
+
+        def csvWriter = new CSVWriter(sw, {
+            "Product Code" { it.productCode }
+            "Name" { it.name }
+            "Bin Location" { it.binLocation }
+            "ABC" { it.abcClass }
+            "Most Recent Stock Count" { it.latestInventoryDate }
+            "QoH" { it.quantityOnHand }
+            "Unit of Measure" { it.unitOfMeasure }
+            "Date Created" { it.dateCreated }
+            "Date Updated" { it.lastUpdated }
+        })
+
+        products.each { product ->
+            def latestInventoryDate = latestInventoryDateMap[product.id]
+            def row =  [
+                    productCode: product.productCode?:"",
+                    name: product.name,
+                    unitOfMeasure: product.unitOfMeasure?:"",
+                    abcClass: inventoryLevelMap[product]?.abcClass?:"",
+                    binLocation: inventoryLevelMap[product]?.binLocation?:"",
+                    latestInventoryDate: latestInventoryDate?"${formatDate.format(latestInventoryDate)}":"",
+                    quantityOnHand: quantityMap[product]?:"",
+                    dateCreated: product.dateCreated?"${formatDate.format(product.dateCreated)}":"",
+                    lastUpdated: product.lastUpdated?"${formatDate.format(product.lastUpdated)}":"",
+            ]
+            csvWriter << row
+        }
+        return sw.toString()
     }
 
 
