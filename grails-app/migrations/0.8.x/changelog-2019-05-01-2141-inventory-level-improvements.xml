@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="jmiranda (generated)" id="1556764773500-1">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="inventory_level" columnName="expected_lead_time_days"/>
             </not>
@@ -10,7 +10,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1556764773500-2">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="inventory_level" columnName="forecast_period_days"/>
             </not>
@@ -20,7 +20,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1556764773500-3">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="inventory_level" columnName="forecast_quantity"/>
             </not>
@@ -30,7 +30,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1556764773500-4">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="inventory_level" columnName="preferred_bin_location_id"/>
             </not>
@@ -40,7 +40,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1556764773500-5">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="inventory_level" columnName="replenishment_location_id"/>
             </not>
@@ -50,7 +50,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1556764773500-6">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="inventory_level" columnName="comments"/>
             </not>
@@ -60,6 +60,11 @@
         </addColumn>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1556764773500-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKC254A2E1CFDCB4DF"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="preferred_bin_location_id"
                                  baseTableName="inventory_level"
                                  constraintName="FKC254A2E1CFDCB4DF"
@@ -69,6 +74,11 @@
                                  referencedTableName="location"/>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1556764773500-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKC254A2E1F07D879A"/>
+            </not>
+        </preConditions>
         <addForeignKeyConstraint baseColumnNames="replenishment_location_id"
                                  baseTableName="inventory_level"
                                  constraintName="FKC254A2E1F07D879A"
