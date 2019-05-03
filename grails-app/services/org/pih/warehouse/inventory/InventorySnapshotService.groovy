@@ -14,6 +14,9 @@ import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
+
 import java.sql.BatchUpdateException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -25,12 +28,6 @@ class InventorySnapshotService {
     def dataSource
     def inventoryService
     def persistenceInterceptor
-
-    def refreshInventorySnapshots(Date date) {
-        deleteInventorySnapshots(date)
-        populateInventorySnapshots(date)
-    }
-
 
     def populateInventorySnapshots() {
         def transactionDates = getTransactionDates()
@@ -94,6 +91,7 @@ class InventorySnapshotService {
     }
 
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     def deleteInventorySnapshots(Date date, Location location, Product product) {
         Map params = [:]
 
@@ -110,7 +108,8 @@ class InventorySnapshotService {
             params.put("product", product)
         }
 
-        InventorySnapshot.executeUpdate(deleteStmt, params)
+        def results = InventorySnapshot.executeUpdate(deleteStmt, params)
+        log.info "Deleted ${results} inventory snapshots for date ${date}, location ${location}, product ${product}"
     }
 
     def transformBinLocations(List binLocations) {
