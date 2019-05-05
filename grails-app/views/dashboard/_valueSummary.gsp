@@ -48,19 +48,6 @@
                             (<small id="progressPercentage">0%</small>)
                         </td>
                     </tr>
-                <tr>
-                <td class="center" style="width: 1%">
-                    <img src="${createLinkTo(dir:'images/icons/silk/time.png')}" class="middle"/>
-                </td>
-                <td>
-                    <warehouse:message code="default.lastUpdated.label" default="Last updated"/>
-                </td>
-                <td class="right">
-                    <div id="lastUpdated">
-                        <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
-                    </div>
-                </td>
-            </tr>
                     </tbody>
                     <tfoot>
                     <tr class="odd">
@@ -150,13 +137,10 @@
                 var progress = data.hitCount / data.totalCount
                 var progressSummary = data.hitCount + " out of " + data.totalCount;
                 var progressPercentage = progress*100;
-                var lastUpdated = data.lastUpdated;
-                $("#lastUpdated").html(lastUpdated);
-
 
                 $('#totalStockValue').html(value);
 
-                $("#totalStockSummary").html("Pricing data is available for " + formatPercentage(progressPercentage)  + " of all products");
+                $("#totalStockSummary").html("Last updated: " + data.lastUpdated);
                 $('#progressSummary').html(progressSummary);
                 $( "#progressbar" ).progressbar({ value: progressPercentage });
                 $( "#progressPercentage").html("<span title='" + progressSummary + "'>" + formatPercentage(progressPercentage) + "</span>");
