@@ -1,7 +1,7 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <!-- Block which includes the logo and login banner -->
 <div id="header" class="yui-b">
-	<div class="yui-g">
+	<div class="yui-gd">
 		<div id="banner">
 		    <div class="yui-u first" >
 				<div class="logo">
