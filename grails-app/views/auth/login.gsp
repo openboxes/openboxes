@@ -39,12 +39,16 @@
 							<tbody>
 								<tr>
 									<td class="left middle ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-										<g:textField class="text" id="username" name="username" value="${userInstance?.username?:params.username}" />
+										<g:textField class="text" id="username" name="username"
+													 placeholder="${warehouse.message(code:'login.username.label')}"
+													 value="${userInstance?.username?:params.username}" />
 									</td>
 								</tr>
 								<tr>
 									<td class="left middle ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-										<g:passwordField class="text" id="password" name="password" value="${userInstance?.password?:params.password}" />
+										<g:passwordField class="text" id="password" name="password"
+														 placeholder="${warehouse.message(code:'login.password.label')}"
+														 value="${userInstance?.password?:params.password}" />
 									</td>
 								</tr>
 								<tr>
@@ -81,8 +85,6 @@
 
 			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
 			$("#browserTimezone").val(timezone.olson_tz); // Set the user timezone offset as a hidden input
-            $("#username").watermark("${warehouse.message(code:'login.username.label')}");
-		    $("#password").watermark("${warehouse.message(code:'login.password.label')}");
 			$("#username").focus();
 
             openboxes.expireFromLocal();

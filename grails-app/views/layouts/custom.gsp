@@ -141,14 +141,6 @@
         Loading ...
     </div>
 </div>
-<!-- Include other plugins -->
-<g:if test="${System.getenv().get('headless') != 'false'}" env="test">
-    <!--headless driver throw error when using watermark-->
-</g:if>
-<g:else>
-    <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
-</g:else>
-
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.jira.issue.collector.enabled)}">
     <!-- JIRA Issue Collector -->
     <script type="text/javascript" src="${grailsApplication.config.openboxes.jira.issue.collector.url}"></script>
@@ -164,7 +156,6 @@
 
 
 <script type="text/javascript" src="${createLinkTo(dir:'js/action-menu.js')}" type="text/javascript"></script>
-
 <script type="text/javascript" src="${createLinkTo(dir:'js/chosen.js')}" type="text/javascript"></script>
 <script type="text/javascript" src="${createLinkTo(dir:'js/location-chooser.js')}" type="text/javascript"></script>
 <script type="text/javascript" src="${createLinkTo(dir:'js/megamenu.js')}" type="text/javascript"></script>

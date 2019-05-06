@@ -303,12 +303,6 @@
 		};
 
 		/**
-		 * Initialize all lot number fields 
-		 * TODO Need to be i18n'd.
-		 */
-		$(".lotNumber").watermark('${warehouse.message(code:'transaction.addNewLotSerialNumber.label')}');		
-
-		/**
 		 * Initialize the table used to hold all transaction entries
 		 */					
 		alternateRowColors("#incomingTransfer");
