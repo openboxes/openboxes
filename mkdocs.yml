@@ -12,8 +12,10 @@ markdown_extensions:
   - admonition
   - footnotes
   - tables
+extra:
+    toc_depth: 1
 
-pages:
+nav:
 - Home: 'index.md'
 - About:
     - 'Benefits': 'about/benefits.md'
@@ -24,16 +26,26 @@ pages:
     - 'Install on Ubuntu':
       - 'Install on Ubuntu 14.04': 'installation/ubuntu1404.md'
       - 'Install on Ubuntu 16.04': 'installation/ubuntu1604.md'
+      - 'Install on Ubuntu 18.04':
+        - 'Overview': 'installation/ubuntu1804/index.md'
+        - 'Choose Hosting': 'installation/ubuntu1804/hosting.md'
+        - 'Prepare Ubuntu': 'installation/ubuntu1804/ubuntu.md'
+        - 'Install Java': 'installation/ubuntu1804/java.md'
+        - 'Install Tomcat': 'installation/ubuntu1804/tomcat.md'
+        - 'Install MySQL': 'installation/ubuntu1804/mysql.md'
+        - 'Install Apache': 'installation/ubuntu1804/apache.md'
     - 'Install on Mac OS': 'installation/macos.md'
     - 'Install on Windows': 'installation/windows.md'
     - 'Upgrading': 'upgrading/index.md'
 
 - Configuration Guide:
     - 'General': 'configuration/configuration.md'
-    - 'Database': 'configuration/database.md'
-    - 'Email': 'configuration/email.md'
-    - 'Application': 'configuration/application.md'
-    - 'Example': 'configuration/example.md'
+    - 'Configure Database Connection': 'configuration/database.md'
+    - 'Configure Email': 'configuration/email.md'
+    - 'Configure Application': 'configuration/application.md'
+    - 'Configuration Example': 'configuration/example.md'
+    - 'Configure AJP': 'installation/ubuntu1804/configure-ajp.md'
+    - 'Configure HTTPS': 'installation/ubuntu1804/configure-https.md'
 
 - User Guide: 'user-guide/index.md'
 - Developer Guide:
