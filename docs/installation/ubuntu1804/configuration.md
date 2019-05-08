@@ -1,35 +1,14 @@
-# Configuration
-
-## Configure Environment
-Determine the path to Java 
-```
-$ sudo update-java-alternatives --list
-java-1.7.0-openjdk-amd64       1071       /usr/lib/jvm/java-1.7.0-openjdk-amd64
-``` 
-
-### Add environment variables to `~/.bashrc`
-```
-export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
-export CATALINA_HOME=/opt/tomcat/apache-tomcat-7.0.91
-```
-
-### Refresh environment
-```
-. ~/.bashrc
-```
-
----
-## Configure Application 
 
 
-## Create openboxes-config.properties file
+1. Create openboxes-config.properties file
 ```
 cd /opt/tomcat
 sudo mkdir /opt/tomcat/.grails
 sudo vi /opt/tomcat/.grails/openboxes-config.properties
 ```
 
-## Copy the following contents into opneboxes-config.properties
+1. Copy the following contents into openboxes-config.properties
+
 **/opt/tomcat/.grails/openboxes-config.properties**
 ```
 # Database connection settings
@@ -52,4 +31,4 @@ grails.serverURL=http://localhost:8080/openboxes
 
 
 !!! note 
-    Documentation for all available configuration properties is provided in the Configuration section.
+    Documentation for all available configuration properties is provided in the [Configuration](/configuration) section.

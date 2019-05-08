@@ -1,81 +1,82 @@
 site_name: OpenBoxes
 site_description: 
 site_author: Justin Miranda
-theme: 'readthedocs'
 repo_url: https://github.com/openboxes/openboxes
-#include_search: true
+theme: 'readthedocs'
+include_search: true
 #use_absolute_urls: true
 use_directory_urls: true
-copyright: Copyright &copy; 2010-2018, OpenBoxes
+copyright: Copyright &copy; 2010-2019, OpenBoxes
 google_analytics: ['UA-37396941-2', 'openboxes.com']
 markdown_extensions:
   - admonition
   - footnotes
   - tables
-extra:
-    toc_depth: 1
-
 nav:
-- Home: 'index.md'
+- 'Home': 'index.md'
 - About:
+    - 'Features': 'https://openboxes.com/features/'
     - 'Benefits': 'about/benefits.md'
     - 'Considerations': 'about/considerations.md'
     - 'Release Notes': 'about/release-notes.md'
-- Installation Guide:
+- Installation:
     - 'Overview': 'installation/index.md'
-    - 'Install on Ubuntu':
-      - 'Install on Ubuntu 14.04': 'installation/ubuntu1404.md'
-      - 'Install on Ubuntu 16.04': 'installation/ubuntu1604.md'
-      - 'Install on Ubuntu 18.04':
+    - 'Ubuntu':
+      - 'Ubuntu 18.04':
         - 'Overview': 'installation/ubuntu1804/index.md'
-        - 'Choose Hosting': 'installation/ubuntu1804/hosting.md'
-        - 'Prepare Ubuntu': 'installation/ubuntu1804/ubuntu.md'
-        - 'Install Java': 'installation/ubuntu1804/java.md'
-        - 'Install Tomcat': 'installation/ubuntu1804/tomcat.md'
-        - 'Install MySQL': 'installation/ubuntu1804/mysql.md'
-        - 'Install Apache': 'installation/ubuntu1804/apache.md'
-    - 'Install on Mac OS': 'installation/macos.md'
-    - 'Install on Windows': 'installation/windows.md'
+        - 'Hosting': 'installation/ubuntu1804/hosting.md'
+        - 'Ubuntu': 'installation/ubuntu1804/ubuntu.md'
+        - 'Java': 'installation/ubuntu1804/java.md'
+        - 'Tomcat': 'installation/ubuntu1804/tomcat.md'
+        - 'MySQL': 'installation/ubuntu1804/mysql.md'
+        - 'Apache': 'installation/ubuntu1804/apache.md'
+        - 'Configuration': 'installation/ubuntu1804/configuration.md'
+        - 'Deployment': 'installation/ubuntu1804/deployment.md'
+        - 'Troubleshooting': 'installation/ubuntu1804/troubleshooting.md'
+      - 'Ubuntu 16.04': 'installation/ubuntu1604.md'
+      - 'Ubuntu 14.04': 'installation/ubuntu1404.md'
+    - 'Mac OS': 'installation/macos.md'
+    - 'Windows': 'installation/windows.md'
     - 'Upgrading': 'upgrading/index.md'
-
-- Configuration Guide:
-    - 'General': 'configuration/configuration.md'
-    - 'Configure Database Connection': 'configuration/database.md'
-    - 'Configure Email': 'configuration/email.md'
-    - 'Configure Application': 'configuration/application.md'
-    - 'Configuration Example': 'configuration/example.md'
-    - 'Configure AJP': 'installation/ubuntu1804/configure-ajp.md'
-    - 'Configure HTTPS': 'installation/ubuntu1804/configure-https.md'
-
-- User Guide: 'user-guide/index.md'
-- Developer Guide:
+- Configuration:
+    - 'Overview': 'configuration/index.md'
+    - 'Tomcat AJP': 'configuration/ajp.md'
+    - 'Apache HTTPS': 'configuration/https.md'
+    - 'Database Connection': 'configuration/database.md'
+    - 'Email': 'configuration/email.md'
+    - 'OpenBoxes': 'configuration/application.md'
+    - 'Sentry': 'configuration/sentry.md'
+    - 'Example': 'configuration/example.md'
+- Users:
+    - 'Overview': 'user-guide/index.md'
+- Developers:
     - 'Introduction': 'developer-guide/index.md'
     - 'Getting Started': 'developer-guide/getting-started.md'
     - 'Contributing': 'developer-guide/contributing.md'
     - 'Syncing a Fork': 'developer-guide/syncing-a-fork.md'
     - 'Tagging a Release': 'developer-guide/tagging.md'
+    - REST API Guide:
+        - 'Overview': 'api-guide/index.md'
+        - 'Getting Started': 'api-guide/getting-started.md'
+        - 'Generic API': 'api-guide/generic.md'
+        - 'Custom API':
+            - 'Core':
+                - 'Identifiers': 'api-guide/identifier.md'
+                - 'Internal Locations': 'api-guide/internalLocation.md'
+                - 'Localizations': 'api-guide/localization.md'
+                - 'Locations': 'api-guide/location.md'
+                - 'Lookup': 'api-guide/lookup.md'
+            - 'Products':
+                - 'Categories': 'api-guide/category.md'
+                - 'Products': 'api-guide/product.md'
+            - 'Stock Movements':
+                - 'Stock Movement': 'api-guide/stockMovement.md'
+                - 'Stock Movement Item': 'api-guide/stockMovementItem.md'
+                - 'Stock Movement Status': 'api-guide/stockMovementStatus.md'
+                - 'Putaway': 'api-guide/putaway.md'
+                - 'Receiving': 'api-guide/receiving.md'
 
-- REST API Guide:
-    - 'Overview': 'api-guide/index.md'
-    - 'Getting Started': 'api-guide/getting-started.md'
-    - 'Generic API': 'api-guide/generic.md'
-    - 'Custom API':
-        - 'Core':
-            - 'Identifiers': 'api-guide/identifier.md'
-            - 'Internal Locations': 'api-guide/internalLocation.md'
-            - 'Localizations': 'api-guide/localization.md'
-            - 'Locations': 'api-guide/location.md'
-            - 'Lookup': 'api-guide/lookup.md'
-        - 'Products':
-            - 'Categories': 'api-guide/category.md'
-            - 'Products': 'api-guide/product.md'
-        - 'Stock Movements':
-            - 'Stock Movement': 'api-guide/stockMovement.md'
-            - 'Stock Movement Item': 'api-guide/stockMovementItem.md'
-            - 'Stock Movement Status': 'api-guide/stockMovementStatus.md'
-            - 'Putaway': 'api-guide/putaway.md'
-            - 'Receiving': 'api-guide/receiving.md'
-
-- Support: 'support/index.md'
+- Support:
+    - 'Overview': 'support/index.md'
 
 

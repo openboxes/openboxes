@@ -8,7 +8,8 @@ another endpoint to allow developers to access any of the domain objects via a m
 ```
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/generic/product | jsonlint
-
+```
+```
 {
   "data": [
     {
@@ -24,47 +25,7 @@ https://openboxes.ngrok.io/openboxes/api/generic/product | jsonlint
     {
       "id": "ff80818155df9de40155df9e321c0005",
       "productCode": "00002",
-      "name": "Tylenol 325mg",
-      "description": null,
-      "category": {
-        "id": "1",
-        "name": "Medicines"
-      }
-    },
-    {
-      "id": "ff80818155df9de40155df9e329b0009",
-      "productCode": "00003",
-      "name": "Aspirin 20mg",
-      "description": null,
-      "category": {
-        "id": "1",
-        "name": "Medicines"
-      }
-    },
-    {
-      "id": "ff80818155df9de40155df9e3312000d",
-      "productCode": "00004",
-      "name": "General Pain Reliever",
-      "description": null,
-      "category": {
-        "id": "1",
-        "name": "Medicines"
-      }
-    },
-    {
-      "id": "ff80818155df9de40155df9e33930011",
-      "productCode": "00005",
-      "name": "Similac Advance low iron 400g",
-      "description": null,
-      "category": {
-        "id": "1",
-        "name": "Medicines"
-      }
-    },
-    {
-      "id": "ff80818155df9de40155df9e34080015",
-      "productCode": "00006",
-      "name": "Similac Advance + iron 365g",
+      "name": "Acetaminophen 325mg",
       "description": null,
       "category": {
         "id": "1",
@@ -78,17 +39,7 @@ https://openboxes.ngrok.io/openboxes/api/generic/product | jsonlint
       "description": null,
       "category": {
         "id": "2",
-        "name": "Supplies"
-      }
-    },
-    {
-      "id": "ff80818155df9de40155df9e34f1001d",
-      "productCode": "00008",
-      "name": "Print Paper A4",
-      "description": null,
-      "category": {
-        "id": "2",
-        "name": "Supplies"
+        "name": "Computer Equipment"
       }
     }
   ]
@@ -99,7 +50,8 @@ https://openboxes.ngrok.io/openboxes/api/generic/product | jsonlint
 ```
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/generic/product/ff80818155df9de40155df9e31000001
-
+```
+```
 {
 	"data": {
 		"id": "ff80818155df9de40155df9e31000001",
@@ -119,7 +71,8 @@ https://openboxes.ngrok.io/openboxes/api/generic/product/ff80818155df9de40155df9
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"name":"product 0", "category.id":"ROOT"}' \
 https://openboxes.ngrok.io/openboxes/api/generic/product
-
+```
+```
 {
 	"data": {
 		"id": "ff8081816407132d01640730bd150003",
@@ -139,7 +92,8 @@ https://openboxes.ngrok.io/openboxes/api/generic/product
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"description":"This is the penultimate product"}' \
 https://openboxes.ngrok.io/openboxes/api/generic/product/ff8081816407132d0164071eec250001 | jsonlint
-
+```
+```
 {
   "data": {
     "id": "ff8081816407132d0164071eec250001",
@@ -164,7 +118,8 @@ If there are no errors, both objects should be created and returned.
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '[{"name":"product 1","category.id":"ROOT"},{"name":"product 2","category.id":"ROOT"}]' \
 https://openboxes.ngrok.io/openboxes/api/generic/product
-
+```
+```
 {
 	"data": [{
 		"id": "ff8081816407132d0164071eec250001",
@@ -195,7 +150,8 @@ for the first object that failed - not for all objects that fail.
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '[{"name":"product 1"},{"name":"product 2"}]' \
 https://openboxes.ngrok.io/openboxes/api/generic/product
-
+```
+```
 {
 	"errorCode": 400,
 	"errorMessage": "Validation errors",
@@ -220,7 +176,8 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d '[{"id":"ff8081816407132d0164071eec250001", "name":"product 1+","category.id":"ROOT"},\
 {"id":"ff8081816407132d0164071eec2d0002", "name":"product 2.1","category.id":"ROOT"}]' \
 https://openboxes.ngrok.io/openboxes/api/generic/product
-
+```
+```
 {
 	"data": [{
 		"id": "ff8081816407132d0164071eec250001",
@@ -261,14 +218,15 @@ all shipment items that reference a particular product) at this time so please
 
 ```
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
--d '{"searchAttributes":[{"property":"name", "operator":"ilike", "value":"Tyl%"}]}' \
+-d '{"searchAttributes":[{"property":"name", "operator":"ilike", "value":"Ace%"}]}' \
 https://openboxes.ngrok.io/openboxes/api/generic/product/search?max=1
-
+```
+```
 {
 	"data": [{
 		"id": "ff80818155df9de40155df9e321c0005",
 		"productCode": "00002",
-		"name": "Tylenol 325mg",
+		"name": "Acetaminophen 325mg",
 		"description": null,
 		"category": {
 			"id": "1",

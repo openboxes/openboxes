@@ -2,19 +2,19 @@ Whether you plan to install OpenBoxes on-premise or in the cloud, the installati
 similar. 
 
 
-## Cloud
-Here are a few options for cheapish cloud hosting providers.
+#### Cloud
+Here are a few recommended options for hosting.
 
 | Hosting Provider | Instance Type | Memory | vCPU | Disk | Monthly Cost |
 | ----- | ------ | --- | --- | --- | --- |
 | [Digital Ocean](https://www.digitalocean.com/pricing/) | Droplet | 4GB | 2 | 80GB | $20 |
-| [Amazon Web Services EC2](http://www.ec2instances.info/) | t3.medium | 4GB | 2 | | $30 |
-| [Google Compute Engine](https://cloud.google.com/compute/pricing) | n1-standard-1 | 3.75GB | 1 | | $25 |
-|  | n1-standard-2 | 7.5GB | 2 | | $50 |
+| [Amazon Web Services EC2](http://www.ec2instances.info/) | t3.medium | 4GB | 2 | 8GB | $30 |
+| [Google Compute Engine](https://cloud.google.com/compute/pricing) | n1-standard-1 | 3.75GB | 1 | 30GB | $25 |
+| [Google Compute Engine](https://cloud.google.com/compute/pricing) | n1-standard-2 | 7.5GB | 2 | 30GB | $50 |
 | [Azure VM](https://cloud.google.com/compute/pricing) | B2S | 4GB | 2 | 8GB | $30 |
 | [RimuHosting](https://rimuhosting.com/order/v2orderstart.jsp) | Custom VPS | 4GB | 8 | 50GB | $30 |
 | [Linode](https://www.linode.com/pricing) | Linode 4GB | 4GB | 2 | 80GB | $20 |
-|  | Dedicated 4GB | 4GB | 2 | 25GB | $30 |
+| [Linode](https://www.linode.com/pricing) | Dedicated 4GB | 4GB | 2 | 25GB | $30 |
 
 
 NOTE: AWS has a free-tier that includes a free year of 750 hours per month for t2.micro EC2 instances (as well as other 
@@ -26,14 +26,15 @@ size and permgen memory allocated to Tomcat to something minimal (see Installing
 !!! note
     Please let us know if we missed a good hosting option.
 
-## On-Premise
-Installing OpenBoxes on-premise requires a bit of work to install the appropriate Ubuntu version on the rack-mounted 
+#### On-Premise
+Installing OpenBoxes on-premise requires a bit of work to install the appropriate Ubuntu version on a rack-mounted 
 server, desktop, or laptop that you've designated as your server. Our installation docs will not describe how to install 
-Ubuntu 16.04 Desktop or Server, so you'll need to consult Ubuntu docs. Here are a few tutorials that might be helpful.
+Ubuntu Desktop or Server, so you'll need to consult Ubuntu docs. Here are a few tutorials that might be helpful.
 
 * [Ubuntu Desktop](https://tutorials.ubuntu.com/tutorial/tutorial-install-ubuntu-desktop)
 * [Ubuntu Server](https://tutorials.ubuntu.com/tutorial/tutorial-install-ubuntu-server)
 
+Once Ubuntu is installed, you can continue to the next step (Installing Ubuntu dependencies).
 
 !!! note
     Contact us if you'd like to discuss what it would take to host OpenBoxes in the cloud and on-premise. This can 

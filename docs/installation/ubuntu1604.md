@@ -72,7 +72,7 @@ of the Java 7 JRE or JDK so we'll need to do some work to get this working. I wo
     
     Grails 1.3.9 does not support Java 8+ so Tomcat will fail to deploy OpenBoxes. 
     When it fails, you will send an email to 
-    [support@openboxes.com](support@openboxes.com) asking why the installation failed. When we receive your email, 
+    [support@openboxes.com](mailto:support@openboxes.com) asking why the installation failed. When we receive your email, 
     we will point you back to the little blue box that you ignored. Don't be that person.
 
 #### Choose your choice
@@ -493,7 +493,7 @@ appropriately and/or there's a memory leak in the application.
 * PermGen (`OutOfMemoryError: PermGen space`)
 
 See [this article] (https://plumbr.eu/outofmemoryerror/java-heap-space) for a good description of the problem. 
-Contact [support@openboxes.com](support@openboxes.com) if you have further questions.
+Contact [support@openboxes.com](mailto:support@openboxes.com) if you have further questions.
 
 #### Out of Memory: Killed process 31088 (java)
 In this case, the Linux kernel has killed your Tomcat instance because it over stepped the OS bounds on memory. At 

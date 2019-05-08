@@ -1,4 +1,6 @@
-# 3.9 Troubleshooting
+
+
+
 
 ## Unable to load specified config location 
 You can ignore these errors because these files are only used to override the default `openboxes-config.properties`.
@@ -24,7 +26,7 @@ appropriately and/or there's a memory leak in the application.
 * PermGen (`OutOfMemoryError: PermGen space`)
 
 See [this article] (https://plumbr.eu/outofmemoryerror/java-heap-space) for a good description of the problem. 
-Contact [support@openboxes.com](support@openboxes.com) if you have further questions.
+Contact [support@openboxes.com](mailto:support@openboxes.com) if you have further questions.
 
 ## Out of Memory: Killed process 31088 (java)
 In this case, the Linux kernel has killed your Tomcat instance because it over stepped the OS bounds on memory. At 
@@ -135,4 +137,28 @@ Nov 16, 2018 6:11:27 PM org.apache.coyote.AbstractProtocol start
 INFO: Starting ProtocolHandler ["ajp-bio-8009"]
 Nov 16, 2018 6:11:27 PM org.apache.catalina.startup.Catalina start
 INFO: Server startup in 546085 ms
+```
+
+## Uploads directory does not exist
+
+### Error
+```
+Unable to upload file due to exception: uploads/inventory (32).xls (No such file or directory)
+```
+![Uploads directory does not exist](/img/import-data-uploads-directory-does-not-exist.png)
+
+### Solution
+Create `uploads` directory under Tomcat root directory (`/opt/tomcat`). 
+
+```
+sudo mkdir /opt/tomcat/uploads
+sudo chown tomcat:tomcat /opt/tomcat/uploads
+```
+
+There are times where this may not resolve the issue (particularly when you install Tomcat from scatch like we've done
+here in these instructions). We're still looking into this bug, but in case you get the same error even after creating the 
+`uploads` directory under Tomcat, consider creating it under the root (/) directory.
+```
+sudo mkdir /uploads
+sudo chown tomcat:tomcat /uploads
 ```
