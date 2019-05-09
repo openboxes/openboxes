@@ -114,7 +114,7 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
         "product": {
           "id": "ff80818155df9de40155df9e321c0005",
           "productCode": "00002",
-          "name": "Tylenol 325mg",
+          "name": "Acetaminophen 325mg",
           "description": null,
           "category.id": "1",
           "category.name": "Medicines"

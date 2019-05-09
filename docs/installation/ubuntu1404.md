@@ -98,7 +98,7 @@ The following errors are related to the `-Xms` (min heap), `-Xmx` (max heap) , a
 * Heap space (`OutOfMemoryError: Java heap space`)
 * PermGen (`OutOfMemoryError: PermGen space`)
 
-See [this article] (https://plumbr.eu/outofmemoryerror/java-heap-space) for a good description of the problem. Contact [support@openboxes.com](support@openboxes.com) if you have further questions.
+See [this article] (https://plumbr.eu/outofmemoryerror/java-heap-space) for a good description of the problem. Contact [support@openboxes.com](mailto:support@openboxes.com) if you have further questions.
 
 ### Out of Memory: Killed process 31088 (java)
 In this case, the Linux kernel has killed your  Tomcat instance because it over stepped the OS bounds on memory. At this point, you may have increased the max heap size as much as you can. This probably means you need to upgrade to a larger instance type (i.e. as we mentioned above, an instance type that has 2GB of memory is a good start).
