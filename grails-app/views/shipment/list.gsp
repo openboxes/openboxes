@@ -22,7 +22,6 @@
             <div class="yui-gf">
                 <div class="yui-u first">
                     <g:render template="filters" model="[]"/>
-
                 </div>
                 <div class="yui-u">
 
@@ -66,12 +65,12 @@
                     </g:form>
                 </div>
             </div>
-			
+
         </div>
 
 
 		<script type="text/javascript">
-			$(function() { 		
+			$(function() {
 		    	$(".tabs").tabs(
 	    			{
 	    				cookie: {
@@ -79,7 +78,7 @@
 	    					expires: 1
 	    				}
 	    			}
-				); 
+				);
 
 		    	var index = $('.tabs li a').index($('a[href="#add"]').get(0));
 		    	$('.tabs').tabs({selected: index});
@@ -100,6 +99,6 @@
             });
 
         </script>
-        
+
     </body>
 </html>
