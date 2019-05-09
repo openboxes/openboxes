@@ -243,6 +243,9 @@ class StocklistManagement extends Component {
           sortable={false}
           style={{ maxHeight: 'calc(100vh - 250px)' }}
           collapseOnDataChange={false}
+          defaultSorted={[{
+            id: 'locationGroup.name',
+          }]}
           resolveData={values => values.map((row) => {
             if (!_.get(row, 'locationGroup.name')) {
               return { ...row, locationGroup: { name: 'No location group' } };
