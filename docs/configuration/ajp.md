@@ -1,57 +1,52 @@
-# AJP 
+## Configure Tomcat to listen for requests from Apache
 
-## Configure mod_jk
+1. Make sure that the following line in server.xml is uncommented.
 
-```
-sudo apt-get install libapache2-mod-jk
-```
+        <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
 
-## Enable mod_jk 
+1. If you needed to uncomment it, save the file, and then restart Tomcat for the changes to take effect.
 
-```
-sudo a2enmod jk
-```
+        sudo service tomcat restart
 
-## Update workers.properties
-*/etc/libapache2-mod-jk/workers.properties*
-```
-workers.tomcat_home=/opt/tomcat/apache-tomcat-7.0.91
-workers.java_home=/usr/lib/jvm/java-7-openjdk-amd64
-```
 
-## Configure Tomcat server.xml
+## Configure JK module for Apache
 
-Make sure that the following line in server.xml is uncommented.
+1. Install mod_jk module
 
-```
-<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
-```
+        sudo apt-get install libapache2-mod-jk
 
-If you needed to uncomment it, save the file, and then restart Tomcat for the changes to take effect.
-```
-sudo service tomcat restart
-```
+
+1. Enable mod_jk 
+
+        sudo a2enmod jk
+
+
+1. Configure mod_jk workers.properties */etc/libapache2-mod-jk/workers.properties*
+
+        workers.tomcat_home=/opt/tomcat/apache-tomcat-7.0.94
+        workers.java_home=/usr/lib/jvm/java-7-openjdk-amd64
 
 
 ## To delegate requests from Apache to Tomcat
-Add the following line to your apache configuration in sites-enabled. If you've enabled HTTPS already, you might have
-to edit two files. However, if you enabled redirect 
 
-- /etc/apache2/sites-enabled/000-default.conf
-- /etc/apache2/sites-enabled/000-default-le-ssl.conf
+1. Add the following line to your apache configuration in sites-enabled. 
 
-```
-JkMount /manager* ajp13_worker
-JkMount /openboxes* ajp13_worker
-```
+        JkMount /manager* ajp13_worker
+        JkMount /openboxes* ajp13_worker
 
-## To redirect requests from the root context to /openboxes
-```
-RedirectMatch ^/$ /openboxes/
-```
+1. To redirect requests from the root context to /openboxes (optional, but recommended)
 
-## Restart Apache
-```
-sudo service apache2 restart
-```
+        RedirectMatch ^/$ /openboxes/
+
+
+1. Restart Apache
+
+        sudo service apache2 restart
+
+
+!!! note
+    If you've enabled HTTPS already, you may need to edit multiple files. 
+    
+    - /etc/apache2/sites-enabled/000-default.conf
+    - /etc/apache2/sites-enabled/000-default-le-ssl.conf
 
