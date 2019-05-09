@@ -91,7 +91,14 @@ class InventoryController {
     }
 
     def editBinLocation = {
-        render "Hello, World"
+
+        Product product = Product.findByProductCode(params.productCode)
+        Location location = Location.get(session.warehouse.id)
+        Location binLocation = Location.findByParentLocationAndName(location, params.binLocation)
+        InventoryItem inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, params.lotNumber)
+        Integer quantity = inventoryService.getQuantityFromBinLocation(location, binLocation, inventoryItem)
+        [binLocation: binLocation, inventoryItem: inventoryItem, quantity: quantity]
+
     }
 
     def saveInventoryChanges = { ManageInventoryCommand command ->

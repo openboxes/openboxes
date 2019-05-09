@@ -7,9 +7,10 @@
         <g:set var="entityName" value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}" />
         <title><warehouse:message code="inventory.manage.label" default="Browse inventory"/></title>
         <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
-        <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jqueryui-editable/css/jqueryui-editable.css" rel="stylesheet"/>
         <style>
         .dataTable > tr > td { white-space: nowrap; }
+        .dataTable tr.even:hover { background-color: #b2d1ff; }
+        .dataTable tr.odd:hover { background-color: #b2d1ff; }
         </style>
     </head>
     <body>
@@ -80,72 +81,54 @@
 
                             <div class="box dialog">
                                 <h2><warehouse:message code="inventory.manage.label" default="Manage inventory"/></h2>
-                                <table class="dataTable">
+                                <table id="manageInventoryTable" class="dataTable">
                                     <thead>
                                         <tr>
-                                            <th class="middle" style="width: 1%">
+                                            <th width="1%">
                                                 <g:message code="product.productCode.label"/>
                                             </th>
-                                            <th class="middle">
+                                            <th width="30%">
                                                 <g:message code="product.name.label"/>
                                             </th>
-                                            <th class="middle">
+                                            <th width="5%">
                                                 <g:message code="location.binLocation.label"/>
                                             </th>
-                                            <th class="middle">
+                                            <th width="5%">
                                                 <g:message code="inventoryItem.lotNumber.label"/>
                                             </th>
-                                            <th class="middle">
+                                            <th width="5%">
                                                 <g:message code="inventoryItem.expirationDate.label"/>
                                             </th>
-                                            <th class="middle">
+                                            <th width="5%">
                                                 <g:message code="default.quantityOnHand.label"/>
-                                            </th>
-                                            <th class="middle">
-                                                <g:message code="default.quantityOnHand.label"/>
-                                            </th>
-                                            <th>
-                                                <g:message code="default.reasonCode.label" default="Reason Code"/>
                                             </th>
                                         </tr>
                                     </thead>
                                     <tfoot>
                                     <tr>
-                                        <th class="middle" style="width: 1%">
+                                        <th>
                                             <g:message code="product.productCode.label"/>
                                         </th>
-                                        <th class="middle">
+                                        <th>
                                             <g:message code="product.name.label"/>
                                         </th>
-                                        <th class="middle">
+                                        <th>
                                             <g:message code="location.binLocation.label"/>
                                         </th>
-                                        <th class="middle">
+                                        <th>
                                             <g:message code="inventoryItem.lotNumber.label"/>
                                         </th>
-                                        <th class="middle">
+                                        <th>
                                             <g:message code="inventoryItem.expirationDate.label"/>
                                         </th>
-                                        <th class="middle">
-                                            <g:message code="default.quantityOnHand.label"/>
-                                        </th>
-                                        <th class="middle">
-                                            <g:message code="default.quantityOnHand.label"/>
-                                        </th>
                                         <th>
-                                            <g:message code="default.reasonCode.label" default="Reason Code"/>
+                                            <g:message code="default.quantityOnHand.label"/>
                                         </th>
                                     </tr>
                                     </tfoot>
 
                                 </table>
-
-                                <div class="buttons">
-                                    <button class="button"><g:message code="default.button.save.label"/></button>
-                                </div>
-
                             </div>
-
                         </form>
 					</div>
 				</div>
@@ -154,21 +137,21 @@
         <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
         <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
         <script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jqueryui-editable/js/jqueryui-editable.min.js"></script>
 
         <script>
 			$(document).ready(function() {
 
-			    $(".dataTable").dataTable({
+			    var table = $(".dataTable").dataTable({
                     "bJQueryUI": true,
                     // "sPaginationType": "full_numbers",
-                    // "iDisplayLength": 10,
+                    "iDisplayLength": 100,
                     "bProcessing": true,
                     "sAjaxSource": "${request.contextPath}/inventory/binLocations",
                     "bDeferRender": true,
+                    "bSortClasses": false,
                     "bScrollInfinite": true,
                     "bScrollCollapse": true,
-                    "sScrollY": "400px",
+                    "sScrollY": "500px",
                     "fnDrawCallback": function () {
                         %{--$('.dataTable tbody td').editable('${request.contextPath}/inventory/saveBinLocation', {--}%
                         %{--    "callback": function( sValue, y ) {--}%
@@ -179,6 +162,16 @@
                         %{--} );--}%
                     }
                 });
+
+                $('#manageInventoryTable tbody').on('click', 'tr', function () {
+                    console.log(this);
+                    var nTds = $('td', this);
+                    var productCode = $(nTds[0]).text();
+                    var binLocation = $(nTds[2]).text();
+                    var lotNumber = $(nTds[3]).text();
+                    var url = "${request.contextPath}/inventory/editBinLocation?productCode=" + productCode + "&binLocation=" + binLocation + "&lotNumber=" + lotNumber;
+                    openModalDialog("#dlgShowDialog", "Edit Record", "800px", url);
+                } );
 
                 $(".tabs").tabs({
                     cookie : {
