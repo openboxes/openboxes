@@ -10,6 +10,7 @@
 
 package org.pih.warehouse.inventory
 
+import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import grails.validation.ValidationException
@@ -48,67 +49,41 @@ class InventoryController {
 		redirect(action: "browse");
 	}
 
-    /*
-    def calculateQuantityOnHand = {
-        def product = Product.get(params.id)
-        def location = Location.get(session?.warehouse?.id)
-        def quantityMap = inventoryService.calculateQuantityOnHand(product, location)
-        render ([quantityMap: quantityMap] as JSON)
-    }
-    */
-
-
     def manage = { ManageInventoryCommand command ->
-
-        if(!params.max) params.max = 10
-        if(!params.offset) params.offset = 0
-        if(!params.type) params.type = 'list'
-
-        List products = []
-        Map quantityMap
-        Location location = Location.load(session.warehouse.id)
-
-        log.info("tags: " + command.tags)
-        if (command.tags) {
-            def tags = Tag.findAllByIdInList(command.tags)
-            products.addAll(productService.getProducts(null, tags, params))
-        }
-
-        if (command.productCodes) {
-            command?.productCodes.split(",").each { productCode ->
-                log.info "Product code " + productCode
-                def product = Product.findByProductCodeLike(productCode)
-                if (product) {
-                    products.add(product)
-                }
-            }
-        }
-
-        log.info ("Products: " + products)
-        if (products) {
-
-            products = products.unique()
-            command.inventoryItems = products*.inventoryItems.flatten()
-
-            quantityMap = inventoryService.getQuantityByInventoryItemMap(location, products)
-
-            command.inventoryItems = command.inventoryItems.collect { inventoryItem ->
-                def quantityOnHand = quantityMap[inventoryItem]
-                [product: inventoryItem.product, inventoryItem: inventoryItem, quantityOnHand: quantityOnHand]
-            }
-
-            command.inventoryItems = command.inventoryItems.findAll { it.quantityOnHand > 0 }
-        }
-
         [command: command]
     }
 
+    def binLocations = {
+        Location location = Location.load(session.warehouse.id)
+        List binLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+
+        def data = binLocations.collect {
+            [
+                    it?.inventoryItem.product?.productCode,
+                    it?.inventoryItem.product?.name,
+                    it?.binLocation?.name,
+                    it?.inventoryItem.lotNumber,
+                    it?.inventoryItem?.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.format(it?.inventoryItem?.expirationDate) : null,
+                    it?.quantity,
+                    it?.quantity,
+                    "None"
+            ]
+        }
+
+        def results = ["aaData": data]
+        render(results as JSON)
+    }
+
+    def editBinLocation = {
+        Product product = Product.findByProductCode(params.productCode)
+        Location location = Location.get(session.warehouse.id)
+        Location binLocation = Location.findByParentLocationAndName(location, params.binLocation)
+        InventoryItem inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, params.lotNumber)
+        Integer quantity = inventoryService.getQuantityFromBinLocation(location, binLocation, inventoryItem)
+        [binLocation: binLocation, inventoryItem: inventoryItem, quantity: quantity]
+    }
 
     def saveInventoryChanges = { ManageInventoryCommand command ->
-        log.info ("params: " + params)
-        log.info ("command: " + command)
-        log.info ("entries: " + command.entries)
-
         Transaction transaction = new Transaction(params)
         try {
             //transaction.transactionDate = params.transactionDate
@@ -1583,6 +1558,7 @@ class ManageInventoryCommand {
 
     List<ManageInventoryEntryCommand> entries = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(ManageInventoryEntryCommand.class));
     List inventoryItems = []
+    List binLocations = []
     String productCodes
     List tags = []
 }

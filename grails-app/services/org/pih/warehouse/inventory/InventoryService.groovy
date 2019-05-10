@@ -2021,29 +2021,32 @@ class InventoryService implements ApplicationContextAware {
 	 */
 	boolean adjustStock(AdjustStockCommand command) {
 
-        def quantity = command.quantity
+        def newQuantity = command.newQuantity
         def location = command.location
         def inventory = command.location.inventory
         def inventoryItem = command.inventoryItem
         def binLocation = command.binLocation
-        def quantityAvailable = getQuantityFromBinLocation(location, binLocation, inventoryItem)
+        def availableQuantity = getQuantityFromBinLocation(location, binLocation, inventoryItem)
+		def adjustedQuantity = newQuantity - availableQuantity
 
-        log.info "Check quantity: ${quantity} vs ${quantityAvailable}: ${quantityAvailable==quantity}"
-        if (quantityAvailable == quantity) {
-            command.errors.rejectValue("quantity","adjustStock.invalid.quantity.message")
+        log.info "Check quantity: ${newQuantity} vs ${availableQuantity}: ${availableQuantity==newQuantity}"
+        if (availableQuantity == newQuantity || adjustedQuantity == 0) {
+            command.errors.rejectValue("newQuantity","adjustStock.invalid.quantity.message")
         }
 
         if (command.validate() && !command.hasErrors()) {
-            def transaction = new Transaction();
-            // Need to create a transaction if we want the inventory item to show up in the stock card
+			// Need to create a transaction if we want the inventory item to show up in the stock card
+			def transaction = new Transaction();
             transaction.transactionDate = new Date();
-            transaction.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID);
+            transaction.transactionType = adjustedQuantity < 0 ?
+					TransactionType.get(Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID) :
+					TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
             transaction.inventory = inventory;
             transaction.comment = command.comment
 
             // Add transaction entry to transaction
             def transactionEntry = new TransactionEntry();
-            transactionEntry.quantity = quantity
+            transactionEntry.quantity = (adjustedQuantity).abs()
             transactionEntry.inventoryItem = inventoryItem;
             transactionEntry.binLocation = binLocation
 
