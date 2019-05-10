@@ -122,13 +122,13 @@
 
                     </td>
 
-                    <td class="border-right middle" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 6vw">
+                    <td class="border-right middle">
 
                         <g:if test="${stockHistoryEntry?.showDetails}">
-                            <div>
+                            <div >
                                 <g:if test="${stockHistoryEntry?.transaction?.incomingShipment }">
                                     <g:link controller="shipment" action="showDetails" id="${stockHistoryEntry?.transaction?.incomingShipment?.id }">
-                                        <div title="${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber } &rsaquo; ${stockHistoryEntry?.transaction.incomingShipment?.name }">
+                                        <div class="ellipsis" title="${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber } &rsaquo; ${stockHistoryEntry?.transaction.incomingShipment?.name }">
                                             <g:message code="shipment.label"/> &rsaquo;
                                             ${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber } &rsaquo;
                                             ${stockHistoryEntry?.transaction.incomingShipment?.name }
@@ -137,7 +137,7 @@
                                 </g:if>
                                 <g:elseif test="${stockHistoryEntry?.transaction?.outgoingShipment }">
                                     <g:link controller="shipment" action="showDetails" id="${stockHistoryEntry?.transaction?.outgoingShipment?.id }">
-                                        <div title="${stockHistoryEntry?.transaction.outgoingShipment?.shipmentNumber } &rsaquo; ${stockHistoryEntry?.transaction.outgoingShipment?.name }">
+                                        <div class="ellipsis" title="${stockHistoryEntry?.transaction.outgoingShipment?.shipmentNumber } &rsaquo; ${stockHistoryEntry?.transaction.outgoingShipment?.name }">
                                             <g:message code="shipment.label"/> &rsaquo;
                                             ${stockHistoryEntry?.transaction.outgoingShipment?.shipmentNumber } &rsaquo;
                                             ${stockHistoryEntry?.transaction.outgoingShipment?.name }

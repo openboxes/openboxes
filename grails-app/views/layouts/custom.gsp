@@ -326,7 +326,7 @@
 
 <g:javascript>
 
-    function openModalDialog(target, title, width, url) {
+    function openModalDialog(target, title, width, height, url) {
 
         var position = {
             my: "center center",
@@ -342,7 +342,7 @@
             width: width,
             autoResize:true,
             resizable: true,
-            minHeight:"auto",
+            minHeight: height,
             position: position,
             open: function(event, ui) {
                 $(this).html("Loading...");
@@ -366,13 +366,14 @@
             var title = $(this).data("title");
             var target = $(this).data("target") || "#dlgShowDialog";
             var width = $(this).data("width") || "800";
-            openModalDialog(target, title, width, url)
-
-
+            var height = $(this).data("height") || "auto";
+            openModalDialog(target, title, width, height, url)
         });
 
-        $(".btn-close-dialog").live("click", function () {
-            $("#dlgShowDialog").dialog( "close" );
+        $(".btn-close-dialog").live("click", function (event) {
+            event.preventDefault();
+            var target = $(this).data("target") || "#dlgShowDialog";
+            $(target).dialog( "close" );
         });
 
 	});

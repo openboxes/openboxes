@@ -74,62 +74,56 @@
                     </div>
 					<div class="yui-u">
 
-
-
-
-                        <form method="POST" action="saveInventoryChanges">
-
-                            <div class="box dialog">
-                                <h2><warehouse:message code="inventory.manage.label" default="Manage inventory"/></h2>
-                                <table id="manageInventoryTable" class="dataTable">
-                                    <thead>
-                                        <tr>
-                                            <th width="1%">
-                                                <g:message code="product.productCode.label"/>
-                                            </th>
-                                            <th width="30%">
-                                                <g:message code="product.name.label"/>
-                                            </th>
-                                            <th width="5%">
-                                                <g:message code="location.binLocation.label"/>
-                                            </th>
-                                            <th width="5%">
-                                                <g:message code="inventoryItem.lotNumber.label"/>
-                                            </th>
-                                            <th width="5%">
-                                                <g:message code="inventoryItem.expirationDate.label"/>
-                                            </th>
-                                            <th width="5%">
-                                                <g:message code="default.quantityOnHand.label"/>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
+                        <div class="box dialog">
+                            <h2><warehouse:message code="inventory.manage.label" default="Manage inventory"/></h2>
+                            <table id="manageInventoryTable" class="dataTable">
+                                <thead>
                                     <tr>
-                                        <th>
+                                        <th width="1%">
                                             <g:message code="product.productCode.label"/>
                                         </th>
-                                        <th>
+                                        <th width="30%">
                                             <g:message code="product.name.label"/>
                                         </th>
-                                        <th>
+                                        <th width="5%">
                                             <g:message code="location.binLocation.label"/>
                                         </th>
-                                        <th>
+                                        <th width="5%">
                                             <g:message code="inventoryItem.lotNumber.label"/>
                                         </th>
-                                        <th>
+                                        <th width="5%">
                                             <g:message code="inventoryItem.expirationDate.label"/>
                                         </th>
-                                        <th>
+                                        <th width="5%">
                                             <g:message code="default.quantityOnHand.label"/>
                                         </th>
                                     </tr>
-                                    </tfoot>
+                                </thead>
+                                <tfoot>
+                                <tr>
+                                    <th>
+                                        <g:message code="product.productCode.label"/>
+                                    </th>
+                                    <th>
+                                        <g:message code="product.name.label"/>
+                                    </th>
+                                    <th>
+                                        <g:message code="location.binLocation.label"/>
+                                    </th>
+                                    <th>
+                                        <g:message code="inventoryItem.lotNumber.label"/>
+                                    </th>
+                                    <th>
+                                        <g:message code="inventoryItem.expirationDate.label"/>
+                                    </th>
+                                    <th>
+                                        <g:message code="default.quantityOnHand.label"/>
+                                    </th>
+                                </tr>
+                                </tfoot>
 
-                                </table>
-                            </div>
-                        </form>
+                            </table>
+                        </div>
 					</div>
 				</div>
 			</div>
@@ -143,7 +137,6 @@
 
 			    var table = $(".dataTable").dataTable({
                     "bJQueryUI": true,
-                    // "sPaginationType": "full_numbers",
                     "iDisplayLength": 100,
                     "bProcessing": true,
                     "sAjaxSource": "${request.contextPath}/inventory/binLocations",
@@ -151,16 +144,7 @@
                     "bSortClasses": false,
                     "bScrollInfinite": true,
                     "bScrollCollapse": true,
-                    "sScrollY": "500px",
-                    "fnDrawCallback": function () {
-                        %{--$('.dataTable tbody td').editable('${request.contextPath}/inventory/saveBinLocation', {--}%
-                        %{--    "callback": function( sValue, y ) {--}%
-                        %{--        /* Redraw the table from the new data on the server */--}%
-                        %{--        oTable.fnDraw();--}%
-                        %{--    },--}%
-                        %{--    "height": "14px"--}%
-                        %{--} );--}%
-                    }
+                    "sScrollY": 500
                 });
 
                 $('#manageInventoryTable tbody').on('click', 'tr', function () {
@@ -168,9 +152,15 @@
                     var nTds = $('td', this);
                     var productCode = $(nTds[0]).text();
                     var binLocation = $(nTds[2]).text();
-                    var lotNumber = $(nTds[3]).text();
+                    var lotNumber = escape($(nTds[3]).html());
                     var url = "${request.contextPath}/inventory/editBinLocation?productCode=" + productCode + "&binLocation=" + binLocation + "&lotNumber=" + lotNumber;
-                    openModalDialog("#dlgShowDialog", "Edit Record", "800px", url);
+                    openModalDialog("#dlgShowDialog", "Adjust Stock", 1000, 400, url);
+
+                    // Focus and select quantity field
+                    $("#newQuantity").livequery(function(){
+                        $(this).focus();
+                        $(this).select();
+                    });
                 } );
 
                 $(".tabs").tabs({
@@ -186,7 +176,8 @@
                     'placeholder':'test',
                     'removeWithBackspace' : true
                 });
-			});	
+
+			});
 		</script>
     </body>
 </html>

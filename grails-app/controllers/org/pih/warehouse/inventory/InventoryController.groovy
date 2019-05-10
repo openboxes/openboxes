@@ -49,22 +49,9 @@ class InventoryController {
 		redirect(action: "browse");
 	}
 
-    /*
-    def calculateQuantityOnHand = {
-        def product = Product.get(params.id)
-        def location = Location.get(session?.warehouse?.id)
-        def quantityMap = inventoryService.calculateQuantityOnHand(product, location)
-        render ([quantityMap: quantityMap] as JSON)
-    }
-    */
-
-
     def manage = { ManageInventoryCommand command ->
-
-
         [command: command]
     }
-
 
     def binLocations = {
         Location location = Location.load(session.warehouse.id)
@@ -83,29 +70,20 @@ class InventoryController {
             ]
         }
 
-        def results = [
-                "aaData": data
-        ]
-
+        def results = ["aaData": data]
         render(results as JSON)
     }
 
     def editBinLocation = {
-
         Product product = Product.findByProductCode(params.productCode)
         Location location = Location.get(session.warehouse.id)
         Location binLocation = Location.findByParentLocationAndName(location, params.binLocation)
         InventoryItem inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, params.lotNumber)
         Integer quantity = inventoryService.getQuantityFromBinLocation(location, binLocation, inventoryItem)
         [binLocation: binLocation, inventoryItem: inventoryItem, quantity: quantity]
-
     }
 
     def saveInventoryChanges = { ManageInventoryCommand command ->
-        log.info ("params: " + params)
-        log.info ("command: " + command)
-        log.info ("entries: " + command.entries)
-
         Transaction transaction = new Transaction(params)
         try {
             //transaction.transactionDate = params.transactionDate

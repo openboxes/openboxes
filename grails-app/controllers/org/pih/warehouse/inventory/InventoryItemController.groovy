@@ -617,6 +617,13 @@ class InventoryItemController {
         } catch (ValidationException e) {
             command.errors = e.errors
         }
+
+		if (params.redirectUri) {
+			redirect(uri: params.redirectUri)
+			return
+		}
+
+
 		chain(controller: "inventoryItem", action: "showStockCard",
                 id: inventoryItem?.product?.id, params: ['inventoryItem.id':inventoryItem?.id], model: [command:command])
 	}
