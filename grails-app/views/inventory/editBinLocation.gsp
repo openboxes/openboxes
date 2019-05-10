@@ -69,7 +69,7 @@
                 <td valign="top" class="">
                     <input id="newQuantity" name="newQuantity" type="number" class="text medium"
                            autofocus="autofocus"
-                           value=""/> ${inventoryItem?.product?.unitOfMeasure}
+                           value="${quantity}"/> ${inventoryItem?.product?.unitOfMeasure}
                 </td>
             </tr>
             <tr class="prop">
