@@ -1,6 +1,6 @@
 <div class="dialog">
-
-    <g:form controller="inventoryItem" action="adjustStock" autocomplete="off">
+    <jqvalui:renderValidationScript for="org.pih.warehouse.inventory.AdjustStockCommand" form="adjustStockForm"/>
+    <g:form name="adjustStockForm" controller="inventoryItem" action="adjustStock" autocomplete="off">
 
         <g:hiddenField name="product.id" value="${inventoryItem?.product?.id}"/>
         <g:hiddenField name="location.id" value="${location?.id}"/>
@@ -18,6 +18,7 @@
             <tr class="prop">
                 <td valign="top" class="name"><label><warehouse:message code="location.binLocation.label" /></label></td>
                 <td valign="top" class="value">
+                    ${location?.name} &rsaquo;
                     <g:if test="${binLocation}">
                         ${binLocation?.name}
                     </g:if>
@@ -50,7 +51,7 @@
             <tr class="prop">
                 <td valign="top" class="name"><label><warehouse:message code="inventory.previousQuantity.label" /></label></td>
                 <td valign="top" class="value">
-                    <g:hiddenField id="quantityAvailable" name="quantityAvailable" value="${quantityAvailable }"/>
+                    <g:hiddenField id="c" name="currentQuantity" value="${quantityAvailable }"/>
                     ${quantityAvailable }
                     ${inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                 </td>
@@ -58,8 +59,14 @@
             <tr class="prop">
                 <td valign="top" class="name"><label><warehouse:message code="inventory.quantity.label" /></label></td>
                 <td valign="top" class="value">
-                    <input type="number" name="quantity" size="6" value="${quantityAvailable }" class="text"/>
+                    <input type="number" name="newQuantity" size="6" value="${quantityAvailable }" class="text"/>
                     ${inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name"><label><warehouse:message code="default.reasonCode.label" default="Reason Code"/></label></td>
+                <td valign="top" class="">
+                    <g:selectInventoryAdjustmentReasonCode name="reasonCode" value="${reasonCode}"  noSelection="['':'']"/>
                 </td>
             </tr>
             <tr class="prop">
@@ -71,9 +78,16 @@
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="2" class="center">
+                <td></td>
+                <td>
                     <button class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="inventory.adjustStock.label"/>
+                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>
+                        <warehouse:message code="default.button.save.label"/>
+                    </button>
+
+                    <button class="btn-close-dialog button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}"/>
+                        <warehouse:message code="default.button.close.label"/>
                     </button>
                 </td>
             </tr>
