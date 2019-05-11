@@ -56,8 +56,9 @@ class StockMovementService {
     def identifierService
     def requisitionService
     def shipmentService
-    def inventoryService
     def locationService
+    def inventoryService
+    def inventorySnapshotService
 
     boolean transactional = true
 
@@ -252,8 +253,15 @@ class StockMovementService {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
         }
 
+        def startTime = System.currentTimeMillis()
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+        log.info (">>>>>>>>>>>>>>> createFromRequisition: ${System.currentTimeMillis()-startTime} ms")
+
+        startTime = System.currentTimeMillis()
         stockMovement.documents = getDocuments(stockMovement)
+        log.info (">>>>>>>>>>>>>>> getDocuments: ${System.currentTimeMillis()-startTime} ms")
+
+        startTime = System.currentTimeMillis()
         if (stepNumber.equals("3")) {
             stockMovement.lineItems = null
             stockMovement.editPage = getEditPage(id)
@@ -272,6 +280,7 @@ class StockMovementService {
                 stockMovement.packPage = getPackPage(id)
             }
         }
+        log.info (">>>>>>>>>>>>>>> get stock movement for stepNumber ${stepNumber}: ${System.currentTimeMillis()-startTime} ms")
 
         return stockMovement
     }
@@ -395,7 +404,7 @@ class StockMovementService {
 
         if (quantityRequired) {
             // Retrieve all available items and then calculate suggested
-            List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, product)
+            List<AvailableItem> availableItems = inventorySnapshotService.getAvailableBinLocations(location, product)
             log.info "Available items: ${availableItems}"
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
@@ -548,7 +557,7 @@ class StockMovementService {
             availableSubstitutions = productAssociations.collect { productAssociation ->
 
                 def associatedProduct = productAssociation.associatedProduct
-                def availableItems = inventoryService.getAvailableBinLocations(location, associatedProduct)
+                def availableItems = getAvailableBinLocations(location, associatedProduct)
 
                 log.info "Available items for substitution ${associatedProduct}: ${availableItems}"
                 SubstitutionItem substitutionItem = new SubstitutionItem()
@@ -564,7 +573,7 @@ class StockMovementService {
 
     List<SubstitutionItem> getSubstitutionItems(Location location, RequisitionItem requisitionItem) {
         !requisitionItem?.substitutionItems ? null : requisitionItem?.substitutionItems?.collect { RequisitionItem item ->
-            List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, item.product)
+            List<AvailableItem> availableItems = getAvailableBinLocations(location, item.product)
 
             SubstitutionItem substitutionItem = new SubstitutionItem()
             substitutionItem.productId = item?.product?.id
@@ -575,6 +584,22 @@ class StockMovementService {
             return substitutionItem
         }
     }
+
+    List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
+        //return inventoryService.getAvailableBinLocations(location, item.product)
+
+        List availableBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, [product])
+        List<AvailableItem> availableItems = availableBinLocations.collect {
+            return new AvailableItem(
+                    inventoryItem: it?.inventoryItem,
+                    binLocation: it?.binLocation,
+                    quantityAvailable: it.quantity
+            )
+        }
+
+        return inventoryService.sortAvailableItems(availableItems)
+    }
+
 
     // These two methods do very different things
 //    List<SubstitutionItem> getSubstitutionItems(StockMovementItem stockMovementItem) {
@@ -589,12 +614,20 @@ class StockMovementService {
 
     EditPage getEditPage(String id) {
         EditPage editPage = new EditPage()
+        def startTime = System.currentTimeMillis()
         StockMovement stockMovement = getStockMovement(id)
+        log.info("Get stock movement ${id}: ${System.currentTimeMillis()-startTime}")
+
+        Map monthlyStocklistQuantities = calculateMonthlyStockListQuantity(stockMovement.origin)
+
+        startTime = System.currentTimeMillis()
         stockMovement.lineItems.each { stockMovementItem ->
             stockMovementItem.stockMovement = stockMovement
             EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
+            editPageItem.quantityConsumed = monthlyStocklistQuantities.get(stockMovementItem.product.id)
             editPage.editPageItems.addAll(editPageItem)
         }
+        log.info("Build edit pages for stock movement: ${System.currentTimeMillis()-startTime} ms")
         return editPage
     }
 
@@ -649,6 +682,67 @@ class StockMovementService {
         return pickPageItems
     }
 
+    Float calculateMonthlyStockListQuantity(Product product, Location location) {
+
+        List monthlyStockListQuantities = RequisitionItem.createCriteria().list {
+            projections {
+                property("quantity")
+                requisition {
+                    property("replenishmentPeriod")
+                }
+
+            }
+            requisition {
+                eq("isTemplate", Boolean.TRUE)
+                eq("isPublished", Boolean.TRUE)
+                eq("origin", location)
+            }
+            eq("product", product)
+        }
+
+        Float monthlyStockListQuantity =
+                monthlyStockListQuantities.sum { it[1] ? Math.ceil(((Double) it[0]) / it[1] * 30) : 0 }
+
+        return monthlyStockListQuantity
+    }
+
+    def calculateMonthlyStockListQuantity(Location location) {
+
+        List stocklistItems = RequisitionItem.createCriteria().list {
+            projections {
+                property("product.id")
+                property("quantity")
+                requisition {
+                    property("replenishmentPeriod")
+                }
+            }
+            requisition {
+                eq("isTemplate", Boolean.TRUE)
+                eq("isPublished", Boolean.TRUE)
+                eq("origin", location)
+            }
+        }
+
+        def monthlyStockListQuantities = stocklistItems.collect {
+            Float quantity = it[2] ? Math.ceil(((Double) it[1]) / it[2] * 30) : 0
+            [product: it[0], quantity: quantity]
+        }
+
+        // Get a map of monthly stocklist quantities with productId, quantities summed
+        monthlyStockListQuantities =
+                monthlyStockListQuantities.groupBy { it?.product }.
+                        collect { k, v -> [productId: k, quantity: v.quantity.sum()] }
+
+        // Rebuild list of maps as a map (productId: quantity]
+        monthlyStockListQuantities =
+                monthlyStockListQuantities.inject([:]) {map, col ->
+                    map << [(col.productId): col.quantity]
+                }
+
+        return monthlyStockListQuantities
+    }
+
+
     Float calculateMonthlyStockListQuantity(StockMovementItem stockMovementItem) {
         Integer monthlyStockListQuantity = 0
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
@@ -671,20 +765,19 @@ class StockMovementService {
         EditPageItem editPageItem = new EditPageItem()
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         Location location = requisitionItem?.requisition?.origin
-        List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
+
+        // Qty Available
+        List<AvailableItem> availableItems = inventorySnapshotService.getAvailableBinLocations(location, requisitionItem.product)
+
+        // Substitution
         List<SubstitutionItem> availableSubstitutions = getAvailableSubstitutions(location, requisitionItem.product)
         List<SubstitutionItem> substitutionItems = getSubstitutionItems(location, requisitionItem)
-
-
-        // Calculate monthly stock
-        Integer monthlyStockListQuantity = calculateMonthlyStockListQuantity(stockMovementItem)
 
         editPageItem.requisitionItem = requisitionItem
         editPageItem.productId = requisitionItem.product.id
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
         editPageItem.quantityRequested = requisitionItem.quantity
-        editPageItem.quantityConsumed = monthlyStockListQuantity
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         editPageItem.substitutionItems = substitutionItems
@@ -702,8 +795,8 @@ class StockMovementService {
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
-        List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem.product)
 
+        List<AvailableItem> availableItems = inventorySnapshotService.getAvailableBinLocations(location, requisitionItem.product)
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         pickPageItem.availableItems = availableItems
