@@ -25,7 +25,7 @@ class Constants {
 	static final adminControllers=['createProduct', 'createProductFromTemplate', 'admin']
 	static final adminActions = ['product':['create'], 'person': ['list'], 'user':['list'], 'location':['edit'], 'shipper':['create'], 'locationGroup':['create'],'locationType':['create'], '*': ['delete']]
 
-
+	static final String DEFAULT_YEAR_FORMAT = "yyyy"
 	static final String DEFAULT_DATE_FORMAT = "dd/MMM/yyyy"
 	static final String DEFAULT_DATE_TIME_FORMAT = "dd/MMM/yyyy HH:mm:ss"
 	static final String DEFAULT_TIME_FORMAT = "HH:mm:ss z"
