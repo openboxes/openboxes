@@ -3753,41 +3753,46 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-	def getAvailableBinLocations(Location location, Product product) {
-		return getAvailableBinLocations(location, [product], false)
+	List<AvailableItem>  getAvailableBinLocations(Location location, Product product) {
+		return getAvailableBinLocations(location, product, false)
 	}
 
-	def getAvailableBinLocations(Location location, Product product, boolean excludeOutOfStock) {
+	List<AvailableItem>  getAvailableBinLocations(Location location, Product product, boolean excludeOutOfStock) {
 		return getAvailableBinLocations(location, [product], excludeOutOfStock)
 	}
 
-	def getAvailableBinLocations(Location location, List products, boolean excludeOutOfStock = false) {
+	List<AvailableItem> getAvailableBinLocations(Location location, List products, boolean excludeOutOfStock = false) {
 		def availableBinLocations = getProductQuantityByBinLocation(location, products)
 
-		availableBinLocations = availableBinLocations.collect {
+		List<AvailableItem> availableItems = availableBinLocations.collect {
             return new AvailableItem(
 					inventoryItem: it?.inventoryItem,
 					binLocation: it?.binLocation,
 					quantityAvailable: it.quantity
             )
 		}
-		availableBinLocations = availableBinLocations.findAll { it.quantityAvailable > 0 }
+
+		availableItems = sortAvailableItems(availableItems)
+		return availableItems
+	}
+
+	List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems) {
+		availableItems = availableItems.findAll { it.quantityAvailable > 0 }
 
 		// Sort bins  by available quantity
-		availableBinLocations = availableBinLocations.sort { a, b ->
+		availableItems = availableItems.sort { a, b ->
 			a?.quantityAvailable <=> b?.quantityAvailable
 		}
 
 		// Sort empty expiration dates last
-		availableBinLocations = availableBinLocations.sort { a, b ->
+		availableItems = availableItems.sort { a, b ->
 			!a?.inventoryItem?.expirationDate ?
 					!b?.inventoryItem?.expirationDate ? 0 : 1 :
 					!b?.inventoryItem?.expirationDate ? -1 :
 							a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
 		}
 
-
-		return availableBinLocations
+		return availableItems
 	}
 
 
