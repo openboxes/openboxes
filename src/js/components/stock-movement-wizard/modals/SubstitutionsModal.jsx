@@ -214,10 +214,14 @@ class SubstitutionsModal extends Component {
     return (
       <div>
         <div className="form-group pb-2">
-          <label class="col-sm-2 col-form-label font-weight-bold"><Translate id="react.stockMovement.quantitySelected.label" defaultMessage="Quantity selected" /></label>
+          <label htmlFor="quantity-selected" className="col-sm-2 col-form-label font-weight-bold">
+            <Translate id="react.stockMovement.quantitySelected.label" defaultMessage="Quantity selected" />
+          </label>
+          <div id="quantity-selected">
             {_.reduce(values.substitutions, (sum, val) =>
                 (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)
-        }
+            }
+          </div>
         </div>
       </div>
     );
@@ -240,12 +244,12 @@ class SubstitutionsModal extends Component {
       >
         <div>
           <div className="form-group">
-            <label class="col-sm-2 col-form-label font-weight-bold"><Translate id="react.stockMovement.product.label" defaultMessage="Product" /></label>
-            {this.state.attr.lineItem.productCode} {this.state.attr.lineItem.productName}
+            <label htmlFor="product" className="col-sm-2 col-form-label font-weight-bold"><Translate id="react.stockMovement.product.label" defaultMessage="Product" /></label>
+            <div id="product" className="col-sm-10">{this.state.attr.lineItem.productCode} {this.state.attr.lineItem.productName}</div>
           </div>
           <div className="form-group">
-            <label class="col-sm-2 col-form-label font-weight-bold"><Translate id="react.stockMovement.quantityRequested.label" defaultMessage="Quantity requested" /></label>
-            {this.state.attr.lineItem.quantityRequested}
+            <label htmlFor="quantity-requested" className="col-sm-2 col-form-label font-weight-bold"><Translate id="react.stockMovement.quantityRequested.label" defaultMessage="Quantity requested" /></label>
+            <div id="quantity-requested" className="col-sm-10">{this.state.attr.lineItem.quantityRequested}</div>
           </div>
         </div>
       </ModalWrapper>
