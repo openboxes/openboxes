@@ -484,8 +484,8 @@ class PickPage extends Component {
                 onClick={() => this.sortByBins()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                {this.state.sorted && <Translate id="react.stockMovement.originalOrder.label" defaultMessage="Original order" />}
-                {!this.state.sorted && <Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" />}
+                {this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.originalOrder.label" defaultMessage="Original order" /></span>}
+                {!this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" /></span>}
               </button>
             </span>
             <form onSubmit={handleSubmit} className="print-mt">
