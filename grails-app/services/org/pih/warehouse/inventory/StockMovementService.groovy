@@ -29,6 +29,7 @@ import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.picklist.Picklist
@@ -1584,7 +1585,7 @@ class StockMovementService {
                             documentType: documentTemplate?.documentType?.name,
                             contentType : documentTemplate?.contentType,
                             stepNumber  : null,
-                            uri         : g.createLink(controller: 'document', action: "download",
+                            uri         : g.createLink(controller: 'document', action: "render",
                                     id: documentTemplate?.id, params: [shipmentId: stockMovement?.shipment?.id],
                                     absolute: true, title: documentTemplate?.filename)
                     ]
@@ -1592,12 +1593,13 @@ class StockMovementService {
             }
 
             stockMovement?.shipment?.documents.each { Document document ->
+                def action = document.documentType.documentCode == DocumentCode.SHIPPING_TEMPLATE ? "render" : "download"
                 documentList << [
                         name        : document?.name,
                         documentType: document?.documentType?.name,
                         contentType : document?.contentType,
                         stepNumber  : null,
-                        uri         : g.createLink(controller: 'document', action: "download",
+                        uri         : g.createLink(controller: 'document', action: action,
                                 id: document?.id, params: [shipmentId: stockMovement?.shipment?.id],
                                 absolute: true, title: document?.filename)
                 ]

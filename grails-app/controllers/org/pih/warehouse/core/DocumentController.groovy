@@ -341,26 +341,33 @@ class DocumentController {
             redirect(controller: "shipment", action: "showDetails", id:document.getShipment().getId());
         }
 		else {
-
-            // FIXME create a new method in the shipment controller to handle shipment-specific downloads
-            if (documentInstance?.documentType?.documentCode == DocumentCode.SHIPPING_TEMPLATE) {
-                Shipment shipmentInstance = Shipment.get(params.shipmentId)
-                // FIXME Move this into the service layer and try to pass back a BAOS
-                File tempFile = fileService.renderShippingTemplate(documentInstance, shipmentInstance)
-                def filename = "${documentInstance.name}-${shipmentInstance?.name?.trim()}.docx"
-                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"");
-                response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-                response.outputStream << tempFile.readBytes()
-                response.outputStream.flush()
-            }
-            else {
-                response.setHeader "Content-disposition", "attachment;filename=\"${documentInstance.filename}\""
-                response.contentType = documentInstance.contentType
-                response.outputStream << documentInstance.fileContents
-                response.outputStream.flush()
-            }
+            response.setHeader "Content-disposition", "attachment;filename=\"${documentInstance.filename}\""
+            response.contentType = documentInstance.contentType
+            response.outputStream << documentInstance.fileContents
+            response.outputStream.flush()
 		}
 	}
+
+    def render = {
+        def documentInstance = Document.get(params.id);
+        if (!documentInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
+            redirect(controller: "shipment", action: "showDetails", id:document.getShipment().getId());
+        }
+        else {
+            if (documentInstance?.documentType?.documentCode != DocumentCode.SHIPPING_TEMPLATE) {
+                throw new IllegalArgumentException("Document render action only supports documents with document code ${DocumentCode.SHIPPING_TEMPLATE}")
+            }
+            Shipment shipmentInstance = Shipment.get(params.shipmentId)
+            // FIXME Move this into the service layer and try to pass back a BAOS
+            File tempFile = fileService.renderShippingTemplate(documentInstance, shipmentInstance)
+            def filename = "${documentInstance.name}-${shipmentInstance?.name?.trim()}.docx"
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"");
+            response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            response.outputStream << tempFile.readBytes()
+            response.outputStream.flush()
+        }
+    }
 
     /**
      * Saves changes to document metadata (or, more specifically, saves changes to metadata--type,name,documentNumber--associated with
