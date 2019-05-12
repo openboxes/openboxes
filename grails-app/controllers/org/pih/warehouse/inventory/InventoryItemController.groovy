@@ -98,9 +98,11 @@ class InventoryItemController {
         cmd.warehouse = currentLocation
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
         def quantityMap = inventoryService.getCurrentStockAllLocations(commandInstance?.product, currentLocation, currentUser)
-        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
+		//def targetUri = g.createLink(controller: "inventoryItem", action: "showStockCard", id: commandInstance?.product?.id, absolute: true)
+		def targetUri = "/inventoryItem/showStockCard/${commandInstance?.product?.id}"
+		log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        render(template: "showCurrentStockAllLocations", model: [commandInstance:commandInstance, quantityMap:quantityMap])
+        render(template: "showCurrentStockAllLocations", model: [commandInstance:commandInstance, quantityMap:quantityMap, targetUri: targetUri])
     }
 
     def showAlternativeProducts = { StockCardCommand cmd ->
