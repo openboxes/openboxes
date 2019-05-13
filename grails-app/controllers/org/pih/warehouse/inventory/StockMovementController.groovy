@@ -274,7 +274,7 @@ class StockMovementController {
         def shipmentItems = []
         def shipments = shipmentService.getShipmentsByDestination(session.warehouse)
 
-        shipments.findAll { (it.currentStatus == ShipmentStatusCode.SHIPPED || it.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED) && it.requisition }.each {
+        shipments.findAll { it.currentStatus == ShipmentStatusCode.SHIPPED || it.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED }.each {
             it.shipmentItems.findAll { it.quantityRemaining > 0 }.each {
                 shipmentItems << it
             }
@@ -303,7 +303,7 @@ class StockMovementController {
                         quantity: shipmentItem.quantityRemaining,
                         expectedShippingDate: formatDate(date:shipmentItem.shipment.expectedShippingDate, format: "dd-MMM-yy"),
                         expectedDeliveryDate: formatDate(date:shipmentItem.shipment.expectedDeliveryDate, format: "dd-MMM-yy"),
-                        shipmentNumber: shipmentItem.shipment.requisition.requestNumber,
+                        shipmentNumber: shipmentItem.shipment.shipmentNumber,
                         shipmentName: shipmentItem.shipment.name,
                         origin: shipmentItem.shipment.origin,
                         destination: shipmentItem.shipment.destination,
