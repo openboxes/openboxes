@@ -184,7 +184,7 @@ class SubstitutionsModal extends Component {
       sub.quantitySelected > 0 && !sub.originalItem);
     const subQty = _.reduce(values.substitutions, (sum, val) =>
       (sum + (!val.originalItem ? _.toInteger(val.quantitySelected) : 0)), 0);
-    const originalItem = _.find(values.substitutions, sub => sub.originalItem);
+    const originalItem = this.state.attr.lineItem;
 
     const url = `/openboxes/api/stockMovementItems/${originalItem.requisitionItemId}/substituteItem`;
     const payload = {
