@@ -26,7 +26,7 @@
             </g:unless>
             <g:each in="${requisitionItems?.sort()}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
-                    <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.groupBy { it?.inventoryItem }}"/>
+                    <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.findAll { it.quantity > 0 }?.groupBy { it?.inventoryItem }}"/>
                     <g:set var="picklistItemsGroup" value="${inventoryItemMap?.values()?.toList()}"/>
                     <g:set var="numInventoryItem" value="${inventoryItemMap?.size() ?: 1}"/>
                 </g:if>

@@ -52,10 +52,10 @@
 
                 <g:if test="${picklist}">
                     <g:if test="${sorted}">
-                        <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItemsSortedByBinName()}"/>
+                        <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItemsSortedByBinName()?.findAll { it.quantity > 0 }}"/>
                     </g:if>
                     <g:else>
-                        <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
+                        <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()?.findAll { it.quantity > 0 }}"/>
                     </g:else>
                     <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>
                 </g:if>
