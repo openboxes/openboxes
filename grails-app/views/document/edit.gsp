@@ -173,13 +173,13 @@
                                     </td>
                                     <td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
                                         <input type="file" id="fileContents" name="fileContents" />
+                                        <g:actionSubmit class="button" action="upload" value="${warehouse.message(code: 'default.button.upload.label', default: 'Upload')}" />
                                     </td>
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top"></td>
                                     <td valign="top">
                                         <div class="buttons left">
-                                            <g:actionSubmit class="button" action="upload" value="${warehouse.message(code: 'default.button.upload.label', default: 'Upload')}" />
 
                                             <g:link controller="document" action="download" class="button" id="${documentInstance?.id}">
                                                 <g:message code="document.download.label"/>
