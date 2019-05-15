@@ -15,10 +15,10 @@
         <th>Destination</th>
         <th>Requested</th>
         <th>Canceled</th>
-        <th>Demand</th>
         <th>Approved</th>
         <th>Aproved Change</th>
         <th>Approved Substitution</th>
+        <th>Demand</th>
         <th>Reason Code</th>
         </thead>
         <tbody>
@@ -47,10 +47,10 @@
             { "mData": "destination_name", "sWidth": "0%" },
             { "mData": "quantity_requested", "sWidth": "0%" },
             { "mData": "quantity_canceled", "sWidth": "0%" },
-            { "mData": "quantity_demand", "sWidth": "0%" },
             { "mData": "quantity_approved", "sWidth": "0%" },
             { "mData": "quantity_change_approved", "sWidth": "0%" },
             { "mData": "quantity_substitution_approved", "sWidth": "0%" },
+            { "mData": "quantity_demand", "sWidth": "0%" },
             { "mData": "cancel_reason_code", "sWidth": "0%" },
         ]
     });

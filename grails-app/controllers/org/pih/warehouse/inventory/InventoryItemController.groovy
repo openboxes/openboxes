@@ -302,7 +302,7 @@ class InventoryItemController {
 		if (params.format=='csv') {
 			def data = forecastingService.getDemandDetails(location, product)
 			def csv = dataService.generateCsv(data)
-			def filename = "product-demand-${product.productCode}-${location.name}.csv"
+			def filename = "Product Demand ${product.productCode} ${location.name}.csv"
 			response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
 			render(contentType: "text/csv", text: csv)
 
