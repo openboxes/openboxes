@@ -61,6 +61,7 @@ class JsonController {
     def consoleService
     def userService
     def inventorySnapshotService
+    def forecastingService
 
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
@@ -1672,4 +1673,11 @@ class JsonController {
         render ([aaData:activityList] as JSON)
     }
 
+
+    def getProductDemand = {
+        Product product = Product.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        def demandDetails = forecastingService.getDemandDetails(location, product)
+        render ([aaData:demandDetails]as JSON)
+    }
 }

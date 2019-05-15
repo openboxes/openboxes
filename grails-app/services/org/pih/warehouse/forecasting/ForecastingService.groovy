@@ -22,12 +22,33 @@ class ForecastingService {
     def dataSource
 
 
+
     def getDemand(Location origin, Product product) {
+
+        def rows = getDemandDetails(origin, product)
+        def startDate = rows.min { it.date_requested }?.date_requested
+        def endDate = rows.max { it.date_requested }?.date_requested
+        def totalDemand = rows.sum { it.quantity_demand }?:0
+        def totalDays = (startDate && endDate) ? (endDate - startDate) : 1
+        def dailyDemand = (totalDemand && totalDays) ? (totalDemand / totalDays) : 0
+        def monthlyDemand = dailyDemand * 30
+        return [
+                totalDemand: totalDemand,
+                dateRange: [startDate: startDate, endDate: endDate],
+                totalDays: totalDays,
+                dailyDemand: dailyDemand,
+                monthlyDemand: monthlyDemand
+        ];
+    }
+
+    def getDemandDetails(Location origin, Product product) {
         String query = """
             select 
                 request_status,
                 request_number,
                 date_requested,
+                month(date_requested) as month_requested,
+                year(date_requested) as year_requested,
                 origin_id,
                 origin_name,
                 destination_id,
@@ -47,22 +68,10 @@ class ForecastingService {
             AND origin_id = :originId
         """
         Sql sql = new Sql(dataSource)
-        List rows = sql.rows(query, [productId: product.id, originId: origin.id])
-
-        def startDate = rows.min { it.date_requested }?.date_requested
-        def endDate = rows.max { it.date_requested }?.date_requested
-        def totalDemand = rows.sum { it.quantity_demand }?:0
-        def totalDays = (startDate && endDate) ? (endDate - startDate) : 1
-        def dailyDemand = (totalDemand && totalDays) ? (totalDemand / totalDays) : 0
-        def monthlyDemand = dailyDemand * 30
-        return [
-                totalDemand: totalDemand,
-                dateRange: [startDate: startDate, endDate: endDate],
-                totalDays: totalDays,
-                dailyDemand: dailyDemand,
-                monthlyDemand: monthlyDemand
-        ];
+        List data = sql.rows(query, [productId: product.id, originId: origin.id])
+        return data
     }
+
 
     def getDemandSummary(Location origin, Product product) {
         List data = []

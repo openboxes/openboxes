@@ -31,6 +31,7 @@
 			<li><a href="${request.contextPath}/inventoryItem/showPending/${commandInstance?.product?.id}?type=INBOUND"><warehouse:message code="stockCard.pendingInbound.label" default="Pending Inbound"/></a></li>
 			<li><a href="${request.contextPath}/inventoryItem/showPending/${commandInstance?.product?.id}?type=OUTBOUND"><warehouse:message code="stockCard.pendingOutbound.label" default="Pending Outbound"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showConsumption/${commandInstance?.product?.id}"><warehouse:message code="inventory.consumption.label" default="Consumption"/></a></li>
+			<li><a href="${request.contextPath}/inventoryItem/showProductDemand/${commandInstance?.product?.id}"><warehouse:message code="forecasting.demand.label" default="Consumption"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showInventorySnapshot/${commandInstance?.product?.id}"><warehouse:message code="inventory.snapshot.label" default="Snapshot"/></a></li>
 		</ul>
 	</div>

@@ -25,6 +25,7 @@ import org.pih.warehouse.shipping.ShipmentItemException
 
 class InventoryItemController {
 
+	def dataService
 	def inventoryService;
 	def shipmentService;
 	def requisitionService;
@@ -294,6 +295,22 @@ class InventoryItemController {
         render(template: "showConsumption",
                 model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems, demandSummary:demandSummary])
     }
+
+	def showProductDemand = {
+		Product product = Product.get(params.id)
+		Location location = Location.get(session.warehouse.id)
+		if (params.format=='csv') {
+			def data = forecastingService.getDemandDetails(location, product)
+			def csv = dataService.generateCsv(data)
+			def filename = "product-demand-${product.productCode}-${location.name}.csv"
+			response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+			render(contentType: "text/csv", text: csv)
+
+			return
+		}
+
+		render(template: "showProductDemand", model: [product: product])
+	}
 
 
     def showInventorySnapshot = {
