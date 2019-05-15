@@ -613,6 +613,8 @@ class RequisitionService {
                     }
                 }
             }
+            // FIXME Should uncomment this once the demand calculation is implemented in RequisitionItem
+            //isNull("parentRequisitionItem")
             eq("product", product)
             if (cancelReasonCodes) {
                 or {
