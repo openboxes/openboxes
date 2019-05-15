@@ -118,7 +118,7 @@ class StockMovementController {
     }
 
 
-    def delete = {
+    def removeStockMovement = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
             try {

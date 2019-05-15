@@ -107,16 +107,14 @@
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>
                 </g:elseif>
-            </g:isUserAdmin>
-            <g:isSuperuser>
                 <g:if test="${hasBeenPending || !stockMovement?.shipment?.currentStatus}">
-                    <g:link controller="stockMovement" action="delete" id="${stockMovement.id}" class="button"
+                    <g:link controller="stockMovement" action="removeStockMovement" id="${stockMovement.id}" class="button"
                             onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
                         <warehouse:message code="default.button.delete.label" />
                     </g:link>
                 </g:if>
-            </g:isSuperuser>
+            </g:isUserAdmin>
         </div>
     </div>
 
