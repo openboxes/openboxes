@@ -202,7 +202,7 @@
 
         <tfoot>
             <tr>
-                <td><warehouse:message code="consumption.total.label" default="Total consumption"/></td>
+                <td><warehouse:message code="default.total.label" default="Total"/></td>
                 <td class="center"><g:formatNumber number="${totalQuantityRequested}" maxFractionDigits="0"/></td>
                 <td class="center"><g:formatNumber number="${totalQuantityCanceled}" maxFractionDigits="0"/></td>
                 <td class="center"><g:formatNumber number="${totalQuantityApproved}" maxFractionDigits="0"/></td>
@@ -210,12 +210,20 @@
                 <td class="center"><g:formatNumber number="${totalQuantityIssued}" maxFractionDigits="0"/></td>
             </tr>
             <tr>
-                <td><warehouse:message code="consumption.average.label" default="Average consumption (per month)"/></td>
-                <td class="center"><g:formatNumber number="${totalQuantityRequested/numberOfMonths}" maxFractionDigits="0"/></td>
-                <td class="center"><g:formatNumber number="${totalQuantityCanceled/numberOfMonths}" maxFractionDigits="0"/></td>
-                <td class="center"><g:formatNumber number="${totalQuantityApproved/numberOfMonths}" maxFractionDigits="0"/></td>
-                <td class="center"><g:formatNumber number="${totalQuantityPicked/numberOfMonths}" maxFractionDigits="0"/></td>
-                <td class="center"><g:formatNumber number="${totalQuantityIssued/numberOfMonths}" maxFractionDigits="0"/></td>
+                <td><warehouse:message code="default.monthly.label" default="Monthly"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityRequested/numberOfDays*30}" maxFractionDigits="0"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityCanceled/numberOfDays*30}" maxFractionDigits="0"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityApproved/numberOfDays*30}" maxFractionDigits="0"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityPicked/numberOfDays*30}" maxFractionDigits="0"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityIssued/numberOfDays*30}" maxFractionDigits="0"/></td>
+            </tr>
+            <tr>
+                <td><warehouse:message code="default.daily.label" default="Daily"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityRequested/numberOfDays}" maxFractionDigits="0"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityCanceled/numberOfDays}" maxFractionDigits="0"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityApproved/numberOfDays}" maxFractionDigits="0"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityPicked/numberOfDays}" maxFractionDigits="0"/></td>
+                <td class="center"><g:formatNumber number="${totalQuantityIssued/numberOfDays}" maxFractionDigits="0"/></td>
             </tr>
         </tfoot>
     </table>

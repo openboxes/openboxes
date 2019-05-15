@@ -289,10 +289,13 @@ class InventoryItemController {
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
         def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouse, commandInstance?.product, cmd.startDate, cmd.endDate, reasonCodes)
 
-		def demandSummary = forecastingService.getDemandSummary(cmd.warehouse, cmd.product)
+        // Calculate the number of days between first and last requisition
+		def firstDateRequested = issuedRequisitionItems.collect { it.requisition.dateRequested }.min()
+		def lastDateRequested = issuedRequisitionItems.collect { it.requisition.dateRequested }.max()
+		def numberOfDays = (firstDateRequested && lastDateRequested) ? lastDateRequested-firstDateRequested : 1
 
         render(template: "showConsumption",
-                model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems, demandSummary:demandSummary])
+                model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems, numberOfDays: numberOfDays])
     }
 
 
