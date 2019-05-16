@@ -309,7 +309,7 @@ class InventoryItemController {
 			def quantityIssued = transactionEntries.findAll { te -> te.requestNumber == requestNumber }.collect { it.quantity }.sum()
             def quantityApproved = it?.quantityApproved?:0
             def quantityPicked = it?.calculateQuantityPicked()?:0
-            if (it.status == RequisitionItemStatus.CHANGED) {
+            if (it.status in [RequisitionItemStatus.CHANGED, RequisitionItemStatus.SUBSTITUTED]) {
                 quantityApproved = it?.requisitionItems?.collect { it.quantityApproved }.sum()
                 quantityPicked = it?.requisitionItems?.collect { it.calculateQuantityPicked() }.sum()
             }
