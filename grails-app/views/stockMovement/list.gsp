@@ -40,7 +40,7 @@
                 <div class="button-group">
                     <g:link controller="stockMovement" action="exportItems" class="button">
                         <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
-                        ${warehouse.message(code: 'stockMovements.exportIncomingItems.label', default: 'Export incoming items')}
+                        ${warehouse.message(code: 'stockMovements.exportIncomingItems.label', default: 'Export all incoming items')}
                     </g:link>
                 </div>
             </g:if>
