@@ -50,12 +50,12 @@
                             <g:formatNumber number="${monthlyQuantityCanceled}"/>
                         </td>
                         <td class="center middle">
-                            <div class="${monthlyQuantityApproved != monthlyQuantityIssued ? 'discrepancy': ''}" title="Approved quantity should equal Issued quantity">
+                            <div class="${monthlyQuantityPicked < monthlyQuantityApproved ? 'discrepancy': ''}" title="Picked should not be less than Approved">
                                 <g:formatNumber number="${monthlyQuantityApproved}"/>
                             </div>
                         </td>
                         <td class="center middle">
-                            <div class="${monthlyQuantityPicked != monthlyQuantityIssued ? 'discrepancy': ''}" title="Picked quantity should equal Issued quantity">
+                            <div class="${monthlyQuantityIssued < monthlyQuantityPicked ? 'discrepancy': ''}" title="Issued should not be less than Picked">
                                 <g:formatNumber number="${monthlyQuantityPicked}"/>
                             </div>
                         </td>
@@ -130,22 +130,26 @@
                                                 ${requisitionItem.reasonCode}
                                             </td>
                                             <td class="center middle">
-                                                ${quantityRequested}
+                                                <g:formatNumber number="${quantityRequested}"/>
                                             </td>
                                             <td class="center middle">
-                                                ${quantityCanceled}
+                                                <g:formatNumber number="${quantityCanceled}"/>
                                             </td>
                                             <td class="center middle">
-                                                ${quantityRequired}
+                                                <g:formatNumber number="${quantityRequired}"/>
                                             </td>
                                             <td class="center middle">
-                                                ${quantityApproved}
+                                                <div class="${quantityPicked < quantityApproved ? 'discrepancy': ''}" title="Picked should not be less than approved">
+                                                    <g:formatNumber number="${quantityApproved}"/>
+                                                </div>
                                             </td>
                                             <td class="center middle">
-                                                ${quantityPicked}
+                                                <div class="${quantityIssued < quantityPicked ? 'discrepancy': ''}" title="Issued should not be less than picked">
+                                                    <g:formatNumber number="${quantityPicked}"/>
+                                                </div>
                                             </td>
                                             <td class="center middle">
-                                                ${quantityIssued}
+                                                <g:formatNumber number="${quantityIssued}"/>
                                             </td>
                                         </tr>
                                     </g:each>
