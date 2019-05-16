@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
@@ -614,7 +615,7 @@ class RequisitionService {
                 }
             }
             // FIXME Should uncomment this once the demand calculation is implemented in RequisitionItem
-            //isNull("parentRequisitionItem")
+            isNull("parentRequisitionItem")
             eq("product", product)
             if (cancelReasonCodes) {
                 or {
@@ -625,6 +626,29 @@ class RequisitionService {
         }
         //println requisitionItems
         return requisitionItems
+    }
+
+    def getIssuedTransactionEntries(Location location, Product product, Date startDate, Date endDate) {
+        def transactionEntries = TransactionEntry.createCriteria().list {
+            transaction {
+                transactionType {
+                    eq("transactionCode", TransactionCode.DEBIT)
+                }
+                eq("inventory", location.inventory)
+                if (startDate) {
+                    ge("transactionDate", startDate)
+                }
+                if (endDate) {
+                    le("transactionDate", endDate)
+                }
+            }
+            inventoryItem {
+                eq("product", product)
+
+            }
+        }
+        log.info ("transaction entries " + transactionEntries.size())
+        return transactionEntries
     }
 
 
