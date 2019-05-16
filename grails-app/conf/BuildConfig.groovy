@@ -26,7 +26,7 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // uncomment to disable ehcache
         // excludes 'ehcache'
-        excludes "xml-apis"
+		excludes "xml-apis", "xmlbeans"
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
@@ -41,6 +41,7 @@ grails.project.dependency.resolution = {
         mavenRepo "http://repo.grails.org/grails/plugins-releases/"
         mavenRepo "http://repo.grails.org/grails/plugins/"
         mavenRepo "http://repo.grails.org/grails/core/"
+        mavenRepo "http://oss.sonatype.org/content/repositories/snapshots/"
     }
 
     dependencies {
@@ -86,6 +87,28 @@ grails.project.dependency.resolution = {
         test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
         test("org.codehaus.geb:geb-spock:0.6.3") {
             exclude 'spock'
+        }
+
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:1.0.5") {
+            excludes "xercesImpl", "xml-apis", "xmlbeans"
+        }
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:1.0.5") {
+            excludes "xercesImpl", "xml-apis", "xmlbeans"
+        }
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:1.0.5") {
+            excludes "xercesImpl", "xml-apis", "xmlbeans"
+        }
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:1.0.5") {
+            excludes "xercesImpl", "xml-apis", "xmlbeans"
+        }
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:1.0.5") {
+            excludes "xercesImpl", "xml-apis", "xmlbeans"
+        }
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:1.0.5") {
+            excludes "xercesImpl", "xml-apis", "xmlbeans"
+        }
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:1.0.5") {
+            excludes "xercesImpl", "xml-apis", "xmlbeans"
         }
 
         // Fake SMTP server
