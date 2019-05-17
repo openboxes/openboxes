@@ -1,17 +1,17 @@
 <%@ page defaultCodec="html" %>
-<div class="page dialog" style="page-break-after: ${pageBreakAfter};">
-    <table id="requisition-items">
+<div class="page-content">
+    <table id="requisition-items" class="fs-repeat-header w100">
         <thead>
-            <tr class="theader">
+            <tr>
                 <th><warehouse:message code="report.number.label"/></th>
-                <th class="center">${warehouse.message(code: 'product.productCode.label')}</th>
+                <th>${warehouse.message(code: 'product.productCode.label')}</th>
                 <th>${warehouse.message(code: 'product.label')}</th>
-                <th class="center">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
-                <th class="center">${warehouse.message(code: 'requisitionItem.quantityDelivered.label', default: "Delivered")}</th>
-                <th style="min-width: 150px;">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
+                <th>${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
+                <th>${warehouse.message(code: 'requisitionItem.quantityDelivered.label', default: "Delivered")}</th>
+                <th>${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
-                <th class="center">${warehouse.message(code: 'requisitionItem.quantity.label', default: "Quantity")}</th>
-                <th class="left">${warehouse.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
+                <th>${warehouse.message(code: 'requisitionItem.quantity.label', default: "Quantity")}</th>
+                <th>${warehouse.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
             </tr>
         </thead>
         <tbody>
