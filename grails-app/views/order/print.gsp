@@ -41,15 +41,7 @@
 
         <div class="left">
             <div class="logo">
-                <g:if test="${session?.warehouse?.logo }">
-                    <a href="${createLink(uri: '/dashboard/index')}">
-                        <img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}" class="middle" />
-                    </a>
-                </g:if>
-                <g:else>
-                    <a href="${createLink(uri: '/dashboard/index')}">
-                        <span class="middle"><warehouse:message code="default.openboxes.label"/></span></a>
-                </g:else>
+                <g:displayReportLogo/>
             </div>
         </div>
         <div class="right">

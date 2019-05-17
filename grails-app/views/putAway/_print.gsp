@@ -90,7 +90,7 @@
         <table>
             <tr>
                 <td>
-                    <img class="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg', absolute: true)}"/>
+                    <g:displayReportLogo/>
                 </td>
                 <td>
                     ${jsonObject?.putawayNumber}

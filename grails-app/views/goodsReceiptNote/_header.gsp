@@ -2,9 +2,7 @@
     <tr>
         <td width="1%">
             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
-                <div class="print-logo nailthumb-container" style="float: left;">
-                    <img src="${grailsApplication.config.openboxes.logoSquare.url}"/>
-                </div>
+                <g:displayReportLogo/>
             </div>
         </td>
         <td>
@@ -13,7 +11,7 @@
                 <h3>${shipment?.shipmentNumber} - ${shipment?.name }
                 <g:if test="${shipment.shipmentNumber}">
                     <div class="barcode">
-                    <img src="${createLink(controller: 'product', action: 'barcode', params: [data: shipment?.shipmentNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
+                        <img src="${createLink(controller: 'product', action: 'barcode', params: [data: shipment?.shipmentNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
                     </div>
                 </g:if>
             </div>
