@@ -54,7 +54,7 @@ class StockMovementController {
         def offset = params.offset?params.offset as int:0
         User currentUser = User.get(session?.user?.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
-        boolean incoming = params?.direction == "INBOUND"
+        boolean incoming = params?.direction == "INBOUND" || params.destination?.id == currentLocation?.id
 
         if (params.direction=="OUTBOUND") {
             params.origin = params.origin?:currentLocation
@@ -274,11 +274,21 @@ class StockMovementController {
         def shipmentItems = []
         def shipments = shipmentService.getShipmentsByDestination(session.warehouse)
 
-        shipments.findAll { it.currentStatus == ShipmentStatusCode.SHIPPED || it.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED }.each {
-            it.shipmentItems.findAll { it.quantityRemaining > 0 }.each {
-                shipmentItems << it
+        shipments.findAll { it.currentStatus == ShipmentStatusCode.SHIPPED || it.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED }.each { shipment ->
+            shipment.shipmentItems.findAll { it.quantityRemaining > 0 }.groupBy { it.product }.each { product, value ->
+                shipmentItems << [
+                        productCode: product.productCode,
+                        productName: product.name,
+                        quantity: value.sum { it.quantityRemaining },
+                        expectedShippingDate: formatDate(date:shipment.expectedShippingDate, format: "dd-MMM-yy"),
+                        shipmentNumber: shipment.shipmentNumber,
+                        shipmentName: shipment.name,
+                        origin: shipment.origin,
+                        destination: shipment.destination,
+                ]
             }
         }
+
 
         if (shipmentItems) {
             def date = new Date();
@@ -289,7 +299,6 @@ class StockMovementController {
                 "Product Name" { it.productName }
                 "Quantity Incoming" { it.quantity }
                 "Expected Shipping Date" { it.expectedShippingDate }
-                "Expected Delivery Date" { it.expectedDeliveryDate }
                 "Shipment Number" { it.shipmentNumber }
                 "Shipment Name" { it.shipmentName }
                 "Origin" { it.origin }
@@ -298,15 +307,14 @@ class StockMovementController {
 
             shipmentItems.each { shipmentItem ->
                 csv << [
-                        productCode: shipmentItem.product.productCode,
-                        productName: shipmentItem.product.name,
-                        quantity: shipmentItem.quantityRemaining,
-                        expectedShippingDate: formatDate(date:shipmentItem.shipment.expectedShippingDate, format: "dd-MMM-yy"),
-                        expectedDeliveryDate: formatDate(date:shipmentItem.shipment.expectedDeliveryDate, format: "dd-MMM-yy"),
-                        shipmentNumber: shipmentItem.shipment.shipmentNumber,
-                        shipmentName: shipmentItem.shipment.name,
-                        origin: shipmentItem.shipment.origin,
-                        destination: shipmentItem.shipment.destination,
+                        productCode: shipmentItem.productCode,
+                        productName: shipmentItem.productName,
+                        quantity: shipmentItem.quantity,
+                        expectedShippingDate: shipmentItem.expectedShippingDate,
+                        shipmentNumber: shipmentItem.shipmentNumber,
+                        shipmentName: shipmentItem.shipmentName,
+                        origin: shipmentItem.origin,
+                        destination: shipmentItem.destination,
                 ]
             }
             //println csv.writer.toString()
