@@ -29,6 +29,14 @@ class StocklistController {
 
 	}
 
+
+	def renderHtml = {
+		Stocklist stocklist = stocklistService.getStocklist(params.id)
+		render(
+				template: "/stocklist/print",
+				model: [stocklist:stocklist])
+	}
+
 	def renderPdf = {
 		Stocklist stocklist = stocklistService.getStocklist(params.id)
 

@@ -84,31 +84,31 @@
 			</g:link>
 			<g:link controller="requisitionTemplate" action="editHeader" id="${requisition?.id}" class="button">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />&nbsp;
-				${warehouse.message(code: 'requisitionTemplate.editHeader.label', default: 'Edit stock list')}
+				${warehouse.message(code: 'default.edit.label', args: [warehouse.message(code:'requisitionTemplate.label')])}
 			</g:link>
 			<g:link controller="requisitionTemplate" action="edit" id="${requisition?.id}" class="button">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'application_add.png')}" />&nbsp;
-				${warehouse.message(code: 'requisitionTemplate.edit.label', default: 'Edit stock list items')}
+				${warehouse.message(code: 'default.button.edit.label')}
 			</g:link>
 			<g:link controller="requisitionTemplate" action="batch" id="${requisition?.id}" class="button">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_go.png')}" />
-				&nbsp;${warehouse.message(code: 'requisitionTemplate.import.label', default: 'Import stock list items')}
+				&nbsp;${warehouse.message(code: 'default.button.import.label')}
 			</g:link>
 			<g:link controller="requisitionTemplate" action="export" id="${requisition?.id}" class="button">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
-				&nbsp;${warehouse.message(code: 'requisitionTemplate.export.label', default: 'Export stock list items')}
+				&nbsp;${warehouse.message(code: 'default.button.export.label')}
 			</g:link>
 
 			<g:if test="${!requisition.isPublished}">
 				<g:link controller="requisitionTemplate" action="publish" id="${requisition?.id}" class="button">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_world.png')}" />
-					&nbsp;${warehouse.message(code: 'requisitionTemplate.publish.label', default: 'Publish stock list')}
+					&nbsp;${warehouse.message(code: 'default.button.publish.label')}
 				</g:link>
 			</g:if>
 			<g:else>
 				<g:link controller="requisitionTemplate" action="unpublish" id="${requisition?.id}" class="button">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_world.png')}" />
-					&nbsp;${warehouse.message(code: 'requisitionTemplate.unpublish.label', default: 'Unpublish stock list')}
+					&nbsp;${warehouse.message(code: 'default.button.unpublish.label')}
 				</g:link>
 			</g:else>
 		</g:isUserAdmin>
@@ -118,20 +118,26 @@
 		</g:link>
 		<span class="action-menu" style="margin-left: 15px">
 			<button class="action-btn button">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}" />&nbsp;
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'page_attach.png')}" />&nbsp;
 				${warehouse.message(code: 'default.button.download.label')}
 				<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 			</button>
 			<div class="actions">
 				<div class="action-menu-item">
+					<g:link controller="stocklist" action="renderHtml" id="${requisition?.id}" target="_blank">
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'html.png')}" />&nbsp;
+						${warehouse.message(code: 'default.button.preview.label')}
+					</g:link>
+				</div>
+				<div class="action-menu-item">
 					<g:link controller="stocklist" action="renderPdf" id="${requisition?.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}" />&nbsp;
+						<img src="${createLinkTo(dir:'images/icons',file:'pdf.png')}" />&nbsp;
 						${warehouse.message(code: 'default.button.downloadPdf.label')}
 					</g:link>
 				</div>
 				<div class="action-menu-item">
 					<g:link controller="stocklist" action="generateCsv" id="${requisition?.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'disk_download.png')}" />&nbsp;
+						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />&nbsp;
 						${warehouse.message(code: 'default.button.downloadXls.label')}
 					</g:link>
 				</div>
