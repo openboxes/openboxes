@@ -13,13 +13,13 @@ markdown_extensions:
   - footnotes
   - tables
 nav:
-- 'Home': 'index.md'
-- About:
+  - 'Home': 'index.md'
+  - About:
     - 'Features': 'https://openboxes.com/features/'
     - 'Benefits': 'about/benefits.md'
     - 'Considerations': 'about/considerations.md'
     - 'Release Notes': 'about/release-notes.md'
-- Installation:
+  - Installation:
     - 'Overview': 'installation/index.md'
     - 'Ubuntu 18.04':
       - 'Overview': 'installation/ubuntu1804/index.md'
@@ -38,7 +38,7 @@ nav:
     - 'Mac OS': 'installation/macos.md'
     - 'Windows': 'installation/windows.md'
     - 'Upgrading': 'upgrading/index.md'
-- Configuration:
+  - Configuration:
     - 'Overview': 'configuration/index.md'
     - 'Tomcat AJP': 'configuration/ajp.md'
     - 'Apache HTTPS': 'configuration/https.md'
@@ -47,15 +47,15 @@ nav:
     - 'OpenBoxes': 'configuration/application.md'
     - 'Sentry': 'configuration/sentry.md'
     - 'Example': 'configuration/example.md'
-- Users:
+  - Users:
     - 'Overview': 'user-guide/index.md'
-- Developers:
+  - Developers:
     - 'Introduction': 'developer-guide/index.md'
     - 'Getting Started': 'developer-guide/getting-started.md'
     - 'Contributing': 'developer-guide/contributing.md'
     - 'Syncing a Fork': 'developer-guide/syncing-a-fork.md'
     - 'Tagging a Release': 'developer-guide/tagging.md'
-- 'REST API Guide':
+  - 'REST API Guide':
     - 'Overview': 'api-guide/index.md'
     - 'Getting Started': 'api-guide/getting-started.md'
     - 'Generic API': 'api-guide/generic.md'
@@ -76,8 +76,7 @@ nav:
             - 'Stock Movement Status': 'api-guide/stockMovementStatus.md'
             - 'Putaway': 'api-guide/putaway.md'
             - 'Receiving': 'api-guide/receiving.md'
-
-- Support:
+  - Support:
     - 'Overview': 'support/index.md'
 
 
