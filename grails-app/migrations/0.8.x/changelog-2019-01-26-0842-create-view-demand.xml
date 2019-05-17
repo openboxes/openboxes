@@ -91,7 +91,7 @@
             WHERE
             1 = 1
             AND requisition_item.requisition_item_type = 'ORIGINAL'
-            AND requisition.status = 'ISSUED') AS tmp1) AS tmp2
+            AND requisition.status = 'ISSUED') AS tmp1) AS tmp2;
         </createView>
     </changeSet>
 </databaseChangeLog>
