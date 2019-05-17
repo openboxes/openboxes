@@ -15,6 +15,11 @@
 <div class="page" style="page-break-after: ${pageBreakAfter};">
     <table id="requisition-items" class="fs-repeat-header" border="0">
         <thead>
+            <tr class="">
+                <td colspan="10">
+                    <h4 class="title">${groupName}</h4>
+                </td>
+            </tr>
             <tr class="theader">
                 <th><warehouse:message code="report.number.label"/></th>
                 <th class="center">${warehouse.message(code: 'product.productCode.label')}</th>

@@ -14,12 +14,9 @@
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
 
 </head>
-
 <body>
-<div id="print-header" style="line-height: 40px;">
-    <%--<img id="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>--%>
-    <span class="title"><warehouse:message code="picklist.print.label"/></span>
-    <div class="right button-group" style="margin:10px;">
+<div id="print-header">
+    <div class="right button-group">
         <a href="javascript:window.print()" type="button" id="print-button" onclick="window.print();"  class="button">
             ${warehouse.message(code: "default.button.print.label", default: 'Print')}
         </a>
@@ -30,20 +27,16 @@
             ${warehouse.message(code: "default.button.close.label", default: 'Close')}
         </a>
     </div>
+    <h1 class="title"><warehouse:message code="picklist.print.label"/></h1>
     <hr/>
 </div>
-
-<div class="clear"></div>
-
 
 
 <table border="0">
     <tr>
         <td width="1%">
             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
-                <div class="print-logo nailthumb-container-100 center">
-                    <img src="${createLinkTo(dir: 'images/', file: 'hands.jpg')}"/>
-                </div>
+                <g:displayReportLogo/>
             </div>
         </td>
         <td>
@@ -129,7 +122,39 @@
 
 
 
-<table class="signature-table" style="border: 1px solid lightgrey;">
+
+
+<g:set var="requisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
+<g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()}}'/>
+<g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
+<g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
+<g:set var="requisitionItemsControlled" value='${requisitionItems.findAll {it?.product?.controlledSubstance}}'/>
+<g:set var="requisitionItemsHazmat" value='${requisitionItems.findAll {it?.product?.hazardousMaterial}}'/>
+<g:set var="requisitionItemsOther" value='${requisitionItems.findAll {!it?.product?.hazardousMaterial && !it?.product?.coldChain && !it?.product?.controlledSubstance}}'/>
+
+<div>
+    <g:if test="${requisitionItemsColdChain}">
+        <g:set var="groupName" value="${g.message(code:'product.coldChain.label', default:'Cold Chain')}"></g:set>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain, groupName: groupName, location:location, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
+    </g:if>
+    <g:if test="${requisitionItemsControlled}">
+        <g:set var="groupName" value="${g.message(code:'product.controlledSubstance.label', default:'Controlled Substance')}"></g:set>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled, groupName: groupName, location:location, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
+    </g:if>
+    <g:if test="${requisitionItemsHazmat}">
+        <g:set var="groupName" value="${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous Material')}"></g:set>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat, groupName: groupName, location:location, pageBreakAfter: (requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
+    </g:if>
+    <g:if test="${requisitionItemsOther}">
+        <g:set var="groupName" value="${warehouse.message(code:'product.everythingElse.label', default:'Medicines & Consumables')}"></g:set>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, groupName: groupName, location:location, pageBreakAfter:(requisitionItemsCanceled)?'always':'avoid', sorted:sorted]"/>
+    </g:if>
+    <g:if test="${requisitionItemsCanceled}">
+        <g:set var="groupName" value="${warehouse.message(code:'canceled.canceled.label', default:'Canceled')}"></g:set>
+        <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled, groupName: groupName, location:location, pageBreakAfter: 'avoid', sorted:sorted]"/>
+    </g:if>
+</div>
+<table class="signature-table" style="border: 0px solid lightgrey;">
     <tr class="theader">
         <th width="15%"></th>
         <th width="20%"><warehouse:message code="default.name.label"/></th>
@@ -223,60 +248,10 @@
         </td>
     </tr>
 </table>
-
-<div class="clear"></div>
-
-<g:set var="requisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
-<g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()}}'/>
-<g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
-<g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
-<g:set var="requisitionItemsControlled" value='${requisitionItems.findAll {it?.product?.controlledSubstance}}'/>
-<g:set var="requisitionItemsHazmat" value='${requisitionItems.findAll {it?.product?.hazardousMaterial}}'/>
-<g:set var="requisitionItemsOther" value='${requisitionItems.findAll {!it?.product?.hazardousMaterial && !it?.product?.coldChain && !it?.product?.controlledSubstance}}'/>
-
-<div>
-    <g:if test="${requisitionItemsColdChain}">
-        <h2>
-            <img src="${resource(dir: 'images/icons/', file: 'coldchain.gif')}" title="Cold chain"/>&nbsp;
-            ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
-        </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain, location:location, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
-    </g:if>
-    <g:if test="${requisitionItemsControlled}">
-        <h2>
-            <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" title="Controlled substance"/>&nbsp;
-            ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
-        </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled, location:location, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
-    </g:if>
-    <g:if test="${requisitionItemsHazmat}">
-        <h2>
-            <img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png')}" title="Hazardous material"/>&nbsp;
-            ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
-
-        </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat, location:location, pageBreakAfter: (requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
-    </g:if>
-    <g:if test="${requisitionItemsOther}">
-        <h2>
-            <img src="${resource(dir: 'images/icons/silk', file: 'pill.png')}" title="Medicines & Consumables"/>&nbsp;
-            ${warehouse.message(code:'product.everythingElse.label', default:'Medicines & Consumables')}
-        </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsOther, location:location, pageBreakAfter:(requisitionItemsCanceled)?'always':'avoid', sorted:sorted]"/>
-    </g:if>
-    <g:if test="${requisitionItemsCanceled}">
-        <h2>
-            <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" title="Canceled"/>&nbsp;
-            ${warehouse.message(code:'default.canceled.label', default:'Canceled')}
-        </h2>
-        <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled, location:location, pageBreakAfter: 'avoid', sorted:sorted]"/>
-    </g:if>
-</div>
-
 <script>
     $(document).ready(function () {
-        $('.nailthumb-container').nailthumb({ width: 100, height: 60 });
-        $('.nailthumb-container-100').nailthumb({ width: 100, height: 100 });
+        $('.nailthumb').nailthumb({ width: 100, height: 60 });
+        $('.nailthumb-100').nailthumb({ width: 100, height: 100 });
     });
 </script>
 

@@ -12,7 +12,6 @@
 </head>
 <body>
 	<h2 id="print-header">
-		<img id="logo" src="${createLinkTo(dir:'images/', file:'hands.jpg')}" />
 		${requisition?.name}
 		<span style="float: right;">
 		    <button type="button" id="print-button" onclick="window.print()">

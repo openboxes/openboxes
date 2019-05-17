@@ -3,10 +3,7 @@
 <div id="header" class="yui-b">
 	<div id="banner" class="yui-gd">
         <div class="yui-u first" >
-            <div class="logo">
-                <g:displayLogo location="${session?.warehouse?.id}"/>
-
-            </div>
+            <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}"/>
         </div>
 
         <div class="yui-u">

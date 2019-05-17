@@ -37,7 +37,6 @@
 
         .small {font-size: xx-small;}
         .line{border-bottom: 1px solid black}
-        .logo { width: 60px; height: 60px; }
         .canceled { text-decoration: line-through; }
         .page-start {
             -fs-page-sequence: start;
@@ -106,7 +105,7 @@
                     <table class="no-border-table">
                         <tr>
                             <td>
-                                <img class="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg', absolute: true)}"/>
+                                <g:displayReportLogo/>
                             </td>
                             <td>
                                 <h3>${warehouse.message(code: 'report.stockRequisition.label')}: ${stocklist?.requisition?.name} </h3>

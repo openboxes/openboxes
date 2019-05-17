@@ -148,6 +148,7 @@
         </table>
         <hr/>
     </div>
+
     <div id="header" class="header">
         <table class="w100 fixed-layout b-0">
             <tr>
@@ -156,7 +157,7 @@
                     <table class="no-border-table w100">
                         <tr>
                             <td class="left" width="1%">
-                                <img class="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg', absolute: true)}"/>
+                                <g:displayReportLogo/>
                             </td>
                             <td class="left top">
                                 <h1 class="m-5">${warehouse.message(code: 'requisition.deliveryNote.label')}</h1>
