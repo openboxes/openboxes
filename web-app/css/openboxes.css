@@ -1595,8 +1595,6 @@ h2 {
     font-size: 2em;
     font-weight: bold;
     line-height: 30px;
-    height: 100%;
-    max-height: 30px;
 }
 .logo a, .logo a:hover, .logo a:visited {
     color: #666;
