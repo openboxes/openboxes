@@ -3,7 +3,7 @@
     <jqvalui:renderValidationScript for="org.pih.warehouse.inventory.AdjustStockCommand" form="adjustStockForm"/>
     <g:form id="adjustStockForm" name="adjustStockForm" controller="inventoryItem" action="adjustStock">
         <g:hiddenField name="product.id" value="${inventoryItem?.product?.id}"/>
-        <g:hiddenField name="location.id" value="${binLocation?.parentLocation?.id}"/>
+        <g:hiddenField name="location.id" value="${location?.id}"/>
         <g:hiddenField name="binLocation.id" value="${binLocation?.id}"/>
         <g:hiddenField name="inventoryItem.id" value="${inventoryItem?.id}"/>
         <g:hiddenField name="redirectUri" value="/inventory/manage"/>

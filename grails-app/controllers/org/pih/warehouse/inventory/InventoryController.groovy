@@ -80,7 +80,7 @@ class InventoryController {
         Location binLocation = Location.findByParentLocationAndName(location, params.binLocation)
         InventoryItem inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, params.lotNumber)
         Integer quantity = inventoryService.getQuantityFromBinLocation(location, binLocation, inventoryItem)
-        [binLocation: binLocation, inventoryItem: inventoryItem, quantity: quantity]
+        [location: location, binLocation: binLocation, inventoryItem: inventoryItem, quantity: quantity]
     }
 
     def saveInventoryChanges = { ManageInventoryCommand command ->
