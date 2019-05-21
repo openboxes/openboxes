@@ -323,7 +323,7 @@ jqueryValidationUi {
 
 // Allow users to customize logo image url as well as label, width, and height
 openboxes.logo = {
-	url = "https://openboxes.com/img/logo.png"
+	url = "https://openboxes.com/img/logo-smaller.png"
 	label = null
 	height = null
 	width = null
