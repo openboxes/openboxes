@@ -6,7 +6,7 @@
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- **/ 
+ **/
 package org.pih.warehouse.product
 
 import com.google.zxing.BarcodeFormat
@@ -59,8 +59,8 @@ class ProductController {
 		redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
 	}
 
-	/** 
-	 * Perform a bulk update of 
+	/**
+	 * Perform a bulk update of
 	 */
 	def batchEdit = { BatchEditCommand cmd ->
 		def startTime = System.currentTimeMillis()
@@ -168,6 +168,7 @@ class ProductController {
 		boolean includeInactive = params.boolean('includeInactive')?:false
         def category = params.categoryId ? Category.load(params.categoryId) : null
         def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
+		def catalogs = params.catalogId ? ProductCatalog.getAll(params.list("catalogId")) : []
         params.name = params.q
         params.description = params.q
         params.brandName = params.q
@@ -183,7 +184,7 @@ class ProductController {
 			params.max = -1
 		}
 
-		productInstanceList = productService.getProducts(category, tags, includeInactive, params)
+		productInstanceList = productService.getProducts(category, catalogs, tags, includeInactive, params)
 
 		if (params.format) {
 			def date = new Date();
@@ -223,7 +224,7 @@ class ProductController {
         //render(view: "edit", model: [productInstance : productInstance, rootCategory: productService.getRootCategory()])
         //return;
         /*
-		if (!productInstance.productCode) { 
+		if (!productInstance.productCode) {
 			productInstance.productCode = productService.generateProductIdentifier();
 		}
 		// Add tags
@@ -543,15 +544,15 @@ class ProductController {
 
 		println "savePackage: " + params
 		def productInstance = Product.get(params.product.id)
-		
-		def packageInstance = ProductPackage.get(params.id) 
-		if (!packageInstance) { 
+
+		def packageInstance = ProductPackage.get(params.id)
+		if (!packageInstance) {
 			packageInstance = new ProductPackage(params)
 			productInstance.addToPackages(packageInstance)
 		}
-		else { 
+		else {
 			packageInstance.properties = params
-		}			
+		}
 
 		if (!productInstance.hasErrors() && productInstance.save(flush: true) ) {
 			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"
@@ -570,7 +571,7 @@ class ProductController {
 
 
 	/**
-	 * 
+	 *
 	 */
 	def importDependencies = {
 		/*
@@ -628,7 +629,7 @@ class ProductController {
 	 */
 	def upload = { DocumentCommand command ->
 		log.info "Uploading document: " + params
-		
+
 		// HACK - for some reason the Product in document command is not getting bound
 		command.product = Product.get(params.product.id)
 
@@ -674,7 +675,7 @@ class ProductController {
 
 
 		}
-		else { 
+		else {
 			def file = command.fileContents;
 			// file must not be empty and must be less than 10MB
 			// FIXME The size limit needs to go somewhere
@@ -691,7 +692,7 @@ class ProductController {
 						contentType: file.contentType,
 						documentNumber: command.documentNumber,
 						documentType:  command.documentType)
-	
+
 				if (!command?.product) {
 					log.info "Cannot add document " + documentInstance + "  because product does not exist";
 					flash.message = "${warehouse.message(code: 'document.productDoesNotExist.message')}"
@@ -699,7 +700,7 @@ class ProductController {
 					return
 				}
 				else {
-	
+
 					// Check to see if there are any errors
 					if (documentInstance.validate() && !documentInstance.hasErrors()) {
 						log.info "Saving document " + documentInstance;
@@ -805,13 +806,13 @@ class ProductController {
 		//assert names[1].age == 456
 	}
 
-	
-	def renderImage = { 
+
+	def renderImage = {
 		def documentInstance = Document.get(params.id);
-		if (documentInstance) {		
+		if (documentInstance) {
 			response.outputStream << documentInstance.fileContents
 		}
-		else { 
+		else {
 			response.sendError(404)
 		}
 	}
@@ -902,12 +903,12 @@ class ProductController {
      *
      * @params product.id
      */
-	def exportProducts = { 
+	def exportProducts = {
 		println "export products: " + params
 		def productIds = params.list('product.id')
 		println "Product IDs: " + productIds
 		def products = productService.getProducts(productIds.toArray())
-		if (products) { 
+		if (products) {
 			def date = new Date();
 			response.setHeader("Content-disposition",
 					"attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
@@ -916,12 +917,12 @@ class ProductController {
 			println "export products: " + csv
 			render csv
 		}
-		else { 
+		else {
 			//render(text: 'No products found', status: 404)
 			response.sendError(404)
-						
+
 		}
-		
+
 	}
 
     /**
@@ -945,7 +946,7 @@ class ProductController {
     /**
      * Renders form to begin the import process
      */
-	def importAsCsv = { 
+	def importAsCsv = {
 		// renders the initial form
 	}
 
@@ -953,25 +954,25 @@ class ProductController {
      * Upload CSV file
      */
 	def uploadCsv = { ImportDataCommand command ->
-		
+
 		log.info "uploadCsv " + params
-			
+
 		def columns
-		def localFile 
-		def uploadFile = command?.importFile	
-			
+		def localFile
+		def uploadFile = command?.importFile
+
 		def existingProductsMap = [:]
 		def tag = ""
-		
-		if (request.method == "POST") { 
-			
-			// Step 1: Upload file 			
+
+		if (request.method == "POST") {
+
+			// Step 1: Upload file
 			if (uploadFile && !uploadFile?.empty) {
-				
+
 				def contentTypes = ['application/vnd.ms-excel','text/plain','text/csv','text/tsv']
 				println "Content type: " + uploadFile.contentType
 				println "Validate: " + contentTypes.contains(uploadFile.contentType)
-				
+
 				try {
 
                     // Upload file
@@ -996,7 +997,7 @@ class ProductController {
                     tag = FilenameUtils.getBaseName(command?.importFile?.originalFilename)
 
 					command.products = productService.validateProducts(csv)
-					
+
 					flash.message = "Uploaded file ${uploadFile?.originalFilename} to ${localFile.absolutePath}"
 
                     //dataService.getFileProperties(uploadFile)
@@ -1017,13 +1018,13 @@ class ProductController {
                     log.error("Exception occurred while uploading product import CSV " + e.message, e)
                     command.errors.reject("Unknown error: " + e.message)
 
-				}				
-			}			
+				}
+			}
 			else {
                 command.errors.reject("${warehouse.message(code: 'import.emptyFile.message', default: 'File is empty')}")
-			}			
+			}
 		}
-		
+
 		render(view: 'importAsCsv', model: [command:command, columns:columns, tag: tag])
 	}
 
@@ -1031,9 +1032,9 @@ class ProductController {
      * Perform import of CSV
      */
 	def importCsv = { ImportDataCommand command ->
-		
+
 		log.info "import " + params
-		
+
 		// Step 2: Import data from file
 		def tags = []
 		def columns = []
@@ -1061,7 +1062,7 @@ class ProductController {
 
 		}
 		render(view: 'importAsCsv', model: [command:command, tags: tags, columns:columns, productsHaveBeenImported: true])
-		
+
     }
 
 

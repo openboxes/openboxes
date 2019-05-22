@@ -17,6 +17,8 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ReportUtil
+import org.hibernate.criterion.CriteriaSpecification
+
 
 import java.text.SimpleDateFormat
 /**
@@ -307,17 +309,28 @@ class ProductService {
         return getProducts(category, tags, false, params)
     }
 
+	/**
+	 * Get all products that match category, tags, and search parameters.
+	 * @param category
+	 * @param tags
+	 * @param params
+	 * @return
+	 */
+	List<Product> getProducts(Category category, List<Tag> tags, boolean includeInactive, Map params) {
+		return getProducts(category, [], tags, includeInactive, params)
+	}
 
     /**
      * Get all products that match category, tags, and other search parameters.
      *
      * @param category
+	 * @param catalogs
      * @param tags
      * @param params
      * @return
      */
-    def getProducts(Category category, List<Tag> tagsInput, boolean includeInactive, Map params) {
-        log.info "get products where category=" + category + ", tags=" + tagsInput + ", params=" + params
+	List<Product> getProducts(Category category, List<ProductCatalog> catalogsInput, List<Tag> tagsInput, boolean includeInactive, Map params) {
+        log.info "get products where category=" + category + ", catalogs=" + catalogsInput + ", tags=" + tagsInput + ", params=" + params
 
         int max = params.max ? params.int("max") : 10
         int offset = params.offset ? params.int("offset") : 0
@@ -356,12 +369,19 @@ class ProductService {
                 }
 
 
+				or {
+					if (tagsInput) {
+						tags {
+							'in'("id", tagsInput.collect { it.id })
+						}
+					}
 
-                if (tagsInput) {
-                    tags {
-                        'in'("id", tagsInput.collect { it.id } )
-                    }
-                }
+					if (catalogsInput) {
+						productCatalogItems {
+							"in"("productCatalog", catalogsInput)
+						}
+					}
+				}
 
                 or {
                     if (params.name) ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
@@ -390,7 +410,7 @@ class ProductService {
             if (sortColumn) order(sortColumn, sortOrder)
         }
 
-        return results
+        return results.unique()
     }
 
     /**
