@@ -336,6 +336,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def picklistItems = getPicklistItems()
         picklistItems?.toArray()?.each {
             removeFromPicklistItems(it)
+            requisition.picklist.removeFromPicklistItems(it)
             it.picklist.removeFromPicklistItems(it)
             it.delete()
         }
