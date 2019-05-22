@@ -8,7 +8,6 @@ import ArrayField from '../../form-elements/ArrayField';
 import TextField from '../../form-elements/TextField';
 import DateField from '../../form-elements/DateField';
 import SelectField from '../../form-elements/SelectField';
-import CheckboxField from '../../form-elements/CheckboxField';
 import { showSpinner, hideSpinner } from '../../../actions';
 import Translate from '../../../utils/Translate';
 import { debounceProductsFetch } from '../../../utils/option-utils';
@@ -36,17 +35,7 @@ const FIELDS = {
       ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
-    getDynamicRowAttr: ({ rowValues }) => ({
-      className: rowValues.remove ? 'crossed-out' : '',
-    }),
     fields: {
-      remove: {
-        type: CheckboxField,
-        label: '',
-        attributes: {
-          custom: true,
-        },
-      },
       product: {
         type: SelectField,
         label: 'react.partialReceiving.product.label',
