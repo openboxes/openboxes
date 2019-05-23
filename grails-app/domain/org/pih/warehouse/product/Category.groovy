@@ -162,4 +162,9 @@ class Category implements Comparable, Serializable {
         ]
     }
 
+	static PROPERTIES = [
+			"id":"id",
+			"name":"name",
+			"parentCategoryId":"parentCategoryId",
+	]
 }

@@ -58,4 +58,9 @@ class Tag implements Serializable {
 		createdBy(nullable:true)
 	}
 
+    static PROPERTIES = [
+            "id":"id",
+            "tag":"tag"
+    ]
+
 }
