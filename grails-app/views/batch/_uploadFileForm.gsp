@@ -60,17 +60,24 @@
                             <warehouse:message code="default.template.label" default="Download template"/>
                         </g:link>
                     </div>
-                    <%--
                     <div>
                         <label>
-                            <g:radio name="type" value="product" checked="${params.type=='Product'}"/>
-                            ${g.message(code:'products.label')}
+                            <g:radio name="type" value="productCatalog" checked="${params.type=='productCatalog'}"/>
+                            ${g.message(code:'productCatalog.label')}
                         </label>
-                        <g:link controller="batch" action="downloadExcel" params="[type:'Product']">
+                        <g:link controller="batch" action="downloadExcel" params="[type:'ProductCatalog']">
                             <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
                     </div>
-                    --%>
+                    <div>
+                        <label>
+                            <g:radio name="type" value="productCatalogItem" checked="${params.type=='productCatalogItem'}"/>
+                            ${g.message(code:'productCatalogItem.label')}
+                        </label>
+                        <g:link controller="batch" action="downloadExcel" params="[type:'ProductCatalogItem']">
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                        </g:link>
+                    </div>
                     <div>
                         <label>
                             <g:radio name="type" value="productSupplier" checked="${params.type=='productSupplier'}"/>

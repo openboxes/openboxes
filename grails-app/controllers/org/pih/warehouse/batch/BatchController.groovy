@@ -164,6 +164,12 @@ class BatchController {
 						case "product":
 							dataImporter = new ProductExcelImporter(command?.filename)
 							break;
+						case "productCatalog":
+							dataImporter = new ProductCatalogExcelImporter(command?.filename)
+							break;
+						case "productCatalogItem":
+							dataImporter = new ProductCatalogItemExcelImporter(command?.filename)
+							break;
 						case "productSupplier":
 							dataImporter = new ProductSupplierExcelImporter(command?.filename)
 							break;
