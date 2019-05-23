@@ -329,9 +329,9 @@ class FileService {
         Tr thead = Context.getWmlObjectFactory().createTr();
         addTc(thead, "Box", true);
         addTc(thead, "Product", true);
-        addTc(thead, "Lot Number", true);
-        addTc(thead, "Expires", true);
-        addTc(thead, "Quantity", true);
+        addTc(thead, "Lot", true);
+        addTc(thead, "Exp", true);
+        addTc(thead, "Qty", true);
         table.getContent().add(thead);
 
         int cellWidthTwips = 0
@@ -411,13 +411,10 @@ class FileService {
 
         addObjectProperties(mappings, "SHIPMENT", shipmentInstance, Shipment.class)
         addObjectProperties(mappings, "ORIGIN", shipmentInstance?.origin, Location.class)
-        //addObjectProperties(mappings, "ORIGIN.ADDRESS", shipmentInstance?.origin?.address, Address.class)
+        addObjectProperties(mappings, "ORIGIN.ADDRESS", shipmentInstance?.origin?.address, Address.class)
         addObjectProperties(mappings, "DESTINATION", shipmentInstance?.destination, Location.class)
-        //addObjectProperties(mappings, "DESTINATION.ADDRESS", shipmentInstance?.destination?.address, Address.class)
+        addObjectProperties(mappings, "DESTINATION.ADDRESS", shipmentInstance?.destination?.address, Address.class)
         addObjectProperties(mappings, "CARRIER", shipmentInstance?.carrier, Person.class)
-        mappings.put("SHIPMENT.CONSIGNOR", shipmentInstance?.consignorAddress)
-        mappings.put("SHIPMENT.CONSIGNEE", shipmentInstance?.consigneeAddress)
-
 
         mappings.remove("ORIGIN.LOGO")
         mappings.remove("DESTINATION.LOGO")
