@@ -26,8 +26,8 @@
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="requisition.dateRequestedBetween.label" default="Date requested between"/></label>
                                     <div>
-                                        <g:jqueryDatePicker name="dateRequestedFrom" value="${params.dateRequestedFrom}"/>
-                                        <g:jqueryDatePicker name="dateRequestedTo" value="${params.dateRequestedTo}"/>
+                                        <g:jqueryDatePicker name="dateRequestedFrom" value="${params.dateRequestedFrom}" autocomplete="off"/>
+                                        <g:jqueryDatePicker name="dateRequestedTo" value="${params.dateRequestedTo}" autocomplete="off"/>
                                     </div>
                                 </div>
                                 <div class="filter-list-item">

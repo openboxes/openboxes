@@ -4,17 +4,17 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
-        
-        <title><warehouse:message code="transaction.list.label"/></title>    
-    </head>    
+
+        <title><warehouse:message code="transaction.list.label"/></title>
+    </head>
 
 	<body>
        <div class="body">
-       
+
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			
+
 			<div class="yui-gf">
                 <div class="yui-u first">
                     <div class="box">
@@ -54,10 +54,10 @@
                                 </label>
                                 <div>
                                     <g:jqueryDatePicker id="transactionDateFrom" name="transactionDateFrom" placeholder="${g.message(code:'default.from.label')}"
-                                                        value="${params.transactionDateFrom}" format="MM/dd/yyyy"/>
+                                                        value="${params.transactionDateFrom}" format="MM/dd/yyyy" autocomplete="off"/>
                                     <label>-</label>
                                     <g:jqueryDatePicker id="transactionDateTo" name="transactionDateTo" placeholder="${g.message(code:'default.to.label')}"
-                                                        value="${params.transactionDateTo}" format="MM/dd/yyyy"/>
+                                                        value="${params.transactionDateTo}" format="MM/dd/yyyy" autocomplete="off"/>
                                 </div>
                             </div>
                             <div class="filter">
@@ -192,14 +192,14 @@
                 </div>
 			</div>
 		</div>
-		
+
 		<script>
-			$(document).ready(function() {			
+			$(document).ready(function() {
 				$("#transactionTypeSelect").change(function() {
 				    $(this).closest("form").submit();
 				});
 			});
-		
-		</script>		
+
+		</script>
 	</body>
 </html>
