@@ -37,8 +37,12 @@ class ProductCatalogItem implements Comparable, Serializable {
     int compareTo(obj) {
         def sortOrder = id <=> obj?.id
         return sortOrder;
-
     }
 
+    static PROPERTIES = [
+            "productCatalogCode":"productCatalog.code",
+            "productCode":"product.productCode",
+            "productName":"product.name",
+    ]
 
 }
