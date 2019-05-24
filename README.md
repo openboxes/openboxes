@@ -1,4 +1,3 @@
-[![Stories in Ready](https://badge.waffle.io/openboxes/openboxes.png?label=ready&title=Ready)](https://waffle.io/openboxes/openboxes)
 [![Build Status](https://travis-ci.org/openboxes/openboxes.svg?branch=develop)](https://travis-ci.org/openboxes/openboxes)
 [![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
 [![Slack Signup](http://slack-signup.openboxes.com/badge.svg)](http://slack-signup.openboxes.com)
