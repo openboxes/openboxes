@@ -294,7 +294,7 @@ class FileService {
 
             // Add each table cell
             row.each { columnName, value ->
-                addTc(tr, value)
+                addTc(tr, value, cellWidthTwipsDefault)
             }
         }
 
@@ -306,18 +306,20 @@ class FileService {
 
 
     Tbl createPackingListTable(WordprocessingMLPackage wordMLPackage, Shipment shipment) {
-        int cols = 6;
+        int cols = 5
         int writableWidthTwips = wordMLPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips();
         int cellWidthTwipsDefault = new Double(Math.floor((writableWidthTwips/cols))).intValue();
 
-        Map cellWidthTwipsRatio = [1: 0.75, 2: 2.5, 3: 1.0, 4: 1.0, 5: 0.5, 6: 0.5]
+        Map cellWidthTwipsRatio = [1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0]
 
         //TblFactory.createTable(4, 4, cellWidthTwipsDefault);
 
         Tbl table = Context.getWmlObjectFactory().createTbl();
+		addBorders(table)
 
         TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid();
-        table.setTblGrid(tblGrid);
+		table.setTblGrid(tblGrid);
+
         // Add required <w:gridCol w:w="4788"/>
         for (int i=1 ; i<=cols; i++) {
             TblGridCol gridCol = Context.getWmlObjectFactory().createTblGridCol();
@@ -334,31 +336,49 @@ class FileService {
         addTc(thead, "Qty", true);
         table.getContent().add(thead);
 
-        int cellWidthTwips = 0
         def previousContainer = null;
         def shipmentItems = shipment?.shipmentItems?.sort { it?.container?.sortOrder }
+
         // Iterate over shipment items and add them to the table
         for (ShipmentItem shipmentItem : shipmentItems) {
             Tr tr = Context.getWmlObjectFactory().createTr();
             table.getContent().add(tr);
 
             if (shipmentItem?.container != previousContainer) {
-                addTc(tr, shipmentItem?.container?.name?.replaceAll("\n", "") ?: "None")
+                addTc(tr, shipmentItem?.container?.name?.replaceAll("\n", "") ?: "None", cellWidthTwipsDefault)
             }
             else {
-                addTc(tr, "")
+                addTc(tr, "", cellWidthTwipsDefault)
             }
-            addTc(tr, shipmentItem.inventoryItem?.product?.name?:"")
-            addTc(tr, shipmentItem?.inventoryItem?.lotNumber?:"")
-            addTc(tr, shipmentItem?.inventoryItem?.expirationDate?.format("MM-dd-yyyy")?:"")
-            addTc(tr, "${shipmentItem?.quantity} ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:''}")
+            addTc(tr, shipmentItem.inventoryItem?.product?.name?:"", cellWidthTwipsDefault)
+            addTc(tr, shipmentItem?.inventoryItem?.lotNumber?:"", cellWidthTwipsDefault)
+            addTc(tr, shipmentItem?.inventoryItem?.expirationDate?.format("MM-dd-yyyy")?:"", cellWidthTwipsDefault)
+            addTc(tr, "${shipmentItem?.quantity} ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:''}", cellWidthTwipsDefault)
             previousContainer = shipmentItem?.container;
         }
 
         return table
     }
 
-    def addTc(Tr tr, Object value) {
+	def addBorders(Tbl table) {
+		table.setTblPr(new TblPr());
+		CTBorder border = new CTBorder();
+		border.setColor("auto");
+		border.setSz(new BigInteger("4"));
+		border.setSpace(new BigInteger("0"));
+		border.setVal(STBorder.SINGLE);
+
+		TblBorders borders = new TblBorders();
+		borders.setBottom(border);
+		borders.setLeft(border);
+		borders.setRight(border);
+		borders.setTop(border);
+		borders.setInsideH(border);
+		borders.setInsideV(border);
+		table.getTblPr().setTblBorders(borders);
+	}
+
+    def addTc(Tr tr, Object value, int cellWidthTwips) {
         Tc tc = Context.getWmlObjectFactory().createTc();
         tr.getContent().add(tc);
 
@@ -368,7 +388,7 @@ class FileService {
         TblWidth cellWidth = Context.getWmlObjectFactory().createTblWidth();
         tcPr.setTcW(cellWidth);
         cellWidth.setType("auto");
-        //cellWidth.setW(BigInteger.valueOf(cellWidthTwips));
+		cellWidth.setW(BigInteger.valueOf(cellWidthTwips))
 
         // Cell content - an empty <w:p/>
         value = value.toString().replace("\n", "")
@@ -714,25 +734,6 @@ class FileService {
 		
 		return para;
 	}
-
-    void addBorders(Tbl table) {
-        //table.setTblPr(new TblPr());
-        CTBorder border = new CTBorder();
-        border.setColor("auto");
-        border.setSz(new BigInteger("4"));
-        border.setSpace(new BigInteger("0"));
-        border.setVal(STBorder.SINGLE);
-
-        TblBorders borders = new TblBorders();
-        borders.setBottom(border);
-        borders.setLeft(border);
-        borders.setRight(border);
-        borders.setTop(border);
-        borders.setInsideH(border);
-        borders.setInsideV(border);
-        table.getTblPr().setTblBorders(borders);
-    }
-
 
 	/**
 	 * 
