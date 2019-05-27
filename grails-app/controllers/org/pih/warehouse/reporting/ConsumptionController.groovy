@@ -514,7 +514,7 @@ class ShowConsumptionRowCommand {
     }
 
     Integer getTransferBalance() {
-        transferOutQuantity
+        transferOutQuantity + expiredQuantity + damagedQuantity + otherQuantity
     }
 
     Float getMonthlyQuantity() {
