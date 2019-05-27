@@ -53,6 +53,10 @@ class ConsumptionController {
             command.selectedLocations = []
             command.selectedCategories = []
             command.selectedTransactionTypes = []
+            if (params.format == "csv") {
+                params.remove("format")
+                flash.message = "Unable to download CSV as parameters have changed. Please try download again."
+            }
         }
 
 
