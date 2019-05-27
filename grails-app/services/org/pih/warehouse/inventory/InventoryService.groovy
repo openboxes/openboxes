@@ -2940,9 +2940,9 @@ class InventoryService implements ApplicationContextAware {
 				}
 			}
             if (fromLocations) {
-				and {
-					'in'("inventory", fromLocations.collect { it.inventory })
-
+				'in'("inventory", fromLocations.collect { it.inventory })
+				or {
+					isNull("destination")
 					not {
 						'in'("destination", fromLocations)
 					}

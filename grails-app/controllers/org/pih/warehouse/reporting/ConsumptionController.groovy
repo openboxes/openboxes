@@ -11,16 +11,13 @@ package org.pih.warehouse.reporting
 
 import grails.converters.JSON
 import groovy.time.TimeCategory
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
-import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
@@ -33,8 +30,6 @@ import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.report.ConsumptionService
 import org.pih.warehouse.report.ReportService
 import org.pih.warehouse.requisition.Requisition
-
-import java.text.SimpleDateFormat
 
 class ConsumptionController {
 
@@ -51,6 +46,19 @@ class ConsumptionController {
             return;
         }
 
+        // If any parameters have changed we need to reset filters
+        if (command.hasParameterChanged()) {
+            command.selectedProperties = []
+            command.selectedTags = []
+            command.selectedLocations = []
+            command.selectedCategories = []
+            command.selectedTransactionTypes = []
+            if (params.format == "csv") {
+                params.remove("format")
+                flash.message = "Unable to download CSV as parameters have changed. Please try download again."
+            }
+        }
+
 
         // Hack to fix PIMS-2728
         if (command.selectedProperties) {
@@ -63,11 +71,16 @@ class ConsumptionController {
         def products = tags ? inventoryService.getProductsByTags(tags) : null
 
         // Add an entire day to account for the 24 hour period on the end date
-        Date endDate = command.toDate ? command.toDate + 1 : null
+        Date toDate = command.toDate ? command.toDate + 1 : null
+
+        // Set to midnight
+        if (toDate) {
+            toDate.clearTime()
+        }
 
         // Get all transactions
         command.debits = inventoryService.getDebitsBetweenDates(command.fromLocations,
-                command.selectedLocations, command.fromDate, endDate,
+                command.selectedLocations, command.fromDate, toDate,
                 command.selectedTransactionTypes)
 
         def transactions = []
@@ -385,13 +398,8 @@ class ConsumptionController {
                 unitCost: it?.unitCost,
                 unitPrice: it?.unitPrice
         ]}
-
-
         render results as JSON
     }
-
-
-
 
     def product = {
         Product product = Product.get(params.id)
@@ -406,14 +414,18 @@ class ShowConsumptionCommand {
     // Map of product to ShowConsumptionRowCommand
     def rows = new TreeMap();
 
-    // Filters
+    // Parameters
     Date fromDate
     Date toDate
+    List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
 
+    // State
+    String parametersHash
+
+    // Filters
     List<Tag> tags = []
     List<Category> categories = []
     List<Product> products = []
-    List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
     List<TransactionType> transactionTypes = []
     List<TransactionType> selectedTransactionTypes = []
@@ -446,6 +458,15 @@ class ShowConsumptionCommand {
         toDate(nullable: true)
     }
 
+    Boolean hasParameterChanged() {
+        String newParametersHash = generateParametersHash()
+        return !parametersHash.equals(newParametersHash)
+    }
+
+    String generateParametersHash() {
+        String parameters = "${fromDate}:${toDate}:${fromLocations}"
+        return DigestUtils.md5Hex(parameters.bytes)
+    }
 
     Integer getNumberOfDays() {
         return (toDate - fromDate)
@@ -497,7 +518,7 @@ class ShowConsumptionRowCommand {
     }
 
     Integer getTransferBalance() {
-        transferOutQuantity
+        transferOutQuantity + expiredQuantity + damagedQuantity + otherQuantity
     }
 
     Float getMonthlyQuantity() {
