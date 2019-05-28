@@ -26,7 +26,13 @@ const SHIPMENT_FIELDS = {
   description: {
     label: 'react.stockMovement.description.label',
     defaultMessage: 'Description',
-    type: LabelField,
+    type: (params) => {
+      if (params.issued) {
+        return <TextField {...params} />;
+      }
+
+      return <LabelField {...params} />;
+    },
   },
   'origin.name': {
     label: 'react.stockMovement.origin.label',
@@ -78,13 +84,7 @@ const SHIPMENT_FIELDS = {
   name: {
     label: 'react.stockMovement.shipmentName.label',
     defaultMessage: 'Shipment name',
-    type: (params) => {
-      if (params.issued) {
-        return <TextField {...params} />;
-      }
-
-      return <LabelField {...params} />;
-    },
+    type: LabelField,
   },
 };
 
@@ -237,7 +237,7 @@ class SendMovementPage extends Component {
     if (values.statusCode === 'ISSUED') {
       payload = {
         'destination.id': values.destination.id,
-        name: values.name,
+        description: values.description,
         'shipmentType.id': values.shipmentType,
       };
     }
@@ -308,8 +308,9 @@ class SendMovementPage extends Component {
             trackingNumber: stockMovementData.trackingNumber,
             driverName: stockMovementData.driverName,
             comments: stockMovementData.comments,
-            // Below values are reassigned in case of editing destination
+            // Below values are reassigned in case of editing destination or description
             name: stockMovementData.name,
+            description: stockMovementData.description,
             destination: {
               id: stockMovementData.destination.id,
               type: destinationType ? destinationType.locationTypeCode : null,
