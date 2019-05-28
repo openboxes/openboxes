@@ -313,6 +313,8 @@ class StockMovementService {
         if (picklist) {
             picklist.picklistItems.findAll { it.requisitionItem == requisitionItem }.toArray().each {
                 picklist.removeFromPicklistItems(it)
+                requisitionItem.removeFromPicklistItems(it)
+                it.delete()
             }
             picklist.save()
         }
