@@ -265,9 +265,14 @@ class SendMovementPage extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const shipmentTypes = _.map(response.data.data, type => (
-          { value: type.id, label: _.split(type.name, '|')[0] }
-        ));
+        const shipmentTypes = _.map(response.data.data, (type) => {
+          const [en, fr] = _.split(type.name, '|fr:');
+          return {
+            value: type.id,
+            label: this.props.locale === 'fr' && fr ? fr : en,
+          };
+        });
+
         this.setState({ shipmentTypes }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
@@ -647,6 +652,7 @@ const mapStateToProps = state => ({
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  locale: state.session.activeLanguage,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -667,4 +673,5 @@ SendMovementPage.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  locale: PropTypes.string.isRequired,
 };
