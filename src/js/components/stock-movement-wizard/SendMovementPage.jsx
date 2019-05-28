@@ -435,7 +435,7 @@ class SendMovementPage extends Component {
             label: this.props.translate('react.stockMovement.confirmPreviousPage.correctError.label', 'Correct error'),
           },
           {
-            label: this.props.translate('react.stockMovement.confirmPreviousPage.continue.label ', 'Continue (lose unsaved work)'),
+            label: this.props.translate('react.stockMovement.confirmPreviousPage.continue.label', 'Continue (lose unsaved work)'),
             onClick: () => this.props.previousPage(values),
           },
         ],

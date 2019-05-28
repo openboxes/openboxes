@@ -119,11 +119,11 @@ const FIELDS = {
         fieldKey: '',
         flexWidth: '1.3',
         attributes: {
-          onClick: () => Alert.error('This feature is not available yet. Please adjust stock on the electronic stock card page.'),
           className: 'btn btn-outline-primary',
         },
-        getDynamicAttr: ({ subfield }) => ({
+        getDynamicAttr: ({ subfield, translate }) => ({
           hidden: subfield,
+          onClick: () => Alert.error(translate('react.stockMovement.alert.disabledAdjustment.label', 'This feature is not available yet. Please adjust stock on the electronic stock card page.')),
         }),
       },
       revert: {
@@ -497,6 +497,7 @@ class PickPage extends Component {
                 bins: this.state.bins,
                 locationId: this.state.values.origin.id,
                 reasonCodes: this.props.reasonCodes,
+                translate: this.props.translate,
               }))}
               <div className="d-print-none">
                 <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
@@ -544,4 +545,5 @@ PickPage.propTypes = {
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
+  translate: PropTypes.func.isRequired,
 };
