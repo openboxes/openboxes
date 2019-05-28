@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
@@ -20,6 +20,7 @@ import org.pih.warehouse.core.ReasonCode
 class ReasonCodeApiController {
 
     def locationService
+    def messageSource
 
     def list = {
 
@@ -58,7 +59,7 @@ class ReasonCodeApiController {
     ReasonCodeCommand getReasonCode(ReasonCode reasonCodeEnum) {
         ReasonCodeCommand reasonCode = new ReasonCodeCommand()
         reasonCode.id = reasonCodeEnum.name()
-        reasonCode.name = g.message(code: "enum.ReasonCode." + reasonCodeEnum.name())
+        reasonCode.name = messageSource.getMessage("enum.ReasonCode." + reasonCodeEnum.name(), null, "", session?.user?.locale?:"en")
         reasonCode.description = reasonCodeEnum.name()
         reasonCode.sortOrder = reasonCodeEnum.sortOrder
         return reasonCode
