@@ -192,7 +192,7 @@ class PackingPage extends Component {
         const { packPageItems } = resp.data.data.packPage;
         this.setState({ values: { ...this.state.values, packPageItems } });
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'));
+        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }
