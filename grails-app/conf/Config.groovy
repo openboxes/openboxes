@@ -321,19 +321,9 @@ jqueryValidationUi {
 }
 
 
-// Allow users to customize logo image url as well as label, width, and height
-openboxes.logo = {
-	url = "https://openboxes.com/img/logo-smaller.png"
-	label = null
-	height = null
-	width = null
-}
-
-openboxes.report.logo = {
-	url = "https://openboxes.com/img/logo_100.png"
-	width = 100
-	height = 100
-}
+// Allow users to customize logo image url as well as label
+openboxes.logo.url = "https://openboxes.com/img/logo_30.png"
+openboxes.report.logo.url = "https://openboxes.com/img/logo_100.png"
 
 // Allow system to anonymize user data to prevent it from being accessed by unauthorized users
 openboxes.anonymize.enabled = false
