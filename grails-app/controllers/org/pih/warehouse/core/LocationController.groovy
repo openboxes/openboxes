@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import grails.validation.ValidationException
@@ -18,7 +18,7 @@ import org.pih.warehouse.shipping.ShipmentItemException
 import org.springframework.web.multipart.MultipartFile
 
 class LocationController {
-	
+
 	def inventoryService
 	def locationService
 	def dataService
@@ -26,25 +26,25 @@ class LocationController {
 	/**
 	 * Controllers for managing other locations (besides warehouses)
 	 */
-	
-	def index = { 
+
+	def index = {
 		redirect(action: "list")
 	}
-	
+
 	def list = {
 
 		def locationsTotal = 0;
 		def locationType = LocationType.get(params["locationType.id"])
 		def locationGroup = LocationGroup.get(params["locationGroup.id"])
-		
+
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		params.offset = params.offset ? params.int("offset") : 0
 		def locations = locationService.getLocations(locationType, locationGroup, params.q, params.max, params.offset as int)
-		
+
 		[locationInstanceList: locations, locationInstanceTotal: locations.totalCount]
 	}
-	
-	def show = { 
+
+	def show = {
 		def locationInstance = inventoryService.getLocation(params.id)
 		if (!locationInstance) {
 			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
@@ -54,7 +54,7 @@ class LocationController {
 			return [locationInstance: locationInstance]
 		}
 	}
-	
+
 	def edit = {
 		def locationInstance = inventoryService.getLocation(params.id)
 		if (!locationInstance) {
@@ -65,7 +65,7 @@ class LocationController {
 			return [locationInstance: locationInstance]
 		}
 	}
-	
+
 	def update = {
 		def locationInstance = inventoryService.getLocation(params.id)
 
@@ -82,6 +82,7 @@ class LocationController {
 			}
 
 			locationInstance.properties = params
+            def existingLocation = locationInstance.parentLocation.locations.any { it.name == locationInstance.name }
 
 			if (locationInstance.validate() && !locationInstance.hasErrors()) {
 				try {
@@ -108,6 +109,9 @@ class LocationController {
 				}
             }
 			else {
+				if (existingLocation) {
+					flash.error = "${warehouse.message(code: 'location.existingLocation.label', default: 'Bin location with this name has already been created')}"
+				}
 				render(view: "edit", model: [locationInstance: locationInstance])
 			}
 		}
@@ -125,7 +129,7 @@ class LocationController {
 
 
 	}
-	
+
 	def delete = {
 		def locationInstance = Location.get(params.id)
 		if (locationInstance) {
@@ -178,8 +182,8 @@ class LocationController {
 			}
 		}
 	}
-	   
-		   
+
+
 	def renderLogo = {
 		def location = Location.get(params.id)
 		if (location?.logo) {
@@ -239,17 +243,17 @@ class LocationController {
 		}
 		[locationInstance:locationInstance]
 	}
-	
-	def deleteLogo = { 
+
+	def deleteLogo = {
 		def location = Location.get(params.id)
-		if (location) { 
+		if (location) {
 			location.logo = []
 			location.save(flush:true)
 			flash.message = "Logo has been deleted"
 		}
 		redirect(action: "uploadLogo", id: params.id);
 	}
-	   	   
+
 	def deleteTransaction = {
 		def transaction = Transaction.get(params.id)
 		transaction.delete();
