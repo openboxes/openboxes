@@ -262,23 +262,23 @@
 
         <table class="w100 fixed-layout b-0">
             <tr>
-                    <h2><warehouse:message code="deliveryNote.notes.label"/></h2>
+                    <h2><warehouse:message code="deliveryNote.notes.label" default="Notes"/></h2>
             </tr>
             <tr>
                 <td>
-                    <label><warehouse:message code="deliveryNote.trackingNumber.label"/>: </label>
-                    ${requisition.shipment.referenceNumbers.first()?:''}
+                    <label><warehouse:message code="deliveryNote.trackingNumber.label" default="Tracking number"/>: </label>
+                    ${requisition?.shipment?.referenceNumbers ? requisition?.shipment?.referenceNumbers?.first() : ''}
                 </td>
             </tr>
             <tr>
                 <td>
-                    <label><warehouse:message code="deliveryNote.driverName.label"/>: </label>
+                    <label><warehouse:message code="deliveryNote.driverName.label" default="Driver name"/>: </label>
                     ${requisition.shipment.driverName?:''}
                 </td>
             </tr>
             <tr>
                 <td>
-                    <label><warehouse:message code="deliveryNote.comments.label"/>: </label>
+                    <label><warehouse:message code="deliveryNote.comments.label" default="Comments"/>: </label>
                     ${requisition.shipment.additionalInformation?:''}
                 </td>
             </tr>
