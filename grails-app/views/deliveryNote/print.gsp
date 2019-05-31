@@ -201,7 +201,7 @@
                                     </tr>
                                     <tr>
                                         <td class="name">
-                                            <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
+                                            <label><warehouse:message code="deliveryNote.shipDate.label" default="Ship date"/>:</label>
                                         </td>
                                         <td>
                                             <g:formatDate date="${new Date()}" format="d MMMMM yyyy hh:mma"/>
@@ -259,6 +259,30 @@
             </h2>
             <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled, location:location, pageBreakAfter: 'avoid']"/>
         </g:if>
+
+        <table class="w100 fixed-layout b-0">
+            <tr>
+                    <h2><warehouse:message code="deliveryNote.notes.label"/></h2>
+            </tr>
+            <tr>
+                <td>
+                    <label><warehouse:message code="deliveryNote.trackingNumber.label"/>: </label>
+                    ${requisition.shipment.referenceNumbers.first()?:''}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label><warehouse:message code="deliveryNote.driverName.label"/>: </label>
+                    ${requisition.shipment.driverName?:''}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label><warehouse:message code="deliveryNote.comments.label"/>: </label>
+                    ${requisition.shipment.additionalInformation?:''}
+                </td>
+            </tr>
+        </table>
 
         <table class="signature-table w100 fixed-layout">
             <tr>
