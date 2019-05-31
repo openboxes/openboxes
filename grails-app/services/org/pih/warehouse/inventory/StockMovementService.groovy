@@ -140,8 +140,9 @@ class StockMovementService {
         }
 
         if (RequisitionStatus.ISSUED == requisition.status) {
-            requisition.name = stockMovement.name != requisition.name || requisition.destination == stockMovement.destination ? stockMovement.name : stockMovement.generateName()
+            requisition.name = stockMovement.description == requisition.description && requisition.destination == stockMovement.destination ? stockMovement.name : stockMovement.generateName()
             requisition.destination = stockMovement.destination
+            requisition.description = stockMovement.description
 
             if (requisition.hasErrors() || !requisition.save(flush: true)) {
                 throw new ValidationException("Invalid requisition", requisition.errors)
@@ -1207,7 +1208,7 @@ class StockMovementService {
         }
 
         if (stockMovement.requisition.status == RequisitionStatus.ISSUED) {
-            shipment.name = stockMovement.name != shipment.name || shipment.destination == stockMovement.destination ? stockMovement.name : stockMovement.generateName()
+            shipment.name = shipment.description == stockMovement.description && shipment.destination == stockMovement.destination ? stockMovement.name : stockMovement.generateName()
 
             if (shipment.destination != stockMovement.destination) {
                 shipment.outgoingTransactions?.each { transaction ->
