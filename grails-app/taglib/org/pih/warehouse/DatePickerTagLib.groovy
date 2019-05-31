@@ -6,22 +6,22 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse
 
 import java.text.SimpleDateFormat
 
 class DatePickerTagLib {
-		
-	
-	
+
+
+
 	def datePicker = { attrs, body ->
 		def datePickerTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.FormTagLib')
 		out << datePickerTagLib.datePicker.call(attrs)
 	}
 
 	def jqueryDatePicker = {attrs, body ->
-		
+
 		def id = attrs.id ? attrs.id : attrs.name;
 		def name = attrs.name;
 		def autoSize = attrs.autoSize ?:(attrs.size)?"false":"true";
@@ -39,20 +39,21 @@ class DatePickerTagLib {
         def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
 		def placeholder = attrs.placeholder ?: '';
 		// def showHint = attrs.showHint ?: false;
-		
-		if (value) { 
+		def autocomplete = attrs.autocomplete ?: 'on'
+
+		if (value) {
 			if (value instanceof Date) {
 				value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
-			} 
+			}
 		}
-			
+
 		if (name == null) {
 			throw new IllegalArgumentException("name parameter must be specified")
 		}
-		
+
 		def html = """
 			<input id='${id}' name='${name}' type='hidden' ${dataBind}/>
-			<input id='${id}-datepicker' name='${name}-datepicker' type='text'
+			<input id='${id}-datepicker' name='${name}-datepicker' autocomplete ='${autocomplete}' type='text'
 					placeholder='${placeholder}' class='${cssClass} text large' size="${size}" ${readOnly?"readonly='readonly'":""}/>
 			<script type=\'text/javascript\'>
 
@@ -85,7 +86,7 @@ class DatePickerTagLib {
                             \$.datepicker._clearDate(this);
                         }
                     });
-					
+
 					// If we reset the date, we need to reset the hidden form field as well.
 					jQuery('#${id}-datepicker').change(function() {
 					    try {
@@ -106,8 +107,8 @@ class DatePickerTagLib {
 			</script>""";
 
 		out << html;
-				
+
 	}
-	
-	
+
+
 }

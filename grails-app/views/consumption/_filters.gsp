@@ -29,7 +29,7 @@
                         <warehouse:message code="consumption.afterDate.label" default="Consumed on or after"/>
                     </label>
                     <div>
-                        <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy" cssClass="large"/>
+                        <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy" cssClass="large" autocomplete="off"/>
                     </div>
                 </div>
                 <div class="filter-list-item">
@@ -37,7 +37,7 @@
                         <warehouse:message code="consumption.beforeDate.label" default="Consumed on or before"/>
                     </label>
                     <div>
-                        <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy" cssClass="large"/>
+                        <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy" cssClass="large" autocomplete="off"/>
                     </div>
                 </div>
             </fieldset>

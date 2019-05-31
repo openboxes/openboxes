@@ -91,13 +91,13 @@
 									</tr>
 									<tr>
 										<td>
-											<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
+											<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy" autocomplete="off"/>
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
-											
+											<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy" autocomplete="off"/>
+
 										</td>
 									</tr>
 									<tr>
