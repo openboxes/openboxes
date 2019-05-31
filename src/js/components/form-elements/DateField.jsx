@@ -47,6 +47,9 @@ class DateField extends Component {
           selected={moment(value, dateFormat).isValid() ? moment(value, dateFormat) : null}
           onChange={date => onChange(date)}
           onChangeRaw={onChangeRaw}
+          onSelect={() => {
+            this.dateInput.setOpen(false);
+          }}
           popperContainer={CalendarContainer}
           onKeyPress={(event) => {
             if (event.which === 13 /* Enter */) {
