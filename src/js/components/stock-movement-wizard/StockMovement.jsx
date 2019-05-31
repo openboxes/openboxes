@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import { getTranslate } from 'react-localize-redux';
 
 import CreateStockMovement from './CreateStockMovement';
 import AddItemsPage from './AddItemsPage';
@@ -12,6 +13,7 @@ import SendMovementPage from './SendMovementPage';
 import WizardSteps from '../form-elements/WizardSteps';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
+import { translateWithDefaultMessage } from '../../utils/Translate';
 
 /** Main stock movement form's wizard component. */
 class StockMovements extends Component {
@@ -56,8 +58,13 @@ class StockMovements extends Component {
    * Returns array of form steps.
    * @public
    */
-  static getStepList() {
-    return ['Create', 'Add items', 'Edit', 'Pick', 'Pack', 'Send'];
+  getStepList() {
+    return [this.props.translate('react.stockMovement.create.label', 'Create'),
+      this.props.translate('react.stockMovement.addItems.label', 'Add items'),
+      this.props.translate('react.stockMovement.edit.label', 'Edit'),
+      this.props.translate('react.stockMovement.pick.label', 'Pick'),
+      this.props.translate('react.stockMovement.pack.label', 'Pack'),
+      this.props.translate('react.stockMovement.send.label', 'Send')];
   }
 
   /**
@@ -225,11 +232,12 @@ class StockMovements extends Component {
     const { page, values } = this.state;
 
     const formList = this.getFormList();
+    const stepList = this.getStepList();
 
     return (
       <div>
         <div>
-          <WizardSteps steps={StockMovements.getStepList()} currentStep={page} />
+          <WizardSteps steps={stepList} currentStep={page} />
         </div>
         <div className="panel panel-primary">
           <div className="panel-heading movement-number">
@@ -252,6 +260,7 @@ class StockMovements extends Component {
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, {
@@ -272,6 +281,7 @@ StockMovements.propTypes = {
   locale: PropTypes.string.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {

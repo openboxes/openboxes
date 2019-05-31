@@ -297,8 +297,8 @@ body {
 
 .wizard-steps div a, .wizard-steps div:not(:first-child) span {
   height: 35px;
-  padding: 0 10px 0 25px;
-  line-height: 36px
+  padding: 0 20px 0 35px;
+  line-height: 36px;
 }
 
 .wizard-steps div:first-child a {
@@ -313,7 +313,6 @@ body {
   border-left: none;
   border-right: none;
   font-size: 1.2em;
-  width: 10vw;
   text-align: center;
   overflow-wrap: break-word;
 }
