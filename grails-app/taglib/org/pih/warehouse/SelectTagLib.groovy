@@ -402,7 +402,7 @@ class SelectTagLib {
         long startTime = System.currentTimeMillis()
 
 		def currentLocation = Location.get(session?.warehouse?.id)
-        def activityCode = ActivityCode."${attrs.activityCode}"
+        def activityCode = attrs.activityCode ? ActivityCode."${attrs.activityCode}" : null
 
 		attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() };
         //log.info "get all locations " + (System.currentTimeMillis() - startTime) + " ms"
