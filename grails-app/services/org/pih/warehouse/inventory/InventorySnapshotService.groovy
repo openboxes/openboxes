@@ -114,7 +114,7 @@ class InventorySnapshotService {
     }
 
     def transformBinLocations(List binLocations) {
-        return binLocations.collect {
+        def binLocationsTransformed = binLocations.collect {
             [
                     product      : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
                     inventoryItem: [id: it?.inventoryItem?.id, lotNumber: it?.inventoryItem?.lotNumber, expirationDate: it?.inventoryItem?.expirationDate],
@@ -123,6 +123,14 @@ class InventorySnapshotService {
             ]
         }
 
+        // Attempting to prevent deadlock due to gap locks
+        binLocationsTransformed = binLocationsTransformed.sort { a,b ->
+            a?.binLocation?.name <=> b?.binLocation?.name ?:
+                    a?.product?.productCode <=> b?.product?.productCode ?:
+                            a?.inventoryItem?.lotNumber <=> b?.inventoryItem?.lotNumber
+        }
+
+        return binLocationsTransformed
     }
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
