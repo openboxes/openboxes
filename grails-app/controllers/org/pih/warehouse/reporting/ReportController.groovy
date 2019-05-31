@@ -408,7 +408,8 @@ class ReportController {
                     sw.append("Tags").append(",")
 
                     command.locations?.each { location ->
-                        sw.append("QoH ").append((location?.name).toString().replace(',','')).append(",")
+                        String locationName = StringEscapeUtils.escapeCsv(location?.name)
+                        sw.append(locationName).append(",")
                     }
 
                     sw.append("QoH Total")
