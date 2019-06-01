@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
@@ -41,14 +42,22 @@ class InventorySnapshotService {
     def populateInventorySnapshots(Date date) {
         def startTime = System.currentTimeMillis()
         def locations = getDepotLocations()
-        GParsPool.withPool {
-            locations.eachParallel { Location location ->
-                persistenceInterceptor.init()
-                location = Location.get(location.id)
-                log.debug "Creating or updating inventory snapshot for date ${date}, location ${location.name} ..."
+        boolean useGpars = ConfigurationHolder.config.openboxes.inventorySnapshot.useGpars?:true
+
+        if (useGpars) {
+            GParsPool.withPool {
+                locations.eachParallel { Location location ->
+                    persistenceInterceptor.init()
+                    location = Location.get(location.id)
+                    populateInventorySnapshots(date, location)
+                    persistenceInterceptor.flush()
+                    persistenceInterceptor.destroy()
+                }
+            }
+        }
+        else {
+            locations.each { Location location ->
                 populateInventorySnapshots(date, location)
-                persistenceInterceptor.flush()
-                persistenceInterceptor.destroy()
             }
         }
         log.info "Created inventory snapshot for ${date} in " + (System.currentTimeMillis() - startTime) + " ms"
@@ -134,7 +143,7 @@ class InventorySnapshotService {
     }
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
-        def batchSize = 1000
+        def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize?:100
         def sql = new Sql(dataSource)
         if (sql) {
             try {
@@ -160,16 +169,15 @@ class InventorySnapshotService {
                         String binLocationName = entry?.binLocation?.name ?
                                 "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
 
-                        // '${UUID.randomUUID().toString()}',
+                        // '${UUID.randomUUID().toString()}'
                         def insertStmt =
-                                "insert into inventory_snapshot(version, date, location_id, product_id, product_code," +
+                                "insert into inventory_snapshot(version, date, location_id, product_id, product_code, " +
                                         "inventory_item_id, lot_number, expiration_date, bin_location_id, bin_location_name, " +
                                         "quantity_on_hand, date_created, last_updated) " +
                                         "values (0, '${dateString}', '${location?.id}', " +
                                         "'${productId}', '${productCode}', " +
                                         "${inventoryItemId}, ${lotNumber}, ${expirationDate}, " +
-                                        "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) " +
-                                        "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, version=version+1, last_updated=now()"
+                                        "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) "
 
 
                         //log.info ("insertStmt: ${insertStmt}")
