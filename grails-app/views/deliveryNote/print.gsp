@@ -204,7 +204,7 @@
                                             <label><warehouse:message code="deliveryNote.shipDate.label" default="Ship date"/>:</label>
                                         </td>
                                         <td>
-                                            <g:formatDate date="${new Date()}" format="d MMMMM yyyy hh:mma"/>
+                                            <g:formatDate date="${requisition?.shipment?.expectedShippingDate}" format="d MMMMM yyyy  hh:mma"/>
                                         </td>
                                     </tr>
                                 </table>
@@ -273,13 +273,13 @@
             <tr>
                 <td>
                     <label><warehouse:message code="deliveryNote.driverName.label" default="Driver name"/>: </label>
-                    ${requisition.shipment.driverName?:''}
+                    ${requisition?.shipment?.driverName?:''}
                 </td>
             </tr>
             <tr>
                 <td>
                     <label><warehouse:message code="deliveryNote.comments.label" default="Comments"/>: </label>
-                    ${requisition.shipment.additionalInformation?:''}
+                    ${requisition?.shipment?.additionalInformation?:''}
                 </td>
             </tr>
         </table>
