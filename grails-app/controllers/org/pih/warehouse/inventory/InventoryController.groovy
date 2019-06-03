@@ -1310,7 +1310,11 @@ class InventoryController {
 					transaction.save(failOnError: true)
 					flash.message = "Successfully saved transaction " + transaction?.transactionNumber?:transaction?.id
 					//redirect(controller: "inventory", action: "browse")
-                    redirect(controller: "inventoryItem", action: "showStockCard", id: params["product.id"])
+                    if (productIds.size() > 1) {
+                        redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
+                    } else {
+                        redirect(controller: "inventoryItem", action: "showStockCard", id: productIds)
+                    }
 				}
 			} catch (ValidationException e) {
 				log.debug ("caught validation exception " + e)
