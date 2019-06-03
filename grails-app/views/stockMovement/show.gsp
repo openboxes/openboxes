@@ -21,7 +21,18 @@
     <div class="button-bar ">
         <g:if test="${stockMovement.documents}">
             <div class="right">
-                <div class="button-group">
+                <div class="button-container">
+
+                    <g:link controller="doc4j" action="downloadSomething" id="${stockMovement?.shipment?.id }" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_word.png')}" />
+                        <warehouse:message code="default.button.download.label"/>
+                    </g:link>
+
+                    <g:link controller="doc4j" action="downloadShipmentManifestDocx" id="${stockMovement?.shipment?.id }" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_word.png')}" />
+                        <warehouse:message code="default.button.download.label"/>
+                    </g:link>
+
                     <g:link controller="stockMovement" action="addDocument" class="button" id="${stockMovement?.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
                         <warehouse:message code="stockMovement.uploadDocuments.label" />
