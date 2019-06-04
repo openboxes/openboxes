@@ -47,24 +47,24 @@ class CalculateQuantityJob {
             date = new Date() + 1
             date.clearTime()
         }
-        log.info "Executing calculate quantity job for date=${includeAllDates ? 'ALL' : date}, user=${user}, location=${location}, product=${product}, mergedJobDataMap=${context.mergedJobDataMap}"
+        log.info "Executing calculate quantity job for date=${includeAllDates ? 'ALL' : date}, user=${user?.id}, location=${location?.id}, product=${product?.id}, mergedJobDataMap=${context.mergedJobDataMap}"
         if (includeAllDates) {
             inventorySnapshotService.populateInventorySnapshots()
         }
         else {
             // Triggered by ?
             if (product && date && location) {
-                log.info "Triggered job for product ${product} at ${location} on ${date}"
+                log.info "Triggered job for product ${product?.id} at ${location?.id} on ${date}"
                 inventorySnapshotService.populateInventorySnapshots(date, location, product)
             }
             // Triggered by the inventory snapshot tab off the product page
             else if (product && location) {
-                log.info "Triggered job for product ${product} at ${location} on ${date}"
+                log.info "Triggered job for product ${product?.id} at ${location?.id} on ${date}"
                 inventorySnapshotService.populateInventorySnapshots(location, product)
             }
             // Triggered by the Inventory Snapshot page
             else if (date && location) {
-                log.info "Triggered calculate quantity job for all products at ${location} on ${date}"
+                log.info "Triggered calculate quantity job for all products at ${location?.id} on ${date}"
                 inventorySnapshotService.populateInventorySnapshots(date, location)
             }
             // Triggered by the CalculateQuantityJob
@@ -93,7 +93,7 @@ class CalculateQuantityJob {
 //            }
 //        }
 
-        log.info "Successfully completed job for location=${location?:"ALL"}, product=${product?:"ALL"}, ${date?:"ALL"}): " + elapsedTime + " ms"
+        log.info "Successfully completed job for location=${location?:"ALL"}, product=${product?.id?:"ALL"}, ${date?:"ALL"}): " + elapsedTime + " ms"
         println "=".multiply(60)
     }
 
