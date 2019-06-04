@@ -32,10 +32,10 @@ import org.pih.warehouse.shipping.ShipmentItem
  * report on product availability across a generic product like Ibuprofen
  * no matter what size or shape it is.
  *
- * We will just support "1 unit" for now.  Variations of products will 
- * eventually be stored as product variants (e.g. a 200 count bottle of 
- * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored 
- * as 20 mg tablets).  
+ * We will just support "1 unit" for now.  Variations of products will
+ * eventually be stored as product variants (e.g. a 200 count bottle of
+ * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored
+ * as 20 mg tablets).
  */
 class Product implements Comparable, Serializable {
 
@@ -225,7 +225,8 @@ class Product implements Comparable, Serializable {
         inventoryLevels: InventoryLevel,
         inventoryItems: InventoryItem,
         productComponents: ProductComponent,
-        productSuppliers: ProductSupplier
+        productSuppliers: ProductSupplier,
+        productCatalogItems: ProductCatalogItem
     ]
 
     static mapping = {

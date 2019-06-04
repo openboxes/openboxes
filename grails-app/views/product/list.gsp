@@ -8,14 +8,14 @@
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
 		<!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.list.label" args="[entityName]" /></content>
-    </head>    
+    </head>
     <body>
         <div class="body">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
             <div>
-            
+
 				<div class="button-bar">
                     <g:link class="button" action="list">
                         <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
@@ -69,6 +69,15 @@
                                     <p>
                                         <g:checkBox name="includeCategoryChildren" value="${params.includeCategoryChildren}"/>
                                         <label>${warehouse.message(code:'search.includeCategoryChildren.label', default: 'Include all products in all subcategories.')}</label>
+                                    </p>
+                                </div>
+                                <div class="filter-list-item">
+                                    <label><warehouse:message code="product.formulary.label"/></label>
+                                    <p>
+                                        <g:selectCatalogs name="catalogId" noSelection="['null':'']"
+                                                          value="${params.list('catalogId')}"
+                                                          style="width:100%;"
+                                                          class="chzn-select-deselect"/>
                                     </p>
                                 </div>
                                 <div class="filter-list-item">
