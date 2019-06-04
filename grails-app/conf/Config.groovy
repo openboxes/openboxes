@@ -469,11 +469,11 @@ openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
-openboxes.jobs.assignIdentifierJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every five minutes
 
 // Calculate current quantity on hand
 openboxes.jobs.calculateQuantityJob.enabled = true
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 */5 * * * ?" // every five minutes
 
 // Calculate historical quantity on hand
 openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
@@ -482,7 +482,7 @@ openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 
 // Data Cleaning Job
 openboxes.jobs.dataCleaningJob.enabled = true
-openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
+openboxes.jobs.dataCleaningJob.cronExpression = "0 */5 * * * ?"       // every five minutes
 
 // Data Migration Job (enabled, but needs to be triggered manually)
 openboxes.jobs.dataMigrationJob.enabled = true
