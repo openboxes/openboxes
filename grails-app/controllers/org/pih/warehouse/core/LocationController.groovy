@@ -82,7 +82,6 @@ class LocationController {
 			}
 
 			locationInstance.properties = params
-            def existingLocation = locationInstance.parentLocation.locations.any { it.name == locationInstance.name }
 
 			if (locationInstance.validate() && !locationInstance.hasErrors()) {
 				try {
@@ -109,10 +108,8 @@ class LocationController {
 				}
             }
 			else {
-				if (existingLocation) {
-					flash.error = "${warehouse.message(code: 'location.existingLocation.label', default: 'Bin location with this name has already been created')}"
-				}
 				render(view: "edit", model: [locationInstance: locationInstance])
+				return
 			}
 		}
 		else {
