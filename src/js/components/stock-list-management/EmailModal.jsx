@@ -98,9 +98,9 @@ class EmailModal extends Component {
     const { manager } = this.props;
     this.setState({
       formValues: {
-        subject: 'STOCK LIST UPDATE',
-        text: 'Please find attached a new version of your stock list reflecting' +
-          ' recent updates. Please use this version for your next replenishment request.',
+        subject: this.props.translate('react.stockListManagement.emailSubject.label', 'STOCK LIST UPDATE'),
+        text: this.props.translate('react.stockListManagement.emailMessage.label', 'Please find attached a new' +
+          ' version of your stock list reflecting recent updates. Please use this version for your next replenishment request.'),
         recipients: manager ? [{ id: manager.id, email: manager.email, label: manager.name }] : [],
         includePdf: true,
         includeXls: true,
