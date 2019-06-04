@@ -53,6 +53,71 @@ class LocationTests extends GrailsUnitTestCase {
 
     }
 
+    void test_shouldValidateOnNameUniqueConstraintIfSameNameButDifferentParentLocation() {
+        def locationType = new LocationType(locationTypeCode: LocationTypeCode.BIN_LOCATION, name: "Bin Location")
+
+        def binLocation1 = new Location(name: "AA-01-01-01", parentLocation: location1, locationType: locationType)
+        def binLocation2 = new Location(name: "AA-01-01-02", parentLocation: location1, locationType: locationType)
+        def binLocation3 = new Location(name: "AA-01-01-01", parentLocation: location2, locationType: locationType)
+
+        mockDomain(Location, [binLocation1, binLocation2, binLocation3])
+        binLocation1.save()
+        binLocation2.save()
+
+        assertTrue "Should validate with same name but different parent location", binLocation3.validate()
+    }
+
+    void test_shouldNotValidateNameUniqueConstraintIfSameName() {
+
+        def locationType = new LocationType(locationTypeCode: LocationTypeCode.BIN_LOCATION, name: "Bin Location")
+
+        def binLocation1 = new Location(name: "AA-01-01-01", parentLocation: location1, locationType: locationType)
+        def binLocation2 = new Location(name: "AA-01-01-02", parentLocation: location1, locationType: locationType)
+        def binLocation3 = new Location(name: "AA-01-01-01", parentLocation: location2, locationType: locationType)
+        def binLocation4 = new Location(name: "AA-01-01-01", parentLocation: location1, locationType: locationType)
+
+        mockDomain(Location, [binLocation1, binLocation2, binLocation3])
+        binLocation1.save()
+        binLocation2.save()
+
+        assertFalse "Should not validate with the same name and same parent location", binLocation4.validate()
+        assertEquals "unique", binLocation4.errors["name"]
+    }
+
+
+    void test_shouldNotValidateLocationNumberOnUniqueConstraintIfSame() {
+
+        def locationType = new LocationType(locationTypeCode: LocationTypeCode.BIN_LOCATION, name: "Bin Location")
+
+        def binLocation1 = new Location(name: "AA-01-01-01", locationNumber: "My Bin", parentLocation: location1, locationType: locationType)
+        def binLocation2 = new Location(name: "AA-01-01-02", locationNumber: "My Bin", parentLocation: location1, locationType: locationType)
+
+        mockDomain(Location, [binLocation1])
+        binLocation1.save()
+
+        // Should not validate with the same name and same parent location
+        assertFalse binLocation2.validate()
+        assertEquals "unique", binLocation2.errors["locationNumber"]
+    }
+
+    void test_shouldValidateLocationNumberOnUniqueConstraintIfNull() {
+
+        def locationType = new LocationType(locationTypeCode: LocationTypeCode.BIN_LOCATION, name: "Bin Location")
+
+        def binLocation1 = new Location(name: "AA-01-01-01", locationNumber: null, parentLocation: location1, locationType: locationType)
+        def binLocation2 = new Location(name: "AA-01-01-02", locationNumber: null, parentLocation: location1, locationType: locationType)
+        def binLocation3 = new Location(name: "AA-01-01-03", locationNumber: null, parentLocation: location1, locationType: locationType)
+
+        mockDomain(Location, [binLocation1, binLocation2])
+
+        // Should validate if location number is null for multiple  and same parent location
+        assertTrue binLocation1.validate()
+        assertTrue binLocation2.validate()
+        assertTrue binLocation3.validate()
+    }
+
+
+
     void test_shouldSaveLocation() {
         def location = new Location(name: "Default location", locationType: new LocationType(name: "Depot", description: "Depot"))
 
