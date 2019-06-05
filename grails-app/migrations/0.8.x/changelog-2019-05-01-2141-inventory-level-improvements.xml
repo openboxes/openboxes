@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1556764773500-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="expected_lead_time_days"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="expected_lead_time_days" type="DECIMAL(19,2)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1556764773500-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="forecast_period_days"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="forecast_period_days" type="DECIMAL(19,2)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1556764773500-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="forecast_quantity"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="forecast_quantity" type="DECIMAL(19,2)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1556764773500-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="preferred_bin_location_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="preferred_bin_location_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1556764773500-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="replenishment_location_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="replenishment_location_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1556764773500-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="comments"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="comments" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1556764773500-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKC254A2E1CFDCB4DF"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="preferred_bin_location_id"
+                                 baseTableName="inventory_level"
+                                 constraintName="FKC254A2E1CFDCB4DF"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1556764773500-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKC254A2E1F07D879A"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="replenishment_location_id"
+                                 baseTableName="inventory_level"
+                                 constraintName="FKC254A2E1F07D879A"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="location"/>
+    </changeSet>
+</databaseChangeLog>

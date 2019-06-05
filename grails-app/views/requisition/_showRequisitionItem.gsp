@@ -93,14 +93,6 @@
             <span class="canceled">${requisitionItem?.quantity?:0}</span>
             <span>${requisitionItem?.substitutionItem?.quantity?:0}</span>
         </g:if>
-        <g:elseif test="${requisitionItem?.isChanged()}">
-            <span class="canceled">
-                ${requisitionItem?.quantity?:0}
-            </span>
-            <span>
-                ${requisitionItem?.modificationItem?.quantity?:0}
-            </span>
-        </g:elseif>
         <g:elseif test="${requisitionItem?.isCanceled()}">
             <div class="canceled">
                 ${requisitionItem?.quantity?:0}

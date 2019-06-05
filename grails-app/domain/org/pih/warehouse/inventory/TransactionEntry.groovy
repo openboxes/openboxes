@@ -54,26 +54,6 @@ class TransactionEntry implements Comparable, Serializable {
 		comments(nullable:true, maxSize: 255)	
     }
     
-    /**
-     * Transient properties used as a hack so that we can use TransactionEntry as a command object and store lot number and product
-     * TODO: find a better way to do this... or just remove this once we rework the current "create transaction" interface
-     * the danger here is that legacy code we've missed will actually use and rely on the values of these now-transient properties
-     */
-    //static transients = ['lotNumber','product']
-    //String lotNumber
-    //Product product
-    
-    /**
-    String getLotNumber() {
-    	return inventoryItem?.lotNumber ?: lotNumber
-    }
-    
-    String getProduct() {
-    	return inventoryItem?.product ?: product
-    }
-    */
-    
-    
 	/**
 	 * Sort by the sort parameters of the parent transaction
 	 */

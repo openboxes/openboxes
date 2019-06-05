@@ -18,6 +18,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -25,6 +26,7 @@ import org.pih.warehouse.shipping.ShipmentItemException
 
 class InventoryItemController {
 
+	def dataService
 	def inventoryService;
 	def shipmentService;
 	def requisitionService;
@@ -98,9 +100,11 @@ class InventoryItemController {
         cmd.warehouse = currentLocation
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
         def quantityMap = inventoryService.getCurrentStockAllLocations(commandInstance?.product, currentLocation, currentUser)
-        log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
+		//def targetUri = g.createLink(controller: "inventoryItem", action: "showStockCard", id: commandInstance?.product?.id, absolute: true)
+		def targetUri = "/inventoryItem/showStockCard/${commandInstance?.product?.id}"
+		log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        render(template: "showCurrentStockAllLocations", model: [commandInstance:commandInstance, quantityMap:quantityMap])
+        render(template: "showCurrentStockAllLocations", model: [commandInstance:commandInstance, quantityMap:quantityMap, targetUri: targetUri])
     }
 
     def showAlternativeProducts = { StockCardCommand cmd ->
@@ -285,13 +289,74 @@ class InventoryItemController {
 
         // now populate the rest of the commmand object
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-        def issuedRequisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouse, commandInstance?.product, cmd.startDate, cmd.endDate, reasonCodes)
+        def requisitionItems = requisitionService.getIssuedRequisitionItems(commandInstance?.warehouse, commandInstance?.product, cmd.startDate, cmd.endDate, reasonCodes)
 
-		def demandSummary = forecastingService.getDemandSummary(cmd.warehouse, cmd.product)
+        // Calculate the number of days between first and last requisition
+		def firstDateRequested = requisitionItems.collect { it.requisition.dateRequested }.min()
+		def lastDateRequested = requisitionItems.collect { it.requisition.dateRequested }.max()
+		def numberOfDays = (firstDateRequested && lastDateRequested) ? lastDateRequested-firstDateRequested : 1
 
-        render(template: "showConsumption",
-                model: [commandInstance:commandInstance, issuedRequisitionItems:issuedRequisitionItems, demandSummary:demandSummary])
+		// Get quantity issued by request
+		def transactionEntries = requisitionService.getIssuedTransactionEntries(commandInstance?.warehouse, commandInstance?.product, cmd.startDate, cmd.endDate)
+		transactionEntries = transactionEntries.collect {
+			[
+					requestNumber  : it.transaction?.outgoingShipment?.requisition?.requestNumber,
+					quantity       : it?.quantity,
+			]
+		}
+
+		requisitionItems = requisitionItems.collect {
+			def requestNumber = it?.requisition?.requestNumber
+			def quantityIssued = transactionEntries.findAll { te -> te.requestNumber == requestNumber }.collect { it.quantity }.sum()
+            def quantityApproved = it?.quantityApproved?:0
+            def quantityPicked = it?.calculateQuantityPicked()?:0
+            if (it.status in [RequisitionItemStatus.CHANGED, RequisitionItemStatus.SUBSTITUTED]) {
+                quantityApproved = it?.requisitionItems?.collect { it.quantityApproved }.sum()
+                quantityPicked = it?.requisitionItems?.collect { it.calculateQuantityPicked() }.sum()
+            }
+			[
+					monthRequested   : it?.requisition?.monthRequested,
+					status		     : it?.status,
+					productCode      : it?.product?.productCode,
+					productName      : it?.product?.name,
+					origin           : it?.requisition?.origin?.name,
+					requisitionId    : it?.requisition?.id,
+					requestNumber    : it?.requisition?.requestNumber,
+					reuestStatus	 : it?.requisition?.status,
+					destination      : it?.requisition?.destination?.name,
+					lotNumber        : it?.inventoryItem?.lotNumber,
+					expirationDate   : it?.inventoryItem?.expirationDate,
+					dateRequested    : it?.requisition?.dateRequested,
+					quantityRequested: it?.quantity?:0,
+					quantityCanceled : it?.quantityCanceled?:0,
+					quantityApproved : quantityApproved,
+					quantityRequired : it?.calculateQuantityRequired()?:0,
+					quantityPicked   : quantityPicked,
+                    quantityIssued   : quantityIssued,
+					reasonCode		 : it?.cancelReasonCode,
+					comments         : it?.comment
+			]
+		}
+
+		render(template: "showConsumption",
+                model: [commandInstance:commandInstance, requisitionItems:requisitionItems, numberOfDays: numberOfDays])
     }
+
+	def showProductDemand = {
+		Product product = Product.get(params.id)
+		Location location = Location.get(session.warehouse.id)
+		if (params.format=='csv') {
+			def data = forecastingService.getDemandDetails(location, product)
+			def csv = dataService.generateCsv(data)
+			def filename = "Product Demand ${product.productCode} ${location.name}.csv"
+			response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+			render(contentType: "text/csv", text: csv)
+
+			return
+		}
+
+		render(template: "showProductDemand", model: [product: product])
+	}
 
 
     def showInventorySnapshot = {
@@ -617,6 +682,13 @@ class InventoryItemController {
         } catch (ValidationException e) {
             command.errors = e.errors
         }
+
+		if (params.redirectUri) {
+			redirect(uri: params.redirectUri)
+			return
+		}
+
+
 		chain(controller: "inventoryItem", action: "showStockCard",
                 id: inventoryItem?.product?.id, params: ['inventoryItem.id':inventoryItem?.id], model: [command:command])
 	}

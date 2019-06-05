@@ -173,7 +173,6 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/footable/', file:'footable.js')}" type="text/javascript" ></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.js" type="text/javascript"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.countdown/2.2.0/jquery.countdown.min.js" type="text/javascript"></script>
 
 <!-- JIRA Issue Collector -->
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.jira.issue.collector.enabled)}">
@@ -325,6 +324,40 @@
 </g:if>
 
 <g:javascript>
+
+    function openModalDialog(target, title, width, height, url) {
+
+        var position = {
+            my: "center center",
+            at: "center center",
+            of: window
+        };
+
+        $(target).attr("title", title);
+        $(target).dialog({
+            title: title,
+            autoOpen: true,
+            modal: true,
+            width: width,
+            autoResize:true,
+            resizable: true,
+            minHeight: height,
+            position: position,
+            open: function(event, ui) {
+                $(this).html("Loading...");
+                $(this).load(url, function(response, status, xhr) {
+                    if (xhr.status !== 200) {
+                        $(this).text("");
+                        $("<p></p>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
+                        var error = JSON.parse(response);
+                        var stack = $("<div></div>").addClass("stack empty").appendTo($(this));
+                        $("<code></code>").text(error.errorMessage).appendTo(stack)
+                    }
+                });
+            }
+        }).dialog('open');
+    }
+
     $(document).ready(function() {
 
         $(".btn-show-dialog").live("click", function (event) {
@@ -332,39 +365,14 @@
             var title = $(this).data("title");
             var target = $(this).data("target") || "#dlgShowDialog";
             var width = $(this).data("width") || "800";
-            var position = {
-                my: "center center",
-                at: "center center",
-                of: window
-            };
-
-            $(target).attr("title", title);
-            $(target).dialog({
-                title: title,
-                autoOpen: true,
-                modal: true,
-                width: width,
-                autoResize:true,
-                resizable: true,
-                minHeight:"auto",
-                position: position,
-                open: function(event, ui) {
-                    $(this).html("Loading...");
-                    $(this).load(url, function(response, status, xhr) {
-                        if (xhr.status !== 200) {
-                            $(this).text("");
-                            $("<p></p>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
-                            var error = JSON.parse(response);
-                            var stack = $("<div></div>").addClass("stack empty").appendTo($(this));
-                            $("<code></code>").text(error.errorMessage).appendTo(stack)
-                        }
-                    });
-                }
-            }).dialog('open');
+            var height = $(this).data("height") || "auto";
+            openModalDialog(target, title, width, height, url)
         });
 
-        $(".btn-close-dialog").live("click", function () {
-            $("#dlgShowDialog").dialog( "close" );
+        $(".btn-close-dialog").live("click", function (event) {
+            event.preventDefault();
+            var target = $(this).data("target") || "#dlgShowDialog";
+            $(target).dialog( "close" );
         });
 
 	});

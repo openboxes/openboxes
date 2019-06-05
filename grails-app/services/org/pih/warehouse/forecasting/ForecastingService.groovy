@@ -22,33 +22,10 @@ class ForecastingService {
     def dataSource
 
 
-    def getDemand(Location origin, Product product) {
-        String query = """
-            select 
-                request_status,
-                request_number,
-                date_requested,
-                origin_id,
-                origin_name,
-                destination_id,
-                destination_name,
-                product_id,
-                product_code,
-                product_name,
-                quantity_requested,
-                quantity_canceled,
-                quantity_approved,
-                quantity_change_approved,
-                quantity_substitution_approved,
-                quantity_demand,
-                cancel_reason_code
-            FROM product_demand
-            WHERE product_id = :productId
-            AND origin_id = :originId
-        """
-        Sql sql = new Sql(dataSource)
-        List rows = sql.rows(query, [productId: product.id, originId: origin.id])
 
+    def getDemand(Location origin, Product product) {
+
+        def rows = getDemandDetails(origin, product)
         def startDate = rows.min { it.date_requested }?.date_requested
         def endDate = rows.max { it.date_requested }?.date_requested
         def totalDemand = rows.sum { it.quantity_demand }?:0
@@ -63,6 +40,33 @@ class ForecastingService {
                 monthlyDemand: monthlyDemand
         ];
     }
+
+    def getDemandDetails(Location origin, Product product) {
+        String query = """
+            select 
+                request_status,
+                request_number,
+                date_requested,
+                origin_name,
+                destination_name,
+                product_code,
+                product_name,
+                quantity_requested,
+                quantity_canceled,
+                quantity_approved,
+                quantity_change_approved,
+                quantity_substitution_approved,
+                quantity_demand,
+                cancel_reason_code
+            FROM product_demand
+            WHERE product_id = :productId
+            AND origin_id = :originId
+        """
+        Sql sql = new Sql(dataSource)
+        List data = sql.rows(query, [productId: product.id, originId: origin.id])
+        return data
+    }
+
 
     def getDemandSummary(Location origin, Product product) {
         List data = []

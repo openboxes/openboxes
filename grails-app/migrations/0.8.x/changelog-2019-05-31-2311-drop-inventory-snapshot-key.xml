@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="jmiranda (generated)" id="1559362354263-1">
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="inventory_snapshot_key"/>
+        </preConditions>
+        <dropUniqueConstraint constraintName="inventory_snapshot_key" tableName="inventory_snapshot"/>
+    </changeSet>
+</databaseChangeLog>

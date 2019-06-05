@@ -1,7 +1,7 @@
-<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.core.Constants; org.pih.warehouse.core.RoleType" %>
 <div id="footer">
 	<div style="line-height: 2em;" class="center middle">
-		&copy; 2017 <a href="https://openboxes.com">Powered by OpenBoxes</a> &nbsp;&nbsp; | &nbsp;&nbsp;
+		&copy; <g:copyrightYear/> <a href="https://openboxes.com">Powered by OpenBoxes</a> &nbsp;&nbsp; | &nbsp;&nbsp;
         <g:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b> &nbsp;&nbsp; | &nbsp;&nbsp;
         <g:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}"><g:meta name="app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 		<g:message code="application.branchName.label"/>: <b><g:meta name="app.branchName"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;

@@ -6,7 +6,6 @@
     <table>
         <thead>
         <tr>
-            <th width="1%"></th>
             <th>${warehouse.message(code:'location.label')}</th>
             <th>${warehouse.message(code:'location.locationType.label')}</th>
             <th class="right">
@@ -30,15 +29,31 @@
                         <g:set var="totalQuantity" value="${totalQuantity + locationGroupEntry.value.totalQuantity}"/>
                         <g:set var="totalValue" value="${totalValue + locationGroupEntry.value.totalValue}"/>
 
+                        <tr class="prop header">
+                            <td>
+                                ${locationGroupEntry.key?:g.message(code:'default.none.label', default: "No location group")}
+                                <small>(${locations.size()} locations)</small>
+                            </td>
+                            <td>
+
+                            </td>
+                            <td class="right">
+                                <g:formatNumber number="${locationGroupEntry?.value?.totalQuantity}" format="###,###.#" maxFractionDigits="1"/>
+                            </td>
+                            <td class="right">
+                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'access.accessDenied.label')])}">
+                                    ${g.formatNumber(number: locationGroupEntry?.value?.totalValue, format: '###,###,##0.00', maxFractionDigits: 2) }
+                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                </g:hasRoleFinance>
+                            </td>
+                        </tr>
                         <g:each in="${locations}" var="locationEntry">
                             <tr class="prop">
-                                <td class="middle">
-                                    <g:link controller="dashboard" action="chooseLocation" id="${locationEntry?.location?.id}" class="button">
-                                        <g:message code="default.button.show.label"/>
+                                <td class="middle indent">
+                                    <g:link controller="dashboard" action="chooseLocation" id="${locationEntry?.location?.id}"
+                                            params="['targetUri':targetUri]">
+                                        ${locationEntry?.location?.name}
                                     </g:link>
-                                </td>
-                                <td class="middle">
-                                    ${locationEntry?.location?.name}
                                 </td>
                                 <td class="middle">
                                     <format:metadata obj="${locationEntry?.location?.locationType?.name}"/>
@@ -55,27 +70,6 @@
                                 </td>
                             </tr>
                         </g:each>
-                        <tr class="summary prop">
-                            <th>
-
-                            </th>
-                            <th>
-                                ${locationGroupEntry.key?:g.message(code:'default.none.label', default: "No Location Group")}
-                                <small>(${locations.size()} locations)</small>
-                            </th>
-                            <th>
-
-                            </th>
-                            <th class="right">
-                                <g:formatNumber number="${locationGroupEntry?.value?.totalQuantity}" format="###,###.#" maxFractionDigits="1"/>
-                            </th>
-                            <th class="right">
-                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'access.accessDenied.label')])}">
-                                    ${g.formatNumber(number: locationGroupEntry?.value?.totalValue, format: '###,###,##0.00', maxFractionDigits: 2) }
-                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                </g:hasRoleFinance>
-                            </th>
-                        </tr>
                     </g:each>
 
                 </g:each>
@@ -83,7 +77,6 @@
             <tfoot>
                 <tr class="summary">
 
-                    <th></th>
                     <th><warehouse:message code="default.total.label"/></th>
                     <th></th>
                     <th class="right">

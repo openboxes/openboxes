@@ -78,8 +78,10 @@ class RequisitionTemplateController {
         if (!requisition) {
             flash.message = "Could not find requisition with ID ${params.id}"
             redirect(action: "list")
-        }
-        else {
+        } else if (!requisition.requestedBy) {
+            flash.error = "${warehouse.message(code:'stockList.noManagerAssociated.label')}"
+            redirect(controller: "requisitionTemplate", action: "show", params:[id: params.id])
+        } else {
             [requisition: requisition];
         }
     }

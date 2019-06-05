@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.inventory
 
-public enum InventoryStatus {
+enum InventoryStatus {
 
 	INACTIVE(0),
     NOT_SUPPORTED(1),

@@ -254,6 +254,12 @@ input:focus, select:focus, textarea:focus {
     background: url(../images/icons/silk/decline.png) center left no-repeat;
 }
 
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 7vw;
+}
 
 /* MESSAGES AND ERRORS */
 
@@ -1589,8 +1595,6 @@ h2 {
     font-size: 2em;
     font-weight: bold;
     line-height: 30px;
-    font-family: "Trebuchet MS",Trebuchet,Calibri,Tahoma,Segoe;
-    text-transform: lowercase;
 }
 .logo a, .logo a:hover, .logo a:visited {
     color: #666;
@@ -1908,6 +1912,17 @@ div#dashboard li {
 */
 .list li {
     background-color: #eee;
+}
+
+.header td {
+    background-color: #eee;
+    border-top: 3px solid lightgrey;
+    font-weight: bold;
+    color: #666
+}
+
+.indent {
+    text-indent: 15px;
 }
 
 .prop-multi {

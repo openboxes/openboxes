@@ -22,6 +22,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.grails.plugins.csv.CSVWriter
 
 class StockMovementController {
 
@@ -53,6 +54,7 @@ class StockMovementController {
         def offset = params.offset?params.offset as int:0
         User currentUser = User.get(session?.user?.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
+        boolean incoming = params?.direction == "INBOUND" || params.destination?.id == currentLocation?.id
 
         if (params.direction=="OUTBOUND") {
             params.origin = params.origin?:currentLocation
@@ -99,7 +101,7 @@ class StockMovementController {
         def stockMovements = stockMovementService.getStockMovements(stockMovement, params, max, offset)
         def statistics = requisitionService.getRequisitionStatistics(requisition.destination, requisition.origin, currentUser)
 
-        render(view:"list", params:params, model:[stockMovements: stockMovements, statistics:statistics])
+        render(view:"list", params:params, model:[stockMovements: stockMovements, statistics:statistics, incoming:incoming])
 
     }
 
@@ -116,7 +118,7 @@ class StockMovementController {
     }
 
 
-    def delete = {
+    def removeStockMovement = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
             try {
@@ -267,5 +269,63 @@ class StockMovementController {
 
         render([data: "Data will be imported successfully"] as JSON)
 	}
+
+    def exportItems = {
+        def shipmentItems = []
+        def shipments = shipmentService.getShipmentsByDestination(session.warehouse)
+
+        shipments.findAll { it.currentStatus == ShipmentStatusCode.SHIPPED || it.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED }.each { shipment ->
+            shipment.shipmentItems.findAll { it.quantityRemaining > 0 }.groupBy { it.product }.each { product, value ->
+                shipmentItems << [
+                        productCode: product.productCode,
+                        productName: product.name,
+                        quantity: value.sum { it.quantityRemaining },
+                        expectedShippingDate: formatDate(date:shipment.expectedShippingDate, format: "dd-MMM-yy"),
+                        shipmentNumber: shipment.shipmentNumber,
+                        shipmentName: shipment.name,
+                        origin: shipment.origin,
+                        destination: shipment.destination,
+                ]
+            }
+        }
+
+
+        if (shipmentItems) {
+            def date = new Date();
+            def sw = new StringWriter()
+
+            def csv = new CSVWriter(sw, {
+                "Code" { it.productCode }
+                "Product Name" { it.productName }
+                "Quantity Incoming" { it.quantity }
+                "Expected Shipping Date" { it.expectedShippingDate }
+                "Shipment Number" { it.shipmentNumber }
+                "Shipment Name" { it.shipmentName }
+                "Origin" { it.origin }
+                "Destination" { it.destination }
+            })
+
+            shipmentItems.each { shipmentItem ->
+                csv << [
+                        productCode: shipmentItem.productCode,
+                        productName: shipmentItem.productName,
+                        quantity: shipmentItem.quantity,
+                        expectedShippingDate: shipmentItem.expectedShippingDate,
+                        shipmentNumber: shipmentItem.shipmentNumber,
+                        shipmentName: shipmentItem.shipmentName,
+                        origin: shipmentItem.origin,
+                        destination: shipmentItem.destination,
+                ]
+            }
+            //println csv.writer.toString()
+            response.contentType = "text/csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"Items shipped not received_${session.warehouse.name}_${date.format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType: "text/csv", text: csv.writer.toString())
+            return;
+        }
+        else {
+            render(text: 'No shipments found', status: 404)
+        }
+    }
 
 }

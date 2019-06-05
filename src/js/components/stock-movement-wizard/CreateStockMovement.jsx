@@ -9,6 +9,7 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import moment from 'moment';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -35,6 +36,11 @@ function validate(values) {
   }
   if (!values.dateRequested) {
     errors.dateRequested = 'react.default.error.requiredField.label';
+  } else {
+    const dateRequested = moment(values.dateRequested, 'MM/DD/YYYY');
+    if (moment().diff(dateRequested) < 0) {
+      errors.dateRequested = 'react.stockMovement.error.futureDate.label';
+    }
   }
   return errors;
 }

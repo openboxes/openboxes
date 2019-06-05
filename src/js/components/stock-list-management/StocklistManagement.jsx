@@ -6,6 +6,7 @@ import ReactTable from 'react-table';
 import update from 'immutability-helper';
 import { getTranslate } from 'react-localize-redux';
 import { Tooltip } from 'react-tippy';
+import Alert from 'react-s-alert';
 
 import 'react-table/react-table.css';
 
@@ -26,6 +27,7 @@ class StocklistManagement extends Component {
       availableStocklists: [],
       productInfo: null,
       users: [],
+      isLoading: true,
     };
 
     this.addItem = this.addItem.bind(this);
@@ -86,7 +88,7 @@ class StocklistManagement extends Component {
 
     apiClient.get(url)
       .then((response) => {
-        this.setState({ data: parseResponse(response.data.data) });
+        this.setState({ data: parseResponse(response.data.data), isLoading: false });
       })
       .catch(this.props.hideSpinner());
   }
@@ -240,8 +242,17 @@ class StocklistManagement extends Component {
           showPagination={false}
           minRows={0}
           sortable={false}
-          style={{ maxHeight: 'calc(100vh - 250px)' }}
+          noDataText={this.state.isLoading ? 'Loading...' : 'No rows found'}
+          style={{
+             maxHeight: this.state.productInfo && _.some(
+            this.state.productInfo.catalogs,
+                            catalog => !_.isEmpty(catalog),
+            ) ? 'calc(100vh - 275px)' : 'calc(100vh - 250px)',
+            }}
           collapseOnDataChange={false}
+          defaultSorted={[{
+            id: 'locationGroup.name',
+          }]}
           resolveData={values => values.map((row) => {
             if (!_.get(row, 'locationGroup.name')) {
               return { ...row, locationGroup: { name: 'No location group' } };
@@ -526,11 +537,18 @@ class StocklistManagement extends Component {
                       href={`/openboxes/stocklist/generateCsv/${original.stocklistId}`}
                     ><Translate id="react.default.button.printCsv.label" defaultMessage="Print XLS" />
                     </a>
-                    <EmailModal
-                      stocklistId={original.stocklistId}
-                      users={this.state.users}
-                      manager={original.manager}
-                    />
+                    {original.manager ?
+                      <EmailModal
+                        stocklistId={original.stocklistId}
+                        users={this.state.users}
+                        manager={original.manager}
+                      /> :
+                      <button
+                        className="btn btn-outline-secondary btn-xs mr-1"
+                        onClick={() => Alert.error(this.props.translate('react.stockListManagement.alert.noManagerAssociated.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
+                      ><Translate id="react.default.button.email.label" defaultMessage="Email" />
+                      </button>
+                    }
                   </div>
                 );
               },

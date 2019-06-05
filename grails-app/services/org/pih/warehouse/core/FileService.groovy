@@ -294,7 +294,7 @@ class FileService {
 
             // Add each table cell
             row.each { columnName, value ->
-                addTc(tr, value)
+                addTc(tr, value, cellWidthTwipsDefault)
             }
         }
 
@@ -306,18 +306,20 @@ class FileService {
 
 
     Tbl createPackingListTable(WordprocessingMLPackage wordMLPackage, Shipment shipment) {
-        int cols = 6;
+        int cols = 5
         int writableWidthTwips = wordMLPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips();
         int cellWidthTwipsDefault = new Double(Math.floor((writableWidthTwips/cols))).intValue();
 
-        Map cellWidthTwipsRatio = [1: 0.75, 2: 2.5, 3: 1.0, 4: 1.0, 5: 0.5, 6: 0.5]
+        Map cellWidthTwipsRatio = [1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0]
 
         //TblFactory.createTable(4, 4, cellWidthTwipsDefault);
 
         Tbl table = Context.getWmlObjectFactory().createTbl();
+		addBorders(table)
 
         TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid();
-        table.setTblGrid(tblGrid);
+		table.setTblGrid(tblGrid);
+
         // Add required <w:gridCol w:w="4788"/>
         for (int i=1 ; i<=cols; i++) {
             TblGridCol gridCol = Context.getWmlObjectFactory().createTblGridCol();
@@ -329,36 +331,54 @@ class FileService {
         Tr thead = Context.getWmlObjectFactory().createTr();
         addTc(thead, "Box", true);
         addTc(thead, "Product", true);
-        addTc(thead, "Lot Number", true);
-        addTc(thead, "Expires", true);
-        addTc(thead, "Quantity", true);
+        addTc(thead, "Lot", true);
+        addTc(thead, "Exp", true);
+        addTc(thead, "Qty", true);
         table.getContent().add(thead);
 
-        int cellWidthTwips = 0
         def previousContainer = null;
         def shipmentItems = shipment?.shipmentItems?.sort { it?.container?.sortOrder }
+
         // Iterate over shipment items and add them to the table
         for (ShipmentItem shipmentItem : shipmentItems) {
             Tr tr = Context.getWmlObjectFactory().createTr();
             table.getContent().add(tr);
 
             if (shipmentItem?.container != previousContainer) {
-                addTc(tr, shipmentItem?.container?.name?.replaceAll("\n", "") ?: "None")
+                addTc(tr, shipmentItem?.container?.name?.replaceAll("\n", "") ?: "None", cellWidthTwipsDefault)
             }
             else {
-                addTc(tr, "")
+                addTc(tr, "", cellWidthTwipsDefault)
             }
-            addTc(tr, shipmentItem.inventoryItem?.product?.name?:"")
-            addTc(tr, shipmentItem?.inventoryItem?.lotNumber?:"")
-            addTc(tr, shipmentItem?.inventoryItem?.expirationDate?.format("MM-dd-yyyy")?:"")
-            addTc(tr, "${shipmentItem?.quantity} ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:''}")
+            addTc(tr, shipmentItem.inventoryItem?.product?.name?:"", cellWidthTwipsDefault)
+            addTc(tr, shipmentItem?.inventoryItem?.lotNumber?:"", cellWidthTwipsDefault)
+            addTc(tr, shipmentItem?.inventoryItem?.expirationDate?.format("MM-dd-yyyy")?:"", cellWidthTwipsDefault)
+            addTc(tr, "${shipmentItem?.quantity} ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:''}", cellWidthTwipsDefault)
             previousContainer = shipmentItem?.container;
         }
 
         return table
     }
 
-    def addTc(Tr tr, Object value) {
+	def addBorders(Tbl table) {
+		table.setTblPr(new TblPr());
+		CTBorder border = new CTBorder();
+		border.setColor("auto");
+		border.setSz(new BigInteger("4"));
+		border.setSpace(new BigInteger("0"));
+		border.setVal(STBorder.SINGLE);
+
+		TblBorders borders = new TblBorders();
+		borders.setBottom(border);
+		borders.setLeft(border);
+		borders.setRight(border);
+		borders.setTop(border);
+		borders.setInsideH(border);
+		borders.setInsideV(border);
+		table.getTblPr().setTblBorders(borders);
+	}
+
+    def addTc(Tr tr, Object value, int cellWidthTwips) {
         Tc tc = Context.getWmlObjectFactory().createTc();
         tr.getContent().add(tc);
 
@@ -368,7 +388,7 @@ class FileService {
         TblWidth cellWidth = Context.getWmlObjectFactory().createTblWidth();
         tcPr.setTcW(cellWidth);
         cellWidth.setType("auto");
-        //cellWidth.setW(BigInteger.valueOf(cellWidthTwips));
+		cellWidth.setW(BigInteger.valueOf(cellWidthTwips))
 
         // Cell content - an empty <w:p/>
         value = value.toString().replace("\n", "")
@@ -409,18 +429,23 @@ class FileService {
         mappings.put("TODAY", today);
         mappings.put("DATE", date);
 
+		// Shipment
         addObjectProperties(mappings, "SHIPMENT", shipmentInstance, Shipment.class)
+
+		// Origin
         addObjectProperties(mappings, "ORIGIN", shipmentInstance?.origin, Location.class)
-        //addObjectProperties(mappings, "ORIGIN.ADDRESS", shipmentInstance?.origin?.address, Address.class)
-        addObjectProperties(mappings, "DESTINATION", shipmentInstance?.destination, Location.class)
-        //addObjectProperties(mappings, "DESTINATION.ADDRESS", shipmentInstance?.destination?.address, Address.class)
+        addObjectProperties(mappings, "ORIGIN.ADDRESS", shipmentInstance?.origin?.address, Address.class)
+		addObjectProperties(mappings, "ORIGIN.LOCATION_GROUP.ADDRESS",
+				shipmentInstance?.origin?.locationGroup?.address, Address.class)
+
+		// Destination
+		addObjectProperties(mappings, "DESTINATION", shipmentInstance?.destination, Location.class)
+        addObjectProperties(mappings, "DESTINATION.ADDRESS", shipmentInstance?.destination?.address, Address.class)
+		addObjectProperties(mappings, "DESTINATION.LOCATION_GROUP.ADDRESS",
+				shipmentInstance?.destination?.locationGroup?.address, Address.class)
+
+		// Other associations
         addObjectProperties(mappings, "CARRIER", shipmentInstance?.carrier, Person.class)
-        mappings.put("SHIPMENT.CONSIGNOR", shipmentInstance?.consignorAddress)
-        mappings.put("SHIPMENT.CONSIGNEE", shipmentInstance?.consigneeAddress)
-
-
-        mappings.remove("ORIGIN.LOGO")
-        mappings.remove("DESTINATION.LOGO")
 
         // Causes freeze when opening document
         //addObjectProperties(mappings, "CURRENT_USER", AuthService.currentUser.get(), User.class)
@@ -429,31 +454,37 @@ class FileService {
         // Add all reference numbers
         shipmentInstance.referenceNumbers.each { ReferenceNumber referenceNumber ->
             log.info "Reference number ${referenceNumber?.referenceNumberType} = " + referenceNumber?.identifier
-
             FormatTagLib formatTag = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
             String referenceNumberType = formatTag.metadata(obj: referenceNumber.referenceNumberType)
             referenceNumberType = referenceNumberType.toUpperCase().replaceAll(" ", "_")
             //String referenceNumberType = referenceNumber?.referenceNumberType?.name?.toUpperCase()
-            mappings.put("SHIPMENT." + referenceNumberType, referenceNumber?.identifier)
+            mappings.put(referenceNumberType, referenceNumber?.identifier)
         }
 
         // Add additional properties generated
         def decimalFormatter = new DecimalFormat("\$###,##0.00")
         String totalValue = decimalFormatter.format(shipmentInstance?.calculateTotalValue()?:0.0)
-        mappings.put("SHIPMENT.TOTAL_VALUE", totalValue)
-        mappings.put("SHIPMENT.STATUS", shipmentInstance?.getStatus())
-        mappings.put("SHIPMENT.FREIGHT_FORWARDER", shipmentInstance?.shipmentMethod?.shipper?.name)
-        mappings.put("SHIPMENT.ACTUAL_SHIPPING_DATE", shipmentInstance?.getActualShippingDate())
-        mappings.put("SHIPMENT.ACTUAL_DELIVERY_DATE", shipmentInstance?.getActualDeliveryDate())
+        mappings.put("STATUS", shipmentInstance?.getStatus())
+		mappings.put("TOTAL_VALUE", totalValue)
+		mappings.put("DRIVER_NAME", shipmentInstance?.driverName)
+        mappings.put("FREIGHT_FORWARDER", shipmentInstance?.shipmentMethod?.shipper?.name)
+        mappings.put("ACTUAL_SHIPPING_DATE", shipmentInstance?.getActualShippingDate())
+        mappings.put("ACTUAL_DELIVERY_DATE", shipmentInstance?.getActualDeliveryDate())
 
 		if (!hasRoleFinance) {
 			def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
 			String accessDeniedMessage = "${g.message(code: 'access.accessDenied.label')}"
-			mappings.put("SHIPMENT.TOTAL_VALUE", accessDeniedMessage)
-			mappings.put("SHIPMENT.TOTALVALUE", accessDeniedMessage)
+			mappings.put("TOTAL_VALUE", accessDeniedMessage)
+			mappings.put("TOTALVALUE", accessDeniedMessage) // for backwards compatibility
 		}
 
-        return mappings;
+
+		// Remove any sensitive or
+		mappings.remove("ORIGIN.LOGO")
+		mappings.remove("DESTINATION.LOGO")
+
+
+		return mappings;
     }
 
 
@@ -717,25 +748,6 @@ class FileService {
 		
 		return para;
 	}
-
-    void addBorders(Tbl table) {
-        //table.setTblPr(new TblPr());
-        CTBorder border = new CTBorder();
-        border.setColor("auto");
-        border.setSz(new BigInteger("4"));
-        border.setSpace(new BigInteger("0"));
-        border.setVal(STBorder.SINGLE);
-
-        TblBorders borders = new TblBorders();
-        borders.setBottom(border);
-        borders.setLeft(border);
-        borders.setRight(border);
-        borders.setTop(border);
-        borders.setInsideH(border);
-        borders.setInsideV(border);
-        table.getTblPr().setTblBorders(borders);
-    }
-
 
 	/**
 	 * 

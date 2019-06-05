@@ -20,6 +20,9 @@
 <g:if test="${flash.message}">
     <div class="message">${flash.message}</div>
 </g:if>
+<g:if test="${flash.error}">
+    <div class="errors">${flash.error}</div>
+</g:if>
 <g:hasErrors bean="${requisition}">
     <div class="errors">
         <g:renderErrors bean="${requisition}" as="list" />
@@ -143,6 +146,7 @@
           "bScrollCollapse": true,
           "bJQueryUI": true,
           "bAutoWidth": true,
+          "aaSorting": [],
           "sPaginationType": "full_numbers",
           "sAjaxSource": "${request.contextPath}/json/getRequisitionItems/" + $("#id").val(),
           "fnServerData": function ( sSource, aoData, fnCallback ) {

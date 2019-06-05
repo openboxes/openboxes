@@ -321,11 +321,9 @@ jqueryValidationUi {
 }
 
 
-// Allow users to customize logo image url as well as labale
-openboxes.logo.label = ""
-openboxes.logo.url = "/openboxes/images/logo/logo.png"
-openboxes.logoSquare.url = "/openboxes/images/logo/logo-512x512.png"
-openboxes.logoSmall.url = "/openboxes/images/logo/logo-small.png"
+// Allow users to customize logo image url as well as label
+openboxes.logo.url = "https://openboxes.com/img/logo_30.png"
+openboxes.report.logo.url = "https://openboxes.com/img/logo_100.png"
 
 // Allow system to anonymize user data to prevent it from being accessed by unauthorized users
 openboxes.anonymize.enabled = false
@@ -471,11 +469,11 @@ openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
-openboxes.jobs.assignIdentifierJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every five minutes
 
 // Calculate current quantity on hand
 openboxes.jobs.calculateQuantityJob.enabled = true
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 */5 * * * ?" // every five minutes
 
 // Calculate historical quantity on hand
 openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
@@ -484,7 +482,7 @@ openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 
 // Data Cleaning Job
 openboxes.jobs.dataCleaningJob.enabled = true
-openboxes.jobs.dataCleaningJob.cronExpression = "0 * * * * ?"       // every minute
+openboxes.jobs.dataCleaningJob.cronExpression = "0 */5 * * * ?"       // every five minutes
 
 // Data Migration Job (enabled, but needs to be triggered manually)
 openboxes.jobs.dataMigrationJob.enabled = true
@@ -524,6 +522,10 @@ openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es' , 'pt']
 openboxes.locale.defaultCurrencyCode = "USD"
 openboxes.locale.defaultCurrencySymbol = "\$"
 //openboxes.locale.supportedCurrencyCodes = ["USD","CFA"]
+
+// Inventory snapshot configuration
+openboxes.inventorySnapshot.useGparse = true
+openboxes.inventorySnapshot.batchSize = 1500
 
 // Global megamenu configuration
 openboxes.megamenu.dashboard.enabled = true

@@ -14,13 +14,17 @@ import org.apache.poi.poifs.filesystem.OfficeXmlFileException
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.CategoryExcelImporter
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
 import org.pih.warehouse.importer.LocationExcelImporter
 import org.pih.warehouse.importer.PersonExcelImporter
+import org.pih.warehouse.importer.ProductCatalogExcelImporter
+import org.pih.warehouse.importer.ProductCatalogItemExcelImporter
 import org.pih.warehouse.importer.ProductExcelImporter
 import org.pih.warehouse.importer.ProductSupplierExcelImporter
+import org.pih.warehouse.importer.TagExcelImporter
 import org.pih.warehouse.importer.UserExcelImporter
 import org.pih.warehouse.importer.UserLocationExcelImporter
 import org.pih.warehouse.product.ProductSupplier
@@ -134,10 +138,6 @@ class BatchController {
 			}
 
 			def dataImporter
-			//if (!command?.type) { 
-			//	command.errors.reject("${warehouse.message(code: 'importDataCommand.type.invalid')}")
-			//}
-
 			if (localFile) {
 				log.info "Local xls file " + localFile.getAbsolutePath()
 				command.importFile = localFile
@@ -146,6 +146,9 @@ class BatchController {
 				try { 
 					// Need to choose the right importer 
 					switch(command.type) {
+						case "category":
+							dataImporter = new CategoryExcelImporter(command?.filename);
+							break;
 						case "inventory":
 							dataImporter = new InventoryExcelImporter(command?.filename);
 							break;
@@ -161,8 +164,17 @@ class BatchController {
 						case "product":
 							dataImporter = new ProductExcelImporter(command?.filename)
 							break;
+						case "productCatalog":
+							dataImporter = new ProductCatalogExcelImporter(command?.filename)
+							break;
+						case "productCatalogItem":
+							dataImporter = new ProductCatalogItemExcelImporter(command?.filename)
+							break;
 						case "productSupplier":
 							dataImporter = new ProductSupplierExcelImporter(command?.filename)
+							break;
+						case "tag":
+							dataImporter = new TagExcelImporter(command?.filename)
 							break;
 						case "user":
 							dataImporter = new UserExcelImporter(command?.filename)

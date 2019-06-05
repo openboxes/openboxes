@@ -78,5 +78,11 @@ class ProductCatalog implements Comparable, Serializable {
 
     }
 
+    static PROPERTIES = [
+            "id":"id",
+            "code":"code",
+            "name":"name",
+            "description":"description"
+    ]
 
 }

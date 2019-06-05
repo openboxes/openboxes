@@ -36,6 +36,14 @@
         <div class="right">
 
             <g:set var="relatedToMe" value="${params?.createdBy?.id==session?.user?.id}"/>
+            <g:if test="${incoming}">
+                <div class="button-group">
+                    <g:link controller="stockMovement" action="exportItems" class="button">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+                        ${warehouse.message(code: 'stockMovements.exportIncomingItems.label', default: 'Export all incoming items')}
+                    </g:link>
+                </div>
+            </g:if>
             <div class="button-group">
                 <g:link controller="stockMovement" action="list" params="['createdBy.id':session?.user?.id]" class="button ${relatedToMe?'primary':''}">
                     ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}

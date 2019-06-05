@@ -37,7 +37,6 @@
 
         .small {font-size: xx-small;}
         .line{border-bottom: 1px solid black}
-        .logo { width: 60px; height: 60px; }
         .canceled { text-decoration: line-through; }
         .page-start {
             -fs-page-sequence: start;
@@ -68,7 +67,7 @@
         .b-l0 { border-left: 0 !important; }
         .no-padding { padding: 0 !important; }
         .w100 { width: 100% !important; }
-        .no-wrap { white-space: nowrap; }      
+        .no-wrap { white-space: nowrap; }
         .gray-background { background-color: #ddd !important; }
         .fixed-layout { table-layout: fixed; }
     </style>
@@ -106,7 +105,7 @@
                     <table class="no-border-table">
                         <tr>
                             <td>
-                                <img class="logo" src="${createLinkTo(dir: 'images/', file: 'hands.jpg', absolute: true)}"/>
+                                <g:displayReportLogo/>
                             </td>
                             <td>
                                 <h3>${warehouse.message(code: 'report.stockRequisition.label')}: ${stocklist?.requisition?.name} </h3>
@@ -197,7 +196,7 @@
 
         <div>
             <g:if test="${requisitionItems}">
-                <g:render template="/stocklist/itemList" model="[requisitionItems:requisitionItems]"/>
+                <g:render template="/stocklist/itemList" model="[requisitionItems:requisitionItems, stocklist:stocklist]"/>
             </g:if>
         </div>
     </div>

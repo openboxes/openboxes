@@ -29,6 +29,14 @@ class StocklistController {
 
 	}
 
+
+	def renderHtml = {
+		Stocklist stocklist = stocklistService.getStocklist(params.id)
+		render(
+				template: "/stocklist/print",
+				model: [stocklist:stocklist])
+	}
+
 	def renderPdf = {
 		Stocklist stocklist = stocklistService.getStocklist(params.id)
 
@@ -54,8 +62,13 @@ class StocklistController {
 	}
 
 	def sendMail = {
+		Stocklist stocklist = stocklistService.getStocklist(params.id)
+
 		if (!params.recipients || !params.id || !params.body || !params.subject) {
 			flash.error="${warehouse.message(code:'email.noParams.message')}"
+			redirect(controller: "requisitionTemplate", action: "sendMail", params:[id: params.id])
+		} else if (!Arrays.asList(params.recipients).contains(stocklist.requestedBy.email)) {
+			flash.error="${warehouse.message(code:'stockList.noManagerSelected.label')}"
 			redirect(controller: "requisitionTemplate", action: "sendMail", params:[id: params.id])
 		} else {
 			def emailBody = params.body + "\n\n" + "Sent by " + session.user.name
