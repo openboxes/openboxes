@@ -18,20 +18,18 @@ class ImageTagLib {
     def grailsApplication
 
     // Cannot cache logo because it might change between locations
-    //@Cacheable("customLogo")
     def displayLogo = { attrs, body ->
 
         // For the main logo, we want the logo config to be used as the default
         // and allow location logo to override
-        def logoConfig = grailsApplication.config.openboxes.logo
-
+        def logoUrl = grailsApplication.config.openboxes.logo.url
+        println "logoUrl: ${logoUrl}"
         // Use custom location logo if one exists
         Location location = Location.get(session?.warehouse?.id)
         if(location?.logo) {
-            logoConfig.url = "${createLink(controller:'location', action:'viewLogo', id:location?.id)}"
+            logoUrl = "${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}"
         }
-
-        attrs.logo = logoConfig
+        attrs.logoUrl = logoUrl
         attrs.showLabel = (attrs.showLabel!=null)?attrs.showLabel:true
 
         out << g.render(template: '/taglib/displayLogo', model: [attrs:attrs]);
@@ -42,7 +40,7 @@ class ImageTagLib {
 
         // For the report logo we'll use the logo config unless there's no logo,
         // then we'll try to use the location logo
-        attrs.logo = grailsApplication.config.openboxes.report.logo
+        attrs.logoUrl = grailsApplication.config.openboxes.report.logo.url
         attrs.showLabel = (attrs.showLabel!=null)?attrs.showLabel:true
 
         out << g.render(template: '/taglib/displayLogo', model: [attrs:attrs]);
