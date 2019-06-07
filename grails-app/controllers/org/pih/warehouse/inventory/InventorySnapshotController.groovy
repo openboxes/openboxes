@@ -75,7 +75,6 @@ class InventorySnapshotController {
         date.clearTime()
         Product product = Product.get(params.productId)
         Location location = Location.get(session.warehouse.id)
-        inventorySnapshotService.deleteInventorySnapshots(date, location, product)
         inventorySnapshotService.populateInventorySnapshots(date, location, product)
         render ([status: "OK"] as JSON)
     }
