@@ -29,6 +29,7 @@
             //"bServerSide": true,
             "sServerMethod": "GET",
             "iDisplayLength": 25,
+            "bSort": false,
             "bSearch": false,
             "bScrollInfinite": true,
             "bScrollCollapse": true,
