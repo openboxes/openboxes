@@ -5,4 +5,19 @@
         </preConditions>
         <dropUniqueConstraint constraintName="inventory_snapshot_key" tableName="inventory_snapshot"/>
     </changeSet>
+    <changeSet author="jmiranda (generated)" id="1559362354263-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="inventory_snapshot_idx"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="inventory_snapshot_idx"
+                     tableName="inventory_snapshot">
+            <column name="date"/>
+            <column name="location_id"/>
+            <column name="product_code"/>
+            <column name="lot_number"/>
+            <column name="bin_location_name"/>
+        </createIndex>
+    </changeSet>
 </databaseChangeLog>

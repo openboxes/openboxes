@@ -226,6 +226,7 @@ class EditItemsPage extends Component {
       statusCode: '',
       revisedItems: [],
       values: { ...this.props.initialValues, editPageItems: [] },
+      hasItemsLoaded: false,
     };
 
     this.revertItem = this.revertItem.bind(this);
@@ -258,11 +259,12 @@ class EditItemsPage extends Component {
    * @public
    */
   fetchAllData(forceFetch) {
+    this.props.showSpinner();
+
     if (!this.props.reasonCodesFetched || forceFetch) {
-      this.fetchData(this.props.fetchReasonCodes);
+      this.props.fetchReasonCodes();
     }
 
-    this.props.showSpinner();
     this.fetchLineItems().then((resp) => {
       const { statusCode, editPage } = resp.data.data;
       const editPageItems = _.map(
@@ -286,24 +288,11 @@ class EditItemsPage extends Component {
         statusCode,
         revisedItems: _.filter(editPageItems, item => item.statusCode === 'CHANGED'),
         values: { ...this.state.values, editPageItems },
-      });
-
-      this.props.hideSpinner();
+        hasItemsLoaded: true,
+      }, () => this.props.hideSpinner());
     }).catch(() => {
       this.props.hideSpinner();
     });
-  }
-
-  /**
-   * Fetches data using function given as an argument(reducers components).
-   * @param {function} fetchFunction
-   * @public
-   */
-  fetchData(fetchFunction) {
-    this.props.showSpinner();
-    fetchFunction()
-      .then(() => this.props.hideSpinner())
-      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -644,6 +633,7 @@ class EditItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
+                  disabled={!this.state.hasItemsLoaded}
                   onClick={() => {
                     if (!invalid) {
                       this.nextPage(values);

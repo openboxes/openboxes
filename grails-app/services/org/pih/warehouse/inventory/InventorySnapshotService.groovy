@@ -70,10 +70,17 @@ class InventorySnapshotService {
     }
 
     def populateInventorySnapshots(Date date, Location location) {
+
+        // Delete all inventory snapshots for the given date and location
+        deleteInventorySnapshots(date, location)
+
+        // Calculate current stock for given location
         def startTime = System.currentTimeMillis()
         def binLocations = calculateBinLocations(location)
         def readTime = (System.currentTimeMillis()-startTime)
         startTime = System.currentTimeMillis()
+
+        // Save inventory snapshots to database
         saveInventorySnapshots(date, location, binLocations)
         def writeTime = System.currentTimeMillis()-startTime
         log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${readTime}ms/${writeTime}ms"
@@ -96,10 +103,14 @@ class InventorySnapshotService {
         deleteInventorySnapshots(date, null)
     }
 
+    def deleteInventorySnapshots(Location location) {
+        Date date = getMostRecentInventorySnapshotDate() ?: new Date() +1
+        deleteInventorySnapshots(date, location)
+    }
+
     def deleteInventorySnapshots(Date date, Location location) {
         deleteInventorySnapshots(date, location, null)
     }
-
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     def deleteInventorySnapshots(Date date, Location location, Product product) {
@@ -109,12 +120,12 @@ class InventorySnapshotService {
         params.put("date", date)
 
         if (location) {
-            deleteStmt + " and snapshot.location = :location"
+            deleteStmt += " and snapshot.location = :location"
             params.put("location", location)
         }
 
         if (product) {
-            deleteStmt + " and snapshot.product = :product"
+            deleteStmt += " and snapshot.product = :product"
             params.put("product", product)
         }
 
@@ -143,7 +154,7 @@ class InventorySnapshotService {
     }
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
-        def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize?:100
+        def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize?:1000
         def sql = new Sql(dataSource)
         if (sql) {
             try {

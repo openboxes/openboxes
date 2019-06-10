@@ -70,7 +70,6 @@ class CalculateQuantityJob {
             // Triggered by the CalculateQuantityJob
             else if (date) {
                 log.info "Triggered calculate quantity job for all locations and products on ${date}"
-                inventorySnapshotService.deleteInventorySnapshots(date)
                 inventorySnapshotService.populateInventorySnapshots(date)
             } else {
                 log.info "Triggered calculate quantity job for all dates, locations, products"

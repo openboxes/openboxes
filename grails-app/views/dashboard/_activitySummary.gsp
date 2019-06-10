@@ -29,6 +29,7 @@
             //"bServerSide": true,
             "sServerMethod": "GET",
             "iDisplayLength": 25,
+            "bSort": false,
             "bSearch": false,
             "bScrollInfinite": true,
             "bScrollCollapse": true,
@@ -47,7 +48,7 @@
                     "url": sSource,
                     "data": aoData,
                     "success": fnCallback,
-                    "timeout": 10000,   // optional if you want to handle timeouts (which you should)
+                    "timeout": 15000,   // optional if you want to handle timeouts (which you should)
                     "error": handleAjaxError // this sets up jQuery to give me errors
                 } );
             },
