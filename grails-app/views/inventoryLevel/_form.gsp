@@ -1,4 +1,4 @@
-
+<%@ page import="org.pih.warehouse.inventory.Inventory;" %>
 <g:form method="post" controller="inventoryLevel" action="save" autocomplete="off">
     <div>
         <g:hiddenField name="id" value="${inventoryLevelInstance?.id}" />
@@ -32,10 +32,10 @@
                     <label for="inventory.id"><warehouse:message code="inventoryLevel.inventory.label" default="Inventory" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'inventory', 'errors')}">
-                    <g:select id="${inventoryLevelInstance?.id?'edit':'save'}-${inventoryLevelInstance?.id}-inventory-id" name="inventory.id" from="${org.pih.warehouse.inventory.Inventory.list()}" optionKey="id"
+                    <g:select id="${inventoryLevelInstance?.id?'edit':'save'}-${inventoryLevelInstance?.id}-inventory-id" name="inventory.id" from="${Inventory.list()}" optionKey="id"
                                 style="width: 300px;"
-                                noSelection="['null':warehouse.message(code:'inventoryLevel.chooseInventory.label',default:'Choose inventory')]"
-                                value="${inventoryLevelInstance?.inventory?.id}" class="chzn-select-deselect" />
+                                noSelection="['':'']"
+                                value="${inventoryLevelInstance?.inventory?.id?:inventory.id}" class="chzn-select-deselect" />
                 </td>
             </tr>
             <tr class="prop">

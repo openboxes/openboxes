@@ -61,7 +61,7 @@ class InventoryLevelController {
     def create = {
         def inventoryLevelInstance = new InventoryLevel()
         inventoryLevelInstance.properties = params
-        return [inventoryLevelInstance: inventoryLevelInstance]
+        return [inventoryLevelInstance: inventoryLevelInstance, inventory: inventory]
     }
 
     def save = {

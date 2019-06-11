@@ -9,7 +9,7 @@
 	        <title>${productInstance?.productCode } ${productInstance?.name }</title>
 		</g:if>
 		<g:else>
-	        <title><warehouse:message code="product.add.label" /></title>	
+	        <title><warehouse:message code="product.add.label" /></title>
 			<content tag="label1"><warehouse:message code="inventory.label"/></content>
 		</g:else>
 		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
@@ -31,11 +31,11 @@
 	                <g:renderErrors bean="${productInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            
-   			<g:if test="${productInstance?.id }">         
+
+   			<g:if test="${productInstance?.id }">
 				<g:render template="summary" model="[productInstance:productInstance]"/>
 			</g:if>
-			
+
 			<div style="padding: 10px">
 
                 <div class="tabs tabs-ui">
@@ -66,7 +66,7 @@
                             </li>
 
                         </g:if>
-					</ul>	
+					</ul>
 					<div id="tabs-details" class="ui-tabs-hide">
                         <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
                         <g:form action="${formAction}" method="post">
@@ -366,7 +366,7 @@
                             <g:render template="productPackages" model="[productInstance:productInstance]"/>
 						</div>
                         <div id="inventory-level-dialog" class="dialog hidden" title="Add a new stock level">
-                            <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new InventoryLevel()]"/>
+                            <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new InventoryLevel(),inventory:inventory]"/>
                         </div>
                         <div id="uom-class-dialog" class="dialog hidden" title="Add a unit of measure class">
                             <g:render template="uomClassDialog" model="[productInstance:productInstance]"/>
@@ -411,7 +411,7 @@
 	    					expires: 1
 	    				}
 	    			}
-				); 
+				);
 
                 $(".open-dialog").livequery('click', function(event) {
 				    event.preventDefault();
@@ -433,12 +433,12 @@
 					}
 				});
 
-				function updateBinLocation() { 
+				function updateBinLocation() {
 					$("#binLocation").val('updated')
 				}
 
 				$(".binLocation").change(function(){ updateBinLocation() });
-				
+
 			});
 		</script>
     </body>
