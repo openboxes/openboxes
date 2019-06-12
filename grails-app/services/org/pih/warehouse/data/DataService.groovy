@@ -270,11 +270,11 @@ class DataService {
         def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
         if (!inventoryLevel) {
             inventoryLevel = new InventoryLevel();
-            inventoryLevel.product = product
-            inventoryLevel.lastUpdated = new Date()
-            inventoryLevel.dateCreated = new Date()
-            inventory.addToConfiguredProducts(inventoryLevel)
+            inventoryLevel.inventory = inventory
+            product.addToInventoryLevels(inventoryLevel)
+
         }
+
         inventoryLevel.status = InventoryStatus.SUPPORTED
         inventoryLevel.binLocation = binLocation
         inventoryLevel.minQuantity = minQuantity
@@ -282,9 +282,6 @@ class DataService {
         inventoryLevel.maxQuantity = maxQuantity
         inventoryLevel.preferred = Boolean.valueOf(preferredForReorder)
 
-        if(inventoryLevel.hasErrors()||!inventoryLevel.save()) {
-            throw new ValidationException("Inventory level is invalid", inventoryLevel.errors)
-        }
         return inventoryLevel
     }
 
