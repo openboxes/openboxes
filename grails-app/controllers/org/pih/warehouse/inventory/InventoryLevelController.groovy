@@ -9,11 +9,14 @@
 **/ 
 package org.pih.warehouse.inventory
 
-import org.grails.plugins.csv.CSVWriter
+import grails.orm.PagedResultList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
 class InventoryLevelController {
+
+    def productService
+    def dataService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -23,7 +26,36 @@ class InventoryLevelController {
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [inventoryLevelInstanceList: InventoryLevel.list(params), inventoryLevelInstanceTotal: InventoryLevel.count()]
+
+        def terms = params.q ? params?.q?.split(" ") : null
+        def products = terms ? productService.searchProducts(terms, null) : []
+        def location = Location.get(params?.location?.id)
+
+        // Remove paging parameters if user is downloading CSV export
+        if (params.format) {
+            params.remove("max")
+            params.remove("offset")
+        }
+
+        PagedResultList inventoryLevels = InventoryLevel.createCriteria().list(params) {
+            if (location?.inventory) {
+                eq("inventory", location.inventory)
+            }
+            if (products) {
+                'in'("product", products)
+            }
+        }
+
+        if (params.format && inventoryLevels) {
+            def filename = "inventoryLevels.csv"
+            String text = dataService.exportInventoryLevels(inventoryLevels)
+            response.contentType = "text/csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+            render(contentType:"text/csv", text: text)
+            return;
+        }
+
+        [inventoryLevelInstanceList: inventoryLevels, inventoryLevelInstanceTotal: inventoryLevels?.totalCount]
     }
 
     def create = {
@@ -206,44 +238,10 @@ class InventoryLevelController {
 
 
         if (inventoryLevels) {
-            def sw = new StringWriter()
-
-            def csv = new CSVWriter(sw, {
-                "Product Code" {it.productCode}
-                "Product Name" {it.productName}
-                "Inventory" {it.inventory}
-                "Status" {it.status}
-                "Bin Location" {it.binLocation}
-                "Preferred" {it.preferred}
-                "ABC Class" {it.abcClass}
-                "Min Quantity" {it.minQuantity}
-                "Reorder Quantity" {it.reorderQuantity}
-                "Max Quantity" {it.maxQuantity}
-                "Forecast Quantity" {it.forecastQuantity}
-                "Forecast Period" {it.forecastPeriodDays}
-                "UOM" {it.unitOfMeasure}
-            })
-            inventoryLevels.each { inventoryLevel ->
-                csv << [
-                        productCode: inventoryLevel.product.productCode,
-                        productName: inventoryLevel.product.name,
-                        inventory: inventoryLevel.inventory.warehouse.name,
-                        status: inventoryLevel.status,
-                        binLocation: inventoryLevel.binLocation?:"",
-                        preferred: inventoryLevel.preferred?:"",
-                        abcClass: inventoryLevel.abcClass?:"",
-                        minQuantity: inventoryLevel.minQuantity?:"",
-                        reorderQuantity: inventoryLevel.reorderQuantity?:"",
-                        maxQuantity: inventoryLevel.maxQuantity?:"",
-                        forecastQuantity: inventoryLevel.forecastQuantity?:"",
-                        forecastPeriodDays: inventoryLevel.forecastPeriodDays?:"",
-                        unitOfMeasure: inventoryLevel?.product?.unitOfMeasure?:"EA"
-                ]
-            }
-            println csv.writer.toString()
+            String text = dataService.exportInventoryLevels(inventoryLevels)
             response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}.csv\"")
-            render(contentType:"text/csv", text: csv.writer.toString())
+            render(contentType:"text/csv", text: text)
             return;
         }
         else {

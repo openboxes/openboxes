@@ -13,6 +13,7 @@
         <table>
             <thead>
             <tr class="odd">
+                <th><warehouse:message code="default.actions.label"/></th>
                 <th><warehouse:message code="inventoryLevel.status.label"/></th>
                 <th><warehouse:message code="inventory.label"/></th>
                 <th><warehouse:message code="inventoryLevel.binLocation.label"/></th>
@@ -24,7 +25,6 @@
                 <th class="center"><warehouse:message code="inventoryLevel.forecastPeriodDays.label"/></th>
                 <th class="center"><warehouse:message code="default.comments.label"/></th>
                 <th class="center"><warehouse:message code="default.lastUpdated.label"/></th>
-                <th><warehouse:message code="default.actions.label"/></th>
             </tr>
             </thead>
             <tbody>
@@ -32,6 +32,28 @@
             <g:each var="inventoryLevelInstance" in="${productInstance?.inventoryLevels}" status="i">
 
                 <tr class="prop ${i%2?'even':'odd'}">
+                    <td>
+
+                        <div class="action-menu">
+                            <button class="action-btn">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
+                            </button>
+                            <div class="actions">
+                                <div class="action-menu-item">
+
+                                    <a href="javascript:void(0);" class="open-dialog create" dialog-id="inventory-level-${inventoryLevelInstance?.id}-dialog">
+                                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                                        ${warehouse.message(code:'default.button.edit.label')}</a>
+
+                                </div>
+                                <div class="action-menu-item">
+                                    <g:link controller="inventoryLevel" action="delete" class="" id="${inventoryLevelInstance?.id}">
+                                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+                                        ${warehouse.message(code:'default.button.delete.label')}</g:link>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
                     <td>
                         ${inventoryLevelInstance?.status}
                     </td>
@@ -71,18 +93,6 @@
                         <g:formatDate date="${inventoryLevelInstance?.lastUpdated }"/>
                     </td>
 
-                    <td>
-                        <div class="button-container">
-                            <a href="javascript:void(0);" class="open-dialog create button" dialog-id="inventory-level-${inventoryLevelInstance?.id}-dialog">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-                                ${warehouse.message(code:'default.button.edit.label')}</a>
-
-                            <g:link controller="inventoryLevel" action="delete" class="button" id="${inventoryLevelInstance?.id}">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file: 'delete.png')}"/>&nbsp;
-                                ${warehouse.message(code:'default.button.delete.label')}</g:link>
-
-                        </div>
-                    </td>
                 </tr>
             </g:each>
             <g:unless test="${productInstance?.inventoryLevels}">

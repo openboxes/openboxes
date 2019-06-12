@@ -20,8 +20,25 @@
 	            </div>
             </g:hasErrors>
 
+            <div class="buttonBar">
+                <g:link action="list" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
+                    <warehouse:message code="default.list.label" default="List" args="[g.message(code: 'inventoryLevels.label')]"/>
+                </g:link>
+                <g:link action="create" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                    <warehouse:message code="default.add.label" default="Add" args="[g.message(code: 'inventoryLevel.label')]"/>
+                </g:link>
 
-            <g:render template="../inventoryLevel/form" model="[productInstance:inventoryLevelInstance.product,inventoryLevelInstance:inventoryLevelInstance]"/>
+            </div>
+
+            <div class="box">
+                <h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
+
+                <g:render template="../inventoryLevel/form" model="[productInstance:inventoryLevelInstance.product,inventoryLevelInstance:inventoryLevelInstance]"/>
+
+            </div>
+
 
             <%--
             <g:form method="post" controller="inventoryLevel" action="save">
