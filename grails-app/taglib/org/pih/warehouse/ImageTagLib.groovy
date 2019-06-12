@@ -23,7 +23,7 @@ class ImageTagLib {
         // For the main logo, we want the logo config to be used as the default
         // and allow location logo to override
         def logoUrl = grailsApplication.config.openboxes.logo.url
-        println "logoUrl: ${logoUrl}"
+
         // Use custom location logo if one exists
         Location location = Location.get(session?.warehouse?.id)
         if(location?.logo) {

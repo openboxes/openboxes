@@ -30,7 +30,7 @@
                             <warehouse:message code="import.inventory.label" default="Inventory"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'inventory.xls']">
-                            <warehouse:message code="default.template.label" default="Download template"/>
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
                     </div>
                     <div>
@@ -39,7 +39,7 @@
                             <warehouse:message code="import.inventoryLevel.label" default="Inventory levels"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'inventoryLevels.xls']">
-                            <warehouse:message code="default.template.label" default="Download template"/>
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
                     </div>
                     <div>
@@ -48,7 +48,7 @@
                             <warehouse:message code="locations.label" default="Locations"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'locations.xls']">
-                            <warehouse:message code="default.template.label" default="Download template"/>
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
                     </div>
                     <div>
@@ -57,7 +57,7 @@
                             <warehouse:message code="persons.label" default="People"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'persons.xls']">
-                            <warehouse:message code="default.template.label" default="Download template"/>
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
                     </div>
                     <div>
@@ -102,7 +102,7 @@
                             <warehouse:message code="users.label" default="Users"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'users.xls']">
-                            <warehouse:message code="default.template.label" default="Download template"/>
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
                     </div>
                     <div>
@@ -111,7 +111,7 @@
                             <warehouse:message code="userLocations.label" default="User Locations"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'userLocations.xls']">
-                            <warehouse:message code="default.template.label" default="Download template"/>
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
                     </div>
                     %{--<div class="chzn-container">--}%

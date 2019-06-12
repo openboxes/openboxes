@@ -270,11 +270,11 @@ class DataService {
         def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
         if (!inventoryLevel) {
             inventoryLevel = new InventoryLevel();
-            inventoryLevel.product = product
-            inventoryLevel.lastUpdated = new Date()
-            inventoryLevel.dateCreated = new Date()
-            inventory.addToConfiguredProducts(inventoryLevel)
+            inventoryLevel.inventory = inventory
+            product.addToInventoryLevels(inventoryLevel)
+
         }
+
         inventoryLevel.status = InventoryStatus.SUPPORTED
         inventoryLevel.binLocation = binLocation
         inventoryLevel.minQuantity = minQuantity
@@ -282,9 +282,6 @@ class DataService {
         inventoryLevel.maxQuantity = maxQuantity
         inventoryLevel.preferred = Boolean.valueOf(preferredForReorder)
 
-        if(inventoryLevel.hasErrors()||!inventoryLevel.save()) {
-            throw new ValidationException("Inventory level is invalid", inventoryLevel.errors)
-        }
         return inventoryLevel
     }
 
@@ -585,6 +582,44 @@ class DataService {
         }
         return sw.toString()
     }
+
+    String exportInventoryLevels(List inventoryLevels) {
+        def sw = new StringWriter()
+        def csv = new CSVWriter(sw, {
+            "Product Code" {it.productCode}
+            "Product Name" {it.productName}
+            "Inventory" {it.inventory}
+            "Status" {it.status}
+            "Bin Location" {it.binLocation}
+            "Preferred" {it.preferred}
+            "ABC Class" {it.abcClass}
+            "Min Quantity" {it.minQuantity}
+            "Reorder Quantity" {it.reorderQuantity}
+            "Max Quantity" {it.maxQuantity}
+            "Forecast Quantity" {it.forecastQuantity}
+            "Forecast Period" {it.forecastPeriodDays}
+            "UOM" {it.unitOfMeasure}
+        })
+        inventoryLevels.each { inventoryLevel ->
+            csv << [
+                    productCode: inventoryLevel.product.productCode,
+                    productName: inventoryLevel.product.name,
+                    inventory: inventoryLevel.inventory.warehouse.name,
+                    status: inventoryLevel.status,
+                    binLocation: inventoryLevel.binLocation?:"",
+                    preferred: inventoryLevel.preferred?:"",
+                    abcClass: inventoryLevel.abcClass?:"",
+                    minQuantity: inventoryLevel.minQuantity?:"",
+                    reorderQuantity: inventoryLevel.reorderQuantity?:"",
+                    maxQuantity: inventoryLevel.maxQuantity?:"",
+                    forecastQuantity: inventoryLevel.forecastQuantity?:"",
+                    forecastPeriodDays: inventoryLevel.forecastPeriodDays?:"",
+                    unitOfMeasure: inventoryLevel?.product?.unitOfMeasure?:"EA"
+            ]
+        }
+        return csv.writer.toString()
+    }
+
 
     /**
      * Export the given requisitions to CSV.

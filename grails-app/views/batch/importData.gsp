@@ -62,7 +62,6 @@
                                 <td class="value">
                                     <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
                                 </td>
-
                             </tr>
                         </table>
                     </div>
@@ -135,11 +134,14 @@
         <script type="text/javascript">
             $(document).ready(function(){
                 $('#dataTable').dataTable({
-                    "sScrollX": "500px",
                     "bJQueryUI": true,
-                    "sPaginationType": "full_numbers",
+                    "bAutoWidth": true,
+                    "sScrollX": "100%",
+                    "sScrollY": 300,
                     "bScrollCollapse": true,
-                    "bPaginate": true
+                    "bScrollInfinite": true,
+                    "iDisplayLength": 15,
+                    "bSearch": false
                 });
             });
 
