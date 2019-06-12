@@ -29,7 +29,7 @@
                     <span class="action-menu">
                         <button class="action-btn button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'page_save.png')}" />
-                            &nbsp; <g:message code="default.download.label"/>
+                            &nbsp; <g:message code="default.button.download.label"/>
                             <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
                         </button>
                         <div class="actions">
