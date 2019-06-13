@@ -271,9 +271,9 @@ class SelectTagLib {
     }
 
     def selectRecipient = { attrs, body ->
-        attrs.from = User.findAllByEmailIsNotNull().sort { it.firstName }
+        attrs.from = Person.findAllByEmailIsNotNull().sort { it.firstName }
         attrs.optionKey = 'email'
-        attrs.optionValue = { it.name + " (" + it.username + ")"}
+        attrs.optionValue = { it.name }
         out << g.select(attrs)
     }
 
