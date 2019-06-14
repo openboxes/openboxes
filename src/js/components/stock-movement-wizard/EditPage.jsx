@@ -490,9 +490,7 @@ class EditItemsPage extends Component {
             })),
           })),
         },
-      });
-
-      this.props.hideSpinner();
+      }, () => this.props.hideSpinner());
     }).catch(() => {
       this.props.hideSpinner();
     });

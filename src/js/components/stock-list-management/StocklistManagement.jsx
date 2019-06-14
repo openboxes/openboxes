@@ -27,7 +27,10 @@ class StocklistManagement extends Component {
       availableStocklists: [],
       productInfo: null,
       users: [],
-      isLoading: true,
+      isDataLoading: true,
+      usersFetched: false,
+      stocklistsFetched: false,
+
     };
 
     this.addItem = this.addItem.bind(this);
@@ -65,6 +68,13 @@ class StocklistManagement extends Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if ((!prevState.usersFetched || !prevState.stocklistsFetched) &&
+      this.state.usersFetched && this.state.stocklistsFetched) {
+      this.props.hideSpinner();
+    }
+  }
+
   dataFetched = false;
 
   fetchUsers() {
@@ -76,8 +86,7 @@ class StocklistManagement extends Component {
         const users = _.map(response.data.data, user => (
           { value: { id: user.id, email: user.email, label: user.name }, label: user.name }
         ));
-        this.setState({ users });
-        this.props.hideSpinner();
+        this.setState({ users, usersFetched: true });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -88,7 +97,7 @@ class StocklistManagement extends Component {
 
     apiClient.get(url)
       .then((response) => {
-        this.setState({ data: parseResponse(response.data.data), isLoading: false });
+        this.setState({ data: parseResponse(response.data.data), isDataLoading: false });
       })
       .catch(this.props.hideSpinner());
   }
@@ -102,6 +111,7 @@ class StocklistManagement extends Component {
         this.setState({
           availableStocklists: _.map(parseResponse(response.data.data), val =>
             ({ value: val, label: val.name })),
+          stocklistsFetched: true,
         });
       })
       .catch(this.props.hideSpinner());
@@ -242,7 +252,7 @@ class StocklistManagement extends Component {
           showPagination={false}
           minRows={0}
           sortable={false}
-          noDataText={this.state.isLoading ? 'Loading...' : 'No rows found'}
+          noDataText={this.state.isDataLoading ? 'Loading...' : 'No rows found'}
           style={{
              maxHeight: this.state.productInfo && _.some(
             this.state.productInfo.catalogs,

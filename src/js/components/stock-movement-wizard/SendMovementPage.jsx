@@ -181,7 +181,6 @@ class SendMovementPage extends Component {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
 
-      this.fetchShipmentTypes();
       this.fetchStockMovementData();
     }
   }
@@ -190,7 +189,6 @@ class SendMovementPage extends Component {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
-      this.fetchShipmentTypes();
       this.fetchStockMovementData();
     }
   }
@@ -326,7 +324,7 @@ class SendMovementPage extends Component {
           },
         }, () => {
           this.props.setValues(this.state.values);
-          this.props.hideSpinner();
+          this.fetchShipmentTypes();
         });
       })
       .catch(() => this.props.hideSpinner());

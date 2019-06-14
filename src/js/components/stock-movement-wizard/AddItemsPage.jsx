@@ -540,7 +540,7 @@ class AddItemsPage extends Component {
    */
   fetchAllData(forceFetch) {
     if (!this.props.recipientsFetched || forceFetch) {
-      this.fetchData(this.props.fetchUsers);
+      this.props.fetchUsers();
     }
 
     this.fetchAndSetLineItems();
@@ -577,9 +577,7 @@ class AddItemsPage extends Component {
         currentLineItems: lineItems,
         values: { ...this.state.values, lineItems: lineItemsData },
         sortOrder,
-      });
-
-      this.props.hideSpinner();
+      }, () => this.props.hideSpinner());
     }).catch(() => this.props.hideSpinner());
   }
 
@@ -593,18 +591,6 @@ class AddItemsPage extends Component {
     return apiClient.get(url)
       .then(resp => resp)
       .catch(err => err);
-  }
-
-  /**
-   * Fetches data using function given as an argument.
-   * @param {function} fetchFunction
-   * @public
-   */
-  fetchData(fetchFunction) {
-    this.props.showSpinner();
-    fetchFunction()
-      .then(() => this.props.hideSpinner())
-      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -857,7 +843,6 @@ class AddItemsPage extends Component {
     return apiClient.delete(removeItemsUrl)
       .catch(() => {
         this.fetchAndSetLineItems();
-        this.props.hideSpinner();
         return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
       });
   }
@@ -931,7 +916,6 @@ class AddItemsPage extends Component {
 
     return apiClient.post(url, formData, config)
       .then(() => {
-        this.props.hideSpinner();
         this.fetchAndSetLineItems();
       })
       .catch(() => {
