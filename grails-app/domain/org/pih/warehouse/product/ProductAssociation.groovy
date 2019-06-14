@@ -35,5 +35,19 @@ class ProductAssociation {
         quantity(nullable:true)
         comments(nullable:true)
 	}
-	
+
+
+	static PROPERTIES = [
+			"id":"id",
+			"Type":"code",
+			"Product Code":"product.productCode",
+			"Product Name":"product.name",
+			"Associated Product Code":"associatedProduct.productCode",
+			"Associated Product Name":"associatedProduct.name",
+			"Quantity":"quantity",
+			"Comments":"comments",
+			"Date created":"dateCreated",
+			"Last updated":"lastUpdated"
+	]
+
 }

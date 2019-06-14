@@ -9,7 +9,12 @@
 **/ 
 package org.pih.warehouse.product
 
+import grails.orm.PagedResultList
+
 class ProductAssociationController {
+
+    def dataService
+    def productService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -19,7 +24,42 @@ class ProductAssociationController {
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [productAssociationInstanceList: ProductAssociation.list(params), productAssociationInstanceTotal: ProductAssociation.count()]
+
+        def terms = params.q ? params?.q?.split(" ") : null
+        def products = terms ? productService.searchProducts(terms, null) : []
+        def selectedTypes = params.list("code").collect { it as ProductAssociationTypeCode }
+
+        // Remove paging parameters if user is downloading CSV export
+        if (params.format) {
+            params.remove("max")
+            params.remove("offset")
+        }
+
+        PagedResultList productAssociations = ProductAssociation.createCriteria().list(params) {
+            if (selectedTypes) {
+                'in'("code", selectedTypes)
+            }
+            or {
+                ilike("id", params.q + "%")
+                if (products) {
+                    or {
+                        'in'("product", products)
+                        'in'("associatedProduct", products)
+                    }
+                }
+            }
+        }
+
+        if (params.format && productAssociations) {
+            def filename = "productAssociations.csv"
+            def data = productAssociations ? dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES) : [[:]]
+            def text = dataService.generateCsv(data)
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+            render(contentType:"text/csv", text: text)
+            return;
+        }
+
+        [productAssociationInstanceList: productAssociations, productAssociationInstanceTotal: productAssociations.totalCount, selectedTypes: selectedTypes]
     }
 
     def create = {
@@ -129,5 +169,15 @@ class ProductAssociationController {
             productAssociation.product = product
         }
         render(template: "dialog", model: [productAssociation: productAssociation])
+    }
+
+
+    def export = {
+        def productAssociations = ProductAssociation.list()
+        def data = productAssociations ? dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES) : [[:]]
+        response.setHeader("Content-disposition",
+                "attachment; filename=\"productAssociations.csv\"")
+        response.contentType = "text/csv"
+        render dataService.generateCsv(data)
     }
 }
