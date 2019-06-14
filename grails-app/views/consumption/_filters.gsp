@@ -4,6 +4,17 @@
     height: 26px;
     line-height: 26px;
 }
+
+.location-container {
+    height: 120px;
+}
+
+.location-container .chosen-container-multi .chosen-choices {
+    height: 120px !important;
+    overflow-y: auto;
+}
+
+
 </style>
 <div class="filters">
 	<g:form method="get" controller="consumption" action="show">
@@ -64,8 +75,11 @@
                             <label>
                                 <warehouse:message code="consumption.toLocations.label" default="Destinations(s)"/>
                             </label>
-                            <g:selectLocation name="selectedLocations"
-                                              value="${command?.selectedLocations?.id}" multiple="true" class="chzn-select-deselect"/>
+                            <div class="location-container">
+                                <g:selectLocation name="selectedLocations"
+                                                  value="${command?.selectedLocations?.id}" multiple="true" class="chzn-select-deselect"/>
+                            </div>
+
                             <span class="fade"><g:message code="consumption.destinations.optional.message"/></span>
                         </div>
                     </g:if>
@@ -74,19 +88,14 @@
                             <label>
                                 <warehouse:message code="consumption.toLocation.label" default="Destination(s)"/>
                             </label>
-                            <g:selectLocationWithOptGroup name="selectedLocations" from="${command?.toLocations}"
-                                                          value="${command.selectedLocations*.id}"
-                                                          class="chzn-select-deselect" multiple="multiple"/>
+                            <div class="location-container">
+                                <g:selectLocationWithOptGroup name="selectedLocations" from="${command?.toLocations}"
+                                                              value="${command.selectedLocations*.id}"
+                                                              class="chzn-select-deselect" multiple="multiple"/>
+                            </div>
                         </div>
                     </g:elseif>
-                    <div class="filter-list-item">
 
-                        <label><warehouse:message code="consumption.transactionTypes.label" default="Transaction Types"/></label>
-                        <g:selectTransactionType name="selectedTransactionTypes" from="${command?.transactionTypes}"
-                                                 transactionCode="${org.pih.warehouse.inventory.TransactionCode.DEBIT}"
-                                                 multiple="true" class="chzn-select-deselect"
-                                                 value="${command?.selectedTransactionTypes?.id}"/>
-                    </div>
                 </div>
 
             </fieldset>
