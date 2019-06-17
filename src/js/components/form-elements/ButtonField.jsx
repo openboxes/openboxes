@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Tooltip } from 'react-tippy';
 
 import Translate from '../../utils/Translate';
 
@@ -14,9 +15,20 @@ const ButtonField = (props) => {
   const attr = { ...attributes, ...dynamicAttr };
 
   return (
-    <button type="button" key={fieldName} {...attr} className={`btn btn-xs ${attr.className}`} >
+    <button type="button" key={fieldName} {...attr} className={`text-truncate btn btn-xs ${attr.className}`} >
       {
-        typeof ButtonLabel === 'string' ? <Translate id={ButtonLabel} defaultMessage={buttonDefaultMessage} /> : <ButtonLabel />
+        typeof ButtonLabel === 'string' ?
+          <Tooltip
+            html={(ButtonLabel &&
+            <Translate id={ButtonLabel} defaultMessage={buttonDefaultMessage} />)}
+            theme="transparent"
+            arrow="true"
+            delay="150"
+            duration="250"
+            hideDelay="50"
+          > <Translate id={ButtonLabel} defaultMessage={buttonDefaultMessage} />
+          </Tooltip>
+          : <ButtonLabel />
       }
     </button>
   );

@@ -47,14 +47,14 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
-        flexWidth: '4.7',
+        flexWidth: '3.8',
         attributes: {
           className: 'text-left ml-1',
         },
       },
       lotNumber: {
         type: LabelField,
-        flexWidth: '1.3',
+        flexWidth: '1.1',
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
       },
@@ -66,7 +66,7 @@ const FIELDS = {
       },
       'binLocation.name': {
         type: LabelField,
-        flexWidth: '1.2',
+        flexWidth: '1.1',
         label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin location',
       },
@@ -93,7 +93,7 @@ const FIELDS = {
         defaultMessage: 'Edit pick',
         type: EditPickModal,
         fieldKey: '',
-        flexWidth: '0.6',
+        flexWidth: '0.7',
         attributes: {
           title: 'react.stockMovement.editPick.label',
         },
@@ -117,7 +117,7 @@ const FIELDS = {
         buttonDefaultMessage: 'Adjust stock',
         type: ButtonField,
         fieldKey: '',
-        flexWidth: '1.3',
+        flexWidth: '1',
         attributes: {
           className: 'btn btn-outline-primary',
         },
@@ -130,7 +130,7 @@ const FIELDS = {
         type: ButtonField,
         label: 'react.default.button.undoEdit.label',
         defaultMessage: 'Undo edit',
-        flexWidth: '0.7',
+        flexWidth: '1',
         fieldKey: '',
         buttonLabel: 'react.default.button.undoEdit.label',
         buttonDefaultMessage: 'Undo edit',

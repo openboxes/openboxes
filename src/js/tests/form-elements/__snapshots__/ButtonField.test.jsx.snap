@@ -2,7 +2,7 @@
 
 exports[`ButtonField component is correctly rendering component label 1`] = `
 <button
-  className="btn btn-xs btn-outline-primary"
+  className="text-truncate btn btn-xs btn-outline-primary"
   type="button"
 >
   <span>
@@ -13,9 +13,7 @@ exports[`ButtonField component is correctly rendering component label 1`] = `
 
 exports[`ButtonField component is correctly rendering string label 1`] = `
 <button
-  className="btn btn-xs btn-outline-primary"
+  className="text-truncate btn btn-xs btn-outline-primary"
   type="button"
->
-  button label
-</button>
+/>
 `;

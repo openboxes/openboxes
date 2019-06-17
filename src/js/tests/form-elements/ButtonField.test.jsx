@@ -11,6 +11,8 @@ jest.mock('react-localize-redux', () => ({
   },
 }));
 
+jest.mock('react-tippy');
+
 describe('ButtonField component is correctly rendering', () => {
   it('string label', () => {
     const fieldConfig = {
