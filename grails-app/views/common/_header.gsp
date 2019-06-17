@@ -31,13 +31,6 @@
                                             <g:message code="default.edit.label" args="[g.message(code:'user.profile.label')]"></g:message>
                                         </g:link>
                                     </li>
-                                    <li class="action-menu-item">
-                                        <g:link  controller="dashboard" action="index" style="color: #666;">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'application_view_tile.png')}"/>
-                                            <warehouse:message code="dashboard.label" default="Dashboard"/>
-                                        </g:link>
-                                    </li>
-
                                     <g:if test="${session._showTime}">
                                         <li class="action-menu-item">
                                             <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
@@ -82,26 +75,6 @@
                                             ${warehouse.message(code:'cache.flush.label', default: 'Refresh data caches')}
                                         </g:link>
                                     </li>
-
-                                    <g:if test="${session?.warehouse}">
-                                        <%--
-                                        <li class="action-menu-item">
-                                            <g:link controller="dashboard" action="chooseLocation" style="color: #666">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"/>
-                                                <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
-                                            </g:link>
-                                        </li>
-                                        --%>
-                                        <li class="action-menu-item">
-                                            <a href="javascript:void(0);" class="btn-show-dialog"
-                                               data-title="${g.message(code:'dashboard.chooseLocation.label')}"
-                                               data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}"
-                                               style="color: #666">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"/>
-                                                <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
-                                            </a>
-                                        </li>
-                                    </g:if>
                                     <li class="action-menu-item">
                                         <g:link class="list" controller="auth" action="logout" style="color:#666">
                                             <img src="${resource(dir: 'images/icons/silk', file: 'door.png')}" class="middle"/>
