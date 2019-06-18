@@ -34,6 +34,12 @@
 						<g:datePicker name="expirationDate" precision="day" default="none" value="${inventoryItem?.expirationDate }" noSelection="['':'']"/>
 					</td>
 				</tr>
+				<tr class="prop">
+					<td valign="top" class="name"><label><g:message code="default.comments.label"/></label></td>
+					<td valign="top" class="value">
+						<g:textArea name="comments" value="${inventoryItem?.comments}" class="text medium" rows="5"/>
+					</td>
+				</tr>
 			</tbody>
 			<tfoot>
 				<tr>

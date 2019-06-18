@@ -35,6 +35,8 @@ class InventoryItem implements Serializable {
 	String lotNumber;						// Lot information for a product  
 	Date expirationDate;
 
+    String comments
+
     Integer quantity
 	Integer quantityOnHand
 	Integer quantityAvailableToPromise
@@ -43,7 +45,7 @@ class InventoryItem implements Serializable {
 	Date dateCreated;
 	Date lastUpdated;
 	
-	static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise', 'grailsApplication']
+	static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise']
 
 	static belongsTo = [ product : Product ]
 	
@@ -56,7 +58,8 @@ class InventoryItem implements Serializable {
     static constraints = {
 		product(nullable:false)
 		lotNumber(nullable:true, unique:['product'], maxSize:255)
-		expirationDate(nullable:true)	
+		expirationDate(nullable:true)
+        comments(nullable:true)
     }
 
     Map toJson() {
