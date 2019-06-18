@@ -173,8 +173,8 @@ class PackingPage extends Component {
   fetchAllData() {
     this.fetchLineItems().then((resp) => {
       const { packPageItems } = resp.data.data.packPage;
-      this.setState({ values: { ...this.state.values, packPageItems } });
-      this.props.hideSpinner();
+      this.setState({ values: { ...this.state.values, packPageItems } }, () =>
+        this.props.hideSpinner());
     }).catch(() => {
       this.props.hideSpinner();
     });
