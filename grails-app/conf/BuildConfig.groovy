@@ -65,6 +65,9 @@ grails.project.dependency.resolution = {
         // Required by LDAP
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
 
+        // Render Zebra labels
+        compile "fr.w3blog:zebra-zpl:0.0.3"
+
         // Required by rendering plugin (NoClassDefFoundError: org/springframework/mock/web/MockHttpServletRequest)
         runtime 'org.springframework:spring-test:3.0.5.RELEASE'
 
