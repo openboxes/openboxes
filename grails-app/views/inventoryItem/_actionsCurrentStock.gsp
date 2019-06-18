@@ -45,35 +45,41 @@
             <g:isSuperuser>
                 <g:set var="templates" value="${org.pih.warehouse.core.Document.findAllByDocumentCode(org.pih.warehouse.core.DocumentCode.ZEBRA_TEMPLATE)}"/>
                 <g:each in="${templates}" var="template">
+                    <hr/>
+                    <div class="action-menu-item">
+                        <a href="javascript:void(-1)">
+                            <label>${template.name}</label>
+                        </a>
+                    </div>
+                    <div class="action-menu-item">
+                        <g:link controller="document" action="buildZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
+                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'brick.png')}"/>&nbsp;
+                            <g:message code="default.build.label" args="[template.name]"/>
+                        </g:link>
+                    </div>
                     <div class="action-menu-item">
                         <g:link controller="document" action="renderZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'paintbrush.png')}"/>&nbsp;
-                            <g:message code="default.button.render.label" default="Render"/> ${template.name}
+                            <img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
+                            <g:message code="default.render.label" args="[template.name]"/>
                         </g:link>
                     </div>
                     <div class="action-menu-item">
                         <g:link controller="document" action="exportZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;
-                            <g:message code="default.button.export.label" default="Export"/> ${template.name}
+                            <img src="${resource(dir: 'images/icons/silk', file: 'application_link.png')}"/>&nbsp;
+                            <g:message code="default.export.label" args="[template.name]"/>
                         </g:link>
                     </div>
                     <div class="action-menu-item">
                         <g:link controller="document" action="printZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
                             <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>&nbsp;
-                            <g:message code="default.button.print.label" default="Print"/> ${template.name}
+                            <g:message code="default.print.label" args="[template.name]"/>
                         </g:link>
                     </div>
                 </g:each>
+
             </g:isSuperuser>
 
 
-        <%--
-            <g:render template="editItemDialog" model="[dialogId:dialogId, inventoryInstance:commandInstance?.inventory, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]"/>
-            <g:render template="adjustStock" model="[dialogId:dialogId, inventoryInstance:commandInstance?.inventory, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-            <g:render template="transferStock" model="[dialogId:dialogId, inventoryInstance:commandInstance?.inventory, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-            <g:render template="returnStock" model="[dialogId:dialogId, inventoryInstance:commandInstance?.inventory, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-            <g:render template="addToShipment" model="[dialogId:dialogId, commandInstance:commandInstance, binLocation:binLocation, itemInstance:itemInstance, itemQuantity: itemQuantity]" />
-        --%>
         </div>
     </g:isUserManager>
 </div>

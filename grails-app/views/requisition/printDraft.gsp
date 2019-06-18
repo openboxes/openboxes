@@ -16,7 +16,7 @@
 		<span style="float: right;">
 		    <button type="button" id="print-button" onclick="window.print()">
 		        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-		        ${warehouse.message(code:"default.print.label")}
+		        ${warehouse.message(code:"default.button.print.label")}
 		    </button>
 		</span>
     </h2>

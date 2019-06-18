@@ -13,7 +13,7 @@
 		<div id="print-button">
 			<button type="button" onclick="window.print()">
 				<img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-				${warehouse.message(code:"default.print.label")}
+				${warehouse.message(code:"default.button.print.label")}
 			</button>
 			<button type="button" onclick="window.close()">
 				<img src="${resource(dir: 'images/icons/silk', file: 'printer_cancel.png')}" />
