@@ -22,7 +22,7 @@
         <div  class="right">
             <button type="button" onclick="window.print()">
                 <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-                ${warehouse.message(code:"default.print.label")}
+                ${warehouse.message(code:"default.button.print.label")}
             </button>
         </div>
     </h2>
