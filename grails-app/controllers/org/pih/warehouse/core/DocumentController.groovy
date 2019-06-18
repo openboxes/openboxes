@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import groovy.text.Template
+import groovyx.net.http.HTTPBuilder
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.springframework.web.context.request.RequestContextHolder
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
@@ -423,8 +424,8 @@ class DocumentController {
 
     def printZebraTemplate = {
         Document document = Document.load(params.id)
-        InventoryItem inventoryItem = InventoryItem.load(params.inventoryItemId)
         Location location = Location.load(session.warehouse.id)
+        InventoryItem inventoryItem = InventoryItem.load(params?.inventoryItem?.id)
 
         String lptPort = grailsApplication.config.openboxes.linePrinterTerminal.port
 
@@ -446,7 +447,7 @@ class DocumentController {
         redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.id)
     }
 
-    def renderZebraTemplate = {
+    def buildZebraTemplate = {
         Document document = Document.load(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
@@ -456,7 +457,26 @@ class DocumentController {
         render (renderedContent)
     }
 
-    def viewZebraTemplate = {
+    def renderZebraTemplate = {
+
+        Document document = Document.load(params.id)
+        InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
+        Location location = Location.load(session.warehouse.id)
+        Map model = [document:document, inventoryItem:inventoryItem, location:location]
+        String body = renderTemplate(document, model)
+        String contentType = "image/png"
+
+        def http = new HTTPBuilder("http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/".toString())
+        def html = http.post(body: body)
+
+        response.contentType = contentType
+        response.outputStream << html
+        response.flush()
+    }
+
+
+
+    def exportZebraTemplate = {
         Document document = Document.load(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
