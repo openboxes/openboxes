@@ -15,6 +15,12 @@
                                 </a>
                             </g:if>
                         </g:each>
+                        <g:isUserAdmin>
+                            <g:render template="addLocation"></g:render>
+                            <a href="javascript:$('#dlgAddLocation').dialog('open');">
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'building_add.png')}" alt="Add a location" class="middle"/>
+                            </a>
+                        </g:isUserAdmin>
                     </td>
                 </tr>
             </g:if>
