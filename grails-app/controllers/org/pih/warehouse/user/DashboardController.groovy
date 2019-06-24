@@ -95,46 +95,6 @@ class DashboardController {
 			return;
 		}
 
-		def addLocation ={
-			flash.addLocation = true
-			log.info("locationInstance.hashCode " + flash.locationInstance?.hashCode())
-			if (!flash.locationInstance) {
-				flash.locationInstance = new Location()
-			}
-		}
-
-		def saveLocation ={
-			def locationInstance
-			log.info "saveLocationAction: " + params
-			if (flash.locationInstance) {
-				locationInstance.properties = params
-			}
-			else {
-				locationInstance = new Location(params)
-			}
-
-			def locations = Location.findAll(locationInstance);
-			//flash.message
-			log.info "saveLocationAction: found " + locations?.size() + " locations"
-			if (locations) {
-				flash.message = "${warehouse.message(code:'location.alreadyExists.message', args:[locationInstance.name])}"
-			}
-			else {
-
-				if (locationInstance.save(flush:true) && !locationInstance.hasErrors()) {
-					log.info "saved location " + locationInstance + " with id " + locationInstance?.id
-					flash.message = "${warehouse.message(code:'location.created.message', args:[locationInstance.name])}"
-				}
-				else {
-					log.info "invalid location " + locationInstance.errors
-					flash.message = "${warehouse.message(code:'location.invalid.message', args:[locationInstance.name])}"
-					flash.addLocation = true
-					flash.locationInstance = locationInstance
-				}
-			}
-			redirect(action: "chooseLocation")
-		}
-
 		def receipt = Receipt.findByReceiptNumber(params.searchTerms)
 		if (receipt) {
 			redirect(controller: "receipt", action: "show", id: receipt.id)
@@ -343,6 +303,45 @@ class DashboardController {
 		[savedLocations: [user.warehouse], loginLocationsMap:locationService.getLoginLocationsMap(user, warehouse)]
 	}
 
+	def addLocation ={
+		flash.addLocation = true
+		log.info("locationInstance.hashCode " + flash.locationInstance?.hashCode())
+		if (!flash.locationInstance) {
+			flash.locationInstance = new Location()
+		}
+	}
+
+	def saveLocation ={
+		def locationInstance
+		log.info "saveLocationAction: " + params
+		if (flash.locationInstance) {
+			locationInstance.properties = params
+		}
+		else {
+			locationInstance = new Location(params)
+		}
+
+		def locations = Location.findAll(locationInstance);
+		//flash.message
+		log.info "saveLocationAction: found " + locations?.size() + " locations"
+		if (locations) {
+			flash.message = "${warehouse.message(code:'location.alreadyExists.message', args:[locationInstance.name])}"
+		}
+		else {
+
+			if (locationInstance.save(flush:true) && !locationInstance.hasErrors()) {
+				log.info "saved location " + locationInstance + " with id " + locationInstance?.id
+				flash.message = "${warehouse.message(code:'location.created.message', args:[locationInstance.name])}"
+			}
+			else {
+				log.info "invalid location " + locationInstance.errors
+				flash.message = "${warehouse.message(code:'location.invalid.message', args:[locationInstance.name])}"
+				flash.addLocation = true
+				flash.locationInstance = locationInstance
+			}
+		}
+		redirect(action: "chooseLocation")
+	}
 
 	def changeLocation = {
 		User user = User.get(session.user.id);

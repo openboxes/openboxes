@@ -11,7 +11,6 @@
 			    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>  
 			    	<!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
 				</g:if>
-				<g:form controller="dashboard" action="chooseLocation">
 					<div class="box">
                         <h2>
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
@@ -31,7 +30,6 @@
                             </g:link>
                         </div>
 					</div>
-				</g:form>				
 			</div>
 		</div>
     </body>
