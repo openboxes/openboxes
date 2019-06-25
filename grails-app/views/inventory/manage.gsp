@@ -135,7 +135,7 @@
         <script>
 			$(document).ready(function() {
 
-			    var table = $(".dataTable").dataTable({
+			    $(".dataTable").dataTable({
                     "bJQueryUI": true,
                     "iDisplayLength": 100,
                     "bProcessing": true,

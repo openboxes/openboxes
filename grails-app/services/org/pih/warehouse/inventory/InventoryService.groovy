@@ -3685,7 +3685,12 @@ class InventoryService implements ApplicationContextAware {
 		return getQuantityByBinLocation(transactionEntries, true)
 	}
 
-    List getBinLocationSummary(List binLocations) {
+	List getBinLocationDetails(Location location, Date date) {
+		List transactionEntries = getTransactionEntriesBeforeDate(location, date)
+		return getQuantityByBinLocation(transactionEntries, true)
+	}
+
+	List getBinLocationSummary(List binLocations) {
 
         List results = []
         List defaultStatuses = ["inStock", "outOfStock"]

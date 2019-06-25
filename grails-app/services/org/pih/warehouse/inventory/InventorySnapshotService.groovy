@@ -76,7 +76,7 @@ class InventorySnapshotService {
 
         // Calculate current stock for given location
         def startTime = System.currentTimeMillis()
-        def binLocations = calculateBinLocations(location)
+        def binLocations = calculateBinLocations(location, date)
         def readTime = (System.currentTimeMillis()-startTime)
         startTime = System.currentTimeMillis()
 
@@ -86,6 +86,12 @@ class InventorySnapshotService {
         log.info "Saved ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")}: ${readTime}ms/${writeTime}ms"
     }
 
+
+    def calculateBinLocations(Location location, Date date) {
+        def binLocations = inventoryService.getBinLocationDetails(location, date)
+        binLocations = transformBinLocations(binLocations)
+        return binLocations
+    }
 
     def calculateBinLocations(Location location) {
         def binLocations = inventoryService.getBinLocationDetails(location)
@@ -569,8 +575,13 @@ class InventorySnapshotService {
     }
 
     List getQuantityOnHandByBinLocation(Location location) {
-        def data = []
         Date date = getMostRecentInventorySnapshotDate()
+        return getQuantityOnHandByBinLocation(location, date)
+    }
+
+
+    List getQuantityOnHandByBinLocation(Location location, Date date) {
+        def data = []
         if (location && date) {
             def results = InventorySnapshot.executeQuery("""
 						select 
@@ -605,9 +616,13 @@ class InventorySnapshotService {
     }
 
     List getQuantityOnHandByBinLocation(Location location, List<Product> products) {
+        Date date = getMostRecentInventorySnapshotDate()
+
+        return getQuantityOnHandByBinLocation(location, date, products)
+    }
+    List getQuantityOnHandByBinLocation(Location location, Date date, List<Product> products) {
         log.info ("getQuantityOnHandByBinLocation: location=${location} product=${products}" )
         def data = []
-        Date date = getMostRecentInventorySnapshotDate()
         if (location && date) {
             def results = InventorySnapshot.executeQuery("""
 						select 
