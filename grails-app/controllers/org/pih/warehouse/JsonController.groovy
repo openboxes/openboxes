@@ -1532,28 +1532,27 @@ class JsonController {
         Date startDate = command.startDate
         Date endDate = command.endDate
 
-        log.info "startDate = ${startDate}, endDate = ${endDate}"
-
+        // Get starting balance
         def balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate)
         if (balanceOpeningMap.empty) {
             inventorySnapshotService.populateInventorySnapshots(startDate, location)
             balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate)
         }
 
-
+        // Get ending balance
         def balanceClosingMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate)
         if (balanceClosingMap.empty) {
             inventorySnapshotService.populateInventorySnapshots(endDate, location)
             balanceClosingMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate)
         }
 
+        // We need all products that
         def products = new HashSet()
         products.addAll(balanceOpeningMap.collect { it.product })
         products.addAll(balanceClosingMap.collect { it.product })
 
-
+        // Get all transactions between start and end dates
         def transactionsByTransactionCode = TransactionFact.createCriteria().list {
-
             projections {
                 productKey {
                     groupProperty("productCode")
@@ -1582,13 +1581,14 @@ class JsonController {
             ]
         }
 
-
-        //log.info "transactionsByTransactionCode: " + transactionsByTransactionCode
-
         // Flatten the data to make it easier to display
         def data = products.collect { Product product ->
+
+            // Get balances by product
             def balanceOpening = balanceOpeningMap.findAll { it.product == product }.sum { it?.quantity?:0 }?:0
             def balanceClosing = balanceClosingMap.findAll { it.product == product }.sum { it?.quantity?:0 }?:0
+
+            // Get quantity by transaction
             def inbound = transactionsByTransactionCode.find { it.productCode == product.productCode && it.transactionTypeName.startsWith("Transfer In") }
             def outbound = transactionsByTransactionCode.find { it.productCode == product.productCode && it.transactionTypeName.startsWith("Transfer Out") }
             def expired = transactionsByTransactionCode.find { it.productCode == product.productCode && it.transactionTypeName.startsWith("Expired") }
@@ -1602,6 +1602,7 @@ class JsonController {
             def quantityDamaged = damaged?.quantity?:0
             def quantityAdjusted = adjusted?.quantity?:0
 
+            // Calculate discrepancy
             def quantityDiscrepancy = balanceClosing -
                     balanceOpening -
                     quantityInbound +
@@ -1609,6 +1610,8 @@ class JsonController {
                     quantityExpired +
                     quantityDamaged +
                     quantityAdjusted
+
+            // Transform data into inventory balance rows
             [
                     productCode: product.productCode,
                     productName: product.name,
@@ -1631,8 +1634,6 @@ class JsonController {
             return
         }
 
-
-
         render(["aaData":data] as JSON)
     }
 
@@ -1643,7 +1644,6 @@ class JsonController {
         Product product = Product.findByProductCode(params.productCode)
         Date startDate = command.startDate
         Date endDate = command.endDate
-
 
         def balanceOpeningBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate, [product])
         def balanceClosingBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate, [product])
