@@ -13,8 +13,6 @@
     height: 120px !important;
     overflow-y: auto;
 }
-
-
 </style>
 <div class="filters">
 	<g:form method="get" controller="consumption" action="show">
@@ -23,7 +21,8 @@
 
         <div class="box">
             <h2><warehouse:message code="consumption.parameters.label" default="Parameters"/></h2>
-            <fieldset>
+
+            <div class="parameters">
 
                 <div class="filter-list-item">
                     <label>
@@ -51,10 +50,10 @@
                         <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy" cssClass="large" autocomplete="off"/>
                     </div>
                 </div>
-            </fieldset>
+            </div>
 
             <h2><warehouse:message code="consumption.filters.label" default="Filters"/></h2>
-            <fieldset>
+            <div class="filters">
 
                 <div class="filter-list">
 
@@ -98,9 +97,9 @@
 
                 </div>
 
-            </fieldset>
+            </div>
             <h2><warehouse:message code="consumption.renderOptions.label" default="Render Options"/></h2>
-            <fieldset>
+            <div class="options">
 
                 <div class="filter-list-item">
                     <label><warehouse:message code="consumption.additionalColumns.label" default="Additional columns (CSV only)"/></label>
@@ -166,7 +165,7 @@
                         </g:link>
                     </div>
                 </div>
-            </fieldset>
+            </div>
         </div>
     </g:form>
 

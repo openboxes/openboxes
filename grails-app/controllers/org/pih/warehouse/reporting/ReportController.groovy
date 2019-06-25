@@ -216,20 +216,20 @@ class ReportController {
 		}
 
 		[command : command]
-
-
 	}
 
 
 	def showTransactionReport = {
-
 		InventoryReportCommand command = new InventoryReportCommand();
+        command.location = Location.get(session.warehouse.id)
 		command.rootCategory = productService.getRootCategory();
-
-
 		[command : command ]
 	}
 
+    def showTransactionReportDialog = {
+        def url = createLink(controller: "json", action: "getInventoryBalanceReportDetails", params:params)
+        render(template: "dataTableDialog", model: [url: url])
+    }
 
 	def generateTransactionReport = { InventoryReportCommand command ->
 		// We always need to initialize the root category

@@ -38,6 +38,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.reporting.Indicator
+import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
@@ -51,6 +52,7 @@ import java.text.SimpleDateFormat
 class JsonController {
 
     def dataSource
+    def dataService
     def dashboardService
 	def inventoryService
 	def productService
@@ -1519,11 +1521,216 @@ class JsonController {
                     totalValue: totalValue
             ]
         }
+        render(["aaData":data] as JSON)
+    }
 
+    def getInventoryBalanceReport = { InventoryBalanceReportCommand command ->
+        log.info "getInventoryBalanceReport: " + params
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
 
+        Date startDate = command.startDate
+        Date endDate = command.endDate
+
+        // Get starting balance
+        def balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate)
+        if (balanceOpeningMap.empty) {
+            inventorySnapshotService.populateInventorySnapshots(startDate, location)
+            balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate)
+        }
+
+        // Get ending balance
+        def balanceClosingMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate)
+        if (balanceClosingMap.empty) {
+            inventorySnapshotService.populateInventorySnapshots(endDate, location)
+            balanceClosingMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate)
+        }
+
+        // We need all products that
+        def products = new HashSet()
+        products.addAll(balanceOpeningMap.collect { it.product })
+        products.addAll(balanceClosingMap.collect { it.product })
+
+        // Get all transactions between start and end dates
+        def transactionsByTransactionCode = TransactionFact.createCriteria().list {
+            projections {
+                productKey {
+                    groupProperty("productCode")
+                }
+                transactionTypeKey {
+                    groupProperty("transactionCode")
+                    groupProperty("transactionTypeName")
+                }
+                sum("quantity")
+            }
+
+            transactionDateKey {
+                between("date", startDate, endDate)
+            }
+            locationKey {
+                eq("locationId", location.id)
+            }
+        }
+
+        transactionsByTransactionCode = transactionsByTransactionCode.collect {
+            [
+                    productCode: it[0],
+                    transactionCode: it[1],
+                    transactionTypeName: it[2],
+                    quantity: it[3]
+            ]
+        }
+
+        // Flatten the data to make it easier to display
+        def data = products.collect { Product product ->
+
+            // Get balances by product
+            def balanceOpening = balanceOpeningMap.findAll { it.product == product }.sum { it?.quantity?:0 }?:0
+            def balanceClosing = balanceClosingMap.findAll { it.product == product }.sum { it?.quantity?:0 }?:0
+
+            // Get quantity by transaction
+            def inbound = transactionsByTransactionCode.find { it.productCode == product.productCode && it.transactionTypeName.startsWith("Transfer In") }
+            def outbound = transactionsByTransactionCode.find { it.productCode == product.productCode && it.transactionTypeName.startsWith("Transfer Out") }
+            def expired = transactionsByTransactionCode.find { it.productCode == product.productCode && it.transactionTypeName.startsWith("Expired") }
+            def damaged = transactionsByTransactionCode.find { it.productCode == product.productCode && it.transactionTypeName.startsWith("Damaged") }
+            def adjusted = transactionsByTransactionCode.find { it.productCode == product.productCode && it.transactionTypeName.startsWith("Adjust") }
+            def cycleCountOccurred = transactionsByTransactionCode.find { it.productCode == product.productCode && it.transactionTypeName.contains("Inventory") }
+
+            def quantityInbound = inbound?.quantity?:0
+            def quantityOutbound = outbound?.quantity?:0
+            def quantityExpired = expired?.quantity?:0
+            def quantityDamaged = damaged?.quantity?:0
+            def quantityAdjusted = adjusted?.quantity?:0
+
+            // Calculate discrepancy
+            def quantityDiscrepancy = balanceClosing -
+                    balanceOpening -
+                    quantityInbound +
+                    quantityOutbound +
+                    quantityExpired +
+                    quantityDamaged +
+                    quantityAdjusted
+
+            // Transform data into inventory balance rows
+            [
+                    productCode: product.productCode,
+                    productName: product.name,
+                    cycleCountOccurred: cycleCountOccurred?true:"",
+                    balanceOpening: balanceOpening,
+                    quantityInbound: quantityInbound,
+                    quantityOutbound: quantityOutbound,
+                    quantityExpired: quantityExpired,
+                    quantityDamaged: quantityDamaged,
+                    quantityAdjusted: quantityAdjusted + quantityDiscrepancy,
+                    balanaceClosing: balanceClosing,
+
+            ]
+        }
+
+        if (params.format == "text/csv") {
+            String csv = dataService.generateCsv(data);
+            response.setHeader("Content-disposition", "attachment; filename=\"transaction-report.csv\"")
+            render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+            return
+        }
 
         render(["aaData":data] as JSON)
+    }
 
+    def getInventoryBalanceReportDetails = { InventoryBalanceReportCommand command ->
+        log.info "getInventoryBalanceReport: " + params
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
+        Product product = Product.findByProductCode(params.productCode)
+        Date startDate = command.startDate
+        Date endDate = command.endDate
+
+        def balanceOpeningBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate, [product])
+        def balanceClosingBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate, [product])
+
+        def transactionsByTransactionCode = TransactionFact.createCriteria().list {
+            projections {
+                productKey {
+                    property("productCode")
+                }
+                transactionDateKey {
+                    property("date")
+                }
+                transactionTypeKey {
+                    property("transactionCode")
+                    property("transactionTypeName")
+                }
+                property("quantity")
+            }
+
+            transactionDateKey {
+                between("date", startDate, endDate)
+            }
+            locationKey {
+                eq("locationId", location.id)
+            }
+            productKey {
+                eq("productCode", product.productCode)
+            }
+
+            transactionDateKey {
+                order("date")
+            }
+        }
+
+
+        def balanceOpening = balanceOpeningBinLocations.quantity?.sum()
+        def balanceClosing = balanceClosingBinLocations.quantity?.sum()
+        def balanceRunning = balanceOpening
+        transactionsByTransactionCode = transactionsByTransactionCode.collect {
+            def quantity = it[4]
+            def transactionCode = it[2]
+
+            if (transactionCode == "PRODUCT_INVENTORY") {
+                balanceRunning = quantity
+                quantity = null
+            }
+            else if (transactionCode == "DEBIT") {
+                balanceRunning -= quantity
+            }
+            else if (transactionCode == "CREDIT") {
+                balanceRunning += quantity
+            }
+
+            [
+                    transactionDate    : it[1]?.format("dd MMM yyyy"),
+                    transactionTime    : it[1]?.format("HH:mm:ss"),
+                    transactionCode    : transactionCode,
+                    transactionTypeName: LocalizationUtil.getLocalizedString(it[3], session.locale),
+                    quantity           : quantity,
+                    balance            : balanceRunning,
+            ]
+        }
+
+        log.info("balanceOpening: " + balanceOpening)
+
+        transactionsByTransactionCode.add(0, [
+                transactionDate    : startDate?.format("dd MMM yyyy"),
+                transactionTime    : startDate?.format("HH:mm:ss"),
+                transactionCode    : "BALANCE_OPENING",
+                transactionTypeName: "Opening Balance",
+                quantity           : null,
+                balance            : balanceOpening])
+
+        transactionsByTransactionCode.add([
+                transactionDate    : endDate?.format("dd MMM yyyy"),
+                transactionTime    : endDate?.format("HH:mm:ss"),
+                transactionCode    : "BALANCE_CLOSING",
+                transactionTypeName: "Closing Balance",
+                quantity           : null,
+                balance            : balanceClosing])
+
+        log.info "transactionsByTransactionCode: " + transactionsByTransactionCode
+
+        // Flatten the data to make it easier to display
+        def data = transactionsByTransactionCode
+
+        render(["aaData": data] as JSON)
     }
 
 
@@ -1680,4 +1887,11 @@ class JsonController {
         def demandDetails = forecastingService.getDemandDetails(location, product)
         render ([aaData:demandDetails]as JSON)
     }
+}
+
+
+class InventoryBalanceReportCommand {
+    Date startDate
+    Date endDate
+    Location location
 }
