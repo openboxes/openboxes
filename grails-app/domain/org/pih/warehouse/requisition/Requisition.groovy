@@ -17,6 +17,7 @@ import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.product.Product
 
 class Requisition implements Comparable<Requisition>, Serializable {
 
@@ -357,6 +358,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
     BigDecimal getTotalCost() {
         def itemsWithPrice = requisitionItems?.findAll { it.product.pricePerUnit }
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum()?:0
+    }
+
+    BigDecimal getQuantityByProduct(Product product) {
+       return requisitionItems?.findAll { it.product == product }?.collect { it.quantity }?.sum()?:0
     }
 
 
