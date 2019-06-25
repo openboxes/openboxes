@@ -192,9 +192,9 @@ class StockMovementApiController {
 
         bindStockMovement(stockMovement, jsonObject)
 
-        stockMovement = stockMovementService.reviseItems(stockMovement)
+        List<EditPageItem> revisedItems = stockMovementService.reviseItems(stockMovement)
 
-        render ([data:stockMovement] as JSON)
+        render ([data:revisedItems] as JSON)
     }
 
     def updateItems = {
