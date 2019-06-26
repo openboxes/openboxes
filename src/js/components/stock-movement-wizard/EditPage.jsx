@@ -360,10 +360,11 @@ class EditItemsPage extends Component {
 
     return this.reviseRequisitionItems(formValues)
       .then((resp) => {
-        const editPageItems = _.get(resp, 'data.data.editPage.editPageItems');
+        const editPageItems = _.get(resp, 'data.data');
         if (editPageItems && editPageItems.length) {
           this.setState({
-            revisedItems: _.filter(editPageItems, item => item.statusCode === 'CHANGED'),
+            revisedItems: [...this.state.revisedItems, ...editPageItems],
+            values: formValues,
           });
         }
         this.props.hideSpinner();

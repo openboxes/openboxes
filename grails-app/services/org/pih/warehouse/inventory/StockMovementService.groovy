@@ -964,8 +964,9 @@ class StockMovementService {
         return stockMovement
     }
 
-    StockMovement reviseItems(StockMovement stockMovement) {
+    List<EditPageItem> reviseItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
+        def revisedItems = []
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
@@ -990,6 +991,7 @@ class StockMovementService {
                         stockMovementItem.comments)
 
                 requisitionItem.quantityApproved = 0
+                stockMovementItem.statusCode = "CHANGED"
             }
         }
 
@@ -1000,9 +1002,14 @@ class StockMovementService {
         createMissingPicklistItems(stockMovement)
         createMissingShipmentItems(stockMovement)
 
-        stockMovement.editPage = getEditPage(stockMovement.id)
+        stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
+            if (stockMovementItem.statusCode == 'CHANGED') {
+                EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
+                revisedItems.add(editPageItem)
+            }
+        }
 
-        return stockMovement
+        return revisedItems
     }
 
     void substituteItem(StockMovementItem stockMovementItem) {
