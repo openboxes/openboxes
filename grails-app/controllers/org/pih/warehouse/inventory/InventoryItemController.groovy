@@ -72,11 +72,7 @@ class InventoryItemController {
 			// now populate the rest of the commmand object
 			inventoryService.getStockCardCommand(cmd, params)
 
-			def demand = [:]
-			boolean forecastingEnabled = grailsApplication.config.openboxes.forecastingEnabled?:false
-			if (forecastingEnabled) {
-				demand = forecastingService.getDemand(cmd.warehouse, cmd.product)
-			}
+			def demand = forecastingService.getDemand(cmd.warehouse, cmd.product)
 
             [ commandInstance: cmd, demand: demand ]
         } catch (ProductException e) {
