@@ -160,7 +160,7 @@ const FIELDS = {
       autofillLine: {
         fieldKey: '',
         label: '',
-        flexWidth: '0',
+        flexWidth: '0.1',
         type: ({
           // eslint-disable-next-line react/prop-types
           subfield, parentIndex, rowIndex, autofillLines, fieldValue, shipmentReceived,
@@ -187,6 +187,7 @@ const FIELDS = {
         flexWidth: '0.8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
+          showValueTooltip: true,
         },
       },
       'container.name': {
