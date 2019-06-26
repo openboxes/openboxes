@@ -3,6 +3,7 @@ package org.pih.warehouse.api
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -98,6 +99,7 @@ class StockMovement {
                 identifier: requisition?.requestNumber,
                 origin: origin,
                 destination: destination,
+                hasManageInventory: origin.supports(ActivityCode.MANAGE_INVENTORY),
                 stocklist: [id: stocklist?.id, name: stocklist?.name],
                 dateRequested: dateRequested?.format("MM/dd/yyyy"),
                 dateShipped: dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
