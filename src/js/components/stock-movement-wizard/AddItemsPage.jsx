@@ -555,6 +555,7 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
     this.fetchLineItems().then((resp) => {
       const { lineItems } = resp.data.data;
+      const { hasManageInventory } = resp.data.data;
       let lineItemsData;
       if (!lineItems.length) {
         lineItemsData = new Array(1).fill({ sortOrder: 100 });
@@ -575,7 +576,11 @@ class AddItemsPage extends Component {
       const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
       this.setState({
         currentLineItems: lineItems,
-        values: { ...this.state.values, lineItems: lineItemsData },
+        values: {
+          ...this.state.values,
+          lineItems: lineItemsData,
+          hasManageInventory,
+        },
         sortOrder,
       }, () => this.props.hideSpinner());
     }).catch(() => this.props.hideSpinner());
