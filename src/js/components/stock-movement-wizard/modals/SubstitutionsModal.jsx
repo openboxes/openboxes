@@ -44,16 +44,25 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       productName: {
         type: LabelField,
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       minExpirationDate: {
         type: LabelField,
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       quantityAvailable: {
         type: LabelField,
@@ -214,16 +223,12 @@ class SubstitutionsModal extends Component {
   calculateSelected(values) {
     return (
       <div>
-        <div className="form-group pb-2">
-          <label htmlFor="quantity-selected" className="col-sm-2 col-form-label font-weight-bold">
-            <Translate id="react.stockMovement.quantitySelected.label" defaultMessage="Quantity selected" />
-          </label>
-          <div id="quantity-selected">
-            {_.reduce(values.substitutions, (sum, val) =>
-                (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)
-            }
-          </div>
+        <div className="font-weight-bold pb-2">
+          <Translate id="react.stockMovement.quantitySelected.label" defaultMessage="Quantity selected" />: {_.reduce(values.substitutions, (sum, val) =>
+          (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)
+        }
         </div>
+        <hr />
       </div>
     );
   }
@@ -244,13 +249,14 @@ class SubstitutionsModal extends Component {
         renderBodyWithValues={this.calculateSelected}
       >
         <div>
-          <div className="form-group">
-            <label htmlFor="product" className="col-sm-2 col-form-label font-weight-bold"><Translate id="react.stockMovement.product.label" defaultMessage="Product" /></label>
-            <div id="product" className="col-sm-10">{this.state.attr.lineItem.productCode} {this.state.attr.lineItem.productName}</div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.lineItem.productCode}
           </div>
-          <div className="form-group">
-            <label htmlFor="quantity-requested" className="col-sm-2 col-form-label font-weight-bold"><Translate id="react.stockMovement.quantityRequested.label" defaultMessage="Quantity requested" /></label>
-            <div id="quantity-requested" className="col-sm-10">{this.state.attr.lineItem.quantityRequested}</div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.lineItem.productName}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.quantityRequested.label" defaultMessage="Qty Requested" />: {this.state.attr.lineItem.quantityRequested}
           </div>
         </div>
       </ModalWrapper>
