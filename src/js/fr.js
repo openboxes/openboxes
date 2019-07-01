@@ -395,8 +395,18 @@ const fr = {
       },
     },
     requisitionTemplate: {
-      label: 'Stock lists',
-      link: '/openboxes/requisitionTemplate/list',
+      label: 'Stocklists',
+      link: '#',
+      subsections: {
+        listStockLists: {
+          label: 'Liste de stock lists',
+          link: '/openboxes/requisitionTemplate/list',
+        },
+        createStockList: {
+          label: 'Créer stock list',
+          link: '/openboxes/requisitionTemplate/create',
+        },
+      },
     },
     configuration: {
       label: 'Configuration',
