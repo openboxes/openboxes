@@ -27,6 +27,7 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
@@ -277,7 +278,7 @@ class StockMovementService {
             stockMovement.packPage = getPackPage(id)
         }
         else if (stepNumber.equals("6")) {
-            if (!stockMovement.origin.isSupplier()) {
+            if (!stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                 stockMovement.lineItems = null
                 stockMovement.packPage = getPackPage(id)
             }
@@ -322,7 +323,7 @@ class StockMovementService {
     }
 
     void createMissingPicklistItems(StockMovement stockMovement) {
-        if (!stockMovement?.origin?.isSupplier() && stockMovement.requisition?.status >= RequisitionStatus.PICKING) {
+        if (!stockMovement?.origin?.isSupplier() && stockMovement?.origin?.supports(ActivityCode.MANAGE_INVENTORY) && stockMovement.requisition?.status >= RequisitionStatus.PICKING) {
             stockMovement?.lineItems?.each { StockMovementItem stockMovementItem ->
                 if (stockMovementItem.statusCode == 'SUBSTITUTED') {
                     for (StockMovementItem subStockMovementItem : stockMovementItem.substitutionItems) {
@@ -1343,7 +1344,7 @@ class StockMovementService {
     }
 
     void createMissingShipmentItems(Requisition requisition, Shipment shipment) {
-        if (requisition.origin.isSupplier()) {
+        if (requisition.origin.isSupplier() || !requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
             requisition.requisitionItems?.each { RequisitionItem requisitionItem ->
                 Container container = createOrUpdateContainer(shipment, requisitionItem.palletName, requisitionItem.boxName)
                 ShipmentItem shipmentItem = createOrUpdateShipmentItem(requisitionItem)
