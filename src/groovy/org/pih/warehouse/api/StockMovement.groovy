@@ -99,7 +99,7 @@ class StockMovement {
                 identifier: requisition?.requestNumber,
                 origin: origin,
                 destination: destination,
-                hasManageInventory: origin.supports(ActivityCode.MANAGE_INVENTORY),
+                hasManageInventory: origin?.supports(ActivityCode.MANAGE_INVENTORY),
                 stocklist: [id: stocklist?.id, name: stocklist?.name],
                 dateRequested: dateRequested?.format("MM/dd/yyyy"),
                 dateShipped: dateShipped?.format("MM/dd/yyyy HH:mm XXX"),

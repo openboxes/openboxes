@@ -188,7 +188,7 @@ class StockMovements extends Component {
               break;
             default:
               page = 6;
-              if (values.origin.type === 'SUPPLIER') {
+              if (values.origin.type === 'SUPPLIER' || !values.hasManageInventory) {
                 prevPage = 2;
               } else {
                 prevPage = 5;
