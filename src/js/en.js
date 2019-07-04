@@ -397,8 +397,8 @@ const en = {
     requisitionTemplate: {
       label: 'Stocklists',
       link: '#',
-      listStockLists: {
-        list: {
+      subsections: {
+        listStockLists: {
           label: 'List stock lists',
           link: '/openboxes/requisitionTemplate/list',
         },
