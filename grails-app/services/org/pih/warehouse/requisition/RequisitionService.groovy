@@ -161,6 +161,47 @@ class RequisitionService {
     }
 
     /**
+     * Get all stock lists for given multiple origins and destinations
+     *
+     * @param origins
+     * @param destinations
+     * @return
+     */
+    List<Requisition> getRequisitionTemplates(List<Location> origins, List<Location> destinations) {
+        return Requisition.createCriteria().list {
+            eq("isTemplate", Boolean.TRUE)
+            or {
+                if (origins) {
+                    'in'("origin", origins)
+                }
+                if (destinations) {
+                    'in'("destination", destinations)
+                }
+            }
+        }
+    }
+
+    /**
+     * Get all items for given requisitions
+     * @param List<Location> origins
+     * @param List<Location> destinations
+     * @return
+     */
+    List<Requisition> getRequisitionTemplatesItems(List<Requisition> requisitions) {
+        return RequisitionItem.createCriteria().list() {
+         if (requisitions) {
+                'in'("requisition", requisitions)
+            }
+            product {
+                category {
+                    order("name", "asc")
+                }
+                order("name", "asc")
+            }
+        }
+    }
+
+    /**
      * Get requisition template
      */
     def getAllRequisitionTemplates(Requisition requisition, Map params) {

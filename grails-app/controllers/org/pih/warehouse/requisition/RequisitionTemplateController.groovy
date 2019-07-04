@@ -86,6 +86,80 @@ class RequisitionTemplateController {
         }
     }
 
+    def exportPage = { }
+
+    def exportAsCsv = {
+        def requisitionItems = []
+        def origins = []
+        def destinations = []
+
+        params.origin.each { origin ->
+            origins << Location.get(origin)
+        }
+        params.destination.each { destination ->
+            destinations << Location.get(destination)
+        }
+
+        def requisitions = requisitionService.getRequisitionTemplates(origins, destinations)
+        requisitionService.getRequisitionTemplatesItems(requisitions).groupBy { it.product }.collect { product, value ->
+            def totalCost = 0
+            requisitions.each { requisition ->
+                totalCost = product?.pricePerUnit ? totalCost + (requisition.getQuantityByProduct(product) * product?.pricePerUnit) : ""
+            }
+            requisitionItems << [
+                    product: product,
+                    productCode: product.productCode ?: "",
+                    productName: product.name ?: "",
+                    category: product?.category?.name ?: "",
+                    pricePerUnit: product?.pricePerUnit ?: "",
+                    totalCost: totalCost,
+            ]
+        }
+
+        def sw = new StringWriter()
+
+        try {
+            if (requisitionItems) {
+                sw.append(g.message(code: 'product.code.label')).append(",")
+                sw.append(g.message(code: 'product.description.label')).append(",")
+                sw.append(g.message(code: 'product.primaryCategory.label')).append(",")
+
+               requisitions.each { requisition ->
+                    String stocklistName = StringEscapeUtils.escapeCsv(requisition?.name)
+                    sw.append(stocklistName).append(",")
+                }
+
+                sw.append(g.message(code: 'product.unitCost.label')).append(",")
+                sw.append(g.message(code: 'product.totalValue.label'))
+
+                sw.append("\n")
+                requisitionItems.each { requisitionItem ->
+
+                    sw.append(StringEscapeUtils.escapeCsv(requisitionItem?.productCode)).append(",")
+                    sw.append(StringEscapeUtils.escapeCsv(requisitionItem?.productName)).append(",")
+                    sw.append(StringEscapeUtils.escapeCsv(requisitionItem?.category)).append(",")
+
+
+                    requisitions?.each { requisition ->
+                        sw.append((requisition?.getQuantityByProduct(requisitionItem.product) ?: "").toString()).append(",")
+                    }
+
+                    sw.append(requisitionItem?.pricePerUnit.toString()).append(",")
+                    sw.append(requisitionItem?.totalCost.toString()).append(",")
+
+                    sw.append("\n")
+                }
+            }
+
+        } catch (RuntimeException e) {
+            log.error (e.message)
+            sw.append(e.message)
+        }
+
+        response.setHeader("Content-disposition", "attachment; filename=\"Stocklists-items-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+        render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
+    }
+
 	def save = {
         def requisition = new Requisition(params)
 
