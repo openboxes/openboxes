@@ -82,6 +82,10 @@ class StockMovementService {
 
         StockMovement stockMovement = getStockMovement(id)
         Requisition requisition = Requisition.get(id)
+        if (status == RequisitionStatus.CHECKING) {
+            Shipment shipment = requisition.shipment
+            shipment.expectedShippingDate = new Date()
+        }
         if (!status in RequisitionStatus.list()) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
         } else if (status < requisition.status) {
@@ -1124,7 +1128,7 @@ class StockMovementService {
         Requisition requisition = requisitionItem.requisition
         requisitionItem.undoChanges()
         requisitionItem.save(flush: true)
-        
+
         removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
         requisition.removeFromRequisitionItems(requisitionItem)
         requisitionItem.delete()
