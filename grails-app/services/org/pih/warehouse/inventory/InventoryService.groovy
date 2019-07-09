@@ -78,6 +78,36 @@ class InventoryService implements ApplicationContextAware {
 	def getOrderService() {
 		return applicationContext.getBean("orderService")
 	}
+/**
+ * Return the inventory item by product id
+ */
+	InventoryItem getInventoryItemByProduct(String id){
+		Product product = Product.findById(id)
+		InventoryItem inventoryItem = InventoryItem.findByProduct(product)
+		return inventoryItem
+	}
+	/**
+	 * Return the inventory item by id
+	 */
+
+	InventoryItem getInvetoryItemById(String id){
+		InventoryItem inventoryItem = InventoryItem.findById(id)
+		return  inventoryItem
+	}
+
+	/**
+	 * delete inventory item
+	 */
+
+	void deleteInvetoryItem(String id){
+		InventoryItem inventoryItem = getInvetoryItemById(id)
+		inventoryItem.delete()
+	}
+
+	InventoryItem updateInvetoryItem(InventoryItem inventoryItem){
+		InventoryItem inventoryItem1 =  inventoryItem.merge()
+		return  inventoryItem1
+	}
 
 
 	/**
