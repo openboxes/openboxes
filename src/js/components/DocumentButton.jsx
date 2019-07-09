@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const DocumentButton = ({
-  buttonIcon, buttonTitle, link, target,
+  buttonIcon, buttonTitle, link, logo, target,
 }) => (
   <a
     href={link}
@@ -10,7 +10,7 @@ const DocumentButton = ({
     target={target}
     rel="noopener noreferrer"
   >
-    <span><i className={`pr-2 fa ${buttonIcon}`} />{buttonTitle}</span>
+    <span><i className={`pr-2 fa ${buttonIcon}`} />{buttonTitle} <img src={logo} alt={logo} /> </span>
   </a>
 );
 
@@ -25,10 +25,12 @@ DocumentButton.propTypes = {
   link: PropTypes.string.isRequired,
   /** Target attribute, that specifies where to open the linked document (_blank by default) */
   target: PropTypes.string,
+  logo: PropTypes.string,
 };
 
 DocumentButton.defaultProps = {
   buttonIcon: 'fa-download',
   buttonTitle: 'Print Document',
   target: '_blank',
+  logo: '',
 };

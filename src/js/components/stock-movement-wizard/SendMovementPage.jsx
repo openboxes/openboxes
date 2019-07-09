@@ -222,6 +222,7 @@ class SendMovementPage extends Component {
   }
 
   dataFetched = false;
+  logopath = null;
 
   saveValues(values) {
     let payload = {
@@ -500,8 +501,18 @@ class SendMovementPage extends Component {
                     if (document.hidden) {
                       return null;
                     }
+                    if (document.name === 'Delivery Note') {
+                      this.logopath = '/images/icons/pdf.png';
+                    } else if (document.name === 'Export Packing List') {
+                      this.logopath = '/images/icons/silk/page_white_excel.png';
+                    } else if (document.name === 'Packing List') {
+                      this.logopath = '/images/icons/silk/page_white_excel.png';
+                    } else if (document.name === 'Certificate of Donation') {
+                      this.logopath = '/images/icons/silk/page_white_excel.png';
+                    }
                     return (<DocumentButton
                       link={document.uri}
+                      logo={this.logopath}
                       buttonTitle={document.name}
                       {...document}
                       key={idx}
