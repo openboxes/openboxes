@@ -70,7 +70,7 @@
                                     </td>
 									<td valign="top"
 										class="value ${hasErrors(bean: shipmentInstance, field: 'origin', 'errors')}">								
-										<g:selectShipmentOrigin name="origin.id"
+										<g:selectShipmentOrigin id="origin" name="origin.id" onchange="categoryChanged();"
 											optionKey="id"
                                             class="chzn-select-deselect"
 											value="${shipmentInstance?.origin?.id ? shipmentInstance?.origin?.id : params.type == 'OUTGOING' ? session.warehouse.id : ''}" 
@@ -86,13 +86,22 @@
                                         </g:link>
                                     </td>
 									<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
-										<g:selectShipmentDestination name="destination.id"
+										<g:selectShipmentDestination id="destination" name="destination.id" onchange="categoryChanged();"
                                                                      class="chzn-select-deselect"
 											optionKey="id" value="${shipmentInstance?.destination?.id ? shipmentInstance?.destination?.id : (params.type == 'INCOMING') ? session.warehouse.id : ''}" 
 											noSelection="['null':'']" />	
 									</td>
 								</tr>
-								
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label><warehouse:message code="requisitionTemplate.label" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: shipmentInstance, field: 'destination', 'errors')}">
+									<select id="stockName" name= "stocklistId" class="chzn-select-deselect">
+										<option value="">Select an Option</option>
+									</select>
+								</td>
+							</tr>
 								<!--  
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="shipment.loadingDate.label" default="Loading Date" /></td>
@@ -129,5 +138,24 @@
 
             </g:form>
         </div>
+	<script>
+		function categoryChanged() {
+			jQuery.ajax({type:'GET',
+				url:'/openboxes/api/stocklists?origin.id='+ $('#origin').val() +'&destination.id='+$('#destination').val(),
+				success:function(data,textStatus){
+					console.log(data);
+					console.log(Object.keys(data.data).length);
+					for (var i=0; i<Object.keys(data.data).length; i++) {
+						console.log(data.data[i].name);
+						$('#stockName').append($('<option>').text(data.data[i].name).attr('value', data.data[i].id));
+						$('#stockName').trigger("chosen:updated");
+					}
+				},
+				error:function(XMLHttpRequest,textStatus,errorThrown){
+					console.log(error);
+					console.log(textStatus);
+				}});
+		}
+	</script>
     </body>
 </html>

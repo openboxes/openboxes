@@ -19,6 +19,9 @@ import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionException
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 import org.springframework.web.multipart.MultipartFile
 
@@ -84,6 +87,25 @@ class CreateShipmentWorkflowController {
 
 						// set (or reset) the shipment workflow here, since the shipment type may have change
 						flow.shipmentWorkflow = shipmentService.getShipmentWorkflow(flow.shipmentInstance)
+
+						if(params.stocklistId != "" ){
+							for(RequisitionItem requisitionItem : RequisitionItem.findAllByRequisition(Requisition.findById(params.stocklistId ))){
+
+								try {
+									shipmentService.addToShipmentItems(flow.shipmentInstance.id, params.containerId, InventoryItem.findByProduct(Product.findById(requisitionItem.product.id)).id, requisitionItem.quantity as int)
+								}
+								catch (ValidationException e) {
+									flow.shipmentInstance = Shipment.read(flow?.shipmentInstance?.id)
+									flow.shipmentInstance.errors = e.errors
+									error()
+								} catch (Exception e) {
+									log.warn("Error while adding shipment item to shipment: " + e.message, e)
+									flow.shipmentInstance.errors.reject(e.message)
+									error()
+								}
+							}
+
+						}
 					}
 
 				} catch (ShipmentException e) {

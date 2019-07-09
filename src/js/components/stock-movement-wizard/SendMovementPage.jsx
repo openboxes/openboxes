@@ -497,7 +497,7 @@ class SendMovementPage extends Component {
                     }))}
                 </div>
                 <div className="print-buttons-container col-md-3 flex-grow-1">
-                  {this.state.documents.length && _.map(this.state.documents, (document, idx) => {
+                  {this.state.documents.length && _.map(this.state.documents, (document, idx) => {https://github.com/openboxes/openboxes/issues/1022
                     if (document.hidden) {
                       return null;
                     }
