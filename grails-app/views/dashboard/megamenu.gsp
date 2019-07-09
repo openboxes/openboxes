@@ -95,7 +95,13 @@
                                 <g:each var="category" in="${entry.value }">
                                     <div class="mm-menu-item">
                                         <g:link controller="inventory" action="browse" params="[subcategoryId:category?.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-                                            ${category } (${category.products.size() })
+                                            ${category }
+                                            <g:set var="counter" value="${0}" />
+                                            <g:each in="${category.categories}" var="subcat">
+                                                <g:set var="counter" value="${counter + subcat.products.size()}" />
+                                            </g:each>
+                                            <g:set var="counter" value="${category.products.size() + counter}" />
+                                            (${counter})
                                         </g:link>
                                     </div>
                                 </g:each>
