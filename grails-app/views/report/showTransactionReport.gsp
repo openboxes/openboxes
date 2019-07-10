@@ -49,7 +49,7 @@
 								<label>
 									<warehouse:message code="report.location.label"/>
 								</label>
-								<g:selectLocation class="chzn-select-deselect filter" name="locationId" id="locationId"
+								<g:selectLocation class="chzn-select-deselect filter" name="locationId" id="locationId" activityCode="MANAGE_INVENTORY"
 												  noSelection="['':'']" maxChars="75" groupBy="locationType" value="${command?.location?.id}"/>
 							</div>
 							<div class="filter-list-item">
@@ -84,7 +84,7 @@
 						</div>
 						<div class="buttons">
 							<button class="submit-button button">
-								${g.message(code: 'default.button.submit.label')}
+								${g.message(code: 'default.button.run.label')}
 							</button>
 							<button class="download-button button">
 								${g.message(code: 'default.button.download.label')}
@@ -109,11 +109,11 @@
 								<th><warehouse:message code="product.label"/></th>
 								<th><warehouse:message code="inventoryBalance.cycleCount.label" default="Cycle Count"/></th>
 								<th class="center"><warehouse:message code="inventoryBalance.openingBalance.label" default="Opening Balance"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.inbound.label" default="Inbound"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.outbound.label" default="Outbound"/></th>
+								<th class="center"><warehouse:message code="inventoryBalance.inbound.label" default="Transferred In"/></th>
+								<th class="center"><warehouse:message code="inventoryBalance.outbound.label" default="Transferred Out"/></th>
 								<th class="center"><warehouse:message code="inventoryBalance.expired.label" default="Expired"/></th>
 								<th class="center"><warehouse:message code="inventoryBalance.damaged.label" default="Damaged"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.adjusted.label" default="Adjusted"/></th>
+								<th class="center"><warehouse:message code="inventoryBalance.adjusted.label" default="Adjustment"/></th>
 								<th class="center"><warehouse:message code="inventoryBalance.closingBalance.label" default="Closing Balance"/></th>
 							</tr>
 							</thead>
@@ -131,11 +131,11 @@
 								<th><warehouse:message code="product.label"/></th>
 								<th><warehouse:message code="inventoryBalance.cycleCount.label" default="Cycle Count"/></th>
 								<th class="center"><warehouse:message code="inventoryBalance.openingBalance.label" default="Opening Balance"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.inbound.label" default="Inbound"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.outbound.label" default="Outbound"/></th>
+								<th class="center"><warehouse:message code="inventoryBalance.inbound.label" default="Transferred In"/></th>
+								<th class="center"><warehouse:message code="inventoryBalance.outbound.label" default="Transferred Out"/></th>
 								<th class="center"><warehouse:message code="inventoryBalance.expired.label" default="Expired"/></th>
 								<th class="center"><warehouse:message code="inventoryBalance.damaged.label" default="Damaged"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.adjusted.label" default="Adjusted"/></th>
+								<th class="center"><warehouse:message code="inventoryBalance.adjusted.label" default="Adjustment"/></th>
 								<th class="center"><warehouse:message code="inventoryBalance.closingBalance.label" default="Closing Balance"/></th>
 							</tr>
 							</tfoot>
@@ -178,19 +178,52 @@
 				[5, 15, 25, 50, 100, 500, 1000, "All"]
 			],
 			"aoColumns": [
-				{"mData": "productCode"},
-				{"mData": "productName"},
-				{"mData": "cycleCountOccurred"},
-				{"mData": "balanceOpening", "sType": 'numeric'},
-				{"mData": "quantityInbound", "sType": 'numeric'},
-				{"mData": "quantityOutbound", "sType": 'numeric'},
-				{"mData": "quantityExpired", "sType": 'numeric'},
-				{"mData": "quantityDamaged", "sType": 'numeric'},
-				{"mData": "quantityAdjusted", "sType": 'numeric'},
-				{"mData": "balanaceClosing", "sType": 'numeric'}
+				{"mData": "Code"},
+				{"mData": "Name", "sWidth": "250px"},
+				{"mData": "Cycle Count"},
+				{"mData": "Opening Balance", "sType": 'numeric'},
+				{"mData": "Transferred In", "sType": 'numeric'},
+				{"mData": "Transferred Out", "sType": 'numeric'},
+				{"mData": "Expired", "sType": 'numeric'},
+				{"mData": "Damaged", "sType": 'numeric'},
+				{"mData": "Adjustment", "sType": 'numeric'},
+				{"mData": "Closing Balance", "sType": 'numeric'}
 			],
 			"bUseRendered": false,
-			"dom": '<"top"i>rt<"bottom"flp><"clear">'
+			"dom": '<"top"i>rt<"bottom"flp><"clear">',
+            "fnRowCallback": function( nRow, aData) {
+                $('td:eq(3)', nRow).html(Number(aData["Opening Balance"]).toLocaleString('en-US'));
+                $('td:eq(4)', nRow).html(Number(aData["Transferred In"]).toLocaleString('en-US'));
+                $('td:eq(5)', nRow).html(Number(aData["Transferred Out"]).toLocaleString('en-US'));
+                $('td:eq(6)', nRow).html(Number(aData["Expired"]).toLocaleString('en-US'));
+                $('td:eq(7)', nRow).html(Number(aData["Damaged"]).toLocaleString('en-US'));
+                $('td:eq(8)', nRow).html(Number(aData["Adjustment"]).toLocaleString('en-US'));
+                $('td:eq(9)', nRow).html(Number(aData["Closing Balance"]).toLocaleString('en-US'));
+
+                if (aData["Transferred In"] > 0) {
+                  $('td:eq(4)', nRow).css('color', 'green')
+                }
+
+			    if (aData["Transferred Out"] > 0) {
+				  $('td:eq(5)', nRow).css('color', 'red')
+			    }
+
+                if (aData["Expired"] > 0) {
+                  $('td:eq(6)', nRow).css('color', 'red')
+                }
+
+                if (aData["Damaged"] > 0) {
+                  $('td:eq(7)', nRow).css('color', 'red')
+                }
+
+                if (aData["Adjustment"] > 0) {
+                  $('td:eq(8)', nRow).css('color', 'green')
+                } else if (aData["Adjustment"] < 0) {
+                  $('td:eq(8)', nRow).html(Number(aData["Adjustment"]).toString().replace("-", "(")).append(")").css('color', 'red')
+			    }
+
+            return nRow;
+          }
 			//"aaSorting": [[ 2, "desc" ], [3, "desc"]],
 
 		};
