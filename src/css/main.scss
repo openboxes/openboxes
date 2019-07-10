@@ -227,13 +227,24 @@ body {
 
 .movement-number {
   height: auto;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   line-height: 36px;
   list-style: none;
   font-size: 25px;
   color: $blue-alpha;
   text-align: center;
   overflow-wrap: break-word;
+
+  .shipment-status {
+    border: 1px solid #a5d24a;
+    border-radius:2px;
+    padding: 5px;
+    background: #cde69c;
+    color: #638421;
+    font-size: 15px;
+    margin-right: 20px;
+    margin-top: 4px;
+  }
 }
 
 
