@@ -470,6 +470,10 @@ openboxes.typeahead.minLength = 3
 // Refresh inventory snapshots
 openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 
+// Refresh transaction fact table
+openboxes.jobs.refreshTransactionFactJob.enabled = true
+openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 */12 * * * ?" // every ten minutes
+
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
 openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every five minutes

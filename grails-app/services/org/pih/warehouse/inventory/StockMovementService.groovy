@@ -1124,7 +1124,7 @@ class StockMovementService {
         Requisition requisition = requisitionItem.requisition
         requisitionItem.undoChanges()
         requisitionItem.save(flush: true)
-        
+
         removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
         requisition.removeFromRequisitionItems(requisitionItem)
         requisitionItem.delete()
@@ -1488,8 +1488,9 @@ class StockMovementService {
     void validateRequisition(Requisition requisition) {
 
         requisition.requisitionItems.each { requisitionItem ->
-            if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY))
-            validateRequisitionItem(requisitionItem)
+            if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                validateRequisitionItem(requisitionItem)
+            }
         }
     }
 
