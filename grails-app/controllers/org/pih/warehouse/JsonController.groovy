@@ -1532,6 +1532,21 @@ class JsonController {
         Date startDate = command.startDate
         Date endDate = command.endDate
 
+        // FIXME Command validation not working so we're doing it manually
+
+        if (!startDate || !endDate || !locationId) {
+            throw new IllegalArgumentException("All parameter fields are required")
+        }
+
+        if (!startDate.before(endDate)) {
+            throw new IllegalArgumentException("Start date must occur before end date")
+        }
+
+        if (endDate.after(new Date())) {
+            throw new IllegalArgumentException("End date must occur on or before today")
+        }
+
+
         // Get starting balance
         def balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate)
         if (balanceOpeningMap.empty) {
