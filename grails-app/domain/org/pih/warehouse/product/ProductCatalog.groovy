@@ -7,6 +7,7 @@ class ProductCatalog implements Comparable, Serializable {
     String name
     String description
     Boolean active = Boolean.TRUE
+    Boolean colorAdded = Boolean.FALSE
 
     static hasMany = [
         productCatalogItems: ProductCatalogItem
@@ -17,6 +18,7 @@ class ProductCatalog implements Comparable, Serializable {
         name(nullable:false)
         description(nullable:true)
         active(nullable:true)
+        colorAdded(nullable:true)
     }
 
     // Auditing fields

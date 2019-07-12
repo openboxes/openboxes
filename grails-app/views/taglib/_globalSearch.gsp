@@ -1,13 +1,16 @@
+<style>
+    .catalogItem a { color:dodgerblue;}
+</style>
 <span>
 	<g:form method="GET" controller="dashboard" action="globalSearch" style="display: inline;">
 		<g:textField id="${attrs.id}" name="searchTerms" class="globalSearch top" type="text" size="${attrs.size}"
             placeholder="${warehouse.message(code:'globalSearch.placeholder.label')}"
 			value="${attrs.value}"/>
-		<g:hiddenField name="resetSearch" value="${true }"/>							
-		<g:hiddenField name="categoryId" value="${session?.rootCategory?.id }"/>	
+		<g:hiddenField name="resetSearch" value="${true }"/>
+		<g:hiddenField name="categoryId" value="${session?.rootCategory?.id }"/>
 		<g:hiddenField name="searchPerformed" value="${true }"/>
 		<g:hiddenField name="showHiddenProducts" value="on"/>
-		<g:hiddenField name="showOutOfStockProducts" value="on"/>			
+		<g:hiddenField name="showOutOfStockProducts" value="on"/>
 	</g:form>
 </span>
 <script>
@@ -36,7 +39,13 @@
                 this.value = ui.item.label;
                 event.preventDefault(); // Prevent the default focus behavior.
             }
-        });
+        }).data("autocomplete")._renderItem = function( ul, item ) {
+          return $( "<li></li>" )
+            .data("item.autocomplete", item)
+            .addClass(item.addColor ? 'catalogItem' : '')
+            .append( "<a>" + item.label + "</a>" )
+            .appendTo( ul );
+        };
     });
 </script>
-</span>		
+</span>

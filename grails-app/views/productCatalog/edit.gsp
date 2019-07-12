@@ -100,6 +100,15 @@
                                     </td>
                                 </tr>
 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="addColor"><warehouse:message code="productCatalog.addColor.label" default="Add color in the Global Search" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: productCatalogInstance, field: 'colorAdded', 'errors')}">
+                                    <g:checkBox name="colorAdded" value="${productCatalogInstance?.colorAdded}" />
+                                </td>
+                            </tr>
+
                             </tbody>
                             <tfoot>
                                 <tr class="prop">
