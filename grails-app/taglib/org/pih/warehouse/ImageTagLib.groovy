@@ -23,6 +23,7 @@ class ImageTagLib {
         // For the main logo, we want the logo config to be used as the default
         // and allow location logo to override
         def logoUrl = grailsApplication.config.openboxes.logo.url
+        def logoLabel = grailsApplication.config.openboxes.logo.label
 
         // Use custom location logo if one exists
         Location location = Location.get(session?.warehouse?.id)
@@ -30,6 +31,7 @@ class ImageTagLib {
             logoUrl = "${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}"
         }
         attrs.logoUrl = logoUrl
+        attrs.logoLabel = logoLabel
         attrs.showLabel = (attrs.showLabel!=null)?attrs.showLabel:true
 
         out << g.render(template: '/taglib/displayLogo', model: [attrs:attrs]);
