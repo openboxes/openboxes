@@ -84,9 +84,11 @@
 						</div>
 						<div class="buttons">
 							<button class="submit-button button">
-								${g.message(code: 'default.button.submit.label')}
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'play_blue.png')}" />
+								${g.message(code: 'default.button.run.label')}
 							</button>
 							<button class="download-button button">
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
 								${g.message(code: 'default.button.download.label')}
 							</button>
 						</div>
@@ -142,6 +144,15 @@
 						</table>
 					</div>
 				</div>
+				<g:isSuperuser>
+					<div class="button-bar right">
+						<g:link controller="report" action="refreshTransactionFact" class="button">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" />
+							${message(code:"default.button.refresh.label")} ${message(code:"default.data.label")}
+						</g:link>
+					</div>
+				</g:isSuperuser>
+
 			</div>
 		</div>
 	</div>

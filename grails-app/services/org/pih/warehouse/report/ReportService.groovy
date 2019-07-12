@@ -562,6 +562,7 @@ class ReportService implements ApplicationContextAware {
         ]
     }
 
+
     void buildDimensions() {
         truncateFacts()
         truncateDimensions()
@@ -580,19 +581,19 @@ class ReportService implements ApplicationContextAware {
 
     def truncateFacts() {
         executeStatements(["SET FOREIGN_KEY_CHECKS = 0",
-                           "truncate transaction_fact",
-                           "truncate consumption_fact",
+                           "delete from transaction_fact",
+                           "delete from consumption_fact",
                            "SET FOREIGN_KEY_CHECKS = 1"])
     }
 
     def truncateDimensions() {
         executeStatements([
                 "SET FOREIGN_KEY_CHECKS = 0",
-                "truncate date_dimension",
-                "truncate location_dimension",
-                "truncate lot_dimension",
-                "truncate product_dimension",
-                "truncate transaction_type_dimension",
+                "delete from date_dimension",
+                "delete from location_dimension",
+                "delete from lot_dimension",
+                "delete from product_dimension",
+                "delete from transaction_type_dimension",
                 "SET FOREIGN_KEY_CHECKS = 1"])
 }
 
@@ -601,47 +602,44 @@ class ReportService implements ApplicationContextAware {
 		Sql sql = new Sql(dataSource)
 
 		dmlStatements.each { String dmlStatement ->
-            def startTime = System.currentTimeMillis()
-            log.info "Executing statement: " + dmlStatement
+			def startTime = System.currentTimeMillis()
+			log.info "Executing statement: " + dmlStatement
 			sql.execute(dmlStatement)
-            log.info("Executed in ${(System.currentTimeMillis()-startTime)} ms")
+			sql.commit()
+			log.info("Executed in ${(System.currentTimeMillis() - startTime)} ms")
 		}
 	}
 
 	void buildTransactionTypeDimension() {
-		String deleteStatement = "delete from transaction_type_dimension;"
 		String insertStatement = """
             INSERT into transaction_type_dimension (version, transaction_code, transaction_type_name, transaction_type_id)
             SELECT 0, transaction_type.transaction_code, transaction_type.name, transaction_type.id
             FROM transaction_type
         """
-        executeStatements([deleteStatement, insertStatement])
+        executeStatements([insertStatement])
 	}
 
 	void buildLotDimension() {
-		String deleteStatement = "delete from lot_dimension;"
 		String insertStatement = """
             INSERT INTO lot_dimension (version, product_code, lot_number, expiration_date, inventory_item_id)
             SELECT 0, product.product_code, inventory_item.lot_number, inventory_item.expiration_date, inventory_item.id
             FROM inventory_item
             JOIN product ON product.id = inventory_item.product_id;
         """
-        executeStatements([deleteStatement, insertStatement])
+        executeStatements([insertStatement])
 	}
 
     void buildProductDimension() {
-        String deleteStatement = "delete from product_dimension"
 		String insertStatement = """
             INSERT INTO product_dimension (version, product_id, active, product_code, product_name, generic_product, category_name, abc_class, unit_cost, unit_price)
             SELECT 0, product.id, product.active, product.product_code, product.name, NULL, category.name, product.abc_class, product.cost_per_unit, product.price_per_unit
             FROM product
             JOIN category ON category.id = product.category_id
         """
-        executeStatements([deleteStatement, insertStatement])
+        executeStatements([insertStatement])
     }
 
     void buildLocationDimension() {
-        String deleteStatement = "delete from location_dimension"
         String insertStatement = """
             INSERT INTO location_dimension (version, location_name, location_number, location_type_code, location_type_name, location_group_name, parent_location_name, location_id)
             SELECT 0, location.name, location.location_number, location_type.location_type_code, location_type.name, location_group.name, parent_location.name, location.id
@@ -649,11 +647,10 @@ class ReportService implements ApplicationContextAware {
             JOIN location_type ON location_type.id = location.location_type_id
             LEFT JOIN location_group ON location_group.id = location.location_group_id
             LEFT JOIN location parent_location ON parent_location.id = location.parent_location_id;        """
-        executeStatements([deleteStatement, insertStatement])
+        executeStatements([insertStatement])
     }
 
     void buildDateDimension() {
-        DateDimension.executeUpdate("delete from DateDimension ")
         def minTransactionDate = Transaction.minTransactionDate.list()
         log.info ("minTransactionDate: " + minTransactionDate)
         Date today = new Date()
@@ -669,7 +666,7 @@ class ReportService implements ApplicationContextAware {
             dateDimension.monthName = date.format("MMMMM")
             dateDimension.monthYear = date.format("MM-yyyy")
             dateDimension.weekdayName = date.format("EEEEE")
-            dateDimension.save()
+            dateDimension.save(flush:true)
         }
     }
     
