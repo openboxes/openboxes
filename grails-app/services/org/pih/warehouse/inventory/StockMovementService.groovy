@@ -1364,6 +1364,7 @@ class StockMovementService {
 
                 shipmentItems.each { ShipmentItem shipmentItem ->
                     shipment.addToShipmentItems(shipmentItem)
+                    shipment.save()
                 }
             }
         }
