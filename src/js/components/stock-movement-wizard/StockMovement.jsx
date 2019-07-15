@@ -248,7 +248,7 @@ class StockMovements extends Component {
               <span>{`${values.movementNumber} - ${this.getShipmentName()}`}</span>
             }
             {page === 6 ?
-              <span className="shipment-status float-right"> {`${values.shipmentStatus}`} </span> : null
+              <span className="shipment-status float-right"> {`${values.shipmentStatus ? values.shipmentStatus : 'PENDING'}`} </span> : null
             }
           </div>
           <div className="panelBody px-1">
