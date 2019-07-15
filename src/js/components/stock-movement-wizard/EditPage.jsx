@@ -317,12 +317,25 @@ class EditItemsPage extends Component {
       },
     );
 
+    let updatedValues = values;
+
     _.forEach(itemsToRevise, (item) => {
       const editPageItemIndex = _.findIndex(this.state.values.editPageItems, editPageItem =>
         item.requisitionItemId === editPageItem.requisitionItemId);
-      this.setState({
-        values: update(values, { editPageItems: { [editPageItemIndex]: { statusCode: { $set: 'CHANGED' } } } }),
+
+      updatedValues = update(updatedValues, {
+        editPageItems: {
+          [editPageItemIndex]: {
+            statusCode: {
+              $set: 'CHANGED',
+            },
+          },
+        },
       });
+    });
+
+    this.setState({
+      values: updatedValues,
     });
 
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/reviseItems`;
