@@ -885,23 +885,4 @@ class DataService {
         return xlsData
     }
 
-    /**
-     * Saves an uploaded file to disk.
-     *
-     * @param uploadFile
-     * @return
-     */
-    def saveFileToDisk(uploadFile) {
-        def localFile
-        try {
-            localFile = new File("uploads/" + uploadFile?.originalFilename);
-            localFile.mkdirs()
-            uploadFile?.transferTo(localFile);
-        } catch (IOException e ) {
-            log.error("Error saving uploaded file: " + e.message, e)
-            throw e;
-        }
-        return localFile
-    }
-
 }

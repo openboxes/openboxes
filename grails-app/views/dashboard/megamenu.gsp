@@ -641,6 +641,12 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
+                                <g:link controller="batch" action="importData">
+                                    <warehouse:message code="default.import.label"
+                                                       args="[warehouse.message(code:'default.data.label', default: 'Data')]"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="localization" action="list" class="list">
                                     <g:message code="localization.label" default="Localization"/>
                                 </g:link>
@@ -753,12 +759,6 @@
                                 <g:link controller="eventType" action="list"
                                         class="eventType">
                                     <warehouse:message code="location.eventTypes.label" default="Event Types" />
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="batch" action="importData">
-                                    <warehouse:message code="default.import.label"
-                                                       args="[warehouse.message(code:'default.data.label', default: 'Data')]"/>
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">

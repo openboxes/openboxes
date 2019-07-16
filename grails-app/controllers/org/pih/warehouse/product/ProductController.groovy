@@ -16,6 +16,7 @@ import grails.validation.ValidationException
 import org.hibernate.Criteria
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.UploadService
 
 import javax.activation.MimetypesFileTypeMap
 import java.sql.SQLException
@@ -46,6 +47,7 @@ class ProductController {
 	def documentService;
 	def inventoryService;
 	def barcodeService
+	UploadService uploadService
 
 	static allowedMethods = [save: "POST", update: "POST"];
 
@@ -976,8 +978,7 @@ class ProductController {
 				try {
 
                     // Upload file
-                    localFile = new File("uploads/" + uploadFile?.originalFilename);
-					localFile.mkdirs()
+					localFile = uploadService.createLocalFile(uploadFile.originalFilename)
 					uploadFile?.transferTo(localFile);
 					session.localFile = localFile
 
