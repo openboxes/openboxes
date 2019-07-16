@@ -21,6 +21,28 @@ class Doc4jController {
 	def documentService
 	def shipmentService
 
+	def viewPackingList = {
+		log.info params
+		def shipmentInstance = Shipment.get(params.id)
+		Location currentLocation = Location.get(session.warehouse.id)
+
+		if (!shipmentInstance) {
+			throw new Exception("Unable to locate shipment with ID ${params.id}")
+		}
+
+		[shipment:shipmentInstance, currentLocation:currentLocation]
+	}
+
+	def viewCertificateOfDonation = {
+		def shipmentInstance = Shipment.get(params.id);
+
+		if (!shipmentInstance) {
+			throw new Exception("Unable to locate shipment with ID ${params.id}")
+		}
+
+		[shipment: shipmentInstance]
+	}
+
 	def downloadLetter = {
 		def shipmentInstance = Shipment.get(params.id);
 

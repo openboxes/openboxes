@@ -1561,11 +1561,46 @@ class StockMovementService {
                             hidden      : false
                     ],
                     [
+                            name        : g.message(code: "shipping.exportPackingList.label"),
+                            documentType: DocumentGroupCode.PACKING_LIST.name(),
+                            contentType : "application/pdf",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'itextPdf', action: "exportPackingListPdf", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "shipping.downloadPackingList.label"),
+                            documentType: DocumentGroupCode.PACKING_LIST.name(),
+                            contentType : "text/html",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'doc4j', action: "viewPackingList", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
                             name        : g.message(code: "shipping.downloadPackingList.label"),
                             documentType: DocumentGroupCode.PACKING_LIST.name(),
                             contentType : "application/vnd.ms-excel",
                             stepNumber  : 5,
                             uri         : g.createLink(controller: 'doc4j', action: "downloadPackingList", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "shipping.downloadPackingList.label"),
+                            documentType: DocumentGroupCode.PACKING_LIST.name(),
+                            contentType : "application/pdf",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'itextPdf', action: "downloadPackingListPdf", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "shipping.downloadCertificateOfDonation.label"),
+                            documentType: DocumentGroupCode.CERTIFICATE_OF_DONATION.name(),
+                            contentType : "text/html",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'doc4j', action: "viewCertificateOfDonation", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "shipping.downloadCertificateOfDonation.label"),
+                            documentType: DocumentGroupCode.CERTIFICATE_OF_DONATION.name(),
+                            contentType : "application/pdf",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'itextPdf', action: "certificateOfDonationPdf", id: stockMovement?.shipment?.id, absolute: true)
                     ],
                     [
                             name        : g.message(code: "shipping.downloadCertificateOfDonation.label"),
@@ -1574,7 +1609,6 @@ class StockMovementService {
                             stepNumber  : 5,
                             uri         : g.createLink(controller: 'doc4j', action: "downloadCertificateOfDonation", id: stockMovement?.shipment?.id, absolute: true)
                     ]
-
             ])
         }
 

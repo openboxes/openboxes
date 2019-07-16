@@ -501,14 +501,12 @@ class SendMovementPage extends Component {
                     if (document.hidden) {
                       return null;
                     }
-                    if (document.name === 'Delivery Note') {
+                    if (document.contentType.includes('pdf')) {
                       this.logopath = '/images/icons/pdf.png';
-                    } else if (document.name === 'Export Packing List') {
+                    } else if (document.contentType.includes('ms-excel')) {
                       this.logopath = '/images/icons/silk/page_white_excel.png';
-                    } else if (document.name === 'Packing List') {
-                      this.logopath = '/images/icons/silk/page_white_excel.png';
-                    } else if (document.name === 'Certificate of Donation') {
-                      this.logopath = '/images/icons/silk/page_white_excel.png';
+                    } else if (document.contentType.includes('html')) {
+                      this.logopath = '/images/icons/silk/html_go.png';
                     }
                     return (<DocumentButton
                       link={document.uri}
