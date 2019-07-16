@@ -65,6 +65,8 @@ If a maintainer asks you to "rebase" your PR, they're saying that a lot of code 
 2. Do the changes in your fork, following the notes above
 3. If you like the change and think the project could use it, send a pull request!
 
+For detailed instructions please see [Contributing a Pull Request](https://github.com/openboxes/openboxes/wiki/Contributing-a-Pull-Request) on our wiki.
+
 # How to report a bug
 
 When filing an issue, make sure to answer these five questions:
@@ -87,3 +89,4 @@ The core team looks at Pull Requests on a regular basis. Hopefully any major con
 # Thanks!
 
 If you actually read this document, you get a gold star! We're happy you're interested in helping make OpenBoxes even better. :)
+
