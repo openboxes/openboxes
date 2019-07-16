@@ -89,4 +89,3 @@ The core team looks at Pull Requests on a regular basis. Hopefully any major con
 # Thanks!
 
 If you actually read this document, you get a gold star! We're happy you're interested in helping make OpenBoxes even better. :)
-
