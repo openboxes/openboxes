@@ -53,7 +53,8 @@ const FIELDS = {
       },
       productName: {
         type: LabelField,
-        flexWidth: '4.5',
+        headerAlign: 'left',
+        flexWidth: '3.5',
         label: 'react.stockMovement.productName.label',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
@@ -63,7 +64,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.quantityRequested.label',
         defaultMessage: 'Qty requested',
-        flexWidth: '1',
+        flexWidth: '1.1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
@@ -92,7 +93,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.monthlyQuantity.label',
         defaultMessage: 'Monthly stocklist qty',
-        flexWidth: '1.45',
+        flexWidth: '1.5',
         getDynamicAttr: ({ hasStockList, translate }) => ({
           formatValue: (value) => {
             if (value && value !== '0') {
@@ -161,7 +162,7 @@ const FIELDS = {
         type: ButtonField,
         label: 'react.default.button.undo.label',
         defaultMessage: 'Undo',
-        flexWidth: '0.9',
+        flexWidth: '1',
         fieldKey: '',
         buttonLabel: 'react.default.button.undo.label',
         buttonDefaultMessage: 'Undo',
