@@ -166,6 +166,10 @@
                             <button class="button icon search" name="search" class="button">
                                 ${warehouse.message(code:'default.search.label')}
                             </button>
+                            <button name="format" value="csv" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
+                                <warehouse:message code="default.button.download.label" default="Download"/>
+                            </button>
                         </div>
 
                         <div class="clear"></div>
