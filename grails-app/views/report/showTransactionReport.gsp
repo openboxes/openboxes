@@ -84,9 +84,11 @@
 						</div>
 						<div class="buttons">
 							<button class="submit-button button">
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'play_blue.png')}" />
 								${g.message(code: 'default.button.run.label')}
 							</button>
 							<button class="download-button button">
+								<img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
 								${g.message(code: 'default.button.download.label')}
 							</button>
 						</div>
@@ -142,11 +144,37 @@
 						</table>
 					</div>
 				</div>
+				<g:isSuperuser>
+					<div class="button-bar right">
+						<g:link controller="report" action="refreshTransactionFact" class="button">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" />
+							${message(code:"default.button.refresh.label")} ${message(code:"default.data.label")}
+						</g:link>
+					</div>
+				</g:isSuperuser>
+
 			</div>
 		</div>
 	</div>
 
 <script>
+
+    function handleAjaxError(xhr, status, error) {
+        if (status === 'timeout') {
+            errorMessage('The server took too long to send the data.');
+        } else {
+
+            if (xhr.responseText) {
+                var errorMessage = JSON.parse(xhr.responseText).errorMessage;
+                alert(errorMessage);
+            }
+        }
+        destroyDataTable();
+    }
+
+    function destroyDataTable() {
+    	$('#inventoryBalanceReport').dataTable().fnDestroy();
+	}
 
 	function initializeDataTable() {
 		var options = {
@@ -166,7 +194,17 @@
 				data.push({ name: "startDate", value: $("#startDate").val() });
 				data.push({ name: "endDate", value: $("#endDate").val() });
 			},
-
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback,
+                    "timeout": 30000,
+                    "error": handleAjaxError
+                })
+            },
 			"oLanguage": {
 				"sZeroRecords": "No records found",
 				"sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
@@ -237,7 +275,34 @@
 
 		$(".submit-button").click(function(event){
 			event.preventDefault();
-			initializeDataTable();
+			var today = new Date();
+			var locationId = $("#locationId").val();
+			var startDate = $("#startDate").val();
+			var endDate = $("#endDate").val();
+			var validated = true;
+
+			// FIXME Needed basic form validation to prevent some unwanted issues on the backend
+			if (!endDate || !startDate || !locationId) {
+				alert("All fields are required");
+				validated = false
+			}
+
+			startDate = Date.parse(startDate);
+			endDate = Date.parse(endDate);
+
+			if (startDate > endDate) {
+				alert("Start date must occur before end date");
+				validated = false
+			}
+
+			if (endDate > today) {
+				alert("End date must occur on or before today");
+				validated = false
+			}
+
+			if (validated) {
+				initializeDataTable();
+			}
 		});
 
 		$(".download-button").click(function(event) {
@@ -256,10 +321,6 @@
 			var nTds = $('td', this);
 			var productCode = $(nTds[0]).text();
 			var productName = $(nTds[1]).text();
-			var locationId = $("#locationId").val();
-			var startDate = $("#startDate").val();
-			var endDate = $("#endDate").val();
-
 			var params = {
 				productCode: productCode,
 				locationId: $("#locationId").val(),
@@ -267,9 +328,11 @@
 				endDate: $("#endDate").val()
 			};
 
-			var queryString = $.param(params);
-			var url = "${request.contextPath}/report/showTransactionReportDialog?" + queryString;
-			openModalDialog("#dlgShowDialog", productCode + " " + productName, 800, null, url);
+			if (productCode && productName) {
+				var queryString = $.param(params);
+				var url = "${request.contextPath}/report/showTransactionReportDialog?" + queryString;
+				openModalDialog("#dlgShowDialog", productCode + " " + productName, 800, null, url);
+			}
 		} );
 
 	});

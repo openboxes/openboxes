@@ -59,7 +59,7 @@ class ReasonCodeApiController {
     ReasonCodeCommand getReasonCode(ReasonCode reasonCodeEnum) {
         ReasonCodeCommand reasonCode = new ReasonCodeCommand()
         reasonCode.id = reasonCodeEnum.name()
-        reasonCode.name = messageSource.getMessage("enum.ReasonCode." + reasonCodeEnum.name(), null, "", session?.user?.locale?:"en")
+        reasonCode.name = messageSource.getMessage("enum.ReasonCode.${reasonCodeEnum.name()}", null, null, session?.user?.locale ?: new Locale("en"))
         reasonCode.description = reasonCodeEnum.name()
         reasonCode.sortOrder = reasonCodeEnum.sortOrder
         return reasonCode

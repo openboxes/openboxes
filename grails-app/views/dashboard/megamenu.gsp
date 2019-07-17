@@ -28,14 +28,14 @@
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="inventorySnapshot" action="list" class="list">
-                            <warehouse:message code="inventory.snapshot.label" default="Inventory snapshots" />
+                            <warehouse:message code="inventory.snapshot.label" default="Inventory Snapshots" />
                             <span class="beta">Beta</span>
                         </g:link>
 
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="consumption" action="list" class="list">
-                            <warehouse:message code="consumption.report.label" default="Consumption report" />
+                            <warehouse:message code="consumption.report.label" default="Consumption Report" />
                             <span class="beta">Beta</span>
                         </g:link>
 
@@ -355,7 +355,7 @@
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="consumption" action="show">
-                            <warehouse:message code="report.consumption.label" default="Consumption report"/>
+                            <warehouse:message code="report.consumption.label" default="Consumption Report"/>
                         </g:link>
                     </div>
                     <%--
@@ -375,7 +375,7 @@
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="report" action="showInventorySamplingReport">
-                            <warehouse:message code="report.showInventorySamplingReport.label" default="Inventory sampling report"/>
+                            <warehouse:message code="report.showInventorySamplingReport.label" default="Inventory Sampling Report"/>
                         </g:link>
                     </div>
                 </div>
