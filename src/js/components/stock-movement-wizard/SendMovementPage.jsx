@@ -135,9 +135,6 @@ const FIELDS = {
     type: TextField,
     label: 'react.stockMovement.comments.label',
     defaultMessage: 'Comments',
-    getDynamicAttr: ({ issued }) => ({
-      disabled: issued,
-    }),
   },
 };
 
@@ -237,6 +234,7 @@ class SendMovementPage extends Component {
         'destination.id': values.destination.id,
         description: values.description,
         'shipmentType.id': values.shipmentType,
+        comments: values.comments,
       };
     }
 
