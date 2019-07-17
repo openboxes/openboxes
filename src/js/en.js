@@ -254,7 +254,7 @@ const en = {
           link: '/openboxes/inventory/show',
         },
         showTransactionReport: {
-          label: 'Transcription Report',
+          label: 'Transaction Report',
           link: '/openboxes/report/showTransactionReport',
         },
         consumption: {

@@ -1628,23 +1628,23 @@ class JsonController {
 
             // Transform data into inventory balance rows
             [
-                    productCode: product.productCode,
-                    productName: product.name,
-                    cycleCountOccurred: cycleCountOccurred?true:"",
-                    balanceOpening: balanceOpening,
-                    quantityInbound: quantityInbound,
-                    quantityOutbound: quantityOutbound,
-                    quantityExpired: quantityExpired,
-                    quantityDamaged: quantityDamaged,
-                    quantityAdjusted: quantityAdjusted + quantityDiscrepancy,
-                    balanaceClosing: balanceClosing,
+                    "Code": product.productCode,
+                    "Name": product.name,
+                    "Cycle Count": cycleCountOccurred?true:"",
+                    "Opening Balance": balanceOpening,
+                    "Transferred In": quantityInbound,
+                    "Transferred Out": quantityOutbound,
+                    "Expired": quantityExpired,
+                    "Damaged": quantityDamaged,
+                    "Adjustment": quantityAdjusted + quantityDiscrepancy,
+                    "Closing Balance": balanceClosing,
 
             ]
         }
 
         if (params.format == "text/csv") {
             String csv = dataService.generateCsv(data);
-            response.setHeader("Content-disposition", "attachment; filename=\"transaction-report.csv\"")
+            response.setHeader("Content-disposition", "attachment; filename=\"Transaction-Report-${startDate.format("yyyyMMdd")}-${endDate.format("yyyyMMdd")}.csv\"")
             render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
             return
         }
