@@ -160,26 +160,6 @@ class RequisitionService {
         }
     }
 
-    /**
-     * Get all stock lists for given multiple origins and destinations
-     *
-     * @param origins
-     * @param destinations
-     * @return
-     */
-    List<Requisition> getRequisitionTemplates(List<Location> origins, List<Location> destinations) {
-        return Requisition.createCriteria().list {
-            eq("isTemplate", Boolean.TRUE)
-            or {
-                if (origins) {
-                    'in'("origin", origins)
-                }
-                if (destinations) {
-                    'in'("destination", destinations)
-                }
-            }
-        }
-    }
 
     /**
      * Get all items for given requisitions
@@ -232,6 +212,16 @@ class RequisitionService {
         return getRequisitions(new Requisition(destination:destination, origin: origin), [:])
     }
 
+    /**
+     * Get all requisitions for the given query.
+     * @param destination
+     * @param query
+     * @param params
+     * @return
+     */
+    def getRequisitions(Requisition requisition, Map params) {
+        return getRequisitions(requisition, params, [], [])
+    }
 
     /**
      * Get all requisitions for the given destination and query.
@@ -240,7 +230,7 @@ class RequisitionService {
      * @param params
      * @return
      */
-    def getRequisitions(Requisition requisition, Map params) {
+    def getRequisitions(Requisition requisition, Map params, List<Location> origins, List<Location> destinations) {
         println "Get requisitions: " + params
 
         def isRelatedToMe = Boolean.parseBoolean(params?.isRelatedToMe)
@@ -323,6 +313,14 @@ class RequisitionService {
                 }
                 else {
                     order("dateRequested", "desc")
+                }
+                and {
+                    if (origins) {
+                        'in'("origin", origins)
+                    }
+                    if (destinations) {
+                        'in'("destination", destinations)
+                    }
                 }
                 //maxResults(10)
                 //eq("isPublished", false)
