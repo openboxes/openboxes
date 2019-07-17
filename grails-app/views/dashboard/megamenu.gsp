@@ -331,11 +331,10 @@
             <div class="mm-item-content">
 
                 <div class="mm-content-section">
-                    <h3><warehouse:message code="dataExports.label" default="Data Exports" /></h3>
+                    <h3><warehouse:message code="report.inventoryReports.label" default="Inventory Reports" /></h3>
                     <div class="mm-menu-item">
-                        <g:link controller="cycleCount" action="exportAsCsv">
-                            <warehouse:message code="report.cycleCount.label" default="Cycle Count Report"/>
-                        </g:link>
+                        <g:link controller="inventory" action="listInStock">
+                            <warehouse:message code="inventory.inStock.label"/></g:link>
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="report" action="showBinLocationReport">
@@ -343,11 +342,30 @@
                         </g:link>
                     </div>
                     <div class="mm-menu-item">
+                        <g:link controller="inventory" action="listExpiredStock" class="report-expired">
+                            <warehouse:message code="inventory.expiredStock.label"/></g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="inventory" action="listExpiringStock" class="report-expiring">
+                            <warehouse:message code="inventory.expiringStock.label"/></g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="showInventoryByLocationReport" class="">
+                            <warehouse:message code="report.inventoryByLocationReport.label" default="Inventory By Location Report"/></g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="cycleCount" action="exportAsCsv">
+                            <warehouse:message code="report.cycleCount.label" default="Cycle Count Report"/>
+                        </g:link>
+                    </div>
+                    <div class="mm-menu-item">
                         <g:link controller="inventory" action="show">
                             <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH Report"/>
                         </g:link>
                     </div>
-
+                </div>
+                <div class="mm-content-section">
+                    <h3><warehouse:message code="report.transactionReports.label" default="Transaction Reports" /></h3>
                     <div class="mm-menu-item">
                         <g:link controller="report" action="showTransactionReport">
                             <warehouse:message code="report.showTransactionReport.label"/>
@@ -358,60 +376,8 @@
                             <warehouse:message code="report.consumption.label" default="Consumption Report"/>
                         </g:link>
                     </div>
-                    <%--
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="showConsumption" class="report_consumption"><warehouse:message code="inventory.consumption.label"/></g:link>
-                    </div>
-                    --%>
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="listDailyTransactions">
-                            <warehouse:message code="transaction.dailyTransactions.label"/>
-                        </g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="report" action="showShippingReport">
-                            <warehouse:message code="report.showShippingReport.label"/>
-                        </g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="report" action="showInventorySamplingReport">
-                            <warehouse:message code="report.showInventorySamplingReport.label" default="Inventory Sampling Report"/>
-                        </g:link>
-                    </div>
                 </div>
                 <div class="mm-content-section">
-                    <h3><warehouse:message code="reports.inventory.label" default="Inventory Reports" /></h3>
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="listExpiredStock" class="report-expired">
-                            <warehouse:message code="inventory.expiredStock.label"/></g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="listExpiringStock" class="report-expiring">
-                            <warehouse:message code="inventory.expiringStock.label"/></g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="listInStock">
-                            <warehouse:message code="inventory.inStock.label"/></g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="listLowStock" class="report-low">
-                            <warehouse:message code="inventory.lowStock.label"/></g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="listReorderStock" class="report-reorder">
-                            <warehouse:message code="inventory.reorderStock.label"/></g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="report" action="exportBinLocation" params="[downloadFormat:'csv']" class="">
-                            <warehouse:message code="report.exportBinLocations.label" default="Export bin locations"/></g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="report" action="showInventoryByLocationReport" class="">
-                            <warehouse:message code="report.inventoryByLocationReport.label" default="Inventory By Location Report"/></g:link>
-                    </div>
-                </div>
-                <div class="mm-content-section">
-
                     <h3><warehouse:message code="dataExports.label" default="Data Exports" /></h3>
                     <div class="mm-menu-item">
                         <g:link controller="product" action="exportAsCsv">
@@ -445,6 +411,10 @@
                         <g:link controller="requisitionItem" action="listCanceled" class="">
                             <warehouse:message code="requisitionItem.listCanceled.label" default="Export requisition items"/>
                         </g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="exportBinLocation" params="[downloadFormat:'csv']" class="">
+                            <warehouse:message code="report.exportBinLocations.label" default="Export bin locations"/></g:link>
                     </div>
                 </div>
             </div>
