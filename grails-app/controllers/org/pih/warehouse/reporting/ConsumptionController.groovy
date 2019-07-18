@@ -295,7 +295,9 @@ class ConsumptionController {
             }
 
             def csv = dataService.generateCsv(csvrows)
-            response.setHeader("Content-disposition", "attachment; filename=\"Consumption-${new Date().format("dd MMM yyyy hhmmss")}.csv\"")
+            response.setHeader("Content-disposition", "attachment; filename=\"Consumption-" +
+                    "${!fromLocationsEmpty && command.fromLocations.size() > 1 ? command.fromLocations : command.fromLocations.first()}" +
+                    "-${new Date().format("dd MMM yyyy hhmmss")}.csv\"")
             render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
             return
         }
