@@ -80,6 +80,11 @@ class StockMovementController {
             }
         }
 
+        if (params.format) {
+            max = null
+            offset = null
+        }
+
         // Discard the requisition so it does not get saved at the end of the request
         Requisition requisition = new Requisition(params)
         requisition.discard()
@@ -100,6 +105,43 @@ class StockMovementController {
 
         def stockMovements = stockMovementService.getStockMovements(stockMovement, params, max, offset)
         def statistics = requisitionService.getRequisitionStatistics(requisition.destination, requisition.origin, currentUser)
+
+        if (params.format && stockMovements) {
+
+            def sw = new StringWriter()
+            def csv = new CSVWriter(sw, {
+                "Status" {it.status}
+                "Receipt Status" {it.receiptStatus}
+                "Identifier" {it.id}
+                "Name" {it.name}
+                "Origin" {it.origin}
+                "Destination" {it.destination}
+                "Stocklist" {it.stocklist}
+                "Requested by" {it.requestedBy}
+                "Date Requested" {it.dateRequested}
+                "Date Created" {it.dateCreated}
+                "Date Shipped" {it.dateShipepd}
+            })
+
+            stockMovements.each { stockMov ->
+                csv << [
+                        status: stockMov.status,
+                        receiptStatus: stockMov.shipment?.status,
+                        id: stockMov.identifier,
+                        name: stockMov.description,
+                        origin: stockMov.origin?.name ?: "",
+                        destination: stockMov.destination?.name ?: "",
+                        stocklist: stockMov.stocklist?.name ?: "",
+                        requestedBy: stockMov.requestedBy?:warehouse.message(code:'default.none.label'),
+                        dateRequested: stockMov.dateRequested ?: "",
+                        dateCreated: stockMov.requisition?.dateCreated ?: "",
+                        dateShipepd: stockMov.shipment?.expectedShippingDate ?: "",
+                ]
+            }
+
+            response.setHeader("Content-disposition", "attachment; filename=\"StockMovements-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType:"text/csv", text: sw.toString(), encoding:"UTF-8")
+        }
 
         render(view:"list", params:params, model:[stockMovements: stockMovements, statistics:statistics, incoming:incoming])
 
