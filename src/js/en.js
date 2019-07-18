@@ -241,13 +241,29 @@ const en = {
       label: 'Reporting',
       link: '#',
       subsections: {
-        cycleCountReport: {
-          label: 'Cycle Count Report',
-          link: '/openboxes/cycleCount/exportAsCsv',
+        listInStock: {
+          label: 'In stock ',
+          link: '/openboxes/inventory/listInStock',
         },
         showBinLocationReport: {
           label: 'Bin Location Report',
           link: '/openboxes/report/showBinLocationReport',
+        },
+        listExpiredStock: {
+          label: 'Expired stock',
+          link: '/openboxes/inventory/listExpiredStock',
+        },
+        listExpiringStock: {
+          label: 'Expiring stock',
+          link: '/openboxes/inventory/listExpiringStock',
+        },
+        showInventoryByLocationReport: {
+          label: 'Inventory By Location Report',
+          link: '/openboxes/report/showInventoryByLocationReport',
+        },
+        cycleCountReport: {
+          label: 'Cycle Count Report',
+          link: '/openboxes/cycleCount/exportAsCsv',
         },
         inventory: {
           label: 'Baseline QoH Report',
@@ -261,45 +277,13 @@ const en = {
           label: 'Consumption Report',
           link: '/openboxes/consumption/show',
         },
-        listDailyTransactions: {
-          label: 'Daily Transactions Report',
-          link: '/openboxes/inventory/listDailyTransactions',
-        },
-        showShippingReport: {
-          label: 'Shipping Report',
-          link: '/openboxes/report/showShippingReport',
-        },
-        showInventorySamplingReport: {
-          label: 'Inventory Sampling Report',
-          link: '/openboxes/report/showInventorySamplingReport',
-        },
-        listExpiredStock: {
-          label: 'Expired stock',
-          link: '/openboxes/inventory/listExpiredStock',
-        },
-        listExpiringStock: {
-          label: 'Expiring stock',
-          link: '/openboxes/inventory/listExpiringStock',
-        },
-        listLowStock: {
-          label: 'Low stock',
-          link: '/openboxes/inventory/listLowStock',
-        },
-        listReorderStock: {
-          label: 'Reorder stock',
-          link: '/openboxes/inventory/listReorderStock',
-        },
-        exportBinLocation: {
-          label: 'Export bin locations',
-          link: '/openboxes/report/exportBinLocation?downloadFormat=csv',
-        },
-        showInventoryByLocationReport: {
-          label: 'Inventory By Location Report',
-          link: '/openboxes/report/showInventoryByLocationReport',
-        },
         exportAsCsv: {
           label: 'Export products',
           link: '/openboxes/product/exportAsCsv',
+        },
+        exportProductSources: {
+          label: 'Export product sources',
+          link: '/openboxes/productSupplier/export',
         },
         exportLatestInventoryDate: {
           label: 'Export latest inventory date',
@@ -314,8 +298,12 @@ const en = {
           link: '/openboxes/requisition/export',
         },
         requisitionItem: {
-          label: 'Export requisition intems',
+          label: 'Export requisition items',
           link: '/openboxes/requisitionItem/listCanceled',
+        },
+        exportBinLocation: {
+          label: 'Export bin locations',
+          link: '/openboxes/report/exportBinLocation?downloadFormat=csv',
         },
       },
     },
