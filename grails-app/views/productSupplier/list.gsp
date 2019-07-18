@@ -13,7 +13,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <div class="list dialog">
-            
+
 				<div class="button-bar">
                     <g:link class="button" action="list">
                         <img src="${createLinkTo(dir:'images/icons/silk', file:'application_view_list.png')}" />
@@ -32,12 +32,16 @@
                     <table>
                         <thead>
                             <tr>
-                            
+
                                 <g:sortableColumn property="id" title="${warehouse.message(code: 'productSupplier.id.label', default: 'Id')}" />
-                            
+
+                                <th><g:message code="product.code.label" default="Product Code" /></th>
+
+                                <g:sortableColumn property="code" title="${warehouse.message(code: 'productSupplier.sourceCode.label', default: 'Source Code')}" />
+
                                 <th><g:message code="productSupplier.product.label" default="Product" /></th>
-                            
-                                <g:sortableColumn property="code" title="${warehouse.message(code: 'productSupplier.code.label', default: 'Code')}" />
+
+                                <th><g:message code="productSupplier.sourceName.label" default="Source Name" /></th>
 
                                 <th><g:message code="productSupplier.supplier.label" default="Supplier" /></th>
 
@@ -58,21 +62,28 @@
                         <tbody>
                         <g:each in="${productSupplierInstanceList}" status="i" var="productSupplierInstance">
                             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                            
+
                                 <td>
                                     <g:link action="edit" id="${productSupplierInstance.id}">
                                         ${fieldValue(bean: productSupplierInstance, field: "id")}</g:link>
                                 </td>
 
+                                <td>
+                                    <g:link controller="product" action="edit" id="${productSupplierInstance?.product?.id}">
+                                        ${fieldValue(bean: productSupplierInstance, field: "product.productCode")}
+                                    </g:link>
+                                </td>
+
+                                <td>${fieldValue(bean: productSupplierInstance, field: "code")?:g.message(code:'default.none.label')}</td>
 
                                 <td>
                                     <g:link controller="product" action="edit" id="${productSupplierInstance?.product?.id}">
                                         ${fieldValue(bean: productSupplierInstance, field: "product")}
                                     </g:link>
                                 </td>
-                            
-                                <td>${fieldValue(bean: productSupplierInstance, field: "code")?:g.message(code:'default.none.label')}</td>
-                            
+
+                                <td>${fieldValue(bean: productSupplierInstance, field: "name")?:g.message(code:'default.none.label')}</td>
+
                                 <td>${fieldValue(bean: productSupplierInstance, field: "supplier")}</td>
 
                                 <td>${fieldValue(bean: productSupplierInstance, field: "manufacturer")}</td>
