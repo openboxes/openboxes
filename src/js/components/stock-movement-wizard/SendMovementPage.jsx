@@ -234,7 +234,7 @@ class SendMovementPage extends Component {
         'destination.id': values.destination.id,
         description: values.description,
         'shipmentType.id': values.shipmentType,
-        comments: values.comments,
+        comments: values.comments || '',
       };
     }
 
