@@ -10,11 +10,13 @@
 package org.pih.warehouse.product
 
 import org.apache.commons.io.FilenameUtils
+import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.importer.ImportDataCommand
 
 class ProductCatalogController {
 
-    def productService
+    UploadService uploadService
+    ProductService productService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -180,8 +182,7 @@ class ProductCatalogController {
                 try {
 
                     // Upload file
-                    localFile = new File("uploads/" + uploadFile?.originalFilename);
-                    localFile.mkdirs()
+                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
                     uploadFile?.transferTo(localFile);
 
                     // Get CSV content

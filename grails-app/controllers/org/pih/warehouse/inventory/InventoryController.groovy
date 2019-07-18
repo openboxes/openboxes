@@ -42,6 +42,7 @@ class InventoryController {
     def requisitionService
     def inventorySnapshotService
     def userService
+    def uploadService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"];
 
@@ -1509,8 +1510,7 @@ class InventoryController {
             CommonsMultipartFile uploadFile = (CommonsMultipartFile) mpr.getFile("file");
             if (!uploadFile?.empty) {
                 try {
-                    localFile = new File("uploads/" + uploadFile.originalFilename);
-                    localFile.mkdirs()
+                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
                     uploadFile.transferTo(localFile);
                     //flash.message = "File uploaded successfully"
 
