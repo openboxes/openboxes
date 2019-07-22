@@ -36,6 +36,10 @@
         .even {
             box-shadow: inset 0 0 0 1000px #fff;
         }
+        .stockHistory td {
+            max-width: 200px;
+            word-wrap: break-word;
+        }
     }
 
     .print-history { display:none !important; }
