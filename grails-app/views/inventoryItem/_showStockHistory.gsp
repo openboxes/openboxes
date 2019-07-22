@@ -213,7 +213,12 @@
                     </td>
                     <td class="border-right middle center">
                         <g:if test="${stockHistoryEntry?.comments}">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${stockHistoryEntry.comments}"/>
+                            <g:if test="${params.print}">
+                                ${stockHistoryEntry.comments}
+                            </g:if>
+                            <g:else>
+                                <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${stockHistoryEntry.comments}"/>
+                            </g:else>
                         </g:if>
                     </td>
 
