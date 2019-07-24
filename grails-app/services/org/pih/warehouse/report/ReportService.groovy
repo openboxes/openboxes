@@ -693,6 +693,7 @@ class ReportService implements ApplicationContextAware {
                 transaction_entry.quantity
             from transaction_entry 
             join transaction on transaction.id = transaction_entry.transaction_id
+			left join `order` on transaction.order_id = `order`.id
             join inventory on transaction.inventory_id = inventory.id 
             join location on location.inventory_id = transaction.inventory_id
             join transaction_type on transaction_type.id = transaction.transaction_type_id 
