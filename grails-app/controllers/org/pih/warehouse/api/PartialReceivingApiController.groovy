@@ -44,7 +44,7 @@ class PartialReceivingApiController {
         if (partialReceipt.receiptStatus == PartialReceiptStatus.COMPLETED) {
             log.debug "Save partial receipt"
             receiptService.saveAndCompletePartialReceipt(partialReceipt)
-            receiptService.saveInboundTransaction(partialReceipt)
+
         }
         else if (partialReceipt.receiptStatus == PartialReceiptStatus.PENDING || partialReceipt.receiptStatus == PartialReceiptStatus.CHECKING) {
             receiptService.savePartialReceipt(partialReceipt, false)
