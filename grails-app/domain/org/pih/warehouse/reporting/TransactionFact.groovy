@@ -49,4 +49,20 @@ class TransactionFact {
         transactionNumber(nullable:false)
         quantity(nullable:true)
     }
+
+    static namedQueries = {
+        minTransactionDate {
+            projections {
+                min 'transactionDate'
+            }
+            uniqueResult = true
+        }
+
+        maxTransactionDate {
+            projections {
+                max 'transactionDate'
+            }
+            uniqueResult = true
+		}
+    }
 }

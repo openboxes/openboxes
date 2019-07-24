@@ -19,6 +19,9 @@ import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.ProductReportCommand
+import org.quartz.JobKey
+import org.quartz.core.QuartzScheduler
+import org.quartz.impl.StdScheduler
 import util.ReportUtil
 
 class ReportController {
@@ -30,6 +33,7 @@ class ReportController {
 	def reportService
     def messageService
     def inventorySnapshotService
+    StdScheduler quartzScheduler
 
     def refreshTransactionFact = {
         RefreshTransactionFactJob.triggerNow([:])
@@ -230,7 +234,11 @@ class ReportController {
 		InventoryReportCommand command = new InventoryReportCommand();
         command.location = Location.get(session.warehouse.id)
 		command.rootCategory = productService.getRootCategory();
-		[command : command ]
+
+        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob"))
+        def nextFireTime = triggers*.nextFireTime.max()
+
+		[command : command, count: TransactionFact.count(), maxDate: TransactionFact.maxTransactionDate(), nextFireTime: nextFireTime]
 	}
 
     def showTransactionReportDialog = {
