@@ -472,7 +472,7 @@ openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
-openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 */12 * * * ?" // every ten minutes
+openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
