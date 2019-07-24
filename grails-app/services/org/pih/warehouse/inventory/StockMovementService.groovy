@@ -79,8 +79,6 @@ class StockMovementService {
     void updateStatus(String id, RequisitionStatus status) {
 
         log.info "Update status ${id} " + status
-
-        StockMovement stockMovement = getStockMovement(id)
         Requisition requisition = Requisition.get(id)
         if (!status in RequisitionStatus.list()) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
