@@ -3,6 +3,7 @@
 <html>
 <head>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'openboxes.css')}" type="text/css" media="all" />
 
     <style>
 
@@ -43,13 +44,6 @@
     }
 
     .print-history { display:none !important; }
-
-    .odd {
-        background: #f7f7f7;
-    }
-    .even {
-        background: #fff;
-    }
 
     </style>
 
