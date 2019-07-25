@@ -48,11 +48,16 @@ class MigrationController {
 
         def productSuppliers = migrationService.getProductsForMigration()
 
+        def receiptsWithoutTransaction = migrationService.getReceiptsWithoutTransaction()
+
+        def shipmentsWithoutTransaction = migrationService.getShipmentsWithoutTransaction()
+
         TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
         def inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
-
         [
                 organizationCount: organizations.size(),
+                receiptsWithoutTransactionCount: receiptsWithoutTransaction.size(),
+                shipmentsWithoutTransactionCount: shipmentsWithoutTransaction.size(),
                 inventoryTransactionCount:inventoryTransactionCount,
                 productSupplierCount: productSuppliers.size(),
                 transactionFactCount: TransactionFact.count(),
@@ -61,9 +66,23 @@ class MigrationController {
                 productDimensionCount: ProductDimension.count(),
                 lotDimensionCount: LotDimension.count(),
                 dateDimensionCount: DateDimension.count(),
-
-
         ]
+    }
+
+    def receiptsWithoutTransaction = {
+        def receiptsWithoutTransaction = migrationService.getReceiptsWithoutTransaction()
+        receiptsWithoutTransaction = receiptsWithoutTransaction.collect {
+            [status: it.receiptStatusCode.name(), receiptNumber: it.receiptNumber, shipmentNumber: it.shipment?.shipmentNumber]
+        }.sort { it?.shipmentNumber }
+        render (receiptsWithoutTransaction as JSON)
+    }
+
+    def shipmentsWithoutTransaction = {
+        def shipmentsWithoutTransaction = migrationService.getShipmentsWithoutTransaction()
+        shipmentsWithoutTransaction = shipmentsWithoutTransaction.collect {
+            [status: it.currentStatus.name(), shipmentNumber: it.shipmentNumber, origin: it.origin.name, destination: it.destination.name]
+        }
+        render (shipmentsWithoutTransaction as JSON)
     }
 
     def downloadCurrentInventory = {

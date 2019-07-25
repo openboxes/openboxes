@@ -10,6 +10,7 @@
 package org.pih.warehouse.receiving
 
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.shipping.Shipment
 
 class Receipt implements Serializable, Comparable<Receipt> {
@@ -23,6 +24,7 @@ class Receipt implements Serializable, Comparable<Receipt> {
 	Date dateCreated;
 	Date lastUpdated;
 
+	static hasOne = [transaction : Transaction]
 	static hasMany = [ receiptItems : ReceiptItem ]
 	static belongsTo = [ shipment : Shipment ]
 	
@@ -33,6 +35,7 @@ class Receipt implements Serializable, Comparable<Receipt> {
 
 	// Constraints
 	static constraints = {
+		transaction(nullable:true)
         shipment(nullable:true)
         recipient(nullable:true)
         receiptNumber(nullable:true, blank: false)
