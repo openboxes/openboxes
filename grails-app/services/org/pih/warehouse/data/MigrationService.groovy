@@ -33,6 +33,10 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class MigrationService {
 
@@ -40,12 +44,35 @@ class MigrationService {
     def inventoryService
     def persistenceInterceptor
     def mailService
-
     def dataSource
     def sessionFactory
 
-
     boolean transactional = true
+
+    def getReceiptsWithoutTransaction() {
+        return Receipt.createCriteria().list() {
+            eq("receiptStatusCode", ReceiptStatusCode.RECEIVED)
+            transaction {
+                isNull("id")
+            }
+        }
+    }
+
+    def getShipmentsWithoutTransaction() {
+        return Shipment.createCriteria().list() {
+            not {
+                'in'("currentStatus", [ShipmentStatusCode.PENDING])
+            }
+            outgoingTransactions {
+                isNull("id")
+            }
+            origin {
+                locationType {
+                    eq("locationTypeCode", LocationTypeCode.DEPOT)
+                }
+            }
+        }
+    }
 
 
     def getCurrentInventory(List<Location> locations) {

@@ -5,27 +5,42 @@
     </h2>
     <table>
         <tr>
-            <th><g:message code="shipping.shipmentNumber.label"/></th>
-            <th><g:message code="receipt.receiptNumber.label"/></th>
             <th><g:message code="receipt.receiptStatusCode.label"/></th>
+            <th><g:message code="receipt.receiptNumber.label"/></th>
+            <th><g:message code="shipping.shipmentNumber.label"/></th>
+            <th><g:message code="transaction.transactionNumber.label"/></th>
             <th><g:message code="product.productCode.label"/></th>
             <th><g:message code="product.label"/></th>
             <th><g:message code="inventoryItem.lotNumber.label"/></th>
             <th><g:message code="inventoryItem.expirationDate.label"/></th>
             <th><g:message code="location.binLocation.label"/></th>
-            <th><g:message code="receiptItem.quantityReceived.label" default="Received"/></th>
             <th><g:message code="receiptItem.quantityCanceled.label" default="Canceled"/></th>
+            <th><g:message code="receiptItem.quantityPending.label" default="Pending"/></th>
+            <th><g:message code="receiptItem.quantityReceived.label" default="Received"/></th>
         </tr>
         <g:each var="receiptItem" in="${receiptItems}" status="status">
             <tr class="prop ${status%2?'even':'odd'}">
                 <td>
-                    ${receiptItem?.receipt?.shipment?.shipmentNumber}
+                    <span title="${receiptItem?.receipt.receiptStatusCode} on ${receiptItem?.receipt?.actualDeliveryDate}
+                    ${g.message(code:'default.created.label')} ${receiptItem?.receipt?.dateCreated}">
+                        <format:metadata obj="${receiptItem?.receipt.receiptStatusCode}"/>
+                    </span>
                 </td>
                 <td>
                     ${receiptItem?.receipt.receiptNumber?:receiptItem?.receipt?.id}
                 </td>
                 <td>
-                    <format:metadata obj="${receiptItem?.receipt.receiptStatusCode}"/>
+                    ${receiptItem?.receipt?.shipment?.shipmentNumber}
+                </td>
+                <td>
+                    <g:if test="${receiptItem?.receipt?.transaction}">
+                        <g:link controller="inventory" action="showTransaction" id="${receiptItem?.receipt?.transaction?.id}">
+                            ${receiptItem?.receipt?.transaction?.transactionNumber?:receiptItem?.receipt?.transaction?.id}
+                        </g:link>
+                    </g:if>
+                    <g:else>
+                        <g:message code="default.notAvailable.label"/>
+                    </g:else>
                 </td>
                 <td>
                     <g:link controller="inventoryItem" action="showStockCard" id="${receiptItem?.product?.id}">
@@ -48,15 +63,23 @@
                     ${receiptItem?.binLocation?.name}
                 </td>
                 <td>
+                    ${receiptItem?.quantityCanceled?:0}
+                </td>
+                <td>
+                    <g:if test="${receiptItem?.receipt.receiptStatusCode != org.pih.warehouse.receiving.ReceiptStatusCode.RECEIVED}">
+                        ${receiptItem?.quantityReceived?:0}
+                    </g:if>
+                    <g:else>
+                        0
+                    </g:else>
+                </td>
+                <td>
                     <g:if test="${receiptItem?.receipt.receiptStatusCode == org.pih.warehouse.receiving.ReceiptStatusCode.RECEIVED}">
                         ${receiptItem?.quantityReceived?:0}
                     </g:if>
                     <g:else>
-                        <g:message code="default.tbd.label" default="TBD"/>
+                        0
                     </g:else>
-                </td>
-                <td>
-                    ${receiptItem?.quantityCanceled?:0}
                 </td>
             </tr>
         </g:each>
