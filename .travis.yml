@@ -1,3 +1,4 @@
+dist: trusty
 language: groovy
 jdk:
 - openjdk7
