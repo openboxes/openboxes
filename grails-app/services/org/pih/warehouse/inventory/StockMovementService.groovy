@@ -586,6 +586,7 @@ class StockMovementService {
             substitutionItem.productName = item?.product?.name
             substitutionItem.productCode = item?.product?.productCode
             substitutionItem.quantitySelected = item?.quantity
+            substitutionItem.quantityConsumed = calculateMonthlyStockListQuantity(item.product, location)
             substitutionItem.availableItems = availableItems
             return substitutionItem
         }
@@ -784,6 +785,7 @@ class StockMovementService {
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
         editPageItem.quantityRequested = requisitionItem.quantity
+        editPageItem.quantityConsumed = calculateMonthlyStockListQuantity(stockMovementItem)
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         editPageItem.substitutionItems = substitutionItems
