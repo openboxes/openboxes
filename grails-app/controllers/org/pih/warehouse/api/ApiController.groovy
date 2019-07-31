@@ -14,6 +14,7 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
+import grails.util.GrailsUtil
 
 class ApiController {
 
@@ -63,6 +64,15 @@ class ApiController {
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         def menuConfig = grailsApplication.config.openboxes.megamenu
         boolean isImpersonated = session.impersonateUserId ? true : false
+        def buildNumber = grailsApplication.metadata.'app.revisionNumber'
+        def buildDate = grailsApplication.metadata.'app.buildDate'
+        def branchName = grailsApplication.metadata.'app.branchName'
+        def grailsVersion = grailsApplication.metadata.'app.grails.version'
+        def appVersion = grailsApplication.metadata.'app.version'
+        def environment = GrailsUtil.environment
+        def ipAddress = request?.getRemoteAddr()
+        def hostname = session.hostname?:"Unknown"
+        def timezone = session?.timezone?.ID
         render ([
             data:[
                 user:user,
@@ -72,6 +82,15 @@ class ApiController {
                 supportedActivities: supportedActivities,
                 menuConfig: menuConfig,
                 isImpersonated: isImpersonated,
+                grailsVersion: grailsVersion,
+                appVersion: appVersion,
+                branchName: branchName,
+                buildNumber: buildNumber,
+                environment: environment,
+                buildDate: buildDate,
+                ipAddress: ipAddress,
+                hostname: hostname,
+                timezone: timezone,
                 activeLanguage: locale.language]
         ] as JSON)
     }

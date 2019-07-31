@@ -8,8 +8,5 @@
     <div style="flex: 1">
         <g:layoutBody />
     </div>
-    <div class="border-top align-self-end text-center py-2 w-100 footer">
-        <g:render template="/common/footer" />
-    </div>
 </body>
 </html>
