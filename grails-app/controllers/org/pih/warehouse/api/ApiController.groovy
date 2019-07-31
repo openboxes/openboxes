@@ -62,6 +62,7 @@ class ApiController {
         def locale = localizationService.getCurrentLocale()
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         def menuConfig = grailsApplication.config.openboxes.megamenu
+        boolean isImpersonated = session.impersonateUserId ? true : false
         render ([
             data:[
                 user:user,
@@ -70,18 +71,25 @@ class ApiController {
                 isUserAdmin: isUserAdmin,
                 supportedActivities: supportedActivities,
                 menuConfig: menuConfig,
+                isImpersonated: isImpersonated,
                 activeLanguage: locale.language]
         ] as JSON)
     }
 
 
     def logout = {
-        session.invalidate()
-        render ([status: 200, text: "Logout was successful"])
+        if (session.impersonateUserId) {
+            session.user = User.get(session.activeUserId)
+            session.impersonateUserId = null
+            session.activeUserId = null
+            render([status: 200, text: "Logout was successful"])
+        } else {
+            session.invalidate()
+            render([status: 200, text: "Logout was successful"])
+        }
     }
 
-
-	def status = {
+    def status = {
         boolean databaseStatus = true
         String databaseStatusMessage = "Database is available"
 
