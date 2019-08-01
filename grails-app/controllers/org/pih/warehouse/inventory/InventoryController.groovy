@@ -319,7 +319,11 @@ class InventoryController {
                 for (date in command?.dates) {
                     println "Get quantity map " + date + " location = " + location
                     def quantityMap = [:]
-                    quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, date, command.tags)
+                    def revisedDate = date
+                    use(TimeCategory) {
+                        revisedDate = revisedDate.plus(1.day)
+                    }
+                    quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, revisedDate, command.tags)
                     def existingQuantityMap = quantityMapByDate[date]
                     if (existingQuantityMap) {
                         quantityMapByDate[date] = mergeQuantityMap(existingQuantityMap, quantityMap)
@@ -378,7 +382,11 @@ class InventoryController {
         def dates = []
         if (startDate.before(endDate)) {
             def date = startDate
-            while(date.before(endDate)) {
+            def end = endDate
+            use(TimeCategory) {
+                end = endDate.plus(1.day)
+            }
+            while(date.before(end)) {
                 println "Start date = " + date + " endDate = " + endDate
 
                 dates << date
