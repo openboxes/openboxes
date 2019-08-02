@@ -60,12 +60,18 @@
 		</div>
 		<g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
 			<div class="action-menu-item">
-				<g:link controller="inventory" action="createInventory" params="['product.id':productInstance?.id]">
+				<g:link controller="inventory" action="createAdjustment" params="['product.id':productInstance?.id]">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'package_green.png')}"/>&nbsp;
 					<g:message code="inventory.inventoryAdjusted.label" />
 				</g:link>
 			</div>
 		</g:supports>
+		<div class="action-menu-item">
+			<g:link controller="inventory" action="createTransaction" params="['product.id':productInstance?.id]">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'package_down.png')}"/>&nbsp;
+				<g:message code="default.create.label" args="[g.message(code: 'default.debit.label')]"/>
+			</g:link>
+		</div>
 		<div class="action-menu-item">
 			<g:link controller="inventory" action="createConsumed" params="['product.id':productInstance?.id]">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'package_stop.png')}"/>&nbsp;

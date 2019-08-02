@@ -1112,8 +1112,8 @@ class InventoryController {
         forward(action: "createTransaction", params:params)
     }
 
-    def createInventory = {
-        params.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)
+    def createAdjustment = {
+        params.transactionType = TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params:params)
     }
 
@@ -1138,11 +1138,6 @@ class InventoryController {
 		def warehouseInstance = Location.get(session?.warehouse?.id);
 		def transactionInstance = new Transaction(params);
 
-		if (!transactionInstance?.transactionType) {
-			flash.message = "Cannot create transaction for unknown transaction type ${params['transactionType.id']}";
-			redirect(controller: "inventoryItem", action: "showStockCard", id: params["product.id"])
-            return
-		}
 
         def products = []
 
@@ -1179,8 +1174,6 @@ class InventoryController {
 		command.warehouseInstance = warehouseInstance
 
 		command.quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory, products);
-		command.transactionTypeList = TransactionType.list();
-		command.locationList = Location.list();
 
 		[command : command]
 
@@ -1189,48 +1182,36 @@ class InventoryController {
 	/**
 	 * Save a transaction that sets the current inventory level for stock.
 	 */
-    @CacheFlush("inventoryBrowserCache")
-	def saveInventoryTransaction = { TransactionCommand command ->
+	def saveAdjustmentTransaction = { TransactionCommand command ->
 		log.info ("Saving inventory adjustment " + params)
         log.info "Command: " + command
 
 		def transaction = command?.transactionInstance;
 		def warehouseInstance = Location.get(session?.warehouse?.id);
-		//def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory)
-
-		// Item cannot have a negative quantity
-		command.transactionEntries.each {
-			if (it.quantity < 0) {
-				transaction.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", [it?.inventoryItem?.lotNumber] as Object[], "")
-			}
-		}
 
 		// Check to see if there are errors, if not save the transaction
 		if (!transaction.hasErrors()) {
 			try {
 				// Add validated transaction entries to the transaction we want to persist
 				command.transactionEntries.each {
-
-					// FIXME Need to do some validation at this point
-					//def onHandQuantity = quantityMap[it.inventoryItem]
-					// If the quantity changes, we record a new transaction entry
-					//if (it.quantity != onHandQuantity) {
-					def transactionEntry = new TransactionEntry()
-                    transactionEntry.product = it.inventoryItem.product
-					transactionEntry.inventoryItem = it.inventoryItem
-					transactionEntry.quantity = it.quantity
-                    transactionEntry.binLocation = it.binLocation
-                    transactionEntry.comments = it.comment
-					transaction.addToTransactionEntries(transactionEntry)
-					//}
+                    if (it.quantity != 0) {
+                        def transactionEntry = new TransactionEntry()
+                        transactionEntry.product = it.inventoryItem.product
+                        transactionEntry.inventoryItem = it.inventoryItem
+                        transactionEntry.binLocation = it.binLocation
+                        transactionEntry.quantity = it.quantity
+                        transactionEntry.comments = it.comment
+                        transactionEntry.reasonCode = it.reasonCode
+                        transaction.addToTransactionEntries(transactionEntry)
+                    }
 				}
 
 				// Validate the transaction object
 				if (!transaction.hasErrors() && transaction.validate()) {
 					transaction.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transaction?.transactionNumber?:transaction?.id
-					//redirect(controller: "inventory", action: "browse")
-					redirect(controller: "inventory", action: "browse")
+					flash.message = "Successfully saved transaction"
+                    def productId = command.transactionEntries.first()?.inventoryItem?.product?.id
+					redirect(controller: "inventoryItem", action: "showStockCard", id: productId)
 				}
 			} catch (ValidationException e) {
 				log.debug ("caught validation exception " + e)
@@ -1309,7 +1290,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transaction?.hasErrors() && transaction?.validate()) {
 					transaction.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transaction?.transactionNumber?:transaction?.id
+					flash.message = "Successfully saved transaction"
 					//redirect(controller: "inventory", action: "browse")
                     if (productIds.size() > 1) {
                         redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
@@ -1410,7 +1391,7 @@ class InventoryController {
 				// Validate the transaction object
 				if (!transactionInstance.hasErrors() && transactionInstance.validate()) {
 					transactionInstance.save(failOnError: true)
-					flash.message = "Successfully saved transaction " + transactionInstance?.transactionNumber?:transactionInstance?.id
+					flash.message = "Successfully saved transaction"
 					//redirect(controller: "inventory", action: "browse")
 					redirect(controller: "inventory", action: "browse")
 				}

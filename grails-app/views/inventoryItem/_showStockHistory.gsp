@@ -111,7 +111,7 @@
                             <format:date obj="${stockHistoryEntry?.transaction?.transactionDate}" format="hh:mma"/>
                         </g:if>
                     </td>
-                    <td>
+                    <td class="middle">
                         <g:if test="${stockHistoryEntry?.showDetails}">
                             <div title="${stockHistoryEntry?.transaction?.dateCreated}">
                                 ${stockHistoryEntry?.transaction?.createdBy?.name?:g.message(code:'default.unknown.label')}

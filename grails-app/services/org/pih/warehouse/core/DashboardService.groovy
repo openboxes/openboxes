@@ -304,7 +304,6 @@ class DashboardService {
         long startTime = System.currentTimeMillis()
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        log.info inventoryLevelMap.keySet().size()
 
         def totalStock = quantityMap
         def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
