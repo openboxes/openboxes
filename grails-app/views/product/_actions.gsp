@@ -67,6 +67,12 @@
 			</div>
 		</g:supports>
 		<div class="action-menu-item">
+			<g:link controller="inventory" action="createTransaction" params="['product.id':productInstance?.id]">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'package_down.png')}"/>&nbsp;
+				<g:message code="default.create.label" args="[g.message(code: 'default.debit.label')]"/>
+			</g:link>
+		</div>
+		<div class="action-menu-item">
 			<g:link controller="inventory" action="createConsumed" params="['product.id':productInstance?.id]">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'package_stop.png')}"/>&nbsp;
 				<warehouse:message code="inventory.inventoryConsumed.label" />
