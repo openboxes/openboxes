@@ -3,22 +3,20 @@
 		<td class="middle" style="width:1%">
 			<g:render template="../transaction/actions"/>
 		</td>
-		<td class="top">
+		<td class="middle">
 			<div class="title"> 
 				<small class="transactionNumber">${transactionInstance?.transactionNumber }</small>
-				<div>
-                    <g:link controller="inventory" action="showTransaction" id="${transactionInstance?.id }">
+				<g:link controller="inventory" action="showTransaction" id="${transactionInstance?.id }">
 
-                        <format:metadata obj="${transactionInstance?.transactionType}" /> <g:if
-                            test="${transactionInstance?.source }">
-                        <warehouse:message code="default.from.label" />
-                        ${transactionInstance?.source?.name }
-                        </g:if> <g:if test="${transactionInstance?.destination }">
-                            <warehouse:message code="default.to.label" />
-                            ${transactionInstance?.destination?.name }
-                        </g:if>
-                    </g:link>
-				</div>
+					<format:metadata obj="${transactionInstance?.transactionType}" /> <g:if
+						test="${transactionInstance?.source }">
+					<warehouse:message code="default.from.label" />
+					${transactionInstance?.source?.name }
+					</g:if> <g:if test="${transactionInstance?.destination }">
+						<warehouse:message code="default.to.label" />
+						${transactionInstance?.destination?.name }
+					</g:if>
+				</g:link>
 			</div>
 		
 		</td>

@@ -693,6 +693,7 @@ class ReportService implements ApplicationContextAware {
                 transaction_entry.quantity
             from transaction_entry 
             join transaction on transaction.id = transaction_entry.transaction_id
+			left join `order` on transaction.order_id = `order`.id
             join inventory on transaction.inventory_id = inventory.id 
             join location on location.inventory_id = transaction.inventory_id
             join transaction_type on transaction_type.id = transaction.transaction_type_id 
@@ -702,6 +703,8 @@ class ReportService implements ApplicationContextAware {
             join location_dimension on location_dimension.location_id = location.id
             join date_dimension transaction_date_dimension on transaction_date_dimension.date = date(transaction.transaction_date)
             join transaction_type_dimension on transaction_type_dimension.transaction_type_id = transaction_type.id
+            where transaction.order_id is null 
+            or `order`.order_type_code not in ('TRANSFER_ORDER') ;
         """
         executeStatements([insertStatement])
     }
