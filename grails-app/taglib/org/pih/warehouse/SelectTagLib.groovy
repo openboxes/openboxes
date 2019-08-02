@@ -257,7 +257,7 @@ class SelectTagLib {
 
 
     def selectUser = { attrs, body ->
-        attrs.from = User.list().sort { it.firstName }
+        attrs.from = User.findAllByActive(true).sort { it.firstName }
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name + " (" + it.username + ")"}
         out << g.select(attrs)

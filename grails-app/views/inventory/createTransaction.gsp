@@ -6,8 +6,8 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label')}" />
         <g:set var="transactionType" value="${format.metadata(obj: command?.transactionInstance?.transactionType)}"/>
-        <title>${transactionType }</title>
-    </head>    
+        <title><g:message code="default.create.label" args="[g.message(code: 'transaction.label')]"/></title>
+    </head>
     <body>
         <div class="body">
             <g:if test="${flash.message}">
@@ -37,29 +37,19 @@
 			</div>
 
 			<div class="dialog">
-					<g:if test="${command?.transactionInstance?.transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID}">
-						<g:render template="outgoingTransfer"></g:render>
-					</g:if>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID}">
-						<g:render template="incomingTransfer"></g:render>
-					</g:elseif>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.INVENTORY_TRANSACTION_TYPE_ID}">
-						<g:render template="inventoryAdjustment"></g:render>
-					</g:elseif>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID}">
-						<g:render template="inventoryConsumed"></g:render>
-					</g:elseif>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.DAMAGE_TRANSACTION_TYPE_ID}">
-						<g:render template="inventoryConsumed"></g:render>
-					</g:elseif>
-					<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID}">
-						<g:render template="inventoryConsumed"></g:render>
-					</g:elseif>
-					<g:else>
-						Unknown transaction type
-					</g:else> 
-				</div>
-                <div class="clear"></div>
+				<g:if test="${command?.transactionInstance?.transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID}">
+					<g:render template="outgoingTransfer"></g:render>
+				</g:if>
+				<g:elseif test="${command?.transactionInstance?.transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID}">
+					<g:render template="incomingTransfer"></g:render>
+				</g:elseif>
+				<g:elseif test="${command?.transactionInstance?.transactionType?.id in [Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID, Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID]}">
+					<g:render template="inventoryAdjustment"></g:render>
+				</g:elseif>
+				<g:else>
+					<g:render template="inventoryConsumed"></g:render>
+				</g:else>
+			</div>
 		</div>
 	</body>
 </html>
