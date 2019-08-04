@@ -16,6 +16,7 @@
                     <th class="center"><warehouse:message code="requisitionItem.quantityApproved.label" /></th>
                     <th class="center"><warehouse:message code="requisitionItem.quantityPicked.label" default="Picked"/></th>
                     <th class="center"><warehouse:message code="requisitionItem.quantityCanceled.label" /></th>
+                    <th class="center"><warehouse:message code="requisitionItem.quantityAdjusted.label" /></th>
                     <th class="center"><warehouse:message code="requisitionItem.quantityIssued.label" default="Issued"/></th>
                     <th class="center"><warehouse:message code="requisitionItem.reasonCodes.label" /></th>
                 </tr>

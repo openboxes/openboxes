@@ -202,6 +202,21 @@
         <td class="middle center">
             <g:if test="${requisitionItem?.isSubstituted()}">
                 <div>
+                    ${requisitionItem?.substitutionItem?.quantityAdjusted?:0}
+                </div>
+            </g:if>
+            <g:elseif test="${requisitionItem?.isCanceled()}">
+                <div>
+                    ${requisitionItem?.quantityAdjusted?:0}
+                </div>
+            </g:elseif>
+            <g:else>
+                ${requisitionItem?.quantityAdjusted?:0}
+            </g:else>
+        </td>
+        <td class="middle center">
+            <g:if test="${requisitionItem?.isSubstituted()}">
+                <div>
                     ${requisitionItem?.substitutionItem?.quantityIssued?:0}
                 </div>
             </g:if>

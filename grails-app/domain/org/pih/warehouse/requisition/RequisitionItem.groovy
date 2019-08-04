@@ -85,7 +85,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     User updatedBy
 
 
-    static transients = [ "type", "substitutionItems", "monthlyDemand", 'totalCost', 'quantityIssued']
+    static transients = [ "type", "substitutionItems", "monthlyDemand", 'totalCost', 'quantityIssued', 'quantityAdjusted']
 
 	static belongsTo = [ requisition: Requisition ]
 	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
@@ -595,6 +595,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     Integer getQuantityIssued() {
         return requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == this }?.sum { it.quantity } ?: 0
+    }
+
+    Integer getQuantityAdjusted() {
+        return modificationItem ? (modificationItem.quantityIssued - quantity) : (quantityIssued - quantity)
     }
 
     def next() {
