@@ -8,6 +8,7 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { getTranslate } from 'react-localize-redux';
 import { confirmAlert } from 'react-confirm-alert';
+import queryString from 'query-string';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -21,6 +22,8 @@ import TextField from '../form-elements/TextField';
 import LabelField from '../form-elements/LabelField';
 import { debounceLocationsFetch } from '../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+
+const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
 const SHIPMENT_FIELDS = {
   description: {
@@ -100,7 +103,7 @@ const FIELDS = {
       autoComplete: 'off',
     },
     getDynamicAttr: ({ issued }) => ({
-      disabled: issued,
+      disabled: issued || showOnly,
     }),
   },
   shipmentType: {
@@ -110,6 +113,7 @@ const FIELDS = {
     attributes: {
       required: true,
       showValueTooltip: true,
+      disabled: showOnly,
     },
     getDynamicAttr: ({ shipmentTypes }) => ({
       options: shipmentTypes,
@@ -120,7 +124,7 @@ const FIELDS = {
     label: 'react.stockMovement.trackingNumber.label',
     defaultMessage: 'Tracking number',
     getDynamicAttr: ({ issued }) => ({
-      disabled: issued,
+      disabled: issued || showOnly,
     }),
   },
   driverName: {
@@ -128,13 +132,16 @@ const FIELDS = {
     label: 'react.stockMovement.driverName.label',
     defaultMessage: 'Driver name',
     getDynamicAttr: ({ issued }) => ({
-      disabled: issued,
+      disabled: issued || showOnly,
     }),
   },
   comments: {
     type: TextField,
     label: 'react.stockMovement.comments.label',
     defaultMessage: 'Comments',
+    attributes: {
+      disabled: showOnly,
+    },
   },
 };
 
@@ -516,6 +523,7 @@ class SendMovementPage extends Component {
                     }
                     return (<DocumentButton
                       link={document.uri}
+                      disabled={showOnly}
                       buttonTitle={document.name}
                       {...document}
                       key={idx}
@@ -523,7 +531,7 @@ class SendMovementPage extends Component {
                   })}
                   <div className="dropzone btn btn-outline-secondary">
                     <Dropzone
-                      disabled={values.statusCode === 'ISSUED'}
+                      disabled={values.statusCode === 'ISSUED' || showOnly}
                       onDrop={this.onDrop}
                       multiple
                     >
@@ -548,21 +556,35 @@ class SendMovementPage extends Component {
                 </div>
               </div>
               <hr />
-              <button
-                type="button"
-                onClick={() => this.onSave(values)}
-                className="btn btn-outline-secondary float-right btn-form btn-xs"
-                disabled={invalid}
-              >
-                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
-              </button>
-              <button
-                type="button"
-                onClick={() => this.saveAndExit(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-              >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-              </button>
+              { !showOnly ?
+                <span>
+                  <button
+                    type="button"
+                    onClick={() => this.onSave(values)}
+                    className="btn btn-outline-secondary float-right btn-form btn-xs"
+                    disabled={invalid}
+                  >
+                    <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.saveAndExit(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  >
+                    <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                  </button>
+                </span>
+                :
+                <button
+                  type="button"
+                  disabled={invalid}
+                  onClick={() => {
+                    window.location = '/openboxes/stockMovement/list?type=REQUEST';
+                  }}
+                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
+                >
+                  <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
+                </button> }
               <div className="col-md-9 pl-0">
                 {_.map(FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
@@ -574,7 +596,7 @@ class SendMovementPage extends Component {
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={values.statusCode === 'ISSUED'}
+                  disabled={values.statusCode === 'ISSUED' || showOnly}
                   onClick={() => this.previousPage(values, invalid)}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
@@ -583,7 +605,7 @@ class SendMovementPage extends Component {
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
                   className={`${values.shipmentStatus === 'SHIPPED' ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
-                  disabled={invalid || values.statusCode === 'ISSUED'}
+                  disabled={invalid || values.statusCode === 'ISSUED' || showOnly}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
                 {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
@@ -591,7 +613,7 @@ class SendMovementPage extends Component {
                     type="submit"
                     onClick={() => { this.rollbackStockMovement(); }}
                     className="btn btn-outline-success float-right btn-xs"
-                    disabled={invalid || !(values.statusCode === 'ISSUED')}
+                    disabled={invalid || !(values.statusCode === 'ISSUED') || showOnly}
                   >
                     <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
                   </button> : null
@@ -648,7 +670,7 @@ class SendMovementPage extends Component {
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={values.statusCode === 'ISSUED'}
+                  disabled={values.statusCode === 'ISSUED' || showOnly}
                   onClick={() => this.previousPage(values, invalid)}
                 > <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
@@ -656,7 +678,7 @@ class SendMovementPage extends Component {
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
                   className={`${values.shipmentStatus === 'SHIPPED' ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
-                  disabled={invalid || values.statusCode === 'ISSUED'}
+                  disabled={invalid || values.statusCode === 'ISSUED' || showOnly}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
                 {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
@@ -664,7 +686,7 @@ class SendMovementPage extends Component {
                     type="submit"
                     onClick={() => { this.rollbackStockMovement(); }}
                     className="btn btn-outline-success float-right  btn-xs"
-                    disabled={invalid || !(values.statusCode === 'ISSUED')}
+                    disabled={invalid || !(values.statusCode === 'ISSUED') || showOnly}
                   >
                     <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
                   </button> : null

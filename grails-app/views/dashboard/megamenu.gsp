@@ -222,6 +222,11 @@
                                 <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
                             </g:link>
                         </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="stockMovement" action="create" params="[type:'REQUEST']">
+                                <warehouse:message code="request.label"/>
+                            </g:link>
+                        </div>
                         <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
                         <div class="mm-menu-item">
                             <g:link controller="putAway" action="index">
