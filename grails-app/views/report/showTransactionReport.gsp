@@ -1,4 +1,4 @@
-<%@ page defaultCodec="html" %>
+<%@ page import="org.pih.warehouse.core.ActivityCode" defaultCodec="html" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -49,8 +49,14 @@
 								<label>
 									<warehouse:message code="report.location.label"/>
 								</label>
-								<g:selectLocation class="chzn-select-deselect filter" name="locationId" id="locationId" activityCode="MANAGE_INVENTORY"
-												  noSelection="['':'']" maxChars="75" groupBy="locationType" value="${command?.location?.id}"/>
+								<g:selectLocation class="chzn-select-deselect filter"
+												  name="locationId"
+												  id="locationId"
+												  activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
+												  noSelection="['':'']"
+												  maxChars="75"
+												  groupBy="locationType"
+												  value="${command?.location?.id}"/>
 							</div>
 							<div class="filter-list-item">
 
