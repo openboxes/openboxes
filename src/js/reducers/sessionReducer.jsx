@@ -25,6 +25,10 @@ const initialState = {
     debounceTime: 500,
     minSearchLength: 3,
   },
+  user: {
+    username: '',
+  },
+  isImpersonated: '',
 };
 
 export default function (state = initialState, action) {
@@ -38,6 +42,8 @@ export default function (state = initialState, action) {
         supportedActivities: _.get(action, 'payload.data.data.supportedActivities'),
         menuConfig: _.get(action, 'payload.data.data.menuConfig'),
         activeLanguage: _.get(action, 'payload.data.data.activeLanguage'),
+        user: _.get(action, 'payload.data.data.user'),
+        isImpersonated: _.get(action, 'payload.data.data.isImpersonated'),
       };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload };

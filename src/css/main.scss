@@ -279,6 +279,18 @@ body {
   font-weight: bold;
 }
 
+.notice {
+  padding: .8em;
+  margin-bottom: 1em;
+  border: 2px solid #FFD324;
+  background:#FFF6BF;
+  color:#514721;
+  font-size: 13px;
+    a {
+      color: #514721;
+    }
+}
+
 /* = WIZARD STEPS CONTAINER
 ----------------------------*/
 
