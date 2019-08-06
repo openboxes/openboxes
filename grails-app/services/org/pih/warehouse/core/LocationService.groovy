@@ -89,10 +89,14 @@ class LocationService {
 		return locations
 	}
 
-	def getLocations(String [] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation) {
+	def getLocations(String [] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User user) {
 
 		def locations = new HashSet()
 		locations += getLocations(fields, params)
+
+		if (params.applyUserFilter) {
+			locations = locations.findAll { location -> user.hasPrimaryRole(location) }
+		}
 
 		if (!isSuperuser) {
 			if (direction == "INBOUND") {
@@ -167,7 +171,7 @@ class LocationService {
         def nullHigh = new NullComparator(true)
         def locations = getLoginLocations(currentLocation)
         if (locations) {
-			locations = locations.findAll { Location location -> user.getEffectiveRoles(location) }
+			locations = locations.findAll { Location location -> user.hasPrimaryRole(location) }
 			locations = locations.collect { Location location ->
 				[
 						id           : location?.id,

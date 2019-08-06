@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core;
 
 enum RoleType {
@@ -84,4 +84,8 @@ enum RoleType {
 	static list() {
 		[ROLE_BROWSER, ROLE_ASSISTANT, ROLE_MANAGER, ROLE_ADMIN, ROLE_SUPERUSER, ROLE_FINANCE, ROLE_USER_NOTIFICATION, ROLE_PRODUCT_NOTIFICATION, ROLE_ORDER_NOTIFICATION, ROLE_SHIPMENT_NOTIFICATION]
 	}
+
+    static listPrimaryRoleTypes() {
+        [ROLE_BROWSER, ROLE_ASSISTANT, ROLE_MANAGER, ROLE_ADMIN, ROLE_SUPERUSER]
+    }
 }
