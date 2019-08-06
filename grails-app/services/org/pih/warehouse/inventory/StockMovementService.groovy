@@ -304,6 +304,11 @@ class StockMovementService {
         if (requisitionItem.modificationItem) {
             requisitionItem = requisitionItem.modificationItem
         }
+
+        if (requisitionItem.pickReasonCode) {
+            requisitionItem.pickReasonCode = null
+        }
+
         Picklist picklist = requisitionItem?.requisition?.picklist
         log.info "Clear picklist"
         if (picklist) {
@@ -438,6 +443,11 @@ class StockMovementService {
         if (!picklistItem) {
             picklistItem = new PicklistItem()
             picklist.addToPicklistItems(picklistItem)
+        }
+
+        // Set pick reason code if it is different than the one that has already been added to the item
+        if (reasonCode && requisitionItem.pickReasonCode != reasonCode) {
+            requisitionItem.pickReasonCode = reasonCode
         }
 
         // Remove from picklist
