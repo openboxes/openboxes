@@ -10,6 +10,8 @@
 		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
 		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
 		<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
+		<script src="${createLinkTo(dir:'js/jquery.checkboxList/', file:'jquery.checkboxList.js')}" type="text/javascript" ></script>
+
     </head>
     <body>
         <div class="body">
@@ -221,18 +223,40 @@
                                             <g:checkBox name="local" value="${locationInstance?.local}" title="${g.message(code:'warehouse.local.message')}"/>
                                         </td>
                                     </tr>
-
-
-
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                             <label for="name"><warehouse:message code="location.supportedActivities.label" /></label>
                                         </td>
                                         <td valign="top" class="value">
+                                            <g:set var="sameAsDefaults" value="${locationInstance?.locationType?.supportedActivities.equals(locationInstance?.supportedActivities)}"/>
+                                            <g:set var="useDefault" value="${locationInstance?.supportedActivities.empty || sameAsDefaults}"/>
+
+                                            <g:if test="${useDefault}">
+                                                <g:set var="supportedActivities" value="${locationInstance?.locationType?.supportedActivities}"/>
+                                            </g:if>
+                                            <g:else>
+                                                <g:set var="supportedActivities" value="${locationInstance?.supportedActivities}"/>
+                                            </g:else>
                                             <g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
-                                            <g:select name="supportedActivities" multiple="true" class="chzn-select-deselect" from="${activityList }" size="${activityList.size()+1 }" style="width: 150px"
-                                                      optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.supportedActivities?:locationInstance?.locationType?.supportedActivities}"
-                                                      noSelection="['':warehouse.message(code:'location.useDefaultActivities.label')]" />
+                                            <select id="supported-activities" name="supportedActivities" multiple="true" disabled="disabled">
+                                                <g:each var="activity" in="${activityList}" >
+                                                    <g:set var="isDefault" value="${locationInstance?.locationType?.supportedActivities?.contains(activity.toString())}"/>
+                                                    <g:set var="isSelected" value="${supportedActivities.contains(activity.toString())}"/>
+                                                    <option value="${activity}" ${isSelected?'selected':''}>
+                                                        ${format.metadata(obj:activity)}
+                                                    </option>
+                                                </g:each>
+                                            </select>
+                                            <div class="buttons left">
+
+                                                <g:link controller="locationType" action="edit" id="${locationInstance?.locationType?.id}" class="button">
+                                                    <g:message code="default.edit.button" default="Edit {0}" args="['Supported Activities']"/>
+                                                </g:link>
+                                                <g:link controller="location" action="resetSupportedActivities" id="${locationInstance?.id}" class="button">
+                                                    <g:message code="default.reset.button" default="Reset {0}" args="['Supported Activities']"/>
+                                                </g:link>
+
+                                            </div>
 
                                         </td>
                                     </tr>
@@ -527,6 +551,10 @@
                 hide: true
             });
             */
+
+            $("#supported-activities").multiSelectToCheckboxes({});
+
+
         });
 
     </script>

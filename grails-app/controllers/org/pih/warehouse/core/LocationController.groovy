@@ -153,6 +153,13 @@ class LocationController {
 		}
 	}
 
+	def resetSupportedActivities = {
+        def location = Location.get(params.id);
+		location.supportedActivities.clear()
+		location.save();
+		redirect(action: "edit", id: params.id)
+	}
+
     def showContents = {
         def binLocation = Location.get(params.id);
         if (!binLocation) {
