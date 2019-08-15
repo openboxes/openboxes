@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1565890211110-1" >
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    <![CDATA[
+                        SELECT count(*) AS duplicate_count
+                        FROM (
+                          SELECT date, location_id, bin_location_id, product_id, inventory_item_id
+                          FROM inventory_snapshot
+                          GROUP BY date, location_id, bin_location_id, product_id, inventory_item_id
+                          HAVING COUNT(*) > 1
+                        ) AS inventory_snapshot_duplicates;
+                    ]]>
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment>Remove duplicates before creating unique constraint on inventory_snapshot.</comment>
+        <sql>
+            CREATE TABLE IF NOT EXISTS inventory_snapshot_new
+                SELECT DISTINCT * FROM inventory_snapshot
+                GROUP BY date, location_id, bin_location_id, product_id, inventory_item_id;
+            ALTER TABLE inventory_snapshot RENAME inventory_snapshot_old;
+            ALTER TABLE inventory_snapshot_new RENAME inventory_snapshot;
+            DROP TABLE inventory_snapshot_old;
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1565890211110-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="inventory_snapshot_uniq_idx"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint constraintName="inventory_snapshot_uniq_idx"
+                             tableName="inventory_snapshot"
+                             columnNames="date, location_id, product_code, lot_number, bin_location_name"/>
+    </changeSet>
+    <!-- Add foreign key constraints back to inventory snapshot table since they're useful for
+        improving query performance since the unique index does not include fields we typically
+        search on -->
+    <changeSet author="jmiranda (generated)" id="1565890211110-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK740B5478ABEBD5"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="location_id" baseTableName="inventory_snapshot"
+          constraintName="FK740B5478ABEBD5" deferrable="false" initiallyDeferred="false"
+          referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1565890211110-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK740B547AA992CED"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="inventory_snapshot"
+          constraintName="FK740B547AA992CED" deferrable="false" initiallyDeferred="false"
+          referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1565890211110-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK740B547DED5FAE7"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="inventory_snapshot"
+          constraintName="FK740B547DED5FAE7" deferrable="false" initiallyDeferred="false"
+          referencedColumnNames="id" referencedTableName="product"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1565890211110-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK740B54769DB749D"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="bin_location_id" baseTableName="inventory_snapshot"
+          constraintName="FK740B54769DB749D" deferrable="false" initiallyDeferred="false"
+          referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+</databaseChangeLog>
