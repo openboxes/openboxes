@@ -413,12 +413,13 @@ class InventorySnapshotService {
         if (locations) {
             Date date = getMostRecentInventorySnapshotDate()
             def results = InventorySnapshot.executeQuery("""
-						select i.date, product, i.location, category.name, i.quantityOnHand
+						select i.date, product, i.location, category.name, sum(i.quantityOnHand)
 						from InventorySnapshot i, Product product, Category category
 						where i.location in (:locations)
 						and i.date = :date
 						and i.product = product
 						and i.product.category = category
+						group by i.date, product, i.location, category.name
 						""", [locations: locations, date: date])
 
             results.each {
@@ -479,6 +480,7 @@ class InventorySnapshotService {
 						left outer join iis.binLocation bl
 						where iis.location = :location
 						and iis.date = :date
+						group by iis.binLocation
 						""", [location: location, date: date])
             //data = results
             def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
