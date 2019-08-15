@@ -534,7 +534,6 @@ openboxes.locale.defaultCurrencySymbol = "\$"
 //openboxes.locale.supportedCurrencyCodes = ["USD","CFA"]
 
 // Inventory snapshot configuration
-openboxes.inventorySnapshot.useGparse = true
 openboxes.inventorySnapshot.batchSize = 1500
 
 // Global megamenu configuration
