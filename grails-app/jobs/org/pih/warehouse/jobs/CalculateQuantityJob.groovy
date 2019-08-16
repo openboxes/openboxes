@@ -82,18 +82,8 @@ class CalculateQuantityJob {
         }
 
         def elapsedTime = (System.currentTimeMillis() - startTime)
-//        if (user?.email) {
-//            String subject = "Calculate quantity job completed in ${elapsedTime} ms"
-//            String message = """Location: ${location}\nProduct: ${product}\nDate: ${date}\n"""
-//            try {
-//                mailService.sendMail(subject, message, user.email)
-//            } catch (Exception e) {
-//                log.error("Unable to send email " + e.message, e)
-//            }
-//        }
-
         log.info "Successfully completed job for location=${location?:"ALL"}, product=${product?.id?:"ALL"}, ${date?:"ALL"}): " + elapsedTime + " ms"
-        println "=".multiply(60)
+        println "=".multiply(180)
     }
 
 

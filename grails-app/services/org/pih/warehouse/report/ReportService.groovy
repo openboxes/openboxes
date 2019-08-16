@@ -53,15 +53,11 @@ import java.text.SimpleDateFormat
 
 class ReportService implements ApplicationContextAware {
 
-    def dataSource
-    def sessionFactory
-	def productService
+	def dataService
 	def inventoryService
 	def dashboardService
-	def shipmentService
 	def grailsApplication
     def userService
-
 
 	ApplicationContext applicationContext
 	
@@ -580,14 +576,14 @@ class ReportService implements ApplicationContextAware {
     }
 
     def truncateFacts() {
-        executeStatements(["SET FOREIGN_KEY_CHECKS = 0",
+        dataService.executeStatements(["SET FOREIGN_KEY_CHECKS = 0",
                            "delete from transaction_fact",
                            "delete from consumption_fact",
                            "SET FOREIGN_KEY_CHECKS = 1"])
     }
 
     def truncateDimensions() {
-        executeStatements([
+        dataService.executeStatements([
                 "SET FOREIGN_KEY_CHECKS = 0",
                 "delete from date_dimension",
                 "delete from location_dimension",
@@ -598,17 +594,7 @@ class ReportService implements ApplicationContextAware {
 }
 
 
-    void executeStatements(List dmlStatements) {
-		Sql sql = new Sql(dataSource)
 
-		dmlStatements.each { String dmlStatement ->
-			def startTime = System.currentTimeMillis()
-			log.info "Executing statement: " + dmlStatement
-			sql.execute(dmlStatement)
-			sql.commit()
-			log.info("Executed in ${(System.currentTimeMillis() - startTime)} ms")
-		}
-	}
 
 	void buildTransactionTypeDimension() {
 		String insertStatement = """
@@ -616,7 +602,7 @@ class ReportService implements ApplicationContextAware {
             SELECT 0, transaction_type.transaction_code, transaction_type.name, transaction_type.id
             FROM transaction_type
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
 	}
 
 	void buildLotDimension() {
@@ -626,7 +612,7 @@ class ReportService implements ApplicationContextAware {
             FROM inventory_item
             JOIN product ON product.id = inventory_item.product_id;
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
 	}
 
     void buildProductDimension() {
@@ -636,7 +622,7 @@ class ReportService implements ApplicationContextAware {
             FROM product
             JOIN category ON category.id = product.category_id
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
     void buildLocationDimension() {
@@ -647,7 +633,7 @@ class ReportService implements ApplicationContextAware {
             JOIN location_type ON location_type.id = location.location_type_id
             LEFT JOIN location_group ON location_group.id = location.location_group_id
             LEFT JOIN location parent_location ON parent_location.id = location.parent_location_id;        """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
     void buildDateDimension() {
@@ -706,7 +692,7 @@ class ReportService implements ApplicationContextAware {
             where transaction.order_id is null 
             or `order`.order_type_code not in ('TRANSFER_ORDER') ;
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
 
@@ -751,7 +737,7 @@ class ReportService implements ApplicationContextAware {
             join date_dimension transaction_date_dimension on transaction_date_dimension.date = date(transaction.transaction_date)
             WHERE transaction_type.transaction_code = 'DEBIT'
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
 

@@ -47,11 +47,7 @@ import java.text.SimpleDateFormat
 
 class InventoryService implements ApplicationContextAware {
 
-	def dataSource
     def sessionFactory
-    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
-    def startTime = System.currentTimeMillis()
-    def lastBatchStarted = startTime
     def persistenceInterceptor
 
     def dataService
@@ -59,7 +55,6 @@ class InventoryService implements ApplicationContextAware {
 	def identifierService
     def messageService
 	def locationService
-	//def authService
 
 	static transactional = true
 
@@ -3031,8 +3026,6 @@ class InventoryService implements ApplicationContextAware {
         def transactionEntries = []
         if (date) {
             def products = tagIds ? getProductsByTagId(tagIds) : []
-
-			log.info "Get products by tag ${tagIds}: " + products.toString()
 			def criteria = TransactionEntry.createCriteria();
 			transactionEntries = criteria.list {
 				if (products) {
