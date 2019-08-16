@@ -27,13 +27,11 @@ import util.ReportUtil
 class ReportController {
 
 	def documentService
-    def dataService
 	def inventoryService
 	def productService
 	def reportService
     def messageService
     def inventorySnapshotService
-    StdScheduler quartzScheduler
 
     def refreshTransactionFact = {
         RefreshTransactionFactJob.triggerNow([:])
@@ -235,10 +233,7 @@ class ReportController {
         command.location = Location.get(session.warehouse.id)
 		command.rootCategory = productService.getRootCategory();
 
-        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob"))
-        def nextFireTime = triggers*.nextFireTime.max()
-
-		[command : command, count: TransactionFact.count(), maxDate: TransactionFact.maxTransactionDate(), nextFireTime: nextFireTime]
+		[command : command]
 	}
 
     def showTransactionReportDialog = {
