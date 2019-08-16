@@ -13,9 +13,6 @@
           type="text/css" media="screen, projection"/>
     <script src="${createLinkTo(dir: 'js/jquery/', file: 'jquery.colorpicker.js')}"
             type="text/javascript"></script>
-    <script src="${createLinkTo(dir: 'js/jquery.checkboxList/', file: 'jquery.checkboxList.js')}"
-            type="text/javascript"></script>
-
 </head>
 
 <body>
