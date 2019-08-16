@@ -480,10 +480,9 @@ class InventorySnapshotService {
 						left outer join iis.binLocation bl
 						where iis.location = :location
 						and iis.date = :date
-						group by iis.binLocation
+						group by iis.product, iis.location, iis.binLocation
 						""", [location: location, date: date])
             //data = results
-            def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
             data = results.collect {
                 def product = it[0]
                 def inventoryItem = it[1]
@@ -491,7 +490,6 @@ class InventorySnapshotService {
                 def quantity = it[3]
 
                 [
-                        status        : status(quantity),
                         product       : product,
                         inventoryItem : inventoryItem,
                         binLocation   : binLocation,
