@@ -88,6 +88,12 @@ class LocationController {
 					if (locationInstance?.address?.validate() && !locationInstance?.address?.hasErrors()) {
 						locationInstance.address.save()
 					}
+
+					boolean useDefault = params.useDefault as boolean
+					if (useDefault) {
+						locationInstance.supportedActivities.clear()
+					}
+
                     inventoryService.saveLocation(locationInstance)
                     if (locationInstance?.id == session?.warehouse?.id) {
 						session.warehouse = locationInstance

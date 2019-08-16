@@ -73,7 +73,7 @@
 	                                <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'supportedActivities', 'errors')}">
 	                                	<g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
 	                                	<g:select name="supportedActivities" multiple="true" from="${activityList }"
-												  size="${activityList.size() }" style="width: 100%"
+												  size="${activityList.size() }" class="chzn-select-deselect"
 	                                		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationTypeInstance?.supportedActivities}" />
 	                                </td>
 	                            </tr>

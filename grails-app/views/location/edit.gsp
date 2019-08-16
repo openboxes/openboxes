@@ -224,7 +224,7 @@
                                         </td>
                                     </tr>
                                     <tr class="prop">
-                                        <td valign="top" class="name">
+                                        <td valign="top" class="name" rowspan="2">
                                             <label for="name"><warehouse:message code="location.supportedActivities.label" /></label>
                                         </td>
                                         <td valign="top" class="value">
@@ -237,8 +237,29 @@
                                             <g:else>
                                                 <g:set var="supportedActivities" value="${locationInstance?.supportedActivities}"/>
                                             </g:else>
+
                                             <g:set var="activityList" value="${org.pih.warehouse.core.ActivityCode.list() }"/>
-                                            <select id="supported-activities" name="supportedActivities" multiple="true" disabled="disabled">
+                                            <div class="buttons button-group right">
+                                                <g:link controller="locationType" action="edit" id="${locationInstance?.locationType?.id}" class="button">
+                                                    <g:message code="default.edit.label" args="['defaults settings']"/>
+                                                </g:link>
+                                                <g:link controller="location" action="resetSupportedActivities" id="${locationInstance?.id}" class="button">
+                                                    <g:message code="default.resetTo.label" default="Reset to {0}" args="['default settings']"/>
+                                                </g:link>
+
+                                            </div>
+                                            <div>
+                                                <label>
+                                                    <g:checkBox name="useDefault" value="${true}" checked="${useDefault}" class="use-default"/>
+                                                    Use Default Settings
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <select id="supported-activities" name="supportedActivities" class="chzn-select-deselect"
+                                                    multiple="true" ${useDefault?'disabled':''}>
                                                 <g:each var="activity" in="${activityList}" >
                                                     <g:set var="isDefault" value="${locationInstance?.locationType?.supportedActivities?.contains(activity.toString())}"/>
                                                     <g:set var="isSelected" value="${supportedActivities.contains(activity.toString())}"/>
@@ -247,16 +268,6 @@
                                                     </option>
                                                 </g:each>
                                             </select>
-                                            <div class="buttons left">
-
-                                                <g:link controller="locationType" action="edit" id="${locationInstance?.locationType?.id}" class="button">
-                                                    <g:message code="default.edit.button" default="Edit {0}" args="['Supported Activities']"/>
-                                                </g:link>
-                                                <g:link controller="location" action="resetSupportedActivities" id="${locationInstance?.id}" class="button">
-                                                    <g:message code="default.reset.button" default="Reset {0}" args="['Supported Activities']"/>
-                                                </g:link>
-
-                                            </div>
 
                                         </td>
                                     </tr>
@@ -552,8 +563,15 @@
             });
             */
 
-            $("#supported-activities").multiSelectToCheckboxes({});
 
+            $(".use-default").change(function(){
+              if ($(this).is(':unchecked')) {
+                $("#supported-activities").prop("disabled", false).trigger("chosen:updated");
+              }
+              else {
+                $("#supported-activities").prop("disabled", true).trigger("chosen:updated");
+              }
+            });
 
         });
 
