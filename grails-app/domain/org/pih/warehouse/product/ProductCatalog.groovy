@@ -7,7 +7,7 @@ class ProductCatalog implements Comparable, Serializable {
     String name
     String description
     Boolean active = Boolean.TRUE
-    Boolean colorAdded = Boolean.FALSE
+    String color
 
     static hasMany = [
         productCatalogItems: ProductCatalogItem
@@ -18,7 +18,7 @@ class ProductCatalog implements Comparable, Serializable {
         name(nullable:false)
         description(nullable:true)
         active(nullable:true)
-        colorAdded(nullable:true)
+        color(nullable: true)
     }
 
     // Auditing fields
@@ -66,7 +66,7 @@ class ProductCatalog implements Comparable, Serializable {
      * @return
      */
     String toString() {
-        return "${name}";
+        return "${name}"
     }
 
     /**
@@ -76,7 +76,7 @@ class ProductCatalog implements Comparable, Serializable {
         def sortOrder =
                 name <=> obj?.name ?:
                         id <=> obj?.id
-        return sortOrder;
+        return sortOrder
 
     }
 

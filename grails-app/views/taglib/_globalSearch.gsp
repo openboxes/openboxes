@@ -1,6 +1,3 @@
-<style>
-    .catalogItem a { color:dodgerblue;}
-</style>
 <span>
 	<g:form method="GET" controller="dashboard" action="globalSearch" style="display: inline;">
 		<g:textField id="${attrs.id}" name="searchTerms" class="globalSearch top" type="text" size="${attrs.size}"
@@ -40,11 +37,11 @@
                 event.preventDefault(); // Prevent the default focus behavior.
             }
         }).data("autocomplete")._renderItem = function( ul, item ) {
+          var link = $("<a></a>").text(item.label).css("color", item.color);
           return $( "<li></li>" )
-            .data("item.autocomplete", item)
-            .addClass(item.addColor ? 'catalogItem' : '')
-            .append( "<a>" + item.label + "</a>" )
-            .appendTo( ul );
+          .data("item.autocomplete", item)
+          .append(link)
+          .appendTo(ul);
         };
     });
 </script>

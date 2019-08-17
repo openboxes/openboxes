@@ -12,20 +12,8 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
-import groovy.sql.Sql
-import groovy.time.TimeCategory
-import org.apache.commons.lang.StringEscapeUtils
-import org.hibernate.FetchMode
-import org.hibernate.annotations.Cache
-import org.pih.warehouse.core.*
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.pih.warehouse.core.ApiException
-import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Localization
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.User
+import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
@@ -89,7 +77,7 @@ class JsonController {
         log.info "addToRequisitionItems: ${params} "
         def json
         def requisition = Requisition.get(params?.requisition?.id)
-        def product = Product.get(params?.product?.id);
+        def product = Product.get(params?.product?.id)
         if (!requisition) {
             response.status = 400
             json = [success: false, errors: ["Unable to find requisition with ID ${params?.requisition?.id}"]]
@@ -215,7 +203,7 @@ class JsonController {
 
             }
         } catch (Exception e) {
-            log.error("Error trying to translate using syslang API ", e);
+            log.error("Error trying to translate using syslang API ", e)
             throw new ApiException(message: "Unable to query syslang API: " + e.message)
         }
         return translation
@@ -228,7 +216,7 @@ class JsonController {
 		// Create a new localization based on the message source
 
 		if (!localization) {
-            localization = new Localization();
+            localization = new Localization()
 
             // Get translation from message source
 			def message = messageSource.getMessage(params.code, null, params.resolvedMessage, session?.user?.locale?:"en")
@@ -254,8 +242,8 @@ class JsonController {
         log.info "localization.toJson() = " + (localization.toJson() as JSON)
 
 
-		render localization.toJson() as JSON;
-	}
+        render localization.toJson() as JSON
+    }
 
 	def saveLocalization = {
 		log.info "Save localization " + params
@@ -270,8 +258,8 @@ class JsonController {
 			localization = Localization.findByCodeAndLocale(data.code, locale?.toString())
 		    if (!localization) {
                 log.info "Nope. Creating empty localization "
-			    localization = new Localization();
-		    }
+                localization = new Localization()
+            }
         }
 
 		//localization.properties = data
@@ -305,7 +293,7 @@ class JsonController {
         def localization = Localization.get(params.id)
         try {
             if (localization) {
-                localization.delete();
+                localization.delete()
                 jsonResponse = [success: true, message: "successfully deleted translation"]
             }
         } catch (Exception e) {
@@ -470,7 +458,7 @@ class JsonController {
 
 
     def findProductCodes = {
-        def searchTerm = params.term + "%";
+        def searchTerm = params.term + "%"
         def c = Product.createCriteria()
         def products = c.list {
             eq("active", true)
@@ -482,26 +470,26 @@ class JsonController {
 
         //"id": "Netta rufina", "label": "Red-crested Pochard", "value": "Red-crested Pochard" },
         def results = products.unique().collect { [ value: it.productCode, label: it.productCode + " " + it.name ] }
-        render results as JSON;
+        render results as JSON
     }
 
 
 	def findTags = {
-		def searchTerm = "%" + params.term + "%";
-		def c = Tag.createCriteria()
+        def searchTerm = "%" + params.term + "%"
+        def c = Tag.createCriteria()
 		def tags = c.list {
 			projections { property "tag" }
 			ilike("tag", searchTerm)
 		}
 
 		def results = tags.unique().collect { [ value: it, label: it ] }
-		render results as JSON;
-	}
+        render results as JSON
+    }
 
 	def autoSuggest = {
         log.info "autoSuggest: " + params
-		def searchTerm = "%" + params.term + "%";
-		def c = Product.createCriteria()
+        def searchTerm = "%" + params.term + "%"
+        def c = Product.createCriteria()
 		def results = c.list {
 			projections {
 				property "${params.field}"
@@ -510,8 +498,8 @@ class JsonController {
 			ilike("${params.field}", searchTerm)
 		}
 		results = results.unique().collect { [ value: it, label: it ] }
-		render results as JSON;
-	}
+        render results as JSON
+    }
 
     def autoSuggestProductGroups = {
         log.info "autoSuggest: " + params
@@ -529,13 +517,13 @@ class JsonController {
             }
         }
         results = results.unique().collect { [ value: it, label: it ] }
-        render results as JSON;
+        render results as JSON
     }
 
 
 	def findProductNames = {
-		def searchTerm = "%" + params.term + "%";
-		def c = Product.createCriteria()
+        def searchTerm = "%" + params.term + "%"
+        def c = Product.createCriteria()
 		def productNames = c.list {
 			projections {
 				property "name"
@@ -545,13 +533,13 @@ class JsonController {
 		}
 
 		def results = productNames.unique().collect { [ value: it, label: it ] }
-		render results as JSON;
-	}
+        render results as JSON
+    }
 
 	def findPrograms = {
         log.info "find programs " + params
-		def searchTerm = params.term + "%";
-		def c = Requisition.createCriteria()
+        def searchTerm = params.term + "%"
+        def c = Requisition.createCriteria()
 
 		def names = c.list {
 			projections {
@@ -561,8 +549,8 @@ class JsonController {
 		}
 		// Try again
 		if (names.isEmpty()) {
-			searchTerm = "%" + params.term + "%";
-			c = Requisition.createCriteria()
+            searchTerm = "%" + params.term + "%"
+            c = Requisition.createCriteria()
 			names = c.list {
 				projections {
 					property "recipientProgram"
@@ -577,35 +565,35 @@ class JsonController {
 		}
 
 		def results = names.collect { [ value: it, label: it ] }
-		render results as JSON;
-	}
+        render results as JSON
+    }
 
 
 	def getInventoryItem = {
-		render InventoryItem.get(params.id).toJson() as JSON;
-	}
+        render InventoryItem.get(params.id).toJson() as JSON
+    }
 
 	def getQuantity = {
 		log.info params
 		def quantity = 0
-		def location = Location.get(session.warehouse.id);
-		def lotNumber = (params.lotNumber) ? (params.lotNumber) : "";
-		def product = (params.productId) ? Product.get(params.productId) : null;
+        def location = Location.get(session.warehouse.id)
+        def lotNumber = (params.lotNumber) ? (params.lotNumber) : ""
+        def product = (params.productId) ? Product.get(params.productId) : null
 
-		def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber);
-		if (inventoryItem) {
+        def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber)
+        if (inventoryItem) {
 			quantity = inventoryService.getQuantity(location?.inventory, inventoryItem)
 		}
-		log.info "quantity by lotnumber '" + lotNumber + "' and product '" + product + "' = " + quantity;
-		render quantity ?: "N/A";
-	}
+        log.info "quantity by lotnumber '" + lotNumber + "' and product '" + product + "' = " + quantity
+        render quantity ?: "N/A"
+    }
 
 	def sortContainers = {
 		def container
 		params.get("container[]").eachWithIndex { id, index ->
 			container = Container.get(id)
 			container.sortOrder = index
-			container.save(flush:true);
+            container.save(flush: true)
             log.info ("container " + container.name + " saved at index " + index)
 		}
 		container.shipment.save(flush:true)
@@ -621,7 +609,7 @@ class JsonController {
         params.get("requisitionItem[]").eachWithIndex { id, index ->
             requisitionItem = RequisitionItem.get(id)
             requisitionItem.orderIndex = index
-            requisitionItem.save(flush:true);
+            requisitionItem.save(flush: true)
             log.info ("requisitionItem " + id + " saved at index " + index)
         }
         requisitionItem.requisition.refresh()
@@ -633,10 +621,10 @@ class JsonController {
 	 */
 	def getInventoryItems = {
 		log.info params
-		def productInstance = Product.get(params?.product?.id);
-		def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
-		render inventoryItemList as JSON;
-	}
+        def productInstance = Product.get(params?.product?.id)
+        def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
+        render inventoryItemList as JSON
+    }
 
 
 	/**
@@ -646,8 +634,8 @@ class JsonController {
 		log.info params
         long startTime = System.currentTimeMillis()
 		def inventoryItems = []
-		def location = Location.get(session.warehouse.id);
-		if (params.term) {
+        def location = Location.get(session.warehouse.id)
+        if (params.term) {
 
 			// Improved the performance of the auto-suggest by moving
 			def tempItems = inventoryService.findInventoryItems(params.term)
@@ -714,16 +702,16 @@ class JsonController {
 			inventoryItems = inventoryItems.sort { it.expirationDate }
 		}
 
-		render inventoryItems as JSON;
-	}
+        render inventoryItems as JSON
+    }
 
 	def findLotsByName = {
 		log.info params
 		// Constrain by product id if the productId param is passed in
-		def items = new TreeSet();
-		if (params.term) {
-			def searchTerm = "%" + params.term + "%";
-			items = InventoryItem.withCriteria {
+        def items = new TreeSet()
+        if (params.term) {
+            def searchTerm = "%" + params.term + "%"
+            items = InventoryItem.withCriteria {
 				and {
 					or {
 						ilike("lotNumber", searchTerm)
@@ -735,8 +723,8 @@ class JsonController {
 				}
 			}
 
-			def warehouse = Location.get(session.warehouse.id);
-			def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
+            def warehouse = Location.get(session.warehouse.id)
+            def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
 
 			if (items) {
 				items = items.collect() { item ->
@@ -756,8 +744,8 @@ class JsonController {
 				}
 			}
 		}
-		render items as JSON;
-	}
+        render items as JSON
+    }
 
 
     def createPerson = {
@@ -792,8 +780,8 @@ class JsonController {
 
 	def findPersonByName = {
 		log.info "findPersonByName: " + params
-		def items = new TreeSet();
-		try {
+        def items = new TreeSet()
+        try {
 
 			if (params.term) {
 
@@ -809,7 +797,7 @@ class JsonController {
 				}
 
 				if (items) {
-					items.unique();
+                    items.unique()
                     items = items.collect() {
 
 						[
@@ -839,20 +827,20 @@ class JsonController {
                 items.add([id: "new", label: 'Create new record for ' + params.term, value: null, valueText: params.term])
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+            e.printStackTrace()
 
-		}
+        }
         log.info "returning ${items?.size()} items: " + items
-        render items as JSON;
+        render items as JSON
 
 
-	}
+    }
 
 	def findProductByName = {
 
 		log.info("find products by name " + params)
-		def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT);
-		def products = new TreeSet()
+        def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT)
+        def products = new TreeSet()
 
 		if (params.term) {
             def terms = params.term.split(" ")
@@ -929,8 +917,8 @@ class JsonController {
 		}
 
 		log.info "Returning " + products.size() + " results for search " + params.term
-		render products as JSON;
-	}
+        render products as JSON
+    }
 
 	def findRequestItems = {
 
@@ -981,15 +969,15 @@ class JsonController {
 		}
 
 		log.info "Returning " + items.size() + " results for search " + params.term
-		render items as JSON;
-	}
+        render items as JSON
+    }
 
 
 
     def searchProductPackages = {
 
         log.info "Search product packages " + params
-        def location = Location.get(session.warehouse.id);
+        def location = Location.get(session.warehouse.id)
         def results = productService.searchProductAndProductGroup(params.term)
         if (!results) {
             results = productService.searchProductAndProductGroup(params.term, true)
@@ -1035,7 +1023,7 @@ class JsonController {
 
 
     def searchProduct = {
-        def location = Location.get(session.warehouse.id);
+        def location = Location.get(session.warehouse.id)
         def results = productService.searchProductAndProductGroup(params.term)
         if (!results) {
             results = productService.searchProductAndProductGroup(params.term, true)
@@ -1135,7 +1123,7 @@ class JsonController {
 		items.unique{ it.id }
 		def json = items.collect { Product product ->
             def quantity = quantityMap[product] ?: 0
-            boolean addColor = product.getProductCatalogs().find { it.colorAdded } ? true : false
+            def color = product.productCatalogs.find { it.color }?.color
             quantity = " [" + quantity + " " + (product?.unitOfMeasure ?: "EA") + "]"
             def type = product.class.simpleName.toLowerCase()
             [
@@ -1144,7 +1132,7 @@ class JsonController {
                     url  : request.contextPath + "/" + type + "/redirect/" + product.id,
                     value: product.name,
                     label: product.productCode + " " + product.name + " " + quantity,
-                    addColor: addColor
+                    color: color
             ]
         }
 		render json as JSON
@@ -1294,25 +1282,25 @@ class JsonController {
         def type
         def barcode = params.barcode
 
-        def product = Product.findByProductCode(barcode);
+        def product = Product.findByProductCode(barcode)
         if (product) {
             url = g.createLink(controller: "inventoryItem", action: "showStockCard", id: product.id, absolute: true)
             type = "stock card"
         }
         else {
-            def requisition = Requisition.findByRequestNumber(barcode);
+            def requisition = Requisition.findByRequestNumber(barcode)
             if (requisition) {
                 url = g.createLink(controller: "requisition", action: "show", id: requisition.id, absolute: true)
                 type = "requisition"
             }
             else {
-                def shipment = Shipment.findByShipmentNumber(barcode);
+                def shipment = Shipment.findByShipmentNumber(barcode)
                 if (shipment) {
                     url = g.createLink(controller: "shipment", action: "showDetails", id: shipment.id, absolute: true)
                     type = "shipment"
                 }
                 else {
-                    def purchaseOrder = Order.findByOrderNumber(barcode);
+                    def purchaseOrder = Order.findByOrderNumber(barcode)
                     if (purchaseOrder) {
                         url = g.createLink(controller: "purchaseOrder", action: "show", id: purchaseOrder.id, absolute: true)
                         type = "purchase order"
@@ -1327,7 +1315,7 @@ class JsonController {
      * Stock Card > Snapshot graph
      */
     def getQuantityOnHandByMonth = {
-        log.info params;
+        log.info params
         def dates = []
         def format = "MMM-yy"
         def numMonths = (params.numMonths as int)?:12
@@ -1445,7 +1433,7 @@ class JsonController {
         log.info "newData: " + newData
 
 
-        render ([label: "${product?.name}", location: "${location.name}", data:newData] as JSON);
+        render([label: "${product?.name}", location: "${location.name}", data: newData] as JSON)
     }
 
     def getFastMovers = {
@@ -1645,7 +1633,7 @@ class JsonController {
         }
 
         if (params.format == "text/csv") {
-            String csv = dataService.generateCsv(data);
+            String csv = dataService.generateCsv(data)
             response.setHeader("Content-disposition", "attachment; filename=\"transaction-report.csv\"")
             render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
             return
@@ -1788,7 +1776,7 @@ class JsonController {
 
         // Add recent shipments
         def shipments = Shipment.executeQuery( "select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
-			(s.origin = :origin or s.destination = :destination)", ['lastUpdated':new Date()-daysToInclude, 'origin':location, 'destination':location] );
+			(s.origin = :origin or s.destination = :destination)", ['lastUpdated': new Date() - daysToInclude, 'origin': location, 'destination': location])
         shipments.each {
             def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
             def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
@@ -1830,7 +1818,7 @@ class JsonController {
                     shipment: it]
         }
 
-        def products = Product.executeQuery( "select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude] );
+        def products = Product.executeQuery("select distinct p from Product p where p.lastUpdated >= :lastUpdated", ['lastUpdated': new Date() - daysToInclude])
         products.each {
             def link = "${createLink(controller: 'inventoryItem', action: 'showStockCard', params:['product.id': it.id])}"
             def user = (it.dateCreated == it.lastUpdated) ? it?.createdBy : it.updatedBy
@@ -1849,7 +1837,7 @@ class JsonController {
         // If the current location has an inventory, add recent transactions associated with that location to the activity list
         if (location?.inventory) {
             def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
-				t.inventory = :inventory", ['lastUpdated':new Date()-daysToInclude, 'inventory':location?.inventory] );
+				t.inventory = :inventory", ['lastUpdated': new Date() - daysToInclude, 'inventory': location?.inventory])
 
             transactions.each {
                 def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
@@ -1868,7 +1856,7 @@ class JsonController {
             }
         }
 
-        def users = User.executeQuery( "select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated':new Date()-daysToInclude], [max: 10] );
+        def users = User.executeQuery("select distinct u from User u where u.lastUpdated >= :lastUpdated", ['lastUpdated': new Date() - daysToInclude], [max: 10])
         users.each {
             def link = "${createLink(controller: 'user', action: 'show', id: it.id)}"
             def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"

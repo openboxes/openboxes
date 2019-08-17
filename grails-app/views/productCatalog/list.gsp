@@ -43,7 +43,8 @@
 
                             <g:sortableColumn property="active" title="${warehouse.message(code: 'productCatalog.active.label', default: 'Active')}" />
 
-                            <g:sortableColumn property="colorAdded" title="${warehouse.message(code: 'productCatalog.colorAdded.label', default: 'Color Added')}" />
+                            <g:sortableColumn property="color"
+                                              title="${warehouse.message(code: 'productCatalog.color.label', default: 'Color')}"/>
 
                             <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'productCatalog.dateCreated.label', default: 'Date Created')}" />
 
@@ -63,7 +64,7 @@
 
                             <td><g:formatBoolean boolean="${productCatalogInstance.active}" /></td>
 
-                            <td>${productCatalogInstance.colorAdded ? "Yes" : ""}</td>
+                            <td>${productCatalogInstance.color}</td>
 
                             <td><format:date obj="${productCatalogInstance.dateCreated}" /></td>
 
