@@ -47,13 +47,13 @@
                             <div class="prop">
                                 <label><warehouse:message code="reporting.startDate.label" default="Start date"/></label>
                                 <div>
-                                    <g:jqueryDatePicker id="startDate" name="startDate" value="${command?.startDate}" format="MM/dd/yyyy" size="30"/>
+                                    <g:jqueryDatePicker id="startDate" name="startDate" value="${command?.startDate}" format="MM/dd/yyyy" size="30" autocomplete="off"/>
                                 </div>
                             </div>
                             <div class="prop">
                                 <label><warehouse:message code="reporting.endDate.label" default="End date"/></label>
                                 <div>
-                                    <g:jqueryDatePicker id="endDate" name="endDate" value="${command?.endDate}" format="MM/dd/yyyy" size="30"/>
+                                    <g:jqueryDatePicker id="endDate" name="endDate" value="${command?.endDate}" format="MM/dd/yyyy" size="30" autocomplete="off"/>
                                 </div>
                             </div>
                             <div class="prop">
