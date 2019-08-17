@@ -71,7 +71,11 @@
                                 <g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == params?.inventoryItem?.id ? 'selected-row' : ''}"/>
                                 <tr class="${styleClass} ${status%2==0?'odd':'even'}">
                                     <td>
-                                        <g:selectBinLocation class="chzn-select-deselect" name="recordInventoryRows[${status}].binLocation.id"
+                                        <g:hiddenField
+                                                name="recordInventoryRows[${status}].binLocation.id"
+                                                value="${recordInventoryRow?.binLocation?.id}"/>
+                                        <g:selectBinLocation class="chzn-select-readonly"
+                                                             name="recordInventoryRows[${status}].binLocation.id"
                                                              value="${recordInventoryRow?.binLocation?.id }" noSelection="['':'']"/>
                                     </td>
                                     <td>
@@ -93,16 +97,15 @@
                                     </td>
                                     <td class="middle center">
                                         ${recordInventoryRow?.oldQuantity }
-                                        ${commandInstance?.product?.unitOfMeasure?:"EA" }
                                         <g:hiddenField name="recordInventoryRows[${status}].oldQuantity"
                                                        value="${recordInventoryRow?.oldQuantity }"/>
                                     </td>
                                     <td class="middle center">
-                                        <g:textField id="newQuantity-${status }" class="newQuantity text"
+                                        <g:textField id="newQuantity-${status}" type="number"
+                                                     class="newQuantity text"
                                                      name="recordInventoryRows[${status }].newQuantity" size="8"
                                                      value="${recordInventoryRow?.newQuantity }" />
 
-                                        ${commandInstance?.product?.unitOfMeasure?:"EA" }
                                     </td>
 									<td class="middle center">
 										<g:textField id="comment-${status }" class="text"
@@ -422,21 +425,23 @@
 		<g:hiddenField id="expirationDate{{= getIndex()}}-hidden" name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}"/>
 		<g:textField id="expirationDate{{= getIndex()}}" class="expirationDate date text" name="recordInventoryRows[{{= getIndex()}}].expirationDate-text" value="{{= ExpirationDate}}" size="10" />
         --%>
-        <g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate" default="none" noSelection="['':'']"
-          years="${2010..2030}" precision="day" />
+<g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
+<g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate"
+              default="none" noSelection="['': '']" years="${currentYear - 10..currentYear + 20}"
+              precision="day"/>
 
 
         </td>
 	<td style="text-align: center; vertical-align: middle;">
-		{{= Qty}} {{= UnitOfMeasure}}
+		{{= Qty}}
 		<g:hiddenField id="oldQuantity-{{= getIndex()}}" class="oldQuantity"
 			name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>
 	</td>
 	<td style="text-align: center; vertical-align: middle;">
 		<g:textField
-			id="newQuantity-{{= getIndex()}}" class="newQuantity text" name="recordInventoryRows[{{= getIndex()}}].newQuantity"
-				size="8" value="{{= Qty}}" />
-			{{= UnitOfMeasure}}
+        id="newQuantity-{{= getIndex()}}" type="number" class="newQuantity text"
+        name="recordInventoryRows[{{= getIndex()}}].newQuantity"
+        size="8" value="{{= Qty}}" />
 	</td>
 	<td class="center middle">
 	    <g:textField id="comment-{{= getIndex()}}" class="text"
