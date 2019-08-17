@@ -20,6 +20,7 @@ class TransactionEntryCommand {
 	
 	InventoryItem inventoryItem
 	String comment
+	String reasonCode
 	String lotNumber
 	Location binLocation
 	Product product

@@ -19,12 +19,14 @@ import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.ProductReportCommand
+import org.quartz.JobKey
+import org.quartz.core.QuartzScheduler
+import org.quartz.impl.StdScheduler
 import util.ReportUtil
 
 class ReportController {
 
 	def documentService
-    def dataService
 	def inventoryService
 	def productService
 	def reportService
@@ -230,7 +232,8 @@ class ReportController {
 		InventoryReportCommand command = new InventoryReportCommand();
         command.location = Location.get(session.warehouse.id)
 		command.rootCategory = productService.getRootCategory();
-		[command : command ]
+
+		[command : command]
 	}
 
     def showTransactionReportDialog = {

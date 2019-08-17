@@ -37,13 +37,15 @@ class FieldArrayComponent extends Component {
     return (
       <div className="d-flex flex-column">
         <div className="text-center border">
-          <div className="d-flex flex-row border-bottom font-weight-bold py-1">
+          <div className="d-flex flex-row border-bottom font-weight-bold py-1 mr-3">
             {_.map(fieldsConfig.fields, (config, name) => (
               <div
                 key={name}
+                className="mx-1"
                 style={{
                   flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
                   minWidth: 0,
+                  textAlign: config.headerAlign ? config.headerAlign : 'center',
                 }}
               >
                 <Tooltip

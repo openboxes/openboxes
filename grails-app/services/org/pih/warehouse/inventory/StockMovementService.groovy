@@ -79,9 +79,11 @@ class StockMovementService {
     void updateStatus(String id, RequisitionStatus status) {
 
         log.info "Update status ${id} " + status
-
-        StockMovement stockMovement = getStockMovement(id)
         Requisition requisition = Requisition.get(id)
+        if (status == RequisitionStatus.CHECKING) {
+            Shipment shipment = requisition.shipment
+            shipment.expectedShippingDate = new Date()
+        }
         if (!status in RequisitionStatus.list()) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
         } else if (status < requisition.status) {
@@ -586,6 +588,7 @@ class StockMovementService {
             substitutionItem.productName = item?.product?.name
             substitutionItem.productCode = item?.product?.productCode
             substitutionItem.quantitySelected = item?.quantity
+            substitutionItem.quantityConsumed = calculateMonthlyStockListQuantity(item.product, location)
             substitutionItem.availableItems = availableItems
             return substitutionItem
         }
@@ -784,6 +787,7 @@ class StockMovementService {
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
         editPageItem.quantityRequested = requisitionItem.quantity
+        editPageItem.quantityConsumed = calculateMonthlyStockListQuantity(stockMovementItem)
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         editPageItem.substitutionItems = substitutionItems

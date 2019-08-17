@@ -57,9 +57,11 @@ class ReasonCodeApiController {
     }
 
     ReasonCodeCommand getReasonCode(ReasonCode reasonCodeEnum) {
+        Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale?:"en")
+        Locale locale = session?.user?.locale ?: defaultLocale
         ReasonCodeCommand reasonCode = new ReasonCodeCommand()
         reasonCode.id = reasonCodeEnum.name()
-        reasonCode.name = messageSource.getMessage("enum.ReasonCode." + reasonCodeEnum.name(), null, "", session?.user?.locale?:"en")
+        reasonCode.name = messageSource.getMessage("enum.ReasonCode.${reasonCodeEnum.name()}", null, null, locale)
         reasonCode.description = reasonCodeEnum.name()
         reasonCode.sortOrder = reasonCodeEnum.sortOrder
         return reasonCode

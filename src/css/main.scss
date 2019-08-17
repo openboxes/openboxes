@@ -99,16 +99,21 @@ body {
   border-bottom: solid 1px $gray-alpha;
 }
 
-#footer > div > a, #footer > div > b > a {
-  color: $gray-delta;
-}
-
 .footer {
+  position:absolute;
+  vertical-align: middle;
+  border-top: 1px solid #aaa;
+  bottom: 5vh;
+  width:100%;
+  text-align: center;
+  height: 3.5vh;
   font-size: 12px;
   color: $gray-delta;
-  background-color: white;
-  position: sticky;
-  bottom: 0;
+    div {
+      a {
+        color: $gray-delta;
+      }
+    }
 }
 
 .language-selector {
@@ -227,13 +232,24 @@ body {
 
 .movement-number {
   height: auto;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   line-height: 36px;
   list-style: none;
   font-size: 25px;
   color: $blue-alpha;
   text-align: center;
   overflow-wrap: break-word;
+
+  .shipment-status {
+    border: 1px solid #a5d24a;
+    border-radius:2px;
+    padding: 5px;
+    background: #cde69c;
+    color: #638421;
+    font-size: 15px;
+    margin-right: 20px;
+    margin-top: 4px;
+  }
 }
 
 
@@ -266,6 +282,18 @@ body {
 
 .selected {
   font-weight: bold;
+}
+
+.notice {
+  padding: .8em;
+  margin-bottom: 1em;
+  border: 2px solid #FFD324;
+  background:#FFF6BF;
+  color:#514721;
+  font-size: 13px;
+    a {
+      color: #514721;
+    }
 }
 
 /* = WIZARD STEPS CONTAINER

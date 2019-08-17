@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import grails.util.Metadata
@@ -23,31 +23,31 @@ class LocalizationService {
 
 	// session-scoped (because it needs access to the user)
 	static scope = "session"
-	
+
 	// inject the grails application so we can access the default locale
 	def grailsApplication
-	
-	
+
+
 	String formatMetadata(Object object) {
-		def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')	
+		def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
 		return format.metadata(obj: object)
 	}
-	
-	String formatDate(Date date) { 
+
+	String formatDate(Date date) {
 		def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
 		return format.date(obj: date)
 	}
-	
+
 	/**
 	 * Localizes the passed string value based on the current locale
 	 */
 	String getLocalizedString(String value) {
-	
+
 		// null check
 		if (!value) {
 			return value
 		}
-		
+
 		return LocalizationUtil.getLocalizedString(value, getCurrentLocale())
 	}
 	/**
@@ -65,7 +65,8 @@ class LocalizationService {
 	 */
 	Locale getCurrentLocale() {
 		// fetch the locale of the current user; if there isn't one, use the default locale
-		return (RequestContextHolder.currentRequestAttributes().getSession().user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale))
+		return (RequestContextHolder.currentRequestAttributes().getSession().user?.locale ?: 
+            new Locale(grailsApplication.config.openboxes.locale.defaultLocale?:"en"))
 	}
 
 	/**

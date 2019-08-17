@@ -18,8 +18,13 @@ class MainRouter extends React.Component {
 
     this.props.initialize({
       languages: [
+        { name: 'Arabic', code: 'ar' },
         { name: 'English', code: 'en' },
         { name: 'French', code: 'fr' },
+        { name: 'German', code: 'de' },
+        { name: 'Italian', code: 'it' },
+        { name: 'Spanish', code: 'es' },
+        { name: 'Portuguese', code: 'pt' },
       ],
       options: {
         renderToStaticMarkup,
@@ -29,6 +34,11 @@ class MainRouter extends React.Component {
 
     this.props.addTranslationForLanguage(en, 'en');
     this.props.addTranslationForLanguage(fr, 'fr');
+    this.props.addTranslationForLanguage(en, 'es');
+    this.props.addTranslationForLanguage(en, 'pt');
+    this.props.addTranslationForLanguage(en, 'it');
+    this.props.addTranslationForLanguage(en, 'de');
+    this.props.addTranslationForLanguage(en, 'ar');
   }
 
   componentDidMount() {

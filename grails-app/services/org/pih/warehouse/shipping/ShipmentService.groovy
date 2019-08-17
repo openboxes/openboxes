@@ -16,6 +16,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.hibernate.FetchMode
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
@@ -1547,16 +1548,24 @@ class ShipmentService {
 	}
 
 	boolean synchronizeTransactions(Shipment shipment) {
-        if (shipment.hasShipped() && shipment?.outgoingTransactions?.isEmpty()) {
+
+        if (shipment.hasShipped() && shipment?.outgoingTransactions?.isEmpty() && shipment.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
             createOutboundTransaction(shipment)
         }
 
-        if (shipment.wasReceived() && shipment?.incomingTransactions?.isEmpty()) {
+        if (shipment.wasReceived() && shipment?.incomingTransactions?.isEmpty() && shipment.destination.supports(ActivityCode.MANAGE_INVENTORY)) {
             if (!shipment.receipt) {
                 createReceipt(shipment, shipment.actualShippingDate)
             }
             createInboundTransaction(shipment)
         }
+
+		if (shipment.wasReceived() && shipment?.incomingTransactions?.size() == 1 && !shipment?.receipt?.transaction ) {
+			def transaction = shipment.incomingTransactions?.iterator().next()
+			transaction.receipt = shipment?.receipt
+			transaction.save()
+		}
+
         return true
     }
 	/**
@@ -1607,6 +1616,7 @@ class ShipmentService {
 		creditTransaction.destination = null
 		creditTransaction.inventory = shipment?.destination?.inventory
 		creditTransaction.transactionDate = shipment.receipt.actualDeliveryDate
+		creditTransaction.receipt = shipment?.receipt
 
 		shipment?.receipt?.receiptItems.each {
 			def inventoryItem =

@@ -37,6 +37,7 @@ import org.apache.poi.hssf.usermodel.*
 
 class DataService {
 
+    def dataSource
     def productService
     def sessionFactory
     def userService
@@ -52,6 +53,25 @@ class DataService {
     }
 
     static transactional = true
+
+    List executeQuery(String query) {
+        return new Sql(dataSource).rows(query)
+    }
+
+    void executeStatements(List statementList) {
+		Sql sql = new Sql(dataSource)
+        sql.withTransaction {
+            try {
+                statementList.each { String statement ->
+                    sql.execute(statement)
+                }
+                sql.commit()
+            } catch (Exception e) {
+                sql.rollback();
+                log.error("Error while executing statements: " + e.message, e)
+            }
+        }
+	}
 
 
     /**
@@ -883,25 +903,6 @@ class DataService {
             else log.debug "ignoring row ${rowNum}"
         }
         return xlsData
-    }
-
-    /**
-     * Saves an uploaded file to disk.
-     *
-     * @param uploadFile
-     * @return
-     */
-    def saveFileToDisk(uploadFile) {
-        def localFile
-        try {
-            localFile = new File("uploads/" + uploadFile?.originalFilename);
-            localFile.mkdirs()
-            uploadFile?.transferTo(localFile);
-        } catch (IOException e ) {
-            log.error("Error saving uploaded file: " + e.message, e)
-            throw e;
-        }
-        return localFile
     }
 
 }

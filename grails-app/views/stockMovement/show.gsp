@@ -217,6 +217,7 @@
                             <td class="value">
                                 <g:link controller="shipment" action="showDetails" id="${stockMovement?.shipment?.id}" params="[override:true]">
                                     ${g.message(code:'default.view.label', args: [g.message(code: 'shipment.label')])}
+                                    ${stockMovement?.shipment?.shipmentNumber}
                                 </g:link>
                             </td>
                         </tr>
@@ -227,7 +228,52 @@
                             <td class="value">
                                 <g:link controller="requisition" action="show" id="${stockMovement?.id}" params="[override:true]">
                                     ${g.message(code:'default.view.label', args: [g.message(code: 'requisition.label')])}
+                                    ${stockMovement?.requisition?.requestNumber}
                                 </g:link>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <g:message code="default.inbound.label"/>
+                            </td>
+                            <td class="value">
+                                <g:if test="${stockMovement.shipment?.incomingTransactions}">
+                                    <g:each var="inboundTransaction" in="${stockMovement?.shipment?.incomingTransactions}">
+                                        <g:link controller="inventory" action="showTransaction" id="${inboundTransaction?.id}">
+                                            ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
+                                            ${inboundTransaction?.transactionNumber?:inboundTransaction?.id}
+                                        </g:link>
+                                    </g:each>
+                                </g:if>
+                                <g:else>
+                                    <g:if test="${stockMovement?.shipment?.currentStatus == ShipmentStatusCode.RECEIVED}">
+                                        <g:link controller="shipment" action="syncTransactions" id="${stockMovement.shipment?.id}">
+                                            <g:message code="default.create.label" args="[g.message(code:'transaction.label')]"/>
+                                        </g:link>
+                                    </g:if>
+                                </g:else>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <g:message code="default.outbound.label"/>
+                            </td>
+                            <td class="value">
+                                <g:if test="${stockMovement.shipment?.outgoingTransactions}">
+                                    <g:each var="outboundTransaction" in="${stockMovement?.shipment?.outgoingTransactions}">
+                                        <g:link controller="inventory" action="showTransaction" id="${outboundTransaction?.id}">
+                                            ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
+                                            ${outboundTransaction?.transactionNumber?:outboundTransaction?.id}
+                                        </g:link>
+                                    </g:each>
+                                </g:if>
+                                <g:else>
+                                    <g:if test="${stockMovement?.shipment?.currentStatus == ShipmentStatusCode.SHIPPED}">
+                                        <g:link controller="shipment" action="syncTransactions" id="${stockMovement.shipment?.id}">
+                                            <g:message code="default.create.label" args="[g.message(code:'transaction.label')]"/>
+                                        </g:link>
+                                    </g:if>
+                                </g:else>
                             </td>
                         </tr>
                     </g:isSuperuser>
@@ -326,7 +372,7 @@
                 <g:if test="${!stockMovement?.origin?.isSupplier()}">
                     <li>
                         <a href="${request.contextPath}/stockMovement/requisition/${stockMovement?.id}">
-                            <warehouse:message code="requisition.label"/>
+                            <warehouse:message code="requestDetails.label"/>
                         </a>
                     </li>
                 </g:if>

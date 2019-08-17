@@ -135,9 +135,6 @@ const FIELDS = {
     type: TextField,
     label: 'react.stockMovement.comments.label',
     defaultMessage: 'Comments',
-    getDynamicAttr: ({ issued }) => ({
-      disabled: issued,
-    }),
   },
 };
 
@@ -237,6 +234,7 @@ class SendMovementPage extends Component {
         'destination.id': values.destination.id,
         description: values.description,
         'shipmentType.id': values.shipmentType,
+        comments: values.comments || '',
       };
     }
 
@@ -474,6 +472,22 @@ class SendMovementPage extends Component {
     }
   }
 
+  /**
+   * Rollback stock movement if it has been shipped
+   * @public
+   */
+  rollbackStockMovement() {
+    this.props.showSpinner();
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const payload = { rollback: true };
+
+    return apiClient.post(url, payload)
+      .then(() => {
+        this.props.hideSpinner();
+        window.location.reload();
+      });
+  }
+
   render() {
     return (
       <div>
@@ -568,11 +582,20 @@ class SendMovementPage extends Component {
                 <button
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
-                  className="btn btn-outline-success float-right btn-form btn-xs"
+                  className={`${values.shipmentStatus === 'SHIPPED' ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
                   disabled={invalid || values.statusCode === 'ISSUED'}
-                >
-                  <Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
+                ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
+                {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
+                  <button
+                    type="submit"
+                    onClick={() => { this.rollbackStockMovement(); }}
+                    className="btn btn-outline-success float-right btn-xs"
+                    disabled={invalid || !(values.statusCode === 'ISSUED')}
+                  >
+                    <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
+                  </button> : null
+                }
                 <table className="table table-striped text-center border my-2 table-xs">
                   <thead>
                     <tr>
@@ -632,10 +655,20 @@ class SendMovementPage extends Component {
                 <button
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
-                  className="btn btn-outline-success float-right btn-form btn-xs"
+                  className={`${values.shipmentStatus === 'SHIPPED' ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
                   disabled={invalid || values.statusCode === 'ISSUED'}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
+                {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
+                  <button
+                    type="submit"
+                    onClick={() => { this.rollbackStockMovement(); }}
+                    className="btn btn-outline-success float-right  btn-xs"
+                    disabled={invalid || !(values.statusCode === 'ISSUED')}
+                  >
+                    <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
+                  </button> : null
+                }
               </div>
             </form>
           )}
@@ -652,13 +685,16 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   locale: state.session.activeLanguage,
+  isUserAdmin: state.session.isUserAdmin,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
 
 SendMovementPage.propTypes = {
   /** Initial component's data */
-  initialValues: PropTypes.shape({}).isRequired,
+  initialValues: PropTypes.shape({
+    shipmentStatus: PropTypes.string,
+  }).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
   /** Function called when data is loading */
@@ -673,4 +709,5 @@ SendMovementPage.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   locale: PropTypes.string.isRequired,
+  isUserAdmin: PropTypes.bool.isRequired,
 };

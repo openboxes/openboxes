@@ -254,7 +254,12 @@ class ReceiptService {
 
     void saveAndCompletePartialReceipt(PartialReceipt partialReceipt) {
         savePartialReceipt(partialReceipt, true)
+        savePartialReceiptEvent(partialReceipt)
+        saveInboundTransaction(partialReceipt)
+    }
 
+
+    void savePartialReceiptEvent(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt.shipment
         Receipt receipt = partialReceipt.receipt
 

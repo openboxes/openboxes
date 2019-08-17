@@ -466,6 +466,56 @@ class UserController {
 		}
 	}
 
+	def createLocationRoles = {
+		LocationRole locationRoleInstance = new LocationRole()
+		locationRoleInstance.user = User.get(params.user.id)
+		render(template: "/locationRole/form", model: [locationRoleInstance:locationRoleInstance])
+	}
+
+	def editLocationRole = {
+		LocationRole locationRoleInstance = LocationRole.get(params.id)
+		render(template: "/locationRole/form", model: [locationRoleInstance:locationRoleInstance])
+	}
+
+	def deleteLocationRole = {
+		LocationRole locationRole = params.id ? LocationRole.get(params.id) : null
+		User user = locationRole.user
+		user.removeFromLocationRoles(locationRole)
+		locationRole.delete()
+		user.save(failOnError: true)
+		redirect(action: "edit", id: user.id)
+	}
+
+	def saveLocationRole = {
+		log.info ("save location role " + params)
+		User user = params.user.id ? User.get(params.user.id) : null
+		Location location = params.location?.id ? Location.get(params.location.id) : null
+		List<Role> roles = params.list("role.id").collect { roleId -> Role.get(roleId) }
+
+		// Update existing role
+		LocationRole locationRole = LocationRole.get(params.id)
+		if (locationRole && roles.size()==1) {
+			locationRole.role = roles.first()
+			locationRole.location = location
+			user.addToLocationRoles(locationRole)
+		}
+		// Create new roles
+		else {
+			List<LocationRole> locationRoles = LocationRole.findAllByUserAndLocation(user, location)
+			roles.each { role ->
+				LocationRole foundLocationRole = locationRoles.find { it.role == role }
+				if (!foundLocationRole) {
+					foundLocationRole = new LocationRole()
+					foundLocationRole.role = role
+					foundLocationRole.location = location
+					user.addToLocationRoles(foundLocationRole)
+				}
+			}
+		}
+		user.save(failOnError: true)
+
+		redirect(action: "edit", id: params.user.id)
+	}
 
 	/**
 	 *

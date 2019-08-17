@@ -85,7 +85,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     User updatedBy
 
 
-    static transients = [ "type", "substitutionItems", "monthlyDemand", 'totalCost']
+    static transients = [ "type", "substitutionItems", "monthlyDemand", 'totalCost', 'quantityIssued', 'quantityAdjusted']
 
 	static belongsTo = [ requisition: Requisition ]
 	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
@@ -405,8 +405,15 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def isChanged() {
         def startTime = System.currentTimeMillis()
-        def isChanged = quantityCanceled > 0 && (modificationItem || substitutionItem || requisitionItems)
+        return quantityCanceled > 0 && (modificationItem || substitutionItem || requisitionItems)
+    }
 
+    def isIncreased() {
+        return (modificationItem ? quantity - modificationItem.quantity : 0) < 0
+    }
+
+    def isReduced() {
+        return (modificationItem ? quantity - modificationItem.quantity : 0) > 0
     }
 
     /**
@@ -584,6 +591,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     BigDecimal getTotalCost() {
         return product.pricePerUnit ? quantity * product?.pricePerUnit : null
+    }
+
+    Integer getQuantityIssued() {
+        return requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == this }?.sum { it.quantity } ?: 0
+    }
+
+    Integer getQuantityAdjusted() {
+        return modificationItem ? (modificationItem.quantityIssued - quantity) : (quantityIssued - quantity)
     }
 
     def next() {
