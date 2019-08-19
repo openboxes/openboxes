@@ -64,7 +64,7 @@ class BootStrap {
 
     def identifierService
     def grailsApplication
-    def uploadService
+    FileService fileService
     DataSource dataSource
 
     def init = { servletContext ->
