@@ -12,7 +12,7 @@ package org.pih.warehouse.core
 import grails.converters.JSON
 import org.pih.warehouse.util.RequestUtil
 import org.springframework.validation.BeanPropertyBindingResult
-import util.ConfigHelper;
+import util.ConfigHelper
 
 class ErrorsController {
 
@@ -107,7 +107,7 @@ class ErrorsController {
 
 
     def sendFeedback = {
-        def enabled = Boolean.parseBoolean(grailsApplication.config.openboxes.mail.feedback.enabled?:"true");
+        def enabled = Boolean.valueOf(grailsApplication.config.openboxes.mail.feedback.enabled ?: true)
 
         if (enabled) {
             def recipients = grailsApplication.config.openboxes.mail.feedback.recipients
@@ -127,7 +127,7 @@ class ErrorsController {
                 mimeType: "image/png"
 
             ]
-            mailService.sendHtmlMailWithAttachment(emailMessage);
+            mailService.sendHtmlMailWithAttachment(emailMessage)
         }
         render "OK"
 
@@ -136,8 +136,6 @@ class ErrorsController {
 
 	def processError = {
 
-        //def enabled = Boolean.valueOf(grailsApplication.config.openboxes.mail.errors.enabled)
-        //def enabled = Boolean.parseBoolean(grailsApplication.config.openboxes.mail.errors.enabled?:"true");
         def enabled = ConfigHelper.booleanValue(grailsApplication.config.openboxes.mail.errors.enabled)
         if (enabled) {
             def recipients = ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients) as List
@@ -145,7 +143,7 @@ class ErrorsController {
             def errorNotificationList = userService.findUsersByRoleType(RoleType.ROLE_ERROR_NOTIFICATION)
             errorNotificationList.each { errorNotificationUser ->
                 if (errorNotificationUser.email)
-                    recipients.add(errorNotificationUser.email);
+                    recipients.add(errorNotificationUser.email)
             }
 
             def ccList = []
@@ -159,7 +157,7 @@ class ErrorsController {
             def subject = "${params.summary?:warehouse.message(code: 'email.errorReportSubject.message')}"
             def body = "${g.render(template:'/email/errorReport', model:[stacktrace:stacktrace], params:params)}"
 
-            mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html");
+            mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html")
             flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [recipients])}"
         }
         else {

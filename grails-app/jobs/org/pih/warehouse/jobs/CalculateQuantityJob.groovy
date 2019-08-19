@@ -38,7 +38,7 @@ class CalculateQuantityJob {
         def location = Location.get(context.mergedJobDataMap.get('locationId'))
         def user = User.get(context.mergedJobDataMap.get('userId'))
         boolean includeAllDates = context.mergedJobDataMap.get('includeAllDates')?
-                Boolean.parseBoolean(context.mergedJobDataMap.get('includeAllDates')):false
+                Boolean.valueOf(context.mergedJobDataMap.get('includeAllDates')) : false
 
         log.info "includeAllDates: " + includeAllDates
 

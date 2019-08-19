@@ -146,27 +146,27 @@ class StockMovementApiController {
             if (status) {
                 switch (status) {
                     case RequisitionStatus.CREATED:
-                        break;
+                        break
                     case RequisitionStatus.EDITING:
-                        break;
+                        break
                     case RequisitionStatus.VERIFYING:
-                        break;
+                        break
                     case RequisitionStatus.PICKING:
                         if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
                         if (createPicklist) stockMovementService.createPicklist(stockMovement)
-                        break;
+                        break
                     case RequisitionStatus.PICKED:
                         stockMovementService.createShipment(stockMovement)
-                        break;
+                        break
                     case RequisitionStatus.CHECKING:
                         stockMovementService.createShipment(stockMovement)
-                        break;
+                        break
                     case RequisitionStatus.ISSUED:
                         stockMovementService.sendStockMovement(params.id)
-                        break;
+                        break
                     default:
                         throw new IllegalArgumentException("Cannot update status with invalid status ${jsonObject.status}")
-                        break;
+                        break
 
                 }
                 // If the dependent actions were updated properly then we can update the
@@ -438,10 +438,10 @@ class StockMovementApiController {
             stockMovementItem.sortOrder = lineItem.sortOrder && !lineItem.isNull("sortOrder") ? new Integer(lineItem.sortOrder) : null
 
             // Actions
-            stockMovementItem.delete = lineItem.delete ? Boolean.parseBoolean(lineItem.delete):Boolean.FALSE
-            stockMovementItem.revert = lineItem.revert ? Boolean.parseBoolean(lineItem.revert):Boolean.FALSE
-            stockMovementItem.cancel = lineItem.cancel ? Boolean.parseBoolean(lineItem.cancel):Boolean.FALSE
-            stockMovementItem.substitute = lineItem.substitute ? Boolean.parseBoolean(lineItem.substitute):Boolean.FALSE
+            stockMovementItem.delete = lineItem.delete ? Boolean.valueOf(lineItem.delete) : Boolean.FALSE
+            stockMovementItem.revert = lineItem.revert ? Boolean.valueOf(lineItem.revert) : Boolean.FALSE
+            stockMovementItem.cancel = lineItem.cancel ? Boolean.valueOf(lineItem.cancel) : Boolean.FALSE
+            stockMovementItem.substitute = lineItem.substitute ? Boolean.valueOf(lineItem.substitute) : Boolean.FALSE
 
             // When substituting a product, we need to include the new product, quantity and reason code
             stockMovementItem.newProduct = lineItem["newProduct.id"] ? Product.load(lineItem["newProduct.id"]) : null
