@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet author="jmiranda (generated)" id="1565890211110-1" runAlways="true">
+    <changeSet author="jmiranda (generated)" id="1565890211110-1">
         <validCheckSum>62b8ef93f3591ba291ce9f907cc497</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
