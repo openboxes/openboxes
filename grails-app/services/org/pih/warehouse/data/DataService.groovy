@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.data
 
-
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.poi.hssf.usermodel.*
@@ -56,7 +55,7 @@ class DataService {
     }
 
     void executeStatements(List statementList) {
-		Sql sql = new Sql(dataSource)
+        Sql sql = new Sql(dataSource)
         sql.withTransaction {
             try {
                 statementList.each { String statement ->
@@ -64,11 +63,11 @@ class DataService {
                 }
                 sql.commit()
             } catch (Exception e) {
-                sql.rollback();
+                sql.rollback()
                 log.error("Error while executing statements: " + e.message, e)
             }
         }
-	}
+    }
 
 
     /**

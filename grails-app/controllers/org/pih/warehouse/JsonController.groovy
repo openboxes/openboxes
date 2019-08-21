@@ -1582,11 +1582,11 @@ class JsonController {
         def locationKey = LocationDimension.findByLocationId(session.warehouse.id)
         //org.pih.warehouse.reporting.TransactionFact.maxTransactionDate.list()
         def model = [
-                locationKey: locationKey,
-                transactionCount: TransactionFact.countByLocationKey(locationKey),
+                locationKey       : locationKey,
+                transactionCount  : TransactionFact.countByLocationKey(locationKey),
                 minTransactionDate: TransactionFact.minTransactionDate.list(),
                 maxTransactionDate: TransactionFact.maxTransactionDate.list(),
-                nextFireTime: nextFireTime
+                nextFireTime      : nextFireTime
         ]
 
         render(template: "/report/showTransactionReportMetadata", model: model)

@@ -765,7 +765,6 @@ class InventoryItemController {
         log.info("container " + containerInstance)
 
 
-
         def shipmentItem = new ShipmentItem(
                 product: productInstance,
                 binLocation: binLocation,

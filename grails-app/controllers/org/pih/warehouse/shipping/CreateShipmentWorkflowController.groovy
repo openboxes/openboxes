@@ -1370,7 +1370,7 @@ class CreateShipmentWorkflowController {
                     referenceNumber.identifier = params.referenceNumbersInput?."${type.id}"
                 } else {
                     // otherwise, we need to add a new reference number
-                    shipment.referenceNumbers.add(new ReferenceNumber([identifier: params.referenceNumbersInput?."${type.id}",
+                    shipment.referenceNumbers.add(new ReferenceNumber([identifier         : params.referenceNumbersInput?."${type.id}",
                                                                        referenceNumberType: type]))
                 }
             } else {

@@ -9,11 +9,6 @@
  **/
 package org.pih.warehouse.util
 
-import javax.crypto.*
-import javax.crypto.spec.*
-import java.security.*
-
-
 class Base64Codec {
 
     static decode = { String target ->

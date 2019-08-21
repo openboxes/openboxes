@@ -10,11 +10,11 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.util.GrailsUtil
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
-import grails.util.GrailsUtil
 
 class ApiController {
 
@@ -71,27 +71,27 @@ class ApiController {
         def appVersion = grailsApplication.metadata.'app.version'
         def environment = GrailsUtil.environment
         def ipAddress = request?.getRemoteAddr()
-        def hostname = session.hostname?:"Unknown"
+        def hostname = session.hostname ?: "Unknown"
         def timezone = session?.timezone?.ID
-        render ([
-            data:[
-                user:user,
-                location:location,
-                isSuperuser: isSuperuser,
-                isUserAdmin: isUserAdmin,
-                supportedActivities: supportedActivities,
-                menuConfig: menuConfig,
-                isImpersonated: isImpersonated,
-                grailsVersion: grailsVersion,
-                appVersion: appVersion,
-                branchName: branchName,
-                buildNumber: buildNumber,
-                environment: environment,
-                buildDate: buildDate,
-                ipAddress: ipAddress,
-                hostname: hostname,
-                timezone: timezone,
-                activeLanguage: locale.language]
+        render([
+                data: [
+                        user               : user,
+                        location           : location,
+                        isSuperuser        : isSuperuser,
+                        isUserAdmin        : isUserAdmin,
+                        supportedActivities: supportedActivities,
+                        menuConfig         : menuConfig,
+                        isImpersonated     : isImpersonated,
+                        grailsVersion      : grailsVersion,
+                        appVersion         : appVersion,
+                        branchName         : branchName,
+                        buildNumber        : buildNumber,
+                        environment        : environment,
+                        buildDate          : buildDate,
+                        ipAddress          : ipAddress,
+                        hostname           : hostname,
+                        timezone           : timezone,
+                        activeLanguage     : locale.language]
         ] as JSON)
     }
 

@@ -31,7 +31,6 @@ import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.FileService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -461,7 +460,7 @@ class BootStrap {
         }
         log.info("Finished running liquibase changelog(s)!")
 
-	def enableFixtures = Boolean.valueOf(grailsApplication.config.openboxes.fixtures.enabled?:true)
+        def enableFixtures = Boolean.valueOf(grailsApplication.config.openboxes.fixtures.enabled ?: true)
         log.info("Insert test fixtures?  " + enableFixtures)
         if (enableFixtures) {
             log.info("Inserting test fixtures ...")

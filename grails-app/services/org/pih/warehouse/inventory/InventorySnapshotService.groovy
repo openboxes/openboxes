@@ -16,6 +16,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
+
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -47,14 +48,14 @@ class InventorySnapshotService {
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)
                 def binLocations = calculateBinLocations(location, date)
-                def readTime = (System.currentTimeMillis()-innerStartTime)
+                def readTime = (System.currentTimeMillis() - innerStartTime)
                 log.info "Read ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
                 persistenceInterceptor.flush()
                 persistenceInterceptor.destroy()
-                return [binLocations:binLocations, location:location, date: date]
+                return [binLocations: binLocations, location: location, date: date]
             }
         }
-        log.info ("Total read time: " + (System.currentTimeMillis()-startTime) + "ms")
+        log.info("Total read time: " + (System.currentTimeMillis() - startTime) + "ms")
 
         // Write all inventory snapshots to the database synchronously
         // Does not use GPars in order to avoid lock wait timeouts
@@ -62,7 +63,7 @@ class InventorySnapshotService {
         for (result in results) {
             saveInventorySnapshots(result.date, result.location, result.binLocations)
         }
-        log.info ("Total write time: " + (System.currentTimeMillis()-startTime) + "ms")
+        log.info("Total write time: " + (System.currentTimeMillis() - startTime) + "ms")
     }
 
     def populateInventorySnapshots(Location location) {
@@ -76,7 +77,7 @@ class InventorySnapshotService {
         // Calculate current stock for given location
         def startTime = System.currentTimeMillis()
         def binLocations = calculateBinLocations(location, date)
-        def readTime = (System.currentTimeMillis()-startTime)
+        def readTime = (System.currentTimeMillis() - startTime)
         log.info "Read ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
 
         // Save inventory snapshots to database
@@ -199,7 +200,7 @@ class InventorySnapshotService {
                 }
                 stmt.executeBatch()
             }
-            log.info "Saved ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${System.currentTimeMillis()-startTime}ms"
+            log.info "Saved ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${System.currentTimeMillis() - startTime}ms"
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
@@ -487,10 +488,10 @@ class InventorySnapshotService {
                 def quantity = it[3]
 
                 [
-                        product       : product,
-                        inventoryItem : inventoryItem,
-                        binLocation   : binLocation,
-                        quantity      : quantity
+                        product      : product,
+                        inventoryItem: inventoryItem,
+                        binLocation  : binLocation,
+                        quantity     : quantity
                 ]
             }
         }
@@ -502,6 +503,7 @@ class InventorySnapshotService {
 
         return getQuantityOnHandByBinLocation(location, date, products)
     }
+
     List getQuantityOnHandByBinLocation(Location location, Date date, List<Product> products) {
         log.info("getQuantityOnHandByBinLocation: location=${location} product=${products}")
         def data = []

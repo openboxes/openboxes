@@ -9,37 +9,21 @@
  **/
 package org.pih.warehouse.report
 
-import groovy.sql.Sql
-import groovyx.gpars.GParsPool
-import org.apache.commons.lang.StringEscapeUtils
+
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
-import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer
-import org.hibernate.FetchMode
-import org.hibernate.classic.Session
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.reporting.ConsumptionFact
 import org.pih.warehouse.reporting.DateDimension
-import org.pih.warehouse.reporting.LocationDimension
-import org.pih.warehouse.reporting.LotDimension
-import org.pih.warehouse.reporting.ProductDimension
-import org.pih.warehouse.reporting.TransactionFact
-import org.pih.warehouse.reporting.TransactionTypeDimension
-import org.pih.warehouse.requisition.Requisition
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.w3c.dom.Document
@@ -49,14 +33,13 @@ import util.InventoryUtil
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 
 class ReportService implements ApplicationContextAware {
 
-	def dataService
-	def inventoryService
-	def dashboardService
-	def grailsApplication
+    def dataService
+    def inventoryService
+    def dashboardService
+    def grailsApplication
     def userService
 
 
@@ -64,12 +47,12 @@ class ReportService implements ApplicationContextAware {
 
     boolean transactional = false
 
-    public void generateShippingReport(ChecklistReportCommand command) {
-		def shipmentItems = command?.shipment?.shipmentItems?.sort()
-		shipmentItems.each { shipmentItem -> 
-			command.checklistReportEntryList << new ChecklistReportEntryCommand(shipmentItem: shipmentItem)
-		}
-	}
+    void generateShippingReport(ChecklistReportCommand command) {
+        def shipmentItems = command?.shipment?.shipmentItems?.sort()
+        shipmentItems.each { shipmentItem ->
+            command.checklistReportEntryList << new ChecklistReportEntryCommand(shipmentItem: shipmentItem)
+        }
+    }
 
     void generateProductReport(ProductReportCommand command) {
 
@@ -564,9 +547,9 @@ class ReportService implements ApplicationContextAware {
 
     def truncateFacts() {
         dataService.executeStatements(["SET FOREIGN_KEY_CHECKS = 0",
-                           "delete from transaction_fact",
-                           "delete from consumption_fact",
-                           "SET FOREIGN_KEY_CHECKS = 1"])
+                                       "delete from transaction_fact",
+                                       "delete from consumption_fact",
+                                       "SET FOREIGN_KEY_CHECKS = 1"])
     }
 
     def truncateDimensions() {
@@ -579,8 +562,6 @@ class ReportService implements ApplicationContextAware {
                 "delete from transaction_type_dimension",
                 "SET FOREIGN_KEY_CHECKS = 1"])
     }
-
-
 
 
     void buildTransactionTypeDimension() {

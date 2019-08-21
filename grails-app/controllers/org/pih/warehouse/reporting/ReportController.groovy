@@ -19,8 +19,6 @@ import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 import org.pih.warehouse.report.ProductReportCommand
-import org.quartz.JobKey
-import org.quartz.core.QuartzScheduler
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
 
@@ -223,8 +221,8 @@ class ReportController {
         command.location = Location.get(session.warehouse.id)
         command.rootCategory = productService.getRootCategory()
 
-	[command : command]
-	}
+        [command: command]
+    }
 
     def showTransactionReportDialog = {
         def url = createLink(controller: "json", action: "getInventoryBalanceReportDetails", params: params)

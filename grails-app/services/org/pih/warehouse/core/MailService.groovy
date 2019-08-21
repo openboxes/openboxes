@@ -14,6 +14,7 @@ import org.apache.commons.mail.EmailAttachment
 import org.apache.commons.mail.HtmlEmail
 import org.apache.commons.mail.SimpleEmail
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+
 import javax.mail.internet.InternetAddress
 
 class MailService {

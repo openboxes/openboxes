@@ -9,9 +9,10 @@
  **/
 package org.pih.warehouse.util
 
-import javax.crypto.*
-import javax.crypto.spec.*
-import java.security.*
+
+import javax.crypto.Cipher
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.DESKeySpec
 
 class DESCodec {
 

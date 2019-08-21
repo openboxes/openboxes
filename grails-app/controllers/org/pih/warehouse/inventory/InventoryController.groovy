@@ -346,7 +346,7 @@ class InventoryController {
             use(TimeCategory) {
                 end = endDate.plus(1.day)
             }
-            while(date.before(end)) {
+            while (date.before(end)) {
                 println "Start date = " + date + " endDate = " + endDate
 
                 dates << date

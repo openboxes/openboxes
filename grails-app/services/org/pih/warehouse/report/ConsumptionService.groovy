@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.report
 
-
 import org.apache.commons.lang.StringEscapeUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants

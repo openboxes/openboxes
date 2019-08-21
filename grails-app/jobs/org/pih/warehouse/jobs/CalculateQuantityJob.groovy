@@ -37,7 +37,7 @@ class CalculateQuantityJob {
         def product = Product.get(context.mergedJobDataMap.get('productId'))
         def location = Location.get(context.mergedJobDataMap.get('locationId'))
         def user = User.get(context.mergedJobDataMap.get('userId'))
-        boolean includeAllDates = context.mergedJobDataMap.get('includeAllDates')?
+        boolean includeAllDates = context.mergedJobDataMap.get('includeAllDates') ?
                 Boolean.valueOf(context.mergedJobDataMap.get('includeAllDates')) : false
 
         log.info "includeAllDates: " + includeAllDates
@@ -81,7 +81,7 @@ class CalculateQuantityJob {
         }
 
         def elapsedTime = (System.currentTimeMillis() - startTime)
-        log.info "Successfully completed job for location=${location?:"ALL"}, product=${product?.id?:"ALL"}, ${date?:"ALL"}): " + elapsedTime + " ms"
+        log.info "Successfully completed job for location=${location ?: "ALL"}, product=${product?.id ?: "ALL"}, ${date ?: "ALL"}): " + elapsedTime + " ms"
         println "=".multiply(180)
     }
 
