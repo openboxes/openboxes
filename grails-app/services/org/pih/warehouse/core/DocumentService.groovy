@@ -151,16 +151,6 @@ class DocumentService {
     }
 
     /**
-     * @param shipmentInstance
-     * @return
-     */
-    void generateChecklistAsPdf(OutputStream outputStream) {
-        WordprocessingMLPackage wordMLPackage = generateChecklist()
-        convertToPdf(outputStream)
-    }
-
-
-    /**
      * Generate the Checklist from a template.
      *
      * @param
@@ -192,29 +182,6 @@ class DocumentService {
 
         return wordMLPackage
     }
-
-    /**
-     *
-     * @param shipmentInstance
-     * @return
-     */
-    File generateLetterAsDocx(Shipment shipmentInstance) {
-        // Save document to temporary file
-        WordprocessingMLPackage wordMLPackage = generateLetter(shipmentInstance)
-        File tempFile = File.createTempFile(shipmentInstance?.name + " - Certificate of Donation", ".docx")
-        wordMLPackage.save(tempFile)
-        return tempFile
-    }
-
-    /**
-     * @param shipmentInstance
-     * @return
-     */
-    void generateLetterAsPdf(Shipment shipmentInstance, OutputStream outputStream) {
-        WordprocessingMLPackage wordMLPackage = generateLetter(shipmentInstance)
-        convertToPdf(wordMLPackage, outputStream)
-    }
-
 
     /**
      * Generate the 'Certificate of Donation' letter from a template.
@@ -287,100 +254,11 @@ class DocumentService {
         return wordMLPackage
     }
 
-    /**
-     *
-     * @param wordMLPackage
-     * @param filePath
-     */
-    void savePackageToFile(WordprocessingMLPackage wordMLPackage, String filePath) {
-        SaveToZipFile saver = new SaveToZipFile(wordMLPackage)
-        saver.save(filePath)
-        log.info("Saved output to:" + filePath)
-    }
-
-
-    /**
-     *
-     * @param pkg
-     * @param afterText
-     * @param table
-     * @throws Exception
-     */
-    void insertTableAfter(WordprocessingMLPackage pkg, String afterText, Tbl table) throws Exception {
-        Body b = pkg.getMainDocumentPart().getJaxbElement().getBody()
-        int addPoint = -1, count = 0
-        for (Object o : b.getEGBlockLevelElts()) {
-            if (o instanceof P && getElementText(o).startsWith(afterText)) {
-                addPoint = count + 1
-                break
-            }
-            count++
-        }
-        if (addPoint != -1)
-            b.getEGBlockLevelElts().add(addPoint, table)
-        else {
-            // didn't find paragraph to insert after...
-        }
-    }
-
     String getElementText(Object jaxbElem) throws Exception {
         StringWriter sw = new StringWriter()
         TextUtils.extractText(jaxbElem, sw)
         return sw.toString()
     }
-
-
-    /**
-     *
-     * @param shipmentInstance
-     * @param cols
-     * @param cellWidthTwips
-     * @return
-     */
-    Tbl createPackingListTable(Shipment shipmentInstance, int cols, int cellWidthTwips) {
-
-        Tbl tbl = Context.getWmlObjectFactory().createTbl()
-        // w:tblPr
-        // xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-        log.info("Namespace: " + Namespaces.W_NAMESPACE_DECLARATION)
-
-        TblPr tblPr = null
-        try {
-            String strTblPr = "<w:tblPr " + Namespaces.W_NAMESPACE_DECLARATION + "><w:tblStyle w:val=\"TableGrid\"/><w:tblW w:w=\"0\" w:type=\"auto\"/><w:tblLook w:val=\"04A0\"/></w:tblPr>"
-            tblPr = (TblPr) XmlUtils.unmarshalString(strTblPr)
-        } catch (JAXBException e) {
-            // Shouldn't happen
-            e.printStackTrace()
-        }
-        tbl.setTblPr(tblPr)
-
-        return tbl
-    }
-
-    /**
-     *
-     * @param tr
-     * @param cellWidthTwips
-     */
-    void createPackingListCell(Tr tr, int cellWidthTwips) {
-
-        Tc tc = Context.getWmlObjectFactory().createTc()
-        tr.getEGContentCellContent().add(tc)
-
-        TcPr tcPr = Context.getWmlObjectFactory().createTcPr()
-        tc.setTcPr(tcPr)
-
-        // <w:tcW w:w="4788" w:type="dxa"/>
-        TblWidth cellWidth = Context.getWmlObjectFactory().createTblWidth()
-        tcPr.setTcW(cellWidth)
-        cellWidth.setType("dxa")
-        cellWidth.setW(BigInteger.valueOf(cellWidthTwips))
-
-        // Cell content - an empty <w:p/>
-        P paragraph = Context.getWmlObjectFactory().createP()
-        tc.getEGBlockLevelElts().add(paragraph)
-    }
-
 
     /**
      *

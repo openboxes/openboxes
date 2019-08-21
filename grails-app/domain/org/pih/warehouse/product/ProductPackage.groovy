@@ -55,7 +55,6 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
     }
 
     static constraints = {
-        //name(nullable:false,unique:true)
         name(nullable: true)
         description(nullable: true)
         gtin(nullable: true)

@@ -258,32 +258,12 @@ class ShipmentService {
         }
     }
 
-    /**
-     *
-     * @param name
-     * @param location
-     * @return
-     */
-    List<Shipment> getShipmentsByNameAndOrigin(String name, Location location) {
-        return Shipment.withCriteria {
-            and {
-                ilike("name", "%" + name + "%")
-                eq("origin", location)
-            }
-        }
-    }
-
-
     List<Shipment> getPendingShipments(Location origin) {
         return getPendingShipments(origin, null)
     }
 
     List<Shipment> getPendingInboundShipments(Location location) {
         return getPendingShipments(null, location)
-    }
-
-    List<Shipment> getPendingOutboundShipments(Location location) {
-        return getPendingShipments(location, null)
     }
 
     /**
@@ -368,21 +348,6 @@ class ShipmentService {
             eq("destination", location)
         }
         log.info "Get shipments by destination " + (System.currentTimeMillis() - startTime) + " ms"
-        return shipments
-    }
-
-    /**
-     *
-     * @param location
-     * @return
-     */
-    List<Shipment> getShipmentsByOrigin(Location location) {
-        def startTime = System.currentTimeMillis()
-        def shipments = Shipment.withCriteria {
-            eq("origin", location)
-        }
-        log.info "Get shipments by origin " + (System.currentTimeMillis() - startTime) + " ms"
-
         return shipments
     }
 
@@ -493,16 +458,6 @@ class ShipmentService {
             container.recipient = (container?.parentContainer?.recipient) ?: container.shipment.recipient
         }
         container.save()
-    }
-
-    /**
-     * Move a container and all of its children to the new shipment.
-     *
-     * @param oldContainer
-     * @param newShipment
-     */
-    void moveContainers(Container oldContainer, Shipment newShipment) {
-        moveContainer(oldContainer, newShipment)
     }
 
     void moveShipmentItemToContainer(String shipmentItemId, String containerId) {
@@ -728,29 +683,6 @@ class ShipmentService {
         return true
     }
 
-
-    Integer getQuantityAllocated(Location location, Location binLocation, InventoryItem inventoryItem) {
-
-        def results = ShipmentItem.createCriteria().list {
-            projections {
-                sum("quantity")
-            }
-            shipment {
-                eq("origin", location)
-                eq("currentStatus", ShipmentStatusCode.PENDING)
-            }
-            if (binLocation) {
-                eq("binLocation", binLocation)
-            } else {
-                isNull("binLocation")
-            }
-            eq("inventoryItem", inventoryItem)
-        }
-
-        return results[0] ?: 0
-
-    }
-
     Integer getDuplicatedShipmentItemsQuantity(Shipment shipment, Location binLocation, InventoryItem inventoryItem) {
 
         def results = ShipmentItem.createCriteria().list {
@@ -913,45 +845,6 @@ class ShipmentService {
         deleteContainers(container?.shipment?.id, containerIds, true)
     }
 
-    void deleteContainerKeepItems(Container container) {
-        // nothing to do if null
-        if (!container) {
-            return
-        }
-
-        def shipment = container.shipment
-
-        // first we need recursively call method to handle deleting all the child containers
-        def childContainers = container.containers.collect { it }
-        // make a copy to avoid concurrent modification
-        childContainers.each {
-            deleteContainer(it)
-        }
-
-        // remove all items in the container from the parent shipment
-        container.getShipmentItems().each { shipmentItem ->
-            //shipment.removeFromShipmentItems(it)
-            shipmentItem.container = null
-        }
-
-        // NOTE: I'm using the standard "remove" set method here instead of the removeFrom Grails
-        // code because the removeFrom code wasn't working correctly, I think because of
-        // the fact that a container can be associated with both a shipment and another container
-
-        // remove the container from its parent
-        //container.parentContainer?.removeFromContainers(container)
-
-        // remove the container itself from the parent shipment
-        shipment.removeFromContainers(container)
-
-        // remove from parent container
-        if (container.parentContainer) {
-            container.parentContainer.removeFromContainers(container)
-        }
-        container.delete()
-    }
-
-
     /**
      * Deletes a shipment item
      *
@@ -1078,22 +971,6 @@ class ShipmentService {
     }
 
     /**
-     * Get a list of shipments.
-     *
-     * @param location
-     * @param eventCode
-     * @return
-     */
-    List<Shipment> getReceivingByDestinationAndStatus(Location location, ShipmentStatusCode statusCode) {
-        def shipmentList = getRecentIncomingShipments(location?.id)
-        if (shipmentList) {
-            shipmentList = shipmentList.findAll { it.status.code == statusCode }
-        }
-        return shipmentList
-    }
-
-
-    /**
      *
      * @param shipmentInstance
      * @param comment
@@ -1216,19 +1093,6 @@ class ShipmentService {
             }
         }
     }
-
-    void markShipmentsAsReceived(List shipmentIds) {
-        if (!shipmentIds) {
-            throw new IllegalArgumentException("Must select at least one shipment in order to use mark as received")
-        }
-
-        Location location = Location.get(session.warehouse.id)
-        shipmentIds.each { shipmentId ->
-            Shipment shipment = Shipment.get(shipmentId)
-            markAsReceived(shipment, location)
-        }
-    }
-
 
     void markAsReceived(Shipment shipment, Location location) {
         try {

@@ -377,17 +377,6 @@ class Product implements Comparable, Serializable {
         return attributes.find { ProductAttribute productAttribute -> productAttribute.attribute == attribute }
     }
 
-
-    /*
-    def getInventoryLevels() {
-        if (id) {
-            Product.withTransaction {
-                return InventoryLevel.findAllByProduct(this)
-            }
-        }
-    }
-    */
-
     /**
      * Get the inventory level by location id.
      *
@@ -503,13 +492,11 @@ class Product implements Comparable, Serializable {
      * Sort by name
      */
     int compareTo(obj) {
-        //this.name <=> obj.name
 
         def sortOrder =
                 name <=> obj?.name ?:
                         id <=> obj?.id
         return sortOrder
-
     }
 
     /**
@@ -529,28 +516,6 @@ class Product implements Comparable, Serializable {
         }
         return false
     }
-
-    /*
-    @Override
-    int hashCode() {
-        if (this.id != null) {
-            println "hashCode using product.id " + this.id.hashCode()
-            return this.id.hashCode();
-        }
-        println "hashCode using super.hashCode() " + super.hashCode()
-
-        return super.hashCode();
-    }
-
-    @Override
-    boolean equals(Object o) {
-        if (o instanceof Product) {
-            Product that = (Product) o;
-            return this.id == that.id;
-        }
-        return false;
-    }
-    */
 
     Map toJson() {
         [

@@ -232,33 +232,3 @@ class BatchController {
     }
 
 }
-
-
-class ImportProductsCommand {
-    def filename
-    def importFile
-    def products
-
-    static constraints = {
-
-    }
-
-}
-
-class ImportInventoryCommand {
-
-    def filename
-    def importFile
-    def transactionInstance
-    def warehouseInstance
-    def inventoryInstance
-    def products
-    def transactionEntries
-    def categories
-    def inventoryItems
-
-    static constraints = {
-
-    }
-}
-

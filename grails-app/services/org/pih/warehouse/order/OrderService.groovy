@@ -251,40 +251,6 @@ class OrderService {
 
     }
 
-
-    /**
-     *
-     * @param location
-     * @return
-     */
-    List<Order> getPendingOrders(Location location) {
-        def orders = Order.withCriteria {
-            or {
-                eq("origin", location)
-                eq("destination", location)
-            }
-        }
-        return orders
-    }
-
-    /**
-     *
-     * @param location
-     * @param product
-     * @return
-     */
-    List<OrderItem> getPendingOrderItemsWithProduct(Location location, Product product) {
-        def orderItems = []
-        def orders = getPendingOrders(location)
-        orders.each {
-            def orderItemList = it.orderItems.findAll { it.product == product }
-            orderItemList.each { orderItems << it }
-        }
-
-        return orderItems
-    }
-
-
     /**
      *
      * @param location
@@ -326,30 +292,6 @@ class OrderService {
             }
         }
         return quantityMap
-    }
-
-    /**
-     *
-     * @param shipments
-     * @return
-     */
-    Map<EventType, ListCommand> getOrdersByStatus(List orders) {
-        def orderMap = new TreeMap<OrderStatus, ListCommand>()
-
-        OrderStatus.list().each {
-            orderMap[it] = []
-        }
-
-        orders.each {
-            def key = it.status
-            def orderList = orderMap[key]
-            if (!orderList) {
-                orderList = new ListCommand(category: key, objectList: new ArrayList())
-            }
-            orderList.objectList.add(it)
-            orderMap.put(key, orderList)
-        }
-        return orderMap
     }
 
     /**

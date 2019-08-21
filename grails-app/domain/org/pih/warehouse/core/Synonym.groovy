@@ -45,12 +45,7 @@ class Synonym implements Serializable {
 
     static mapping = {
         id generator: 'uuid'
-        // Using a join tale because we want multiple one-to-many associations, not many-to-many
-        // product-synonyms, shipment-synonyms, etc
-        //products joinTable: [name:'product_synonym', column: 'product_id', key: 'synonym_id']
     }
-
-    //static hasMany = [products : Product]
 
     static constraints = {
         name(nullable: false, maxSize: 255)

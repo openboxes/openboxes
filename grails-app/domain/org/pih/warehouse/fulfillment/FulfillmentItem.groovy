@@ -37,10 +37,4 @@ class FulfillmentItem implements Serializable {
         inventoryItem(nullable: true)
         quantity(nullable: true)
     }
-
-    /*
-    Integer quantityPacked() {
-        return shipmentItems?.sum { it.quantity }
-    }
-    */
 }

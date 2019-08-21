@@ -52,20 +52,6 @@ class MailService {
         return config.grails.mail.prefix
     }
 
-    def addBccAddresses(email) {
-        def bccAddresses = "${grailsApplication.config.grails.mail.bcc}"
-        println "Add BCC addresses to email: " + bccAddresses
-        if (bccAddresses) {
-            bccAddresses.split(",").each {
-                try {
-                    email.addBcc(it)
-                } catch (Exception e) {
-                    println "Error adding BCC address: " + e.message
-                }
-            }
-        }
-    }
-
 
     /**
      * @return
@@ -109,7 +95,6 @@ class MailService {
                     email.addTo(it)
                 }
 
-                //addBccAddresses(email)
                 email.setFrom(defaultFrom)
                 email.setSubject("${prefix} " + subject)
                 email.setMsg(msg)
@@ -189,7 +174,6 @@ class MailService {
                     email.addTo(it)
                 }
 
-                //addBccAddresses(email)
                 email.setFrom(defaultFrom)
                 email.setSmtpPort(port ?: defaultPort)
                 email.setSubject("${prefix} " + subject)
@@ -399,35 +383,6 @@ class MailService {
                 email.send()
             } catch (Exception e) {
                 log.error "Problem sending email $e.message", e
-            }
-        }
-    }
-
-
-    /**
-     *
-     * @param subject
-     * @param throwable
-     * @return
-     */
-    def sendAlertMail(String subject, Throwable throwable) {
-
-        if (isMailEnabled()) {
-            log.info "Sending HTML email '" + subject
-            try {
-                HtmlEmail email = new HtmlEmail()
-                email.setCharset("UTF-8")
-                email.setSubject("${prefix} " + subject)
-
-                // Authenticate
-                if (username && password) {
-                    email.setAuthentication(username, password)
-                }
-
-                // add more information to email
-                email.send()
-            } catch (Exception e) {
-                log.error("Error sending HTML email message with subject " + subject, e)
             }
         }
     }

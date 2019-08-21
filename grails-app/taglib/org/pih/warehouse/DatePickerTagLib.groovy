@@ -108,6 +108,4 @@ class DatePickerTagLib {
         out << html
 
     }
-
-
 }

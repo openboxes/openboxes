@@ -214,15 +214,6 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
-    def selectPendingShipment = { attrs, body ->
-        def currentLocation = Location.get(session?.warehouse?.id)
-        attrs.from = shipmentService.getPendingShipments(currentLocation).sort {
-            it?.name?.toLowerCase()
-        }
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it.name + " (" + it.origin.name + " to " + it.destination.name + ")" }
-    }
-
     def selectShipment = { attrs, body ->
         def currentLocation = Location.get(session?.warehouse?.id)
         attrs.from = shipmentService.getShipmentsByLocation(currentLocation).sort {
@@ -278,55 +269,6 @@ class SelectTagLib {
         attrs.from = Person.findAllByEmailIsNotNull().sort { it.firstName }
         attrs.optionKey = 'email'
         attrs.optionValue = { it.name }
-        out << g.select(attrs)
-    }
-
-
-    def selectProducts = { attrs, body ->
-        def products = Product.executeQuery("select id, name from Product")
-        products = products.collect { [id: it[0], name: it[1]] }
-        attrs.from = products
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it.name }
-        out << g.select(attrs)
-    }
-
-    def selectWardOrPharmacy = { attrs, body ->
-        def currentLocation = Location.get(session.warehouse.id)
-        def locations = []
-        if (currentLocation) {
-
-            // If the current location is in a location group, then we want to pull from the locations from that group
-            if (currentLocation?.locationGroup != null) {
-                locations = Location.list().findAll { location -> location.locationGroup?.id == currentLocation.locationGroup?.id }.findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            }
-
-            // But if there are no other locations in the location group, then we just want to get all locations that are wards or phaamracies
-            if (!locations) {
-                locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            }
-        }
-
-        if (!locations) {
-            out << render(template: "/taglib/createLocation", model: [location: currentLocation])
-            return
-        }
-
-        attrs.from = locations
-        attrs.optionKey = 'id'
-
-        attrs.groupBy = 'locationType'
-        attrs.value = attrs.value ?: currentLocation?.id
-        if (attrs.groupBy) {
-            attrs.optionValue = { it.name }
-        } else {
-            attrs.optionValue = { "" + format.metadata(obj: it?.locationType) + " - " + it.name }
-        }
-
         out << g.select(attrs)
     }
 
@@ -442,41 +384,6 @@ class SelectTagLib {
         attrs.from = locationService.getOrderSuppliers(currentLocation).sort {
             it?.name?.toLowerCase()
         }
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]" }
-        out << g.select(attrs)
-    }
-
-    def selectRequestOrigin = { attrs, body ->
-        def currentLocation = Location.get(session?.warehouse?.id)
-        def requisitionType = params?.type ? RequisitionType.valueOf(params.type) : null
-
-        def origins = locationService.getNearbyLocations(currentLocation).sort {
-            it?.name?.toLowerCase()
-        }
-
-        // Remove current location
-        origins = origins.minus(currentLocation)
-
-        attrs.from = origins
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it?.name + " [" + format.metadata(obj: it?.locationType) + "]" }
-        out << g.select(attrs)
-    }
-
-    def selectRequestDestination = { attrs, body ->
-        def currentLocation = Location.get(session?.warehouse?.id)
-        attrs.from = locationService.getRequestDestinations(currentLocation).sort {
-            it?.name?.toLowerCase()
-        }
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]" }
-        out << g.select(attrs)
-    }
-
-    def selectCustomer = { attrs, body ->
-        def currentLocation = Location.get(session?.warehouse?.id)
-        attrs.from = locationService.getCustomers(currentLocation).sort { it?.name?.toLowerCase() }
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]" }
         out << g.select(attrs)

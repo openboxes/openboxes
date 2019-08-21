@@ -27,24 +27,6 @@ class AutoSuggestTagLib {
         out << g.render(template: '/taglib/chooseSubstitute', model: [attrs: attrs])
     }
 
-    def autoSuggest_v2 = { attrs, body ->
-        attrs.id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
-        attrs.name = attrs.name
-        attrs.valueId = (attrs.valueId) ? attrs.valueId : ""
-        attrs.valueName = (attrs.valueName) ? attrs.valueName : ""
-        attrs.width = (attrs.width) ? attrs.width : '300px'
-        attrs.minLength = (attrs.minLength) ? attrs.minLength : 1
-        attrs.jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : ""
-        attrs.styleClass = (attrs.styleClass) ?: ""
-        attrs.placeholder = attrs.placeholder ?: ""
-
-        attrs.showValue = (attrs.valueName && attrs.valueId) ? true : false
-        attrs.spanDisplay = "none"
-        attrs.suggestDisplay = "inline"
-
-        out << g.render(template: '/taglib/autoSuggest_v2', model: [attrs: attrs])
-    }
-
 
     def autoSuggest = { attrs, body ->
         attrs.id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()

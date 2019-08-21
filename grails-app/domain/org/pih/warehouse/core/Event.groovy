@@ -50,16 +50,4 @@ class Event implements Comparable, Serializable {
         }
         return diff
     }
-
-    /**
-     * Sorts by event type and then event date
-     * (Note that this sorts earlier event first, unlike the main compareTo that sorts most recent events first)
-     */
-    int compareByEventTypeAndEventDate(obj) {
-        def diff = eventType <=> obj?.eventType
-        if (diff == 0) {
-            diff = eventDate <=> obj?.eventDate
-        }
-        return diff
-    }
 }

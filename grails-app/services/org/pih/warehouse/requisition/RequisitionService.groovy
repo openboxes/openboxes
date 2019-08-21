@@ -187,10 +187,6 @@ class RequisitionService {
         return getRequisitions(requisition, params)
     }
 
-    def getAllRequisitions(Location destination) {
-        return getRequisitions(new Requisition(destination: destination), [max: -1, offset: 0])
-    }
-
     /**
      * Get all requisitions for the given destination.
      * @param destination
@@ -553,41 +549,6 @@ class RequisitionService {
     void undoCancelRequisition(Requisition requisition) {
         requisition.status = RequisitionStatus.PENDING
         requisition.save(flush: true)
-    }
-
-
-    List<Requisition> getIssuedRequisitionsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
-        def requisitions = Transaction.createCriteria().list() {
-            eq("status", RequisitionStatus.ISSUED)
-            if (toLocations) {
-                'in'("destination", toLocations)
-            }
-            if (fromLocations) {
-                'in'("origin", fromLocations)
-            }
-            between('dateRequested', fromDate, toDate)
-        }
-        return requisitions
-    }
-
-    List<Requisition> getPendingRequisitionsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
-        def requisitions = Requisition.createCriteria().list() {
-            lt("status", RequisitionStatus.ISSUED)
-            if (toLocations) {
-                'in'("destination", toLocations)
-            }
-            if (fromLocations) {
-                'in'("origin", fromLocations)
-            }
-            if (fromDate && toDate) {
-                between('dateRequested', fromDate, toDate)
-            } else if (fromDate) {
-                ge("dateRequested", fromDate)
-            } else if (toDate) {
-                le("dateRequested", toDate)
-            }
-        }
-        return requisitions
     }
 
     List<RequisitionItem> getCanceledRequisitionItems(Location location, Product product) {

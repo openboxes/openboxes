@@ -35,10 +35,6 @@ class AuthTagLib {
         if (userService.isUserManager(session?.user))
             out << body()
     }
-    def isUserBrowser = { attrs, body ->
-        if (userService.canUserBrowse(session?.user))
-            out << body()
-    }
     def hasRoleFinance = { attrs, body ->
         if (userService.hasRoleFinance(session?.user)) {
             out << body()
@@ -54,13 +50,6 @@ class AuthTagLib {
         if (isUserInRole)
             out << body()
     }
-
-    def isUserNotInRole = { attrs, body ->
-        def isUserInRole = userService.isUserInRole(session?.user?.id, attrs.roles)
-        if (!isUserInRole)
-            out << body()
-    }
-
 
     def userRole = { attrs, body ->
         Location location = Location.get(session.warehouse.id)

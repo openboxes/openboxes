@@ -29,21 +29,6 @@ class ProductService {
     def grailsApplication
     def identifierService
     def userService
-    /**
-     *
-     * @param query
-     * @return
-     */
-    def getNdcProduct(query) {
-        return getNdcResults("getcode", query)
-    }
-
-    /**
-     *
-     */
-    def findNdcProducts(search) {
-        return getNdcResults("search", search.searchTerms ?: "")
-    }
 
     def getNdcResults(operation, q) {
         def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
@@ -94,21 +79,6 @@ class ProductService {
                 }
         }
         return results
-    }
-
-
-    /**
-     * 	<rxnormdata>
-     * 		<displayTermsList>
-     * 			<term></term>
-     * 		</displayTermsList>
-     * 	</rxnormdata>
-     * @return
-     */
-
-    def findRxNormDisplayNames() {
-        String url = "http://rxnav.nlm.nih.gov/REST/displaynames"
-        return processXml(url, "displayTermsList.term")
     }
 
     def processXml(urlString, itemName) {
@@ -989,15 +959,6 @@ class ProductService {
     }
 
     /**
-     * Download a document at the given URL.
-     *
-     * @param url
-     */
-    def downloadDocument(url) {
-        // move code from ProductController
-    }
-
-    /**
      * Save the given product
      *
      * @param product
@@ -1054,29 +1015,6 @@ class ProductService {
         return tag
     }
 
-    /**
-     * Find products that are similar to the given product.
-     *
-     * @param product
-     * @return
-     */
-    def findSimilarProducts(Product product) {
-        def similarProducts = []
-
-        def searchTerms = product.name.split(",")
-        if (searchTerms) {
-            def products = Product.findAllByNameLike("%" + searchTerms[0] + "%")
-            similarProducts.addAll(products)
-        }
-
-        similarProducts.unique()
-
-        similarProducts.remove(product)
-
-        return similarProducts
-    }
-
-
     Product addProductComponent(String assemblyProductId, String componentProductId, BigDecimal quantity, String unitOfMeasureId) {
         def assemblyProduct = Product.get(assemblyProductId)
         if (assemblyProduct) {
@@ -1112,12 +1050,6 @@ class ProductService {
         return rows
     }
 
-
-    def findProducts() {
-
-        Product.findAll("from Product as p where productCode is null or productCode = ''")
-    }
-
     List<ProductAssociation> getProductAssociations(Product product, List<ProductAssociationTypeCode> types) {
         return ProductAssociation.createCriteria().list {
             eq("product", product)
@@ -1129,7 +1061,6 @@ class ProductService {
             }
         }
     }
-
 
     /**
      * Get all products matching the given terms and categories.
@@ -1182,9 +1113,6 @@ class ProductService {
                 }
             }
         }
-
         return results
     }
-
-
 }

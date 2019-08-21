@@ -372,7 +372,6 @@ class EditPageItem {
     RequisitionItem requisitionItem
 
     Integer quantityRequested
-    //Integer quantityAvailable
     Integer quantityConsumed
     Integer totalMonthlyQuantity
     Integer sortOrder

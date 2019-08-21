@@ -92,23 +92,6 @@ class ReportService implements ApplicationContextAware {
         return list[0]
     }
 
-    TransactionEntry getLatestTransactionEntry(Product product, Inventory inventory) {
-        def list = TransactionEntry.createCriteria().list() {
-            and {
-                inventoryItem {
-                    eq("product.id", product?.id)
-                }
-                transaction {
-                    eq("inventory", inventory)
-                    order("transactionDate", "desc")
-                    order("dateCreated", "desc")
-                }
-            }
-            maxResults(1)
-        }
-        return list[0]
-    }
-
     /**
      *
      * @param command
@@ -288,13 +271,6 @@ class ReportService implements ApplicationContextAware {
         }
     }
 
-    static Document loadXMLFromString(String xml) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-        DocumentBuilder builder = factory.newDocumentBuilder()
-        InputSource is = new InputSource(new StringReader(xml))
-        return builder.parse(is)
-    }
-
     private getHtmlContent(String url) {
 
         HttpClient httpclient = new DefaultHttpClient()
@@ -313,15 +289,6 @@ class ReportService implements ApplicationContextAware {
             // immediate deallocation of all system resources
             httpclient.getConnectionManager().shutdown()
         }
-    }
-
-    private byte[] buildPdf(url) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream()
-        ITextRenderer renderer = new ITextRenderer()
-        renderer.setDocument(url)
-        renderer.layout()
-        renderer.createPDF(baos)
-        return baos.toByteArray()
     }
 
     def calculateQuantityOnHandByProductGroup(locationId) {

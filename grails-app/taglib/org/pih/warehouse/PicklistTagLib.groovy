@@ -42,26 +42,4 @@ class PicklistTagLib {
 
         out << g.render(template: '/taglib/pickRequestItem', model: [attrs: attrs])
     }
-
-
-    def mapRequestItem = { attrs, body ->
-        attrs.products = []
-        if (attrs.requisitionItem.product) {
-            attrs.product = attrs.requisitionItem.product
-            println "product " + attrs.product
-            attrs.inventoryItems = inventoryService.findInventoryItemsByProducts([attrs.product])
-            attrs.inventoryItem = attrs.inventoryItems.find { it.expirationDate != null }
-        } else if (attrs.requisitionItem.category) {
-            attrs.products = attrs.requisitionItem.category.products
-            println "products " + attrs.products
-            attrs.inventoryItems = inventoryService.findInventoryItemsByProducts(attrs.products)
-        } else if (attrs.requisitionItem.productGroup) {
-            attrs.products = attrs.requisitionItem.productGroup.products
-            println "products " + attrs.products
-            attrs.inventoryItems = inventoryService.findInventoryItemsByProducts(attrs.products)
-        }
-
-
-        out << g.render(template: '/taglib/mapRequestItem', model: [attrs: attrs])
-    }
 }

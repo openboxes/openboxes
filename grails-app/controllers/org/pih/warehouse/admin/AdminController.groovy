@@ -272,22 +272,6 @@ class AdminController {
 
         redirect(action: "showSettings")
     }
-
-    Integer doDownloadWar(String remoteUrl, File localFile) {
-        try {
-            log.info("Downloading war file " + remoteUrl + " .... ")
-            def outputStream = new BufferedOutputStream(new FileOutputStream(localFile))
-            def url = new URL(remoteUrl)
-            outputStream << url.openStream()
-            outputStream.close()
-            log.info("... done downloading remote file " + remoteUrl + " to " + localFile.absolutePath)
-            //return file.absolutePath
-            return 0
-        } catch (Exception e) {
-            log.error e
-            throw e
-        }
-    }
 }
 
 class UpgradeCommand {
@@ -321,32 +305,4 @@ class UpgradeCommand {
         }
         return -1
     }
-
-    Date getRemoteFileLastModifiedDate() {
-        if (remoteWebArchiveUrl) {
-            HttpURLConnection conn = null
-            try {
-                conn = (HttpURLConnection) new URL(remoteWebArchiveUrl).openConnection()
-                conn.setRequestMethod("HEAD")
-                conn.getInputStream()
-                return new Date(conn.getLastModified())
-            } catch (IOException e) {
-                return null
-            } finally {
-                if (conn) conn.disconnect()
-            }
-        }
-        return null
-    }
-
-
-    Float getProgressPercentage() {
-        def remoteFileSize = getRemoteFileSize()
-        def localFileSize = localWebArchive?.size()
-        if (remoteFileSize > 0 && localFileSize > 0) {
-            return (localFileSize / remoteFileSize) * 100
-        }
-        return -1
-    }
-
 }

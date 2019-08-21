@@ -13,12 +13,6 @@ class MenuTagLib {
 
     static result = ""
 
-    def displayMenu = { attrs ->
-        out << "<ul>"
-        displayMenuHtml(attrs['rootNode'], 1)
-        out << "</ul>"
-    }
-
     def displayMenuHtml = { node, depth ->
         if (node) {
             if (node.id) {

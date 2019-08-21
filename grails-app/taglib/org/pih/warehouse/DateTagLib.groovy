@@ -43,24 +43,6 @@ class DateTagLib {
         out << g.render(template: '/taglib/expirationDate', model: [attrs: attrs])
     }
 
-    def relativeDate = { attrs, body ->
-
-        Date now = new Date()
-        Date date = attrs.date
-
-        if (date) {
-            def days = date - now
-
-            if (days == 0) {
-                out << "today"
-            } else if (days > 0) {
-                out << "in ${days} days"
-            } else if (days < 0) {
-                out << "${-days} days ago"
-            }
-        }
-    }
-
     def relativeTime = { attrs, body ->
         TimeDuration timeDuration = attrs.timeDuration
         if (timeDuration) {
@@ -91,5 +73,4 @@ class DateTagLib {
         }
         out << prettyDate
     }
-
 }

@@ -29,36 +29,6 @@ class ConsumptionService {
         return ConsumptionFact.executeUpdate("""delete ConsumptionFact c""")
     }
 
-
-    def aggregateConsumption(Location location, Category category, Date startDate, Date endDate) {
-        def results = ConsumptionFact.createCriteria().list {
-            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            projections {
-                groupProperty('product', "product")
-                groupProperty('productCode', "Product Code")
-                groupProperty('productName', "Product Name")
-                groupProperty("categoryName", "Category Name")
-                groupProperty("day", "Day")
-                groupProperty("week", "Week")
-                groupProperty("month", "Month")
-                groupProperty("year", "Year")
-                sum("quantity", "Quantity")
-            }
-
-            if (startDate && endDate) {
-                between('transactionDate', startDate, endDate)
-            }
-            if (category) {
-                eq("categoryName", category.name)
-            }
-            eq("location", location)
-            order("productName", "asc")
-        }
-        return results
-
-    }
-
-
     def listConsumption(Location location, Category category, Date startDate, Date endDate) {
 
         def results = ConsumptionFact.createCriteria().list {
@@ -81,7 +51,6 @@ class ConsumptionService {
 
         return results
     }
-
 
     def generateCrossTab(List<ConsumptionFact> consumptionFactList, Date startDate, Date endDate, String groupBy) {
 
@@ -172,5 +141,4 @@ class ConsumptionService {
         log.info "crosstabRows: " + crosstabRows
         return crosstabRows
     }
-
 }
