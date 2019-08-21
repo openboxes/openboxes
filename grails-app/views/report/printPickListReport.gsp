@@ -162,11 +162,6 @@
                                             <th class="middle">
                                                 <warehouse:message code="product.description.label"/>
                                             </th>
-                                            <%--
-                                            <th class="center middle">
-                                                <warehouse:message code="default.bin.label" default="Bin"/>
-                                            </th>
-                                            --%>
                                             <th class="center middle">
                                                 <warehouse:message code="default.lotNumber.label" default="Lot"/>
                                             </th>
@@ -212,12 +207,6 @@
                                                                  alt="" title="${warehouse.message(code:'product.coldChain.message') }" class="middle"/>
                                                     </g:if>
                                                 </td>
-                                                <%--
-                                                <td>
-                                                    ${entry?.shipmentItem?.binLocation?.name?:g.message(code:'default.label')}
-                                                </td>
-                                                --%>
-
                                                 <td>
                                                     ${entry?.shipmentItem?.inventoryItem?.lotNumber?:entry?.shipmentItem?.lotNumber  }
                                                 </td>

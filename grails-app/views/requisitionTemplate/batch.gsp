@@ -234,110 +234,6 @@
                 </g:form>
             </div>
         </g:if>
-        <%--
-        <div class="box">
-            <h2>${warehouse.message(code:'requisitionTemplate.requisitionItems.label')}</h2>
-            <g:form name="requisitionItemForm" method="post" controller="requisitionTemplate" action="update">
-
-
-                <g:hiddenField name="id" value="${requisition.id}"/>
-                <g:hiddenField name="version" value="${requisition.version}"/>
-
-                <div>
-                    <table  class="sortable" data-update-url="${createLink(controller:'json', action:'sortRequisitionItems')}">
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th><warehouse:message code="product.productCode.label" default="#"/></th>
-                            <th><warehouse:message code="product.label"/></th>
-                            <th><warehouse:message code="default.quantity.label"/></th>
-                            <th><warehouse:message code="unitOfMeasure.label"/></th>
-                            <th><warehouse:message code="default.actions.label"/></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
-                            <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
-                                <td>
-                                    <span class="sorthandle"></span>
-                                </td>
-                                <td>
-                                    ${requisitionItem?.product?.productCode}
-                                </td>
-                                <td>
-                                    <g:hiddenField name="requisitionItems[${i}].product.id" value="${requisitionItem?.product?.id}"/>
-                                    <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                                        ${requisitionItem?.product?.name}
-                                    </g:link>
-                                </td>
-                                <td>
-                                    <g:textField name="requisitionItems[${i}].quantity" value="${requisitionItem?.quantity}" class="text" size="6"/>
-                                </td>
-                                <td>
-                                    <g:selectUnitOfMeasure name="requisitionItems[${i}].productPackage.id" class="chzn-select-deselect"
-                                                           product="${requisitionItem?.product}" value="${requisitionItem?.productPackage?.id}"/>
-                                </td>
-                                <td>
-                                    <g:link controller="requisitionTemplate" action="removeFromRequisitionItems" id="${requisition?.id}"
-                                            params="['requisitionItem.id':requisitionItem?.id]" class="button icon trash">
-                                        ${warehouse.message(code:'default.button.delete.label')}
-                                    </g:link>
-                                </td>
-                            </tr>
-                        </g:each>
-                        <g:unless test="${requisition?.requisitionItems}">
-                            <tr>
-                                <td colspan="6" class="center">
-                                    <span class="fade empty">${warehouse.message(code: "requisition.noRequisitionItems.message")}</span>
-                                </td>
-
-                            </tr>
-                        </g:unless>
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <td>
-
-                            </td>
-                            <td>
-
-                            </td>
-                            <td>
-                                <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
-                                               width="350" styleClass="text"/>
-                            </td>
-                            <td>
-                                <g:textField name="quantity" value="" class="text" size="6"/>
-                            </td>
-                            <td class="left">
-                                EA/1
-                            </td>
-                            <td>
-                                <button class="button icon add" id="add-requisition-item"><warehouse:message code="default.button.add.label"/></button>
-
-                            </td>
-
-                        </tr>
-                        <tr>
-                            <td colspan="7">
-                                <div class="buttons">
-                                    <button class="button" name="save">${warehouse.message(code:'default.button.save.label', default: 'Save') }</button>
-                                    &nbsp;
-                                    <g:link controller="requisitionTemplate" action="list">
-                                        <warehouse:message code="default.button.cancel.label"/>
-                                    </g:link>
-                                </div>
-                            </td>
-                        </tr>
-
-
-                        </tfoot>
-                    </table>
-                </div>
-            </g:form>
-
-        </div>
-        --%>
     </div>
 </div>
 <script>
@@ -357,21 +253,16 @@
             helper: "clone",
             forcePlaceholderSize: true,
             placeholder: "ui-state-highlight",
-            //connectWith: ".connectable",
             update : function() {
                 var updateUrl = "${createLink(controller:'json', action:'sortRequisitionItems') }";
                 var sortOrder = $(this).sortable('serialize');
                 $.post(updateUrl, sortOrder);
-                //$(".sortable tbody tr").removeClass("odd").removeClass("even").filter(":odd").addClass("odd")
-                //        .filter(":even").addClass("even");
-                //location.reload();
                 refreshTable();
             }
         });
         $( ".sortable" ).disableSelection();
 
     });
-
 
 </script>
 </body>

@@ -5,7 +5,6 @@
     <meta name="layout" content="" />
     <title>OpenBoxes Analytics</title>
 
-    <%--<link rel="stylesheet" href="${createLinkTo(dir:'js/bootstrap/css',file:'bootstrap.css')}" type="text/css" media="all" />--%>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
     <!-- Optional theme -->
@@ -31,19 +30,6 @@
                 </button>
                 <a class="navbar-brand" href="#">OpenBoxes Analytics</a>
             </div>
-            <%--
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Dashboard</a></li>
-                    <li><a href="#">Settings</a></li>
-                    <li><a href="#">Profile</a></li>
-                    <li><a href="#">Help</a></li>
-                </ul>
-                <form class="navbar-form navbar-right">
-                    <input type="text" class="form-control" placeholder="Search...">
-                </form>
-            </div>
-            --%>
         </div>
     </div>
 
@@ -79,9 +65,6 @@
 
     </div>
 
-<%--
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
---%>
 <script src="http://nicolas.kruchten.com/pivottable/examples/ext/jquery-1.8.3.min.js"></script>
 <script src="http://nicolas.kruchten.com/pivottable/examples/ext/jquery-ui-1.9.2.custom.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>

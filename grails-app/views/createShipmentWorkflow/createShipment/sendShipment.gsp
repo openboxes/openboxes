@@ -126,162 +126,101 @@
                                                       value="${shipmentInstance?.actualShippingDate?:new Date()}" precision="minute" noSelection="['':'']"/>
 
 									</td>
-								</tr>
+								</tr>										
 
-
-								<%-- 								
 								<tr class="prop">
 									<td valign="top" class="name">
 										<label>
-											<warehouse:message code="default.status.label"/>
+											<warehouse:message code="default.items.label"/>
 										</label>
 									</td>
 									<td valign="top" class="value">
-										<span class="fade">
-											<format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.CREATED}"/>
-										</span>
-										&nbsp;
-										<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
-										&nbsp;
-										<span class="fade">
-											<format:metadata obj="${shipmentInstance?.status?.code}"/>
-										</span>
-										&nbsp;
-										<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
-										&nbsp;
-										<span>
-											<b><format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}"/></b>
-										</span>
-										&nbsp;
-										<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
-										&nbsp;
-										<span class="fade">
-											<format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}"/>
-										</span>
+										<g:if test="${shipmentInstance.shipmentItems}">											
+											<div id="debitShipmentItems" class="${!command || command?.debitStockOnSend ? '' : 'hidden'  }">
+
+												<g:if test="${shipmentInstance?.origin.isWarehouse()}">
+													<warehouse:message code="shipping.itemsInShipmentWillBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
+												</g:if>
+												<g:else>
+													<warehouse:message code="shipping.itemsInShipmentWillNotBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
+												</g:else>
+
+												<div style="overflow: auto; max-height: 300px; border: 1px solid lightgrey;">
+													<table>
+														<tr>
+															<th><warehouse:message code="container.label"/></th>
+															<th><warehouse:message code="product.label"/></th>
+															<th><warehouse:message code="location.binLocation.label"/></th>
+															<th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
+															<th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
+															<th><warehouse:message code="default.quantity.label"/></th>
+															<th><warehouse:message code="default.uom.label"/></th>
+														</tr>
+														<g:set var="previousContainer"/>
+														<g:each var="shipmentItem" in="${shipmentInstance?.shipmentItems.sort() }" status="status">
+															<g:set var="isSameAsPrevious" value="${shipmentItem?.container == previousContainer}"/>
+															<tr class="${status % 2 ? 'even' : 'odd' } ${!isSameAsPrevious ? 'top-border':'' }">
+																<td class="right-border">																	
+																	<g:if test="${!isSameAsPrevious }">
+																		<g:if test="${shipmentItem?.container}">
+																			${shipmentItem?.container?.name }
+																		</g:if>
+																		<g:else>
+																			<g:message code="default.label"/>
+																		</g:else>
+																	</g:if>
+																</td>
+																<td>
+																	<g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
+																		${shipmentItem?.inventoryItem?.product?.productCode}
+																		<format:product product="${shipmentItem?.inventoryItem?.product}"/>
+																</g:link>
+																</td>
+																<td>
+																	${shipmentItem?.binLocation}
+																</td>
+																<td>
+																	<span class="lotNumber">${shipmentItem?.inventoryItem?.lotNumber }</span>																	
+																</td>
+																<td>
+																	<g:if test="${shipmentItem?.inventoryItem?.expirationDate}">
+																		<span class="expirationDate">
+																			<g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate }" format="d MMMMM yyyy"/>
+																		</span>
+																	</g:if>
+																	<g:else>
+																		<span class="fade">
+																			${warehouse.message(code: 'default.never.label')}
+																		</span>
+																	</g:else>
+																</td>
+																<td>
+																	${shipmentItem?.quantity }
+																</td>
+																<td>
+																	${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
+																</td>
+															</tr>
+															<g:set var="previousContainer" value="${shipmentItem?.container }"/>
+														</g:each>
+													</table>	
+												</div>
+											</div>
+											<div id="noDebitShipmentItems" class="${!command || command?.debitStockOnSend ? 'hidden' : ''}">
+												<warehouse:message code="shipping.willNotBeDebited.message" args="[shipmentInstance?.origin?.name]"/>
+											</div>
+										</g:if>
+										
 									</td>
 								</tr>
-								--%>
-										
-
-									<tr class="prop">
-										<td valign="top" class="name">
-											<label>
-												<warehouse:message code="default.items.label"/>
-											</label>
-										</td>
-										<td valign="top" class="value">
-											<g:if test="${shipmentInstance.shipmentItems}">
-												<%--
-												<div>												
-													<g:checkBox name="debitStockOnSend" value="${command ? command.debitStockOnSend : true}"/>
-													&nbsp;
-													<warehouse:message code="shipping.debitStockOnSend.message" args="[shipmentInstance?.origin?.name]"/>											
-												</div>
-												<br/>
-												 --%>
-												
-												<div id="debitShipmentItems" class="${!command || command?.debitStockOnSend ? '' : 'hidden'  }">
-
-													<g:if test="${shipmentInstance?.origin.isWarehouse()}">
-														<warehouse:message code="shipping.itemsInShipmentWillBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
-													</g:if>
-													<g:else>
-														<warehouse:message code="shipping.itemsInShipmentWillNotBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
-													</g:else>
-
-													<div style="overflow: auto; max-height: 300px; border: 1px solid lightgrey;">
-														<table>
-															<tr>
-																<th><warehouse:message code="container.label"/></th>
-																<th><warehouse:message code="product.label"/></th>
-																<th><warehouse:message code="location.binLocation.label"/></th>
-																<th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
-																<th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
-																<th><warehouse:message code="default.quantity.label"/></th>
-                                                                <th><warehouse:message code="default.uom.label"/></th>
-															</tr>
-															<g:set var="previousContainer"/>
-															<g:each var="shipmentItem" in="${shipmentInstance?.shipmentItems.sort() }" status="status">
-																<g:set var="isSameAsPrevious" value="${shipmentItem?.container == previousContainer}"/>
-																<tr class="${status % 2 ? 'even' : 'odd' } ${!isSameAsPrevious ? 'top-border':'' }">
-																	<td class="right-border">																	
-																		<g:if test="${!isSameAsPrevious }">
-																			<g:if test="${shipmentItem?.container}">
-																				${shipmentItem?.container?.name }
-																			</g:if>
-																			<g:else>
-																				<g:message code="default.label"/>
-																			</g:else>
-																		</g:if>
-																	</td>
-																	<td>
-                                                                        <g:link controller="inventoryItem" action="showStockCard" params="['product.id':shipmentItem?.inventoryItem?.product?.id]">
-                                                                            ${shipmentItem?.inventoryItem?.product?.productCode}
-                                                                            <format:product product="${shipmentItem?.inventoryItem?.product}"/>
-                                                                    </g:link>
-																	</td>
-                                                                    <td>
-                                                                        ${shipmentItem?.binLocation}
-                                                                    </td>
-																	<td>
-																		<span class="lotNumber">${shipmentItem?.inventoryItem?.lotNumber }</span>																	
-																	</td>
-																	<td>
-                                                                        <g:if test="${shipmentItem?.inventoryItem?.expirationDate}">
-                															<span class="expirationDate">
-                                                                                <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate }" format="d MMMMM yyyy"/>
-                                                                            </span>
-                                                                        </g:if>
-                                                                        <g:else>
-                                                                            <span class="fade">
-                                                                                ${warehouse.message(code: 'default.never.label')}
-                                                                            </span>
-                                                                        </g:else>
-																	</td>
-																	<td>
-																		${shipmentItem?.quantity }
-																	</td>
-                                                                    <td>
-                                                                        ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
-                                                                    </td>
-																</tr>
-																<g:set var="previousContainer" value="${shipmentItem?.container }"/>
-															</g:each>
-														</table>	
-													</div>
-												</div>
-												<div id="noDebitShipmentItems" class="${!command || command?.debitStockOnSend ? 'hidden' : ''}">
-													<warehouse:message code="shipping.willNotBeDebited.message" args="[shipmentInstance?.origin?.name]"/>
-												</div>
-											</g:if>
-											
-										</td>
-									</tr>
-
 
 								<tr class="prop">
 									<td valign="top" class="name">
 										<label><warehouse:message code="shipping.notifications.label"/></label>
 									</td>
 									<td valign="top" class="value">
-									
 										<g:if test="${includeNotifications }">
-										
-										
-											<warehouse:message code="shipping.notificationEmailsWillBeSentOut.message"/>
-											<%-- 
-											<div>												
-												<g:checkBox name="debitStockOnSend" value="${command ? command.debitStockOnSend : true}"/>
-												&nbsp;
-												<warehouse:message code="shipping.debitStockOnSend.message" args="[shipmentInstance?.origin?.name]"/>											
-											</div>
-											<br/>
-										
-											<span>
-												<g:checkBox name="notify" checked="true"/>
-												<warehouse:message code="shipping.notifications.message"/>
-											</span>
-											--%>								
+											<warehouse:message code="shipping.notificationEmailsWillBeSentOut.message"/>								
 											<warehouse:message code="shipping.notifications.message"/>
 											<table style="border: 1px solid lightgrey;" id="notifyRecipients">	
 												<tr>

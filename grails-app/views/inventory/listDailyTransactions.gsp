@@ -14,41 +14,7 @@
        
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
-			</g:if>
-			
-			
-			<%-- 
-			<table>
-				<tr>
-            		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
-			            <g:form action="listDailyTransactions" method="get">
-			            	<table >
-			            		<tr>
-			            			<th>Show daily transactions for </th>
-			            			<th></th>
-			            		</tr>
-			            		<tr>
-									<td>
-						           		<g:select name="threshold"
-											from="['1':'one week', '14':'two weeks', '30':'one month', 
-												'60':'two months', '90':'three months',
-												'180': 'six months', '365':'one year']"
-											optionKey="key" optionValue="value" value="${thresholdSelected}" 
-											noSelection="['':'--All--']" />&nbsp;&nbsp;    
-						           	</td>
-									<td class="filter-list-item" style="height: 100%; vertical-align: bottom">
-										<button name="filter">
-											<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;Filter </button>
-									</td>							           	
-								</tr>
-							</table>
-			            </g:form>
-            		</td>
-            	</tr>
-			</table>
-			<br/>			
-			--%>
-			
+			</g:if>			
 								
 			<fieldset>		
 				<div class="box">
@@ -101,7 +67,6 @@
                                     <table>
                                         <thead>
                                             <tr class="odd">
-                                                <%--<th width="2%"><warehouse:message code="default.actions.label"/></th> --%>
                                                 <th><warehouse:message code="default.datetime.label"/></th>
                                                 <th><warehouse:message code="transaction.id.label"/></th>
                                                 <th><warehouse:message code="transaction.type.label"/></th>

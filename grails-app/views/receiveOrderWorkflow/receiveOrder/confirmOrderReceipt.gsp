@@ -129,7 +129,6 @@
 										<th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
 										<th class="center"><warehouse:message code="order.ordered.label"/></th>
 										<th class="center"><warehouse:message code="order.received.label"/></th>
-										<%-- <td class="center"><warehouse:message code="order.remaining.label"/></td>--%>
 									</tr>
 								</thead>
 								<tbody>

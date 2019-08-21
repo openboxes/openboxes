@@ -73,15 +73,6 @@
                             <td valign="top" class="value"><g:link controller="inventoryItem" action="show" id="${shipmentItemInstance?.inventoryItem?.id}">${shipmentItemInstance?.inventoryItem?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
-
-                        <%--
-                        <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="shipmentItem.receiptItem.label" default="Receipt Item" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="receiptItem" action="show" id="${shipmentItemInstance?.receiptItem?.id}">${shipmentItemInstance?.receiptItem?.encodeAsHTML()}</g:link></td>
-                            
-                        </tr>
-                        --%>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="shipmentItem.donor.label" default="Donor" /></td>

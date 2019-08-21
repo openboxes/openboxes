@@ -47,11 +47,6 @@
                         ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                     </td>
                     <td>
-                        <%--
-                        <a href="javascript:void(0);" dialog-id="editProductComponent-${productComponent?.id }" class="open-dialog button icon edit">
-                            <warehouse:message code="default.button.edit.label"/>
-                        </a>
-                        --%>
                         <g:remoteLink controller="product" action="deleteProductComponent" id="${productComponent.id }" class="button icon trash"
                                       update="productComponents" onSuccess="onSuccess(data,textStatus)" onComplete="onComplete()">
                             <warehouse:message code="default.button.delete.label" args="[warehouse.message(code:'package.label')]"/>

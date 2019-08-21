@@ -90,14 +90,6 @@
 										<g:else>
 											<img src="${createLinkTo(dir:'images',file:'default_product.png')}" class="middle" width="100" height="100"/>
 										</g:else>
-										<%-- 										
-										<g:each var="document" in="${productInstance?.images}" status="i">
-											<a class="open-dialog" href="javascript:openDialog('#dialog-${document.id }', '#img-${document.id }');">
-												<img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}" 
-													class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />		
-											</a>
-										</g:each>
-										--%>
 									</div>
 									<br/>
 									<div class="name">
@@ -110,14 +102,7 @@
 						</g:each>
 					</ul>				
 				</div>			
-				<div class="buttons center box">
-					<%-- 
-					<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-					<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button>
-					<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-					<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>					
-					--%>
-					
+				<div class="buttons center box">					
                     <g:submitButton name="back" value="Back" />
                     <g:submitButton name="next" value="Next" />
                     <g:submitButton name="cancel" value="Cancel" />
@@ -185,21 +170,7 @@
 												</g:each>
 											</ul>
 										</td>
-									</tr>		
-									<%-- 								
-									<tr class="">
-										<td class="label right">
-											<label class="clear">Link(s):</label>												
-										</td>
-										<td class="value">
-											<g:each in="${product.links }" var="link">
-												<div>
-													<a target="_blank" href="${link.value }">${link.value }</a>
-												</div>
-											</g:each>
-										</td>
-									</tr>
-									--%>										
+									</tr>				
 									<tr class="prop">
 										<td class="label right">
 											<label class="clear">Google ID</label>
@@ -239,7 +210,6 @@
 
 				$("#searchTerms").focus();
 				$("#searchTerms").select();
-					
 			});
 		</script> 				
     </body>

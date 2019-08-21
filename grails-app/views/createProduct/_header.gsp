@@ -1,15 +1,3 @@
-<%-- 
-<div class="box">
-	<h2>${product }</h2>
-	<ul>
-		<li>Category = ${product?.category }</li>
-		<li>Title = ${product?.title }</li>
-		<li>Description = ${product?.description }</li>
-		<li>GTIN = ${product?.gtin }</li>
-		<li>Errors? = ${product?.hasErrors() }</li>
-	</ul>
-</div>
---%>
 <g:if test="${message}">
 	<div class="message">${message}</div>
 </g:if>
@@ -32,14 +20,12 @@
 			</g:link>				
 		</div>
 		<div class="${currentState.equals("verify")?'active-step':''}">
-			<%--<g:link action="create" event="verify"><warehouse:message code="product.choose.label" default="Verify product"/></g:link> --%>
 			<a href="#">
 				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png' )}" class="middle" />&nbsp;
 				<warehouse:message code="product.choose.label" default="Verify product"/></a>
 			
 		</div>
 		<div class="${currentState.equals("confirm")?'active-step':''}">
-			<%--<g:link action="create" event="confirm"><warehouse:message code="product.create.label" default="Confirmation"/></g:link> --%>
 			<a href="#">
 				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png' )}" class="middle" />&nbsp;
 				<warehouse:message code="product.create.label" default="Confirmation"/></a>

@@ -1,4 +1,3 @@
-
 <g:if test="${attrs.products }">
 	<table>
 		<g:each var="inventoryItem" in="${attrs.inventoryItems }">
@@ -32,5 +31,3 @@
 	<g:submitButton name="pickRequestItem" value="${warehouse.message(code:'request.pick.label', default:'Pick')}"></g:submitButton>
 </td>
 </g:else>
-									
-									

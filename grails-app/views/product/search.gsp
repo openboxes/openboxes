@@ -56,10 +56,6 @@
 	                        		<g:if test="${product.upc }">
 										<img src="${createLink(controller:'product',action:'barcode',params:[data:product.upc,width:100,height:10,format:'CODE_128']) }"/>
 									</g:if>
-									<%-- 
-										Example URL
-										/openboxes/product/barcode?data=00048001270688&width=100&height=10&format=CODE_128
-									--%>
 	                        	</td>     
 	                        	<td class="center">
 	                        		<img src="${product.productCode }" width="50" height="50"/>

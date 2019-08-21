@@ -178,13 +178,6 @@
                                         <g:textField name="bgColor"
                                                      value="${locationInstance?.bgColor}"
                                                      class="text" size="10"/>
-                                        <%--
-                                        <g:select name="bgColor" class="colorpicker"
-                                            from="${org.pih.warehouse.core.Constants.COLORS}"
-                                            value="${locationInstance?.bgColor}" />
-
-                                        <span class="fade">#${locationInstance?.bgColor }</span>
-                                         --%>
                                     </td>
                                 </tr>
                                 <tr class="prop">
@@ -197,13 +190,6 @@
                                         <g:textField name="fgColor"
                                                      value="${locationInstance?.fgColor}"
                                                      class="text" size="10"/>
-                                        <%--
-                                        <g:select name="fgColor" class="colorpicker"
-                                            from="${org.pih.warehouse.core.Constants.COLORS}"
-                                            value="${locationInstance?.fgColor}"/>
-
-                                        <span class="fade">#${locationInstance?.fgColor }</span>
-                                        --%>
                                     </td>
                                 </tr>
 
@@ -218,13 +204,6 @@
                                         <g:textField name="sortOrder"
                                                      value="${locationInstance?.sortOrder}"
                                                      class="text" size="10"/>
-                                        <%--
-                                        <g:select name="bgColor" class="colorpicker"
-                                            from="${org.pih.warehouse.core.Constants.COLORS}"
-                                            value="${locationInstance?.bgColor}" />
-
-                                           <span class="fade">#${locationInstance?.bgColor }</span>
-                                            --%>
                                     </td>
                                 </tr>
                             </g:if>
@@ -668,20 +647,6 @@
       window.location.href = href;
       event.preventDefault();
     });
-
-    /*
-    $('#bgColor').colorpicker({
-        size: 20,
-        label: '',
-        hide: true
-    });
-
-    $('#fgColor').colorpicker({
-        size: 20,
-        label: '',
-        hide: true
-    });
-    */
 
     $(".use-default").change(function () {
       if ($(this).is(':unchecked')) {

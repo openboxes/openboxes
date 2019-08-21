@@ -2,10 +2,7 @@
     
     <g:hiddenField name='categoriesList[${i }].deleted' value='false'/>
     <g:hiddenField name='categoriesList[${i }].new' value='false'/>
- 
- 	<%-- 
- 	<g:textField name='categoriesList[${i }].primary' value='${category?.primary}' />
- 	--%>
+
     <span class="del-category">
         <img src="${resource(dir:'images/icons/silk', file:'delete.png')}"
             style="vertical-align:middle;"/>

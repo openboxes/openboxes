@@ -6,11 +6,6 @@
     <div class="dialog">
         <table>
             <thead>
-            <%--
-                <g:sortableColumn property="id" title="${warehouse.message(code: 'productSupplier.id.label', default: 'Id')}" />
-
-                <th><g:message code="productSupplier.product.label" default="Product" /></th>
-            --%>
             <g:sortableColumn property="code" title="${warehouse.message(code: 'default.code.label', default: 'Code')}" />
 
             <th><g:message code="productSupplier.productCode.label" /></th>
@@ -42,19 +37,6 @@
 
                     <g:each var="productSupplier" in="${productInstance?.productSuppliers.sort()}" status="status">
                         <tr class="prop ${status%2==0?'odd':'even'}">
-
-                            <%--
-                            <td><g:link controller="productSupplier" action="edit" id="${productSupplier.id}">${fieldValue(bean: productSupplier, field: "id")}</g:link></td>
-
-                            <td>
-                                <a href="javascript:void(0);" class="btn-show-dialog"
-                                   data-target="#product-supplier-dialog"
-                                   data-title="${g.message(code:'productSupplier.label')}"
-                                   data-url="${request.contextPath}/productSupplier/dialog?id=${productSupplier?.id}&product.id=${productInstance?.id}">
-                                    ${fieldValue(bean: productSupplier, field: "product")}
-                                </a>
-                            </td>
-                            --%>
                             <td>${fieldValue(bean: productSupplier, field: "code")?:g.message(code:'default.none.label')}</td>
 
                             <td>${fieldValue(bean: productSupplier, field: "productCode")?:g.message(code:'default.none.label')}</td>
@@ -121,62 +103,9 @@
 
 
 <g:javascript>
-
-
-
-    //$('#demo-modal').load('get-dynamic-content.php?modal='+modal).dialog(options).dialog('open');
     $(document).ready(function() {
-
-
         $(".tabs").livequery(function() {
             $(this).tabs({});
         });
-        %{--$(".btn-show-dialog").click(function(event) {--}%
-            %{--var target = $(this).data("target")--}%
-            %{--var url = $(this).data("url");--}%
-            %{--var title = $(this).data("title");--}%
-            %{--$(target).attr("title", title);--}%
-            %{--$(target).dialog({--}%
-                %{--autoOpen: false,--}%
-                %{--modal: true,--}%
-                %{--width: 800,--}%
-                %{--autoResize:true,--}%
-                %{--resizable: true,--}%
-                %{--minHeight:"auto",--}%
-                %{--position: {--}%
-                    %{--my: "center top",--}%
-                    %{--at: "center top",--}%
-                    %{--of: window--}%
-                %{--},--}%
-                %{--open: function(event, ui) {--}%
-                    %{--$(this).html("Loading...")--}%
-                    %{--$(this).load(url, function (response, status, xhr) {--}%
-
-                        %{--if (status == "error") {--}%
-
-                            %{--// Clear error--}%
-                            %{--$(this).text("")--}%
-                            %{--$("<p/>").addClass("error").text("An unexpected error has occurred: " + xhr.status + " " + xhr.statusText).appendTo($(this));--}%
-
-                            %{--// If in debug mode (which we always are, at the moment) we can display the error response--}%
-                            %{--// from the server (or javascript error in case error response is not in JSON)--}%
-                            %{--try {--}%
-                                %{--var error = JSON.parse(response);--}%
-                                %{--var stack = $("<div/>").addClass("stack empty").appendTo($(this));--}%
-                                %{--$("<pre/>").text(error.errorMessage).appendTo(stack)--}%
-                            %{--} catch (e) {--}%
-                                %{--console.log("exception: ", e);--}%
-                                %{--//$("<pre/>").text(e.stack).appendTo($(this));--}%
-                                %{--$(this).append(response);--}%
-                            %{--}--}%
-
-                        %{--}--}%
-
-                        %{--//$(this).dialog('open');--}%
-
-                    %{--});--}%
-                %{--}--}%
-            %{--}).dialog('open');--}%
-        %{--});--}%
     });
 </g:javascript>

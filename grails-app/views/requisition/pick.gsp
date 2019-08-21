@@ -11,7 +11,6 @@
     tr.selected, tr.selected a:not(.button) { color: black; font-size: 1.2em; text-decoration: blink; font-weight: bold; }
     tr.selected-middle { border-left: 5px solid #f3961c; }
     tr.selected-bottom { border-bottom: 5px solid #f3961c; border-right: 5px solid #f3961c; border-left: 5px solid #f3961c; }
-    /*tr.unselected, tr.unselected a { color: #ccc; }*/
 </style>
 
 </head>
@@ -35,11 +34,6 @@
 
                 <div id="picklist" class="left ui-validation">
                     <div class="">
-
-                            <%--
-                            <g:link controller="requisitionItem" action="substitute" class="button">Substitute</g:link>
-                            <g:link controller="requisitionItem" action="cancel" class="button">Cancel remaining</g:link>
-                            --%>
                             <div class="box">
                                 <h2><warehouse:message code="requisition.pick.label"/></h2>
 
@@ -109,14 +103,6 @@
                                             <th class="center">
                                                 ${warehouse.message(code: 'requisitionItem.quantityRemaining.label')}
                                             </th>
-                                            <%--
-                                            <th>
-                                                ${warehouse.message(code: 'requisitionItem.status.label')}
-                                            </th>
-                                            <th>
-                                                %
-                                            </th>
-                                            --%>
                                             <th class="center">
                                                 <warehouse:message code="requisitionItem.orderIndex.label" default="Sort order" />
                                             </th>
@@ -128,26 +114,6 @@
                                         <g:set var="status" value="${0}"/>
                                         <g:each var="requisitionItem" in="${requisition?.requisitionItems}" status="i">
                                             <g:if test="${!requisitionItem.parentRequisitionItem || true}">
-                                                <%--
-                                                <g:if test="${requisitionItem?.modificationItem}">
-                                                    <g:render template="pickRequisitionItem"
-                                                              model="[i:i,requisitionItem:requisitionItem?.modificationItem,selectedRequisitionItem:selectedRequisitionItem]"/>
-                                                </g:if>
-                                                <g:elseif test="${requisitionItem?.substitutionItem}">
-                                                    <g:render template="pickRequisitionItem"
-                                                              model="[i:i,requisitionItem:requisitionItem?.substitutionItem,selectedRequisitionItem:selectedRequisitionItem]"/>
-                                                </g:elseif>
-                                                <g:else>
-                                                    <g:render template="pickRequisitionItem"
-                                                              model="[i:i,requisitionItem:requisitionItem,selectedRequisitionItem:selectedRequisitionItem]"/>
-                                                </g:else>
-                                                --%>
-
-
-
-<%--
-                                            <g:set var="tempRequisitionItem" value="${requisitionItem}"/>
---%>
 
                                                 <g:set var="selected" value="${requisitionItem == selectedRequisitionItem }"/>
                                                 <g:set var="noneSelected" value="${!selectedRequisitionItem }"/>
@@ -201,12 +167,7 @@
                                                                     ${requisitionItem.toJson()}
                                                                     ${requisitionItem.calculatePercentageCompleted()}
                                                                 </div>
-                                                                <div>
-                                                                    <%--
-                                                                Requisition items: ${requisitionItem?.requisitionItems?.size()}
-
-                                                                --%>
-                                                                </div>
+                                                                <div></div>
                                                                 <div>
                                                                     <label>Substitution:</label>
                                                                     ${requisitionItem?.substitutionItem?.toJson()}
@@ -224,9 +185,6 @@
                                                 <td class="left middle">
                                                     <a name="${selectedRequisitionItem?.id}"></a>
                                                     <g:if test="${!isChild }">
-                                                    <%--
-                                                    <g:render template="/requisitionItem/actions" model="[requisition:requisition,requisitionItem:requisitionItem]"/>
-                                                    --%>
                                                         <div class="action-menu">
                                                             <button name="actionButtonDropDown" class="action-btn" id="requisitionItem-${requisitionItem?.id }-action">
                                                                 <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -312,11 +270,6 @@
                                                                                         <th class="center border-right">
                                                                                             ${warehouse.message(code: 'requisitionItem.quantityAvailable.label')}
                                                                                         </th>
-                                                                                        <%--
-                                                                                        <th>
-                                                                                            ${warehouse.message(code: 'requisitionItem.quantityToPick.label', default:'Quantity to pick')}
-                                                                                        </th>
-                                                                                        --%>
                                                                                         <th class="center">
                                                                                             ${warehouse.message(code: 'picklistItem.quantity.label')}
                                                                                         </th>
@@ -359,14 +312,6 @@
                                                                                                 ${inventoryItem?.quantity ?: 0}
                                                                                                 ${inventoryItem?.product?.unitOfMeasure?:"EA"}
                                                                                             </td>
-                                                                                            <%--
-                                                                                            <td>
-                                                                                                <g:link controller="requisition" action="addToPicklistItems" id="${requisition?.id}" params=""
-                                                                                                    class="button icon arrowright" >
-                                                                                                    ${requisitionItem?.calculateQuantityRemaining()} ${inventoryItem?.product?.unitOfMeasure?:"EA"}
-                                                                                                </g:link>
-                                                                                            </td>
-                                                                                            --%>
                                                                                             <td class="middle center">
                                                                                                 <g:hiddenField name="picklistItems[${status}].id" value="${picklistItem?.id}"/>
                                                                                                 <g:hiddenField name="picklistItems[${status}].requisitionItem.id" value="${picklistItem?.requisitionItem?.id?:requisitionItem?.id}"/>
@@ -458,36 +403,11 @@
                                                     </div>
 
                                                 </td>
-                                                <%--
-                                                <td>
-                                                    <g:set var="value" value="${((requisitionItem?.calculateQuantityPicked()?:0)+(requisitionItem?.quantityCanceled?:0))/(requisitionItem?.quantity?:1) * 100 }" />
-                                                    <div id="progress-bar-${requisitionItem?.id }" class="progress-bar" style="width: 100px;"></div>
-                                                    <script type="text/javascript">
-                                                        $(function() {
-                                                            $( "#progress-bar-${requisitionItem?.id }" ).progressbar({value: ${value} });
-                                                        });
-                                                    </script>
-                                                </td>
-                                                <td>
-                                                    ${formatNumber(number: value, maxFractionDigits: 0)}%
-                                                </td>
-                                                --%>
                                                 <td class="center middle">
                                                     ${requisitionItem.orderIndex}
                                                 </td>
                                             </tr>
-
-
-
-
-
-
                                             </g:if>
-                                            <%--
-                                            <g:each var="innerRequisitionItem" in="${requisitionItem.requisitionItems}" status="j">
-                                                <g:render template="pickRequisitionItem" model="[requisitionItem:innerRequisitionItem, i:j]"/>
-                                            </g:each>
-                                            --%>
                                         </g:each>
                                     </tbody>
                                 </table>
@@ -523,17 +443,6 @@
 		).addClass('ui-tabs-vertical ui-helper-clearfix');
         $(".tabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
 
-
-        /*
-        $(".dialog-box").dialog({width:600,height:400,position: {
-            my: 'bottom',
-            at: 'top',
-            of: $('#selected-requisition-item')
-        }});
-    	*/
-
-        //$("#requisitionForm").validate({ submitHandler: viewModel.save });
-
         $("#accordion").accordion({
           header: ".accordion-header", 
           icons: false, 
@@ -542,11 +451,8 @@
           heightStyle: "content"
           });
 
-        //setInterval(function () { saveToLocal(); }, 3000);
-
         $("#cancelRequisition").click(function() {
             if(confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}')) {
-                //openboxes.requisition.deletePicklistFromLocal(picklistFromServer.id);
                 return true;
             }
         });
@@ -609,7 +515,6 @@
 			$("#lotNumberText").text(ui.item.lotNumber);
 			$("#expirationDateText").text(expirationDateString);
 			$("#maxQuantityText").text(ui.item.quantity);
-			//$("#quantity").val(ui.item.quantity);
 			$("#quantity").focus();
 			$(this).val('');
 		    return false;

@@ -181,11 +181,4 @@
             </g:each>
         </tbody>
     </table>
-    <%--
-    <p><warehouse:message code="requisitionItem.comment.label"/>:</p>
-    <div id="comment-box">
-        <!--Empty comment box -->
-    </div>
-    --%>
-
 </div>

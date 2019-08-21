@@ -13,12 +13,6 @@
 		
 	<!-- Grails Layout : write head element for page-->
 	<g:layoutHead />
-	<%-- 	
-	<script type="text/javascript">
-		$.noConflict();
-		// Code that uses other library's $ can follow here.
-	</script>
-	--%>
 
 </head>
 <body >
@@ -50,20 +44,11 @@
 									<li>Logged in as <b>${session.user.username}</b>
 										(<g:link class="list" controller="auth" action="logout"><warehouse:message code="default.notuser.label"  default="not you?"/></g:link>)
 									</li>
-									<!-- 
-									| <li><g:link class="list" controller="user" action="preferences"><warehouse:message code="default.preferences.label"  default="Preferences"/></g:link></li>
-									 -->
 									| <li><g:link class="list" controller="auth" action="logout"><warehouse:message code="default.logout.label"  default="Logout"/></g:link></li>
-									| <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>
-									
+									| <li><input type="text" value="search" name="q" style="color: #aaa; font-weight: bold;" disabled=disabled /></li>								
 							    </g:if>
 							    <g:else test="${!session.user}">
-									<li>Not logged in</li>  | <li><g:link class="list" controller="auth" action="login"><warehouse:message code="default.login.label" default="Login"/></g:link></li>
-									<!-- 
-									 | <li><g:link class="list" controller="user" action="register"><warehouse:message code="default.register.label" default="Register"/></g:link></li>
-									 | <li><g:link class="list" controller="user" action="help"><warehouse:message code="default.help.label" default="Help"/></g:link></li>
-									 -->
-									 
+									<li>Not logged in</li>  | <li><g:link class="list" controller="auth" action="login"><warehouse:message code="default.login.label" default="Login"/></g:link></li>									 
 							    </g:else>
 							</ul>
 						</div>
@@ -75,15 +60,8 @@
 		    <div class="yui-b">
 				<!-- Global Navigation menu -->
 				<div class="nav">
-					<%-- <g:render template="../common/breadcrumb" />--%>
-					<g:breadcrumb />
-					
-					
-				    <g:if test="${session.user}">				    
-						<%-- 
-				    	<g:render template="../common/global"/>
-				    	<g:pageProperty name="page.globalLinks" /><!-- Populated using the 'globalLinks' property defined in the GSP file -->
-					    --%>				    
+					<g:breadcrumb />								
+				    <g:if test="${session.user}">			    
 						<!-- TODO Implemented hack to move the settings menu over to the right -->
 						<span class="menuButton" style="position:absolute; right: 15px;"><a class="settings" href="${createLink(uri: '/admin/index')}">Settings</a></span>
 				    </g:if>
@@ -107,38 +85,11 @@
 	      	<div id="yui-main">
 		    	<div id="content" class="yui-b">
 					<!-- Populated using the 'pageTitle' property defined in the GSP file -->
-					<%-- 
-					<g:if test="${pageProperty(name:'page.pageTitle')}">
-					    <div id="pageTitle">
-							<h1><g:pageProperty name="page.pageTitle" /></h1>
-							<hr/>
-					    </div>
-					</g:if>
-					--%>
 					<g:layoutBody />
 				</div>
 	      	</div>
 	      		      	
 	      	<!-- YUI nav block that includes the local navigation menu -->
-	      	<%--	      	
-	      	<div id="menu" role="navigation" class="yui-b">
-		  		<g:if test="${session.user}">
-			  		<!-- Navigation Menu -->
-			  		<div id="navMenu" class="homePagePanel">
-			      		<div class="panelTop"><!-- used to dislay the bottom border of the navigation menu --></div>
-						<div class="panelBody">							
-							<h1><g:pageProperty name="page.menuTitle" /> Menu</h1>
-							<ul>
-								<li><span class="menuButton"><a class="dashboard" href="${createLink(uri: '/home/index')}">Dashboard</a></span></li>
-								<g:pageProperty name="page.localLinks" />
-							</ul>							
-							<br/><!-- this is added in order to get rid of whitespace in menu -->
-						</div>
-						<div class="panelBtm"><!-- used to dislay the bottom border of the navigation menu --></div>
-					</div>
-				</g:if>
-			</div>
-			 --%>
 		</div>
 		
 		<!-- YUI "footer" block that includes footer information -->

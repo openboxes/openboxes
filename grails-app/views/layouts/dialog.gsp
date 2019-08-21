@@ -4,11 +4,7 @@
 <head>
 	<!-- Include default page title -->
 	<title><g:layoutTitle default="Your Location App" /></title>
-	<%--<link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> --%>
-	
-	<%-- 
-	<link rel="stylesheet" href="${createLinkTo(dir:'js/yui/2.7.0/reset-fonts-grids',file:'reset-fonts-grids.css')}" type="text/css">
-	--%>
+
 	<!-- Include Favicon -->
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	

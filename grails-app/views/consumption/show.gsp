@@ -42,11 +42,6 @@
                                     <th class="center"><warehouse:message code="consumption.daily.label" default="Daily"/></th>
                                     <th class="center"><warehouse:message code="consumption.qoh.label" default="QoH"/></th>
                                     <th class="center"><warehouse:message code="consumption.months.label" default="Months"/></th>
-                                    <%--
-                                    <g:each var="property" in="${command.selectedProperties}">
-                                        <th>${property}</th>
-                                    </g:each>
-                                    --%>
                                 </tr>
                             </thead>
                             <tbody>

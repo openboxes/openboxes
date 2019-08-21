@@ -71,20 +71,6 @@
 
 								</td>
 							</tr>
-							<%-- 
-							<tr class="prop">
-								<td class="name"><label><warehouse:message code="inventoryLevel.minimumQuantity.label"/></label></td>
-								<td class="value">
-									<g:textField name="minQuantity" value="${inventoryLevelInstance?.minQuantity }" size="3"/>
-								</td>
-							</tr>
-							<tr class="prop">
-								<td class="name"><label><warehouse:message code="inventoryLevel.reorderQuantity.label"/></label></td>
-								<td class="value">
-									<g:textField name="reorderQuantity" value="${inventoryLevelInstance?.reorderQuantity }" size="3"/>
-								</td>
-							</tr>
-							--%>
 							<tr class="prop">
 								<td></td>
 								<td>

@@ -26,7 +26,6 @@
 
         $('#recentActivity').dataTable( {
             "bProcessing": true,
-            //"bServerSide": true,
             "sServerMethod": "GET",
             "iDisplayLength": 25,
             "bSort": false,
@@ -38,9 +37,7 @@
             "bAutoWidth": true,
             "sPaginationType": "full_numbers",
             "sAjaxSource": "${request.contextPath}/json/getDashboardActivity",
-            "fnServerParams": function ( data ) {
-                //data.push({ name: "location.id", value: $("#currentLocationId").val() });
-            },
+            "fnServerParams": function ( data ) {},
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 $.ajax( {
                     "dataType": 'json',
@@ -56,8 +53,6 @@
                 "sZeroRecords": "No records found",
                 "sProcessing": "Loading ... <img alt='spinner' src='${request.contextPath}/images/spinner.gif' />"
             },
-            //"fnInitComplete": fnInitComplete,
-            //"iDisplayLength" : -1,
             "aLengthMenu": [
                 [5, 10, 25, 100, 1000, -1],
                 [5, 10, 25, 100, 1000, "All"]

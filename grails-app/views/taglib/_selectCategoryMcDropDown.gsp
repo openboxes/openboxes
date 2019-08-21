@@ -5,6 +5,5 @@
 <script>
 $(document).ready(function() {			
 	$("#${attrs.id}").mcDropdown("#mcdropdown", {allowParentSelect:true}); 
-});		
-</script>	
-	
+});
+</script>

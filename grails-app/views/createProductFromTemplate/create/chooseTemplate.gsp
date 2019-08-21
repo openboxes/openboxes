@@ -29,47 +29,8 @@
 							</div>		
 							<div class="template-name">Gloves</div>						
 						</li>
-						<%-- 
-						<li>
-							<div class="template-image">
-								<g:link controller="createProductFromTemplate" action="create" event="next" params="[templateName:'masks']">
-									<img src="${createLinkTo(dir:'images/productTemplates',file:'masks.jpg')}" height="128" width="128"/>
-								</g:link>
-							</div>		
-							<div class="template-name">Masks</div>						
-						</li>
-						<li>
-							<div class="template-image">
-								<g:link controller="createProductFromTemplate" action="create" event="next" params="[templateName:'medicine']">
-									<img src="${createLinkTo(dir:'images/productTemplates',file:'pills.png')}" height="128" width="128"/>
-								</g:link>
-							</div>		
-							<div class="template-name">Medicine</div>						
-						</li>
-						
-						
-						<li>
-							<div class="template-image">
-								<g:link controller="createProductFromTemplate" action="create" event="next" params="[templateName:'new']">
-									<img src="${createLinkTo(dir:'images/productTemplates',file:'new.png')}" height="128" width="128"/>
-								</g:link>
-							</div>		
-							<div class="template-name">New template</div>						
-						</li>							
-						--%>
-					</ul>			
-				
-				
-				</div>			
-				<%-- 
-				<div class="buttons">
-                    <g:submitButton class="back" name="back" value="Back" />
-                    <g:submitButton class="next" name="next" value="Next" />
-                    <g:submitButton class="cancel" name="cancel" value="Cancel" />
-					
-					
+					</ul>
 				</div>
-				--%>
             </g:form>
         </div>
 		<script>			

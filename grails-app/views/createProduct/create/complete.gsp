@@ -162,27 +162,13 @@
 				
 				
 				</div>			
-				<div class="buttons center">
-					<%-- 
-					<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-					<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button>
-					<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-					<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>					
-					--%>
-					
+				<div class="buttons center">					
                     <g:submitButton class="back" name="next" value="Next" />
                     <g:submitButton class="back" name="back" value="Back" />
                     <g:submitButton class="cancel" name="cancel" value="Cancel" />
 					
 				</div>
             </g:form>
-        </div>
-        
-        
-        
-		<script>			
-			//$(document).ready(function() {
-			//});
-		</script> 				
+        </div>				
     </body>
 </html>

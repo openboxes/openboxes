@@ -38,32 +38,3 @@
 		</div>
 	</div>
 </div>
-
-<script>
-    function showIndicators() {
-        //console.log("test");
-    }
-    /*
-    function getIndicator(id, url, timeout, error) {
-        var value = $.ajax({
-            url: url,
-            type: "GET",
-            dataType: "json",
-            timeout: timeout,
-            success: function(response) { console.log(response); },
-            error: function(x, t, m) {
-                if(t==="timeout") {
-                    console.log("got timeout");
-                } else {
-                    console.log(t);
-                }
-            }
-        });
-        console.log(value);
-        $(id).val(value);
-    }
-    */
-    //$(window).load(function(){
-
-    //});
-</script>

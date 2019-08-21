@@ -37,13 +37,6 @@
                                       id="${productGroup.id}" params="[productId:product.id]">
                             <warehouse:message code="default.button.unlink.label" default="Unlink"/>
                         </g:remoteLink>
-
-                        <%--
-                        <g:remoteLink controller="product" action="deleteProductGroup" update="productGroups" class="button icon trash"
-                                      id="${productGroup.id}" params="[productId:product.id]">
-                            <warehouse:message code="default.button.delete.label"/>
-                        </g:remoteLink>
-                        --%>
                     </td>
                 </tr>
             </g:each>

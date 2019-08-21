@@ -32,10 +32,6 @@
                         ${requisitionItem.calculatePercentageCompleted()}
                     </div>
                     <div>
-                        <%--
-                    Requisition items: ${requisitionItem?.requisitionItems?.size()}
-
-                    --%>
                     </div>
                     <div>
                         <label>Substitution:</label>
@@ -54,9 +50,6 @@
     <td class="left">
         <a name="${selectedRequisitionItem?.id}"></a>
         <g:if test="${!isChild }">
-            <%--
-            <g:render template="/requisitionItem/actions" model="[requisition:requisition,requisitionItem:requisitionItem]"/>
-            --%>
             <div class="action-menu">
                 <button name="actionButtonDropDown" class="action-btn" id="requisitionItem-${requisitionItem?.id }-action">
                     <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
@@ -107,11 +100,6 @@
                                     <th class="center border-right">
                                         ${warehouse.message(code: 'requisitionItem.quantityAvailable.label')}
                                     </th>
-                                    <%--
-                                    <th>
-                                        ${warehouse.message(code: 'requisitionItem.quantityToPick.label', default:'Quantity to pick')}
-                                    </th>
-                                    --%>
                                     <th class="center">
                                         ${warehouse.message(code: 'picklistItem.quantity.label')}
                                     </th>
@@ -154,14 +142,6 @@
                                             ${inventoryItem?.quantity ?: 0}
                                             ${inventoryItem?.product?.unitOfMeasure?:"EA"}
                                         </td>
-                                        <%--
-                                        <td>
-                                            <g:link controller="requisition" action="addToPicklistItems" id="${requisition?.id}" params=""
-                                                class="button icon arrowright" >
-                                                ${requisitionItem?.calculateQuantityRemaining()} ${inventoryItem?.product?.unitOfMeasure?:"EA"}
-                                            </g:link>
-                                        </td>
-                                        --%>
                                         <td class="middle center">
                                             <g:hiddenField name="picklistItems[${status}].id" value="${picklistItem?.id}"/>
                                             <g:hiddenField name="picklistItems[${status}].requisitionItem.id" value="${picklistItem?.requisitionItem?.id?:requisitionItem?.id}"/>
@@ -250,20 +230,6 @@
     <td class="center">
         ${requisitionItem?.calculateQuantityRemaining()?:0 }
     </td>
-    <%--
-    <td>
-        <g:set var="value" value="${((requisitionItem?.calculateQuantityPicked()?:0)+(requisitionItem?.quantityCanceled?:0))/(requisitionItem?.quantity?:1) * 100 }" />
-        <div id="progress-bar-${requisitionItem?.id }" class="progress-bar" style="width: 100px;"></div>
-        <script type="text/javascript">
-            $(function() {
-                $( "#progress-bar-${requisitionItem?.id }" ).progressbar({value: ${value} });
-            });
-        </script>
-    </td>
-    <td>
-        ${formatNumber(number: value, maxFractionDigits: 0)}%
-    </td>
-    --%>
     <td class="center">
         ${requisitionItem.orderIndex}
     </td>

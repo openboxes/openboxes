@@ -111,7 +111,6 @@
             dataType: "json",
             timeout: 120000,
             url: "${request.contextPath}/json/getDashboardAlerts?location.id=${session.warehouse.id}",
-            //data: data,
             success: function (data) {
                 console.log(data);
                 var inStockCount = data.inStock?data.inStock:0;
@@ -142,8 +141,6 @@
                 $('#inStockCount').html(errorHtml);
                 $('#overStockCount').html(errorHtml);
                 $('#onHandQuantityZeroCount').html(errorHtml);
-                //$('#totalStockCount').html(errorHtml);
-
             }
         });
     });

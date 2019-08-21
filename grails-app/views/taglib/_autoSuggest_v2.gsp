@@ -13,18 +13,14 @@
 		$("#${attrs.id}-span").click(function() {
 			return false;
 		});
-		//$("#${attrs.id}-suggest").css('width', '300px');
 
 		$("#${attrs.id}-suggest").autocomplete({
 			width: '${attrs.width}',
 			minLength: '${attrs.minLength}',
 			dataType: 'json',
 			highlight: true,
-			//selectFirst: true,
 			scroll: true,
 			autoFill: true,
-			//scrollHeight: 300,
-			//define callback to format results
 			source: function(req, add){							
 				alert("source");
   					var currentLocationId = $("#currentLocationId").val();

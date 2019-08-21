@@ -53,41 +53,17 @@
 								<td class="value">
 									${product.gtin }
 								</td>
-							</tr>							
-							<%-- 
-							<tr class="prop">
-								<td class="name">
-									<label class="clear">Google ID</label>
-								</td>
-								<td class="value">
-									${product.googleId }
-								</td>
-							</tr>
-							--%>		
+							</tr>	
 						</tbody>								
 					</table>				
 				</div>			
 				<div class="buttons center">
-					<%-- 
-					<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-					<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button>
-					<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-					<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>					
-					--%>
-					
                     <g:submitButton class="back" name="back" value="Back" />
                     <g:submitButton class="next" name="next" value="Next" />
                     <g:submitButton class="cancel" name="cancel" value="Cancel" />
 					
 				</div>
             </g:form>
-        </div>
-        
-        
-        
-		<script>			
-			//$(document).ready(function() {
-			//});
-		</script> 				
+        </div>		
     </body>
 </html>

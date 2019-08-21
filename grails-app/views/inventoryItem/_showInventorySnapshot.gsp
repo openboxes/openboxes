@@ -31,10 +31,6 @@
         <div id="placeholder" class="demo-placeholder" style="height:400px; padding: 10px"></div>
     </div>
     <div class="right" style="margin:5px;">
-
-        <%--
-        <a href="javascript:downloadGraph();" class="button icon graph">Download graph</a>
-        --%>
         <g:remoteLink controller="inventorySnapshot" action="triggerCalculateQuantityOnHandJob"
                       class="button icon reload"
                       params="['product.id':product.id,'location.id':session.warehouse.id]">Refresh data</g:remoteLink>
@@ -43,11 +39,6 @@
 
 </div>
 
-
-
-
-
-<%--<script src="${createLinkTo(dir:'js/flot/', file:'jquery.js')}" type="text/javascript" ></script>--%>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.categories.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.canvas.js')}" type="text/javascript" ></script>
@@ -62,17 +53,6 @@
             plotGraph(numMonths);
         });
 
-
-//        var options = {
-//            lines: { show: true },
-//            points: { show: true },
-//            xaxis: { tickDecimals: 0, tickSize: 1 }
-//        };
-
-
-
-
-        //$.plot(placeholder, data, options);
         plotGraph(12);
 
 
@@ -129,12 +109,7 @@
                 console.log(resp);
                 chartData.push(resp);
                 console.log(chartData);
-                //if (chartData.length==1){
-                //    $('#placeholder').html("<div style='text-align: center; vertical-align: middle;'>No data was found to graph</div>");
-                //}
-                //else {
                 myGraph = $.plot(placeholder, chartData, options);
-                //}
             },
             error: function(xhr, status, error) {
                 alert("error");
@@ -150,7 +125,6 @@
     function downloadGraph() {
         var graph = $("#placeholder");
         var myCanvas = graph.getCanvas();
-                //var myCanvas = myGraph.getCanvas();
         var image = myCanvas.toDataURL();
         image = image.replace("image/png","image/octet-stream");
         document.location.href=image;

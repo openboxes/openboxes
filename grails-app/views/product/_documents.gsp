@@ -82,11 +82,6 @@
                                     ${document.lastUpdated }
                                 </td>
                                 <td>
-                                <%--
-                                <g:link controller="document" action="edit" id="${document?.id}" params="['product.id':productInstance?.id]">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
-                                </g:link>
-                                --%>
                                     <g:link controller="product" action="downloadDocument" id="${document?.id}" params="['product.id':productInstance?.id]" target="_blank">
                                         <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Download" />
                                     </g:link>

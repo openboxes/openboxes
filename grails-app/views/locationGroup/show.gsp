@@ -51,13 +51,6 @@
                                             <td>
                                                 ${location?.name }
                                             </td>
-                                            <%--
-                                            <td>
-                                                <g:link controller="stocklist" action="show" id="${location?.id }">
-                                                    ${warehouse.message(code: 'stocklist.manage.label', default: 'Manage stock list')}
-                                                </g:link>
-                                            </td>
-                                            --%>
                                         </tr>
                                     </g:each>
                                 </table>
@@ -81,14 +74,5 @@
 
                 </table>
             </div>
-
-                        
-<script type="text/javascript">
-//$(document).ready(function() {
-//
-//});
-</script>        
-
-
     </body>
 </html>

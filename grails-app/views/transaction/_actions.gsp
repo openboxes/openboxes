@@ -18,14 +18,6 @@
 				&nbsp;${warehouse.message(code: 'transaction.backToInventory.label')}
 			</g:link>
 		</div>
-	<%--
-    <div class="action-menu-item">
-        <g:link controller="inventory" action="listTransactions">
-            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_up.png')}"/>
-            ${warehouse.message(code: 'transaction.backToTransactions.label')}
-        </g:link>
-    </div>
-    --%>
 		<div class="action-menu-item">
 			<hr/>
 		</div>

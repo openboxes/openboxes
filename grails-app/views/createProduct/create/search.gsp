@@ -35,23 +35,9 @@
 				
 				
 				</div>			
-				<div class="buttons right">
-					<%-- 
-					<button name="_eventId_back">&lsaquo; <warehouse:message code="default.button.back.label"/></button>	
-					<button name="_eventId_next"><warehouse:message code="default.button.next.label"/> &rsaquo;</button>
-					<button name="_eventId_save"><warehouse:message code="default.button.saveAndExit.label"/></button>
-					<button name="_eventId_cancel"><warehouse:message code="default.button.cancel.label"/></button>					
-					--%>
-					
-					<%-- 
-                    <g:submitButton class="back" name="back" value="Back" />
-                    <g:submitButton class="cancel" name="cancel" value="Cancel" />
-					--%>
-				</div>
+				<div class="buttons right"></div>
             </g:form>
-        </div>
-        
-        
+        </div>        
         
 		<script>			
 			$(document).ready(function() {

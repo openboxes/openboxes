@@ -37,15 +37,6 @@
 				<warehouse:message code="user.changePhoto.label" />
 			</g:link>
 		</div>
-		<%--
-        <div class="action-menu-item">
-            <g:link controller="user" action="cropPhoto"
-                id="${userInstance?.id }">
-                <img src="${createLinkTo(dir:'images/icons/silk',file:'photo_edit.png')}" class="middle"/>&nbsp;
-                <warehouse:message code="user.cropPhoto.label" />
-            </g:link>
-        </div>
-        --%>
 		<div class="action-menu-item">
 			<g:link action="toggleActivation" id="${userInstance?.id}">
 				<g:if test="${userInstance?.active}">

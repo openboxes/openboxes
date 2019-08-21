@@ -22,12 +22,6 @@
                 <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" />
                 3.&nbsp;${warehouse.message(code: 'default.button.review.label', default: 'Review')}
             </g:link>
-            <%--
-            <g:link class="button" controller="requisition" action="printDraft" id="${requisition?.id}" target="_blank">
-                <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-                &nbsp;${warehouse.message(code: 'requisition.print.label', default: 'Print requisition')}
-            </g:link>
-            --%>
             <g:if test="${session?.warehouse?.id == requisition?.origin?.id }">
                 <g:link class="button ${'pick'.equals(actionName)?'active':'' }" controller="requisition" action="pick" id="${requisition?.id}" name="processRequisition">
                     <img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" />
