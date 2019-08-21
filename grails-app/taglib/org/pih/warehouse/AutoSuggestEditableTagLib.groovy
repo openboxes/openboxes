@@ -1,36 +1,36 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse
 
 // import java.text.SimpleDateFormat
 
 class AutoSuggestEditableTagLib {
-		
 
-	def autoSuggestEditable = { attrs, body ->
-		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
-		def name = attrs.name
-		def valueId = (attrs.valueId)?attrs.valueId:"";
-		def valueName = (attrs.valueName)?attrs.valueName:"";
-		def valueType = (attrs.valueType)?attrs.valueType:"";
-		def width = (attrs.width) ? attrs.width : 200;
-		def size = (attrs.size) ? attrs.size : 20;
-		def minLength = (attrs.minLength) ? attrs.minLength : 1;
-		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
 
-		// def showValue = (valueName && valueId) ? true : false;
-		// def spanDisplay = (showValue) ? "inline" : "none";
-		// def suggestDisplay = (showValue) ? "none" : "inline";
-		def spanDisplay = "none";
-		def suggestDisplay = "inline";		
-		def html = """
+    def autoSuggestEditable = { attrs, body ->
+        def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
+        def name = attrs.name
+        def valueId = (attrs.valueId) ? attrs.valueId : ""
+        def valueName = (attrs.valueName) ? attrs.valueName : ""
+        def valueType = (attrs.valueType) ? attrs.valueType : ""
+        def width = (attrs.width) ? attrs.width : 200
+        def size = (attrs.size) ? attrs.size : 20
+        def minLength = (attrs.minLength) ? attrs.minLength : 1
+        def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : ""
+
+        // def showValue = (valueName && valueId) ? true : false;
+        // def spanDisplay = (showValue) ? "inline" : "none";
+        // def suggestDisplay = (showValue) ? "none" : "inline";
+        def spanDisplay = "none"
+        def suggestDisplay = "inline"
+        def html = """
 			<div>
 				<style>
 					#${id}-suggest {
@@ -49,8 +49,10 @@ class AutoSuggestEditableTagLib {
 					size="${size}" style="width: ${width}px; display: ${suggestDisplay};">
 				
 				<!-- DIV used to display the selected value -->
-				<div id="${id}-span" style="text-align: left; display: ${spanDisplay}; width: ${width}px;">
-					<span id="${id}-span-value">${valueName?:'&nbsp;'}</span>
+				<div id="${id}-span" style="text-align: left; display: ${spanDisplay}; width: ${
+            width
+        }px;">
+					<span id="${id}-span-value">${valueName ?: '&nbsp;'}</span>
 					<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" style="float: right;"/>
 				</div>
 				
@@ -164,10 +166,10 @@ class AutoSuggestEditableTagLib {
 					
 				</script>
 			</div>
-		""";
-			
-		
-		out << html;
-	}
+		"""
+
+
+        out << html
+    }
 
 }

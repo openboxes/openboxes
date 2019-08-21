@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.picklist
 
 import org.pih.warehouse.auth.AuthService
@@ -20,8 +20,7 @@ import org.pih.warehouse.requisition.Requisition
  * (e.g. FEFO, FIFO) or by hand.
  *
  *
- * @author jmiranda
- *
+ * @author jmiranda*
  */
 class Picklist implements Serializable {
 
@@ -40,49 +39,49 @@ class Picklist implements Serializable {
         }
     }
 
-	String id
-	String name
-	String description 		// a user-defined, searchable name for the order
+    String id
+    String name
+    String description        // a user-defined, searchable name for the order
 
-	Requisition requisition
-	Person picker
+    Requisition requisition
+    Person picker
 
-	Date datePicked
+    Date datePicked
 
-	// Audit fields
-	Date dateCreated
-	Date lastUpdated
-	User createdBy
-	User updatedBy
+    // Audit fields
+    Date dateCreated
+    Date lastUpdated
+    User createdBy
+    User updatedBy
 
     static belongsTo = [requisition: Requisition]
-	static hasMany = [ picklistItems : PicklistItem ]
-	static mapping = {
-		id generator: 'uuid'
-		picklistItems cascade: "all-delete-orphan", sort: "sortOrder"
-	}
+    static hasMany = [picklistItems: PicklistItem]
+    static mapping = {
+        id generator: 'uuid'
+        picklistItems cascade: "all-delete-orphan", sort: "sortOrder"
+    }
 
-	static constraints = {
-		name(nullable:true)
-		description(nullable:true)
-		picker(nullable:true)
-		datePicked(nullable:true)
-		dateCreated(nullable:true)
-		lastUpdated(nullable:true)
-		createdBy(nullable:true)
-		updatedBy(nullable:true)
-	}
+    static constraints = {
+        name(nullable: true)
+        description(nullable: true)
+        picker(nullable: true)
+        datePicked(nullable: true)
+        dateCreated(nullable: true)
+        lastUpdated(nullable: true)
+        createdBy(nullable: true)
+        updatedBy(nullable: true)
+    }
 
-  String toString(){
-    "id: ${id}, name:${name}"
-  }
+    String toString() {
+        "id: ${id}, name:${name}"
+    }
 
-  Map toJson(){
-      [
-        id: id,
-        version: version,
-        picklistItems: picklistItems?.collect { it.toJson() }
-      ]
+    Map toJson() {
+        [
+                id           : id,
+                version      : version,
+                picklistItems: picklistItems?.collect { it.toJson() }
+        ]
     }
 
 }

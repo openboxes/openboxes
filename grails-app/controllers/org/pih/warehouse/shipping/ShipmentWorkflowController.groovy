@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.shipping
 
 import org.pih.warehouse.core.Document
@@ -37,8 +37,7 @@ class ShipmentWorkflowController {
         if (shipmentWorkflowInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), shipmentWorkflowInstance.id])}"
             redirect(action: "list", id: shipmentWorkflowInstance.id)
-        }
-        else {
+        } else {
             render(view: "create", model: [shipmentWorkflowInstance: shipmentWorkflowInstance])
         }
     }
@@ -48,8 +47,7 @@ class ShipmentWorkflowController {
         if (!shipmentWorkflowInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             [shipmentWorkflowInstance: shipmentWorkflowInstance]
         }
     }
@@ -59,8 +57,7 @@ class ShipmentWorkflowController {
         if (!shipmentWorkflowInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             return [shipmentWorkflowInstance: shipmentWorkflowInstance, documentTemplates: documentTemplates]
         }
     }
@@ -71,7 +68,7 @@ class ShipmentWorkflowController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (shipmentWorkflowInstance.version > version) {
-                    
+
                     shipmentWorkflowInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow')] as Object[], "Another user has updated this ShipmentWorkflow while you were editing")
                     render(view: "edit", model: [shipmentWorkflowInstance: shipmentWorkflowInstance, documentTemplates: documentTemplates])
                     return
@@ -81,12 +78,10 @@ class ShipmentWorkflowController {
             if (!shipmentWorkflowInstance.hasErrors() && shipmentWorkflowInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), shipmentWorkflowInstance.id])}"
                 redirect(action: "list", id: shipmentWorkflowInstance.id)
-            }
-            else {
+            } else {
                 render(view: "edit", model: [shipmentWorkflowInstance: shipmentWorkflowInstance, documentTemplates: documentTemplates])
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"
             redirect(action: "list")
         }
@@ -104,8 +99,7 @@ class ShipmentWorkflowController {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"
             redirect(action: "list")
         }

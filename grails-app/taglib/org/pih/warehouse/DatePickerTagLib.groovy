@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse
 
 import java.text.SimpleDateFormat
@@ -14,47 +14,48 @@ import java.text.SimpleDateFormat
 class DatePickerTagLib {
 
 
+    def datePicker = { attrs, body ->
+        def datePickerTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.FormTagLib')
+        out << datePickerTagLib.datePicker.call(attrs)
+    }
 
-	def datePicker = { attrs, body ->
-		def datePickerTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.FormTagLib')
-		out << datePickerTagLib.datePicker.call(attrs)
-	}
+    def jqueryDatePicker = { attrs, body ->
 
-	def jqueryDatePicker = {attrs, body ->
-
-		def id = attrs.id ? attrs.id : attrs.name;
-		def name = attrs.name;
-		def autoSize = attrs.autoSize ?:(attrs.size)?"false":"true";
-		def size = attrs.size ?: "10"
-		def cssClass = attrs.cssClass ?: ""
-		def showOn = attrs.showOn ?: "both";
-		def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true");
-		def changeMonthAndYear = attrs.changeMonthAndYear ?: true;
-		// def showClear = attrs.showClear ?: "false"
-		def value = attrs.value;
-        def numberOfMonths = attrs.numberOfMonths?:1
-		def readOnly = attrs.readOnly ?: false
-        def minDate = attrs.minDate ? "new Date('${attrs.minDate}')": null
-        def maxDate = attrs.maxDate ? "new Date('${attrs.maxDate}')": null
+        def id = attrs.id ? attrs.id : attrs.name
+        def name = attrs.name
+        def autoSize = attrs.autoSize ?: (attrs.size) ? "false" : "true"
+        def size = attrs.size ?: "10"
+        def cssClass = attrs.cssClass ?: ""
+        def showOn = attrs.showOn ?: "both"
+        def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true")
+        def changeMonthAndYear = attrs.changeMonthAndYear ?: true
+        // def showClear = attrs.showClear ?: "false"
+        def value = attrs.value
+        def numberOfMonths = attrs.numberOfMonths ?: 1
+        def readOnly = attrs.readOnly ?: false
+        def minDate = attrs.minDate ? "new Date('${attrs.minDate}')" : null
+        def maxDate = attrs.maxDate ? "new Date('${attrs.maxDate}')" : null
         def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
-		def placeholder = attrs.placeholder ?: '';
-		// def showHint = attrs.showHint ?: false;
-		def autocomplete = attrs.autocomplete ?: 'on'
+        def placeholder = attrs.placeholder ?: ''
+        // def showHint = attrs.showHint ?: false;
+        def autocomplete = attrs.autocomplete ?: 'on'
 
-		if (value) {
-			if (value instanceof Date) {
-				value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
-			}
-		}
+        if (value) {
+            if (value instanceof Date) {
+                value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
+            }
+        }
 
-		if (name == null) {
-			throw new IllegalArgumentException("name parameter must be specified")
-		}
+        if (name == null) {
+            throw new IllegalArgumentException("name parameter must be specified")
+        }
 
-		def html = """
+        def html = """
 			<input id='${id}' name='${name}' type='hidden' ${dataBind}/>
 			<input id='${id}-datepicker' name='${name}-datepicker' autocomplete ='${autocomplete}' type='text'
-					placeholder='${placeholder}' class='${cssClass} text large' size="${size}" ${readOnly?"readonly='readonly'":""}/>
+					placeholder='${placeholder}' class='${cssClass} text large' size="${size}" ${
+            readOnly ? "readonly='readonly'" : ""
+        }/>
 			<script type=\'text/javascript\'>
 
 				jQuery(document).ready(function() {
@@ -104,11 +105,11 @@ class DatePickerTagLib {
 						jQuery('#${id}-datepicker').datepicker('setDate', new Date('${value}'));
 					}
 				});
-			</script>""";
+			</script>"""
 
-		out << html;
+        out << html
 
-	}
+    }
 
 
 }

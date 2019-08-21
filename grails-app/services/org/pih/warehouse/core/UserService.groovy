@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.core
 
 import com.unboundid.ldap.sdk.BindRequest
@@ -28,7 +28,6 @@ import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
 import org.pih.warehouse.auth.AuthService
-
 import util.StringUtil
 
 import javax.net.SocketFactory
@@ -55,8 +54,8 @@ class UserService {
         // setting the new password in the database
         if (params.changePassword && userInstance.password != params.password) {
             userInstance.properties = params
-            userInstance.password = params?.password?.encodeAsPassword();
-            userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword();
+            userInstance.password = params?.password?.encodeAsPassword()
+            userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
         } else {
             userInstance.properties = params
             // Needed to bypass the password == passwordConfirm validation
@@ -80,7 +79,7 @@ class UserService {
         def isRolesDirty = !ListUtils.isEqualList(updatedRoles, currentRoles) && params.updateRoles
         log.info "User update: ${updatedRoles} vs ${currentRoles}: isDirty=${isRolesDirty}, canEditRoles=${canEditRoles}"
         if (isRolesDirty && !canEditRoles) {
-            Object [] args = [currentUser.username, userInstance.username]
+            Object[] args = [currentUser.username, userInstance.username]
             userInstance.errors.rejectValue("roles", "user.errors.cannotEditUserRoles.message", args, "User cannot edit user roles")
             throw new ValidationException("user.errors.cannotEditUserRoles.message", userInstance.errors)
         }
@@ -89,24 +88,24 @@ class UserService {
         return userInstance.save(failOnError: true)
     }
 
-    private void updateRoles(user, locationRolePairs){
-        def newAndUpdatedRoles = locationRolePairs.keySet().collect{ locationId ->
-            if(locationRolePairs[locationId]){
+    private void updateRoles(user, locationRolePairs) {
+        def newAndUpdatedRoles = locationRolePairs.keySet().collect { locationId ->
+            if (locationRolePairs[locationId]) {
                 def location = Location.get(locationId)
                 def role = Role.get(locationRolePairs[locationId])
-                def existingRole = user.locationRoles.find{it.location == location}
-                if(existingRole){
+                def existingRole = user.locationRoles.find { it.location == location }
+                if (existingRole) {
                     existingRole.role = role
-                }else{
-                    def newLocationRole = new LocationRole(user: user, location:location, role: role)
+                } else {
+                    def newLocationRole = new LocationRole(user: user, location: location, role: role)
                     user.addToLocationRoles(newLocationRole)
                 }
             }
         }
-        def rolesToRemove = user.locationRoles.findAll{ oldRole ->
+        def rolesToRemove = user.locationRoles.findAll { oldRole ->
             !locationRolePairs[oldRole.location.id]
         }
-        rolesToRemove.each{
+        rolesToRemove.each {
             user.removeFromLocationRoles(it)
         }
     }
@@ -117,7 +116,7 @@ class UserService {
             def roles = [RoleType.ROLE_SUPERUSER]
             return getEffectiveRoles(user).any { roles.contains(it.roleType) }
         }
-        return false;
+        return false
     }
 
     Boolean isUserAdmin(User u) {
@@ -126,7 +125,7 @@ class UserService {
             def roles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
             return getEffectiveRoles(user).any { roles.contains(it.roleType) }
         }
-        return false;
+        return false
     }
 
     Boolean isUserManager(User u) {
@@ -135,7 +134,7 @@ class UserService {
             def roles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_ASSISTANT]
             return getEffectiveRoles(user).any { roles.contains(it.roleType) }
         }
-        return false;
+        return false
     }
 
     Boolean canUserBrowse(User u) {
@@ -144,7 +143,7 @@ class UserService {
             def roles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER, RoleType.ROLE_BROWSER, RoleType.ROLE_ASSISTANT]
             return getEffectiveRoles(user).any { roles.contains(it.roleType) }
         }
-        return false;
+        return false
     }
 
     Boolean hasRoleFinance(User u) {
@@ -153,7 +152,7 @@ class UserService {
             def roleTypes = [RoleType.ROLE_FINANCE]
             return getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
         }
-        return false;
+        return false
     }
 
 
@@ -185,7 +184,7 @@ class UserService {
         }
     }
 
-    def findPersons(String [] terms) {
+    def findPersons(String[] terms) {
         return findPersons(terms, [:])
     }
 
@@ -209,7 +208,7 @@ class UserService {
     def findUsers(String query, Map params) {
         println "findUsers: " + query + " : " + params
         def criteria = User.createCriteria()
-        def results = criteria.list (params) {
+        def results = criteria.list(params) {
             if (query) {
                 or {
                     like("firstName", query)
@@ -225,7 +224,7 @@ class UserService {
             //order("lastName", "desc")
         }
 
-        return results;
+        return results
     }
 
 
@@ -261,15 +260,15 @@ class UserService {
                 }
             }
         }
-        return users;
+        return users
     }
 
-    private def rolesForCurrentLocation(User user){
+    private def rolesForCurrentLocation(User user) {
         def currentLocation = AuthService.currentLocation?.get()
         return user.getRolesByCurrentLocation(currentLocation)
     }
 
-    private def getEffectiveRoles(User user){
+    private def getEffectiveRoles(User user) {
         def currentLocation = AuthService.currentLocation?.get()
         return user.getEffectiveRoles(currentLocation)
     }
@@ -279,13 +278,13 @@ class UserService {
         def recipients = []
         def roleAdmin = Role.findByRoleType(RoleType.ROLE_ADMIN)
         if (roleAdmin) {
-          def criteria = User.createCriteria()
-          recipients = criteria.list {
-              eq("active", true)
-              roles {
-                  eq("id", roleAdmin.id)
-              }
-          }
+            def criteria = User.createCriteria()
+            recipients = criteria.list {
+                eq("active", true)
+                roles {
+                    eq("id", roleAdmin.id)
+                }
+            }
         }
         return recipients
     }
@@ -328,13 +327,14 @@ class UserService {
      * @return
      */
     def authenticateUsingLdap(username, password) {
-        def host = grailsApplication.config.openboxes.ldap.context.server.host?:"ldap.forumsys.com"
-        def port = grailsApplication.config.openboxes.ldap.context.server.port?:389
-        def bindUserDn = grailsApplication.config.openboxes.ldap.context.managerDn?:"cn=read-only-admin,dc=example,dc=com"
-        def bindUserPassword = grailsApplication.config.openboxes.ldap.context.managerPassword?:"password"
-        long responseTimeoutMillis = grailsApplication.config.openboxes.ldap.responseTimeoutMillis?:1000;
+        def host = grailsApplication.config.openboxes.ldap.context.server.host ?: "ldap.forumsys.com"
+        def port = grailsApplication.config.openboxes.ldap.context.server.port ?: 389
+        def bindUserDn = grailsApplication.config.openboxes.ldap.context.managerDn ?: "cn=read-only-admin,dc=example,dc=com"
+        def bindUserPassword = grailsApplication.config.openboxes.ldap.context.managerPassword ?: "password"
+        long responseTimeoutMillis = grailsApplication.config.openboxes.ldap.responseTimeoutMillis ?: 1000
         def searchSubtree = grailsApplication.config.openboxes.ldap.search.searchSubtree
-        String [] attributesToReturn = ["displayName", "password", "mail", "cn"] //grailsApplication.config.openboxes.ldap.search.attributesToReturn
+        String[] attributesToReturn = ["displayName", "password", "mail", "cn"]
+        //grailsApplication.config.openboxes.ldap.search.attributesToReturn
 
         LDAPConnection ldapConnection
 
@@ -343,60 +343,58 @@ class UserService {
 
         try {
 
-            ldapConnection = new LDAPConnection(host, port, bindUserDn, bindUserPassword);
+            ldapConnection = new LDAPConnection(host, port, bindUserDn, bindUserPassword)
             //ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password");
 
             //Search user DN:
-            def searchBaseDn = grailsApplication.config.openboxes.ldap.search.base;
+            def searchBaseDn = grailsApplication.config.openboxes.ldap.search.base
             //def searchBaseDn = "dc=example,dc=com"
 
             // Search filter
             def filter
 
             // Check if the search filter has been overridden in Config.groovy or openboxes-config.properties
-            def searchFilter = grailsApplication.config.openboxes.ldap.search.filter; // "(uid={0})"
+            def searchFilter = grailsApplication.config.openboxes.ldap.search.filter // "(uid={0})"
             if (searchFilter) {
-                filter = StringUtil.format(searchFilter, username);
-                log.info ("Using custom filter ${searchFilter} => ${filter}")
+                filter = StringUtil.format(searchFilter, username)
+                log.info("Using custom filter ${searchFilter} => ${filter}")
 
-            }
-            else {
-                filter = Filter.createEqualityFilter("uid",username);
-                log.info ("Using default equality filter on uid ${filter}")
+            } else {
+                filter = Filter.createEqualityFilter("uid", username)
+                log.info("Using default equality filter on uid ${filter}")
             }
 
 
             // Perform search request
-            SearchRequest searchRequest = new SearchRequest(searchBaseDn, SearchScope.SUB, DereferencePolicy.NEVER, 0, 0, false, filter, attributesToReturn);
-            SearchResult searchResult = ldapConnection.search(searchRequest);
+            SearchRequest searchRequest = new SearchRequest(searchBaseDn, SearchScope.SUB, DereferencePolicy.NEVER, 0, 0, false, filter, attributesToReturn)
+            SearchResult searchResult = ldapConnection.search(searchRequest)
             log.info("Search result: ${searchResult}")
 
             result.searchResult = searchResult
 
             // If we find any entries we'll try to bind using the found DN and the given password
-            log.info(searchResult.getEntryCount() + " entries returned.");
+            log.info(searchResult.getEntryCount() + " entries returned.")
             if (searchResult.entryCount >= 1) {
                 String dn = searchResult.searchEntries[0].getDN()
-                SimpleBindRequest bindRequest = new SimpleBindRequest(dn, password);
-                bindRequest.setResponseTimeoutMillis(responseTimeoutMillis);
-                BindResult bindResult = ldapConnection.bind(bindRequest);
+                SimpleBindRequest bindRequest = new SimpleBindRequest(dn, password)
+                bindRequest.setResponseTimeoutMillis(responseTimeoutMillis)
+                BindResult bindResult = ldapConnection.bind(bindRequest)
 
                 result.dn = dn
                 result.bindResult = bindResult
                 result.resultCode = bindResult.resultCode
 
-                if(bindResult.resultCode == ResultCode.SUCCESS) {
-                    log.info("LDAP authentication successful dn=${dn}");
+                if (bindResult.resultCode == ResultCode.SUCCESS) {
+                    log.info("LDAP authentication successful dn=${dn}")
                     //return result
                     return true
-                }
-                else {
-                    log.info("LDAP authentication unsuccessful dn=${dn}, resultCode=${bindResult?.resultCode?.name}");
+                } else {
+                    log.info("LDAP authentication unsuccessful dn=${dn}, resultCode=${bindResult?.resultCode?.name}")
                 }
             }
 
-        } catch(LDAPException e) {
-            log.info("LDAP exception on bind: "  + e.message);
+        } catch (LDAPException e) {
+            log.info("LDAP exception on bind: " + e.message)
 
         } finally {
             ldapConnection.close()
@@ -404,7 +402,6 @@ class UserService {
         //return result
         return false
     }
-
 
 
 //        Server: ldap.forumsys.com
@@ -426,26 +423,23 @@ class UserService {
 
         try {
             //ldap = new LDAPConnection("ldap.example.com", 389, dn, password);
-            LDAPConnection ldap = new LDAPConnection("ldap.forumsys.com", 389, username, password);
-            return true;
+            LDAPConnection ldap = new LDAPConnection("ldap.forumsys.com", 389, username, password)
+            return true
         }
         catch (LDAPException e) {
             if (e.getResultCode() == ResultCode.INVALID_CREDENTIALS)
-                return false;
+                return false
 
-            throw e;
+            throw e
         }
         return true
     }
 
 
-
-
-
     boolean authenticateUsingLdap3(dn, password) throws LDAPException {
 
-        SocketFactory socketFactory;
-        LDAPConnection ldapConnection = null;
+        SocketFactory socketFactory
+        LDAPConnection ldapConnection = null
 
         try {
             // Use no key manager, and trust all certificates. This would not be used
@@ -457,132 +451,126 @@ class UserService {
             //socketFactory = sslUtil.createSSLSocketFactory();
             //ldapConnection = new LDAPConnection(socketFactory,HOSTNAME,PORT);
 
-            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389);
+            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389)
 
-        } catch(LDAPException e) {
-            log.error("LDAP exception", e);
+        } catch (LDAPException e) {
+            log.error("LDAP exception", e)
             //System.exit(e.getResultCode().intValue());
 
-        } catch(GeneralSecurityException e) {
-            log.error("General security exception: " + e.message, e);
+        } catch (GeneralSecurityException e) {
+            log.error("General security exception: " + e.message, e)
             //System.exit(1);
         }
 
         try {
             //String dn = "uid=user.1,ou=people,dc=example,dc=com";
             //String password = "password";
-            long maxResponseTimeMillis = 1000;
+            long maxResponseTimeMillis = 1000
 
-            BindRequest bindRequest = new SimpleBindRequest(dn,password);
-            bindRequest.setResponseTimeoutMillis(maxResponseTimeMillis);
-            BindResult bindResult = ldapConnection.bind(bindRequest);
+            BindRequest bindRequest = new SimpleBindRequest(dn, password)
+            bindRequest.setResponseTimeoutMillis(maxResponseTimeMillis)
+            BindResult bindResult = ldapConnection.bind(bindRequest)
 
-            if(bindResult.resultCode == ResultCode.SUCCESS) {
-                log.info("authentication successful");
+            if (bindResult.resultCode == ResultCode.SUCCESS) {
+                log.info("authentication successful")
                 return true
             }
 
-            log.info("bindResult: " + bindResult);
-            log.info("diagnosticMessage: " + bindResult.diagnosticMessage);
-            log.info("properties: " + bindResult.properties);
-            log.info("resultCode: " + bindResult.resultCode);
+            log.info("bindResult: " + bindResult)
+            log.info("diagnosticMessage: " + bindResult.diagnosticMessage)
+            log.info("properties: " + bindResult.properties)
+            log.info("resultCode: " + bindResult.resultCode)
 
 
-        } catch(LDAPException e) {
-            log.info("LDAP exception on bind: "  + e.message);
+        } catch (LDAPException e) {
+            log.info("LDAP exception on bind: " + e.message)
             return false
         } finally {
-            ldapConnection.close();
+            ldapConnection.close()
         }
         return false
     }
 
 
-
-
-
-
-    def boolean isUserInGroup(String groupDn, String userDn) throws LDAPException {
-        boolean ret = false;
+    boolean isUserInGroup(String groupDn, String userDn) throws LDAPException {
+        boolean ret = false
 
         LDAPConnection ldapConnection
         try {
-            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password");
-            Entry groupEntry = ldapConnection.getEntry(groupDn);
+            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password")
+            Entry groupEntry = ldapConnection.getEntry(groupDn)
             log.info("groupDn: " + groupDn)
 
-            String[] memberValues = groupEntry.getAttributeValues("uniqueMember");
+            String[] memberValues = groupEntry.getAttributeValues("uniqueMember")
             log.info("memberValues: " + memberValues)
             if (memberValues != null) {
-                DN ldapUserDn = new DN(userDn);
+                DN ldapUserDn = new DN(userDn)
                 for (String memberEntryDnString : memberValues) {
                     log.info("memberEntryDnString: " + memberEntryDnString)
-                    DN memberEntryDn = new DN(memberEntryDnString);
+                    DN memberEntryDn = new DN(memberEntryDnString)
                     if (memberEntryDn.equals(ldapUserDn)) {
-                        ret = true;
-                        break;
+                        ret = true
+                        break
                     }
                 }
             }
         } catch (LDAPException e) {
             log.error("LDAP exception occurred " + e.message, e)
         } finally {
-            ldapConnection.close();
+            ldapConnection.close()
         }
-        return ret;
+        return ret
     }
-
-
 
 
     def getRoles(String rolesDN, String userDN) throws LDAPException {
 
-        Set<String> aclList = new LinkedHashSet<String>();
+        Set<String> aclList = new LinkedHashSet<String>()
         LDAPConnection ldapConnection
         try {
-            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password");
+            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password")
             //LDAPConnection connection = connectionFactory.getLDAPConnection();
-            SearchRequest searchRequest = new SearchRequest(rolesDN, SearchScope.SUB, Filter.createEqualityFilter("uniqueMember", userDN));
+            SearchRequest searchRequest = new SearchRequest(rolesDN, SearchScope.SUB, Filter.createEqualityFilter("uniqueMember", userDN))
 
-            SearchResult sr = ldapConnection.search(searchRequest);
+            SearchResult sr = ldapConnection.search(searchRequest)
             log.info("Search result: ${sr}")
             for (SearchResultEntry sre : sr.getSearchEntries()) {
                 log.info("Search result entry: ${sre}")
-                aclList.add(sre.getDN());
+                aclList.add(sre.getDN())
             }
         } catch (LDAPException e) {
             log.error("LDAP exception occurred " + e.message, e)
 
         } finally {
-            ldapConnection.close();
+            ldapConnection.close()
         }
 
-        return aclList;
+        return aclList
     }
 
 
     def getMembersOfGroup(groupDn) {
-        List<Entry> entryList = new ArrayList();
+        List<Entry> entryList = new ArrayList()
         LDAPConnection ldapConnection
         try {
-            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password");
-            long responseTimeoutMillis = grailsApplication.config.openboxes.ldap.responseTimeoutMillis?:1000;
-            SearchRequest searchRequest = new SearchRequest(groupDn, SearchScope.BASE, "(&)", "isMemberOf");
-            searchRequest.setResponseTimeoutMillis(responseTimeoutMillis);
+            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password")
+            long responseTimeoutMillis = grailsApplication.config.openboxes.ldap.responseTimeoutMillis ?: 1000
+            SearchRequest searchRequest = new SearchRequest(groupDn, SearchScope.BASE, "(&)", "isMemberOf")
+            searchRequest.setResponseTimeoutMillis(responseTimeoutMillis)
 
             def userEntry = ldapConnection.getEntry(groupDn)
             log.info("userEntry: ${userEntry}")
-            String[] memberValues = userEntry.getAttributeValues("uniqueMember");
+            String[] memberValues = userEntry.getAttributeValues("uniqueMember")
             log.info("memberValues: ${memberValues}")
             if (memberValues != null) {
-                DNEntrySource entrySource = new DNEntrySource(ldapConnection, memberValues);
+                DNEntrySource entrySource = new DNEntrySource(ldapConnection, memberValues)
                 log.info("entrySource: ${entrySource}")
                 while (true) {
-                    Entry memberEntry = entrySource.nextEntry();
+                    Entry memberEntry = entrySource.nextEntry()
                     if (memberEntry == null) {
-                        break;
+                        break
                     }
-                    entryList.add(memberEntry.DN);
+                    entryList.add(memberEntry.DN)
                 }
             }
             /*
@@ -608,13 +596,13 @@ class UserService {
     }
 
     def getUserGroups(userDn) {
-        List<Entry> entryList = new ArrayList();
+        List<Entry> entryList = new ArrayList()
         LDAPConnection ldapConnection
         try {
-            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password");
-            long responseTimeoutMillis = grailsApplication.config.openboxes.ldap.responseTimeoutMillis?:1000;
-            SearchRequest searchRequest = new SearchRequest(userDn, SearchScope.BASE, "(&)", "isMemberOf");
-            searchRequest.setResponseTimeoutMillis(responseTimeoutMillis);
+            ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password")
+            long responseTimeoutMillis = grailsApplication.config.openboxes.ldap.responseTimeoutMillis ?: 1000
+            SearchRequest searchRequest = new SearchRequest(userDn, SearchScope.BASE, "(&)", "isMemberOf")
+            searchRequest.setResponseTimeoutMillis(responseTimeoutMillis)
 
             /*
             def userEntry = ldapConnection.getEntry(userDn)
@@ -634,14 +622,13 @@ class UserService {
             }
             */
 
-            SearchResult searchResult = ldapConnection.search(searchRequest);
+            SearchResult searchResult = ldapConnection.search(searchRequest)
             log.info("searchResult: ${searchResult}")
-            if(searchResult.getEntryCount() == 1) {
-                Entry entry = searchResult.getSearchEntry(userDn);
+            if (searchResult.getEntryCount() == 1) {
+                Entry entry = searchResult.getSearchEntry(userDn)
                 log.info("entry: ${entry}")
                 //return getAttributeValues("isMemberOf");
-            }
-            else {
+            } else {
                 log.info("No search results found")
 
             }
@@ -654,8 +641,6 @@ class UserService {
 
         return entryList
     }
-
-
 
 
 }

@@ -1,22 +1,22 @@
 <ehcache>
-	<diskStore path="java.io.tmpdir" />
-	<defaultCache maxElementsInMemory="10000" eternal="false" />
+  <cache eternal="false"
+    maxElementsInMemory="50" maxElementsOnDisk="0" name="org.hibernate.cache.StandardQueryCache"
+    overflowToDisk="false" timeToLiveSeconds="120"/>
+  <cache eternal="true"
+    maxElementsInMemory="5000" maxElementsOnDisk="0" name="org.hibernate.cache.UpdateTimestampsCache"
+    overflowToDisk="false"/>
 
-	<!-- read-mostly objects --><!-- 
+  <!-- read-mostly objects --><!--
 	<cache name="com.foo.bar.Thing" maxElementsInMemory="10000"
 		eternal="false" overflowToDisk="false" maxElementsOnDisk="0" />
  	-->
-	<!-- read-only objects --><!--  	
+  <!-- read-only objects --><!--
 	<cache name="com.foo.bar.Zipcode" maxElementsInMemory="100000"
 		eternal="true" overflowToDisk="false" maxElementsOnDisk="0" />
 	 -->
-	<cache name="org.hibernate.cache.StandardQueryCache"
-		maxElementsInMemory="50" eternal="false" overflowToDisk="false"
-		maxElementsOnDisk="0" timeToLiveSeconds="120" />
-	
-	<!-- timestamps of the most recent updates to queryable tables -->
-	<cache name="org.hibernate.cache.UpdateTimestampsCache"
-		maxElementsInMemory="5000" eternal="true" overflowToDisk="false"
-		maxElementsOnDisk="0" />
+  <defaultCache eternal="false" maxElementsInMemory="10000"/>
+
+  <!-- timestamps of the most recent updates to queryable tables -->
+  <diskStore path="java.io.tmpdir"/>
 
 </ehcache>

@@ -7,9 +7,9 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
+
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
-import org.springframework.cache.ehcache.EhCacheFactoryBean
 
 beans = {
 

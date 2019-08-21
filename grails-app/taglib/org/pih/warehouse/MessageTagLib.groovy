@@ -1,26 +1,26 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse
 
-import grails.plugin.springcache.annotations.Cacheable
+
+import org.pih.warehouse.core.Localization
+
+import java.text.MessageFormat
 
 //import grails.plugin.springcache.annotations.Cacheable
-import java.text.MessageFormat;
-
-import org.pih.warehouse.core.Localization;
 
 class MessageTagLib {
 
-	static namespace = "warehouse"
+    static namespace = "warehouse"
     def grailsApplication
-	def messageSource
+    def messageSource
 
 
     /*
@@ -44,7 +44,7 @@ class MessageTagLib {
         boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.custom.enabled
         if (!databaseStoreEnabled) {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
+            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
             out << defaultTagLib.message.call(attrs)
             return
         }
@@ -79,14 +79,16 @@ class MessageTagLib {
 									data-message="${localization.text}" 
 									data-args="${attrs.args}" 
 									data-localized="" 
-									src="${createLinkTo(dir: 'images/icons/silk', file: 'database.png')}"/>
+									src="${
+                        createLinkTo(dir: 'images/icons/silk', file: 'database.png')
+                    }"/>
 							"""
-                    return;
+                    return
                 } else {
                     message = MessageFormat.format(localization.text, attrs?.args?.toArray())
                     out << """${message}"""
                 }
-                return;
+                return
             }
             //println "localization: " + localization
         }
@@ -105,9 +107,9 @@ class MessageTagLib {
             def hasOthers = localized.values().findAll { word -> word != localized['en'] }
 
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
+            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
 
-            def image = (!hasOthers) ? 'decline' : 'accept';
+            def image = (!hasOthers) ? 'decline' : 'accept'
 
             //def messageSource = grailsAttributes.applicationContext.messageSource
             message = messageSource.getMessage(attrs.code, null, attrs.default, request.locale)
@@ -122,7 +124,9 @@ class MessageTagLib {
 						data-resolved-message="${resolvedMessage}" 
 						data-message="${message}" 
 						data-localized="${localized}" 
-						src="${createLinkTo(dir: 'images/icons/silk', file: image + '.png')}" title="${localized}"/>
+						src="${
+                createLinkTo(dir: 'images/icons/silk', file: image + '.png')
+            }" title="${localized}"/>
 					
 				"""
 
@@ -130,7 +134,7 @@ class MessageTagLib {
         // Display message normally
         else {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale;
+            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
             out << defaultTagLib.message.call(attrs)
         }
         //println "MessageTagLib.message() " + (System.currentTimeMillis() - startTime) + " ms"

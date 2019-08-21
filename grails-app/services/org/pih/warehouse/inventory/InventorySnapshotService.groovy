@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.inventory
 
 import groovy.sql.Sql
@@ -29,7 +29,7 @@ class InventorySnapshotService {
 
     def populateInventorySnapshots() {
         def transactionDates = getTransactionDates()
-        for (Date date: transactionDates) {
+        for (Date date : transactionDates) {
             populateInventorySnapshots(date)
         }
     }
@@ -67,7 +67,7 @@ class InventorySnapshotService {
 
     def populateInventorySnapshots(Location location) {
         // Get most recent inventory snapshot date (or tomorrow's date)
-        Date date = getMostRecentInventorySnapshotDate() ?: new Date() +1
+        Date date = getMostRecentInventorySnapshotDate() ?: new Date() + 1
         populateInventorySnapshots(date, location)
     }
 
@@ -107,7 +107,7 @@ class InventorySnapshotService {
     }
 
     def deleteInventorySnapshots(Location location) {
-        Date date = getMostRecentInventorySnapshotDate() ?: new Date() +1
+        Date date = getMostRecentInventorySnapshotDate() ?: new Date() + 1
         deleteInventorySnapshots(date, location)
     }
 
@@ -146,7 +146,7 @@ class InventorySnapshotService {
         }
 
         // Attempting to prevent deadlock due to gap locks
-        binLocationsTransformed = binLocationsTransformed.sort { a,b ->
+        binLocationsTransformed = binLocationsTransformed.sort { a, b ->
             a?.binLocation?.name <=> b?.binLocation?.name ?:
                     a?.product?.productCode <=> b?.product?.productCode ?:
                             a?.inventoryItem?.lotNumber <=> b?.inventoryItem?.lotNumber
@@ -157,7 +157,7 @@ class InventorySnapshotService {
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
         def startTime = System.currentTimeMillis()
-        def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize?:1000
+        def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
         def sql = new Sql(dataSource)
 
         try {
@@ -254,12 +254,14 @@ class InventorySnapshotService {
                     and i.product = product
                     and i.product.category = category
                     group by i.date, i.location.name, product
-                    """, [location:location, date: date])
+                    """, [location: location, date: date])
 
             // group by i.date, i.location.name, product
 
 
-            def inventoryLevelsByProduct = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product.id }
+            def inventoryLevelsByProduct = InventoryLevel.findAllByInventory(location.inventory).groupBy {
+                it.product.id
+            }
 
             log.info "Query response time: " + (System.currentTimeMillis() - startTime)
             startTime = System.currentTimeMillis()
@@ -268,21 +270,21 @@ class InventorySnapshotService {
                 Product product = it[2]
                 InventoryLevel inventoryLevel = inventoryLevelsByProduct[product.id] ? inventoryLevelsByProduct[product.id][0] : null
                 data << [
-                        date                : it[0],
-                        location            : it[1],
-                        category            : it[3],
-                        productCode         : product.productCode,
-                        product             : product.name,
-                        productGroup        : product?.genericProduct?.name,
-                        tags                : product.tagsToString(),
+                        date           : it[0],
+                        location       : it[1],
+                        category       : it[3],
+                        productCode    : product.productCode,
+                        product        : product.name,
+                        productGroup   : product?.genericProduct?.name,
+                        tags           : product.tagsToString(),
                         //productGroup        : it[5]*.description?.join(":")?:"", //product?.genericProduct?.name,
                         //tags                : it[6]*.tag?.join(","),
-                        status              : inventoryLevel?.status,
-                        quantityOnHand      : it[4],
-                        minQuantity         : inventoryLevel?.minQuantity?:0,
-                        maxQuantity         : inventoryLevel?.maxQuantity?:0,
-                        reorderQuantity     : inventoryLevel?.reorderQuantity?:0,
-                        unitOfMeasure       : product?.unitOfMeasure?:"EA"
+                        status         : inventoryLevel?.status,
+                        quantityOnHand : it[4],
+                        minQuantity    : inventoryLevel?.minQuantity ?: 0,
+                        maxQuantity    : inventoryLevel?.maxQuantity ?: 0,
+                        reorderQuantity: inventoryLevel?.reorderQuantity ?: 0,
+                        unitOfMeasure  : product?.unitOfMeasure ?: "EA"
                 ]
             }
             log.info "Post-processing response time: " + (System.currentTimeMillis() - startTime)
@@ -290,11 +292,11 @@ class InventorySnapshotService {
         return data
     }
 
-    List<AvailableItem>  getAvailableBinLocations(Location location, Product product) {
+    List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
         return getAvailableBinLocations(location, product, false)
     }
 
-    List<AvailableItem>  getAvailableBinLocations(Location location, Product product, boolean excludeOutOfStock) {
+    List<AvailableItem> getAvailableBinLocations(Location location, Product product, boolean excludeOutOfStock) {
         return getAvailableBinLocations(location, [product], excludeOutOfStock)
     }
 
@@ -311,7 +313,7 @@ class InventorySnapshotService {
         }
 
         availableItems = sortAvailableItems(availableItems)
-        log.info ("getAvailableItems(): ${System.currentTimeMillis()-startTime} ms")
+        log.info("getAvailableItems(): ${System.currentTimeMillis() - startTime} ms")
         return availableItems
     }
 
@@ -506,7 +508,7 @@ class InventorySnapshotService {
         return getQuantityOnHandByBinLocation(location, date, products)
     }
     List getQuantityOnHandByBinLocation(Location location, Date date, List<Product> products) {
-        log.info ("getQuantityOnHandByBinLocation: location=${location} product=${products}" )
+        log.info("getQuantityOnHandByBinLocation: location=${location} product=${products}")
         def data = []
         if (location && date) {
             def results = InventorySnapshot.executeQuery("""
@@ -530,11 +532,11 @@ class InventorySnapshotService {
                 def quantity = it[3]
 
                 [
-                        status        : status(quantity),
-                        product       : it[0],
-                        inventoryItem : inventoryItem,
-                        binLocation   : binLocation,
-                        quantity      : quantity
+                        status       : status(quantity),
+                        product      : it[0],
+                        inventoryItem: inventoryItem,
+                        binLocation  : binLocation,
+                        quantity     : quantity
                 ]
             }
         }

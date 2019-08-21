@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
@@ -38,30 +38,30 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     String id
-	String description
+    String description
 
-	// Requested item or product
+    // Requested item or product
     Product product
     Category category
-	InventoryItem inventoryItem
+    InventoryItem inventoryItem
     RequisitionItemType requisitionItemType = RequisitionItemType.ORIGINAL
     ProductGroup productGroup
-	ProductPackage productPackage
+    ProductPackage productPackage
     Integer quantity
 
     // Status is handled dynamically at the moment, but we might want to save it at some point
     //RequisitionItemStatus requisitionItemStatus
 
     // Cancellation / change
-	Integer quantityApproved
+    Integer quantityApproved
     Integer quantityCanceled
-	String cancelReasonCode
-	String cancelComments
+    String cancelReasonCode
+    String cancelComments
 
-	// Miscellaneous information
-	Float unitPrice
-	Person requestedBy	// the person who actually requested the item
-	Boolean substitutable = false
+    // Miscellaneous information
+    Float unitPrice
+    Person requestedBy    // the person who actually requested the item
+    Boolean substitutable = false
     String comment
     Integer orderIndex = 0
 
@@ -71,80 +71,87 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     String lotNumber
     Date expirationDate
 
-	// Parent requisition item
-	RequisitionItem parentRequisitionItem
+    // Parent requisition item
+    RequisitionItem parentRequisitionItem
     RequisitionItem substitutionItem
     RequisitionItem modificationItem
 
     Person recipient
 
-	// Audit fields
-	Date dateCreated
-	Date lastUpdated
+    // Audit fields
+    Date dateCreated
+    Date lastUpdated
     User createdBy
     User updatedBy
 
 
-    static transients = [ "type", "substitutionItems", "monthlyDemand", 'totalCost', 'quantityIssued', 'quantityAdjusted']
+    static transients = ["type", "substitutionItems", "monthlyDemand", 'totalCost', 'quantityIssued', 'quantityAdjusted']
 
-	static belongsTo = [ requisition: Requisition ]
-	static hasMany = [ requisitionItems: RequisitionItem, picklistItems: PicklistItem ] // requisitionItems:RequisitionItem,
+    static belongsTo = [requisition: Requisition]
+    static hasMany = [requisitionItems: RequisitionItem, picklistItems: PicklistItem]
+    // requisitionItems:RequisitionItem,
 
-	static mapping = {
-		id generator: 'uuid'
+    static mapping = {
+        id generator: 'uuid'
         picklistItems cascade: "all-delete-orphan", sort: "id"
-		requisitionItems cascade: "all-delete-orphan", sort: "id", batchSize: 100
-	}
+        requisitionItems cascade: "all-delete-orphan", sort: "id", batchSize: 100
+    }
 
-    static mappedBy = [requisitionItems:'parentRequisitionItem']
+    static mappedBy = [requisitionItems: 'parentRequisitionItem']
 
     static constraints = {
-        requisitionItemType(nullable:true)
-    	description(nullable:true)
-        category(nullable:true)
-        product(nullable:false)
-        productGroup(nullable:true)
-        productPackage(nullable:true)
-        inventoryItem(nullable:true)
-        requestedBy(nullable:true)
-        quantity(nullable:false, min:0)
+        requisitionItemType(nullable: true)
+        description(nullable: true)
+        category(nullable: true)
+        product(nullable: false)
+        productGroup(nullable: true)
+        productPackage(nullable: true)
+        inventoryItem(nullable: true)
+        requestedBy(nullable: true)
+        quantity(nullable: false, min: 0)
         quantityApproved(nullable: true)
-        quantityCanceled(nullable:true,
-            validator: { value, obj->
-                // Must have a cancel reason code
-                if (value > 0 && !obj.cancelReasonCode) {
-                    return false
-                }
-                else {
-                    return true
-                }
-            })
-		cancelReasonCode(nullable:true)
-		cancelComments(nullable:true)
-        unitPrice(nullable:true)
-        substitutable(nullable:false)
-        comment(nullable:true)
-        recipient(nullable:true)
-        palletName(nullable:true)
-        boxName(nullable:true)
-        lotNumber(nullable:true)
-        expirationDate(nullable:true)
+        quantityCanceled(nullable: true,
+                validator: { value, obj ->
+                    // Must have a cancel reason code
+                    if (value > 0 && !obj.cancelReasonCode) {
+                        return false
+                    } else {
+                        return true
+                    }
+                })
+        cancelReasonCode(nullable: true)
+        cancelComments(nullable: true)
+        unitPrice(nullable: true)
+        substitutable(nullable: false)
+        comment(nullable: true)
+        recipient(nullable: true)
+        palletName(nullable: true)
+        boxName(nullable: true)
+        lotNumber(nullable: true)
+        expirationDate(nullable: true)
         orderIndex(nullable: true)
-		parentRequisitionItem(nullable:true)
+        parentRequisitionItem(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
-	}
+    }
 
     /**
      * @return
      */
     def getStatus() {
-        if (isApproved() || parentRequisitionItem) { return RequisitionItemStatus.APPROVED }
-        else if (isSubstituted()) { return RequisitionItemStatus.SUBSTITUTED }
-        else if (isChanged()) { return RequisitionItemStatus.CHANGED }
-        else if (isCanceled()) { return RequisitionItemStatus.CANCELED }
-        else if (isCompleted()) { return RequisitionItemStatus.COMPLETED }
-        else { return RequisitionItemStatus.PENDING }
+        if (isApproved() || parentRequisitionItem) {
+            return RequisitionItemStatus.APPROVED
+        } else if (isSubstituted()) {
+            return RequisitionItemStatus.SUBSTITUTED
+        } else if (isChanged()) {
+            return RequisitionItemStatus.CHANGED
+        } else if (isCanceled()) {
+            return RequisitionItemStatus.CANCELED
+        } else if (isCompleted()) {
+            return RequisitionItemStatus.COMPLETED
+        } else {
+            return RequisitionItemStatus.PENDING
+        }
     }
 
 
@@ -156,7 +163,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def getChange() {
         //return (requisitionItems?.size() > 0) ? requisitionItems?.asList()?.first() : null
-        return modificationItem?:substitutionItem
+        return modificationItem ?: substitutionItem
     }
 
     /**
@@ -167,7 +174,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def getSubstitution() {
         //return (requisitionItems?.size() > 0) ? requisitionItems?.asList()?.first() : null
-        return substitutionItem?:modificationItem
+        return substitutionItem ?: modificationItem
     }
     /**
      * Undo any changes made to this requisition item.
@@ -176,8 +183,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         // This is to protect from undo-ing changes to the child -- we should only undo changes from the parent
         if (parentRequisitionItem) {
             parentRequisitionItem.undoChanges()
-        }
-        else {
+        } else {
             quantityApproved = 0
             quantityCanceled = 0
             cancelComments = null
@@ -238,17 +244,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         // And then create a new requisition item for the remaining quantity (if not 0)
         if (newQuantity == 0) {
             cancelQuantity(reasonCode, comments)
-        }
-        else {
+        } else {
 
             if (newProductPackage == productPackage && newQuantity == quantity) {
-                errors.rejectValue("quantity","requisitionItem.mustChangeQuantityOrPackage.message")
+                errors.rejectValue("quantity", "requisitionItem.mustChangeQuantityOrPackage.message")
             }
             if (newQuantity < 0) {
-                errors.rejectValue("quantity","requisitionItem.quantityMustBeGreaterThanZero.message")
+                errors.rejectValue("quantity", "requisitionItem.quantityMustBeGreaterThanZero.message")
             }
             if (!reasonCode) {
-                errors.rejectValue("cancelReasonCode","requisitionItem.invalidReasonCode.message")
+                errors.rejectValue("cancelReasonCode", "requisitionItem.invalidReasonCode.message")
             }
             if (hasErrors() || !validate()) {
                 throw new ValidationException("Validation errors on requisition item", errors)
@@ -262,11 +267,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             // And then create a new requisition item to represent the new quantity
             modificationItem = new RequisitionItem()
             modificationItem.requisitionItemType =
-                newProductPackage?RequisitionItemType.PACKAGE_CHANGE:RequisitionItemType.QUANTITY_CHANGE
+                    newProductPackage ? RequisitionItemType.PACKAGE_CHANGE : RequisitionItemType.QUANTITY_CHANGE
 
             modificationItem.requisition = requisition
             modificationItem.product = product
-            modificationItem.productPackage = newProductPackage?:productPackage
+            modificationItem.productPackage = newProductPackage ?: productPackage
             modificationItem.parentRequisitionItem = this
             modificationItem.orderIndex = orderIndex
             modificationItem.quantity = newQuantity
@@ -290,10 +295,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             errors.rejectValue("product", "requisitionItem.product.invalid")
         }
         if (newQuantity <= 0) {
-            errors.rejectValue("quantity","requisitionItem.quantity.invalid")
+            errors.rejectValue("quantity", "requisitionItem.quantity.invalid")
         }
         if (!reasonCode) {
-            errors.rejectValue("cancelReasonCode","requisitionItem.reasonCode.invalid")
+            errors.rejectValue("cancelReasonCode", "requisitionItem.reasonCode.invalid")
         }
         if (hasErrors() || !validate()) {
             throw new ValidationException("Validation errors on requisition item", errors)
@@ -306,7 +311,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         substitutionItem.requisition = requisition
         substitutionItem.requisitionItemType = RequisitionItemType.SUBSTITUTION
         substitutionItem.product = newProduct
-        substitutionItem.productPackage = newProductPackage?:productPackage
+        substitutionItem.productPackage = newProductPackage ?: productPackage
         substitutionItem.quantity = newQuantity
         substitutionItem.quantityApproved = newQuantity
         addToRequisitionItems(substitutionItem)
@@ -326,7 +331,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             errors.reject("requisitionItem.alreadyCancelled.message")
         }
         if (!reasonCode) {
-            errors.rejectValue("cancelReasonCode","requisitionItem.reasonCode.invalid")
+            errors.rejectValue("cancelReasonCode", "requisitionItem.reasonCode.invalid")
         }
         if (hasErrors() || !validate()) {
             throw new ValidationException("Validation errors on requisition item", errors)
@@ -348,19 +353,18 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def approveQuantity() {
         if (quantityCanceled >= quantity) {
-            errors.rejectValue("quantityApproved","requisitionItem.quantityApproved.invalid")
+            errors.rejectValue("quantityApproved", "requisitionItem.quantityApproved.invalid")
             throw new ValidationException("Quantity cancelled already exceeds or equals quantity requested. Undo previous changes and try again.", errors)
-        }
-        else {
-            quantityApproved = (quantity?:0) - (quantityCanceled?:0)
+        } else {
+            quantityApproved = (quantity ?: 0) - (quantityCanceled ?: 0)
         }
     }
 
     /**
-     * @return  the quantity (in uom) that has not been canceled
+     * @return the quantity (in uom) that has not been canceled
      */
     def quantityNotCanceled() {
-        return quantity ? (quantity?:0) - (quantityCanceled?:0) : 0
+        return quantity ? (quantity ?: 0) - (quantityCanceled ?: 0) : 0
     }
 
     /**
@@ -369,20 +373,20 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return
      */
     def totalQuantity() {
-        return (productPackage?.quantity?:1) * (quantity?:0)
+        return (productPackage?.quantity ?: 1) * (quantity ?: 0)
     }
 
     def totalQuantityCanceled() {
-        return (productPackage?.quantity?:1) * (quantityCanceled?:0)
+        return (productPackage?.quantity ?: 1) * (quantityCanceled ?: 0)
     }
 
     def totalQuantityApproved() {
-        return (productPackage?.quantity?:1) * (quantityApproved?:0)
+        return (productPackage?.quantity ?: 1) * (quantityApproved ?: 0)
     }
 
 
     def totalQuantityNotCanceled() {
-        return (productPackage?.quantity?:1) * (quantityNotCanceled()?:0)
+        return (productPackage?.quantity ?: 1) * (quantityNotCanceled() ?: 0)
     }
 
     def totalQuantityPicked() {
@@ -417,10 +421,12 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     /**
-     * @return  true if this child requisition item's parent is canceled and the child product and product package is different from its parent
+     * @return true if this child requisition item's parent is canceled and the child product and product package is different from its parent
      */
     def isSubstituted() {
-        def isSubstituted = requisitionItems.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
+        def isSubstituted = requisitionItems.any {
+            it.requisitionItemType == RequisitionItemType.SUBSTITUTION
+        }
         return isSubstituted || (quantityCanceled > 0 && substitutionItem)
     }
 
@@ -443,7 +449,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
 
     /**
-     * @return  true if this child requisition item's parent is canceled and the child product and product package is different from its parent
+     * @return true if this child requisition item's parent is canceled and the child product and product package is different from its parent
      */
     def isSubstitution() {
         return parentRequisitionItem?.isChanged() && (parentRequisitionItem?.product != product)
@@ -462,11 +468,13 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     /**
-     * @return  true if the item has been completed cancelled and has some child items that are substitutes
+     * @return true if the item has been completed cancelled and has some child items that are substitutes
      */
     def hasSubstitution() {
-        def hasSubstitution = requisitionItems?.any { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
-        return hasSubstitution || substitutionItem!=null
+        def hasSubstitution = requisitionItems?.any {
+            it.requisitionItemType == RequisitionItemType.SUBSTITUTION
+        }
+        return hasSubstitution || substitutionItem != null
     }
 
     def canUndoChanges() {
@@ -519,9 +527,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         }
         //log.debug "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        return quantityPicked?:0
+        return quantityPicked ?: 0
     }
-
 
 
     def calculateQuantityRevised() {
@@ -534,14 +541,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 quantityCanceled ? (quantity - quantityCanceled) : quantity
     }
 
-	def calculateQuantityRemaining() {
+    def calculateQuantityRemaining() {
         long startTime = System.currentTimeMillis()
-		def quantityRemaining = totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())
+        def quantityRemaining = totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())
 
 
         //log.debug "calculateQuantityRemaining: " + (System.currentTimeMillis() - startTime) + " ms"
         return quantityRemaining
-	}
+    }
 
     def calculateNumInventoryItem(Inventory inventory) {
         long startTime = System.currentTimeMillis()
@@ -559,7 +566,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def retrievePicklistItemsSortedByBinName() {
         def picklistItems = PicklistItem.findAllByRequisitionItem(this)
-        picklistItems.sort { a,b ->
+        picklistItems.sort { a, b ->
             a.binLocation?.name <=> b.binLocation?.name
         }
         return picklistItems
@@ -570,19 +577,19 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def calculatePercentagePicked() {
-        return totalQuantity()?(totalQuantityPicked()/totalQuantity())*100:0
+        return totalQuantity() ? (totalQuantityPicked() / totalQuantity()) * 100 : 0
     }
 
     def calculatePercentageCanceled() {
-        return totalQuantity()?(totalQuantityCanceled()/totalQuantity())*100:0
+        return totalQuantity() ? (totalQuantityCanceled() / totalQuantity()) * 100 : 0
     }
 
     def calculatePercentageCompleted() {
-        return totalQuantity()?((totalQuantityCanceled()+totalQuantityApproved())/totalQuantity())*100:0
+        return totalQuantity() ? ((totalQuantityCanceled() + totalQuantityApproved()) / totalQuantity()) * 100 : 0
     }
 
     def calculatePercentageRemaining() {
-        return totalQuantity()?(totalQuantityRemaining()/totalQuantity())*100:0
+        return totalQuantity() ? (totalQuantityRemaining() / totalQuantity()) * 100 : 0
     }
 
     Integer getMonthlyDemand() {
@@ -594,7 +601,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     Integer getQuantityIssued() {
-        return requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == this }?.sum { it.quantity } ?: 0
+        return requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == this }?.sum {
+            it.quantity
+        } ?: 0
     }
 
     Integer getQuantityAdjusted() {
@@ -604,15 +613,15 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     def next() {
         def requisitionItems = requisition.requisitionItems as List
         def currentIndex = requisitionItems.findIndexOf { it == this }
-        def nextItem = requisitionItems[currentIndex+1]?:requisitionItems[0]
+        def nextItem = requisitionItems[currentIndex + 1] ?: requisitionItems[0]
         return nextItem
     }
 
     def previous() {
         def requisitionItems = requisition.requisitionItems as List
-        def lastIndex = requisitionItems?.size()-1
+        def lastIndex = requisitionItems?.size() - 1
         def currentIndex = requisitionItems.findIndexOf { it == this }
-        def previousItem = requisitionItems[currentIndex-1]?:requisitionItems[lastIndex]
+        def previousItem = requisitionItems[currentIndex - 1] ?: requisitionItems[lastIndex]
         return previousItem
     }
 
@@ -621,7 +630,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     Set<RequisitionItem> getSubstitutionItems() {
-        return requisitionItems.findAll { it.requisitionItemType == RequisitionItemType.SUBSTITUTION }
+        return requisitionItems.findAll {
+            it.requisitionItemType == RequisitionItemType.SUBSTITUTION
+        }
     }
 
 
@@ -632,8 +643,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     int compareTo(RequisitionItem requisitionItem) {
         return orderIndex <=> requisitionItem.orderIndex ?:
-            requisitionItemType <=> requisitionItem?.requisitionItemType ?:
-                id <=> requisitionItem?.id
+                requisitionItemType <=> requisitionItem?.requisitionItemType ?:
+                        id <=> requisitionItem?.id
     }
 
     String toString() {
@@ -641,58 +652,60 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
 
-    Map toJson(){
+    Map toJson() {
         [
-            id: id,
-            version: version,
-            productId: product?.id,
-            productName: product?.productCode + " " + product?.name + ((productPackage) ? " ("+productPackage?.uom?.code + "/" + productPackage?.quantity + ")" : " (EA/1)"),
-            productPackageId: productPackage?.id,
-            productPackageName: productPackage ? (productPackage?.uom?.code + "/" + productPackage?.quantity) : null,
-            productPackageQuantity: productPackage?.quantity?:1,
-            unitOfMeasure: product?.unitOfMeasure?:"EA",
-            quantity:quantity,
-            requisitionItemType: requisitionItemType,
-            status: getStatus(),
-            totalQuantity:totalQuantity(),
-            quantityCanceled:quantityCanceled,
-            totalQuantityCanceled:totalQuantityCanceled(),
-            comment: comment,
-            recipient: recipient,
-            substitutable: substitutable,
-            isChanged: isChanged(),
-            isSubstituted: isSubstituted(),
-            isPending: isPending(),
-            isSubstitution: isSubstitution(),
-            isCompleted: isCompleted(),
-            isApproved: isApproved(),
-            isCanceled: isCanceled(),
-            orderIndex: orderIndex
+                id                    : id,
+                version               : version,
+                productId             : product?.id,
+                productName           : product?.productCode + " " + product?.name + ((productPackage) ? " (" + productPackage?.uom?.code + "/" + productPackage?.quantity + ")" : " (EA/1)"),
+                productPackageId      : productPackage?.id,
+                productPackageName    : productPackage ? (productPackage?.uom?.code + "/" + productPackage?.quantity) : null,
+                productPackageQuantity: productPackage?.quantity ?: 1,
+                unitOfMeasure         : product?.unitOfMeasure ?: "EA",
+                quantity              : quantity,
+                requisitionItemType   : requisitionItemType,
+                status                : getStatus(),
+                totalQuantity         : totalQuantity(),
+                quantityCanceled      : quantityCanceled,
+                totalQuantityCanceled : totalQuantityCanceled(),
+                comment               : comment,
+                recipient             : recipient,
+                substitutable         : substitutable,
+                isChanged             : isChanged(),
+                isSubstituted         : isSubstituted(),
+                isPending             : isPending(),
+                isSubstitution        : isSubstitution(),
+                isCompleted           : isCompleted(),
+                isApproved            : isApproved(),
+                isCanceled            : isCanceled(),
+                orderIndex            : orderIndex
         ]
     }
 
     Map toStockListDetailsJson() {
         [
-                id: id,
-                quantity: quantity,
-                monthlyDemand: monthlyDemand,
+                id              : id,
+                quantity        : quantity,
+                monthlyDemand   : monthlyDemand,
                 productPackageId: productPackage?.id,
-                totalCost: totalCost ?: 0,
-                product: [
-                        id: product.id,
-                        productCode: product.productCode,
-                        name: product.name,
-                        category: product.category?.name,
+                totalCost       : totalCost ?: 0,
+                product         : [
+                        id           : product.id,
+                        productCode  : product.productCode,
+                        name         : product.name,
+                        category     : product.category?.name,
                         unitOfMeasure: product.unitOfMeasure,
-                        pricePerUnit: product.pricePerUnit ?: 0,
-                        packages: product.packages?.collect { [
-                                id: it.id,
-                                quantity: it.quantity,
-                                uom: [
-                                        code: it.uom?.code,
-                                        name: it.uom?.name
-                                ]
-                        ] }
+                        pricePerUnit : product.pricePerUnit ?: 0,
+                        packages     : product.packages?.collect {
+                            [
+                                    id      : it.id,
+                                    quantity: it.quantity,
+                                    uom     : [
+                                            code: it.uom?.code,
+                                            name: it.uom?.name
+                                    ]
+                            ]
+                        }
                 ]
         ]
     }

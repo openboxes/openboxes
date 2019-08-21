@@ -12,33 +12,31 @@ package org.pih.warehouse.picklist
 import grails.converters.JSON
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.requisition.Requisition
-import org.xml.sax.SAXParseException
 
 class PicklistController {
 
-	def scaffold = true
+    def scaffold = true
 
-	def picklistService
+    def picklistService
     def pdfRenderingService
 
-	def save = {
-		def jsonRequest = request.JSON
-		def jsonResponse = []
-		def picklist = picklistService.save(jsonRequest)
-		if (!picklist.hasErrors()) {
-			jsonResponse = [success: true, data: picklist.toJson()]
-		}
-		else {
-			jsonResponse = [success: false, errors: picklist.errors]
-		}
-		render jsonResponse as JSON
-	}
+    def save = {
+        def jsonRequest = request.JSON
+        def jsonResponse = []
+        def picklist = picklistService.save(jsonRequest)
+        if (!picklist.hasErrors()) {
+            jsonResponse = [success: true, data: picklist.toJson()]
+        } else {
+            jsonResponse = [success: false, errors: picklist.errors]
+        }
+        render jsonResponse as JSON
+    }
 
-	def print = {
-		def requisition = Requisition.get(params.id)
-		def picklist = Picklist.findByRequisition(requisition)
-		def location = Location.get(session.warehouse.id)
-		[requisition:requisition, picklist: picklist, location:location, sorted:params.sorted]
+    def print = {
+        def requisition = Requisition.get(params.id)
+        def picklist = Picklist.findByRequisition(requisition)
+        def location = Location.get(session.warehouse.id)
+        [requisition: requisition, picklist: picklist, location: location, sorted: params.sorted]
     }
 
     def renderPdf = {
@@ -72,7 +70,7 @@ class PicklistController {
         renderPdf(
                 template: "/picklist/print",
                 //locale:locale,
-                model: [requisition:requisition, picklist: picklist, location:location, sorted:params.sorted],
+                model: [requisition: requisition, picklist: picklist, location: location, sorted: params.sorted],
                 filename: "Picklist - ${requisition.requestNumber}"
         )
 
@@ -82,14 +80,14 @@ class PicklistController {
     def renderHtml = {
 
         def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-        def locale = session?.user?.locale ?: session.locale ?: defaultLocale;
+        def locale = session?.user?.locale ?: session.locale ?: defaultLocale
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
         //[requisition:requisition, picklist: picklist, location:location]
 
         println location
-        render(template: "/picklist/print", model: [requisition:requisition, picklist: picklist, location:location, order:params.order])
+        render(template: "/picklist/print", model: [requisition: requisition, picklist: picklist, location: location, order: params.order])
 
     }
 

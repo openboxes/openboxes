@@ -1,34 +1,23 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.report
 
-import groovyx.gpars.GParsPool
+
 import org.apache.commons.lang.StringEscapeUtils
-import org.hibernate.FetchMode
-import org.hibernate.classic.Session
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionCode
-import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.ConsumptionFact
-import org.pih.warehouse.reporting.DateDimension
-import org.pih.warehouse.reporting.LocationDimension
-import org.pih.warehouse.reporting.LotDimension
-import org.pih.warehouse.reporting.ProductDimension
-import org.springframework.transaction.annotation.Transactional
 
-import java.text.DateFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
@@ -103,37 +92,33 @@ class ConsumptionService {
         def dateFormat = new SimpleDateFormat("ddMMyyyy")
 
         def dateKeys = (startDate..endDate).collect { date ->
-            calendar.setTime(date);
+            calendar.setTime(date)
             [
-                    date: date,
-                    day: calendar.get(Calendar.DAY_OF_MONTH),
-                    week: calendar.get(Calendar.WEEK_OF_YEAR),
+                    date : date,
+                    day  : calendar.get(Calendar.DAY_OF_MONTH),
+                    week : calendar.get(Calendar.WEEK_OF_YEAR),
                     month: calendar.get(Calendar.MONTH),
-                    year: calendar.get(Calendar.YEAR),
-                    key: dateFormat.format(date)
+                    year : calendar.get(Calendar.YEAR),
+                    key  : dateFormat.format(date)
             ]
         }.sort { it.date }
 
 
-        def daysBetween = (groupBy!="default") ? -1 : endDate - startDate
+        def daysBetween = (groupBy != "default") ? -1 : endDate - startDate
         if (daysBetween > 365 || groupBy.equals("yearly")) {
             dateFormat = Constants.yearFormat
-        }
-        else if ((daysBetween > 61 && daysBetween < 365) || groupBy.equals("monthly")) {
+        } else if ((daysBetween > 61 && daysBetween < 365) || groupBy.equals("monthly")) {
             dateFormat = Constants.yearMonthFormat
-        }
-        else if (daysBetween > 14 && daysBetween < 60 || groupBy.equals("weekly")) {
+        } else if (daysBetween > 14 && daysBetween < 60 || groupBy.equals("weekly")) {
             dateFormat = Constants.weekFormat
-        }
-        else if (daysBetween > 0 && daysBetween <= 14 || groupBy.equals("daily")) {
+        } else if (daysBetween > 0 && daysBetween <= 14 || groupBy.equals("daily")) {
             dateFormat = Constants.dayFormat
-        }
-        else {
+        } else {
             dateFormat = Constants.yearMonthFormat
         }
         dateKeys = dateKeys.collect { dateFormat.format(it.date) }.unique()
 
-        log.info ("consumptionFactList: " + consumptionFactList)
+        log.info("consumptionFactList: " + consumptionFactList)
 
         def consumptionFactMap = consumptionFactList.inject([:]) { result, consumptionFact ->
             def productId = consumptionFact?.productKey?.productId
@@ -144,7 +129,7 @@ class ConsumptionService {
             if (!quantityMap) {
                 quantityMap = [:]
             }
-            def quantity = quantityMap[dateKey]?:0
+            def quantity = quantityMap[dateKey] ?: 0
             quantity += quantityIssued
             quantityMap[dateKey] = quantity
             result[productId] = quantityMap
@@ -153,35 +138,37 @@ class ConsumptionService {
         log.info "Consumption map: " + consumptionFactMap
 
         def crosstabRows = []
-        def products = consumptionFactList.collect { Product.get(it?.productKey?.productId) }.unique()
+        def products = consumptionFactList.collect {
+            Product.get(it?.productKey?.productId)
+        }.unique()
         products.each { Product product ->
             BigDecimal totalIssued = 0
             BigDecimal totalDemand = 0
             BigDecimal totalCanceled = 0
-            BigDecimal unitCost = product?.costPerUnit?:product?.pricePerUnit?:0
+            BigDecimal unitCost = product?.costPerUnit ?: product?.pricePerUnit ?: 0
             Map row = [
-                    "Code": product?.productCode,
-                    "Name": product?.name,
-                    "Tags": StringEscapeUtils.escapeCsv(product.tagsToString()),
-                    "Catalogs": StringEscapeUtils.escapeCsv(product.productCatalogsToString()),
+                    "Code"     : product?.productCode,
+                    "Name"     : product?.name,
+                    "Tags"     : StringEscapeUtils.escapeCsv(product.tagsToString()),
+                    "Catalogs" : StringEscapeUtils.escapeCsv(product.productCatalogsToString()),
                     "Unit Cost": NumberFormat.getNumberInstance().format(unitCost)
             ]
 
             def consumptionAggregated = consumptionFactMap[product?.id]
             dateKeys.each { dateKey ->
-                def quantityIssued = consumptionAggregated[dateKey]?:0
+                def quantityIssued = consumptionAggregated[dateKey] ?: 0
                 totalIssued += quantityIssued
-                row += [ "${dateKey}" : quantityIssued ]
+                row += ["${dateKey}": quantityIssued]
             }
             BigDecimal averageIssued = totalIssued / dateKeys.size()
 
             row += [
-                    "Total Demand": totalDemand,
+                    "Total Demand"  : totalDemand,
                     "Total Canceled": totalCanceled,
-                    "Total Issued": totalIssued,
-                    "Total Cost": NumberFormat.getNumberInstance().format(totalIssued * unitCost),
+                    "Total Issued"  : totalIssued,
+                    "Total Cost"    : NumberFormat.getNumberInstance().format(totalIssued * unitCost),
                     "Average Issued": averageIssued,
-                    "Average Cost": NumberFormat.getNumberInstance().format(averageIssued * unitCost)
+                    "Average Cost"  : NumberFormat.getNumberInstance().format(averageIssued * unitCost)
             ]
             crosstabRows << row
         }

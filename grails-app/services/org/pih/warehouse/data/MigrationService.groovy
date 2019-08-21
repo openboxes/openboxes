@@ -1,20 +1,18 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.data
 
-import grails.converters.JSON
+
 import grails.validation.ValidationException
 import groovy.sql.Sql
-import groovyx.gpars.GParsExecutorsPool
 import groovyx.gpars.GParsPool
-import org.hibernate.FetchMode
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -81,7 +79,7 @@ class MigrationService {
 
         GParsPool.withPool {
 
-            log.info ("locations: ${locations.size()}")
+            log.info("locations: ${locations.size()}")
             currentInventory = locations.collectParallel { Location location ->
                 persistenceInterceptor.init()
                 def currentInventoryMap
@@ -89,11 +87,11 @@ class MigrationService {
                     def startTime = System.currentTimeMillis()
                     Map<Product, Integer> quantityMap = inventoryService.getQuantityByProductMap(location)
 
-                    log.info "Calculated current inventory for ${location.name} in ${(System.currentTimeMillis()-startTime)} ms"
+                    log.info "Calculated current inventory for ${location.name} in ${(System.currentTimeMillis() - startTime)} ms"
                     currentInventoryMap = [
-                            location: location.name,
-                            products: quantityMap.keySet()?.size()?:0,
-                            checksum: quantityMap.values().sum(),
+                            location   : location.name,
+                            products   : quantityMap.keySet()?.size() ?: 0,
+                            checksum   : quantityMap.values().sum(),
                             quantityMap: quantityMap
                     ]
                     persistenceInterceptor.flush()
@@ -116,10 +114,10 @@ class MigrationService {
             if (result) {
                 result.quantityMap.keySet().collect { product ->
                     def quantity = result.quantityMap[product]
-                    data << [location: result?.location,
+                    data << [location   : result?.location,
                              productCode: product?.productCode,
                              productName: product?.name,
-                             quantity: quantity]
+                             quantity   : quantity]
                 }
             }
         }
@@ -139,7 +137,7 @@ class MigrationService {
                         }
                     }
                 }
-                count "id",'transactionCount'
+                count "id", 'transactionCount'
             }
             if (transactionCodes) {
                 transaction {
@@ -205,7 +203,7 @@ class MigrationService {
                 persistenceInterceptor.init()
                 def location = Location.get(it.locationId)
                 log.info("Migrating ${it.transactionCount} inventory transactions for location ${location.name}")
-                migrateInventoryTransactions(location,true)
+                migrateInventoryTransactions(location, true)
                 persistenceInterceptor.flush()
                 persistenceInterceptor.destroy()
             }
@@ -252,7 +250,7 @@ class MigrationService {
 
     def migrateInventoryTransactions(Location location, Product product, boolean performMigration) {
 
-        log.info ("Migrating inventory transactions for product ${product.productCode} ${product.name} at location ${location.name} ${performMigration}")
+        log.info("Migrating inventory transactions for product ${product.productCode} ${product.name} at location ${location.name} ${performMigration}")
 
         def runningBalance
         def previousTransaction
@@ -270,14 +268,14 @@ class MigrationService {
         }
 
         def transactionEntries = getTransactionEntries(location, product)
-        for (transactionEntry in  transactionEntries) {
+        for (transactionEntry in transactionEntries) {
 
             boolean sameTransaction = (previousTransaction == transactionEntry.transaction)
             if (!sameTransaction && transactionEntry.transaction.transactionType.transactionCode == TransactionCode.PRODUCT_INVENTORY) {
                 runningBalanceMap = [:]
             }
             def itemKey = "${transactionEntry?.inventoryItem?.product?.productCode}:${transactionEntry?.inventoryItem?.lotNumber}:${transactionEntry?.binLocation?.name}"
-            Integer runningBalanceBefore = runningBalanceMap[itemKey]?:0
+            Integer runningBalanceBefore = runningBalanceMap[itemKey] ?: 0
 
             runningBalance = applyTransactionEntry(runningBalanceBefore, transactionEntry, sameTransaction)
             runningBalanceMap[itemKey] = runningBalance
@@ -296,9 +294,9 @@ class MigrationService {
 
                 adjustments << [
                         transactionEntry: transactionEntry,
-                        transaction: transactionEntry.transaction,
-                        quantity: adjustmentQuantity,
-                        comments: comments
+                        transaction     : transactionEntry.transaction,
+                        quantity        : adjustmentQuantity,
+                        comments        : comments
                 ]
             }
 
@@ -325,7 +323,7 @@ class MigrationService {
                         def adjustmentsWithinTransaction = adjustmentsByTransaction[transaction]
                         adjustmentsWithinTransaction.each { adjustment ->
                             def transactionEntryUpdate =
-                                "update transaction_entry set quantity = ${adjustment.quantity}, comments = '${adjustment.comments}' where id = '${adjustment?.transactionEntry?.id}'"
+                                    "update transaction_entry set quantity = ${adjustment.quantity}, comments = '${adjustment.comments}' where id = '${adjustment?.transactionEntry?.id}'"
                             statement.addBatch(transactionEntryUpdate)
                         }
                     }
@@ -343,36 +341,32 @@ class MigrationService {
      * @return
      */
     def applyTransactionEntry(BigDecimal runningBalance, TransactionEntry transactionEntry, boolean sameTransaction) {
-        BigDecimal balance = runningBalance;
+        BigDecimal balance = runningBalance
 
-        def transactionCode = transactionEntry?.transaction?.transactionType?.transactionCode;
+        def transactionCode = transactionEntry?.transaction?.transactionType?.transactionCode
         if (transactionCode == TransactionCode.PRODUCT_INVENTORY) {
             if (sameTransaction) {
-                balance += transactionEntry.quantity;
+                balance += transactionEntry.quantity
+            } else {
+                balance = transactionEntry.quantity
             }
-            else {
-                balance = transactionEntry.quantity;
-            }
+        } else if (transactionCode == TransactionCode.INVENTORY) {
+            balance = transactionEntry.quantity
+        } else if (transactionCode == TransactionCode.DEBIT) {
+            balance -= transactionEntry.quantity
+        } else if (transactionCode == TransactionCode.CREDIT) {
+            balance += transactionEntry.quantity
         }
-        else if (transactionCode == TransactionCode.INVENTORY) {
-            balance = transactionEntry.quantity;
-        }
-        else if (transactionCode == TransactionCode.DEBIT) {
-            balance -= transactionEntry.quantity;
-        }
-        else if (transactionCode == TransactionCode.CREDIT) {
-            balance += transactionEntry.quantity;
-        }
-        return balance;
+        return balance
     }
 
     def getQuantityBeforeTransactionEntry(TransactionEntry transactionEntry) {
-        def quantity = 0;
+        def quantity = 0
         InventoryItem inventoryItem = transactionEntry.inventoryItem
         Location location = transactionEntry.transaction.inventory.warehouse
         Date date = transactionEntry.transaction.transactionDate
         def transactionEntries = inventoryService.getTransactionEntriesOnOrBeforeDate(inventoryItem, location, date)
-        log.info ("Transaction entries: " + transactionEntries)
+        log.info("Transaction entries: " + transactionEntries)
         transactionEntries.remove(transactionEntry)
         quantity = inventoryService.adjustQuantity(quantity, transactionEntries)
         return quantity
@@ -413,8 +407,7 @@ class MigrationService {
         if (newQuantity >= 0) {
             newTransactionType = adjustmentCredit
             adjustmentType = "CREDIT"
-        }
-        else {
+        } else {
             adjustmentType = "DEBIT"
             newQuantity = -newQuantity
             newTransactionType = adjustmentDebit
@@ -428,29 +421,27 @@ class MigrationService {
         BigDecimal productQuantityOnHandNow = inventoryService.getQuantityOnHand(transactionLocation, product)
 
         return [
-                locationId: transactionLocation.id,
-                locationName: transactionLocation.name,
-                productId: inventoryItem?.product?.id,
-                code: inventoryItem.product?.productCode,
-                lotNumber: inventoryItem.lotNumber,
-                binLocation: binLocation?.name,
-                transactionEntry: transactionEntry?.id,
-                transactionDate: transactionEntry?.transaction?.transactionDate,
-                transactionCode: transactionEntry?.transaction?.transactionType?.transactionCode,
-                adjustmentType: adjustmentType,
-                oldQuantity: oldQuantity,
-                quantityOnHandThen:quantityOnHandThen,
-                newQuantity: newQuantity,
+                locationId        : transactionLocation.id,
+                locationName      : transactionLocation.name,
+                productId         : inventoryItem?.product?.id,
+                code              : inventoryItem.product?.productCode,
+                lotNumber         : inventoryItem.lotNumber,
+                binLocation       : binLocation?.name,
+                transactionEntry  : transactionEntry?.id,
+                transactionDate   : transactionEntry?.transaction?.transactionDate,
+                transactionCode   : transactionEntry?.transaction?.transactionType?.transactionCode,
+                adjustmentType    : adjustmentType,
+                oldQuantity       : oldQuantity,
+                quantityOnHandThen: quantityOnHandThen,
+                newQuantity       : newQuantity,
                 //itemQohThen: quantityOnHandThen,
-                productQohNow: productQuantityOnHandNow,
+                productQohNow     : productQuantityOnHandNow,
                 //binQohNow: binQuantityOnHandNow
-                binLocations: binLocations
+                binLocations      : binLocations
         ]
 
 
     }
-
-
 
 
     def migrateOrganizations() {
@@ -485,7 +476,7 @@ class MigrationService {
             }
         }
 
-        log.info ("migrated: ${migratedList.size()}")
+        log.info("migrated: ${migratedList.size()}")
 
         return migratedList
 
@@ -504,7 +495,6 @@ class MigrationService {
         }
         return organization
     }
-
 
 
     def getSuppliersForMigration() {
@@ -538,13 +528,11 @@ class MigrationService {
             }
         }
 
-        log.info ("migrated: ${migratedList.size()}")
+        log.info("migrated: ${migratedList.size()}")
 
         return migratedList
 
     }
-
-
 
 
     def migrateProductSuppliers() {
@@ -580,7 +568,7 @@ class MigrationService {
             }
             //maxResults(5000)
         }
-        return products;
+        return products
     }
 
 
@@ -599,7 +587,7 @@ class MigrationService {
             def manufacturer = findOrCreateOrganization(product.manufacturer, null, orgType, [RoleType.ROLE_MANUFACTURER])
             productSupplier.manufacturer = manufacturer
             if (!productSupplier.manufacturer) {
-                productSupplier.errors.rejectValue("manufacturer", "productSupplier.invalid.manufacturer","Manufacturer ${product?.manufacturer} does not exist.")
+                productSupplier.errors.rejectValue("manufacturer", "productSupplier.invalid.manufacturer", "Manufacturer ${product?.manufacturer} does not exist.")
             }
         }
 
@@ -677,7 +665,7 @@ class MigrationService {
 
         if (suppliers) {
             suppliers.each { supplier ->
-                supplier.organization.delete();
+                supplier.organization.delete()
                 supplier.organization = null
             }
             deletedCount = suppliers.size()
@@ -699,7 +687,7 @@ class MigrationService {
         }
         productSuppliers.each { productSupplier ->
             productSupplier.product?.removeFromProductSuppliers(productSupplier)
-            productSupplier.delete();
+            productSupplier.delete()
         }
 
         return productSuppliers?.size()

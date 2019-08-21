@@ -19,8 +19,7 @@ class QuantityTagLib {
         if (requisitionItem) {
             if (requisitionItem?.productPackage) {
                 out << "${requisitionItem?.quantity} ${requisitionItem?.productPackage?.uom?.code}/${requisitionItem?.productPackage?.quantity}"
-            }
-            else {
+            } else {
                 out << "${requisitionItem?.quantity} EA/1"
             }
 

@@ -1,27 +1,21 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.jobs
 
-import grails.converters.JSON
+
 import grails.plugin.quartz2.TriggerHelper
-import org.quartz.CronTrigger
-import org.quartz.JobDataMap
 import org.quartz.JobDetail
 import org.quartz.JobKey
-import org.quartz.Scheduler
 import org.quartz.Trigger
-import org.quartz.TriggerBuilder
 import org.quartz.TriggerKey
-import org.quartz.core.QuartzScheduler
 import org.quartz.impl.StdScheduler
-import org.quartz.impl.StdSchedulerFactory
 
 import java.text.ParseException
 
@@ -65,13 +59,12 @@ class JobsController {
         JobKey jobKey = JobKey.jobKey(params.id)
         JobDetail jobDetail = quartzScheduler.getJobDetail(jobKey)
 
-        log.info(jobKey);
-        log.info(jobDetail);
+        log.info(jobKey)
+        log.info(jobDetail)
         def triggers = quartzScheduler.getTriggersOfJob(jobKey)
 
-        [jobDetail:jobDetail, jobKey: jobKey, triggers:triggers]
+        [jobDetail: jobDetail, jobKey: jobKey, triggers: triggers]
     }
-
 
 
     def unscheduleJob = {
@@ -87,8 +80,7 @@ class JobsController {
                 // remove all existing triggers
                 quartzScheduler.unscheduleJob(it.key)
             }
-        }
-        else {
+        } else {
             flash.message = "Unable to find job with jobKey = ${params.id}"
         }
         redirect(action: "show", id: params.id)
@@ -102,8 +94,7 @@ class JobsController {
         JobKey jobKey = trigger.jobKey
         if (trigger) {
             quartzScheduler.unscheduleJob(triggerKey)
-        }
-        else {
+        } else {
             flash.message = "Unable to unschedule trigger with trigger key ${params.id}"
         }
         redirect(action: "show", id: jobKey.name)
@@ -121,8 +112,7 @@ class JobsController {
             } catch (ParseException e) {
                 flash.message = "Unable to schedule job with cron expression ${params.cronExpression} due to the following error: " + e.message
             }
-        }
-        else {
+        } else {
             flash.message = "Unable to find job with jobKey = ${params.id}"
         }
 

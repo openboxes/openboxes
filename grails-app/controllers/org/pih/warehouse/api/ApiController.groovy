@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
@@ -31,7 +31,7 @@ class ApiController {
             if (request.JSON.location) {
                 session.warehouse = Location.get(request.JSON.location)
             }
-            render ([status: 200, text: "Authentication was successful"])
+            render([status: 200, text: "Authentication was successful"])
             return
         }
         render([status: 401, text: "Authentication failed"])
@@ -43,7 +43,7 @@ class ApiController {
             throw new ObjectNotFoundException(params.id, Location.class.toString())
         }
         session.warehouse = location
-        render ([status: 200, text: "User ${session.user} is now logged into ${location.name}"])
+        render([status: 200, text: "User ${session.user} is now logged into ${location.name}"])
     }
 
     def chooseLocale = {
@@ -52,7 +52,7 @@ class ApiController {
             throw new ObjectNotFoundException(params.id, Locale.class.toString())
         }
         session.user.locale = locale
-        render ([status: 200, text: "Current language is ${locale}"])
+        render([status: 200, text: "Current language is ${locale}"])
     }
 
     def getSession = {
@@ -118,6 +118,6 @@ class ApiController {
             databaseStatus = false
             databaseStatusMessage = "Error: " + e.message
         }
-		render ([status: "OK", database: [status: databaseStatus, message: databaseStatusMessage?:""] ] as JSON)
-	}
+        render([status: "OK", database: [status: databaseStatus, message: databaseStatusMessage ?: ""]] as JSON)
+    }
 }

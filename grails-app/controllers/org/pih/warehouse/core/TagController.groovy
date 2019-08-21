@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.core
 
 import org.pih.warehouse.product.Product
@@ -35,8 +35,7 @@ class TagController {
         if (tagInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), tagInstance.id])}"
             redirect(action: "list", id: tagInstance.id)
-        }
-        else {
+        } else {
             render(view: "create", model: [tagInstance: tagInstance])
         }
     }
@@ -46,8 +45,7 @@ class TagController {
         if (!tagInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             [tagInstance: tagInstance]
         }
     }
@@ -57,8 +55,7 @@ class TagController {
         if (!tagInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             return [tagInstance: tagInstance]
         }
     }
@@ -69,7 +66,7 @@ class TagController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (tagInstance.version > version) {
-                    
+
                     tagInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'tag.label', default: 'Tag')] as Object[], "Another user has updated this Tag while you were editing")
                     render(view: "edit", model: [tagInstance: tagInstance])
                     return
@@ -79,12 +76,10 @@ class TagController {
             if (!tagInstance.hasErrors() && tagInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), tagInstance.id])}"
                 redirect(action: "list", id: tagInstance.id)
-            }
-            else {
+            } else {
                 render(view: "edit", model: [tagInstance: tagInstance])
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
             redirect(action: "list")
         }
@@ -94,9 +89,9 @@ class TagController {
         def tagInstance = Tag.get(params.id)
         if (tagInstance) {
             try {
-				tagInstance.products.each { product ->
-					tagInstance.removeFromProducts(product)
-				}
+                tagInstance.products.each { product ->
+                    tagInstance.removeFromProducts(product)
+                }
                 tagInstance.delete(flush: true)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
                 redirect(action: "list")
@@ -105,8 +100,7 @@ class TagController {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
             redirect(action: "list")
         }
@@ -128,17 +122,15 @@ class TagController {
                     def product = Product.findByProductCodeLike(productCode)
                     if (!tag.products.contains(product)) {
                         tag.addToProducts(product)
-                        tag.save(flush:true)
+                        tag.save(flush: true)
                     }
                 }
 
-            }
-            else {
+            } else {
                 flash.message = "Please enter at least one product code " + params
 
             }
-        }
-        else {
+        } else {
             flash.message = "Could not find tag with ID " + params.id
             redirect(action: "list")
         }
@@ -161,8 +153,7 @@ class TagController {
                     tag.save(flush: true)
                 }
                 flash.message = "Removed products " + productIds
-            }
-            else {
+            } else {
                 flash.message = "Please choose at least one product to remove"
             }
 
@@ -183,8 +174,7 @@ class TagController {
                 flash.message = "Please choose at least one product to remove " + params
             }
             */
-        }
-        else {
+        } else {
             flash.message = "Could not find tag with ID " + params.id
             redirect(action: "list")
         }

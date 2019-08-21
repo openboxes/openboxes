@@ -11,7 +11,6 @@ package org.pih.warehouse.inventory
 
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 
 class CycleCountController {
 
@@ -27,26 +26,26 @@ class CycleCountController {
         List rows = binLocations.collect {
             def latestInventoryDate = it.product.latestInventoryDate(location.id)
             [
-                    "Product code"       : StringEscapeUtils.escapeCsv(it.product.productCode),
-                    "Product name"       : it.product.name ?: "",
-                    "Generic product"    : it.genericProduct?.name ?: "",
-                    "Category"           : StringEscapeUtils.escapeCsv(it.category?.name ?: ""),
-                    "Formularies"        : it.product.productCatalogs.join(", ") ?: "",
-                    "Lot number"         : StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber ?: ""),
-                    "Expiration date"    : it.inventoryItem.expirationDate ? it.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
-                    "ABC classification" : StringEscapeUtils.escapeCsv(it.product.getAbcClassification(location.id) ?: ""),
-                    "Bin location"       : StringEscapeUtils.escapeCsv(it?.binLocation?.name ?: ""),
-                    "Bin location old"   : StringEscapeUtils.escapeCsv(it.product.getBinLocation(location.id) ?: ""),
-                    "Status"             : g.message(code: "binLocationSummary.${it.status}.label"),
-                    "Last inventory date": latestInventoryDate ? latestInventoryDate.format("dd-MMM-yyyy") : "",
-                    "Quantity on Hand"   : it.quantity ?: 0,
-                    "Physical lot/serial number"   : "",
-                    "Physical bin location"  : "",
-                    "Physical expiration date": "",
-                    "Physical quantity": "",
-                    "Was bin location updated in OpenBoxes?": "",
-                    "${StringEscapeUtils.escapeCsv("Was quantity, lot/serial, and expiration date updated in OpenBoxes?")}" : "",
-                    "Comment": "",
+                    "Product code"                                                                                         : StringEscapeUtils.escapeCsv(it.product.productCode),
+                    "Product name"                                                                                         : it.product.name ?: "",
+                    "Generic product"                                                                                      : it.genericProduct?.name ?: "",
+                    "Category"                                                                                             : StringEscapeUtils.escapeCsv(it.category?.name ?: ""),
+                    "Formularies"                                                                                          : it.product.productCatalogs.join(", ") ?: "",
+                    "Lot number"                                                                                           : StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber ?: ""),
+                    "Expiration date"                                                                                      : it.inventoryItem.expirationDate ? it.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
+                    "ABC classification"                                                                                   : StringEscapeUtils.escapeCsv(it.product.getAbcClassification(location.id) ?: ""),
+                    "Bin location"                                                                                         : StringEscapeUtils.escapeCsv(it?.binLocation?.name ?: ""),
+                    "Bin location old"                                                                                     : StringEscapeUtils.escapeCsv(it.product.getBinLocation(location.id) ?: ""),
+                    "Status"                                                                                               : g.message(code: "binLocationSummary.${it.status}.label"),
+                    "Last inventory date"                                                                                  : latestInventoryDate ? latestInventoryDate.format("dd-MMM-yyyy") : "",
+                    "Quantity on Hand"                                                                                     : it.quantity ?: 0,
+                    "Physical lot/serial number"                                                                           : "",
+                    "Physical bin location"                                                                                : "",
+                    "Physical expiration date"                                                                             : "",
+                    "Physical quantity"                                                                                    : "",
+                    "Was bin location updated in OpenBoxes?"                                                               : "",
+                    "${StringEscapeUtils.escapeCsv("Was quantity, lot/serial, and expiration date updated in OpenBoxes?")}": "",
+                    "Comment"                                                                                              : "",
             ]
         }
 

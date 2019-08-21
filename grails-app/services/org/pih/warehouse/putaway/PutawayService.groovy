@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.putaway
 
 import org.apache.commons.beanutils.BeanUtils
@@ -43,7 +43,9 @@ class PutawayService {
 
         log.info "internalLocations " + internalLocations
         internalLocations.each { internalLocation ->
-            List putawayItemsTemp = binLocationEntries.findAll { it.binLocation == internalLocation }
+            List putawayItemsTemp = binLocationEntries.findAll {
+                it.binLocation == internalLocation
+            }
             if (putawayItemsTemp) {
                 putawayItemsTemp = putawayItemsTemp.collect {
 
@@ -68,14 +70,16 @@ class PutawayService {
 
         List<PutawayItem> pendingPutawayItems = getPendingItems(location)
 
-        putawayItems.removeAll { PutawayItem item -> pendingPutawayItems.find {
-            item.currentLocation?.id == it.currentLocation?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
-                    item.product?.id == it.product?.id
-        }}
+        putawayItems.removeAll { PutawayItem item ->
+            pendingPutawayItems.find {
+                item.currentLocation?.id == it.currentLocation?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
+                        item.product?.id == it.product?.id
+            }
+        }
 
         putawayItems.addAll(pendingPutawayItems)
 
-        return putawayItems.sort { a,b ->
+        return putawayItems.sort { a, b ->
             a.product?.category?.name <=> b.product?.category?.name ?:
                     a.product?.name <=> b.product?.name
         }
@@ -86,8 +90,12 @@ class PutawayService {
         List<Putaway> putaways = orders.collect { Putaway.createFromOrder(it) }
         List<PutawayItem> putawayItems = []
 
-        putaways.each { putawayItems.addAll(it.putawayItems.findAll { it.putawayStatus == PutawayStatus.PENDING ||
-                (it.putawayStatus == PutawayStatus.CANCELED && it.splitItems?.any { item -> item.putawayStatus == PutawayStatus.PENDING }) }) }
+        putaways.each {
+            putawayItems.addAll(it.putawayItems.findAll {
+                it.putawayStatus == PutawayStatus.PENDING ||
+                        (it.putawayStatus == PutawayStatus.CANCELED && it.splitItems?.any { item -> item.putawayStatus == PutawayStatus.PENDING })
+            })
+        }
 
         return putawayItems
     }

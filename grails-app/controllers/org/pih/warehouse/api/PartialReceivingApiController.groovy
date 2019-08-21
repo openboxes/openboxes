@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
@@ -23,12 +23,12 @@ class PartialReceivingApiController {
     def dataService
 
     def list = {
-        render ([data: []] as JSON)
+        render([data: []] as JSON)
     }
 
     def read = {
         PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
-        render([data:partialReceipt] as JSON)
+        render([data: partialReceipt] as JSON)
     }
 
     def update = {
@@ -45,23 +45,21 @@ class PartialReceivingApiController {
             log.debug "Save partial receipt"
             receiptService.saveAndCompletePartialReceipt(partialReceipt)
 
-        }
-        else if (partialReceipt.receiptStatus == PartialReceiptStatus.PENDING || partialReceipt.receiptStatus == PartialReceiptStatus.CHECKING) {
+        } else if (partialReceipt.receiptStatus == PartialReceiptStatus.PENDING || partialReceipt.receiptStatus == PartialReceiptStatus.CHECKING) {
             receiptService.savePartialReceipt(partialReceipt, false)
-        }
-        else if (partialReceipt.receiptStatus == PartialReceiptStatus.ROLLBACK) {
+        } else if (partialReceipt.receiptStatus == PartialReceiptStatus.ROLLBACK) {
             receiptService.rollbackPartialReceipts(partialReceipt.shipment)
             partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
         }
 
 
-        render([data:partialReceipt] as JSON)
+        render([data: partialReceipt] as JSON)
     }
 
     def exportCsv = {
         JSONObject jsonObject = request.JSON
 
-        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id,  params.stepNumber)
+        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
 
         bindPartialReceiptData(partialReceipt, jsonObject)
 
@@ -70,31 +68,31 @@ class PartialReceivingApiController {
             partialReceipt?.partialReceiptContainers?.partialReceiptItems?.add(new PartialReceiptItem())
         }
 
-        def lineItems = partialReceipt.partialReceiptItems.sort { a,b ->
+        def lineItems = partialReceipt.partialReceiptItems.sort { a, b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
                     a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
                             a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
         }.collect {
             [
-            "Receipt item id": it?.receiptItem?.id ?: "",
-            "Shipment item id": it?.shipmentItem?.id ?: "",
-            Code: it?.shipmentItem?.product?.productCode ?: "",
-            Name: it?.shipmentItem?.product?.name ?: "",
-            "Lot/Serial No.": it?.lotNumber ?: "",
-            "Expiration date": it?.expirationDate?.format("MM/dd/yyyy") ?: "",
-            "Bin Location": it?.binLocation ?: "",
-            Recipient: it?.recipient?.id ?: "",
-            Shipped: it?.quantityShipped ?: "",
-            Received: it?.quantityReceived ?: "",
-            "To receive": it?.quantityRemaining ?: "",
-            "Receiving now": it?.quantityReceiving ?: "",
-            Comment: it?.comment ?: ""
+                    "Receipt item id": it?.receiptItem?.id ?: "",
+                    "Shipment item id": it?.shipmentItem?.id ?: "",
+                    Code: it?.shipmentItem?.product?.productCode ?: "",
+                    Name: it?.shipmentItem?.product?.name ?: "",
+                    "Lot/Serial No.": it?.lotNumber ?: "",
+                    "Expiration date": it?.expirationDate?.format("MM/dd/yyyy") ?: "",
+                    "Bin Location": it?.binLocation ?: "",
+                    Recipient: it?.recipient?.id ?: "",
+                    Shipped: it?.quantityShipped ?: "",
+                    Received: it?.quantityReceived ?: "",
+                    "To receive": it?.quantityRemaining ?: "",
+                    "Receiving now": it?.quantityReceiving ?: "",
+                    Comment: it?.comment ?: ""
             ]
         }
 
         String csv = dataService.generateCsv(lineItems)
         response.setHeader("Content-disposition", "attachment; filename=\"PartialReceiving-${params.id}.csv\"")
-        render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
     def importCsv = { ImportDataCommand command ->
@@ -129,13 +127,15 @@ class PartialReceivingApiController {
                     partialReceiptItems.addAll(it)
                 }
 
-                PartialReceiptItem partialReceiptItem = partialReceiptItems.find { receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId }
+                PartialReceiptItem partialReceiptItem = partialReceiptItems.find {
+                    receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId
+                }
 
                 if ((expirationDate && Constants.EXPIRATION_DATE_FORMATTER.parse(expirationDate).format(Constants.EXPIRATION_DATE_FORMAT) != partialReceiptItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT))
-                    || ((recipientId && recipientId != partialReceiptItem?.recipient?.id) || (!recipientId && partialReceiptItem.recipient))
-                    || ((lotNumber && lotNumber != partialReceiptItem.lotNumber) || (!lotNumber && partialReceiptItem.lotNumber))
-                    || ((binLocation && binLocation != partialReceiptItem.binLocation.name) || (!binLocation && partialReceiptItem.binLocation))
-                    || ((code && code != partialReceiptItem.product.productCode) || (!code && partialReceiptItem.product.productCode))) {
+                        || ((recipientId && recipientId != partialReceiptItem?.recipient?.id) || (!recipientId && partialReceiptItem.recipient))
+                        || ((lotNumber && lotNumber != partialReceiptItem.lotNumber) || (!lotNumber && partialReceiptItem.lotNumber))
+                        || ((binLocation && binLocation != partialReceiptItem.binLocation.name) || (!binLocation && partialReceiptItem.binLocation))
+                        || ((code && code != partialReceiptItem.product.productCode) || (!code && partialReceiptItem.product.productCode))) {
                     throw new IllegalArgumentException("You can only import the Receiving Now and the Comment fields. To make other changes, please use the edit line feature. You can then export and import the template again.")
                 }
 
@@ -153,7 +153,7 @@ class PartialReceivingApiController {
         } catch (Exception e) {
             log.warn("Error occurred while importing CSV: " + e.message, e)
             response.status = 500
-            render([errorCode: 500, errorMessage: e?.message?:"An unknown error occurred during import"] as JSON)
+            render([errorCode: 500, errorMessage: e?.message ?: "An unknown error occurred during import"] as JSON)
             return
         }
 

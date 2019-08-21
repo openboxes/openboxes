@@ -16,7 +16,7 @@ class CalculateQuantityJob {
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron name: 'calculateQuantityCronTrigger',
+        cron name: 'calculateQuantityCronTrigger',
                 cronExpression: CH.config.openboxes.jobs.calculateQuantityJob.cronExpression
     }
 
@@ -50,8 +50,7 @@ class CalculateQuantityJob {
         log.info "Executing calculate quantity job for date=${includeAllDates ? 'ALL' : date}, user=${user?.id}, location=${location?.id}, product=${product?.id}, mergedJobDataMap=${context.mergedJobDataMap}"
         if (includeAllDates) {
             inventorySnapshotService.populateInventorySnapshots()
-        }
-        else {
+        } else {
             // Triggered by ?
             if (product && date && location) {
                 log.info "Triggered job for product ${product?.id} at ${location?.id} on ${date}"

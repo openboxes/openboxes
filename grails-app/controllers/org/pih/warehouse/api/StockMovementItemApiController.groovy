@@ -22,17 +22,17 @@ class StockMovementItemApiController {
     def inventoryService
     def stockMovementService
 
-    def list = { 
+    def list = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params?.stockMovement?.id)
         if (!stockMovement) {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
         }
-        render ([data:stockMovement.lineItems] as JSON)
+        render([data: stockMovement.lineItems] as JSON)
     }
 
     def read = {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
-        render ([data:stockMovementItem] as JSON)
+        render([data: stockMovementItem] as JSON)
     }
 
     def updatePicklist = {
@@ -75,7 +75,7 @@ class StockMovementItemApiController {
 
         PickPageItem pickPageItem = stockMovementService.buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
 
-        render ([data:pickPageItem] as JSON)
+        render([data: pickPageItem] as JSON)
     }
 
     def createPicklist = {
@@ -91,7 +91,7 @@ class StockMovementItemApiController {
 
         PickPageItem pickPageItem = stockMovementService.buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
 
-        render ([data:pickPageItem] as JSON)
+        render([data: pickPageItem] as JSON)
     }
 
     def clearPicklist = {
@@ -105,7 +105,7 @@ class StockMovementItemApiController {
         RequisitionItem requisitionItem = RequisitionItem.get(params.id)
         PickPageItem pickPageItem = stockMovementService.buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
 
-        render ([data:pickPageItem] as JSON)
+        render([data: pickPageItem] as JSON)
     }
 
     def substituteItem = {
@@ -131,7 +131,7 @@ class StockMovementItemApiController {
 
         EditPageItem editPageItem = stockMovementService.buildEditPageItem(stockMovementItem)
 
-        render ([data:editPageItem] as JSON)
+        render([data: editPageItem] as JSON)
     }
 
     def revertItem = {
@@ -141,7 +141,7 @@ class StockMovementItemApiController {
 
         EditPageItem editPageItem = stockMovementService.buildEditPageItem(stockMovementItem)
 
-        render ([data:editPageItem] as JSON)
+        render([data: editPageItem] as JSON)
     }
 
     def cancelItem = {
@@ -159,7 +159,7 @@ class StockMovementItemApiController {
 
         stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
 
-        render ([data:stockMovementItem] as JSON)
+        render([data: stockMovementItem] as JSON)
     }
 
     def removeItem = {

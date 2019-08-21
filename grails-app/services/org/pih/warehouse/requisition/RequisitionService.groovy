@@ -28,12 +28,12 @@ import org.pih.warehouse.util.DateUtil
 
 class RequisitionService {
 
-	boolean transactional = true
+    boolean transactional = true
 
-	def identifierService
-	def productService
-	def shipmentService;
-	def inventoryService;
+    def identifierService
+    def productService
+    def shipmentService
+    def inventoryService
 
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
@@ -81,7 +81,6 @@ class RequisitionService {
         }
 
 
-
         results.each {
             statistics[it[0]] = it[1]
         }
@@ -112,7 +111,7 @@ class RequisitionService {
         }
 
 
-        return statistics;
+        return statistics
     }
 
     /**
@@ -163,13 +162,13 @@ class RequisitionService {
 
     /**
      * Get all items for given requisitions
-     * @param List<Location> origins
-     * @param List<Location> destinations
+     * @param List <Location>  origins
+     * @param List <Location>  destinations
      * @return
      */
     List<Requisition> getRequisitionTemplatesItems(List<Requisition> requisitions) {
         return RequisitionItem.createCriteria().list() {
-         if (requisitions) {
+            if (requisitions) {
                 'in'("requisition", requisitions)
             }
             product {
@@ -189,7 +188,7 @@ class RequisitionService {
     }
 
     def getAllRequisitions(Location destination) {
-        return getRequisitions(new Requisition(destination:destination), [max: -1, offset: 0])
+        return getRequisitions(new Requisition(destination: destination), [max: -1, offset: 0])
     }
 
     /**
@@ -198,7 +197,7 @@ class RequisitionService {
      * @return
      */
     def getRequisitions(Location destination) {
-        return getRequisitions(new Requisition(destination:destination), [:])
+        return getRequisitions(new Requisition(destination: destination), [:])
     }
 
 
@@ -209,7 +208,7 @@ class RequisitionService {
      * @return
      */
     def getRequisitions(Location destination, Location origin) {
-        return getRequisitions(new Requisition(destination:destination, origin: origin), [:])
+        return getRequisitions(new Requisition(destination: destination, origin: origin), [:])
     }
 
     /**
@@ -237,7 +236,7 @@ class RequisitionService {
         def requestedDateRange = DateUtil.parseDateRange(params?.requestedDateRange, "d/MMM/yyyy", "-")
 
         def criteria = Requisition.createCriteria()
-        def results = criteria.list(max:params?.max?:10,offset:params?.offset?:0) {
+        def results = criteria.list(max: params?.max ?: 10, offset: params?.offset ?: 0) {
             and {
                 if (issuedDateRange) {
                     between("dateIssued", issuedDateRange[0], issuedDateRange[1])
@@ -253,8 +252,7 @@ class RequisitionService {
                         eq("isTemplate", false)
                         isNull("isTemplate")
                     }
-                }
-                else {
+                } else {
                     eq("isTemplate", requisition.isTemplate)
                 }
                 if (requisition.isPublished) {
@@ -306,9 +304,8 @@ class RequisitionService {
                     }
                 }
                 if (params?.sort) {
-                    order(params?.sort, params?.order?:'desc')
-                }
-                else {
+                    order(params?.sort, params?.order ?: 'desc')
+                } else {
                     order("dateRequested", "desc")
                 }
                 and {
@@ -347,8 +344,7 @@ class RequisitionService {
         println "requisition.errors = " + requisition.errors
         if (savedRequisition) {
             return savedRequisition
-        }
-        else {
+        } else {
             return requisition
         }
 
@@ -377,63 +373,61 @@ class RequisitionService {
      * @param comments
      * @return
      */
-	def issueRequisition(Requisition requisition, User issuedBy, Person deliveredBy, String comments) {
+    def issueRequisition(Requisition requisition, User issuedBy, Person deliveredBy, String comments) {
 
-		// Make sure a transaction has not already been created for this requisition
-		def outboundTransaction = Transaction.findByRequisition(requisition)
-		if (outboundTransaction) {
-			outboundTransaction.errors.reject("Cannot create multiple outbound transaction for the same requisition")
-			throw new ValidationException("Cannot complete inventory transfer", outboundTransaction.errors)
-		}
+        // Make sure a transaction has not already been created for this requisition
+        def outboundTransaction = Transaction.findByRequisition(requisition)
+        if (outboundTransaction) {
+            outboundTransaction.errors.reject("Cannot create multiple outbound transaction for the same requisition")
+            throw new ValidationException("Cannot complete inventory transfer", outboundTransaction.errors)
+        }
 
-		// If an outbound transaction was not found, we create a new one
-		if (!outboundTransaction) {
-			// Create a new transaction
-			outboundTransaction = new Transaction();
-			outboundTransaction.transactionNumber = inventoryService.generateTransactionNumber()
-			outboundTransaction.transactionDate = new Date();
-			outboundTransaction.requisition = requisition
-			// requisition origin is where the requisition originated from (the destination of stock transfer)
-			outboundTransaction.destination = requisition.destination
-			// requisition inventory is the location where the requisition is placed
-			outboundTransaction.inventory = requisition?.origin?.inventory
-			outboundTransaction.comment = comments
+        // If an outbound transaction was not found, we create a new one
+        if (!outboundTransaction) {
+            // Create a new transaction
+            outboundTransaction = new Transaction()
+            outboundTransaction.transactionNumber = inventoryService.generateTransactionNumber()
+            outboundTransaction.transactionDate = new Date()
+            outboundTransaction.requisition = requisition
+            // requisition origin is where the requisition originated from (the destination of stock transfer)
+            outboundTransaction.destination = requisition.destination
+            // requisition inventory is the location where the requisition is placed
+            outboundTransaction.inventory = requisition?.origin?.inventory
+            outboundTransaction.comment = comments
             //outboundTransaction.createdBy = issuedBy
-			outboundTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
-		}
+            outboundTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+        }
 
-		def picklist = Picklist.findByRequisition(requisition)
-		if (picklist) {
-			picklist.picklistItems.each { picklistItem ->
-				def transactionEntry = new TransactionEntry();
-				transactionEntry.inventoryItem = picklistItem.inventoryItem;
-				transactionEntry.quantity = picklistItem.quantity;
-				outboundTransaction.addToTransactionEntries(transactionEntry)
-			}
-			// Not sure if this needs to be done here
-			//outboundTransaction.save(flush:true)
+        def picklist = Picklist.findByRequisition(requisition)
+        if (picklist) {
+            picklist.picklistItems.each { picklistItem ->
+                def transactionEntry = new TransactionEntry()
+                transactionEntry.inventoryItem = picklistItem.inventoryItem
+                transactionEntry.quantity = picklistItem.quantity
+                outboundTransaction.addToTransactionEntries(transactionEntry)
+            }
+            // Not sure if this needs to be done here
+            //outboundTransaction.save(flush:true)
 
-			if (!inventoryService.saveLocalTransfer(outboundTransaction)) {
-				throw new ValidationException("Unable to save local transfer", outboundTransaction.errors)
-			}
-			else {
+            if (!inventoryService.saveLocalTransfer(outboundTransaction)) {
+                throw new ValidationException("Unable to save local transfer", outboundTransaction.errors)
+            } else {
                 Date now = new Date()
-				requisition.status = RequisitionStatus.ISSUED
+                requisition.status = RequisitionStatus.ISSUED
                 requisition.dateIssued = now
                 requisition.issuedBy = issuedBy
                 requisition.dateDelivered = now
                 requisition.deliveredBy = deliveredBy
-				requisition.save(flush:true)
-			}
+                requisition.save(flush: true)
+            }
 
-		}
-		else {
-			requisition.errors.reject("requisition.picklist.mustHavePicklist")
-			throw new ValidationException("Could not find a picklist associated with this requisition", requisition.errors)
-		}
+        } else {
+            requisition.errors.reject("requisition.picklist.mustHavePicklist")
+            throw new ValidationException("Could not find a picklist associated with this requisition", requisition.errors)
+        }
 
-		return outboundTransaction
-	}
+        return outboundTransaction
+    }
 
     void rollbackRequisition(Requisition requisition) {
         try {
@@ -450,7 +444,7 @@ class RequisitionService {
                             transaction.localTransfer.sourceTransaction = null
                             transaction?.localTransfer?.delete()
                         }
-                        transaction.delete();
+                        transaction.delete()
                     }
                 }
                 requisition.save()
@@ -461,25 +455,24 @@ class RequisitionService {
     }
 
 
-	Requisition saveRequisition(Map data, Location userLocation) {
+    Requisition saveRequisition(Map data, Location userLocation) {
 
-		def itemsData = data.requisitionItems ?: []
-		data.remove("requisitionItems")
+        def itemsData = data.requisitionItems ?: []
+        data.remove("requisitionItems")
 
-		def requisition = Requisition.get(data.id?.toString()) ?: new Requisition(status: RequisitionStatus.CREATED)
+        def requisition = Requisition.get(data.id?.toString()) ?: new Requisition(status: RequisitionStatus.CREATED)
 
         try {
             requisition.properties = data
             if (!requisition.requestNumber) {
                 requisition.requestNumber = identifierService.generateRequisitionIdentifier()
             }
-            def requisitionItems = itemsData.collect{  itemData ->
+            def requisitionItems = itemsData.collect { itemData ->
                 println "itemData: " + itemData
-                def requisitionItem = requisition.requisitionItems?.find{i -> itemData.id  && i.id == itemData.id }
-                if(requisitionItem) {
+                def requisitionItem = requisition.requisitionItems?.find { i -> itemData.id && i.id == itemData.id }
+                if (requisitionItem) {
                     requisitionItem.properties = itemData
-                }
-                else{
+                } else {
                     requisitionItem = new RequisitionItem(itemData)
                     requisition.addToRequisitionItems(requisitionItem)
                 }
@@ -490,23 +483,23 @@ class RequisitionService {
             }
 
             def itemsToDelete = requisition.requisitionItems.findAll { dbItem ->
-                !requisitionItems.any{ clientItem-> clientItem.id == dbItem.id}
+                !requisitionItems.any { clientItem -> clientItem.id == dbItem.id }
             }
-            itemsToDelete.each{requisition.removeFromRequisitionItems(it)}
+            itemsToDelete.each { requisition.removeFromRequisitionItems(it) }
             requisition.origin = userLocation
-            requisition.save(flush:true)
+            requisition.save(flush: true)
             println "Requisition: " + requisition
             println "Errors: " + requisition.errors
 
-            requisition.requisitionItems?.each{it.save(flush:true)}
+            requisition.requisitionItems?.each { it.save(flush: true) }
         } catch (Exception e) {
-            log.error("Error saving requisition: " + e.message, e);
+            log.error("Error saving requisition: " + e.message, e)
 
         }
-		return requisition
-	}
+        return requisition
+    }
 
-	void deleteRequisition(Requisition requisition) {
+    void deleteRequisition(Requisition requisition) {
         requisition?.requisitionItems?.toArray().each { RequisitionItem requisitionItem ->
             deleteRequisitionItem(requisitionItem)
         }
@@ -514,8 +507,8 @@ class RequisitionService {
         if (requisition?.picklist) {
             requisition.picklist.delete()
         }
-		requisition.delete()
-	}
+        requisition.delete()
+    }
 
     void deleteRequisitionItem(RequisitionItem requisitionItem) {
         requisitionItem.undoChanges()
@@ -546,7 +539,7 @@ class RequisitionService {
         cloneRequisition.destination = requisition.destination
         cloneRequisition.requestedBy = requisition.requestedBy
         cloneRequisition.requestedDeliveryDate = requisition.requestedDeliveryDate
-        cloneRequisition.isPublished = false; //requisition.isPublished
+        cloneRequisition.isPublished = false //requisition.isPublished
         cloneRequisition.datePublished = null //requisition.datePublished
         cloneRequisition.isTemplate = requisition.isTemplate
 
@@ -568,14 +561,14 @@ class RequisitionService {
 
 
     void cancelRequisition(Requisition requisition) {
-		requisition.status = RequisitionStatus.CANCELED
-		requisition.save(flush: true)
-	}
+        requisition.status = RequisitionStatus.CANCELED
+        requisition.save(flush: true)
+    }
 
-	void undoCancelRequisition(Requisition requisition) {
-		requisition.status = RequisitionStatus.PENDING
-		requisition.save(flush: true)
-	}
+    void undoCancelRequisition(Requisition requisition) {
+        requisition.status = RequisitionStatus.PENDING
+        requisition.save(flush: true)
+    }
 
 
     List<Requisition> getIssuedRequisitionsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
@@ -603,11 +596,9 @@ class RequisitionService {
             }
             if (fromDate && toDate) {
                 between('dateRequested', fromDate, toDate)
-            }
-            else if (fromDate) {
+            } else if (fromDate) {
                 ge("dateRequested", fromDate)
-            }
-            else if (toDate) {
+            } else if (toDate) {
                 le("dateRequested", toDate)
             }
         }
@@ -683,7 +674,7 @@ class RequisitionService {
 
             }
         }
-        log.info ("transaction entries " + transactionEntries.size())
+        log.info("transaction entries " + transactionEntries.size())
         return transactionEntries
     }
 
@@ -718,7 +709,6 @@ class RequisitionService {
     }
 
 
-
     List<RequisitionItem> getPendingRequisitionItems(Location location) {
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
@@ -742,11 +732,9 @@ class RequisitionService {
                 eq("status", RequisitionStatus.ISSUED)
                 if (dateRequestedFrom && dateRequestedTo) {
                     between("dateRequested", dateRequestedFrom, dateRequestedTo)
-                }
-                else if (dateRequestedFrom) {
+                } else if (dateRequestedFrom) {
                     ge("dateRequested", dateRequestedFrom)
-                }
-                else if (dateRequestedTo) {
+                } else if (dateRequestedTo) {
                     le("dateRequested", dateRequestedTo)
                 }
                 order("dateRequested", "desc")
@@ -774,11 +762,9 @@ class RequisitionService {
             else if (requisitionItem.isSubstituted()) {
                 println "generate picklist for substituted items "
                 generatePicklistItem(requisitionItem.substitutionItem)
-            }
-            else if (requisitionItem.isApproved()) {
+            } else if (requisitionItem.isApproved()) {
                 println "generate picklist for approved items "
-            }
-            else {
+            } else {
                 throw new UnsupportedOperationException("Unknown ")
             }
         }
@@ -786,7 +772,6 @@ class RequisitionService {
 
     void generatePicklistItem(RequisitionItem requisitionItem) {
         println "generate picklist for requisition item " + requisitionItem
-
 
 
     }
@@ -801,7 +786,7 @@ class RequisitionService {
                 requisition.picklist.removeFromPicklistItems(picklistItem)
                 picklistItem.delete()
             }
-            requisition.save();
+            requisition.save()
         }
 
     }
@@ -813,27 +798,21 @@ class RequisitionService {
             if (requisitionItem.requisitionItems) {
                 if (requisitionItem.requisitionItems.size() > 1) {
                     throw new Exception("Cannot have more than one change per requisition item")
-                }
-                else {
+                } else {
                     requisitionItem.requisitionItems.each { childItem ->
                         println "Requisition item of type " + childItem.requisitionItemType + " is being normalized."
 
                         if (childItem.requisitionItemType == RequisitionItemType.SUBSTITUTION) {
                             requisitionItem.substitutionItem = childItem
-                        }
-                        else if (childItem.requisitionItemType == RequisitionItemType.PACKAGE_CHANGE) {
+                        } else if (childItem.requisitionItemType == RequisitionItemType.PACKAGE_CHANGE) {
                             requisitionItem.modificationItem = childItem
-                        }
-                        else if (childItem.requisitionItemType == RequisitionItemType.QUANTITY_CHANGE) {
+                        } else if (childItem.requisitionItemType == RequisitionItemType.QUANTITY_CHANGE) {
                             requisitionItem.modificationItem = childItem
-                        }
-                        else if (childItem.requisitionItemType == RequisitionItemType.ORIGINAL) {
+                        } else if (childItem.requisitionItemType == RequisitionItemType.ORIGINAL) {
                             throw new Exception("Original requisition item cannot be modified for requisition ${requisition.requestNumber}")
-                        }
-                        else if (childItem.requisitionItemType == RequisitionItemType.ADDITION) {
+                        } else if (childItem.requisitionItemType == RequisitionItemType.ADDITION) {
                             throw new Exception("Addition operation not supported for requisition ${requisition.requestNumber}")
-                        }
-                        else {
+                        } else {
                             throw new Exception("Operation not supported for requisition ${requisition.requestNumber}")
                         }
                     }

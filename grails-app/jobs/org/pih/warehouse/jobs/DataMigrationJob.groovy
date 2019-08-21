@@ -9,11 +9,11 @@ class DataMigrationJob {
 
     def migrationService
 
-    static triggers = { }
+    static triggers = {}
 
-	def execute(context) {
+    def execute(context) {
 
-        if (ConfigHolder.config.openboxes.jobs.dataMigrationJob.enabled?:false) {
+        if (ConfigHolder.config.openboxes.jobs.dataMigrationJob.enabled ?: false) {
 
             if (LiquibaseUtil.isRunningMigrations()) {
                 log.info "Postponing job execution until liquibase migrations are complete"

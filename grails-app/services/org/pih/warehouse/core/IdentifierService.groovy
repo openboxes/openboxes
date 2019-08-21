@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.core
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
@@ -17,78 +17,78 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.shipping.Shipment
 
 class IdentifierService {
 
     boolean transactional = true
     def grailsApplication
 
-   
-	/**
-	 * A: alphabetic
-	 * L: letter
-	 * N: numeric
-	 * D: digit
-	 * 0-9: digit
-	 *
-	 * @param format
-	 * @return
-	 */
-	def generateIdentifier(String format) {
-		if (!format || format.isEmpty()) {
-			println "format must be specified"
-			throw new IllegalArgumentException("Format pattern string must be specified")
-		}
-		
-		String identifier = ""
-		for (int i = 0; i < format.length(); i++) {
-			switch(format[i]) {
-				case 'N':
-					identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.numeric)
-					break;
-				case 'D':
-					identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.numeric)
-					break;
-				case 'L':
-					identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.alphabetic)
-					break;
-				case 'A':
-					identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.alphanumeric)
-					break;
-				default:
-					identifier += format[i]
-					//throw new IllegalArgumentException("Unsupported format symbol: " + format[i])
-				
-			}
-		}
-		
-		return identifier
-	}
-	
-	/**
-	 * Generate a random identifier of given length using alphanumeric characters.
-	 *
-	 * @param length
-	 */
-	def generateIdentifier(int length) {
-		return RandomStringUtils.random(length, grailsApplication.config.openboxes.identifier.alphanumeric)
-	}
 
-	
-	/**
-	 * @return
-	 */
-	def generateOrderIdentifier() {
-		return generateIdentifier(grailsApplication.config.openboxes.identifier.order.format)
-	}
+    /**
+     * A: alphabetic
+     * L: letter
+     * N: numeric
+     * D: digit
+     * 0-9: digit
+     *
+     * @param format
+     * @return
+     */
+    def generateIdentifier(String format) {
+        if (!format || format.isEmpty()) {
+            println "format must be specified"
+            throw new IllegalArgumentException("Format pattern string must be specified")
+        }
 
-	/**
-	 * @return
-	 */
-	def generateProductIdentifier() {
-		return generateIdentifier(grailsApplication.config.openboxes.identifier.product.format)
-	}
+        String identifier = ""
+        for (int i = 0; i < format.length(); i++) {
+            switch (format[i]) {
+                case 'N':
+                    identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.numeric)
+                    break
+                case 'D':
+                    identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.numeric)
+                    break
+                case 'L':
+                    identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.alphabetic)
+                    break
+                case 'A':
+                    identifier += RandomStringUtils.random(1, grailsApplication.config.openboxes.identifier.alphanumeric)
+                    break
+                default:
+                    identifier += format[i]
+            //throw new IllegalArgumentException("Unsupported format symbol: " + format[i])
+
+            }
+        }
+
+        return identifier
+    }
+
+    /**
+     * Generate a random identifier of given length using alphanumeric characters.
+     *
+     * @param length
+     */
+    def generateIdentifier(int length) {
+        return RandomStringUtils.random(length, grailsApplication.config.openboxes.identifier.alphanumeric)
+    }
+
+
+    /**
+     * @return
+     */
+    def generateOrderIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.order.format)
+    }
+
+    /**
+     * @return
+     */
+    def generateProductIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.product.format)
+    }
 
     /**
      * @return
@@ -99,18 +99,18 @@ class IdentifierService {
 
 
     /**
-	 * @return
-	 */
-	def generateRequisitionIdentifier() {
-		return generateIdentifier(grailsApplication.config.openboxes.identifier.requisition.format)
-	}
+     * @return
+     */
+    def generateRequisitionIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.requisition.format)
+    }
 
-	/**
-	 * @return
-	 */
-	def generateShipmentIdentifier() {
-		return generateIdentifier(grailsApplication.config.openboxes.identifier.shipment.format)
-	}
+    /**
+     * @return
+     */
+    def generateShipmentIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.shipment.format)
+    }
 
     /**
      * @return
@@ -120,13 +120,11 @@ class IdentifierService {
     }
 
     /**
-	 * @return
-	 */
-	def generateTransactionIdentifier() {
-		return generateIdentifier(grailsApplication.config.openboxes.identifier.transaction.format)
-	}
-
-
+     * @return
+     */
+    def generateTransactionIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.transaction.format)
+    }
 
 
     void assignTransactionIdentifiers() {
@@ -166,7 +164,7 @@ class IdentifierService {
                     }
                 }
             } catch (MySQLIntegrityConstraintViolationException e) {
-                log.warn ("Unable to assign identifier due to constraint violation: " + e.message, e)
+                log.warn("Unable to assign identifier due to constraint violation: " + e.message, e)
             } catch (Exception e) {
                 log.warn("Unable to assign identifier to product with ID " + product?.id + ": " + e.message, e)
             }
@@ -233,8 +231,6 @@ class IdentifierService {
             }
         }
     }
-
-
 
 
 }

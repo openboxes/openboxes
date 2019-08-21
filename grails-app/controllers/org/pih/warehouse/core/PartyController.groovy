@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.core
 
 class PartyController {
@@ -33,8 +33,7 @@ class PartyController {
         if (partyInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'party.label', default: 'Party'), partyInstance.id])}"
             redirect(action: "list", id: partyInstance.id)
-        }
-        else {
+        } else {
             render(view: "create", model: [partyInstance: partyInstance])
         }
     }
@@ -44,8 +43,7 @@ class PartyController {
         if (!partyInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'party.label', default: 'Party'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             [partyInstance: partyInstance]
         }
     }
@@ -55,8 +53,7 @@ class PartyController {
         if (!partyInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'party.label', default: 'Party'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             return [partyInstance: partyInstance]
         }
     }
@@ -67,7 +64,7 @@ class PartyController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (partyInstance.version > version) {
-                    
+
                     partyInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'party.label', default: 'Party')] as Object[], "Another user has updated this Party while you were editing")
                     render(view: "edit", model: [partyInstance: partyInstance])
                     return
@@ -77,12 +74,10 @@ class PartyController {
             if (!partyInstance.hasErrors() && partyInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'party.label', default: 'Party'), partyInstance.id])}"
                 redirect(action: "list", id: partyInstance.id)
-            }
-            else {
+            } else {
                 render(view: "edit", model: [partyInstance: partyInstance])
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'party.label', default: 'Party'), params.id])}"
             redirect(action: "list")
         }
@@ -100,8 +95,7 @@ class PartyController {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'party.label', default: 'Party'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'party.label', default: 'Party'), params.id])}"
             redirect(action: "list")
         }

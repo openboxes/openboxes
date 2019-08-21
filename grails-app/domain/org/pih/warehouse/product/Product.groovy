@@ -16,7 +16,6 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
@@ -114,7 +113,7 @@ class Product implements Comparable, Serializable {
 
     // Indicates whether the product requires temperature-controlled supply chain
     // http://en.wikipedia.org/wiki/Cold_chain
-    Boolean coldChain = Boolean.FALSE;
+    Boolean coldChain = Boolean.FALSE
 
     // Allows tracking of inventory by serial number (includes products such as computers and electronics).
     // A serialized product has a qty = 1 per serial number
@@ -132,7 +131,7 @@ class Product implements Comparable, Serializable {
     Boolean reconditioned = Boolean.FALSE
 
     // primary category
-    Category category;
+    Category category
 
     // Default ABC Classification
     String abcClass
@@ -197,36 +196,36 @@ class Product implements Comparable, Serializable {
     // Associations
 
     // Custom product attributes
-    List attributes = new ArrayList();
+    List attributes = new ArrayList()
 
     // Secondary categories (currently not used)
-    List categories = new ArrayList();
+    List categories = new ArrayList()
 
     // List of product components - bill of materials
     List productComponents
 
     // Auditing
-    Date dateCreated;
-    Date lastUpdated;
+    Date dateCreated
+    Date lastUpdated
     User createdBy
     User updatedBy
 
     // "inventoryLevels"
-    static transients = ["rootCategory", "images", "genericProduct", "thumbnail", "binLocation","substitutions"];
+    static transients = ["rootCategory", "images", "genericProduct", "thumbnail", "binLocation", "substitutions"]
 
     static hasMany = [
-        categories: Category,
-        attributes: ProductAttribute,
-        tags: Tag,
-        documents: Document,
-        productGroups: ProductGroup,
-        packages: ProductPackage,
-        synonyms: Synonym,
-        inventoryLevels: InventoryLevel,
-        inventoryItems: InventoryItem,
-        productComponents: ProductComponent,
-        productSuppliers: ProductSupplier,
-        productCatalogItems: ProductCatalogItem
+            categories         : Category,
+            attributes         : ProductAttribute,
+            tags               : Tag,
+            documents          : Document,
+            productGroups      : ProductGroup,
+            packages           : ProductPackage,
+            synonyms           : Synonym,
+            inventoryLevels    : InventoryLevel,
+            inventoryItems     : InventoryItem,
+            productComponents  : ProductComponent,
+            productSuppliers   : ProductSupplier,
+            productCatalogItems: ProductCatalogItem
     ]
 
     static mapping = {
@@ -242,7 +241,7 @@ class Product implements Comparable, Serializable {
         productComponents cascade: "all-delete-orphan"
     }
 
-    static mappedBy = [productComponents:"assemblyProduct"]
+    static mappedBy = [productComponents: "assemblyProduct"]
 
     static constraints = {
         name(nullable: false, blank: false, maxSize: 255)
@@ -250,7 +249,7 @@ class Product implements Comparable, Serializable {
         productCode(nullable: true, maxSize: 255, unique: true)
         unitOfMeasure(nullable: true, maxSize: 255)
         category(nullable: false)
-        productType(nullable:true)
+        productType(nullable: true)
         active(nullable: true)
         coldChain(nullable: true)
         reconditioned(nullable: true)
@@ -277,7 +276,7 @@ class Product implements Comparable, Serializable {
         //route(nullable:true)
         //dosageForm(nullable:true)
         pricePerUnit(nullable: true)
-        costPerUnit(nullable:true)
+        costPerUnit(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
     }
@@ -298,9 +297,9 @@ class Product implements Comparable, Serializable {
      * @return
      */
     Category getRootCategory() {
-        Category rootCategory = new Category();
-        rootCategory.categories = this.categories;
-        return rootCategory;
+        Category rootCategory = new Category()
+        rootCategory.categories = this.categories
+        return rootCategory
     }
 
     /**
@@ -411,7 +410,7 @@ class Product implements Comparable, Serializable {
      */
     String getAbcClassification(String locationId) {
         def inventoryLevel = getInventoryLevel(locationId)
-        return inventoryLevel?.abcClass?:abcClass
+        return inventoryLevel?.abcClass ?: abcClass
     }
 
     /**
@@ -443,7 +442,6 @@ class Product implements Comparable, Serializable {
     def getQuantityAvailableToPromise(Integer locationId) {
         throw new NotImplementedException()
     }
-
 
 
     /**
@@ -492,14 +490,16 @@ class Product implements Comparable, Serializable {
      * @return
      */
     String productCatalogsToString() {
-        return productCatalogs ? productCatalogs.sort { it?.name }.collect { it.name }.join(",") : ""
+        return productCatalogs ? productCatalogs.sort { it?.name }.collect {
+            it.name
+        }.join(",") : ""
     }
 
     /**
      *
      * @return
      */
-    String toString() { return "${name}"; }
+    String toString() { return "${name}" }
 
     /**
      * Sort by name
@@ -508,9 +508,9 @@ class Product implements Comparable, Serializable {
         //this.name <=> obj.name
 
         def sortOrder =
-            name <=> obj?.name ?:
-                id <=> obj?.id
-        return sortOrder;
+                name <=> obj?.name ?:
+                        id <=> obj?.id
+        return sortOrder
 
     }
 
@@ -556,10 +556,10 @@ class Product implements Comparable, Serializable {
 
     Map toJson() {
         [
-                id: id,
+                id         : id,
                 productCode: productCode,
-                name: name,
-                category: category?.toJson(),
+                name       : name,
+                category   : category?.toJson(),
                 description: description,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated

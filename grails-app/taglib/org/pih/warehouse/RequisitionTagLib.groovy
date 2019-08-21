@@ -1,36 +1,42 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse
 
 class RequisitionTagLib {
 
-	def searchProduct = { attrs, body ->
-		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
-		def name = attrs.name
-		def valueId = (attrs.valueId)?attrs.valueId:"";
-		def valueName = (attrs.valueName)?attrs.valueName:"";
-		def width = (attrs.width) ? attrs.width : '300px';
-		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
-		def styleClass = attrs.styleClass ?: ''
-		def placeholder = attrs.placeholder ?: ""
+    def searchProduct = { attrs, body ->
+        def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
+        def name = attrs.name
+        def valueId = (attrs.valueId) ? attrs.valueId : ""
+        def valueName = (attrs.valueName) ? attrs.valueName : ""
+        def width = (attrs.width) ? attrs.width : '300px'
+        def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : ""
+        def styleClass = attrs.styleClass ?: ''
+        def placeholder = attrs.placeholder ?: ""
         def minLength = (attrs.minLength) ?: 1
 
-		def spanDisplay = "none";
-		def suggestDisplay = "inline";
+        def spanDisplay = "none"
+        def suggestDisplay = "inline"
 
 
-		def html = """
-				<span id="${id}-span" class="span" style="text-align: left; display: ${spanDisplay};">${valueName}</span>
-				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${valueId}"/>
+        def html = """
+				<span id="${id}-span" class="span" style="text-align: left; display: ${
+            spanDisplay
+        };">${valueName}</span>
+				<input id="${id}-value" class="value" type="hidden" name="${name}.id" value="${
+            valueId
+        }"/>
 				<input id="${id}-suggest" type="text"
-					class="autocomplete ${styleClass}" name="${name}.name" placeholder="${placeholder}" value="${valueName}"
+					class="autocomplete ${styleClass}" name="${name}.name" placeholder="${
+            placeholder
+        }" value="${valueName}"
 					style="width: ${width}px; display: ${suggestDisplay};">
 
 				<script language="javascript">
@@ -47,7 +53,7 @@ class RequisitionTagLib {
 						//\$("#${id}-suggest").css('width', '300px');
 
 						\$("#${id}-suggest").autocomplete({
-							delay: ${attrs.delay?:300},
+							delay: ${attrs.delay ?: 300},
 							minLength: ${minLength},
 							dataType: 'json',
 							//define callback to format results
@@ -94,10 +100,10 @@ class RequisitionTagLib {
                         };
 					});
 				</script>
-		""";
+		"""
 
 
-		out << html;
-	}
-	
+        out << html
+    }
+
 }

@@ -24,42 +24,42 @@ class Putaway {
     //LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(PutawayItem.class));
 
     static constrants = {
-        origin(nullable:true)
-        destination(nullable:true)
-        putawayNumber(nullable:true)
-        putawayStatus(nullable:true)
-        putawayAssignee(nullable:true)
-        putawayDate(nullable:true)
-        putawayItems(nullable:true)
-        dateCreated(nullable:true)
-        orderedBy(nullable:true)
+        origin(nullable: true)
+        destination(nullable: true)
+        putawayNumber(nullable: true)
+        putawayStatus(nullable: true)
+        putawayAssignee(nullable: true)
+        putawayDate(nullable: true)
+        putawayItems(nullable: true)
+        dateCreated(nullable: true)
+        orderedBy(nullable: true)
     }
 
     List<PutawayItem> getPutawayItems() {
-       return putawayItems.sort { a,b ->
-           (sortBy == "currentBins" ? a.currentBins?.toLowerCase() <=> b.currentBins?.toLowerCase() : 0) ?:
-                   (sortBy == "preferredBin" ? a.preferredBin?.toLowerCase() <=> b.preferredBin?.toLowerCase() : 0) ?:
-                           a.product?.category?.name <=> b.product?.category?.name ?:
-                                   a.product?.name <=> b.product?.name ?:
-                                           a.id <=> b.id
-       }
+        return putawayItems.sort { a, b ->
+            (sortBy == "currentBins" ? a.currentBins?.toLowerCase() <=> b.currentBins?.toLowerCase() : 0) ?:
+                    (sortBy == "preferredBin" ? a.preferredBin?.toLowerCase() <=> b.preferredBin?.toLowerCase() : 0) ?:
+                            a.product?.category?.name <=> b.product?.category?.name ?:
+                                    a.product?.name <=> b.product?.name ?:
+                                            a.id <=> b.id
+        }
     }
 
     Map toJson() {
         return [
-                id: id,
-                putawayNumber: putawayNumber,
-                putawayStatus: putawayStatus?.name(),
-                putawayDate: putawayDate?.format("MM/dd/yyyy"),
-                dateCreated: dateCreated?.format("MMMM dd, yyyy"),
-                putawayAssignee: putawayAssignee,
-                "origin.id": origin?.id,
-                "origin.name": origin?.name,
-                "destination.id": destination?.id,
+                id                : id,
+                putawayNumber     : putawayNumber,
+                putawayStatus     : putawayStatus?.name(),
+                putawayDate       : putawayDate?.format("MM/dd/yyyy"),
+                dateCreated       : dateCreated?.format("MMMM dd, yyyy"),
+                putawayAssignee   : putawayAssignee,
+                "origin.id"       : origin?.id,
+                "origin.name"     : origin?.name,
+                "destination.id"  : destination?.id,
                 "destination.name": destination?.name,
-                putawayItems:  getPutawayItems().collect { it?.toJson() },
-                orderedBy: orderedBy?.name,
-                sortBy: sortBy
+                putawayItems      : getPutawayItems().collect { it?.toJson() },
+                orderedBy         : orderedBy?.name,
+                sortBy            : sortBy
         ]
     }
 
@@ -89,7 +89,7 @@ class Putaway {
 
 
     static PutawayStatus getPutawayStatus(OrderStatus orderStatus) {
-        switch(orderStatus) {
+        switch (orderStatus) {
             case OrderStatus.PENDING:
                 return PutawayStatus.PENDING
             case OrderStatus.COMPLETED:
@@ -101,7 +101,6 @@ class Putaway {
         }
 
     }
-
 
 
 }

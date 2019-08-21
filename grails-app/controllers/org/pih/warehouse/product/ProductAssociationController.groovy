@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.product
 
 import grails.orm.PagedResultList
@@ -55,8 +55,8 @@ class ProductAssociationController {
             def data = productAssociations ? dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES) : [[:]]
             def text = dataService.generateCsv(data)
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType:"text/csv", text: text)
-            return;
+            render(contentType: "text/csv", text: text)
+            return
         }
 
         [productAssociationInstanceList: productAssociations, productAssociationInstanceTotal: productAssociations.totalCount, selectedTypes: selectedTypes]
@@ -80,8 +80,7 @@ class ProductAssociationController {
 
             redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
             //redirect(action: "list", id: productAssociationInstance.id)
-        }
-        else {
+        } else {
             render(view: "create", model: [productAssociationInstance: productAssociationInstance])
         }
     }
@@ -91,8 +90,7 @@ class ProductAssociationController {
         if (!productAssociationInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             [productAssociationInstance: productAssociationInstance]
         }
     }
@@ -102,8 +100,7 @@ class ProductAssociationController {
         if (!productAssociationInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             return [productAssociationInstance: productAssociationInstance]
         }
     }
@@ -114,7 +111,7 @@ class ProductAssociationController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (productAssociationInstance.version > version) {
-                    
+
                     productAssociationInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation')] as Object[], "Another user has updated this ProductAssociation while you were editing")
                     render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
                     return
@@ -126,12 +123,10 @@ class ProductAssociationController {
                 //redirect(action: "list", id: productAssociationInstance.id)
                 redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
 
-            }
-            else {
+            } else {
                 render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
             redirect(action: "list")
         }
@@ -149,8 +144,7 @@ class ProductAssociationController {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
             redirect(action: "list")
         }
