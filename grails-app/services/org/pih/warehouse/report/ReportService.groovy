@@ -71,13 +71,6 @@ class ReportService implements ApplicationContextAware {
 		}
 	}
 
-    void generateShippingReport(ChecklistReportCommand command) {
-        def shipmentItems = command?.shipment?.shipmentItems?.sort()
-        shipmentItems.each { shipmentItem ->
-            command.checklistReportEntryList << new ChecklistReportEntryCommand(shipmentItem: shipmentItem)
-        }
-    }
-
     void generateProductReport(ProductReportCommand command) {
 
         command.inventoryItems = InventoryItem.findAllByProduct(command?.product)

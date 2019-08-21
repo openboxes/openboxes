@@ -230,7 +230,7 @@ class UrlMappings {
         "500"(controller: "errors", action: "handleNotFound", exception: ObjectNotFoundException)
         "500"(controller: "errors", action: "handleValidationErrors", exception: ValidationException)
         "500"(controller: "errors", action: "handleUnauthorized", exception: AuthenticationException)
-        "/"(controller: "home", action: "index")
+        "/"(controller: "dashboard", action: "index")
     }
 
 
