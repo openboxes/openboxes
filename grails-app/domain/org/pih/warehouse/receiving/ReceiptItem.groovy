@@ -15,7 +15,6 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
-// import java.util.Date
 
 class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 
@@ -27,10 +26,6 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
     Integer quantityShipped                // Quantity that was shipped
     Integer quantityReceived            // Quantity could be a class on its own
     Integer quantityCanceled            // Quantity canceled
-    //Integer quantityAccepted
-    //Integer quantityRejected
-    //String rejectionReason
-    //String description				// Item description (for one-off items)
     String comment                        // Comment about the item quality
 
     ShipmentItem shipmentItem
@@ -66,8 +61,6 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
         comment(nullable: true, maxSize: 255)
         sortOrder(nullable: true)
     }
-
-    //int compareTo(obj) { product.name.compareTo(obj.product.name) }
 
     /**
      * Sorts receipt items in the same order as shipment items.

@@ -26,8 +26,6 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 
-// import java.io.Serializable;
-
 class Shipment implements Comparable, Serializable {
 
     def beforeInsert = {
@@ -277,10 +275,6 @@ class Shipment implements Comparable, Serializable {
         return shipmentItems?.sort(shipmentItemComparator)
     }
 
-    //String getShipmentNumber() {
-    //	return (id) ? "S" + String.valueOf(id).padLeft(6, "0")  : "(new shipment)";
-    //}
-
 
     Map<String, List<Container>> getContainersByType() {
         Map<String, List<Container>> containerMap = new HashMap<String, List<Container>>()
@@ -313,30 +307,6 @@ class Shipment implements Comparable, Serializable {
     Boolean wasPartiallyReceived() {
         return events.any { it.eventType?.eventCode == EventCode.PARTIALLY_RECEIVED }
     }
-
-    /*
-    Boolean isIncoming(Location currentLocation) {
-        //return destination?.id == currentLocation?.id
-        return true;
-    }
-
-    Boolean isOutgoing(Location currentLocation) {
-        //return origin?.id == currentLocation?.id
-        return false;
-    }
-
-    Boolean isIncomingOrOutgoing(Location currentLocation) {
-        return isIncoming(currentLocation) || isOutgoing(currentLocation)
-    }
-
-    Boolean isDeleteAllowed(Location currentLocation) {
-        return isIncomingOrOutgoing(currentLocation)
-    }
-
-    Boolean isEditAllowed(Location currentLocation) {
-        return isIncomingOrOutgoing(currentLocation)
-    }
-    */
 
     Boolean isStockMovement() {
         return requisition != null
@@ -476,9 +446,7 @@ class Shipment implements Comparable, Serializable {
     /**
      * Clones the specified container
      */
-    void cloneContainer(Container container, Integer quantity) {
-        // def newContainer = new Container()
-    }
+    void cloneContainer(Container container, Integer quantity) {}
 
     Float totalWeightInKilograms() {
         return containers.findAll { it.parentContainer == null }.collect {

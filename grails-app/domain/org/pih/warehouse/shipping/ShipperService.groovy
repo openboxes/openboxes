@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.shipping
 
-// import java.util.Date;
-
 class ShipperService {
 
     String id

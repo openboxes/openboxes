@@ -11,8 +11,6 @@ package org.pih.warehouse.product
 
 class ProductGroupController {
 
-    //static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-
     def productService
 
     def index = {
@@ -48,7 +46,6 @@ class ProductGroupController {
         if (!productGroupInstance) {
             productGroupInstance = new ProductGroup(params)
         }
-        //productGroupInstance.products = productService.getProducts(params['product.id'])
         def products = productService.getProducts(params['product.id'])
         products.each { product ->
             productGroupInstance.addToProducts(product)
@@ -144,25 +141,8 @@ class ProductGroupController {
             }
             productGroupInstance.properties = params
 
-            // The user changed the category, so we want to redisplay the form with no products
-            //if (params?.oldCategory?.id != productGroupInstance?.category?.id) {
-            //productGroupInstance.products = []
-            //	render(view: "edit", model: [productGroupInstance: productGroupInstance])
-            //	return
-            //}
-
-            //productGroupInstance.products = productService.getProducts(params['product.id'])
-            /*
-            def products = productService.getProducts(params['product.id'])
-            println "Products: " + products
-            products.each { product ->
-                productGroupInstance.addToProducts(product)
-            }*/
-
             if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
-                //redirect(action: "edit", id: productGroupInstance.id)
-                //redirect(controller: "inventory", action: "browse")
                 redirect(controller: "productGroup", action: "list")
             } else {
                 println productGroupInstance.errors
@@ -170,7 +150,6 @@ class ProductGroupController {
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
-            //redirect(controller: "inventory", action: "browse")
             redirect(controller: "productGroup", action: "list")
         }
     }
@@ -216,7 +195,6 @@ class ProductGroupController {
         categories = categories.unique()
 
         if (categories.size() > 1) {
-            //throw new Exception("Product group must contain products from a single category")
             productGroupInstance.errors.rejectValue("category", "Product group must contain products from a single category")
             flash.message = "Please return to the <a href='javascript:history.go(-1)'>Inventory Browser</a> to choose products from a single category."
         }
@@ -269,12 +247,6 @@ class ProductGroupController {
                 productGroup.addToProducts(product)
                 productGroup.save()
             }
-            //def productGroup = ProductGroup.findByName(params.productGroup)
-            //if (!productGroup) {
-            //    productGroup = new ProductGroup(name: params.productGroup, category: product.category)
-            //}
-            //product.addToProductGroups(productGroup)
-            //product.save(failOnError: true)
         }
         render(template: 'products', model: [productGroup: productGroup, products: productGroup.products])
     }

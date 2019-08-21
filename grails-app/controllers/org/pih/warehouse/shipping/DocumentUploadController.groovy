@@ -26,7 +26,5 @@ class DocumentUploadController {
 
         [shipments: Shipment.list()]
     }
-    def view = {
-        // pass through to "view shipment" page
-    }
+    def view = {}
 }

@@ -34,7 +34,6 @@ class BreadcrumbTagLib {
             breadcrumb += "&nbsp; &raquo; &nbsp;"
             breadcrumb += "(unknown warehouse)"
         }
-        // "http://" + request.getServerName() + ":" + request.getServerPort() +
         out << "" + breadcrumb
 
 

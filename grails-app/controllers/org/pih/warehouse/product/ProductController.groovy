@@ -67,8 +67,6 @@ class ProductController {
         if (category || tagIds)
             cmd.productInstanceList = productService.getProducts(category, tagIds, params)
 
-        //cmd.inventoryLevelMap = inventoryService.getInventoryLevels(cmd.productInstanceList, location)
-
         cmd.productInstanceList.eachWithIndex { product, index ->
             println product.category
             cmd.categoryInstanceList << product.category
@@ -77,18 +75,11 @@ class ProductController {
 
         println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        //def domainClass = new DefaultGrailsDomainClass(Product.class)
-
         [commandInstance: cmd, products: cmd.productInstanceList ?: [], categoryInstance: category]
     }
 
     def batchEditProperties = {
         def startTime = System.currentTimeMillis()
-        //   def location = Location.get(session.warehouse.id)
-        //   def category = Category.get(params.categoryId)
-        //   def tagIds = params.list("tagId")
-
-        //  def products = productService.getProducts(category, tagIds, params)
 
         println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
 
@@ -136,18 +127,9 @@ class ProductController {
 
             render(view: "batchEdit", model: [commandInstance: cmd, products: products])
         }
-        //else {
-        // reset the flash message in the case of two submits in a row
-        //flash.message = null
-        //}
-
 
         println "flash " + flash.message
         println "params " + params
-        //cmd.rootCategory = productService.getRootCategory();
-        //render(view: "batchEdit", model: [commandInstance:cmd, products:  cmd.productInstanceList]);
-
-
     }
 
     def list = {
@@ -211,48 +193,6 @@ class ProductController {
         productInstance.properties = params
 
         updateTags(productInstance, params)
-        //productInstance.validate()
-
-        //render(view: "edit", model: [productInstance : productInstance, rootCategory: productService.getRootCategory()])
-        //return;
-        /*
-		if (!productInstance.productCode) {
-			productInstance.productCode = productService.generateProductIdentifier();
-		}
-		// Add tags
-		try {
-			if (params.tagsToBeAdded) {
-				params.tagsToBeAdded.split(",").each { tagText ->
-					Tag tag = Tag.findByTag(tagText)
-					if (!tag) tag = new Tag(tag:tagText)
-					productInstance.addToTags(tag)
-				}
-			}
-		} catch (Exception e) {
-			log.error("Error occurred: " + e.message)
-		}
-
-		// Add attributes
-		Attribute.list().each() {
-			String attVal = params["productAttributes." + it.id + ".value"];
-			if (attVal == "_other" || attVal == null || attVal == '') {
-				attVal = params["productAttributes." + it.id + ".otherValue"];
-			}
-			if (attVal) {
-				productInstance.getAttributes().add(new ProductAttribute(["attribute":it,"value":attVal]))
-			}
-		}
-
-		// find the phones that are marked for deletion
-		def _toBeDeleted = productInstance.categories.findAll {(it?.deleted || (it == null))}
-
-		log.info("toBeDeleted: " + _toBeDeleted )
-
-		// if there are phones to be deleted remove them all
-		if (_toBeDeleted) {
-			productInstance.categories.removeAll(_toBeDeleted)
-		}
-        */
 
         // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
         // when the session is closed.
@@ -268,25 +208,13 @@ class ProductController {
             def inventoryInstance = warehouseInstance?.inventory
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
             sendProductCreatedNotification(productInstance)
-            //redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
-            //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
-            //return;
         }
 
         render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])
     }
 
 
-    def show = {
-        //def productInstance = Product.get(params.id)
-        //if (!productInstance) {
-        //	flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-        //	redirect(controller: "inventoryItem", action: "browse")
-        //}
-        //else {
-        //	[productInstance: productInstance]
-        //}
-    }
+    def show = {}
 
 
     def edit = {
@@ -399,7 +327,6 @@ class ProductController {
     }
 
     def updateTags(productInstance, params) {
-        //def productInstance = Product.get(params.id)
         // Process product tags
         try {
 
@@ -408,7 +335,6 @@ class ProductController {
                 params.tagsToBeAdded.split(",").each { tagText ->
                     Tag tag = Tag.findByTag(tagText)
                     if (!tag) tag = new Tag(tag: tagText)
-                    //productInstance.addToTags(tag)
                     tagList << tag
                 }
             }
@@ -425,7 +351,6 @@ class ProductController {
         } catch (Exception e) {
             log.error("Error occurred: " + e.message)
         }
-        //redirect(action: "edit", id: productInstance?.id)
     }
 
 
@@ -503,7 +428,6 @@ class ProductController {
 
     def deleteProducts = {
         println "Delete products: " + params
-        //def productIds = params.list('product.id')
         def productIds = request.getParameterValues("product.id")
 
         def products = productService.getProducts(productIds)
@@ -559,14 +483,6 @@ class ProductController {
      *
      */
     def importDependencies = {
-        /*
-         if (session.dosageForms) {
-         session.dosageForms.unique().each() {
-         new DosageForm(code: it, name: it).save(flush:true)
-         }
-         session.dosageForms = null
-         }*/
-
         redirect(controller: "product", action: "importProducts")
     }
 
@@ -739,13 +655,11 @@ class ProductController {
     def upnDatabase = {
 
         def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
-        //	def count=0, MAXSIZE=100000
         def rows = []
         try {
             def line = ""
             file.withReader { reader ->
                 while ((line = reader.readLine()) != null) {
-                    //rows << line[0..19].trim()
                     rows << [
                             line                  : line,
                             upn                   : line[0..19].trim(),
@@ -767,22 +681,15 @@ class ProductController {
                             reference             : line[261..280].trim(),
                             referenceQualifierCode: line[281..282].trim()
                     ]
-
-                    //if (++count > MAXSIZE) throw new RuntimeException('File too large!')
                 }
             }
 
 
         } catch (RuntimeException e) {
             log.error(e.message)
-            //render "error " + e.message + "<br/>" + rows
         }
 
         [rows: rows]
-        //render rows;
-
-        //assert names[0].first == 'JOHN'
-        //assert names[1].age == 456
     }
 
 
@@ -816,10 +723,6 @@ class ProductController {
             if (documentInstance.isImage()) {
                 documentService.scaleImage(documentInstance, response.outputStream, '300px', '300px')
             } else {
-                // For Grails 2.3.x
-                //final Resource image = grailsResourceLocator.findResourceForURI('/images/icons/pdf.png')
-                //render file: image.inputStream, contentType: 'image/png'
-
                 // Strip out the most common mime type tree names
                 def documentType = documentInstance.contentType.minus("application/").minus("image/").minus("text/")
                 def servletContext = ServletContextHolder.servletContext
@@ -834,7 +737,6 @@ class ProductController {
 
             }
         } else {
-            //"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
             response.sendError(404)
         }
     }
@@ -847,10 +749,6 @@ class ProductController {
             if (documentInstance.isImage()) {
                 documentService.scaleImage(documentInstance, response.outputStream, '100px', '100px')
             } else {
-                // For Grails 2.3.x
-                //final Resource image = grailsResourceLocator.findResourceForURI('/images/icons/pdf.png')
-                //render file: image.inputStream, contentType: 'image/png'
-
                 // Strip out the most common mime type tree names
                 def documentType = documentInstance.contentType.minus("application/").minus("image/").minus("text/")
                 def servletContext = ServletContextHolder.servletContext
@@ -863,11 +761,7 @@ class ProductController {
                 response.outputStream.flush()
 
             }
-
-            //byte[] bytes = documentInstance.fileContents
-            //resizeImage(bytes, response.outputStream, width, height)
         } else {
-            //"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
             response.sendError(404)
         }
     }
@@ -891,11 +785,8 @@ class ProductController {
             println "export products: " + csv
             render csv
         } else {
-            //render(text: 'No products found', status: 404)
             response.sendError(404)
-
         }
-
     }
 
     /**
@@ -918,9 +809,7 @@ class ProductController {
     /**
      * Renders form to begin the import process
      */
-    def importAsCsv = {
-        // renders the initial form
-    }
+    def importAsCsv = {}
 
     /**
      * Upload CSV file
@@ -957,27 +846,14 @@ class ProductController {
                     columns = productService.getColumns(csv)
                     println "CSV " + csv
 
-                    // Get all existing products
-                    //def existingProducts = productService.getExistingProducts(csv)
-                    //existingProducts.each { product ->
-                    //	existingProductsMap[product.id] = product
-                    //    println "existing product " + product.id + " " + product.name
-                    //}
-
                     // Create default tag based on base filename
                     tag = FilenameUtils.getBaseName(command?.importFile?.originalFilename)
 
                     command.products = productService.validateProducts(csv)
 
                     flash.message = "Uploaded file ${uploadFile?.originalFilename} to ${localFile.absolutePath}"
-
-                    //dataService.getFileProperties(uploadFile)
-                    //def localFile = dataService.saveFile(uploadFile)
-                    //render localFile.getText()
-                    //response.outputStream << localFile.newInputStream()
                 } catch (RuntimeException e) {
                     log.error("An error occurred while uploading product import CSV " + e.message, e)
-                    //flash.message = e.message
                     command.errors.reject(e.message)
                 }
                 catch (FileNotFoundException e) {
@@ -1032,7 +908,6 @@ class ProductController {
 
         }
         render(view: 'importAsCsv', model: [command: command, tags: tags, columns: columns, productsHaveBeenImported: true])
-
     }
 
 
@@ -1180,14 +1055,12 @@ class ProductController {
         if (productCatalog && product) {
             log.info("product: " + product)
             log.info("productCatalog: " + productCatalog)
-            //productCatalog.removeProduct(product)
             def list = productCatalog.productCatalogItems.findAll { it.product = product }
             list.toArray().each { productCatalogItem ->
                 productCatalog.removeFromProductCatalogItems(productCatalogItem)
                 productCatalogItem.delete()
                 productCatalog.save()
             }
-
         }
         redirect(action: "productCatalogs", id: product.id)
     }
@@ -1205,7 +1078,6 @@ class ProductController {
         }
 
         log.info "productCatalogs: " + productCatalogs
-        //def productCatalogs = ProductCatalog.list()
 
         render template: "productCatalogs", model: [productCatalogs: productCatalogs, product: product]
     }

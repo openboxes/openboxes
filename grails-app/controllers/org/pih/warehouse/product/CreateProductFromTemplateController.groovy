@@ -12,8 +12,6 @@ package org.pih.warehouse.product
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.inventory.InventoryService
 
-// import sun.util.logging.resources.logging;
-
 class CreateProductFromTemplateController {
 
     MailService mailService
@@ -29,7 +27,6 @@ class CreateProductFromTemplateController {
         start {
             action {
                 flow.product = new ProductGloveCommand()
-                //[product:flow.product]
             }
             on("success").to("chooseTemplate")
             on(Exception).to("error")
@@ -52,7 +49,6 @@ class CreateProductFromTemplateController {
             on("chooseTemplate").to("chooseTemplate")
             on("enterDetails").to("enterDetails")
             on("confirmDetails").to("confirmDetails")
-            //on("showProduct").to("showProduct")
         }
         enterDetails {
             on("back").to("chooseTemplate")
@@ -63,11 +59,7 @@ class CreateProductFromTemplateController {
                 if (product.hasErrors()) {
                     flash.message = "errors"
                     error()
-                } else {
-                    //flash.message = "Product details have been entered"
                 }
-
-
             }.to("confirmDetails")
 
             on("error").to("confirmDetails")
@@ -76,8 +68,6 @@ class CreateProductFromTemplateController {
             on("chooseTemplate").to("chooseTemplate")
             on("enterDetails").to("enterDetails")
             on("confirmDetails").to("confirmDetails")
-            //on("showProduct").to("showProduct")
-
         }
         confirmDetails {
             on("back").to("enterDetails")
@@ -123,7 +113,6 @@ class CreateProductFromTemplateController {
             on("chooseTemplate").to("chooseTemplate")
             on("enterDetails").to("enterDetails")
             on("confirmDetails").to("confirmDetails")
-            //on("showProduct").to("showProduct")
         }
         finish {
             redirect(controller: "createProductFromTemplate", action: "index")

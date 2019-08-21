@@ -32,9 +32,6 @@ class FulfillmentItem implements Serializable {
     // Bi-directional associations
     static belongsTo = [fulfillment: Fulfillment]
 
-    // One-to-many associations
-    //static hasMany = [ shipmentItems : ShipmentItem ]
-
     static constraints = {
         requisitionItem(nullable: true)
         inventoryItem(nullable: true)

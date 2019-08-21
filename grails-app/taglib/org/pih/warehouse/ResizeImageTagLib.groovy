@@ -14,9 +14,6 @@ import org.pih.warehouse.util.ImageUtil
 class ResizeImageTagLib {
 
     def resizeImage = { attrs, body ->
-        //def file = downloadFile(attrs.src)
-        //out << file.absolutePath
-        //ImageUtil.resizeImage(file.bytes, out, 200, 200);
         def out = new FileOutputStream("/tmp/image.jpg")
         ImageUtil.resizeImage(attrs.src, out, 200, 200)
     }
@@ -29,6 +26,4 @@ class ResizeImageTagLib {
         out.close()
         return new File(filename)
     }
-
-
 }

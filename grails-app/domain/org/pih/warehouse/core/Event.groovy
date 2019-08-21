@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-// import java.util.Date
 
 /**
  * Represents a particular Event of interest during the course of a Shipment
@@ -28,7 +27,6 @@ class Event implements Comparable, Serializable {
     Date dateCreated
     Date lastUpdated
 
-    //static belongsTo = [ shipment : Shipment ]
     static mapping = {
         id generator: 'uuid'
     }

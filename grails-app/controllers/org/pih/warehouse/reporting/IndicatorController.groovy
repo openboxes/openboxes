@@ -26,8 +26,6 @@ class IndicatorController {
         // String code, boolean captureStdout, request
         render consoleService.eval(code, true, request)
     }
-
-
 }
 
 

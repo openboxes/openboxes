@@ -13,7 +13,6 @@ class FormatNumberTagLib {
     static namespace = "g"
 
     def formatNumber = { attrs ->
-        //log.info "Format number: " + attrs;
         //my changes in tag's behaviour
         org.codehaus.groovy.grails.plugins.web.taglib.FormatTagLib formatTagLib = grailsAttributes.applicationContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.FormatTagLib')
 

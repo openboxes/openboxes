@@ -89,7 +89,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     static belongsTo = [requisition: Requisition]
     static hasMany = [requisitionItems: RequisitionItem, picklistItems: PicklistItem]
-    // requisitionItems:RequisitionItem,
 
     static mapping = {
         id generator: 'uuid'
@@ -162,7 +161,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return the child requisition item that represents the quantity change
      */
     def getChange() {
-        //return (requisitionItems?.size() > 0) ? requisitionItems?.asList()?.first() : null
         return modificationItem ?: substitutionItem
     }
 
@@ -173,7 +171,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return the child requisition item that represents the substitution
      */
     def getSubstitution() {
-        //return (requisitionItems?.size() > 0) ? requisitionItems?.asList()?.first() : null
         return substitutionItem ?: modificationItem
     }
     /**
@@ -513,7 +510,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def startTime = System.currentTimeMillis()
         def canChooseSubstitute = !isChanged() && !isApproved() && !isCanceled()
 
-        //println "canChooseSubstitute: " + (System.currentTimeMillis() - startTime) + " ms"
         return canChooseSubstitute
     }
 
@@ -525,8 +521,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         } catch (Exception e) {
 
         }
-        //log.debug "Calculate quantity picked: " + (System.currentTimeMillis() - startTime) + " ms"
-
         return quantityPicked ?: 0
     }
 
@@ -546,7 +540,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def quantityRemaining = totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())
 
 
-        //log.debug "calculateQuantityRemaining: " + (System.currentTimeMillis() - startTime) + " ms"
         return quantityRemaining
     }
 

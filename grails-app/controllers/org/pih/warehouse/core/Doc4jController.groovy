@@ -9,11 +9,7 @@
  **/
 package org.pih.warehouse.core
 
-//import org.apache.poi.hssf.usermodel.HSSFFont
 import org.pih.warehouse.shipping.Shipment
-
-// import java.io.File;
-// import java.io.FileOutputStream
 
 class Doc4jController {
 
@@ -48,7 +44,6 @@ class Doc4jController {
 
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         response.setContentType("application/pdf")
-        //response.outputStream = outputStream;
         return
     }
 
@@ -72,7 +67,6 @@ class Doc4jController {
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
         documentService.generatePackingList(response.outputStream, shipmentInstance)
-        //response.outputStream << tempFile.readBytes()
         return
 
     }

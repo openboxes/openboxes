@@ -156,24 +156,6 @@ class TagController {
             } else {
                 flash.message = "Please choose at least one product to remove"
             }
-
-            /*
-            if (params.productCodesToBeAdded) {
-                def productCodes = params.productCodesToBeAdded.split(",")
-                productCodes.each { productCode ->
-                    def product = Product.findByProductCodeLike(productCode)
-                    if (!tag.products.contains(product)) {
-                        tag.addToProducts(product)
-                        tag.save(flush:true)
-                    }
-                }
-
-
-            }
-            else {
-                flash.message = "Please choose at least one product to remove " + params
-            }
-            */
         } else {
             flash.message = "Could not find tag with ID " + params.id
             redirect(action: "list")

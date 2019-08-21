@@ -43,11 +43,6 @@ class Receipt implements Serializable, Comparable<Receipt> {
         expectedDeliveryDate(nullable: true)
         actualDeliveryDate(nullable: false,
                 validator: { value, obj ->
-                    Date now = new Date()
-                    // can't be delivered in the future
-//				if (!(value <= now)) {
-//					return ["invalid.mustOccurOnOrBeforeToday", value, now]
-//				}
                     // can't be delivered before it is shipped!
                     if (!(value + 1).after(obj.shipment.actualShippingDate)) {
                         return ["invalid.mustOccurOnOrAfterActualShippingDate", value, obj.shipment.actualShippingDate]

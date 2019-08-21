@@ -154,7 +154,6 @@ class InventoryService implements ApplicationContextAware {
             }
             for (entry in map) {
                 entry.value.sort { item1, item2 ->
-                    //item1?.product?.name <=> item2?.product?.name
                     item1?.description <=> item2?.description
                 }
             }
@@ -313,9 +312,6 @@ class InventoryService implements ApplicationContextAware {
     InventoryItemCommand getInventoryItemCommand(Product product, Inventory inventory, InventoryLevel inventoryLevel, Integer quantityOnHand, Integer quantityToReceive, Integer quantityToShip, Boolean showOutOfStockProducts) {
         InventoryItemCommand inventoryItemCommand = new InventoryItemCommand()
 
-        //def startTime = System.currentTimeMillis()
-        //def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
-        //log.debug " * find inventory level by product and inventory: " + (System.currentTimeMillis() - startTime) + " ms"
         inventoryItemCommand.description = product.name
         inventoryItemCommand.category = product.category
         inventoryItemCommand.product = product
@@ -331,9 +327,6 @@ class InventoryService implements ApplicationContextAware {
         inventoryItemCommand.description = productGroup.name
         inventoryItemCommand.productGroup = productGroup
         inventoryItemCommand.category = productGroup.category
-        //inventoryItemCommand.quantityOnHand = 1
-        //inventoryItemCommand.quantityToReceive = 0
-        //inventoryItemCommand.quantityToShip = 0
 
         return inventoryItemCommand
     }
@@ -371,79 +364,6 @@ class InventoryService implements ApplicationContextAware {
     Set<ProductGroup> getProductGroups(Location location, List searchTerms, List categoryFilters, Boolean showHiddenProducts) {
         def productGroups = ProductGroup.list()
         productGroups = productGroups.intersect(getProductGroups(searchTerms, categoryFilters))
-        /*
-         // Get products that match the search terms by name and category
-         def categories = getCategoriesMatchingSearchTerms(searchTerms)
-         // Categories
-         def matchCategories = getExplodedCategories(categoryFilters);
-         log.debug "matchCategories " + matchCategories
-         // Get all products, including hidden ones
-         if (!showHiddenProducts) {
-         def statuses = []
-         statuses << InventoryStatus.NOT_SUPPORTED
-         statuses << InventoryStatus.SUPPORTED_NON_INVENTORY
-         def removeProducts = getProductsByLocationAndStatuses(location, statuses)
-         log.debug "remove " + removeProducts.size() + " hidden products"
-         products.removeAll(removeProducts)
-         }
-         log.debug "base products " + products.size();
-         if (matchCategories && searchTerms) {
-         def searchProducts = ProductGroup.createCriteria().list() {
-         and {
-         or {
-         searchTerms.each {
-         ilike("description", "%" + it + "%")
-         }
-         }
-         'in'("category", matchCategories)
-         }
-         }
-         products = products.intersect(searchProducts);
-         }
-         else {
-         def searchProducts = ProductGroup.createCriteria().list() {
-         or {
-         if (searchTerms) {
-         searchTerms.each {
-         String[] filterTerms = it.split("\\s+");
-         or {
-         and {
-         filterTerms.each {
-         ilike("description", "%" + it + "%")
-         }
-         }
-         and {
-         filterTerms.each {
-         ilike("manufacturer", "%" + it + "%")
-         }
-         }
-         and {
-         filterTerms.each {
-         ilike("productCode", "%" + it + "%")
-         }
-         }
-         }
-         }
-         }
-         if (matchCategories) {
-         'in'("category", matchCategories)
-         }
-         if (categories) {
-         'in'("category", categories)
-         }
-         }
-         }
-         products = products.intersect(searchProducts);
-         }
-         // now localize to only match products for the current locale
-         // TODO: this would also have to handle the category filtering
-         //  products = products.findAll { product ->
-         //  def localizedProductName = getLocalizationService().getLocalizedString(product.name);  // TODO: obviously, this would have to use the actual locale
-         // return productFilters.any {
-         //   localizedProductName.contains(it)  // TODO: this would also have to be case insensitive
-         // }
-         // }
-         */
         return productGroups
     }
 
@@ -476,7 +396,6 @@ class InventoryService implements ApplicationContextAware {
         Map quantityByProduct = [:]
         Map quantityShippedByProduct = shipmentService.getOutgoingQuantityByProduct(location, products)
         Map quantityOrderedByProduct = orderService.getOutgoingQuantityByProduct(location, products)
-        //Map quantityRequestedByProduct = getRequisitionService().getOutgoingQuantityBgetInventoryItemsJsonByProductyProduct(location)
         quantityShippedByProduct.each { product, quantity ->
             def productQuantity = quantityByProduct[product]
             if (!productQuantity) productQuantity = 0
@@ -489,12 +408,6 @@ class InventoryService implements ApplicationContextAware {
             productQuantity += quantity ?: 0
             quantityByProduct[product] = productQuantity
         }
-        //		quantityRequestedByProduct.each { product, quantity ->
-        //			def productQuantity = quantityByProduct[product];
-        //			if (!productQuantity) productQuantity = 0;
-        //			productQuantity += quantity?:0;
-        //			quantityByProduct[product] = productQuantity;
-        //		}
         return quantityByProduct
     }
 
@@ -507,7 +420,6 @@ class InventoryService implements ApplicationContextAware {
         Map quantityByProduct = [:]
         Map quantityShippedByProduct = getShipmentService().getIncomingQuantityByProduct(location, products)
         Map quantityOrderedByProduct = getOrderService().getIncomingQuantityByProduct(location, products)
-        //Map quantityRequestedByProduct = getRequisitionService().getIncomingQuantityByProduct(location)
         quantityShippedByProduct.each { product, quantity ->
             def productQuantity = quantityByProduct[product]
             if (!productQuantity) productQuantity = 0
@@ -520,12 +432,6 @@ class InventoryService implements ApplicationContextAware {
             productQuantity += quantity ?: 0
             quantityByProduct[product] = productQuantity
         }
-        //		quantityRequestedByProduct.each { product, quantity ->
-        //			def productQuantity = quantityByProduct[product];
-        //			if (!productQuantity) productQuantity = 0;
-        //			productQuantity += quantity?:0;
-        //			quantityByProduct[product] = productQuantity;
-        //		}
         return quantityByProduct
     }
 
@@ -540,8 +446,6 @@ class InventoryService implements ApplicationContextAware {
         Map inventoryItemQuantity = [:]
         Set inventoryItems = getInventoryItemsByProductAndInventory(product, inventory)
         Map<InventoryItem, Integer> quantityMap = getQuantityForInventory(inventory)
-
-        //log.debug "getQuantityByInventoryAndProduct: " + quantityMap
 
         inventoryItems.each {
             def quantity = quantityMap[it]
@@ -1027,8 +931,6 @@ class InventoryService implements ApplicationContextAware {
         def quantityByProductAndInventoryItemMap =
                 getQuantityByProductAndInventoryItemMap(entries)
 
-        //log.info "quantityByProductAndInventoryItemMap: " + quantityByProductAndInventoryItemMap
-
         // now collapse this down to be by product
         quantityByProductAndInventoryItemMap.keySet().each { product ->
             quantityByProductAndInventoryItemMap[product].keySet().each { inventoryItem ->
@@ -1039,7 +941,6 @@ class InventoryService implements ApplicationContextAware {
             }
         }
         log.debug " * getQuantityByInventoryItemMap(): " + (System.currentTimeMillis() - startTime) + " ms"
-        //log.info "quantityMap: " + quantityMap
         return quantityMap
     }
 
@@ -1053,7 +954,6 @@ class InventoryService implements ApplicationContextAware {
         return binLocationMap
     }
 
-    //@Transactional(readOnly = true)
     List getQuantityByBinLocation(Location location) {
         def startTime = System.currentTimeMillis()
         List binLocations
@@ -1410,16 +1310,6 @@ class InventoryService implements ApplicationContextAware {
 
     Integer getQuantityAvailableToPromise(Inventory inventory, InventoryItem inventoryItem) {
         def quantityOnHand = getQuantity(inventory, inventoryItem)
-        /*
-         def shipmentItems = ShipmentItem.findAllByInventoryItem(inventoryItem)
-         shipmentItems.findAll { (it?.shipment?.origin == inventory?.warehouse) && it?.shipment?.isPending() }
-         def quantityShipping = shipmentItems.sum { it.quantity }
-         def picklistItems = PicklistItem.findAllByInventoryItem(inventoryItem)
-         picklistItems.findAll { it?.picklist?.request?.origin == inventory?.warehouse }
-         def quantityPicked = picklistItems.sum { it.quantity }
-         */
-
-
         return quantityOnHand
     }
 
@@ -1475,7 +1365,6 @@ class InventoryService implements ApplicationContextAware {
      * @param params
      * @return
      */
-    //@Cacheable("stockCardCommandCache")
     StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
         // Get basic details required for the whole page
         cmd.product = Product.get(params?.product?.id ?: params.id)  // check product.id and id
@@ -1493,11 +1382,6 @@ class InventoryService implements ApplicationContextAware {
         cmd.inventoryItemList?.sort { it.expirationDate }?.sort { it.lotNumber }
 
         cmd.totalQuantity = getQuantityOnHand(cmd.warehouse, cmd.product)
-
-        //cmd.pendingShipmentList = shipmentService.getPendingShipments(cmd.warehouse);
-
-        // Get all lot numbers for a given product
-        //cmd.lotNumberList = getInventoryItemsByProduct(cmd?.product) as List
 
         // Get transaction log for a particular product within an inventory
         cmd.transactionEntryList = getTransactionEntriesByInventoryAndProduct(cmd.inventory, [cmd.product])
@@ -1532,7 +1416,6 @@ class InventoryService implements ApplicationContextAware {
 
         // set the default transaction date to today
         commandInstance.transactionDate = new Date()
-        //commandInstance.transactionDate.clearTime()
 
         if (!commandInstance?.product) {
             commandInstance.errors.reject("error.product.invalid", "Product does not exist")
@@ -1558,7 +1441,6 @@ class InventoryService implements ApplicationContextAware {
             }
 
         }
-        //return commandInstance
     }
 
     /**
@@ -1573,7 +1455,6 @@ class InventoryService implements ApplicationContextAware {
 
         try {
             // Validation was done during bind, but let's do this just in case
-            //if (cmd.validate()) {
             def inventoryItems = getInventoryItemsByProductAndInventory(cmd.product, cmd.inventory)
 
             // Create a new transaction
@@ -1645,7 +1526,6 @@ class InventoryService implements ApplicationContextAware {
                     }
                 }
             }
-            //}
         } catch (Exception e) {
             log.error("Error saving an inventory record to the database ", e)
             throw e
@@ -1693,7 +1573,6 @@ class InventoryService implements ApplicationContextAware {
             }
         }
         return getExplodedCategories(categories)
-        //return categories;
     }
 
     /**
@@ -1750,10 +1629,8 @@ class InventoryService implements ApplicationContextAware {
     Map getInventoryItemsByProducts(Location warehouse, List<Integer> productIds) {
         def inventoryItemMap = [:]
         if (productIds) {
-            //def inventory = Inventory.get(warehouse?.inventory?.id);
             productIds.each {
                 def product = Product.get(it)
-                //def inventoryItems = getInventoryItemsByProductAndInventory(product, inventory);
                 inventoryItemMap[product] = getInventoryItemsByProduct(product)
             }
         }
@@ -1900,7 +1777,6 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryInstance
      * @return
      */
-    //@Transactional(readOnly = true)
     List getTransactionEntriesByInventory(Inventory inventory) {
         def startTime = System.currentTimeMillis()
         def criteria = TransactionEntry.createCriteria()
@@ -1922,7 +1798,6 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryInstance
      * @return
      */
-    //@Transactional(readOnly = true)
     List getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = criteria.list {
@@ -1944,7 +1819,6 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryInstance
      * @return
      */
-    //@Transactional(readOnly = true)
     List getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = criteria.list {
@@ -1967,7 +1841,6 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryItem
      * @param inventory
      */
-    //@Transactional(readOnly = true)
     List getTransactionEntriesByInventoryAndInventoryItem(Inventory inventory, InventoryItem item) {
         return TransactionEntry.createCriteria().list() {
             eq("inventoryItem", item)
@@ -1986,7 +1859,6 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryItem
      * @param inventory
      */
-    //@Transactional(readOnly = true)
     List getTransactionEntriesByInventoryAndInventoryItems(Inventory inventory, List<InventoryItem> inventoryItems) {
         return TransactionEntry.createCriteria().list() {
             'in'("inventoryItem", inventoryItems)
@@ -2118,23 +1990,18 @@ class InventoryService implements ApplicationContextAware {
             Integer quantityOnHand = getQuantityFromBinLocation(location, binLocation, inventoryItem)
 
             if (!otherLocation?.inventory) {
-                //throw new RuntimeException("Destination does not have an inventory")
                 transaction.errors.reject("Destination does not have an inventory")
             }
 
             if (location == otherLocation && binLocation == otherBinLocation) {
-                //throw new RuntimeException("Destination must be different from source")
                 transaction.errors.reject("Cannot transfer to the same location")
             }
 
             if (quantityOnHand < quantity) {
-                //inventoryItem.errors.reject("inventoryItem.quantity.invalid")
-                //throw new RuntimeException("Cannot exceed quantity on hand")
                 transaction.errors.reject("Quantity cannot exceed quantity on hand")
             }
 
             if (quantity <= 0) {
-                //throw new RuntimeException("Quantity must be greater than 0")
                 transaction.errors.reject("Quantity must be greater than 0")
             }
 
@@ -2445,7 +2312,6 @@ class InventoryService implements ApplicationContextAware {
      * @param endDate
      * @return
      */
-    //@Transactional(readOnly = true)
     def getTransactionEntries(Product product, Location location, Date startDate, Date endDate) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = criteria.list {
@@ -2478,7 +2344,6 @@ class InventoryService implements ApplicationContextAware {
      * @param endDate
      * @return
      */
-    //@Transactional(readOnly = true)
     def getTransactionEntriesBeforeDate(InventoryItem inventoryItem, Location location, Date beforeDate) {
         def transactionEntries = []
         if (beforeDate) {
@@ -2506,7 +2371,6 @@ class InventoryService implements ApplicationContextAware {
      * @param endDate
      * @return
      */
-    //@Transactional(readOnly = true)
     def getTransactionEntriesBeforeDate(Product product, Location location, Date beforeDate) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = []
@@ -2535,7 +2399,6 @@ class InventoryService implements ApplicationContextAware {
      * @param endDate
      * @return
      */
-    //@Transactional(readOnly = true)
     def getTransactionEntries(Location location, Category category, Date startDate, Date endDate) {
         def categories = []
         categories << category
@@ -2544,7 +2407,6 @@ class InventoryService implements ApplicationContextAware {
 
     }
 
-    //@Transactional(readOnly = true)
     def getTransactionEntries(Location location, List categories, Date startDate, Date endDate) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = criteria.list {
@@ -2578,7 +2440,6 @@ class InventoryService implements ApplicationContextAware {
 
     void processData(ImportDataCommand command) {
         Date today = new Date()
-        //today.clearTime()
         def transactionInstance = new Transaction(transactionDate: today,
                 transactionType: TransactionType.findById(Constants.INVENTORY_TRANSACTION_TYPE_ID),
                 inventory: command?.location?.inventory)
@@ -2587,8 +2448,6 @@ class InventoryService implements ApplicationContextAware {
 
         // Iterate over each row and validate values
         command?.data?.each { Map params ->
-            //log.debug "Inventory item " + importParams
-
             validateInventoryData(params, command.errors)
 
             def expirationDate = ImporterUtil.parseDate(params.expirationDate, command.errors)
@@ -2810,22 +2669,10 @@ class InventoryService implements ApplicationContextAware {
         def ids = productIds.collect { "'${it}'" }.join(",")
         def result = [:]
         if (ids) {
-            //
-            //def sql = "select te from TransactionEntry as te where te.transaction.inventory.id='${inventory.id}' and te.inventoryItem.product.id in (${ids}) " +
-            //        "order by te.transaction.transactionDate asc, te.transaction.dateCreated asc"
-
             def sql = "select te from TransactionEntry as te where te.transaction.inventory.id='${inventory.id}' and te.inventoryItem.product.id in (${ids})"
             log.debug "SQL: " + sql
             def transactionEntries = TransactionEntry.executeQuery(sql)
             log.debug "transactionEntries " + transactionEntries
-            //transactionEntries.each{ println(it)}
-            //transactionEntries.each{
-            //    println it.transaction.transactionType.transactionCode.toString() + "," +
-            //            it.transaction.transactionDate.toString() + "," +
-            //            it.transaction.dateCreated.toString() + "," +
-            //            it.inventoryItem.lotNumber + "," +
-            //            it.quantity
-            //}
             def map = getQuantityByProductMap(transactionEntries)
             map.keySet().each { result[it.id] = map[it] }
         }
@@ -2855,16 +2702,6 @@ class InventoryService implements ApplicationContextAware {
         }
         result
     }
-
-
-    /**
-     * @param product
-     * @return
-     */
-    //public Integer getQuantityAvailableToPromise(Product product) {}
-    //public Integer getQuantityOnHand(Product product) {}
-    //public Integer getQuantityAvailableToPromise(InventoryItem inventoryItem) {}
-    //public Integer getQuantityOnHand(InventoryItem inventoryItem) {}
 
 
     /**
@@ -2933,7 +2770,6 @@ class InventoryService implements ApplicationContextAware {
 
         if (n > maxSize) {
             n = maxSize
-            //throw new RuntimeException("You cannot request more items than are available at this location [requested=${n},available=${maxSize}].")
         }
 
         Random random = new Random()
@@ -2953,10 +2789,6 @@ class InventoryService implements ApplicationContextAware {
     def getQuantityOnHandAsOfDate(Location location, Date date) {
         return getQuantityOnHandAsOfDate(location, date, null)
     }
-
-    //def getQuantityOnHandAsOfDate(Location location, Date date, Tag tag) {
-    //    return getQuantityOnHandAsOfDate(location, date, [tag])
-    //}
 
     /**
      *  Returns the quantity on hand of each product for the given tag at the given location as of the given date.
@@ -2984,17 +2816,14 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    //@Transactional(readOnly = true)
     def getTransactionEntriesBeforeDate(Location location, Date date) {
         return getTransactionEntriesBeforeDate(location, date, null)
     }
 
-    //@Transactional(readOnly = true)
     def getTransactionEntriesBeforeDate(Location location, Date date, Tag tag) {
         return getTransactionEntriesBeforeDate(location, date, [tag.id] as List)
     }
 
-    //@Transactional(readOnly = true)
     def getTransactionEntriesBeforeDate(Location location, Date date, List tagIds) {
 
         def startTime = System.currentTimeMillis()
@@ -3031,7 +2860,6 @@ class InventoryService implements ApplicationContextAware {
     String exportBaselineQoH(products, quantityMapByDate) {
         def csvrows = []
         products.each { product ->
-            //def inventoryLevel = inventoryLevelMap[product]
             def csvrow = [
                     'Product code'     : product.productCode ?: '',
                     'Product'          : product.name,
@@ -3042,10 +2870,6 @@ class InventoryService implements ApplicationContextAware {
                     'Manufacturer code': product?.manufacturerCode ?: "",
                     'Vendor'           : product?.vendor ?: "",
                     'Vendor code'      : product?.vendorCode ?: ""
-                    //'Bin Location': inventoryLevel?.binLocation?:"",
-                    //'Min': inventoryLevel?.minQuantity?:"",
-                    //'Reorder': inventoryLevel?.reorderQuantity?:"",
-                    //'Max': inventoryLevel?.maxQuantity?:""
             ]
 
             if (quantityMapByDate) {
@@ -3112,7 +2936,6 @@ class InventoryService implements ApplicationContextAware {
             } else {
                 def manufacturerCode = row.manufacturerCode
                 if (manufacturerCode instanceof Double) {
-                    //command.errors.reject("error.manufacturerCode.invalid", "Row ${rowIndex}: Manufacturer code '${manufacturerCode}' must be a string")
                     command.warnings[index] << "Manufacturer code '${manufacturerCode}' must be a string"
                     manufacturerCode = manufacturerCode.toInteger().toString()
                 }
@@ -3125,7 +2948,6 @@ class InventoryService implements ApplicationContextAware {
                 }
                 def lotNumber = row.lotNumber
                 if (lotNumber instanceof Double) {
-                    //command.errors.reject("error.lotNumber.invalid", "Row ${rowIndex}: Lot number '${lotNumber}' must be a string")
                     command.warnings[index] << "Lot number '${lotNumber}' must be a string"
                     lotNumber = lotNumber.toInteger().toString()
                 }
@@ -3160,7 +2982,6 @@ class InventoryService implements ApplicationContextAware {
                 }
 
 
-                //def minLength = Math.min(product.name.length(),row.product.length())
                 def levenshteinDistance = StringUtils.getLevenshteinDistance(product.name, row.product)
                 if (row.product && levenshteinDistance > 0) {
                     command.warnings[index] << "Product name [${row.product}] does not appear to be the same as in the database [${product.name}] (Levenshtein distance: ${levenshteinDistance})"
@@ -3208,7 +3029,6 @@ class InventoryService implements ApplicationContextAware {
 
             // Check the Levenshtein distance between the given name and stored product name (make sure they're close)
             println "Levenshtein distance: " + StringUtils.getLevenshteinDistance(product.name, row.product)
-            //assert product.name == row.product
 
             // Handler for the lot number
             def lotNumber = row.lotNumber
@@ -3374,11 +3194,9 @@ class InventoryService implements ApplicationContextAware {
     def calculateQuantityOnHand(Product product, Location location, Long quantityOnHand, Timestamp stockCountDate) {
         def quantityDebit = getQuantityChangeSince(product, location, TransactionCode.DEBIT, stockCountDate)[0] ?: 0
         def quantityCredit = 0
-//getQuantityChangeSince(product, location, TransactionCode.CREDIT, stockCountDate)[0]?:0
         return quantityOnHand - quantityDebit + quantityCredit
     }
 
-    //resultTransformer CriteriaSpecification.ALIAS_TO_ENTITY_MAP
 
     def getMostRecentQuantityOnHand(Location location) {
         def quantityMap = [:]
@@ -3422,7 +3240,6 @@ class InventoryService implements ApplicationContextAware {
                                     order by te.transaction.transactionDate desc
                                     """, [max: 1, product: product, inventory: location.inventory, transactionCode: TransactionCode.PRODUCT_INVENTORY])
 
-        //return results ? results[0] : null
         return results
     }
 
@@ -3572,7 +3389,6 @@ class InventoryService implements ApplicationContextAware {
         // Assign status based on inventory level values
         genericProductMap.each { k, v ->
             genericProductMap[k].status = getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
-            //InventoryUtil.getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
         }
         return genericProductMap.values().groupBy { it.status }
 
@@ -3617,7 +3433,6 @@ class InventoryService implements ApplicationContextAware {
         } else {
             statusMessage = "UNAVAILABLE"
         }
-        //log.info "getStatusMessage(${inventoryStatus}, ${minQuantity}, ${reorderQuantity}, ${maxQuantity}, ${currentQuantity}) = ${statusMessage}"
         return statusMessage
     }
 
@@ -3664,7 +3479,6 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    //@Transactional(readOnly = true)
     List getTransactionEntriesByLocation(Location location) {
         def startTime = System.currentTimeMillis()
 
@@ -3682,28 +3496,6 @@ class InventoryService implements ApplicationContextAware {
             order("transactionDate", "asc")
             order("dateCreated", "asc")
         }
-
-//		def transactionEntries = TransactionEntry.executeQuery(
-//				'select te from TransactionEntry te ' +
-//						'left join fetch te.transaction ' +
-//						'left join fetch te.transaction.inboundTransfer ' +
-//						'left join fetch te.transaction.outboundTransfer ' +
-//						'left join fetch te.transaction.transactionType ' +
-//						'where te.transaction.inventory = :inventory ' +
-//						'order by te.transaction.transactionDate asc ' +
-//						'order by te.transaction.dateCreated asc'
-//				, [inventory: location.inventory])
-//
-//		def results = Transaction.executeQuery(
-//				'select t from Transaction t ' +
-//						//'left join fetch t.transactionEntries te ' +
-//						'left join fetch t.inboundTransfer ' +
-//						'left join fetch t.outboundTransfer ' +
-//						'where t.inventory = :inventory ' +
-//						'order by t.transactionDate asc ' +
-//						'order by t.dateCreated asc'
-//				, [inventory: location.inventory])
-//
 
         return transactions*.transactionEntries.flatten()
     }

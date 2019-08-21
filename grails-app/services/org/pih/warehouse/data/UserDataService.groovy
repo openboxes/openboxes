@@ -17,9 +17,6 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 class UserDataService {
 
-    //boolean transactional = true
-
-
     /**
      * Validate inventory levels
      */

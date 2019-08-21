@@ -358,7 +358,6 @@ class StockMovementController {
                         destination         : shipmentItem.destination,
                 ]
             }
-            //println csv.writer.toString()
             response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"Items shipped not received_${session.warehouse.name}_${date.format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType: "text/csv", text: csv.writer.toString())

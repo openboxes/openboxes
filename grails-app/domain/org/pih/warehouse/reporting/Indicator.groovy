@@ -15,11 +15,6 @@ class Indicator {
     String name
     String description
     String expression
-    //Location location
-    //Float goalValue
-    //Float actualValue
-    //IndicatorStatus indicatorStatus
-    //IndicatorType indicatorType
 
     Date lastUpdated
     Date dateCreated

@@ -27,8 +27,6 @@ import org.pih.warehouse.importer.UserExcelImporter
 import org.pih.warehouse.importer.UserLocationExcelImporter
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
-// import au.com.bytecode.opencsv.CSVReader;
-
 
 class BatchController {
 
@@ -104,7 +102,6 @@ class BatchController {
         log.info command.location
         log.info session
 
-        // def dataMapList = null;
         if ("POST".equals(request.getMethod())) {
             File localFile = null
             if (request instanceof DefaultMultipartHttpServletRequest) {
@@ -198,14 +195,9 @@ class BatchController {
                     command.columnMap = dataImporter.columnMap
 
                 }
-                //else {
-                //    command.errors.reject("importFile", "${warehouse.message(code: '.message', args:[localFile.getAbsolutePath()])}")
-                //}
 
 
                 if (command?.data?.isEmpty()) {
-                    //flash.message = "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args:[localFile.getAbsolutePath()])}"
-                    //command.reject ...
                     command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [localFile.getAbsolutePath()])}")
                 }
 

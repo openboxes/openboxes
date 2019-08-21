@@ -53,7 +53,6 @@ class CartController {
         }
 
         if (params.redirectUrl) {
-            //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance.id)
             redirect(url: params.redirectUrl)
             return
         }

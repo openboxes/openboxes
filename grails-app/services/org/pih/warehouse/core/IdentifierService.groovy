@@ -58,8 +58,6 @@ class IdentifierService {
                     break
                 default:
                     identifier += format[i]
-            //throw new IllegalArgumentException("Unsupported format symbol: " + format[i])
-
             }
         }
 

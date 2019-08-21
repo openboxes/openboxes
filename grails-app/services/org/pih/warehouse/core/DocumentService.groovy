@@ -57,7 +57,6 @@ import javax.xml.bind.JAXBException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
-//import org.apache.poi.hssf.util.CellReference
 
 class DocumentService {
 
@@ -129,7 +128,6 @@ class DocumentService {
         def appContext = ApplicationHolder.application.parentContext
         def archiveDirectory = filePath
         if (ApplicationHolder.application.isWarDeployed()) {
-            //archiveDirectory = "${File.separator}WEB-INF${File.separator}grails-app${File.separator}conf${File.separator}${filePath}"
             archiveDirectory = "classpath:$filePath"
             file = appContext.getResource(archiveDirectory)?.getFile()
         } else {
@@ -186,48 +184,11 @@ class DocumentService {
         def xml = XmlUtils.marshaltoString(wmlDocumentEl, true)
         def mappings = new HashMap<String, String>()
 
-        /*
-         def formatter = new SimpleDateFormat("MMM dd, yyyy");
-         def date = formatter.format(shipmentInstance.getExpectedShippingDate());
-         mappings.put("date", date);
-         String subtitle = "";
-         if ("Sea".equals(shipmentInstance?.shipmentType?.name)) {
-         ReferenceNumber containerNumber = shipmentInstance.getReferenceNumber("Container Number");
-         if (containerNumber) {
-         //mappings.put("containerNumber", containerNumber.identifier);
-         subtitle = "Container #${containerNumber.identifier} ";
-         }
-         ReferenceNumber sealNumber = shipmentInstance.getReferenceNumber("Seal Number");
-         if (sealNumber) {
-         //mappings.put("sealNumber", sealNumber.identifier);
-         subtitle += "Seal #${sealNumber.identifier}"
-         }
-         log.info("sea shipment " + subtitle)
-         }
-         else if ("Air".equals(shipmentInstance?.shipmentType?.name)) {
-         subtitle = "Freight Forwarder ${shipmentInstance?.shipmentMethod?.shipper?.name}"
-         log.info("air shipment " + subtitle)
-         }
-         mappings.put("subtitle", subtitle)
-         def value = ""
-         if (shipmentInstance?.statedValue) {
-         def decimalFormatter = new DecimalFormat("\$###,###.00")
-         value = decimalFormatter.format(shipmentInstance?.statedValue);
-         }
-         mappings.put("value", value)
-         */
-
         //valorize template
         Object obj = XmlUtils.unmarshallFromTemplate(xml, mappings)
 
         //change  JaxbElement
         documentPart.setJaxbElement((Document) obj)
-
-        // Create a new table for the Packing List
-        //Tbl table = createTable(wordMLPackage, shipmentInstance, 3, 1200);
-
-        // Add table to document
-        //wordMLPackage.getMainDocumentPart().addObject(table);
 
         return wordMLPackage
     }
@@ -287,12 +248,10 @@ class DocumentService {
         if ("Sea".equals(shipmentInstance?.shipmentType?.name)) {
             ReferenceNumber containerNumber = shipmentInstance.getReferenceNumber("Container Number")
             if (containerNumber) {
-                //mappings.put("containerNumber", containerNumber.identifier);
                 subtitle = "Container #${containerNumber.identifier} "
             }
             ReferenceNumber sealNumber = shipmentInstance.getReferenceNumber("Seal Number")
             if (sealNumber) {
-                //mappings.put("sealNumber", sealNumber.identifier);
                 subtitle += "Seal #${sealNumber.identifier}"
             }
             log.info("sea shipment " + subtitle)
@@ -395,28 +354,6 @@ class DocumentService {
         }
         tbl.setTblPr(tblPr)
 
-        /*
-        // <w:tblGrid><w:gridCol w:w="4788"/>
-        TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid();
-        tbl.setTblGrid(tblGrid);
-        // Add required <w:gridCol w:w="4788"/>
-        for (int i=1 ; i<=cols; i++) {
-            TblGridCol gridCol = Context.getWmlObjectFactory().createTblGridCol();
-            gridCol.setW(BigInteger.valueOf(cellWidthTwips));
-            tblGrid.getGridCol().add(gridCol);
-        }
-
-        // Now the rows
-        for (int j=1 ; j<=rows; j++) {
-            //shipmentInstance?.shipmentItems.each { item ->
-
-            Tr tr = Context.getWmlObjectFactory().createTr();
-            tbl.getEGContentRowContent().add(tr);
-            createPackingListCell(tr, cellWidthTwips);
-
-
-        }
-        */
         return tbl
     }
 
@@ -441,13 +378,7 @@ class DocumentService {
 
         // Cell content - an empty <w:p/>
         P paragraph = Context.getWmlObjectFactory().createP()
-        //R run = Context.getWmlObjectFactory().createR();
-        //Text text = Context.getWmlObjectFactory().createText();
-        //text.setValue("testing");
-        //run.getRunContent().add(text)
-        //paragraph.getParagraphContent().add(run);
         tc.getEGBlockLevelElts().add(paragraph)
-
     }
 
 
@@ -496,8 +427,6 @@ class DocumentService {
         TrPr trPr = Context.getWmlObjectFactory().createTrPr()
         trHeader.setTrPr(trPr)
 
-
-        //TrPr trPr = trHeader.getTrPr();
         trPr.getCnfStyleOrDivIdOrGridBefore().add(Context.getWmlObjectFactory().createCTTrPrBaseTblHeader(bdt))
         addTc(wmlPackage, trHeader, "Pallet/Box #", true)
         addTc(wmlPackage, trHeader, "Item", true)
@@ -534,7 +463,6 @@ class DocumentService {
      */
     void addTc(WordprocessingMLPackage wmlPackage, Tr tr, String text, boolean applyBold) {
         Tc tc = Context.getWmlObjectFactory().createTc()
-        // wmlPackage.getMainDocumentPart().createParagraphOfText(text)
         tc.getEGBlockLevelElts().add(createParagraphOfText(text, applyBold))
         tr.getEGContentCellContent().add(tc)
     }
@@ -553,7 +481,6 @@ class DocumentService {
         // Create the run
         R run = Context.getWmlObjectFactory().createR()
         run.getRunContent().add(t)
-        //run.getRPr().setB(true);
         // Set bold property
         if (applyBold) {
             RPr rpr = Context.getWmlObjectFactory().createRPr()
@@ -781,12 +708,6 @@ class DocumentService {
             Workbook workbook = new HSSFWorkbook()
             CreationHelper createHelper = workbook.getCreationHelper()
             Sheet sheet = workbook.createSheet()
-            //sheet.autoSizeColumn(0);
-            //sheet.autoSizeColumn(1);
-            //sheet.autoSizeColumn(2);
-            //sheet.autoSizeColumn(3);
-            //sheet.autoSizeColumn(4);
-            //sheet.autoSizeColumn(5);
             sheet.setColumnWidth((short) 0, (short) ((50 * 5) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) 1, (short) ((50 * 3) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) 2, (short) ((50 * 3) / ((double) 1 / 20)))
@@ -799,7 +720,6 @@ class DocumentService {
             sheet.setColumnWidth((short) 9, (short) ((50 * 2) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) 10, (short) ((50 * 5) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) 11, (short) ((50 * 5) / ((double) 1 / 20)))
-            //sheet.setColumnWidth((short)12, (short) ((50 * 10) / ((double) 1 / 20)))
 
             // Bold font
             Font boldFont = workbook.createFont()
@@ -909,36 +829,6 @@ class DocumentService {
             row.createCell(0).setCellValue("" + getMessageTagLib().message(code: 'shipping.shipmentType.label'))
             row.getCell(0).setCellStyle(labelStyle)
             row.createCell(1).setCellValue("" + getFormatTagLib().metadata(obj: shipmentInstance?.shipmentType))
-
-
-            /*
-            row = sheet.createRow((short)counter++);
-            row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'default.todaysDate.label'));
-            row.getCell(0).setCellStyle(labelStyle);
-            row.createCell(1).setCellValue(new Date());
-            row.getCell(1).setCellStyle(dateStyle);
-
-            row = sheet.createRow((short)counter++);
-            row.createCell(0).setCellValue("" + getMessageTagLib().message(code:'shipping.shipmentNumber.label'));
-            row.getCell(0).setCellStyle(labelStyle);
-            row.createCell(1).setCellValue(shipmentInstance?.id?.toUpperCase());
-            */
-
-            /*
-            // Doesn't seem to work this way, so I'm just going to print out all reference numbers
-            def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
-            if (shipmentWorkflow) {
-                shipmentWorkflow.referenceNumberTypes.each {
-                    def referenceNumber = shipmentInstance.getReferenceNumber(it?.name)
-                    log.info ("reference #: " + it?.name + " " + referenceNumber)
-                    if (referenceNumber) {
-                        row = sheet.createRow((short)counter++);
-                        row.createCell(0).setCellValue(referenceNumber?.referenceNumberType?.name);
-                        row.createCell(1).setCellValue(referenceNumber?.identifier);
-                    }
-                }
-            }
-            */
 
             // REFERENCE NUMBERS
             shipmentInstance.referenceNumbers.each {

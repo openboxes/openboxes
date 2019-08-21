@@ -72,7 +72,7 @@ class OrderService {
      * @return a list of pending incoming order into the given location
      */
     List<Order> getIncomingOrders(Location location) {
-        return Order.findAllByDestination(location)//.findAll { it.isPending() }
+        return Order.findAllByDestination(location)
     }
 
 
@@ -81,7 +81,7 @@ class OrderService {
      * @return a list of pending outgoing order from the given location
      */
     List<Order> getOutgoingOrders(Location location) {
-        return Order.findAllByOrigin(location)//.findAll { it.isPending() }
+        return Order.findAllByOrigin(location)
     }
 
     /**
@@ -126,7 +126,6 @@ class OrderService {
             orderItemCommand.description = it.description
             orderItemCommand.productReceived = it.product
             orderItemCommand.quantityOrdered = it.quantity
-            //orderItemCommand.quantityReceived = it.quantity
             orderCommand?.orderItems << orderItemCommand
         }
         return orderCommand
@@ -265,7 +264,7 @@ class OrderService {
                 eq("destination", location)
             }
         }
-        return orders //.findAll { it.isPending() }
+        return orders
     }
 
     /**
@@ -486,7 +485,6 @@ class OrderService {
 
         } catch (Exception e) {
             log.warn("Unable to import packing list items due to exception: " + e.message, e)
-            //throw new RuntimeException("make sure this causes a rollback", e)
             throw new RuntimeException(e.message)
         }
 

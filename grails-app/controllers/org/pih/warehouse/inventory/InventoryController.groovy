@@ -30,8 +30,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import java.text.SimpleDateFormat
 
-// import java.util.Calendar;
-
 class InventoryController {
 
     def dataSource
@@ -103,7 +101,6 @@ class InventoryController {
             log.info("size " + transaction?.transactionEntries?.size())
 
             if (!transaction?.transactionEntries) {
-                //transaction.errors.reject("default.errors.nonEmpty.message", "List must not be empty")
                 throw new ValidationException("Transaction entries must not be empty", transaction.errors)
             }
 
@@ -253,7 +250,6 @@ class InventoryController {
 
         def elapsedTime = (System.currentTimeMillis() - startTime)
         log.info("Show current inventory: " + (System.currentTimeMillis() - startTime) + " ms")
-        //def inventoryMapping = inventoryInstance.inventoryItems.groupBy{ it?.product }
         [
                 //inventoryMapping: inventoryMapping,
                 location   : location,
@@ -275,33 +271,10 @@ class InventoryController {
             if (!command?.locations) {
                 command.locations = [Location.get(session?.warehouse?.id)]
             }
-            //def transactions = Transaction.findAllByInventory(location.inventory)
-            //def transactionEntries = (transactions*.transactionEntries).flatten()
-            //log.info "transactionEntries: " + transactionEntries.size()
-            //def quantityMap = inventoryService.getQuantityByProductMap(transactionEntries)
 
             if (command.startDate && command.endDate) {
-                //def duration = command?.endDate - command?.startDate
-                //command.dates = new Date[duration+1]
-                //(command?.startDate .. command?.endDate).eachWithIndex { date, i ->
-                //    println "Date " + date + " i " + i
-                //    command.dates[i] = date
-                //}
-
-                //def duration = command.endDate - command.endDate
-                def count = 0
-
                 command.dates = getDatesBetween(command.startDate, command.endDate, command.frequency)
-                //if (command.dates.size() >= 61) {
-                //    command.dates = []
-                //throw new Exception("Choose a different frequency")
-                //    command.errors.rejectValue("frequency","errors.frequency.code","Cannot run report for more than 60 days")
-                //    render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command])
-                //    return
-                //}
-
                 println "dates : " + command?.dates
-
             } else if (command.startDate) {
                 command?.dates << command?.startDate
             } else if (command.endDate) {
@@ -445,8 +418,6 @@ class InventoryController {
                 redirect(action: "browse", id: inventoryInstance.id)
             } else {
                 flash.message = "${warehouse.message(code: 'inventory.unableToCreateItem.message')}"
-                //inventoryInstance.errors = itemInstance.errors;
-                //render(view: "browse", model: [inventoryInstance: inventoryInstance])
             }
         }
     }
@@ -521,7 +492,6 @@ class InventoryController {
                 redirect(action: "show", id: inventoryInstance.id)
             } else {
                 itemInstance.errors.each { println it }
-                //redirect(action: "show", id: inventoryInstance.id)
                 flash.message = "${warehouse.message(code: 'default.notUpdated.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
                 render(view: "show", model: [inventoryInstance: inventoryInstance, itemInstance: itemInstance])
             }
@@ -544,8 +514,6 @@ class InventoryController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
             redirect(action: "show", id: params.inventory.id)
         }
-
-
     }
 
     def listTransactions = {
@@ -665,7 +633,6 @@ class InventoryController {
             return
         }
 
-        //[inventoryItems:lowStock, quantityMap:quantityMap]
         render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
     }
 
@@ -680,7 +647,6 @@ class InventoryController {
             return
         }
 
-        //[inventoryItems:lowStock, quantityMap:quantityMap]
         render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
     }
 
@@ -696,7 +662,6 @@ class InventoryController {
             return
         }
 
-        //[inventoryItems:lowStock, quantityMap:quantityMap]
         render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
     }
 
@@ -997,12 +962,7 @@ class InventoryController {
         Boolean saved = null
         if (!transactionInstance.hasErrors()) {
             try {
-                //if (inventoryService.isValidForLocalTransfer(transactionInstance)) {
-                //	saved = inventoryService.saveLocalTransfer(transactionInstance)
-                //}
-                //else {
                 saved = transactionInstance.save(flush: true)
-                //}
             }
             catch (Exception e) {
                 log.error("Unable to save transaction ", e)
@@ -1138,7 +1098,6 @@ class InventoryController {
             if (productIds) {
                 products = Product.getAll(productIds)
             }
-            //command?.productInventoryItems = inventoryItems.groupBy { it.product }
             command.binLocations = inventoryService.getItemQuantityByBinLocation(warehouseInstance, inventoryItems)
         } else {
             throw new RuntimeException("You must select at least one product or inventory item")
@@ -1269,7 +1228,6 @@ class InventoryController {
                 if (!transaction?.hasErrors() && transaction?.validate()) {
                     transaction.save(failOnError: true)
                     flash.message = "Successfully saved transaction"
-                    //redirect(controller: "inventory", action: "browse")
                     if (productIds.size() > 1) {
                         redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
                     } else {
@@ -1417,7 +1375,7 @@ class InventoryController {
                 transactionInstance : transactionInstance ?: new Transaction(),
                 transactionTypeList : TransactionType.list(),
                 locationInstanceList: Location.findAllByParentLocationIsNull(),
-                quantityMap         : [:],//inventoryService.getQuantityForInventory(warehouseInstance?.inventory),
+                quantityMap         : [:],
                 warehouseInstance   : warehouseInstance
         ]
 
@@ -1474,16 +1432,12 @@ class InventoryController {
                 try {
                     localFile = uploadService.createLocalFile(uploadFile.originalFilename)
                     uploadFile.transferTo(localFile)
-                    //flash.message = "File uploaded successfully"
-
                 } catch (Exception e) {
                     throw new RuntimeException(e)
                 }
             }
 
-            //Workbook workbook = WorkbookFactory.create(file.inputStream)
             //Iterate through bookList and create/persists your domain instances
-            //def bookList = excelImportService.columns(workbook, CONFIG_BOOK_COLUMN_MAP)
             def excelImporter = new InventoryExcelImporter(localFile.absolutePath)
             inventoryList = excelImporter.data
             println inventoryList
@@ -1498,8 +1452,6 @@ class InventoryController {
 
 
 class QuantityOnHandReportCommand {
-    //Location location
-    //def locations = ListUtils.lazyList([], FactoryUtils.instantiateFactory(Location))
     List<Location> locations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
     List dates = []
     List products = []

@@ -90,7 +90,6 @@ class MigrationController {
 
     def locationsWithInventoryTransactions = {
         def locations = migrationService.getLocationsWithTransactions([TransactionCode.INVENTORY])
-        //locations = locations.collect { [id: it.locationId, name:  }
         render([count: locations.size(), locations: locations] as JSON)
     }
 
@@ -161,15 +160,8 @@ class MigrationController {
     def migrateProductSuppliers = { MigrationCommand command ->
         def startTime = System.currentTimeMillis()
         try {
-//            def products = migrationService.getProductsForMigration()
-//            if (params.preview) {
-//                def message = "You will migrate ${products.size()} products"
-//                render(template: "status", model: [message: message])
-//                return
-//            }
             def migratedList = migrationService.migrateProductSuppliersInParallel()
             render(template: "status", model: [message: "Migrated ${migratedList.size()} products in ${System.currentTimeMillis() - startTime} ms"])
-
         } catch (Exception e) {
             command.errors.reject("productSupplier.error.message", e.message)
             render(template: "status", model: [command: command])
@@ -184,16 +176,8 @@ class MigrationController {
     def migrateOrganizations = { MigrationCommand command ->
         def startTime = System.currentTimeMillis()
         try {
-//            def suppliers = migrationService.getSuppliersForMigration()
-//            if (params.preview) {
-//                render(template: "status", model: [message: "You will migrate ${suppliers.size()} organizations"])
-//                return
-//            }
-//
             def migratedList = migrationService.migrationOrganizationsInParallel()
             render(template: "status", model: [message: "Migrated ${migratedList.size()} organizations in ${System.currentTimeMillis() - startTime} ms"])
-
-
         } catch (ValidationException e) {
             command.errors = e.errors
             render(template: "status", model: [command: command])

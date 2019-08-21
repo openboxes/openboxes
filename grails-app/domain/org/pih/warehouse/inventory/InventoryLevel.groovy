@@ -12,8 +12,6 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
-//import java.util.Date;
-
 import util.InventoryUtil
 
 class InventoryLevel {

@@ -40,10 +40,6 @@ class CategorySelectTagLib {
 
 
     def selectCategory_v2 = { attrs ->
-        //if (!attrs.from) {
-        //	attrs.from = productService.getRootCategory()
-        //	attrs.depth = 0;
-        //}
         attrs.from = getCategories(productService.getRootCategory())
         attrs.optionKey = 'id'
         attrs.noSelection = ['null': '-Choose a category-']
@@ -57,9 +53,6 @@ class CategorySelectTagLib {
             attrs.optionValue = { it.name + " (" + it?.products?.size() + ")" }
         }
         out << g.select(attrs)
-
-        //out << render(template:"../taglib/selectCategories", model:[attrs:attrs])
-
     }
 
 
@@ -79,9 +72,7 @@ class CategorySelectTagLib {
     def checkBoxList = { attrs, body ->
         def from = attrs.from
         def value = attrs.value
-        //def cname = attrs.name
         def cname = "product.id"
-        // def isChecked, ht, wd, style, html
 
         //  sets the style to override height and/or width if either of them
         //  is specified, else the default from the CSS is taken

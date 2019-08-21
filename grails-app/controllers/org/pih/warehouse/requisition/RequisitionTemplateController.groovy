@@ -181,7 +181,6 @@ class RequisitionTemplateController {
         if (!requisition.hasErrors() && requisition.save()) {
             flash.message = "Requisition template has been created"
         } else {
-            //flash.message = "there are errors"
             render(view: "create", model: [requisition: requisition])
             return
         }
@@ -243,7 +242,6 @@ class RequisitionTemplateController {
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
                 redirect(action: "show", id: requisition.id)
-                //redirect(action:"list")
             } else {
                 render(view: viewName, model: [requisition: requisition])
             }
@@ -461,7 +459,6 @@ class RequisitionTemplateController {
                 if (params.csv) {
 
                     println "CSV " + params.csv
-                    //lines = params?.csv?.eachLine
                     params?.csv?.toCsvReader('separatorChar': delimiter, 'skipLines': params.skipLines ?: 0).eachLine { tokens ->
                         println "line: " + tokens + " delimiter=" + delimiter
                         println "ROW " + tokens
@@ -537,7 +534,6 @@ class RequisitionTemplateController {
                                         requisitionItem.quantity = quantity
                                         updateCount++
                                     } else {
-                                        //flash.errors << "${index}: Product with product code '${row[0]}' has the same quantity"
                                         ignoreCount++
                                     }
                                 } else {
@@ -567,19 +563,6 @@ class RequisitionTemplateController {
 
     }
 
-    /*
-    def copy = {
-        def requisition = Requisition.get(params.id)
-
-        if (requisition) {
-
-
-        }
-
-    }
-    */
-
-
     private List<Location> getDepots() {
         Location.list().findAll { location -> location.id != session.warehouse.id && location.isWarehouse() }.sort {
             it.name
@@ -602,6 +585,4 @@ class RequisitionTemplateController {
         }
         return locations
     }
-
-
 }

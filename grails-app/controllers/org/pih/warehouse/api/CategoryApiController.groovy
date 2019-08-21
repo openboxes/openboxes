@@ -57,8 +57,5 @@ class CategoryApiController {
             category.delete(flush: true)
             render status: 204
         }
-
     }
-
-
 }

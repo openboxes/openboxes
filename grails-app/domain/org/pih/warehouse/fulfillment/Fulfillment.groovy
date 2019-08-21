@@ -18,7 +18,7 @@ class Fulfillment implements Serializable {
 
     // Attributes
     FulfillmentStatus status
-    //Request request;				// request [to be] fulfilled
+
     Person fulfilledBy                // person whom fulfilled request
     Date dateFulfilled                // the date that the request was fulfilled
 

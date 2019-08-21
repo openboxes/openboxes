@@ -117,7 +117,6 @@ class DashboardController {
         }
     }
 
-    //@Cacheable("dashboardControllerCache")
     def index = {
 
         def startTime = System.currentTimeMillis()
@@ -186,8 +185,6 @@ class DashboardController {
 
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
-
-        //def startTime = System.currentTimeMillis()
 
         // Inbound Shipments
         def inboundShipmentsTotal = Shipment.countByDestination(location)

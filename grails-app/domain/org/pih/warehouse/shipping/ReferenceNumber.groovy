@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.shipping
 
-// import java.io.Serializable;
-
 class ReferenceNumber implements Serializable {
 
     String id

@@ -69,19 +69,6 @@ class FulfillmentService {
         }
         command.fulfillment = fulfillment
 
-        /*
-        requestInstance?.requestItems?.each {
-            def requestItemCommand = new RequestItemCommand();
-            requestItemCommand.primary = true;
-            requestItemCommand.requestItem = it
-            requestItemCommand.type = it.type
-            requestItemCommand.description = it.description
-            requestItemCommand.productReceived = it.product
-            requestItemCommand.quantityRequested = it.quantity;
-            //requestItemCommand.quantityReceived = it.quantity
-            requestCommand?.requestItems << requestItemCommand
-        }
-        */
         return command
     }
 }

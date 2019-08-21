@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse
 
-// import java.text.SimpleDateFormat;
-// import java.util.Date;
 
 class QuantityTagLib {
 
@@ -29,15 +27,3 @@ class QuantityTagLib {
     }
 
 }
-
-
-/*
-${requisitionItem.quantity} x
-<g:if test="${requisitionItem?.productPackage}">
-${requisitionItem?.productPackage?.uom?.code}/${requisitionItem?.productPackage?.quantity}
-</g:if>
-                                                    <g:else>
-                                                        EA/1
-</g:else>
-*/
-

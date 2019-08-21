@@ -20,8 +20,6 @@ import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
 
-// import java.util.Date;
-// import java.util.Collection
 
 /**
  * An product is an instance of a generic.  For instance,

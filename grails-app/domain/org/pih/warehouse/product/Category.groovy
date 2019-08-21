@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.product
 
-//import java.util.Date;
-
 class Category implements Comparable, Serializable {
 
     String id
@@ -126,7 +124,6 @@ class Category implements Comparable, Serializable {
         try {
             return Product.findAllByActiveAndCategory(true, this, [cache: true])
         } catch (Exception e) {
-            //log.info("Error getting products for category " + this.id  + " - " + this.name)
             return null
         }
 
@@ -161,7 +158,6 @@ class Category implements Comparable, Serializable {
                 deleted    : deleted,
                 isRoot     : isRoot,
                 categories : categories?.collect { it.toJson() }
-                //parentCategory: parentCategory.toJson()
         ]
     }
 

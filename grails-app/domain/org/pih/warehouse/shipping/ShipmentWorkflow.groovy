@@ -11,9 +11,6 @@ package org.pih.warehouse.shipping
 
 import org.pih.warehouse.core.Document
 
-// import java.io.Serializable;
-// import java.util.Date;
-
 class ShipmentWorkflow implements Serializable {
 
     String id

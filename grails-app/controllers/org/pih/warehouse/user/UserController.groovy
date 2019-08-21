@@ -53,8 +53,6 @@ class UserController {
 
         userInstanceList = userService.findUsers(query, params)
         userInstanceTotal = userInstanceList.totalCount
-        //userInstanceList = User.findAllByUsernameLikeOrEmailLike(term, term, params)
-        //userInstanceTotal = User.countByUsernameLikeOrEmailLike(term, term, params);
 
         [userInstanceList: userInstanceList, userInstanceTotal: userInstanceTotal]
     }
@@ -289,14 +287,6 @@ class UserController {
         log.info "update auth user locale " + params
         log.info params.locale == 'debug'
         if (params.locale == 'debug') {
-            //def locale = new Locale(params.locale)
-            //if (session.user) {
-            //	session.user.locale = locale;
-            //	session.locale = null
-            //}
-            //else {
-            //	session.locale = locale;
-            //}
             session.useDebugLocale = true
         } else {
             session.useDebugLocale = false
@@ -335,7 +325,6 @@ class UserController {
             redirect(uri: params.targetUri)
             return
         }
-
 
         // redirect to the dashboard
         redirect(controller: "dashboard", action: "index")
@@ -394,7 +383,6 @@ class UserController {
             try {
                 resize(bytes, response.outputStream, width, height)
             } catch (Exception e) {
-                //"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
                 response.outputStream << bytes
             }
         } else {
@@ -509,7 +497,6 @@ class UserController {
             def recipients = users.collect { it.email }
             def activatedOrDeactivated = "${userInstance.active ? warehouse.message(code: 'user.activated.label') : warehouse.message(code: 'user.disabled.label')}"
             def subject = "${warehouse.message(code: 'email.userAccountActivated.message', args: [userInstance.username, activatedOrDeactivated])}"
-            //def subject = "${warehouse.message(code:'email.userAccountChanged.message',args:[userInstance?.email,activatedOrDeactivated])}";
             def body = "${g.render(template: '/email/userAccountActivated', model: [userInstance: userInstance])}"
             mailService.sendHtmlMail(subject, body.toString(), recipients)
             flash.message = "${warehouse.message(code: 'email.sent.message')}"
@@ -560,10 +547,6 @@ class UserController {
         }
     }
 
-    //static scale = {
-    //	BufferedImage thumbnail = Scalr.resize(image, 150);
-    //}
-
     static resize = { bytes, out, maxW, maxH ->
         AWTImage ai = new ImageIcon(bytes).image
         int width = ai.getWidth(null)
@@ -589,11 +572,9 @@ class UserController {
 
         BufferedImage bi = new BufferedImage(dstW, dstH, BufferedImage.TYPE_INT_RGB)
         Graphics2D g2d = bi.createGraphics()
-        //g2d.setComposite(AlphaComposite.Src);
         g2d.drawImage(ai, 0, 0, dstW, dstH, null, null)
         g2d.dispose()
 
         IIO.write(bi, 'JPEG', out)
     }
-
 }

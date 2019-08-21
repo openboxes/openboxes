@@ -20,8 +20,6 @@ class OrderWorkflowController {
     def orderFlow = {
         getProducts {
             action {
-                //params.max = Math.min(params.max ? params.int('max') : 10, 100)
-                //def productList = Product.list(params)
                 def productList = []
                 if (params.searchTerms) {
                     def categoryList = Category.findByNameLike("%" + params.searchTerms + "%")
@@ -61,7 +59,6 @@ class OrderWorkflowController {
             on("submit") {
                 def p = new Person(params)
                 flow.person = p
-                // def e = yes()
                 if (p.hasErrors() || !p.validate()) return error()
             }.to "enterShipping"
             on("return").to "showCart"
@@ -82,10 +79,7 @@ class OrderWorkflowController {
         processPurchaseOrder {
             action {
                 def a = flow.address
-                // def p = flow.person
-                // def pd = flow.paymentDetails
                 def cartItems = flow.cartItems
-                //def o = new Order(person:p, shippingAddress:a, paymentDetails:pd)
                 def order = new Order()
                 order.orderNumber = new Random().nextInt(9999999)
                 cartItems.each {

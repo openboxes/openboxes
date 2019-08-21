@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-//import java.util.Date;
 
 class Address implements Serializable {
 
@@ -26,12 +25,9 @@ class Address implements Serializable {
     Date dateCreated
     Date lastUpdated
 
-    //static belongsTo = [ location : Location, locationGroup : LocationGroup ]
-
     static mapping = {
         id generator: 'uuid'
     }
-
 
     static constraints = {
         address(nullable: false, maxSize: 255)

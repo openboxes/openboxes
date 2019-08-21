@@ -15,8 +15,6 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 class CategoryDataService {
 
-    //boolean transactional = true
-
     Boolean validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
 

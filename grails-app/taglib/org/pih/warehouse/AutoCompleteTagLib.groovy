@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse
 
-// import java.text.SimpleDateFormat
 
 class AutoCompleteTagLib {
 
@@ -19,12 +18,8 @@ class AutoCompleteTagLib {
         def valueId = (attrs.valueId) ? attrs.valueId : ""
         def valueName = (attrs.valueName) ? attrs.valueName : ""
         def width = (attrs.width) ? attrs.width : 200
-        // def minLength = (attrs.minLength) ? attrs.minLength : 1;
         def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : ""
 
-        // def showValue = (valueName && valueId) ? true : false;
-        //def spanDisplay = (showValue) ? "inline" : "none";
-        //def suggestDisplay = (showValue) ? "none" : "inline";
         def spanDisplay = "none"
         def suggestDisplay = "inline"
 

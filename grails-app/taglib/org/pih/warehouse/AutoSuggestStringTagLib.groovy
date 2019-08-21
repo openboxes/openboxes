@@ -8,12 +8,9 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package org.pih.warehouse
-// import java.text.SimpleDateFormat
 
 class AutoSuggestStringTagLib {
 
-
-    //@Cacheable("autoSuggestStringTagCache")
     def autoSuggestString = { attrs, body ->
         out << g.render(template: '/taglib/autoSuggestString', model: [attrs: attrs])
     }
@@ -26,10 +23,6 @@ class AutoSuggestStringTagLib {
         def minLength = (attrs.minLength) ? attrs.minLength : 1
         def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : ""
         def styleClass = (attrs.styleClass) ?: ""
-        // def showValue = (value) ? true : false;
-        // def spanDisplay = (showValue) ? "inline" : "none";
-        // def suggestDisplay = (showValue) ? "none" : "inline";
-        // def spanDisplay = "none";
         def suggestDisplay = "inline"
 
         def html = """

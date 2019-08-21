@@ -85,7 +85,6 @@ class ConsumptionController {
 
         def transactions = []
         transactions.addAll(command.debits)
-        //transactions.addAll(command.credits)
 
         // Sort transaction by date ascending
         transactions = transactions.sort { it.transactionDate }
@@ -105,7 +104,6 @@ class ConsumptionController {
         // Keep track of all the transaction types (we may want to select a subset of these)
         // FIXME Hard-code transaction types (OBPIH-2059)
         command.transactionTypes = [TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)]
-        // transactions*.transactionType
 
         // Iterate over all transactions
         transactions.each { transaction ->
@@ -184,10 +182,7 @@ class ConsumptionController {
 
         // Calculate the on hand quantity for all products returned by the getTransactions() call above
         if (command.fromLocations) {
-
-            //def products = command.productMap.keySet().asList()
             products = command.rows.keySet().asList()
-
 
             // Filter products by tags
             if (command.selectedTags) {
@@ -227,7 +222,6 @@ class ConsumptionController {
                         // For each product, add to the onhand quantity map
                         products.each { product ->
                             def onHandQuantity = onHandQuantityMap[product]
-                            //println "onHandQuantity: " + onHandQuantity
                             if (onHandQuantity) {
                                 command.rows[product].onHandQuantity += onHandQuantity
                             }
@@ -466,11 +460,8 @@ class ShowConsumptionCommand {
     }
 
     Float getNumberOfMonths() {
-
-        //println "numberOfDays: " + numberOfDays
         return numberOfDays / 30
     }
-
 }
 
 class ShowConsumptionRowCommand {
@@ -540,7 +531,6 @@ class ShowConsumptionRowCommand {
         }
         return transferOutLocations
     }
-
 }
 
 class ConsumptionCommand {

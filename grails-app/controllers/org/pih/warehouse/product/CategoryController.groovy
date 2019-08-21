@@ -74,11 +74,6 @@ class CategoryController {
             }
         }
 
-        /*
-        if (categoryInstance.hasErrors()) {
-            render(view: "tree", model: [rootCategory: productService.getRootCategory(), categoryInstance: categoryInstance ])
-        }
-        */
         redirect(action: "tree")
     }
 

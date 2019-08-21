@@ -97,7 +97,6 @@ class ShipmentController {
         } else if (params.type == "outgoing") {
             shipmentInstance.origin = session.warehouse
         }
-        //return [shipmentInstance: shipmentInstance]
         render(view: "create", model: [shipmentInstance: shipmentInstance,
                                        warehouses      : Location.list(), eventTypes: EventType.list()])
     }
@@ -116,7 +115,6 @@ class ShipmentController {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
             redirect(action: "showDetails", id: shipmentInstance.id)
         } else {
-            //redirect(action: "create", model: [shipmentInstance: shipmentInstance], params: [type:params.type])
             render(view: "create", model: [shipmentInstance: shipmentInstance,
                                            warehouses      : Location.list(), eventTypes: EventType.list()])
         }
@@ -257,7 +255,6 @@ class ShipmentController {
 
     def sendShipment = {
         def transactionInstance
-        // def userInstance = User.get(session.user.id)
         def shipmentInstance = Shipment.get(params.id)
         def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
 
@@ -695,15 +692,10 @@ class ShipmentController {
                 rowArray.putAt(5, row[9])
                 writer.writeNext(rowArray)
             }
-
-            //writer.writeAll(resultSet, false);
             log.info "results: " + sw.toString()
             response.setHeader("Content-disposition", "attachment; filename=\"PackingList.csv\"")
             render(contentType: "text/csv", text: sw.toString())
             sql.close()
-            //resultSet.close();
-
-
         }
     }
 
@@ -742,7 +734,6 @@ class ShipmentController {
 
                 if (item.quantity == 0) {
                     item.delete()
-                    //containerInstance.removeFromShipmentItems(item);
                     iter.remove()
                 }
             }
@@ -766,7 +757,6 @@ class ShipmentController {
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'container.label', default: 'Container'), params.containerId])}"
             redirect(action: "showDetails", id: shipmentInstance.id, params: ["containerId": params.containerId])
-            //redirect(action: "list")
         }
     }
 
@@ -778,12 +768,6 @@ class ShipmentController {
         if (container && shipment) {
             def numCopies = (params.copies) ? Integer.parseInt(params.copies) : 1
             int index = (shipment?.containers) ? (shipment.containers.size()) : 1
-            /*try {
-             index = Integer.parseInt(container.name);
-             } catch (NumberFormatException e) {
-             log.warn("The given value " + params.name + " is not an integer");
-             }*/
-
 
             while (numCopies-- > 0) {
                 def containerCopy = new Container(container.properties)
@@ -791,17 +775,10 @@ class ShipmentController {
                 containerCopy.name = "" + (++index)
                 containerCopy.containerType = container.containerType
                 containerCopy.weight = container.weight
-                //containerCopy.dimensions = container.dimensions;
                 containerCopy.shipmentItems = null
                 containerCopy.save(flush: true)
 
                 container.shipmentItems.each {
-                    // def shipmentItemCopy = new ShipmentItem(
-                    //product: it.product,
-                    //quantity: it.quantity,
-                    //recipient: it.recipient,
-                    //ontainer: containerCopy);
-                    //containerCopy.addToShipmentItems(shipmentItemCopy).save(flush:true);
                     containerCopy.shipment.addToShipmentItems(shipmentItem).save(flush: true)
                 }
                 shipment.addToContainers(containerCopy).save(flush: true)
@@ -848,14 +825,6 @@ class ShipmentController {
         log.debug params
         def shipmentInstance = Shipment.get(params.id)
         render(view: "addComment", model: [shipmentInstance: shipmentInstance, comment: new Comment()])
-
-        //def recipient = (params.recipientId) ? User.get(params.recipientId) : null;
-        //def comment = new Comment(comment: params.comment, commenter: session.user, recipient: recipient)
-        //if (shipment) {
-        //	shipment.addToComments(comment).save();
-        //	flash.message = "Added comment '${params.comment}'to shipment $shipment.id";
-        //}
-        //redirect(action: 'addComment', id: params.shipmentId)
     }
 
     /**
@@ -864,13 +833,10 @@ class ShipmentController {
      */
     def addPackage = {
         def shipmentInstance = Shipment.get(params.id)
-        //def containerType = ContainerType.findByName(params?.containerType?.name);
-
         def containerName = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance?.containers?.size() + 1) : "1"
         def containerInstance = new Container(name: containerName)
 
         render(view: "addPackage", model: [shipmentInstance: shipmentInstance, containerInstance: containerInstance])
-
     }
 
 
@@ -892,11 +858,8 @@ class ShipmentController {
                 if (parentContainerInstance) {
                     parentContainerInstance.addToContainers(containerInstance).save(flush: true)
                 }
-                //container.containerType = ContainerType.get(params.containerType.id);
-                //container.name = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance.containers.size() + 1) : "1";
                 redirect(action: "editContents", id: shipmentInstance.id, params: ["container.id": containerInstance.id])
             } else {
-                //flash.message = "Could not save container"
                 render(view: "addPackage", model: [shipmentInstance: shipmentInstance, containerInstance: containerInstance])
             }
         } else {
@@ -966,7 +929,6 @@ class ShipmentController {
 
         if (shipment && container) {
             container.delete()
-            //shipment.removeFromContainers(container).save(flush:true);
             flash.message = "${warehouse.message(code: 'shipping.deletedContainerFromShipment.message', args: [params.id])}"
         } else {
             flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveContainerFromShipment.message', args: [params.id])}"
@@ -981,7 +943,6 @@ class ShipmentController {
         def shipmentId = container.getShipment().getId()
         if (item) {
             container.removeFromShipmentItems(shipmentItem)
-            //item.delete();
             flash.message = "${warehouse.message(code: 'shipping.deletedShipmentItemFromContainer.message', args: [params.id, container.name])}"
             redirect(action: 'showDetails', id: shipmentId)
         } else {
@@ -1026,7 +987,6 @@ class ShipmentController {
             redirect(action: "list")
         }
 
-        //def event = new Event(eventType:EventType.get(params.eventType.id), eventDate:new Date())
         def eventInstance = new Event(params)
         render(view: "editEvent", model: [shipmentInstance: shipmentInstance, eventInstance: eventInstance])
     }
@@ -1076,9 +1036,7 @@ class ShipmentController {
         [shipments: Shipment.list()]
     }
 
-    def view = {
-        // pass through to "view shipment" page
-    }
+    def view = {}
 
     def generateDocuments = {
         def shipmentInstance = Shipment.get(params.id)
@@ -1107,14 +1065,6 @@ class ShipmentController {
                     person.lastName += " " + it
                 }
             }
-            /*
-             if (nameArray.length == 3) {
-             recipient = new Person(firstName : nameArray[0], lastName : nameArray[1], email : nameArray[2]);
-             } else if (nameArray.length == 2) {
-             recipient = new Person(firstName : nameArray[0], lastName : nameArray[1]);
-             } else if (nameArray.length == 1) {
-             recipient = new Person(firstName : nameArray[0]);
-             }*/
         }
         return person
     }
@@ -1239,7 +1189,7 @@ class ReceiveShipmentCommand implements Serializable {
         recipient(nullable: false)
         comments(nullable: true)
         creditStockOnReceive(nullable: false)
-        actualDeliveryDate(nullable: false) //validator: { value, obj-> value > new Date()}
+        actualDeliveryDate(nullable: false)
     }
 
 }

@@ -99,7 +99,6 @@ class InventoryItemController {
         cmd.warehouse = currentLocation
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
         def quantityMap = inventoryService.getCurrentStockAllLocations(commandInstance?.product, currentLocation, currentUser)
-        //def targetUri = g.createLink(controller: "inventoryItem", action: "showStockCard", id: commandInstance?.product?.id, absolute: true)
         def targetUri = "/inventoryItem/showStockCard/${commandInstance?.product?.id}"
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
@@ -127,7 +126,6 @@ class InventoryItemController {
 
     def showStockHistory = { StockCardCommand cmd ->
         def startTime = System.currentTimeMillis()
-        //log.info "showStockCard " + (System.currentTimeMillis() - currentTime) + " ms"
         // add the current warehouse to the command object
         cmd.warehouse = Location.get(session?.warehouse?.id)
 
@@ -207,8 +205,6 @@ class InventoryItemController {
                         showDetails      : (i == 0),
                         isBaseline       : isBaseline,
                         isSameTransaction: (previousTransaction?.id == transaction?.id),
-                        //runningBalance: transactionEntry.balance,
-                        //totalBalance: transactionEntry.totalBalance
                 ]
                 previousTransaction = transaction
             }
@@ -375,18 +371,6 @@ class InventoryItemController {
         render(template: "showInventorySnapshot", model: [inventorySnapshots: inventorySnapshots, product: product])
 
     }
-
-    /*
-    def exportStockHistory = {
-        def location = Location.get(session.warehouse.id)
-        def product = Product.get(params.id)
-        def stockHistory = inventoryService.getStockHistory(location.inventory, product)
-
-
-        render stockHistory
-        //[stockHistory : stockHistory]
-    }
-    */
 
 
     /**
@@ -557,20 +541,15 @@ class InventoryItemController {
 
         // TODO Move all of this logic into the service layer in order to take advantage of Hibernate/Spring transactions
         if (!inventoryItem.hasErrors() && inventoryItem.save()) {
-            //flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), inventoryItem.id])}"
-            //redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem.product.id);
-
             // Need to create a transaction if we want the inventory item
             // to show up in the stock card
             transactionInstance.transactionDate = new Date()
-            //transactionInstance.transactionDate.clearTime(); // we only want to store the date component
             transactionInstance.transactionType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)
             def warehouseInstance = Location.get(session.warehouse.id)
             transactionInstance.source = warehouseInstance
             transactionInstance.inventory = warehouseInstance.inventory
 
             transactionEntry.inventoryItem = inventoryItem
-            //transactionEntry.quantity = params.quantity;
             transactionInstance.addToTransactionEntries(transactionEntry)
 
             transactionInstance.save()
@@ -589,7 +568,6 @@ class InventoryItemController {
 
     def edit = {
         def itemInstance = InventoryItem.get(params.id)
-        //	def inventoryInstance = Inventory.get(params?.inventory?.id)
         if (!itemInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
             redirect(action: "show", id: itemInstance.id)
@@ -641,34 +619,6 @@ class InventoryItemController {
 
         redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
     }
-
-
-//    def donateStock = {
-//        log.info "Params " + params;
-//        def inventoryItem = InventoryItem.get(params.id)
-//        def location = Location.get(session.warehouse.id)
-//        //	def inventoryInstance = Inventory.get(params?.inventory?.id)
-//        if (inventoryItem) {
-//            def results = inventoryService.donateStock(inventoryItem, params.donationQuantity as int, location, params);
-//
-//            println "Success: " + results.success
-//            if (!inventoryItem.hasErrors() && results.success) {
-//                //flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
-//                flash.message = "Your donation offer has been posted to stockswap.org."
-//            }
-//            else {
-//                // There were errors, so we want to display the itemInstance.errors to the user
-//                //flash.itemInstance = itemInstance;
-//
-//                flash.message = "We are unable to donate to stockswap due to an unexpected error."
-//                results.data.errors.errors.each { error ->
-//                    inventoryItem.errors.reject(error.message)
-//                }
-//                flash.itemInstance = inventoryItem
-//            }
-//        }
-//        redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, params: ['inventoryItem.id':inventoryItem?.id])
-//    }
 
 
     /**
@@ -751,7 +701,6 @@ class InventoryItemController {
         log.info "Params " + params
         def itemInstance = InventoryItem.get(params.id)
         def productInstance = Product.get(params?.product?.id)
-        //	def inventoryInstance = Inventory.get(params?.inventory?.id)
         if (itemInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -772,7 +721,6 @@ class InventoryItemController {
             } else {
                 flash.message = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
                 log.info "There were errors trying to save inventory item " + itemInstance?.errors
-                //flash.message = "There were errors"
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
@@ -850,7 +798,6 @@ class InventoryItemController {
             }
 
         } catch (ShipmentItemException e) {
-            //e.errors.reject()
             flash['errors'] = e.shipmentItem.errors
         } catch (ValidationException e) {
             flash['errors'] = e.errors
@@ -864,7 +811,6 @@ class InventoryItemController {
         // Get existing inventory level
         def inventoryLevelInstance = InventoryLevel.get(params.id)
         def productInstance = Product.get(params?.product?.id)
-        //def inventoryInstance = Inventory.get(params?.inventory?.id);
 
         if (inventoryLevelInstance) {
             inventoryLevelInstance.properties = params
@@ -883,17 +829,6 @@ class InventoryItemController {
         redirect(action: 'showStockCard', params: ['product.id': productInstance?.id])
     }
 
-    /*
-    def saveInventoryItem = {
-        def inventory = Inventory.get(params.id)
-        def inventoryItem = new InventoryItem(params)
-        inventory.addToInventoryItem(inventoryItem)
-        if(! inventory.hasErrors() && inventory.save()) {
-            render template:'inventoryItemRow', bean:inventoryItem, var:'inventoryItem'
-        }
-    }
-    */
-
     def create = {
         def inventoryItem = new InventoryItem(params)
         if (InventoryItem && inventoryItem.save()) {
@@ -911,15 +846,12 @@ class InventoryItemController {
             try {
                 inventoryItem.delete(flush: true)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Attribute'), params.id])}"
-                //redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Attribute'), params.id])}"
-                //redirect(action: "list", id: params.id)
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Attribute'), params.id])}"
-            //redirect(action: "list")
         }
 
         redirect(action: 'showLotNumbers', params: ['product.id': inventoryItem?.product?.id])
@@ -977,24 +909,6 @@ class InventoryItemController {
                     transactionEntry.errors.each { log.info it }
                     flash.message = "${warehouse.message(code: 'inventoryItem.inventoryItem.unableToSaveTransactionEntry.message.label')}"
                 }
-
-                /*
-                if (!transactionInstance.hasErrors() && transactionInstance.save(flush:true) {
-                    def transactionEntry = new TransactionEntry(params)
-                    transactionEntry.inventoryItem = inventoryItem;
-                    if (!transactionEntry.hasErrors() &&
-                        transactionInstance.addToTransactionEntries(transactionEntry).save(flush:true)) {
-                        transactionEntry.errors.each { println it }
-                        flash.message = "Unable to save transaction entry"
-                    } else {
-                        flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory item'), itemInstance.id])}"
-                    }
-                }
-                else {
-                    transactionInstance.errors.each { println it }
-                    flash.message = "Unable to save transaction"
-                }
-                */
             }
         }
         redirect(action: "showStockCard", params: ['product.id': productInstance?.id])

@@ -19,8 +19,6 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 
-// import java.util.Date
-
 /**
  *  Represents a unit of work completed within a single warehouse.  A
  *  transaction can be incoming/outgoing and must have a source and
@@ -157,7 +155,6 @@ class Transaction implements Comparable, Serializable {
                     if (value && obj.destination) {
                         return false
                     }   // transaction cannot have both a source and a destination
-                    //if (value && obj.inventory?.warehouse == value) { return false }   // source warehouse can't be the same as transaction warehouse
                     if (obj.transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID && !value) {
                         return false
                     } // transfer in transaction must have source
@@ -169,7 +166,6 @@ class Transaction implements Comparable, Serializable {
                     if (value && obj.source) {
                         return false
                     }  // transaction cannot have both a source and a destination
-                    //if (value && obj.inventory?.warehouse == value) { return false } // destination warehouse can't be the same as transaction warehouse
                     if (obj.transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID && !value) {
                         return false
                     } // transfer out transaction must have destination
@@ -179,7 +175,6 @@ class Transaction implements Comparable, Serializable {
 
 
     LocalTransfer getLocalTransfer() {
-        //return LocalTransfer.findBySourceTransactionOrDestinationTransaction(this, this)
         return inboundTransfer ?: outboundTransfer ?: null
     }
 

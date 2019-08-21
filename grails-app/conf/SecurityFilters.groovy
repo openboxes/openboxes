@@ -49,14 +49,6 @@ class SecurityFilters {
                     AuthService.currentLocation.set(Location.get(session.warehouse.id))
                 }
 
-                // Need to bypass security filter when generating a PDF report, otherwise the
-                // generated PDF contains the login screen
-                //if (controllerName.equals("report") && (actionName.equals("showTransactionReport") || actionName.equals("showChecklistReport"))) {
-                //	log.info ("User: " + session.user )
-                //	log.info ("Location: " + session.location)
-                //	return true;
-                //}
-
                 // This allows requests for the health monitoring endpoint to pass through without a user
                 if (controllerName.equals("api") && actionName.equals("status")) {
                     return true

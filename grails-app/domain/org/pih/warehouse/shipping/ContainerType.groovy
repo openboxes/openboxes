@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.shipping
 
-// import java.util.Date;
-
 /**
  * Represents a means of packaging all or part of a Shipment
  * Examples of this would be Pallet, Box, Piece, Suitcase, etc

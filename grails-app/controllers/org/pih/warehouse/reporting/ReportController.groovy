@@ -153,10 +153,7 @@ class ReportController {
         return
     }
 
-    def showInventoryReport = {
-
-
-    }
+    def showInventoryReport = {}
 
 
     def showInventorySamplingReport = {
@@ -198,9 +195,6 @@ class ReportController {
             sw.append(e.message)
         }
 
-
-        //render sw.toString()
-
         response.setHeader("Content-disposition", "attachment; filename=\"Inventory-sampling-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
         render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
 
@@ -216,11 +210,6 @@ class ReportController {
 
 
     def showProductReport = { ProductReportCommand command ->
-
-        //if (!command?.product) {
-        //	throw new Exception("Unable to locate product " + params?.product?.id)
-        //}
-
         if (!command?.hasErrors()) {
             reportService.generateProductReport(command)
         }
@@ -278,7 +267,6 @@ class ReportController {
     def printPickListReport = { ChecklistReportCommand command ->
 
         Map binLocations
-        //command.rootCategory = productService.getRootCategory();
         if (!command?.hasErrors()) {
             reportService.generateShippingReport(command)
             binLocations = inventoryService.getBinLocations(command.shipment)
@@ -318,7 +306,6 @@ class ReportController {
         url += "&includeEntities=true"
 
         // Let the browser know what content type to expect
-        //response.setHeader("Content-disposition", "attachment;") // removed filename=
         response.setContentType("application/pdf")
 
         // Render pdf to the response output stream
@@ -331,8 +318,6 @@ class ReportController {
     def downloadShippingReport = {
         if (params.format == 'docx') {
             def tempFile = documentService.generateChecklistAsDocx()
-            //		def filename = "shipment-checklist.docx"
-            //response.setHeader("Content-disposition", "attachment; filename=" + filename);
             response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
             response.outputStream << tempFile.readBytes()
         } else if (params.format == 'pdf') {
@@ -343,7 +328,6 @@ class ReportController {
             url += "&includeEntities=true"
             log.info "Fetching url $url"
             response.setContentType("application/pdf")
-            //response.setHeader("Content-disposition", "attachment;") // removed filename=
             reportService.generatePdf(url, response.getOutputStream())
         } else {
             throw new UnsupportedOperationException("Format '${params.format}' not supported")

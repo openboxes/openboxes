@@ -63,7 +63,6 @@ class ConsumptionService {
     def listConsumption(Location location, Category category, Date startDate, Date endDate) {
 
         def results = ConsumptionFact.createCriteria().list {
-            //resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
 
             if (startDate && endDate) {
                 transactionDateKey {
@@ -86,7 +85,6 @@ class ConsumptionService {
 
 
     def generateCrossTab(List<ConsumptionFact> consumptionFactList, Date startDate, Date endDate, String groupBy) {
-
 
         def calendar = Calendar.instance
         def dateFormat = new SimpleDateFormat("ddMMyyyy")

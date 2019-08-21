@@ -20,8 +20,6 @@ class LocationDimension {
     String locationTypeName
     String parentLocationName
 
-    //Location location
-
     static mapping = {
         id generator: 'increment'
         cache true

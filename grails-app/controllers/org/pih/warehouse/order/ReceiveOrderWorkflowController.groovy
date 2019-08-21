@@ -111,11 +111,6 @@ class ReceiveOrderWorkflowController {
                     flow.order = oe.order
                     return error()
                 }
-                // RuntimeExceptions should propagate to the UI
-                //catch (RuntimeException e) {
-                //	flow.orderCommand = orderCommand
-                //	return error();
-                //}
                 log.info(">>>>>>>>>>>>> Success!!!")
                 success()
 
@@ -123,8 +118,6 @@ class ReceiveOrderWorkflowController {
             on("cancel").to("finish")
             on("back").to("processOrderItems")
             on("error").to("confirmOrderReceipt")
-            //on(Exception).to("handleError")
-            //on("success").to("finish")
             on("enterShipmentDetails").to("enterShipmentDetails")
             on("processOrderItems").to("processOrderItems")
             on("confirmOrderReceipt").to("confirmOrderReceipt")

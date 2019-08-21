@@ -26,28 +26,13 @@ class InventorySnapshotController {
 
     def index = {
         redirect(action: "list")
-
     }
 
-    def list = {
-        //def startDate = new Date() - 14
-        //def endDate = new Date() + 14
+    def list = {}
 
+    def show = {}
 
-        //def query = InventorySnapshot.createCriteria()
-        //def inventorySnapshots = InventorySnapshot.list([max:100])
-
-        //[inventorySnapshots:inventorySnapshots]
-    }
-
-    def show = {
-        //def inventorySnapshot = InventorySnapshot.get(params.id)
-        //[inventorySnapshot:inventorySnapshot]
-    }
-
-    def edit = {
-
-    }
+    def edit = {}
 
     def update = {
         println "Update inventory snapshot " + params
@@ -129,7 +114,6 @@ class InventorySnapshotController {
         def filename = "Stock-${location?.name}-${date.format("dd MMM yyyy")}.csv"
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
-        //response.outputStream.flush()
 
     }
 

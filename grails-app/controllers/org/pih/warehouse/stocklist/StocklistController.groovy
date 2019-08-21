@@ -21,12 +21,9 @@ class StocklistController {
     def show = {
         println "stocklist " + params
         def location = Location.get(params.id)
-        //def inventory = Inventory.findByLocation(location)
         def inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
 
-
         [location: location, inventoryLevels: inventoryLevels]
-
     }
 
 

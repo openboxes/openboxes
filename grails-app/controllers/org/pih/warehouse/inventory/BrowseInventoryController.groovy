@@ -15,11 +15,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.product.Category
 
-// import java.text.SimpleDateFormat;
-// import java.util.Calendar;
-
-// import org.pih.warehouse.util.DateUtil
-
 class BrowseInventoryController {
 
     def dataSource
@@ -38,7 +33,6 @@ class BrowseInventoryController {
         if (!location) {
             throw new Exception("Location is required")
         }
-        //def inventorySnapshots = InventorySnapshot.findAllByLocation(location)
         def inventorySnapshots = InventorySnapshot.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
             and {
                 eq("location", location)

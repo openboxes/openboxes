@@ -29,28 +29,8 @@ class JobsController {
 
     def list = {
         log.info "Jobs"
-        //Scheduler quartzScheduler = ctx.getBean('quartzScheduler')
-        //scheduler.start();
-        //scheduler.scheduleJob(job, trigger);
 
         Set<JobKey> jobKeys = quartzScheduler.getJobKeys()
-
-
-        //JobKey jobKey = JobKey.jobKey("org.pih.warehouse.jobs.CalculateQuantityJob")
-        //JobDetail jobDetail = quartzScheduler.getJobDetail(jobKey)
-
-        //def triggers = quartzScheduler.getTriggersOfJob(jobKey)
-
-//        TriggerBuilder.newTrigger().forJob(jobKey).
-//        CronTrigger trigger = new CronTrigger(
-//                triggerName, triggerGroupName,
-//                jobName, jobGroupName,
-//                cronString);
-//
-//        JobDataMap jobDataMap = new JobDataMap();
-//        jobDetail.setJobDataMap(jobDataMap);
-//
-//        quartzScheduler.scheduleJob(jobDetail, trigger);
 
         [jobKeys: jobKeys]
     }
@@ -103,7 +83,6 @@ class JobsController {
     def scheduleJob = {
         JobKey jobKey = JobKey.jobKey(params.id)
         if (jobKey) {
-            //JobDetail jobDetail = quartzScheduler.getJobDetail(jobKey)
             // cronExpression 0 0 22 * * ?
             try {
                 Trigger trigger = TriggerHelper.cronTrigger(jobKey, params.cronExpression, [:])

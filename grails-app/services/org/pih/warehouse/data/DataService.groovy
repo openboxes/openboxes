@@ -98,23 +98,14 @@ class DataService {
 
     def validateInventoryLevel(row) {
         row.each { key, value ->
-
-            //println key + " = " + value + " " + row
             def expectedType = InventoryLevelExcelImporter.propertyMap.get(key).expectedType
             switch (expectedType) {
-            //case  ExcelImportUtils.PROPERTY_TYPE_STRING:
-            //    assert !value || value instanceof String || value instanceof Boolean, "Value [${value}] for column [${key}] must be a String or Boolean but was ${value?.class?.name} (" + row + ").";
-            //    break;
-
                 case ExcelImportUtils.PROPERTY_TYPE_INT:
                     assert !value || value instanceof Number || value instanceof Boolean, "Value [${value}] for column [${key}] must be a Number or Boolean but was ${value?.class?.name} (" + row + ")."
                     break
-
                 case ExcelImportUtils.PROPERTY_TYPE_DATE:
                     assert !value || value instanceof Date, "Value [${value}] for column [${key}] must be a Date but was ${value?.class?.name} (" + row + ")."
                     break
-
-
                 default:
                     break
             }
@@ -160,15 +151,9 @@ class DataService {
         Product.withNewSession {
 
             def product = findProduct(row)
-            //def tags = findOrCreateTags(row.tags)
 
             // Modify product attributes (name, manufacturer, manufacturerCode, vendor, vendorCode, unitOfMeasure, etc)
             updateProduct(product, row)
-
-            // Add tags that don't currently exist
-            //if(row.tags) {
-            //    addTagsToProduct(product, row.tags)
-            //}
 
             // Create inventory level for current location, include bin location
             if (location.inventory) {
@@ -221,7 +206,6 @@ class DataService {
         if (uomCode) {
             def productPackage = findOrCreateProductPackage(product, uomCode, quantity as Integer, price as Float)
             product.addToPackages(productPackage)
-            //product = product.merge()
         }
     }
 
@@ -416,16 +400,7 @@ class DataService {
      * @return
      */
     def updateProduct(product, row) {
-        // Change category
-        //        def category = productService.findOrCreateCategory(row.category)
-        //        if (product.category != category && category) {
-        //            product.category = category
-        //        }
-        // Change product name
-        //        if (row.productName != product.name && product.name != null) {
-        //            product.name = row.productName
-        //        }
-        // Change all other attributes if they exist
+        // Change attributes other than name and category if they exist
         if (row.manufacturer) {
             product.manufacturer = row.manufacturer
         }
@@ -500,7 +475,6 @@ class DataService {
         // Check if the product already has the given tag
         def alreadyHasTag = product.tags.find { it.tag == tagName }
         if (!alreadyHasTag) {
-            //tag = Tag.findByTag(tagName)
             def foundTag = Tag.executeQuery("select distinct t from Tag t where t.tag = :tagName", [tagName: tagName, max: 1])
             if (foundTag) {
                 product.addToTags(foundTag[0])
@@ -819,7 +793,6 @@ class DataService {
                     if (value?.toString()?.isNumber()) {
                         value
                     } else {
-                        //'"' + value.toString().replace('"','""') + '"'
                         StringEscapeUtils.escapeCsv(value.toString())
                     }
                 }
@@ -891,7 +864,6 @@ class DataService {
                         default:
                             xlsData[rowNum][colNum] = ''
                     }
-                    //log.debug xlsData[rowNum][colNum] + " - class: "xlsData[rowNum][colNum].class
                 }
             } else log.debug "ignoring row ${rowNum}"
         }

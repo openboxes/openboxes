@@ -12,22 +12,6 @@ package org.pih.warehouse
 class SearchProductTagLib {
 
     def searchProduct = { attrs, body ->
-
-        /*
-		def id = (attrs.id) ? attrs.id : "autoSuggest_" + (new Random()).nextInt()
-		def name = attrs.name
-		def valueId = (attrs.valueId)?attrs.valueId:"";
-		def valueName = (attrs.valueName)?attrs.valueName:"";
-		def width = (attrs.width) ? attrs.width : '300px';
-		def jsonUrl = (attrs.jsonUrl) ? attrs.jsonUrl : "";
-		def styleClass = attrs.styleClass ?: ''
-		def placeholder = attrs.placeholder ?: ""
-        def minLength = (attrs.minLength) ?: 1
-
-		def spanDisplay = "none";
-		def suggestDisplay = "inline";
-        */
-
         out << render(template: "../taglib/searchProduct", model: [attrs: attrs])
     }
 

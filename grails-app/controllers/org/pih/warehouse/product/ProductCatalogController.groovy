@@ -140,15 +140,12 @@ class ProductCatalogController {
                 }
                 productCatalogItem.delete()
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productCatalogItem.label', default: 'Product Catalog Item'), params.id])}"
-                //redirect(action: "edit", id: productCatalog.id, fragment: "edit-product-catalog-items")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'productCatalogItem.label', default: 'Product Catalog Item'), params.id])}"
-                //redirect(action: "edit", id: params.id, fragment: "edit-product-catalog-items")
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productCatalogItem.label', default: 'Product Catalog Item'), params.id])}"
-            //redirect(action: "list")
         }
         redirect(action: "productCatalogItems", id: productCatalogId)
     }
@@ -220,11 +217,7 @@ class ProductCatalogController {
 
             render csv
         } else {
-            //render(text: 'No products found', status: 404)
             response.sendError(404)
-
         }
-
     }
-
 }

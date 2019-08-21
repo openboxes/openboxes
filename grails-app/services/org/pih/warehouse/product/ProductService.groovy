@@ -182,17 +182,12 @@ class ProductService {
                         link ->
                             product.links[link.'@rel'] = link.'@href'
                     }
-                    //println "categories: " + entry[ns.product][ns.categories][ns.category]
 
                     product.id = entry.id.text()
                     product.googleId = entry[ns.product][ns.googleId].text()
                     product.title = entry[ns.product][ns.title].text()
                     product.description = entry[ns.product][ns.description].text()
                     product.brand = entry[ns.product][ns.brand].text()
-                    //product.gtins << entry[ns.product][ns.gtin].text()
-                    // HACK iterates over all images, but only keeps the last one
-                    // Need to add these to product->documents
-                    //def imageLinks = ""
                     product.gtin = entry[ns.product][ns.gtin].text()
                     entry[ns.product][ns.gtins][ns.gtin].each { gtin ->
                         product.gtins << gtin.text()
@@ -206,7 +201,6 @@ class ProductService {
             log.info("URL: " + url)
             log.info("Response Code: " + connection.responseCode)
             log.info("Response Message: " + connection.responseMessage)
-            //log.info("Response: " + connection.content)
             throw new ApiException("Unable to connect to Google Product Search API using connection URL [" + urlString + "]: " + connection.responseMessage)
         }
 
@@ -248,10 +242,6 @@ class ProductService {
         }
         searchResults = products.intersect(searchResults)
 
-        //if (!showHiddenProducts) {
-        //   searchResults.removeAll(getHiddenProducts())
-        //}
-
         // now localize to only match products for the current locale
         // TODO: this would also have to handle the category filtering
         //  products = products.findAll { product ->
@@ -262,13 +252,6 @@ class ProductService {
         // }
         return searchResults
     }
-
-    /*
-    def getProducts(List ids) {
-        return getProducts(ids.toArray())
-
-    }
-    */
 
     /**
      * @deprecated
@@ -334,7 +317,6 @@ class ProductService {
         String sortColumn = params.sort ?: "name"
         String sortOrder = params.order ?: "asc"
 
-        //max:params.max?:10, offset:params.offset?:0, sort:params.sort?:"name", order:params.order?:"asc"
         def results = Product.createCriteria().list(max: max, offset: offset) {
 
             def fields = params.fields ? params.fields.split(",") : null
@@ -354,7 +336,6 @@ class ProductService {
                     if (params.includeCategoryChildren) {
                         def categories = category.children ?: []
                         categories << category
-                        //categories = categories.collect { it.id }
 
                         println "Categories to search in " + categories
                         'in'("category", categories)
@@ -456,24 +437,10 @@ class ProductService {
         log.info "validate data test "
         // Iterate over each row and validate values
         command?.data?.each { Map params ->
-            //log.debug "Inventory item " + importParams
             log.info "validate data " + params
-            //command?.data[0].newField = 'new field'
-            //command?.data[0].newDate = new Date()
             params.prompts = [:]
             params.prompts["product.id"] = Product.findAllByActiveAndNameLike(true, "%" + params.search1 + "%")
-
-            //def lotNumber = (params.lotNumber) ? String.valueOf(params.lotNumber) : null;
-            //if (params?.lotNumber instanceof Double) {
-            //	errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be not formatted as a Double value");
-            //}
-            //else if (!params?.lotNumber instanceof String) {
-            //	errors.reject("Property 'Serial Number / Lot Number' with value '${lotNumber}' should be formatted as a Text value");
-            //}
-
-
         }
-
     }
 
     /**
@@ -486,29 +453,8 @@ class ProductService {
         try {
             // Iterate over each row
             command?.data?.each { Map params ->
-
                 log.info "import data " + params
-
-                /*
-                 // Create product if not exists
-                 Product product = Product.findByName(params.productDescription);
-                 if (!product) {
-                 product = new Product(params)
-                 product.name = params.productDescription
-                 //upc:params.upc,
-                 //ndc:params.ndc,
-                 //category:category,
-                 //manufacturer:manufacturer,
-                 //manufacturerCode:manufacturerCode,
-                 //unitOfMeasure:unitOfMeasure);
-                 if (!product.save()) {
-                 command.errors.reject("Error saving product " + product?.name)
-                 }
-                 //log.debug "Created new product " + product.name;
-                 }
-                 */
             }
-
         } catch (Exception e) {
             log.error("Error importing data ", e)
             throw e
@@ -540,7 +486,6 @@ class ProductService {
 				from Product as p 				
 				where lower(p.name) like ? 
 				or lower(p.productCode) like ?""", [text, text])
-        // products.each{ println it}
         println " * Search product and product group: " + (System.currentTimeMillis() - startTime) + " ms"
 
         return products
@@ -623,7 +568,6 @@ class ProductService {
         csv.toCsvReader(['skipLines': 1, 'separatorChar': delimiter]).eachLine { tokens ->
             def product = Product.findByIdOrProductCode(tokens[0], tokens[1])
             println "GET EXISTING PRODUCT " + tokens[0] + " OR " + tokens[1]
-            //def product = Product.findById(tokens[0])
             if (product) {
                 product = Product.get(product.id)
                 println "FOUND EXISTING PRODUCT " + product?.id + " " + product?.name
@@ -985,9 +929,7 @@ class ProductService {
 
         if (!tag) {
             // Otherwise try to find an existing tag that matches the tag
-            //Tag.withNewSession {
             tag = Tag.findByTag(tagName)
-
             // Or create a brand new one
             if (!tag) {
                 log.info "Tag ${tagName} does not exist so creating it"
@@ -1073,9 +1015,7 @@ class ProductService {
      * @return
      */
     def saveProduct(Product product, String tags) {
-        //def productInstance = Product.get(product.id)
         if (product) {
-
             // Generate product code if it doesn't already exist
             if (!product.productCode) {
                 product.productCode = generateProductIdentifier()
@@ -1094,49 +1034,6 @@ class ProductService {
                 log.error("Error occurred: " + e.message)
                 throw new ValidationException(e.message, product?.errors)
             }
-
-            // Handle attributes
-            /*
-            Map existingAtts = new HashMap();
-            productInstance.attributes.each() {
-                existingAtts.put(it.attribute.id, it)
-            }
-            Attribute.list().each() {
-                String attVal = params["productAttributes." + it.id + ".value"]
-                if (attVal == "_other" || attVal == null || attVal == '') {
-                    attVal = params["productAttributes." + it.id + ".otherValue"]
-                }
-                ProductAttribute existing = existingAtts.get(it.id)
-                if (attVal != null && attVal != '') {
-                    if (!existing) {
-                        existing = new ProductAttribute(["attribute":it])
-                        productInstance.attributes.add(existing)
-                    }
-                    existing.value = attVal;
-                }
-                else {
-                    productInstance.attributes.remove(existing)
-                }
-            }
-            */
-
-            /*
-            log.info("Categories " + productInstance?.categories);
-
-            // find the phones that are marked for deletion
-            def _toBeDeleted = productInstance.categories.findAll {(it?.deleted || (it == null))}
-
-            log.info("toBeDeleted: " + _toBeDeleted )
-
-            // if there are phones to be deleted remove them all
-            if (_toBeDeleted) {
-                productInstance.categories.removeAll(_toBeDeleted)
-            }
-            */
-
-            //if (!product.validate()) {
-            //	throw new ValidationException("Product is not valid", product.errors)
-            //}
 
             return product.save(flush: true)
         }
@@ -1165,31 +1062,13 @@ class ProductService {
      */
     def findSimilarProducts(Product product) {
         def similarProducts = []
-        /*
-        def productsInSameProductGroup = ProductGroup.findByProduct(product).products
-        if (productsInSameProductGroup) {
-            similarProducts.addAll(productsInSameProductGroup)
-        }
-        */
-        /*
-        def productsInSameCategory = Product.findByCategory(product.category)
-        if (productsInSameCategory) {
-            similarProducts.addAll(productsInSameCategory)
-        }*/
+
         def searchTerms = product.name.split(",")
         if (searchTerms) {
-
             def products = Product.findAllByNameLike("%" + searchTerms[0] + "%")
             similarProducts.addAll(products)
         }
-        /*
-        if (!similarProducts) {
-            searchTerms = product.name.split(" ")
-            searchTerms.each {
-                similarProducts.addAll(Product.findAllByNameLike("%" + it +"%"))
-            }
-        }
-        */
+
         similarProducts.unique()
 
         similarProducts.remove(product)

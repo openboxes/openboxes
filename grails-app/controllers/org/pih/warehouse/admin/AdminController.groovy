@@ -68,8 +68,6 @@ class AdminController {
 
         [
                 command: session.command
-                //remoteFileSize: getRemoteFileSize(command?.remoteWebArchiveUrl),
-                //remoteFileLastModifiedDate: new Date(getRemoteFileLastModifiedDate(command?.remoteWebArchiveUrl))
         ]
     }
 
@@ -152,17 +150,12 @@ class AdminController {
             session.command.future = null
             session.command?.localWebArchive = new File("warehouse.war")
             flash.message = "Attempting to download '" + command?.remoteWebArchiveUrl + "' to '" + command?.localWebArchive?.absolutePath + "'"
-            // Requires executor plugin
-            //session.command.future = callAsync {
-            //	return doDownloadWar(command?.remoteWebArchiveUrl, command?.localWebArchive)
-            //}
         } else {
             flash.message = "Please enter valid web archive url"
 
         }
 
         chain(action: "showUpgrade", model: [command: command])
-        //redirect (action: "showUpgrade")
     }
 
 
@@ -182,7 +175,6 @@ class AdminController {
         destination.bytes = source.bytes
 
         chain(action: "showUpgrade", model: [command: command])
-        //redirect (view: "showUpgrade", model: [command: command])
     }
 
 
@@ -258,13 +250,6 @@ class AdminController {
     def downloadWar = {
         log.info params
         log.info("Updating war file " + params)
-        // def url = "http://ci.pih-emr.org/downloads/openboxes.war"
-
-        // Requires executor plugin
-        //def future = callAsync {
-        //	return doDownloadWar(url)
-        //}
-        //session.future = future
         redirect(action: "showSettings")
     }
 
@@ -281,14 +266,9 @@ class AdminController {
         log.info params
         def source = session.command.localWebArchive
 
-        // def destination = new File(session.command.localWebArchivePath)
-
         def backup = new File(session.command.localWebArchive.absolutePath + ".backup")
         log.info "Backing up " + source.absolutePath + " to " + backup.absolutePath
         backup.bytes = source.bytes
-
-        //destination.bytes = source.bytes
-
 
         redirect(action: "showSettings")
     }
@@ -308,76 +288,6 @@ class AdminController {
             throw e
         }
     }
-
-
-    /*
-    def reloadWar = {
-        log.info("Reloading war file")
-        def future = callAsync {
-            log.info "Within call async"
-            return reloadWar()
-        }
-        session.future = future
-        redirect(action: "showSettings")
-    }
-
-    def doReloadWar() {
-        def connection = null
-        try {
-            //Create connection
-            def url = new URL("http://localhost:8180/manager/reload?path=/openboxes");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            BASE64Encoder enc = new sun.misc.BASE64Encoder();
-            String userpassword = "tomcat" + ":" + "tomcat";
-            String encodedAuthorization = enc.encode( userpassword.getBytes() );
-            connection.setRequestProperty("Authorization", "Basic " + encodedAuthorization);
-
-            return connection.content.text
-
-        } catch (Exception e) {
-            log.error e
-            render e
-        } finally {
-            if(connection != null) {
-                connection.disconnect();
-            }
-        }
-    }
-    */
-
-    /*
-    def getApplications() {
-        def applications = []
-        def connection = null
-        try {
-            //Create connection
-            def url = new URL("http://localhost:8180/manager/list");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            BASE64Encoder enc = new sun.misc.BASE64Encoder();
-            String userpassword = "tomcat" + ":" + "tomcat";
-            String encodedAuthorization = enc.encode( userpassword.getBytes() );
-            connection.setRequestProperty("Authorization", "Basic " + encodedAuthorization);
-
-            connection.content.text.eachLine {
-                applications << it.tokenize(":")
-            }
-
-        } catch (Exception e) {
-            log.error "test"
-
-        } finally {
-
-            if(connection != null) {
-                connection.disconnect();
-            }
-        }
-        return applications
-    }
-    */
-
-
 }
 
 class UpgradeCommand {

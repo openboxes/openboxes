@@ -29,7 +29,6 @@ class DatePickerTagLib {
         def showOn = attrs.showOn ?: "both"
         def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true")
         def changeMonthAndYear = attrs.changeMonthAndYear ?: true
-        // def showClear = attrs.showClear ?: "false"
         def value = attrs.value
         def numberOfMonths = attrs.numberOfMonths ?: 1
         def readOnly = attrs.readOnly ?: false
@@ -37,7 +36,6 @@ class DatePickerTagLib {
         def maxDate = attrs.maxDate ? "new Date('${attrs.maxDate}')" : null
         def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
         def placeholder = attrs.placeholder ?: ''
-        // def showHint = attrs.showHint ?: false;
         def autocomplete = attrs.autocomplete ?: 'on'
 
         if (value) {

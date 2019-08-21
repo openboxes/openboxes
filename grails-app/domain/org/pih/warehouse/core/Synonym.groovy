@@ -12,7 +12,6 @@ package org.pih.warehouse.core
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.product.Product
 
-// import java.util.Date
 
 class Synonym implements Serializable {
 

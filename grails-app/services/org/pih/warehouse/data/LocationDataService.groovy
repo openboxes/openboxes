@@ -17,8 +17,6 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 class LocationDataService {
 
-    //boolean transactional = true
-
     /**
      * Validate inventory levels
      */

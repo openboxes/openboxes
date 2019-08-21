@@ -39,16 +39,12 @@ class PurchaseOrderWorkflowController {
                 if (params.skipTo) {
                     if (params.skipTo == 'details') return success()
                     else if (params.skipTo == 'items') return showOrderItems()
-                    //else if (params.skipTo == 'confirm') return confirmOrder()
-
                 }
 
                 return success()
             }
             on("success").to("enterOrderDetails")
             on("showOrderItems").to("showOrderItems")
-
-            //on("confirmOrder").to("confirmOrder")
         }
 
 
@@ -125,7 +121,6 @@ class PurchaseOrderWorkflowController {
                     def category = Category.get(params?.category?.id)
                     if (category) {
                         orderItem.description = category.name
-                        //orderItem.category = category
                     }
                 }
 
@@ -161,8 +156,6 @@ class PurchaseOrderWorkflowController {
 
             action {
                 log.info("Finishing workflow, save order object " + flow.order)
-                // def order = flow.order;
-
                 try {
 
                     if (!orderService.saveOrder(flow.order)) {
@@ -180,7 +173,6 @@ class PurchaseOrderWorkflowController {
             on("success").to("showOrder")
         }
         cancel {
-            //redirect(controller:"order", action: "list")
             redirect(controller: "order", action: "show", params: ["id": flow.order.id ?: ''])
         }
         showOrder {

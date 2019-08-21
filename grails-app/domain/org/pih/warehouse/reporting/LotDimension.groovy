@@ -17,8 +17,6 @@ class LotDimension {
     Date expirationDate
     String inventoryItemId
 
-    //InventoryItem inventoryItem
-
     static mapping = {
         id generator: 'increment'
         cache true

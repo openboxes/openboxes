@@ -18,9 +18,6 @@ import org.pih.warehouse.importer.ImportDataCommand
 
 class UserLocationDataService {
 
-    //boolean transactional = true
-
-
     /**
      * Validate inventory levels
      */

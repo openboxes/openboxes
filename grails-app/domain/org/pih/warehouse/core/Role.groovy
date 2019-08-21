@@ -9,7 +9,6 @@
  * */
 package org.pih.warehouse.core
 
-// import java.util.Date;
 
 class Role implements Serializable, Comparable<Role> {
 

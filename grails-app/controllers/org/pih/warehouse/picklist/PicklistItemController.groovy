@@ -20,7 +20,6 @@ class PicklistItemController {
         if (picklistItem) {
 
             try {
-                //picklistItem.picklist.removeFromPicklistItems(picklistItem)
                 picklistItem.delete()
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
             }
@@ -32,6 +31,4 @@ class PicklistItemController {
         }
         redirect(controller: "requisition", action: "pick", id: picklistItem?.picklist?.requisition?.id, params: ['requisitionItem.id': picklistItem?.requisitionItem?.id])
     }
-
-
 }

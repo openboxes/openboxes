@@ -24,16 +24,4 @@ class TransactionEntryController {
         }
         redirect(action: "list")
     }
-
-    /*
-    def edit = {
-        def transactionEntryInstance = TransactionEntry.get(params.id)
-        log.info "get transaction entry " + transactionEntryInstance
-        if (!transactionEntryInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'transactionEntry.label'), params.id])}"
-            redirect(action: "create")
-            return;
-        }
-        [transactionEntryInstance: transactionEntryInstance]
-    }*/
 }

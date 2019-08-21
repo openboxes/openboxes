@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-//import java.util.Date;
-
 /**
  * TODO Use enum 
  */

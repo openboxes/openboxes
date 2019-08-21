@@ -139,8 +139,6 @@ class ShipmentService {
      */
     List<Shipment> getRecentOutgoingShipments(String locationId, int daysBefore, int daysAfter) {
         Location location = Location.get(locationId)
-        //def upcomingShipments = Shipment.findAllByOriginAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30,
-        //	[max:5, offset:2, sort:"expectedShippingDate", order:"desc"]);
 
         def criteria = Shipment.createCriteria()
         def now = new Date()
@@ -159,12 +157,6 @@ class ShipmentService {
         for (shipment in upcomingShipments) {
             shipments.add(shipment)
         }
-
-        /*
-        def unknownShipments = Shipment.findAllByOriginAndExpectedShippingDateIsNull(location);
-        for (shipment in unknownShipments) {
-            shipments.add(shipment);
-        }*/
 
         return shipments
     }
@@ -221,41 +213,7 @@ class ShipmentService {
      * @return
      */
     List<Shipment> getShipments() {
-
         return getAllShipments()
-
-        /*
-        return Shipment.withCriteria {
-            eq("mostRecentEvent.eventType.id", EventType.findByName("Departed"))  // change this to reference by id if we reimplement this
-        }*/
-
-        /*
-        //def sessionFactory
-        //sessionFactory = ctx.sessionFactory  // this only necessary if your are working with the Grails console/shell
-        def session = sessionFactory.currentSession
-        def query = session.createSQLQuery(
-            """
-            select s.* , count(*)
-            from shipment s, shipment_event se, event e
-            where se.shipment_events_id = s.id
-            and se.event_id = e.id
-            group by s.id having count(*) > 1
-            order by s.name
-            """
-        );
-        query.addEntity(org.pih.warehouse.shipping.Shipment.class); // this defines the result type of the query
-        //query.setInteger("ids", 1);
-        return query.list();	// return query.list()*.name;
-        */
-
-        //def criteria = Shipment.createCriteria()
-        //def results = criteria.list {
-        //or {
-        //	   for (e in branchList) {
-        //		   eq("branch", b)
-        //	   }
-        //	}
-        //}
     }
 
 
@@ -544,12 +502,6 @@ class ShipmentService {
      * @param newShipment
      */
     void moveContainers(Container oldContainer, Shipment newShipment) {
-        //if (oldContainer.containers) {
-        //oldContainer.containers.each {
-        //	moveContainer(it, newShipment)
-        //}
-        //	throw new UnsupportedOperationException();
-        //}
         moveContainer(oldContainer, newShipment)
     }
 
@@ -597,41 +549,6 @@ class ShipmentService {
 
     }
 
-    /**
-     * Move a container from one shipment to the given shipment.
-     *
-     * @param container
-     * @param shipment
-     */
-    /*
-    void moveContainer(Container oldContainer, Shipment newShipment) {
-
-        // Copy the container and add to the new shipment
-        def newContainer = oldContainer.copyContainer();
-        newShipment.addToContainers(newContainer)
-
-        // Copy each shipment item from one shipment to the other
-        def oldShipment = oldContainer.shipment;
-        oldContainer.shipmentItems.each {
-            def shipmentItem = new ShipmentItem();
-            shipmentItem.container = newContainer
-            shipmentItem.lotNumber = it.lotNumber
-            shipmentItem.expirationDate = it.expirationDate
-            shipmentItem.quantity = it.quantity
-            shipmentItem.product = it.product
-            shipmentItem.recipient = it.recipient
-            newShipment.addToShipmentItems(shipmentItem);
-            oldShipment.removeFromShipmentItems(it)
-            it.delete();
-        }
-        newShipment.save(failOnError:true)
-
-        // Remove old container from shipment
-        oldShipment.removeFromContainers(oldContainer);
-        oldContainer.delete();
-    }
-    */
-
 
     /**
      * @param container the container to be moved
@@ -653,88 +570,7 @@ class ShipmentService {
             shipmentFrom.removeFromShipmentItems(shipmentItem)
             shipmentTo.addToShipmentItems(shipmentItem)
         }
-
-
-        /*
-        def previousShipment = container.shipment;
-        shipment.addToContainers(container)
-        //container.shipment = shipment
-        container.containers.each { child ->
-            //child.shipment = shipment
-            container.addToContainers(child)
-        }
-        shipment.save()
-        previousShipment.save()
-        //container.refresh()
-        //previousShipment.refresh()
-         */
     }
-
-    /*
-    void moveContainer(Container container, Shipment shipment) {
-        // Get a copy of the container to be moved
-        def newContainer = container.copyContainer()
-
-        // Move all children containers
-        container.containers.each { childContainer ->
-            newContainer.addToContainers(childContainer)
-            childContainer.shipment = shipment
-            childContainer.parentContainer.shipment = shipment
-        }
-
-
-        //
-        //newContainer.containers.each { childContainer ->
-        //}
-
-        // Remove the container from the existing shipment
-        def shipmentOld = container.shipment
-        shipmentOld.removeFromContainers(container)
-        saveShipment(shipmentOld)
-
-        // Add the cloned container to the new shipment
-        shipment.addToContainers(newContainer)
-
-        saveShipment(shipment)
-    }
-    */
-
-    /*
-    void moveContainer(Container container, Shipment newShipment) {
-
-        def oldShipment = container.shipment
-
-
-        // Move all shipment items in the container
-        def shipmentItems = oldShipment.shipmentItems.findAll { it.container == container }
-        shipmentItems.each { item ->
-            newShipment.addToShipmentItems(item);
-        }
-
-        // Move all subcontainers and shipment items in the subcontainer
-        container?.containers?.each { box ->
-            newShipment.addToContainers(box);
-            shipmentItems = oldShipment.shipmentItems.findAll { it.container == box }
-            shipmentItems.each { item ->
-                newShipment.addToShipmentItems(item);
-            }
-        }
-
-        newShipment.addToContainers(container);
-        container.shipment = newShipment
-        saveShipment(newShipment)
-
-        oldShipment.removeFromContainers(container)
-        saveShipment(oldShipment)
-        //container.shipment = newShipment
-        //container.save(true)
-        //container.shipment = newShipment;
-        //newShipment.addToContainers(container);
-        //saveShipment(newShipment)
-        //oldShipment.removeFromContainers(container);
-        //saveShipment(oldShipment)
-    }
-    */
 
     /**
      * Saves an item
@@ -798,9 +634,6 @@ class ShipmentService {
             container.save(flush: true)
             println("container " + container.name + " saved at index " + index)
         }
-        //container.shipment.save(flush:true)
-        //container.shipment.refresh()
-
     }
 
     boolean validatePicklist(Shipment shipment) {
@@ -889,7 +722,6 @@ class ShipmentService {
                                 shipmentItem?.binLocation?.name ?: 'Default'
                         ].toArray(),
                         "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode + " " + allPendingShipmentsWithProduct.shipment.shipmentNumber.unique())
-                //throw new ShipmentItemException(message: "shipmentItem.quantity.cannotExceedOnHandQuantity", shipmentItem: shipmentItem)
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
         }
@@ -971,14 +803,6 @@ class ShipmentService {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = criteria.list {
             eq("inventoryItem", inventoryItem)
-//            if (binLocationRequired) {
-//                if (binLocation) {
-//                    eq("binLocation", binLocation)
-//                }
-//                else {
-//                    isNull("binLocation")
-//                }
-//            }
             transaction {
                 eq("inventory", location.inventory)
                 order("transactionDate", "asc")
@@ -1031,7 +855,6 @@ class ShipmentService {
         shipment.unpackedShipmentItems.each { shipmentItem ->
             shipment.removeFromShipmentItems(shipmentItem)
             shipmentItem.delete()
-            //shipment.save()
         }
 
     }
@@ -1050,7 +873,6 @@ class ShipmentService {
                     // Delete all child containers
                     deleteContainers(id, childContainerIds, deleteItems)
 
-                    //println("Contains items: " + container.shipmentItems)
                     if (!deleteItems && container.shipmentItemsFromSession) {
                         throw new ShipmentException(message: "Cannot delete container that contains items", shipment: shipment)
                     } else {
@@ -1126,7 +948,6 @@ class ShipmentService {
         if (container.parentContainer) {
             container.parentContainer.removeFromContainers(container)
         }
-        //container.shipment.save()
         container.delete()
     }
 
@@ -1300,11 +1121,9 @@ class ShipmentService {
         log.info "Send shipment ${shipmentInstance?.name}"
         if (!shipDate || shipDate > new Date()) {
             shipmentInstance.errors.reject("shipment.invalid.invalidShipDate", "Shipping date [" + shipDate + "] must occur on or before today.")
-            //throw new ShipmentException(message: "Shipping date [" + shipDate + "] must occur on or before today.", shipment: shipmentInstance)
         }
         if (shipmentInstance.hasShipped()) {
             shipmentInstance.errors.reject("shipment.invalid.alreadyShipped", "Shipment has already shipped")
-            //throw new ShipmentException(message: "Shipment has already been shipped.", shipment: shipmentInstance);
         }
 
         validateShipment(shipmentInstance)
@@ -1335,7 +1154,6 @@ class ShipmentService {
 
         // Shipment has validation errors (i.e. ship date is invalid) or the shipment has already shipped
         else {
-            //log.warn("Failed to send shipment due to errors: " + shipmentInstance?.errors)
             throw new ValidationException("Failed to send shipment", shipmentInstance?.errors)
         }
     }
@@ -1472,7 +1290,6 @@ class ShipmentService {
             shipmentItems.each { ShipmentItem shipmentItem ->
 
                 def inventoryItem =
-                        //inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
                         inventoryService.findOrCreateInventoryItem(shipmentItem.product, shipmentItem.lotNumber, shipmentItem.expirationDate)
 
                 if (inventoryItem) {
@@ -1687,7 +1504,6 @@ class ShipmentService {
             Transaction debitTransaction = new Transaction()
             debitTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
             debitTransaction.source = null
-            //debitTransaction.destination = shipmentInstance?.destination.isWarehouse() ? shipmentInstance?.destination : null
             debitTransaction.destination = shipmentInstance?.destination
             debitTransaction.inventory = shipmentInstance?.origin?.inventory
             debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
@@ -1737,7 +1553,6 @@ class ShipmentService {
         } catch (Exception e) {
             log.error("An error occrred while creating transaction ", e)
             throw e
-            //shipmentInstance.errors.reject("shipment.invalid", e.message);  // this doesn't seem to working properly
         }
     }
 
@@ -1781,10 +1596,8 @@ class ShipmentService {
      */
     ItemListCommand getAddToShipmentCommand(List<String> productIds, Location location) {
         // Find all inventory items that match the selected products
-        //def products = []
         def inventoryItems = []
         if (productIds) {
-            //products = Product.findAll("from Product as p where p.active = true and p.id in (:ids)", [ids:productIds])
             inventoryItems = InventoryItem.findAll("from InventoryItem as i where i.product.id in (:ids)", [ids: productIds])
         }
 
@@ -2129,7 +1942,6 @@ class ShipmentService {
             }
             catch (IllegalStateException e) {
                 log.warn("Error parsing string cell value [${cell}]: " + e.message, e)
-                //value = Date.parse("dd-MMM-yyyy", getStringCellValue(cell))
                 throw e
             }
         }
@@ -2146,7 +1958,6 @@ class ShipmentService {
             }
             catch (IllegalStateException e) {
                 log.warn("Error parsing string cell value [${cell}]: " + e.message, e)
-                //value = Integer.valueOf((int) cell.getNumericCellValue())
                 throw e
             }
         }
@@ -2162,7 +1973,6 @@ class ShipmentService {
             }
             catch (IllegalStateException e) {
                 log.warn("Error parsing numeric cell value [${cell}]: " + e.message, e)
-                //value = Double.parseDouble(getStringCellValue(cell))
                 throw e
 
             }
@@ -2307,8 +2117,6 @@ class ShipmentService {
                     recipient = findOrCreatePerson(item.recipient)
                 }
                 // Check to see if a shipment item already exists within the given container
-                //ShipmentItem shipmentItem = shipment.findShipmentItem(inventoryItem, container, recipient)
-
                 ShipmentItem shipmentItem = shipment.shipmentItems.find {
                     it.inventoryItem == inventoryItem &&
                             it.container == container &&
@@ -2330,7 +2138,6 @@ class ShipmentService {
                 }
                 // Modify quantity and container for existing shipment items
                 else {
-                    //shipmentItem.inventoryItem = inventoryItem
                     shipmentItem.container = container
                     shipmentItem.quantity = item.quantity
                     shipmentItem.recipient = recipient
@@ -2351,12 +2158,10 @@ class ShipmentService {
 
 
     List getShipmentsWithInvalidStatus() {
-        //log.info "getShipmentsWithInvalidStatus"
         long startTime = System.currentTimeMillis()
         def shipments = Shipment.withCriteria {
             fetchMode 'events', FetchMode.JOIN
         }
-        //log.info "Query: " + (System.currentTimeMillis() - startTime) + "ms"
         startTime = System.currentTimeMillis()
         shipments = shipments.collect {
             [
@@ -2369,12 +2174,10 @@ class ShipmentService {
                     calculatedEvent : it?.mostRecentEvent?.eventDate
             ]
         }
-        //log.info "Convert: " + (System.currentTimeMillis() - startTime) + "ms"
         shipments = shipments.findAll {
             it.calculatedStatus != it.currentStatus || it.calculatedEvent != it.currentEvent
         }
         startTime = System.currentTimeMillis()
-        //log.info "Filter: " + (System.currentTimeMillis() - startTime) + "ms"
         return shipments
     }
 

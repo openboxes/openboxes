@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-// import org.apache.commons.mail.SimpleEmail
-// import org.apache.commons.mail.HtmlEmail
 
 class MessageService {
 

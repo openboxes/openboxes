@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-// import java.util.Date
-
 class Comment implements Serializable {
 
     String id
@@ -24,7 +22,6 @@ class Comment implements Serializable {
 
     // Comments should exist on their own in case we want to tie them to other objects.
     // Shipment (and other entities) should create a join table for comments.
-    //static belongsTo = [ shipment : Shipment ];
 
     static mapping = {
         id generator: 'uuid'

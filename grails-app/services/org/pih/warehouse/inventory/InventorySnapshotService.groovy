@@ -256,9 +256,6 @@ class InventorySnapshotService {
                     group by i.date, i.location.name, product
                     """, [location: location, date: date])
 
-            // group by i.date, i.location.name, product
-
-
             def inventoryLevelsByProduct = InventoryLevel.findAllByInventory(location.inventory).groupBy {
                 it.product.id
             }
@@ -277,8 +274,6 @@ class InventorySnapshotService {
                         product        : product.name,
                         productGroup   : product?.genericProduct?.name,
                         tags           : product.tagsToString(),
-                        //productGroup        : it[5]*.description?.join(":")?:"", //product?.genericProduct?.name,
-                        //tags                : it[6]*.tag?.join(","),
                         status         : inventoryLevel?.status,
                         quantityOnHand : it[4],
                         minQuantity    : inventoryLevel?.minQuantity ?: 0,
@@ -524,7 +519,6 @@ class InventorySnapshotService {
 						and iis.product in (:products)
 						and iis.date = :date
 						""", [location: location, products: products, date: date])
-            //data = results
             def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
             data = results.collect {
                 def inventoryItem = it[1]

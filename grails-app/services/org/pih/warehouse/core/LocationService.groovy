@@ -18,8 +18,6 @@ import util.ConfigHelper
 
 import javax.xml.bind.ValidationException
 
-// import java.text.DecimalFormat
-// import java.text.SimpleDateFormat
 
 class LocationService {
 

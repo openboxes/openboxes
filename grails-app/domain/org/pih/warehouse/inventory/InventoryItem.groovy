@@ -11,9 +11,6 @@ package org.pih.warehouse.inventory
 
 import org.pih.warehouse.product.Product
 
-// import java.util.Date;
-// import java.util.Map
-
 /**
  * Represents an instance of a product, referenced by lot number
  *

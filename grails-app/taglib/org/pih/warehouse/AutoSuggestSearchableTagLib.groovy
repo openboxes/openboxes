@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse
 
-// import java.text.SimpleDateFormat;
 
 class AutoSuggestSearchableTagLib {
 
@@ -23,10 +22,6 @@ class AutoSuggestSearchableTagLib {
         attrs.minLength = (attrs.minLength) ?: 1
         attrs.jsonUrl = (attrs.jsonUrl) ?: ""
 
-        // def showValue = (valueName && valueId) ? true : false;
-        // def spanDisplay = (showValue) ? "inline" : "none";
-        // def suggestDisplay = (showValue) ? "none" : "inline";
-        // def spanDisplay = "none";
         attrs.suggestDisplay = "inline"
         out << g.render(template: '/taglib/autoSuggestSearchable', model: [attrs: attrs])
 

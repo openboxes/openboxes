@@ -24,16 +24,12 @@ class RequisitionItemController {
     def requisitionService
     def inventoryService
 
-    //static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-
     def index = {
         redirect(action: "list", params: params)
     }
 
     def list = {
         println "List requisition items " + params
-        //params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        //[requisitionItemInstanceList: RequisitionItem.list(params), requisitionItemInstanceTotal: RequisitionItem.count()]
 
         def dateRequestedFrom = params.dateRequestedFrom ? Date.parse("MM/dd/yyyy", params.dateRequestedFrom) : null
         def dateRequestedTo = params.dateRequestedTo ? Date.parse("MM/dd/yyyy", params.dateRequestedTo) : null
@@ -44,7 +40,6 @@ class RequisitionItemController {
         def requisitionItemInstanceList = requisitionService.getCanceledRequisitionItems(location, params.list("cancelReasonCode"), dateRequestedFrom, dateRequestedTo, params.max, params.offset)
 
         render(view: "list", model: [requisitionItemInstanceList: requisitionItemInstanceList, requisitionItemInstanceTotal: requisitionItemInstanceList.totalCount])
-
     }
 
     def listCanceled = {
@@ -130,14 +125,12 @@ class RequisitionItemController {
             requisitionItemInstance.properties = params
             if (!requisitionItemInstance.hasErrors() && requisitionItemInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), requisitionItemInstance.id])}"
-                //redirect(action: "list", id: requisitionItemInstance.id)
                 redirect(controller: "requisition", action: "review", id: requisitionItemInstance?.requisition?.id)
             } else {
                 render(view: "edit", model: [requisitionItemInstance: requisitionItemInstance])
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-            //redirect(action: "list")
             redirect(controller: "requisition", action: "review", id: requisitionItemInstance?.requisition?.id)
         }
     }
@@ -151,25 +144,19 @@ class RequisitionItemController {
             try {
                 def requisition = requisitionItemInstance.requisition
                 requisitionItemId = requisitionItemInstance.parentRequisitionItem
-                //if (requisitionItemInstance.parentRequisitionItem) {
-                //requisitionItemInstance.parentRequisitionItem.removeFromRequisitionItems(requisitionItemInstance)
-                //}
 
                 requisition.removeFromRequisitionItems(requisitionItemInstance)
                 requisitionItemInstance.delete(flush: true)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-                //redirect(action: "list")
                 redirect(controller: "requisition", action: "review", id: requisition?.id)
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-                //redirect(action: "list", id: params.id)
                 redirect(controller: "requisition", action: "review", id: requisition?.id, params: ['requisitionItem.id': requisitionItemId])
 
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-            //redirect(action: "list")
             redirect(controller: "requisition", action: "review", id: requisition?.id, params: ['requisitionItem.id': requisitionItemId])
         }
     }
@@ -180,7 +167,6 @@ class RequisitionItemController {
 
     def changeQuantity = {
         log.info "change quantity " + params
-        //  def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
         def productPackage = ProductPackage.get(params?.productPackage?.id)
         try {
@@ -195,7 +181,6 @@ class RequisitionItemController {
             log.error("There are errors: " + requisitionItem.errors)
             redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id,
                     params: ['requisitionItem.id': requisitionItem.id, actionType: params.actionType])
-            //render(view: "../requisition/review", model: [requisition:requisition, selectedRequisitionItem: requisitionItem])
             return
         }
         redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id, params: ['requisitionItem.id': requisitionItem?.id])
@@ -256,7 +241,6 @@ class RequisitionItemController {
         def requisitionItem = RequisitionItem.get(params.id)
         if (requisitionItem) {
             requisitionItem.undoChanges()
-            //requisitionItem.save();
             def redirectAction = params?.redirectAction ?: "review"
             // For now we don't need to choose the selected requisition item (e.g. params:['requisitionItem.id':requisitionItem.id])
             redirect(controller: "requisition", action: redirectAction,
@@ -315,9 +299,6 @@ class RequisitionItemController {
         def requisitionItem = RequisitionItem.get(params.id)
         if (requisitionItem) {
             requisitionItem.cancelQuantity(params.reasonCode, params.comments)
-            //requisitionItem.properties = params
-            //requisitionItem.quantityCanceled = requisitionItem.calculateQuantityRemaining()
-            //requisitionItem.save(flush:true)
             redirect(controller: "requisition", action: "pick", id: requisitionItem?.requisition?.id, params: ['requisitionItem.id': requisitionItem.id])
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
@@ -361,60 +342,27 @@ class RequisitionItemController {
 
     def addAddition = {
         log.info "add addition " + params
-        /*
-		def requisition = Requisition.get(params.id)
-		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
-
-		def supplementalItem = new RequisitionItem(params)
-        supplementalItem.requisition = requisition
-        supplementalItem.parentRequisitionItem = requisitionItem
-		requisition.addToRequisitionItems(supplementalItem)
-		requisitionItem.addToRequisitionItems(supplementalItem)
-		if (!supplementalItem.hasErrors() && supplementalItem.save()) {
-			flash.message = "saved substitution item " + supplementalItem
-		}
-		*/
         redirect(controller: "requisition", action: "review", id: requisition?.id)
     }
 
     def addSubstitution = {
         log.info "add substitution " + params
-        /*
-		def requisition = Requisition.get(params.id)
-		def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
-		requisitionItem.cancelReasonCode = params.parentCancelReasonCode
-		requisitionItem.quantityCanceled = requisitionItem.quantity
-
-		def substitutionItem = new RequisitionItem(params)
-		substitutionItem.requisition = requisition
-		substitutionItem.parentRequisitionItem = requisitionItem
-		requisition.addToRequisitionItems(substitutionItem)
-		requisitionItem.addToRequisitionItems(substitutionItem)
-		if (!substitutionItem.hasErrors() && substitutionItem.save()) {
-			flash.message = "saved substitution item " + substitutionItem
-		}
-		*/
         redirect(controller: "requisition", action: "review", id: requisition?.id)
     }
 
 
     def undoChangeQuantity = {
-        // def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
 
         try {
             requisitionItem.cancelComments = null
             requisitionItem.cancelReasonCode = null
             requisitionItem.quantityCanceled = 0
-            //requisitionItem.requisitionItems.clear();
             requisitionItem.save(flush: true)
         } catch (Exception e) {
             flash.message = "Unable to undo quantity change: " + e.message
         }
-
         redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id)
-
-
     }
 
     def substitute = {
@@ -434,7 +382,6 @@ class RequisitionItemController {
             picklist.addToPicklistItems(picklistItem)
             picklist.save(flush: true)
         }
-
         chain(action: "pick", id: requisition.id, params: ['requisitionItem.id': requisitionItem.id])
     }
 
@@ -443,25 +390,17 @@ class RequisitionItemController {
         def date = new Date()
         def dateFormatted = "${date.format('yyyyMMdd-hhmmss')}"
         def requisitionItems = []
-        //def product = Product.get(params.id)
         def location = Location.get(params?.location?.id ?: session?.warehouse?.id)
         def filename = "Requisition items - ${dateFormatted}"
 
         if (location) {
             filename = "Requisition items - ${location?.name} - ${dateFormatted}"
-
-            //params.max = Math.min(params.max ? params.int('max') : 10, 100)
-            //params.offset = params.offset?:0
-            //def requisitionItemInstanceList
             def dateRequestedFrom = params.dateRequestedFrom ? Date.parse("MM/dd/yyyy", params.dateRequestedFrom) : null
             def dateRequestedTo = params.dateRequestedTo ? Date.parse("MM/dd/yyyy", params.dateRequestedTo) : null
 
-
             requisitionItems = requisitionService.getCanceledRequisitionItems(location, params.list("cancelReasonCode"), dateRequestedFrom, dateRequestedTo, null, null)
-            //requisitionItems = requisitionItemInstanceList.collect { it }
 
         }
-
 
         if (requisitionItems) {
             def sw = new StringWriter()
@@ -495,7 +434,6 @@ class RequisitionItemController {
                         unitOfMeasure    : "EA/1"
                 ]
             }
-            //println csv.writer.toString()
             response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}.csv\"")
             render(contentType: "text/csv", text: csv.writer.toString())
@@ -503,8 +441,5 @@ class RequisitionItemController {
         } else {
             render(text: 'No requisition items found', status: 404)
         }
-
     }
-
-
 }

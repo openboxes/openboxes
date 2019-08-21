@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse
 
-// import java.text.SimpleDateFormat;
-// import java.util.Date;
 
 import com.ocpsoft.pretty.time.PrettyTime
 import grails.plugin.springcache.annotations.Cacheable

@@ -12,7 +12,6 @@ package org.pih.warehouse.core
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import util.StringUtil
 
-// import java.util.Date
 
 class Person implements Comparable, Serializable {
 

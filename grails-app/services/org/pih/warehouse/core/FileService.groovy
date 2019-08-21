@@ -123,11 +123,7 @@ class FileService {
         // Create a new table for the Packing List
         Tbl table = createPackingListTable(wordMLPackage, shipmentInstance)
 
-        // Add table to document
-        //wordMLPackage.getMainDocumentPart().addObject(table);
-
         insertTable(wordMLPackage, "{{PACKING_LIST}}", table)
-
 
         // Get the data mappings
         def dataMappingsTable = []
@@ -213,7 +209,6 @@ class FileService {
         Tbl table = createPackingListTable(wordMLPackage, shipmentInstance)
 
         // Add table to document
-        //wordMLPackage.getMainDocumentPart().addObject(table);
 
         insertTable(wordMLPackage, "{{PACKING_LIST}}", table)
 
@@ -226,14 +221,6 @@ class FileService {
         }
         Tbl debugTable = createTable(wordMLPackage, dataMappingsTable)
         insertTable(wordMLPackage, "{{VARIABLES}}", debugTable)
-
-
-//        Body b = wordMLPackage.getMainDocumentPart().getJaxbElement().getBody();
-//        b.getContent().add(debugTable)
-//        dataMappings.each { key, value ->
-//            P paragraph = createParagraphOfText("${key} = ${value}", false)
-//            b.getContent().add(paragraph)
-//        }
 
         return wordMLPackage
     }
@@ -253,10 +240,6 @@ class FileService {
 
         int writableWidthTwips = wordMLPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips()
         int cellWidthTwipsDefault = new Double(Math.floor((writableWidthTwips / cols))).intValue()
-
-        //Map cellWidthTwipsRatio = [1: 0.75, 2: 2.5, 3: 1.0, 4: 1.0, 5: 0.5, 6: 0.5]
-
-        //TblFactory.createTable(4, 4, cellWidthTwipsDefault);
 
         Tbl table = Context.getWmlObjectFactory().createTbl()
         TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid()
@@ -288,8 +271,6 @@ class FileService {
         }
 
         log.debug "Table: " + XmlUtils.marshaltoString(table, true)
-
-
         return table
     }
 
@@ -300,8 +281,6 @@ class FileService {
         int cellWidthTwipsDefault = new Double(Math.floor((writableWidthTwips / cols))).intValue()
 
         Map cellWidthTwipsRatio = [1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0]
-
-        //TblFactory.createTable(4, 4, cellWidthTwipsDefault);
 
         Tbl table = Context.getWmlObjectFactory().createTbl()
         addBorders(table)
@@ -382,10 +361,6 @@ class FileService {
         value = value.toString().replace("\n", "")
         P paragraph = createParagraphOfText(value.toString(), false)
         tc.getContent().add(paragraph)
-
-        //log.info "Add TC: " + XmlUtils.marshaltoString(tc, true)
-
-
         return tc
     }
 
@@ -403,12 +378,6 @@ class FileService {
 
         // Map of key/value pairs that will be used to hold variables
         def mappings = new HashMap<String, String>()
-
-        // Add all shipment properties to mappings
-//        new DefaultGrailsDomainClass(Shipment.class).persistentProperties.each { property ->
-//            log.info "property " + property.name + " = " + property.naturalName + " " + property.fieldName
-//            mappings.put(property.fieldName, shipmentInstance.properties[property.name]);
-//        }
 
         // Add today's date as an implicit variable
         def formatter = new SimpleDateFormat("MMMMM dd, yyyy")
@@ -435,17 +404,12 @@ class FileService {
         // Other associations
         addObjectProperties(mappings, "CARRIER", shipmentInstance?.carrier, Person.class)
 
-        // Causes freeze when opening document
-        //addObjectProperties(mappings, "CURRENT_USER", AuthService.currentUser.get(), User.class)
-        //addObjectProperties(mappings, "CURRENT_LOCATION", AuthService.currentLocation.get(), Location.class)
-
         // Add all reference numbers
         shipmentInstance.referenceNumbers.each { ReferenceNumber referenceNumber ->
             log.info "Reference number ${referenceNumber?.referenceNumberType} = " + referenceNumber?.identifier
             FormatTagLib formatTag = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
             String referenceNumberType = formatTag.metadata(obj: referenceNumber.referenceNumberType)
             referenceNumberType = referenceNumberType.toUpperCase().replaceAll(" ", "_")
-            //String referenceNumberType = referenceNumber?.referenceNumberType?.name?.toUpperCase()
             mappings.put(referenceNumberType, referenceNumber?.identifier)
         }
 
@@ -553,28 +517,6 @@ class FileService {
         }
         tbl.setTblPr(tblPr)
 
-        /*
-        // <w:tblGrid><w:gridCol w:w="4788"/>
-        TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid();
-        tbl.setTblGrid(tblGrid);
-        // Add required <w:gridCol w:w="4788"/>
-        for (int i=1 ; i<=cols; i++) {
-            TblGridCol gridCol = Context.getWmlObjectFactory().createTblGridCol();
-            gridCol.setW(BigInteger.valueOf(cellWidthTwips));
-            tblGrid.getGridCol().add(gridCol);
-        }
-
-        // Now the rows
-        for (int j=1 ; j<=rows; j++) {
-            //shipmentInstance?.shipmentItems.each { item ->
-
-            Tr tr = Context.getWmlObjectFactory().createTr();
-            tbl.getEGContentRowContent().add(tr);
-            createPackingListCell(tr, cellWidthTwips);
-
-
-        }
-        */
         return tbl
     }
 
@@ -599,11 +541,6 @@ class FileService {
 
         // Cell content - an empty <w:p/>
         P paragraph = Context.getWmlObjectFactory().createP()
-        //R run = Context.getWmlObjectFactory().createR();
-        //Text text = Context.getWmlObjectFactory().createText();
-        //text.setValue("testing");
-        //run.getRunContent().add(text)
-        //paragraph.getParagraphContent().add(run);
         tc.getContent().add(paragraph)
 
     }
@@ -625,9 +562,6 @@ class FileService {
         log.info "cellWidthTwips: " + cellWidthTwips
 
         Tbl tbl = TblFactory.createTable(cols, cols, cellWidthTwips)
-
-        //Tbl tbl = Context.getWmlObjectFactory().createTbl();
-        //TblBorders tblBorders = Context.getWmlObjectFactory().createTblBorders();
 
         // w:tblPr
         log.info("Namespace: " + Namespaces.W_NAMESPACE_DECLARATION)
@@ -663,13 +597,10 @@ class FileService {
         TrPr trPr = Context.getWmlObjectFactory().createTrPr()
         trHeader.setTrPr(trPr)
 
-
-        //TrPr trPr = trHeader.getTrPr();
         trPr.getCnfStyleOrDivIdOrGridBefore().add(Context.getWmlObjectFactory().createCTTrPrBaseTblHeader(bdt))
         addTc(wmlPackage, trHeader, "Pallet/Box #", true)
         addTc(wmlPackage, trHeader, "Item", true)
         addTc(wmlPackage, trHeader, "Qty", true)
-
 
         def previousContainer = null
         def shipmentItems = shipmentInstance?.shipmentItems?.sort { it?.container?.sortOrder }
@@ -701,7 +632,6 @@ class FileService {
      */
     void addTc(Tr tr, String text, boolean applyBold) {
         Tc tc = Context.getWmlObjectFactory().createTc()
-        // wmlPackage.getMainDocumentPart().createParagraphOfText(text)
         tc.getContent().add(createParagraphOfText(text, applyBold))
         tr.getContent().add(tc)
     }
@@ -720,8 +650,6 @@ class FileService {
         // Create the run
         R run = Context.getWmlObjectFactory().createR()
         run.getContent().add(t)
-        //run.setRPr(Context.getWmlObjectFactory().createRPr())
-        //run.getRPr().setB(true);
         // Set bold property
         if (applyBold) {
             RPr rpr = Context.getWmlObjectFactory().createRPr()
@@ -742,10 +670,7 @@ class FileService {
     void convertToPdf(WordprocessingMLPackage wordMLPackage, OutputStream outputStream) {
         wordMLPackage.setFontMapper(new IdentityPlusMapper())
         PdfConversion conversion = new Conversion(wordMLPackage)
-        //((Conversion)conversion).setSaveFO(new File(inputfilepath + ".fo"));
-        //OutputStream outputStream = new FileOutputStream(inputfilepath + ".pdf");
         conversion.output(outputStream)
-        //return outputStream;
     }
 
 

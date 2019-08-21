@@ -104,22 +104,16 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     Fulfillment fulfillment
 
-    //List requisitionItems
-
     // Audit fields
     Date dateCreated
     Date lastUpdated
     User createdBy
     User updatedBy
-    //String weekRequested
-    //String monthRequested
     String monthRequested
-    //String yearRequested
 
     Integer replenishmentPeriod = 0
 
     // Removed comments, documents, events for the time being.
-    //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
     static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
@@ -127,13 +121,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
 
-        //week formula('WEEK(date_requested)')    //provide the exact column name of the date field
-        //month formula('MONTH(date_requested)')
         monthRequested formula: "date_format(date_requested, '%M %Y')"
-        //yearRequested formula: "date_format(date_requested, '%Y')"
-        //comments cascade: "all-delete-orphan"
-        //documents cascade: "all-delete-orphan"
-        //events cascade: "all-delete-orphan"
     }
 
     static constraints = {
@@ -155,17 +143,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
         receivedBy(nullable: true)
         picklist(nullable: true)
         dateRequested(nullable: false)
-        //validator: { value -> value <= new Date()})
         requestedDeliveryDate(nullable: false)
 
         // FIXME Even though Grails complains that "derived properties may not be constrained", when you remove the constraint there are validation errors on Requisition
         // OB-3180 Derived properties may not be constrained. Property [monthRequested] of domain class org.pih.warehouse.requisition.Requisition will not be checked during validation.
         monthRequested(nullable: true)
-        //validator: { value ->
-        //    def tomorrow = new Date().plus(1)
-        //    tomorrow.clearTime()
-        //    return value >= tomorrow
-        //})
         dateCreated(nullable: true)
         dateChecked(nullable: true)
         dateReviewed(nullable: true)

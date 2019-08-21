@@ -230,16 +230,9 @@ class JsonController {
             def message = messageSource.getMessage(params.code, null, params.resolvedMessage, session?.user?.locale ?: "en")
             log.info "get translation for code " + params.code + ", " + session?.user?.locale + " = " + message
 
-            //try {
-            //    localization.translation = getTranslation(message, "en", session?.user?.locale?.toString()?:"en")
-            //} catch (Exception e) {
-            //localization.translation = message;
-            //}
             localization.translation = message
             localization.code = params.code
             localization.text = message
-
-            //localization.args = []
             localization.locale = session.user.locale
         }
 
@@ -248,7 +241,6 @@ class JsonController {
             localization.translation = localization.text
 
         log.info "localization.toJson() = " + (localization.toJson() as JSON)
-
 
         render localization.toJson() as JSON
     }
@@ -270,7 +262,6 @@ class JsonController {
             }
         }
 
-        //localization.properties = data
         localization.text = data.translation
         localization.code = data.code
         localization.locale = locale
@@ -289,7 +280,6 @@ class JsonController {
         }
         log.info(jsonResponse as JSON)
         render jsonResponse as JSON
-        //def localization = new Localization(params)
         return true
     }
 
@@ -314,7 +304,6 @@ class JsonController {
         def product = Product.get(params?.product?.id)
         def location = Location.get(params?.location?.id)
         def quantityToReceive = inventoryService.getQuantityToReceive(location, product)
-        //println "quantityToReceive(" + params + "): " + quantityToReceive
         render(quantityToReceive ?: "0")
     }
 
@@ -323,7 +312,6 @@ class JsonController {
         def product = Product.get(params?.product?.id)
         def location = Location.get(params?.location?.id)
         def quantityToShip = inventoryService.getQuantityToShip(location, product)
-        //println "quantityToShip(" + params + "): " + quantityToShip
         render(quantityToShip ?: "0")
     }
 
@@ -332,8 +320,6 @@ class JsonController {
         def product = Product.get(params?.product?.id)
         def location = Location.get(params?.location?.id)
         def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
-        //println "quantityOnHand(" + params + "): " + quantityOnHand
-        //println "${createLink(controller:'inventoryItem', action: 'showStockCard', id: product.id)}"
         render(quantityOnHand ?: "0")
     }
     @Cacheable("inventoryBrowserCache")
@@ -441,7 +427,6 @@ class JsonController {
 
         def totalCount = results.size()
 
-
         render([
                 summary: [
                         totalCount      : totalCount,
@@ -453,26 +438,15 @@ class JsonController {
                 ],
                 details: [results: results]
         ] as JSON)
-//results.collect { [productCode: it.productCode, quantityOnHand: it.quantityOnHand, ]}
-
     }
 
     def getQuantityOnHandMap = {
         def startTime = System.currentTimeMillis()
-        //def location = Location.get(session?.warehouse?.id)
-        //def results = inventoryService.getQuantityByProductMap(location.inventory)
         def results = inventoryService.getQuantityByProductMap(session?.warehouse?.id)
 
         def elapsedTime = System.currentTimeMillis() - startTime
         render([count: results.size(), elapsedTime: elapsedTime, results: results] as JSON)
     }
-
-
-    // FIXME Remove if not used
-//    Map<Product,Integer> getQuantityOnHand(Inventory inventory) {
-//        return inventoryService.getQuantityByProductMap(inventory)
-//    }
-
 
     def findProductCodes = {
         def searchTerm = params.term + "%"
@@ -523,7 +497,6 @@ class JsonController {
     def autoSuggestProductGroups = {
         log.info "autoSuggest: " + params
         def searchTerms = params.term.split(" ")
-        //def searchTerm = "%" + params.term + "%";
         def c = ProductGroup.createCriteria()
         def results = c.list {
             projections {
@@ -616,7 +589,6 @@ class JsonController {
             log.info("container " + container.name + " saved at index " + index)
         }
         container.shipment.save(flush: true)
-        //container.shipment.refresh()
 
         render(text: "", contentType: "text/plain")
     }
@@ -824,19 +796,6 @@ class JsonController {
                                 desc       : (it?.email) ? it.email : "",
                         ]
                     }
-                } else {
-                    /*
-                    response.status = 404;
-                    render "${warehouse.message(code: 'person.doesNotExist.message', args: [params.term])}"
-                    */
-//					def item =  [
-//						value: "null",
-//						valueText : params.term,
-//						label: "${warehouse.message(code: 'person.doesNotExist.message', args: [params.term])}",
-//						desc: params.term,
-//						icon: ""
-//					];
-//					items.add(item)
                 }
                 items.add([id: "new", label: 'Create new record for ' + params.term, value: null, valueText: params.term])
             }
@@ -884,7 +843,6 @@ class JsonController {
         // Convert from products to json objects
         if (products) {
             // Make sure items are unique
-            //products.unique();
             products = products.collect() { product ->
                 def productQuantity = 0
                 // We need to check to make sure this is a valid product
@@ -896,7 +854,6 @@ class JsonController {
                         def quantity = 0
 
                         // Create inventory items object
-                        //if (quantity > 0) {
                         [
                                 id            : inventoryItem.id ?: 0,
                                 lotNumber     : (inventoryItem?.lotNumber) ?: "",
@@ -905,7 +862,6 @@ class JsonController {
                                         "${warehouse.message(code: 'default.never.label')}",
                                 quantity      : quantity
                         ]
-                        //}
                     }
 
                     // Sort using First-expiry, first out policy
@@ -957,8 +913,6 @@ class JsonController {
                 ilike("name", "%" + params.term + "%")
             }
             productGroups.each { items << [id: it.id, name: it.name, class: it.class] }
-            //items.addAll(productGroups)
-
 
             def categories = Category.withCriteria {
                 ilike("name", "%" + params.term + "%")
@@ -969,7 +923,6 @@ class JsonController {
         // Convert from products to json objects
         if (items) {
             // Make sure items are unique
-            //items.unique();
             items = items.collect() { item ->
                 def type = item.class.simpleName
                 def localizedName = localizationService.getLocalizedString(item.name)
@@ -985,7 +938,6 @@ class JsonController {
 
         if (items.size() == 0) {
             items << [value: null, label: warehouse.message(code: 'product.noProductsFound.message')]
-            //items << [value: null, label: params.term]
         }
 
         log.info "Returning " + items.size() + " results for search " + params.term
@@ -1005,35 +957,16 @@ class JsonController {
         def productIds = results.collect { it[0] }
         def products = productService.getProducts(productIds as String[])
 
-        //def quantities = inventoryService.getQuantityForProducts(location.inventory, productIds)
-        // To reference quantities ...
-        // quantities[productData[0]]
         def result = []
         def value = ""
         def productPackageName = ""
         products.each { product ->
-            //println "productData " + productData
-            //if(productData[3] && !result.any{it.id == productData[3] && it.type == "ProductGroup"})
-            //result.add([id: productData[3], value: productData[2], type:"ProductGroup", group: ""])
-            //result.add([id: productData[0], value: productData[2] + " - " + productData[1], type:"Product", quantity: null, group: ""])
             productPackageName = "EA/1"
             value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
             value = value.trim()
 
             // Add the EACH level items
             result.add([id: product.id, value: value, type: "Product", quantity: null, group: null])
-
-            // Add the package level items
-            /*
-            product.packages.each { pkg ->
-                productPackageName = pkg?.uom?.code + "/" + pkg?.quantity;
-                value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
-                value = value.trim()
-                result.add([id: product.id, value: value, type: "Product", quantity: null, group: null,
-                        productPackageId: pkg?.id, productPackageName: productPackageName, productPackageQty: pkg?.quantity])
-            }
-            */
-
         }
         log.info result
         render result.sort { "${it.group}${it.value}" } as JSON
@@ -1050,36 +983,16 @@ class JsonController {
         def productIds = results.collect { it[0] }
         def products = productService.getProducts(productIds as String[])
 
-        //def quantities = inventoryService.getQuantityForProducts(location.inventory, productIds)
-        // To reference quantities ...
-        // quantities[productData[0]]
         def result = []
         def value = ""
         def productPackageName = ""
         products.each { product ->
-            //println "productData " + productData
-            //if(productData[3] && !result.any{it.id == productData[3] && it.type == "ProductGroup"})
-            //result.add([id: productData[3], value: productData[2], type:"ProductGroup", group: ""])
-            //result.add([id: productData[0], value: productData[2] + " - " + productData[1], type:"Product", quantity: null, group: ""])
             productPackageName = "EA/1"
             value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
             value = value.trim()
 
             // Add the EACH level items
             result.add([id: product.id, value: value, type: "Product", quantity: null, group: null])
-
-            // Add the package level items
-            /*
-            product.packages.each { pkg ->
-                productPackageName = pkg?.uom?.code + "/" + pkg?.quantity;
-                value = product?.productCode + " " + product?.name?.trim() + " (" + productPackageName + ")"
-                value = value.trim()
-                result.add([id: product.id, value: value, type: "Product", quantity: null, group: null,
-                        productPackageId: pkg?.id, productPackageName: productPackageName])
-
-            }
-            */
-
         }
         log.info result
         render result.sort { "${it.group}${it.value}" } as JSON
@@ -1218,10 +1131,7 @@ class JsonController {
         ]
 
         log.info "Elapsed time " + elapsedTime + " s"
-        //render "${params.callback}(${result as JSON})"
         render text: "${params.callback}(${data as JSON})", contentType: "application/javascript", encoding: "UTF-8"
-
-
     }
 
     /**
@@ -1242,8 +1152,6 @@ class JsonController {
             }
         }
 
-        //aaData.unique()
-
         def totalValue = 0
         totalValue = aaData.sum { it.totalValue ?: 0 }
         NumberFormat numberFormat = NumberFormat.getNumberInstance()
@@ -1252,7 +1160,6 @@ class JsonController {
         numberFormat.maximumFractionDigits = 2
         numberFormat.minimumFractionDigits = 2
         def totalValueFormatted = numberFormat.format(totalValue ?: 0)
-        //def totalValue = aaData.collect { it.totalValue }.sum()
         log.info "totalValue = " + totalValueFormatted
 
         render(["aaData"        : aaData,
@@ -1263,7 +1170,6 @@ class JsonController {
     def getSummaryByProductGroup = {
         log.info "getSummaryByProductGroup " + params
         def data = reportService.calculateQuantityOnHandByProductGroup(params.location.id)
-
 
         render(data.productGroupSummary as JSON)
     }
@@ -1399,12 +1305,8 @@ class JsonController {
         }
 
         log.info "Data initialized " + data
-
-
-        // Get all inventory snapshots for the current product and location
-        //def inventorySnapshots = InventorySnapshot.findAllByProductAndLocation(product, location)
-
         log.info "Inventory snapshots between " + dates[0] + " " + dates[dates.size() - 1]
+
         def inventorySnapshots = InventorySnapshot.createCriteria().list() {
             eq("product", product)
             eq("location", location)
@@ -1439,7 +1341,6 @@ class JsonController {
                 log.info "KEY: " + key
                 log.info "VALUE: " + value
                 if (value.days) {
-                    //newData << [key, (value.totalQuantity/value.days) ]
                     newData << [key, (value.maxQuantity)]
                 } else {
                     newData << [key, 0]
@@ -1836,8 +1737,6 @@ class JsonController {
                     lastUpdated: it.lastUpdated,
                     shipment   : it]
         }
-        //order by e.createdDate desc
-        //[max:params.max.toInteger(), offset:params.offset.toInteger ()]
         def shippedShipments = Shipment.executeQuery("SELECT s FROM Shipment s JOIN s.events e WHERE e.eventDate >= :eventDate and e.eventType.eventCode = 'SHIPPED'", ['eventDate': new Date() - daysToInclude])
         shippedShipments.each {
             def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"

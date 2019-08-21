@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-// import java.net.URI;
-// import java.util.Date
 
 /**
  * A document is a file (e.g. document, image) that can be associated with an 
@@ -34,7 +32,6 @@ class Document implements Serializable {
 
     // Documents should exist on their own in case we want to tie them to other objects.
     // Shipment (and other entities) should create a join table for documents.
-    //static belongsTo = [ shipment : Shipment ];
     static mapping = {
         id generator: 'uuid'
         cache true

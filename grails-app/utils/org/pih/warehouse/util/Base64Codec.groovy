@@ -13,8 +13,6 @@ import javax.crypto.*
 import javax.crypto.spec.*
 import java.security.*
 
-// import sun.misc.BASE64Decoder;
-
 
 class Base64Codec {
 

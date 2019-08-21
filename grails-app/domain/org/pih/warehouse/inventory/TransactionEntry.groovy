@@ -14,24 +14,6 @@ import org.pih.warehouse.product.Product
 
 class TransactionEntry implements Comparable, Serializable {
 
-    // FIXME This is a temporary solution that should be replaced by an event queue in a future version
-//	def afterInsert = {
-//		RefreshInventorySnapshotJob.triggerNow([transactionEntryId: id])
-//	}
-
-    // beforeUpdate is used instead of afterUpdate so we can check whether certain fields are dirty. However, this
-    // might cause some issues if the data has not been flushed to the database yet. Therefore we might need to add a
-    // delay on the background job.
-//	def beforeUpdate = {
-//		if (isDirty('quantity') || isDirty('binLocation')) {
-//			RefreshInventorySnapshotJob.triggerNow([transactionEntryId: id])
-//		}
-//	}
-
-//	def afterDelete = {
-//		RefreshInventorySnapshotJob.triggerNow([transactionEntryId: id, deleted: true])
-//	}
-
     String id
     Integer quantity
     Product product
@@ -39,7 +21,7 @@ class TransactionEntry implements Comparable, Serializable {
     Location binLocation            // Bin location of inventory item
 
     String reasonCode
-    String comments                    //
+    String comments
 
     static belongsTo = [transaction: Transaction]
 

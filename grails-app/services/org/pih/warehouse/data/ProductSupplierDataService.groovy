@@ -17,8 +17,6 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 class ProductSupplierDataService {
 
-    //boolean transactional = true
-
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->

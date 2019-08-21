@@ -20,16 +20,10 @@ import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.requisition.RequisitionItem
 
-// import java.util.Date
 
 class ShipmentItem implements Comparable, Serializable {
 
-    //def beforeDelete = {
-    //	container.removeFromShipmentItems(this)
-    //}
-
     String id
-    //String description		// Item description (for one-off items)
     String lotNumber            // Loose coupling to the inventory lot
     Date expirationDate
     Product product                // Specific product that we're tracking
@@ -41,7 +35,6 @@ class ShipmentItem implements Comparable, Serializable {
     InventoryItem inventoryItem
     Container container
     Location binLocation
-    //PackageType packageType		// The type of packaging that this item is stored
     // within.  This is different from the container type
     // (which might be a pallet or shipping container), in
     // that this will likely be a box that the item is
@@ -56,9 +49,6 @@ class ShipmentItem implements Comparable, Serializable {
     static hasMany = [orderShipments: OrderShipment, receiptItems: ReceiptItem]
 
     static transients = ["comments", "quantityReceivedAndCanceled", "quantityRemaining"]
-
-    //static hasOne = [receiptItem: ReceiptItem]
-
 
     static mapping = {
         id generator: 'uuid'
@@ -134,18 +124,6 @@ class ShipmentItem implements Comparable, Serializable {
         }
         return totalQuantityReceived
     }
-
-    /*
-    List addToOrderShipments(OrderShipment orderShipment) {
-        OrderShipment.link(orderShipment, this)
-        return orderShipments()
-    }
-
-    List removeFromOrderShipments(OrderShipment orderShipment) {
-        OrderShipment.unlink(orderShipment, this)
-        return orderShipments()
-    }
-    */
 
 
     Integer quantityReceived() {

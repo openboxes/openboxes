@@ -11,7 +11,6 @@ package org.pih.warehouse.order
 
 import org.pih.warehouse.shipping.ShipmentItem
 
-// import java.util.Date
 
 class OrderShipment implements Serializable {
 
@@ -21,29 +20,5 @@ class OrderShipment implements Serializable {
         id generator: 'uuid'
     }
 
-    //OrderItem orderItem
-    //ShipmentItem shipmentItem
     static belongsTo = [shipmentItem: ShipmentItem, orderItem: OrderItem]
-
-    /*
-    static OrderShipment link(orderItem, shipmentItem) {
-        def orderShipment = OrderShipment.findByOrderItemAndShipmentItem(orderItem, shipmentItem)
-        if (!orderShipment) {
-            orderShipment = new OrderShipment()
-            orderShipment.orderItem = orderItem;
-            orderShipment.shipmentItem = shipmentItem;
-            orderShipment.save()
-        }
-        return orderShipment
-    }
-
-    static void unlink(orderItem, shipmentItem) {
-        def orderShipment = OrderShipment.findByOrderItemAndShipmentItem(orderItem, shipmentItem)
-        if (orderShipment) {
-            //orderItem?.removeFromOrderShipments(orderShipment)
-            //shipmentItem?.removeFromOrderShipments(orderShipment)
-            orderShipment.delete()
-        }
-    }
-    */
 }

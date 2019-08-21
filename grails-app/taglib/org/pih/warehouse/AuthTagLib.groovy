@@ -76,49 +76,8 @@ class AuthTagLib {
         }
     }
 
-    //Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-    /*
-    def isUserInRole = { attrs, body ->
-        def user = User.get(session?.user?.id)
-
-        //def isUserInRole = getIsUserInAnyRoles(user, attrs.roles)
-        def isUserInRole = false;
-        if (!user || !user?.roles) {
-            isUserInRole = false;
-        }
-        else {
-            isUserInRole = user?.roles?.any { attrs.roles.contains(it.roleType) }
-        }
-
-        if (isUserInRole) {
-            out << body()
-        }
-    }
-    */
-
-    /*
-    def isUserNotInRole = { attrs, body ->
-        def user = User.get(session?.user?.id)
-        //def isUserInRole = getIsUserInAnyRoles(user, attrs.roles)
-        def isUserInRole = false;
-        if (!user || !user?.roles) {
-            isUserInRole = false;
-        }
-        else {
-            isUserInRole = user?.roles?.any { attrs.roles.contains(it.roleType) }
-        }
-
-        if (!isUserInRole) {
-            out << body()
-        }
-    }
-    */
-
 
     def authorize = { attrs, body ->
-        //attrs.locale = attrs.locale ?: session?.user?.locale ?: defaultLocale;
-        //def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
-        //out << defaultTagLib.message.call(attrs)
         def authorized = false
 
         def warehouseInstance = Location.get(session.warehouse.id)

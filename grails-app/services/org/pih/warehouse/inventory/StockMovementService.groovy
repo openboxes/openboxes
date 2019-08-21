@@ -587,8 +587,6 @@ class StockMovementService {
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
-        //return inventoryService.getAvailableBinLocations(location, item.product)
-
         List availableBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, [product])
         List<AvailableItem> availableItems = availableBinLocations.collect {
             return new AvailableItem(
@@ -600,17 +598,6 @@ class StockMovementService {
 
         return inventoryService.sortAvailableItems(availableItems)
     }
-
-
-    // These two methods do very different things
-//    List<SubstitutionItem> getSubstitutionItems(StockMovementItem stockMovementItem) {
-//        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
-//        List substitutionItems = requisitionItem?.substitutionItems?.collect { substitutionItem ->
-//            List availableItems = getAvailableItems()
-//            return SubstitutionItem.createFromRequisitionItem(requisitionItem)
-//        }
-//        return substitutionItems
-//    }
 
 
     EditPage getEditPage(String id) {
@@ -1568,27 +1555,6 @@ class StockMovementService {
                     ]
             ])
         }
-//                [
-//                        name        : g.message(code: "shipping.printPickList.label"),
-//                        documentType: DocumentGroupCode.PICKLIST.name(),
-//                        contentType : "text/html",
-//                        stepNumber  : 5,
-//                        uri         : g.createLink(controller: 'report', action: "printPickListReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
-//                ],
-//                [
-//                        name        : g.message(code: "shipping.printShippingReport.label"),
-//                        documentType: DocumentGroupCode.PACKING_LIST.name(),
-//                        contentType : "text/html",
-//                        stepNumber  : 5,
-//                        uri         : g.createLink(controller: 'report', action: "printShippingReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
-//                ],
-//                [
-//                        name        : g.message(code: "shipping.printPaginatedPackingListReport.label"),
-//                        documentType: DocumentGroupCode.PACKING_LIST.name(),
-//                        contentType : "text/html",
-//                        stepNumber  : 5,
-//                        uri         : g.createLink(controller: 'report', action: "printPaginatedPackingListReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
-//                ],
 
         if (stockMovement?.shipment) {
             documentList.addAll([

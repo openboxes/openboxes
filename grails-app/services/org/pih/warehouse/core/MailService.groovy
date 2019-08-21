@@ -14,12 +14,6 @@ import org.apache.commons.mail.EmailAttachment
 import org.apache.commons.mail.HtmlEmail
 import org.apache.commons.mail.SimpleEmail
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
-// import javax.mail.internet.InternetAddress
-
-// import org.apache.commons.mail.EmailException;
-// import org.apache.commons.mail.MultiPartEmail;
-
 import javax.mail.internet.InternetAddress
 
 class MailService {
@@ -71,22 +65,6 @@ class MailService {
         }
     }
 
-    /*
-    def addCcAddresses(email) {
-        def ccAddresses = grailsApplication.config.grails.mail.cc
-        println "Add CC addresses to email: " + ccAddresses
-        if (ccAddresses && ccAddresses.size()) {
-            ccAddresses.each {
-                try {
-                    email.addCc(it)
-                } catch (Exception e) {
-                    println "Error adding CC address: " + e.message
-                }
-            }
-        }
-    }
-    */
-
 
     /**
      * @return
@@ -115,7 +93,6 @@ class MailService {
      * @return
      */
     def sendMail(String subject, String msg, Collection to, Integer port) {
-        //def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
         if (isMailEnabled()) {
             log.info "Sending text email '" + subject + "' to " + to
             try {
@@ -200,7 +177,6 @@ class MailService {
      */
     def sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) {
         log.info "Sending email with subject ${subject} to ${to}"
-        //def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
         if (isMailEnabled() || override) {
             log.info "Sending html email '" + subject + "' to " + to
             try {
@@ -336,8 +312,6 @@ class MailService {
      */
     def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, List<Attachment> attachments, Integer port) {
         log.info("Sending email with attachment " + toList)
-
-        //def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
         if (isMailEnabled()) {
             try {
                 // Create the email message
@@ -354,7 +328,6 @@ class MailService {
                     ccList.each { cc -> email.addCc(cc) }
                 }
 
-                //addBccAddresses(email)
                 email.setSubject("${prefix} " + subject)
                 email.setHtmlMsg(body)
 
@@ -368,16 +341,6 @@ class MailService {
                     email.setAuthentication(username, password)
                 }
 
-                //email.setTextMsg(subject);
-
-                // Create the attachment
-                //EmailAttachment attachment = new EmailAttachment();
-                //attachment.setPath("mypictures/john.jpg");
-                //attachment.setDisposition(EmailAttachment.ATTACHMENT);
-                //attachment.setDescription("Picture of John");
-                //attachment.setName("John");
-                //email.attach(attachment);
-
                 // add the attachment
                 attachments.each {
                     email.attach(new ByteArrayDataSource(it.bytes, it.mimeType),
@@ -388,7 +351,6 @@ class MailService {
                 email.send()
             } catch (Exception e) {
                 log.error "Problem sending email $e.message", e
-                //flash.message = “Confirmation email NOT sent”
             }
         }
     }
@@ -407,7 +369,6 @@ class MailService {
     def sendHtmlMailWithAttachment(message) {
         log.info("Sending email with attachment " + message.to)
 
-        //def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
         if (isMailEnabled()) {
             try {
                 // Create the email message
@@ -437,7 +398,6 @@ class MailService {
                 email.send()
             } catch (Exception e) {
                 log.error "Problem sending email $e.message", e
-                //flash.message = “Confirmation email NOT sent”
             }
         }
     }
@@ -451,13 +411,11 @@ class MailService {
      */
     def sendAlertMail(String subject, Throwable throwable) {
 
-        //def mailEnabled = Boolean.valueOf(grailsApplication.config.grails.mail.enabled)
         if (isMailEnabled()) {
             log.info "Sending HTML email '" + subject
             try {
                 HtmlEmail email = new HtmlEmail()
                 email.setCharset("UTF-8")
-                //addBccAddresses(email)
                 email.setSubject("${prefix} " + subject)
 
                 // Authenticate
@@ -472,31 +430,4 @@ class MailService {
             }
         }
     }
-
-    /*
-    def sendMailWithAttachment(User userInstance) {
-        log.info ("Sending email with attachment " + userInstance?.email)
-        if (Boolean.valueOf(grailsApplication.config.grails.mail.enabled)) {
-            try {
-
-                sendMail {
-                    multipart true
-                    to "${userInstance.email}"
-                    subject "The issue you watch has been updated"
-                    body "Hello World!"
-                    //html g.render(template:"/email/userConfirmed", model:[userInstance:userInstance])
-                    //attachBytes "Some-File-Name.xml", "text/xml", contentOrder.getBytes("UTF-8")
-                    //To get started quickly, try the following
-                    attachBytes './web-app/images/grails_logo.jpg','image/jpg', new File('./web-app/images/grails_logo.jpg').readBytes()
-                }
-                //flash.message = “Confirmation email sent to ${userInstance.emailAddress}”
-            } catch(Exception e) {
-                log.error "Problem sending email $e.message", e
-                //flash.message = “Confirmation email NOT sent”
-            }
-        }
-    }
-    */
-
-
 }

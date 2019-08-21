@@ -9,9 +9,6 @@
  **/
 package org.pih.warehouse.shipping
 
-// import java.io.Serializable;
-// import java.util.Date;
-
 /**
  * Represents a type of reference number that 
  * may be associated with a shipment

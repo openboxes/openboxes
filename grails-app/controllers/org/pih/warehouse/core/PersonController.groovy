@@ -27,8 +27,6 @@ class PersonController {
 
         if (params.q) {
             String[] terms = ["%" + params.q + "%"]
-            //personInstanceList = Person.findAllByFirstNameLikeOrLastNameLike(term, term, params)
-            //personInstanceTotal = Person.countByFirstNameLikeOrLastNameLike(term, term, params);
             personInstanceList = userService.findPersons(terms, params)
             personInstanceTotal = personInstanceList.totalCount
 

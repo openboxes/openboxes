@@ -149,8 +149,6 @@ class RequisitionController {
 
 
     def saveHeader = {
-        //	def success = true
-
         def requisition = Requisition.get(params.id)
 
         if (requisition) {
@@ -189,8 +187,6 @@ class RequisitionController {
 
         if (requisition.status < RequisitionStatus.VERIFYING) {
             requisition.status = RequisitionStatus.VERIFYING
-            //requisition.verifiedBy = User.load(session.user.id)
-            //requisition.dateVerified = new Date()
             requisition.save(flush: true)
         }
 
@@ -208,16 +204,9 @@ class RequisitionController {
 
             requisition?.requisitionItems?.each { requisitionItem ->
                 quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product] ?: 0
-                //inventoryService.getQuantityOnHand(location, requisitionItem?.product)
-                //quantityAvailableToPromiseMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
-                //inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)
             }
 
             def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
-            //def quantityOnHand = (requisitionItem)?inventoryService.getQuantityOnHand(location, requisitionItem?.product):0
-            //def quantityOutgoing = (requisitionItem)?inventoryService.getQuantityToShip(location, requisitionItem?.product):0
-            //def quantityAvailableToPromise = (quantityOnHand - quantityOutgoing)?:0;
-
 
             println "Requisition Status: " + requisition.id + " [" + requisition.status + "]"
             [requisition            : requisition,
@@ -265,13 +254,10 @@ class RequisitionController {
 
             if (requisition.status < RequisitionStatus.CHECKING) {
                 requisition.status = RequisitionStatus.CHECKING
-                //requisition.checkedBy = User.load(session.user.id)
-                //requisition.dateChecked = new Date()
                 requisition.save(flush: true)
             }
 
             def currentInventory = Location.get(session.warehouse.id).inventory
-            //		def picklist = Picklist.findByRequisition(requisition)
             def productInventoryItemsMap = [:]
             def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect {
                 it.product
@@ -302,10 +288,8 @@ class RequisitionController {
         if (requisition) {
 
             if (!requisition.verifiedBy) {
-                //requisition.errors.rejectValue("verifiedBy", "Must specify verified by user before continuing")
                 flash.message = "${warehouse.message(code: 'requisition.verifiedBy.invalid.message')}"
                 chain(controller: "requisition", action: "review", id: params.id, model: [requisition: requisition])
-                //render(view: "review", model: [requisition:requisition])
                 return
             }
 
@@ -349,15 +333,7 @@ class RequisitionController {
 
 
             def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
-            //if (!requisitionItem) {
-            //requisitionItem = requisition.requisitionItems.first()
-            //}
 
-            //def similarProducts = productService.findSimilarProducts(requisitionItem?.product)
-            //def similarProductInventoryItems = inventoryService.getInventoryItemsWithQuantity(similarProducts, currentInventory)
-
-            //String jsonString = [requisition: requisition.toJson(), productInventoryItemsMap: productInventoryItemsMap, picklist: picklist.toJson()] as JSON
-            //return [data: jsonString, requisitionId: requisition.id, requisition:requisition]
             [requisition            : requisition, productInventoryItemsMap: productInventoryItemsMap,
              picklist               : picklist, inventoryLevelMap: inventoryLevelMap,
              selectedRequisitionItem: requisitionItem]
@@ -447,9 +423,6 @@ class RequisitionController {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
 
-
-        //requisitionService.transferStock(requisition)
-
         [requisition: requisition, picklist: picklist]
     }
 
@@ -463,7 +436,6 @@ class RequisitionController {
             requisitionService.issueRequisition(requisition, issuedBy, deliveredBy, comments)
         }
         catch (ValidationException e) {
-            //flash.message = e.message
             requisition = Requisition.read(params.id)
             def picklist = Picklist.findByRequisition(requisition)
             requisition.errors = e.errors
@@ -561,7 +533,6 @@ class RequisitionController {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
-        //render (view: "printDraft", model:[requisition:requisition, picklist: picklist, location:location])
         [requisition: requisition, picklist: picklist, location: location]
     }
 
@@ -569,7 +540,6 @@ class RequisitionController {
     def addToPicklistItems = { AddToPicklistItemsCommand command ->
         println "Add to picklist items " + params
         def requisition = Requisition.get(params.id)
-        //	def requisitionItem = Requisition.get(params.requisitionItem.id)
         println "Requisition " + command?.requisition
         def picklist = Picklist.findByRequisition(command.requisition)
         if (!picklist) {
@@ -588,7 +558,6 @@ class RequisitionController {
                 } else {
                     println "Adding new item to picklist " + picklistItem?.id + " inventoryItem.id=" + picklistItem?.inventoryItem?.id + " qty=" + picklistItem?.quantity
                     picklist.addToPicklistItems(picklistItem)
-                    //picklistItem.save(flush:true)
                     picklist.save(flush: true)
                 }
             }
@@ -728,9 +697,6 @@ class RequisitionController {
 
         requisitionItems?.each { requisitionItem ->
             quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product] ?: 0
-            //inventoryService.getQuantityOnHand(location, requisitionItem?.product)
-            //quantityAvailableToPromiseMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product]?:0
-            //inventoryService.getQuantityAvailableToPromise(location, requisitionItem?.product)
         }
         return [requisition: requisition, requisitionItems: requisitionItems, quantityOnHandMap: quantityOnHandMap]
 
@@ -741,9 +707,7 @@ class RequisitionController {
         def products = []
         products << requisitionItem.product
         requisitionItem.product.productGroups.each { productGroup ->
-            //println "PRODUCT GROUP " + productGroup
             productGroup.products.each { product ->
-                //println "PRODUCT " + product
                 products.add(product)
             }
         }
@@ -759,7 +723,6 @@ class RequisitionController {
                 quantityOnHandMap[product] = inventoryService.getQuantityOnHand(location, product)
             }
             quantityOnHandMap = quantityOnHandMap.sort { a, b -> b.value <=> a.value }
-            //quantityOnHandMap = quantityOnHandMap.sort { it.value }
         }
         return quantityOnHandMap
     }
@@ -790,7 +753,6 @@ class RequisitionController {
         def currentIndex = originalItems.findIndexOf { it == requisitionItem }
         def nextItem = originalItems[currentIndex + 1] ?: originalItems[0]
 
-        //render(template: "editRequisitionItem", model: [requisition:requisition,requisitionItem:requisitionItem,actionType:params.actionType,quantityOnHandMap:quantityOnHandMap])
         redirect(action: "editRequisitionItem", id: params.id, params: ['requisitionItem.id': nextItem?.id, 'actionType': 'show'])
     }
 
@@ -853,21 +815,16 @@ class RequisitionController {
         }
 
         if (requisitionItem.hasErrors()) {
-            //requisitionItem.errors.reject("quantity", "Invalid quantity")
             render(template: "editRequisitionItem", model: [requisition: requisition, requisitionItem: requisitionItem, actionType: params.actionType, quantityOnHandMap: quantityOnHandMap])
             return
         }
 
         // Update go to next item
         params.actionType = "show"
-        //requisitionItem = requisitionItem.next()
         products = getRelatedProducts(requisitionItem)
         quantityOnHandMap = getQuantityOnHandMap(location, products)
 
-
         render(template: 'editRequisitionItem', model: [requisition: requisition, requisitionItem: requisitionItem, quantityOnHandMap: quantityOnHandMap])
-
-        //render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
     }
 
 
@@ -881,11 +838,8 @@ class RequisitionController {
             def products = getRelatedProducts(requisitionItem)
             quantityOnHandMap = getQuantityOnHandMap(location, products)
             requisitionItem.approveQuantity()
-            //requisitionItem.save()
         }
-        //render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
         render(template: 'editRequisitionItem', model: [requisition: requisition, requisitionItem: requisitionItem, actionType: params.actionType, quantityOnHandMap: quantityOnHandMap])
-        //redirect(action:"nextRequisitionItem", id: requisition.id, params:['requisitionItem.id':requisitionItem.id])
     }
 
     def undoChangesFromList = {
@@ -911,7 +865,6 @@ class RequisitionController {
             requisitionItem.undoChanges()
             requisitionItem.save()
         }
-        //render(template:'requisitionItems2', model: getReviewRequisitionModel(params))
 
         render(template: 'editRequisitionItem', model: [requisition: requisition, requisitionItem: requisitionItem, actionType: params.actionType, quantityOnHandMap: quantityOnHandMap])
     }
@@ -919,7 +872,6 @@ class RequisitionController {
 
     def changeQuantity = {
         log.info "change quantity " + params
-        //  def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
         def productPackage = ProductPackage.get(params?.productPackage?.id)
         try {
@@ -934,7 +886,6 @@ class RequisitionController {
             log.error("There are errors: " + requisitionItem.errors)
             redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id,
                     params: ['requisitionItem.id': requisitionItem.id, actionType: params.actionType])
-            //render(view: "../requisition/review", model: [requisition:requisition, selectedRequisitionItem: requisitionItem])
             return
         }
         redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id, params: ['requisitionItem.id': requisitionItem?.id])
@@ -1025,10 +976,7 @@ class RequisitionController {
             return
         }
         redirect(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id, params: ['requisitionItem.id': requisitionItem.id])
-
     }
-
-
 }
 
 
@@ -1041,8 +989,5 @@ class AddToPicklistItemsCommand {
         requisition(nullable: false)
         requisitionItem(nullable: false)
         picklistItems(nullable: true)
-
     }
-
-
 }

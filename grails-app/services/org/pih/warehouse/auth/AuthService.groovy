@@ -18,26 +18,4 @@ class AuthService {
     static ThreadLocal<User> currentUser = new ThreadLocal<User>()
     static ThreadLocal<Location> currentLocation = new ThreadLocal<Location>()
 
-//	static User getCurrentUser() {
-//		return currentUser.get()
-//	}
-//
-//	static void setCurrentUser(User user) {
-//		if (!AuthService.currentUser) {
-//			AuthService.currentUser = new ThreadLocal<User>()
-//		}
-//		currentUser.set(User.get(user.id))
-//	}
-//
-//	static User getCurrentLocation() {
-//		return currentLocation.get()
-//	}
-//
-//	static void setCurrentLocation(Location location) {
-//		if (!AuthService.currentUser) {
-//			AuthService.currentLocation = new ThreadLocal<Location>()
-//		}
-//		currentLocation.set(Location.get(location.id))
-//	}
-
 }

@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.product
 
-//import java.util.Date;
-
 /**
  * Simple implementation of entity-attribute-value model that allows for 
  * a Product to be extended to contain custom attribute values

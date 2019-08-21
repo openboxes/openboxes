@@ -18,8 +18,6 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
-// import java.util.Date
-
 class OrderItem implements Serializable {
 
     String id
@@ -35,7 +33,6 @@ class OrderItem implements Serializable {
     Person recipient
 
     OrderItemStatusCode orderItemStatusCode = OrderItemStatusCode.PENDING
-    //OrderItem parentOrderItem
 
     // Transfer order
     Location originBinLocation
@@ -151,17 +148,5 @@ class OrderItem implements Serializable {
     def totalPrice() {
         return (quantity ? quantity : 0.0) * (unitPrice ? unitPrice : 0.0)
     }
-
-    /*
-    List addToShipmentItems(ShipmentItem shipmentItem) {
-        OrderShipment.link(this, shipmentItem)
-        return shipmentItems()
-    }
-
-    List removeFromShipmentItems(ShipmentItem shipmentItem) {
-        OrderShipment.unlink(this, shipmentItem)
-        return shipmentItems()
-    }
-    */
 
 }

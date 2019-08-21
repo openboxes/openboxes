@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.shipping
 
-// import java.util.Date;
-
 class ShipmentMethod implements java.io.Serializable {
 
     static belongsTo = Shipment
@@ -31,6 +29,5 @@ class ShipmentMethod implements java.io.Serializable {
         shipper(nullable: true)
         shipperService(nullable: true)
         trackingNumber(nullable: true, maxSize: 255)
-        //shipment(nullable:true)
     }
 }

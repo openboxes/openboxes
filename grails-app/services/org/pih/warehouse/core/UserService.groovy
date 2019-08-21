@@ -221,7 +221,6 @@ class UserService {
                 eq("active", Boolean.valueOf(params.status))
             }
             // Disabled to allow the user to choose sorting mechanism (should probably add this as the default)
-            //order("lastName", "desc")
         }
 
         return results
@@ -296,14 +295,7 @@ class UserService {
      * @return
      */
     def authenticate(username, password) {
-        //def authenticated = false
-        //def ldapEnabled = grailsApplication.config.openboxes.ldap.enabled?:false;
-        //if (ldapEnabled) {
-        //    authenticated = authenticateUsingLdap(username, password)
-        //}
-        //return authenticated || authenticateUsingDatabase(username, password)
         return authenticateUsingDatabase(username, password)
-
     }
 
     /**
@@ -334,7 +326,6 @@ class UserService {
         long responseTimeoutMillis = grailsApplication.config.openboxes.ldap.responseTimeoutMillis ?: 1000
         def searchSubtree = grailsApplication.config.openboxes.ldap.search.searchSubtree
         String[] attributesToReturn = ["displayName", "password", "mail", "cn"]
-        //grailsApplication.config.openboxes.ldap.search.attributesToReturn
 
         LDAPConnection ldapConnection
 
@@ -344,11 +335,9 @@ class UserService {
         try {
 
             ldapConnection = new LDAPConnection(host, port, bindUserDn, bindUserPassword)
-            //ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password");
 
             //Search user DN:
             def searchBaseDn = grailsApplication.config.openboxes.ldap.search.base
-            //def searchBaseDn = "dc=example,dc=com"
 
             // Search filter
             def filter
@@ -386,7 +375,6 @@ class UserService {
 
                 if (bindResult.resultCode == ResultCode.SUCCESS) {
                     log.info("LDAP authentication successful dn=${dn}")
-                    //return result
                     return true
                 } else {
                     log.info("LDAP authentication unsuccessful dn=${dn}, resultCode=${bindResult?.resultCode?.name}")
@@ -399,7 +387,6 @@ class UserService {
         } finally {
             ldapConnection.close()
         }
-        //return result
         return false
     }
 
@@ -411,25 +398,13 @@ class UserService {
 //        All user passwords are password.
 
     static boolean authenticateUsingLdap2(String username, String password) throws LDAPException {
-        //LDAPConnection ldap = new LDAPConnection("ldap.forumsys.com", 389);
-        //SearchResult sr = ldap.search("dc=People,dc=example,dc=com", SearchScope.SUB, "(uid=" + username + ")");
-        //LDAPConnection ldap = new LDAPConnection("ldap.forumsys.com", 389);
-        //SearchResult sr = ldap.search("ou=scientists,dc=example,dc=com", SearchScope.SUB, "(uid=" + username + ")");
-        //println "search results " + sr
-        //if (sr.getEntryCount() == 0)
-        //    return false;
-
-        //String dn = sr.getSearchEntries().get(0).getDN();
-
         try {
-            //ldap = new LDAPConnection("ldap.example.com", 389, dn, password);
             LDAPConnection ldap = new LDAPConnection("ldap.forumsys.com", 389, username, password)
             return true
         }
         catch (LDAPException e) {
             if (e.getResultCode() == ResultCode.INVALID_CREDENTIALS)
                 return false
-
             throw e
         }
         return true
@@ -442,29 +417,14 @@ class UserService {
         LDAPConnection ldapConnection = null
 
         try {
-            // Use no key manager, and trust all certificates. This would not be used
-            // in non-trivial code.
-            //SSLUtil sslUtil = new SSLUtil(null,new TrustAllTrustManager());
-
-            // Create the socket factory that will be used to make a secure
-            // connection to the server.
-            //socketFactory = sslUtil.createSSLSocketFactory();
-            //ldapConnection = new LDAPConnection(socketFactory,HOSTNAME,PORT);
-
             ldapConnection = new LDAPConnection("ldap.forumsys.com", 389)
-
         } catch (LDAPException e) {
             log.error("LDAP exception", e)
-            //System.exit(e.getResultCode().intValue());
-
         } catch (GeneralSecurityException e) {
             log.error("General security exception: " + e.message, e)
-            //System.exit(1);
         }
 
         try {
-            //String dn = "uid=user.1,ou=people,dc=example,dc=com";
-            //String password = "password";
             long maxResponseTimeMillis = 1000
 
             BindRequest bindRequest = new SimpleBindRequest(dn, password)
@@ -529,7 +489,6 @@ class UserService {
         LDAPConnection ldapConnection
         try {
             ldapConnection = new LDAPConnection("ldap.forumsys.com", 389, "cn=read-only-admin,dc=example,dc=com", "password")
-            //LDAPConnection connection = connectionFactory.getLDAPConnection();
             SearchRequest searchRequest = new SearchRequest(rolesDN, SearchScope.SUB, Filter.createEqualityFilter("uniqueMember", userDN))
 
             SearchResult sr = ldapConnection.search(searchRequest)
@@ -573,19 +532,6 @@ class UserService {
                     entryList.add(memberEntry.DN)
                 }
             }
-            /*
-            SearchResult searchResult = ldapConnection.search(searchRequest);
-            log.info("searchResult: ${searchResult}")
-            if(searchResult.getEntryCount() == 1) {
-                Entry entry = searchResult.getSearchEntry(userDN);
-                log.info("entry: ${entry}")
-                //return getAttributeValues("isMemberOf");
-            }
-            else {
-                log.info("No search results found")
-
-            }
-            */
         } catch (LDAPException e) {
             log.error("LDAP exception occurred " + e.message, e)
         } finally {
@@ -603,24 +549,6 @@ class UserService {
             long responseTimeoutMillis = grailsApplication.config.openboxes.ldap.responseTimeoutMillis ?: 1000
             SearchRequest searchRequest = new SearchRequest(userDn, SearchScope.BASE, "(&)", "isMemberOf")
             searchRequest.setResponseTimeoutMillis(responseTimeoutMillis)
-
-            /*
-            def userEntry = ldapConnection.getEntry(userDn)
-            log.info("userEntry: ${userEntry}")
-            String[] memberValues = userEntry.getAttributeValues("isMemberOf");
-            log.info("memberValues: ${memberValues}")
-            if (memberValues != null) {
-                DNEntrySource entrySource = new DNEntrySource(ldapConnection, memberValues);
-                log.info("entrySource: ${entrySource}")
-                while (true) {
-                    Entry memberEntry = entrySource.nextEntry();
-                    if (memberEntry == null) {
-                        break;
-                    }
-                    entryList.add(memberEntry.DN);
-                }
-            }
-            */
 
             SearchResult searchResult = ldapConnection.search(searchRequest)
             log.info("searchResult: ${searchResult}")
@@ -641,6 +569,4 @@ class UserService {
 
         return entryList
     }
-
-
 }

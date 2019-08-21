@@ -13,7 +13,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.Product
 
-// import java.text.SimpleDateFormat
 
 class InventoryTagLib {
 

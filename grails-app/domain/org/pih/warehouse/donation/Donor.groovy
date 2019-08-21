@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.donation
 
-//import java.util.Date;
 
 class Donor {
 
@@ -22,12 +21,6 @@ class Donor {
     static mapping = {
         id generator: 'uuid'
     }
-
-    /*
-    static mapping = {
-        tablePerHierarchy false
-        table 'donor'
-    }*/
 
     static constraints = {
         name(nullable: false, maxSize: 255)

@@ -195,8 +195,6 @@ class BootStrap {
                     productCode: product.productCode,
                     name       : product.name,
                     description: product.description
-//                "category.id": product?.category?.id,
-//                "category.name": product?.category?.name
             ]
         }
 
@@ -426,8 +424,6 @@ class BootStrap {
         // Migrating existing data to the new data model is still a work in progress, but you can
         // use the previous versions changelogs.
         //
-        //if (GrailsUtil.environment == 'test' || GrailsUtil.environment == 'development' ||
-        //GrailsUtil.environment == 'client' || GrailsUtil.environment == 'root') {
         log.info("Running liquibase changelog(s) ...")
         Liquibase liquibase = null
         try {
@@ -436,11 +432,9 @@ class BootStrap {
             if (connection == null) {
                 throw new RuntimeException("Connection could not be created.")
             }
-            //LiquibaseUtil.class.getClassLoader();
             def classLoader = getClass().classLoader
             def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
 
-            //def fileOpener = new ClassLoaderFileOpener()
             def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
             boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
             log.info("Liquibase running: " + isRunningMigrations)
@@ -473,11 +467,6 @@ class BootStrap {
             log.info("Inserting test fixtures ...")
             insertTestFixture()
         }
-
-        //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
-        //TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
-        //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
-
 
         // Debug logging used to figure out what log4j properties are ruining it for the rest of us
         getClass().getClassLoader().getResources("log4j.properties").each {

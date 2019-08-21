@@ -149,8 +149,6 @@ class MigrationService {
         }
 
         return results
-//        def locationIds = results.collect { it.locationId }
-//        return Location.findAllByIdInList(locationIds)
     }
 
     def getProductsWithTransactions(Location location, List<TransactionCode> transactionCodes) {
@@ -239,8 +237,6 @@ class MigrationService {
             return [
                     productCode : product?.productCode,
                     location    : location?.name,
-                    //quantityOnHandBefore: quantityOnHandBefore,
-                    //quantityOnHandAfter : quantityOnHandAfter,
                     stockHistory: stockHistory
             ]
         }
@@ -370,7 +366,6 @@ class MigrationService {
         transactionEntries.remove(transactionEntry)
         quantity = inventoryService.adjustQuantity(quantity, transactionEntries)
         return quantity
-
     }
 
     def getQuantityByBinLocationsBeforeTransactionEntry(TransactionEntry transactionEntry) {
@@ -382,7 +377,6 @@ class MigrationService {
         def binLocations = inventoryService.getQuantityByBinLocation(transactionEntries, true)
         binLocations = binLocations.collect { it.value }
         return binLocations
-
     }
 
 
@@ -396,8 +390,6 @@ class MigrationService {
         log.info "Process transaction entry ${transactionEntry.id} for product ${product.productCode}"
 
         BigDecimal quantityOnHandThen = getQuantityBeforeTransactionEntry(transactionEntry)
-        //BigDecimal quantityOnHandThen = inventoryService.getQuantity(inventoryItem, transactionLocation, transactionDate)
-        //BigDecimal binQuantityOnHandNow = inventoryService.getQuantityFromBinLocation(transactionLocation, binLocation, inventoryItem)
         def adjustmentDebit = TransactionType.load(Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID)
         def adjustmentCredit = TransactionType.load(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
         BigDecimal newQuantity = transactionEntry.quantity - quantityOnHandThen
@@ -412,10 +404,6 @@ class MigrationService {
             newQuantity = -newQuantity
             newTransactionType = adjustmentDebit
         }
-//        transactionEntry?.quantity = newQuantity
-//        transactionEntry?.transaction?.transactionType = newTransactionType
-//        transactionEntry.comments = "Migrated from INVENTORY ${oldQuantity} to ${adjustmentType} ${newQuantity} (QoH should be ${quantityOnHandThen})"
-//        transactionEntry.save(flush:true)
 
         def binLocations = getQuantityByBinLocationsBeforeTransactionEntry(transactionEntry)
         BigDecimal productQuantityOnHandNow = inventoryService.getQuantityOnHand(transactionLocation, product)
@@ -434,9 +422,7 @@ class MigrationService {
                 oldQuantity       : oldQuantity,
                 quantityOnHandThen: quantityOnHandThen,
                 newQuantity       : newQuantity,
-                //itemQohThen: quantityOnHandThen,
                 productQohNow     : productQuantityOnHandNow,
-                //binQohNow: binQuantityOnHandNow
                 binLocations      : binLocations
         ]
 
@@ -510,7 +496,6 @@ class MigrationService {
 
     def migrateProductSuppliersInParallel() {
         def migratedList = []
-        //def ids = Product.executeQuery("select distinct(p.id) from Product p where p.active = true")
         def ids = getProductsForMigration()
         GParsPool.withPool {
             migratedList = ids.collectParallel { id ->
@@ -566,7 +551,6 @@ class MigrationService {
                 isNotNull("upc")
                 isNotNull("ndc")
             }
-            //maxResults(5000)
         }
         return products
     }

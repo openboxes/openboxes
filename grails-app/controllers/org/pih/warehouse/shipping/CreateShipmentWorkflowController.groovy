@@ -661,9 +661,6 @@ class CreateShipmentWorkflowController {
             on("autoPickShipmentItems") {
                 try {
                     log.info "AutoPick: " + params
-
-                    //shipmentService.addToShipmentItems(params.shipmentId, params.containerId, params?.inventoryItem?.id, params.quantity as int)
-                    //flash.message = "System has automatically picked items"
                     flash.message = "Psych! This feature has not been implemented yet. But imagine how great life will be when it's finished."
                 } catch (ShipmentItemException e) {
                     flash.message = e.message
@@ -708,9 +705,6 @@ class CreateShipmentWorkflowController {
                 log.info "Save shipment item pick " + params
                 ShipmentItem shipmentItemInstance
                 try {
-
-                    //flow?.shipmentInstance?.refresh()
-                    //shipmentItemInstance = flow.shipmentInstance.shipmentItems.find { it.id = params?.shipmentItem?.id}
                     shipmentItemInstance = ShipmentItem.get(params.shipmentItem.id)
 
                     if (!params.selection) {
@@ -839,8 +833,6 @@ class CreateShipmentWorkflowController {
             on("pickShipmentItems").to("pickShipmentItems")
             on("sendShipment").to("sendShipment")
             on("showDetails").to("showDetails")
-
-
         }
 
         sendShipment {
@@ -866,8 +858,6 @@ class CreateShipmentWorkflowController {
             on("pickShipmentItems").to("pickShipmentItems")
             on("sendShipment").to("sendShipment")
             on("showDetails").to("showDetails")
-
-
         }
 
         sendShipmentAction {
@@ -951,10 +941,7 @@ class CreateShipmentWorkflowController {
                             return error()
                         }
 
-
                         if (!shipmentInstance?.hasErrors() && !transactionInstance?.hasErrors()) {
-                            //flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-                            //redirect(controller: 'shipment', action: "showDetails", id: shipmentInstance?.id)
                             command.shipment = shipmentInstance
                             command.transaction = transactionInstance
                             return success()
@@ -965,10 +952,8 @@ class CreateShipmentWorkflowController {
                     }
                 }
             }
-
             on("success").to("finish")
             on("error").to("sendShipment")
-
         }
 
 
@@ -1057,8 +1042,6 @@ class CreateShipmentWorkflowController {
                 } else {
                     locationInstance = new Location(params)
                 }
-
-                //flash.locationInstance = locationInstance;
 
                 def locations = Location.findAll(locationInstance)
                 //flash.message
@@ -1161,7 +1144,6 @@ class CreateShipmentWorkflowController {
             on("invalid").to("enterTrackingDetails")
 
         }
-
 
         saveBoxAction {
             action {
@@ -1276,8 +1258,6 @@ class CreateShipmentWorkflowController {
                     error()
                 }
                 log.info "Old shipment " + oldShipment.id
-                //flash.shipmentInstance = Shipment.get(oldShipment.id)
-
             }
             on("success").to("enterContainerDetails")
             on("error").to("enterContainerDetails")
@@ -1289,7 +1269,6 @@ class CreateShipmentWorkflowController {
                     log.info "save item action: " + params
                     def shipment = flow?.shipmentInstance
                     def container = Container.get(params?.container?.id)
-                    //def product = Product.get(params?.product?.id)
                     def inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
                     if (!inventoryItem) {
                         inventoryItem = new InventoryItem(params)
@@ -1317,7 +1296,6 @@ class CreateShipmentWorkflowController {
                     if (!shipmentItem?.recipient) {
                         shipmentItem.recipient = container?.recipient
                     }
-                    //shipmentItem.shipment = flow.shipmentInstance;
 
                     // In case there are errors, we use this flow-scoped variable to display errors to user
                     flow.itemInstance = shipmentItem
@@ -1362,13 +1340,6 @@ class CreateShipmentWorkflowController {
         showDetails {
             redirect(controller: "shipment", action: "showDetails", params: ["id": flow.shipmentInstance.id ?: ''])
         }
-
-//		showDetails {
-//			action {
-//				redirect(controller: "shipment", action: "showDetails", id: shipmentInstance?.id)
-//			}
-//
-//		}
 
         finish {
             if (flow.shipmentInstance.id) {

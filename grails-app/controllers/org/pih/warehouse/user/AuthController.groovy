@@ -104,7 +104,6 @@ class AuthController {
 
                 if (session?.targetUri) {
                     redirect(uri: session.targetUri)
-                    //session.removeAttribute("targetUri")
                     return
                 }
 
@@ -216,7 +215,6 @@ class AuthController {
                 // Reset the password to what the user entered
                 userInstance.password = params.password
                 userInstance.passwordConfirm = params.passwordConfirm
-                //flash.message = "${warehouse.message(code: 'default.error.message', args: [warehouse.message(code: 'user.label', default: 'User'), userInstance.id])}"
                 render(view: "signup", model: [userInstance: userInstance])
                 return
             }
@@ -225,7 +223,6 @@ class AuthController {
         // FIXME For some reason, flash.message does not get displayed on redirect
         //flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.email])}"
         redirect(action: "login")
-
     }
 
 
@@ -238,6 +235,4 @@ class AuthController {
         def userInstance = User.get(params.id)
         render(template: "/email/userAccountConfirmed", model: [userInstance: userInstance])
     }
-
-
 }

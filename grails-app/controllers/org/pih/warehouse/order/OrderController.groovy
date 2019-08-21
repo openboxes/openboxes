@@ -18,8 +18,6 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.web.multipart.MultipartFile
 
-// import java.util.Date
-
 class OrderController {
     def orderService
     def reportService
@@ -317,38 +315,6 @@ class OrderController {
         render(view: "receive", model: [orderCommand: command])
     }
 
-    /*
-    def addOrderShipment = {
-        def orderCommand = orderService.getOrder(params.id, session.user.id)
-        int index = Integer.valueOf(params?.index)
-        def orderItemToCopy = orderCommand?.orderItems[index]
-        if (orderItemToCopy) {
-            def orderItemToAdd = new OrderItemCommand();
-            orderItemToAdd.setPrimary(false)
-            orderItemToAdd.setType(orderItemToCopy.type)
-            orderItemToAdd.setDescription(orderItemToCopy.description)
-            orderItemToAdd.setLotNumber(orderItemToCopy.lotNumber);
-            orderItemToAdd.setOrderItem(orderItemToCopy.orderItem)
-            orderItemToAdd.setProductReceived(orderItemToCopy.productReceived)
-            orderItemToAdd.setQuantityOrdered(orderItemToCopy.quantityOrdered)
-
-            orderCommand?.orderItems?.add(index+1, orderItemToAdd);
-        }
-        render(view: "receive", model: [orderCommand: orderCommand])
-        //redirect(action: "receive")
-    }
-
-    def removeOrderShipment = {
-        log.info("Remove order shipment " + params)
-        def orderCommand = session.orderCommand
-        int index = Integer.valueOf(params?.index)
-        orderCommand.orderItems.remove(index)
-
-        //render(view: "receive", model: [orderCommand: orderCommand])
-        redirect(action: "receive")
-    }
-    */
-
 
     def fulfill = {
         def orderInstance = Order.get(params.id)
@@ -370,17 +336,7 @@ class OrderController {
             def shipmentItem = new ShipmentItem(orderItem.properties)
             shipmentInstance.addToShipmentItems(shipmentItem)
             if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush: true)) {
-
-                //			def orderShipment = OrderShipment.link(orderItem, shipmentItem);
-                /*
-                if (!orderShipment.hasErrors() && orderShipment.save(flush:true)) {
-                    flash.message = "success"
-                }
-                else {
-                    flash.message = "order shipment error(s)"
-                    render(view: "fulfill", model: [orderShipment: orderShipment, orderItemInstance: orderItem, shipmentInstance: shipmentInstance])
-                    return;
-                }*/
+                // TODO: Refactor this part
             } else {
                 flash.message = "${warehouse.message(code: 'order.shipmentItemErrors.message')}"
                 render(view: "fulfill", model: [orderItemInstance: orderItem, shipmentInstance: shipmentInstance])
@@ -397,7 +353,6 @@ class OrderController {
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
-            //render(text: 'Unable to find purchase order found', status: 404)
 
         } else {
 
@@ -451,10 +406,7 @@ class OrderController {
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
-            //render(text: 'Unable to find purchase order found', status: 404)
-
         } else {
-
             def date = new Date()
             response.setHeader("Content-disposition", "attachment; filename='\"${orderInstance.orderNumber}-${date.format("MM-dd-yyyy")}.csv\"")
             response.contentType = "text/csv"
@@ -569,7 +521,6 @@ class OrderController {
             url += "&includeEntities=true"
 
             // Let the browser know what content type to expect
-            //response.setHeader("Content-disposition", "attachment;") // removed filename=
             response.setContentType("application/pdf")
 
             // Render pdf to the response output stream

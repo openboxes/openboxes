@@ -13,9 +13,6 @@ import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.inventory.InventoryService
 
-// import java.util.Set
-
-// import sun.util.logging.resources.logging;
 
 class CreateProductController {
 
@@ -30,16 +27,12 @@ class CreateProductController {
 
     def createFlow = {
         start {
-            action {
-                //Product flow.product = new Product()
-                //[product:flow.product]
-            }
+            action {}
             on("success").to("search")
             on(Exception).to("error")
         }
 
         search {
-            //on("error").to("error")
             on("search") { ProductSearchCommand search ->
                 log.info("search: " + params)
                 if (search.hasErrors()) {
@@ -53,9 +46,6 @@ class CreateProductController {
                     flash.message = e.message
                     return error()
                 }
-                //def searchTerms = search?.searchTerms?.split(" ").toList()
-                //flow.localResults = productService.findProducts(searchTerms)
-                //flow.googleResults = productService.findGoogleProducts(search?.searchTerms)
 
                 [search: search]
 
@@ -68,19 +58,12 @@ class CreateProductController {
 
         }
         results {
-            //on("error").to("error")
             on("search") { ProductSearchCommand search ->
                 log.info("results: " + params)
                 if (search.hasErrors()) {
                     flow.search = search
                     return error()
                 }
-
-                //if (search.searchTerms) {
-                //def searchTerms = search?.searchTerms?.split(" ").toList()
-                //flow.localResults = productService.findProducts(searchTerms)
-                //flow.googleResults = productService.findGoogleProducts(search?.searchTerms)
-                //}
                 if (search.searchTerms) {
                     try {
                         productService.findGoogleProducts(search)
@@ -111,7 +94,6 @@ class CreateProductController {
 
                 }
                 flow.product = product
-                //[ product : product ]
             }.to("verify")
             on("verify").to("verify")
             on("search").to("search")
@@ -121,28 +103,21 @@ class CreateProductController {
             on("previousResults") { ProductSearchCommand search ->
 
                 if (search.searchTerms) {
-                    //def searchTerms = search?.searchTerms?.split(" ")?.toList()
                     search?.startIndex -= 25
-                    //flow.googleResults = productService.findGoogleProducts(search?.searchTerms, search?.startIndex, true)
                     try {
                         productService.findGoogleProducts(search)
                     } catch (ApiException e) {
-                        //flash.message = e.message
                         return error()
-
                     }
                 }
                 [search: search]
             }.to("results")
             on("nextResults") { ProductSearchCommand search ->
                 if (search.searchTerms) {
-                    //def searchTerms = search?.searchTerms?.split(" ")?.toList()
                     search?.startIndex += 25
-                    //flow.googleResults = productService.findGoogleProducts(search?.searchTerms, search?.startIndex, true)
                     try {
                         productService.findGoogleProducts(search)
                     } catch (ApiException e) {
-                        //flash.message = e.message
                         return error()
                     }
                 }
@@ -152,7 +127,6 @@ class CreateProductController {
             on("cancel").to("cancel")
         }
         verify {
-            //on("error").to("error")
             on("next") { ProductDetailsCommand command ->
                 log.info("VERIFY: next")
 
@@ -165,15 +139,11 @@ class CreateProductController {
                 log.info("command.title: " + command.title)
                 log.info("command.gtin: " + command.gtin)
 
-
                 flow.product = command
                 if (flow.product.hasErrors()) {
                     flash.message = "Validation exception"
                     return error()
                 }
-
-                //bindData(flow.product, command)
-                //[product : product]
             }.to("create")
             on("search").to("search")
             on("results").to("results")
@@ -211,7 +181,6 @@ class CreateProductController {
         finish {
             // redirect to product edit page
             redirect(controller: "product", action: "edit", id: flow.productInstance.id)
-            //redirect(controller: "createProduct", action: "index")
         }
 
         cancel {

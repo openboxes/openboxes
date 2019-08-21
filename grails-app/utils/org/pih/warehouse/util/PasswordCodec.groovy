@@ -13,7 +13,6 @@ import sun.misc.BASE64Encoder
 
 import java.security.MessageDigest
 
-// import sun.misc.CharacterEncoder
 
 class PasswordCodec {
     static encode = { String str ->

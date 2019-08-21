@@ -20,8 +20,6 @@ class FormatTagLib {
     static namespace = "format"
     def grailsApplication
 
-    //Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-
     /**
      * Formats a Date
      * @attr obj REQUIRED the date to format
@@ -95,11 +93,7 @@ class FormatTagLib {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
             Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
             def value = ""
-            //if (attrs?.product?.productCode) {
-            //    value = attrs?.product?.productCode + " "
-            //}
             value += LocalizationUtil.getLocalizedString(attrs.product.name.encodeAsHTML(), locale)
-
 
             // default format is to display the localized name of the product
             out << value
@@ -151,7 +145,6 @@ class FormatTagLib {
      * If the obj is an enum, the tag returns the localized message.properties code "enum.className.value" (ie enum.ShipmentStatusCode.PENDING)
      */
     def metadata = { attrs ->
-        //log.info ("attrs.obj " + attrs.obj + " [" + attrs.obj.class + "] " + isEnum + " " + attrs.obj.properties.get("name"))
 
         if (attrs.obj) {
             // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale

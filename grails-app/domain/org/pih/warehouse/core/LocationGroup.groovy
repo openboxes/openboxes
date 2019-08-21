@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-// import java.util.Date;
 
 /**
  * Represents a logical grouping of locations (e.g. a site 

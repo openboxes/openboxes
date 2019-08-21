@@ -22,8 +22,6 @@ class ProductDimension {
     BigDecimal unitPrice
     BigDecimal unitCost
 
-    //Product product
-
     static mapping = {
         id generator: 'increment'
         cache true

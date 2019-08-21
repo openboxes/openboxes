@@ -288,9 +288,6 @@ class RequisitionService {
                 if (requisition.commodityClass) {
                     eq("commodityClass", requisition.commodityClass)
                 }
-                //if (commodityClassIsNull) {
-                //    isNull("commodityClass")
-                //}
                 if (requisition.type) {
                     eq("type", requisition.type)
                 }
@@ -316,8 +313,6 @@ class RequisitionService {
                         'in'("destination", destinations)
                     }
                 }
-                //maxResults(10)
-                //eq("isPublished", false)
             }
         }
 
@@ -337,8 +332,6 @@ class RequisitionService {
             requisition.requestNumber = identifierService.generateRequisitionIdentifier()
         }
 
-
-        //requisition.name = generateRequisitionName(requisition)
         def savedRequisition = requisition.save(flush: true)
         println "requisition = " + savedRequisition
         println "requisition.errors = " + requisition.errors
@@ -394,7 +387,6 @@ class RequisitionService {
             // requisition inventory is the location where the requisition is placed
             outboundTransaction.inventory = requisition?.origin?.inventory
             outboundTransaction.comment = comments
-            //outboundTransaction.createdBy = issuedBy
             outboundTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
         }
 
@@ -406,8 +398,6 @@ class RequisitionService {
                 transactionEntry.quantity = picklistItem.quantity
                 outboundTransaction.addToTransactionEntries(transactionEntry)
             }
-            // Not sure if this needs to be done here
-            //outboundTransaction.save(flush:true)
 
             if (!inventoryService.saveLocalTransfer(outboundTransaction)) {
                 throw new ValidationException("Unable to save local transfer", outboundTransaction.errors)
@@ -517,11 +507,6 @@ class RequisitionService {
 
 
     void clearRequisition(Requisition requisition) {
-        //def ids = requisition.requisitionItems.collect { it }
-        //ids.each { id ->
-        //    def requisitionItem = RequisitionItem.get(id);
-        //    requisition.removeFromRequisitionItems()
-        //}
         requisition.requisitionItems*.delete()
         requisition.requisitionItems.clear()
         requisition.save(flush: true)
@@ -619,7 +604,6 @@ class RequisitionService {
             }
             eq("product", product)
         }
-        //println requisitionItems
         return requisitionItems
     }
 
@@ -651,7 +635,6 @@ class RequisitionService {
                 }
             }
         }
-        //println requisitionItems
         return requisitionItems
     }
 

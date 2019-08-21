@@ -95,7 +95,6 @@ class ReportService implements ApplicationContextAware {
             // Need to keep track of the running total so we can adjust the balance as we go
             quantity = productReportEntry.balance
         }
-        //command.quantityFinal = quantity;
         command.quantityFinal = inventoryService.getCurrentQuantity(command?.product, command?.location, command?.endDate)
     }
 
@@ -144,20 +143,15 @@ class ReportService implements ApplicationContextAware {
         command?.includeChildren = false
 
         def products =
-                //inventoryService.getProductsByNestedCategory(command.category)
                 (command?.includeChildren) ? inventoryService.getProductsByNestedCategory(command.category) :
                         inventoryService.getProductsByCategory(command.category)
 
         if (command?.showEntireHistory) {
             def earliestDate = getEarliestTransactionEntry(command?.product, command?.location?.inventory)?.transaction?.transactionDate
-            //def latestDate = getLatestTransactionEntry(command?.product, command?.location?.inventory)?.transaction?.transactionDate
             command.startDate = earliestDate ?: command.startDate
             command.endDate = new Date() + 1
         }
 
-        //
-        //command.startDate = command.startDate?:new Date()
-        //command.endDate = command.endDate?:new Date()
         // TODO Need to restrict by date and category
         def transactionEntries = inventoryService.getTransactionEntries(command.location, command.category, command?.startDate, command?.endDate)
         def transactionEntriesByProduct = transactionEntries.groupBy { it?.inventoryItem?.product }
@@ -182,7 +176,6 @@ class ReportService implements ApplicationContextAware {
                 // Initialize the product map to reference all inventory items for that product
                 def inventoryItems = inventoryService.getInventoryItemsByProduct(product)
                 inventoryItems?.each { inventoryItem ->
-                    //log.info "inventory item -> " + inventoryItem
                     def inventoryItemEntry = productEntry?.entries[inventoryItem]
                     if (!inventoryItemEntry) {
                         inventoryItemEntry = new InventoryReportEntryCommand(product: product, inventoryItem: inventoryItem)
@@ -191,10 +184,6 @@ class ReportService implements ApplicationContextAware {
                     inventoryItemEntry.quantityInitial = inventoryService.getQuantity(inventoryItem, command.location, command.startDate ?: null)
                     inventoryItemEntry.quantityFinal = inventoryService.getQuantity(inventoryItem, command.location, command.endDate ?: new Date())
                     inventoryItemEntry.quantityRunning = inventoryItemEntry.quantityInitial
-
-                    //inventoryItemEntry.quantityInitial = inventoryService.getInitialQuantity(inventoryItem, command?.location, command?.startDate)
-                    //inventoryItemEntry.quantityFinal = inventoryService.getCurrentQuantity(inventoryItem, command?.location, command?.endDate);
-
                 }
             }
         }
@@ -296,15 +285,12 @@ class ReportService implements ApplicationContextAware {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance()
             builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
             DocumentBuilder builder = builderFactory.newDocumentBuilder()
-            //Document document = loadXMLFromString(html)
-            //Document document = builder.parse(new StringBufferInputStream(html));
 
             html = getHtmlContent(url)
 
             ITextRenderer renderer = new ITextRenderer()
             renderer.setDocumentFromString(html)
 
-            //renderer.setDocument(document, url);
             renderer.layout()
             renderer.createPDF(outputStream)
 
@@ -362,7 +348,6 @@ class ReportService implements ApplicationContextAware {
         return baos.toByteArray()
     }
 
-    //@Cacheable("quantityOnHandCache")
     def calculateQuantityOnHandByProductGroup(locationId) {
         def items = []
         def startTime = System.currentTimeMillis()
@@ -404,10 +389,8 @@ class ReportService implements ApplicationContextAware {
         // Group all items by status
         def statusSummary = items.inject([:].withDefault { [count: 0, items: []] }) { map, item ->
             map[item.status].count++
-            //map[item.status].items << item
             map
         }
-
 
         // Group entries by product group
 
@@ -416,13 +399,11 @@ class ReportService implements ApplicationContextAware {
             [id            : null, name: null, status: null, productCodes: [], unitPrice: 0, totalValue: 0, numProducts: 0, numInventoryLevels: 0,
              onHandQuantity: 0, minQuantity: 0, maxQuantity: 0, reorderQuantity: 0, inventoryStatus: null, hasInventoryLevel: false, hasProductGroup: false, inventoryLevelId: null]
         }) { map, item ->
-            //map[item.genericProduct].products << item;
             map[item.genericProduct].id = item.genericProductId
             map[item.genericProduct].name = item.genericProduct
             map[item.genericProduct].hasProductGroup = item.hasProductGroup
             map[item.genericProduct].numProducts++
             map[item.genericProduct].onHandQuantity += item.onHandQuantity
-            //map[item.genericProduct].products << item
             map[item.genericProduct].productCodes << item.productCode
             map[item.genericProduct].totalValue += item.totalValue
             map[item.genericProduct].unitPrice += item.unitPrice
@@ -434,14 +415,12 @@ class ReportService implements ApplicationContextAware {
                 // Make sure we're using the latest version of the inventory level (the one where values are not set to 0)
                 def currentInventoryLevel = map[item.genericProduct].inventotryLevel
                 if (!currentInventoryLevel) {
-                    // || item?.inventoryLevel?.lastUpdated?.after(currentInventoryLevel.lastUpdated)
                     map[item.genericProduct].inventoryLevelId = item?.inventoryLevel?.id
                     map[item.genericProduct].inventoryLevel = item.inventoryLevel
                     map[item.genericProduct].inventoryStatus = item?.inventoryLevel?.status?.name()
                     map[item.genericProduct].minQuantity = item.minQuantity
                     map[item.genericProduct].reorderQuantity = item.reorderQuantity
                     map[item.genericProduct].maxQuantity = item.maxQuantity
-                    //map[item.genericProduct].status =
                 }
             }
 
@@ -450,7 +429,6 @@ class ReportService implements ApplicationContextAware {
 
 
         NumberFormat numberFormat = NumberFormat.getNumberInstance()
-        //numberFormat.maximumFractionDigits = 2
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode ?: "USD"
         numberFormat.currency = Currency.getInstance(currencyCode)
         numberFormat.maximumFractionDigits = 2
@@ -495,7 +473,6 @@ class ReportService implements ApplicationContextAware {
         println "Not stocked: " + notStocked.size()
         println "Out of stock: " + outOfStock.size()
 
-
         // Get product group sizes
         def notStockedCount = notStocked.size()
         def outOfStockCount = outOfStock.size()
@@ -516,7 +493,6 @@ class ReportService implements ApplicationContextAware {
 
         def elapsedTime = (System.currentTimeMillis() - startTime) / 1000
 
-        //render([quantityMap:quantityMap] as JSON)
         return [
                 responseTime         : elapsedTime + "s",
                 productSummary       : [

@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse
 
-// import java.text.SimpleDateFormat
 
 class AutoSuggestTagLib {
 
@@ -40,8 +39,6 @@ class AutoSuggestTagLib {
         attrs.placeholder = attrs.placeholder ?: ""
 
         attrs.showValue = (attrs.valueName && attrs.valueId) ? true : false
-        //def spanDisplay = (showValue) ? "inline" : "none";
-        //def suggestDisplay = (showValue) ? "none" : "inline";
         attrs.spanDisplay = "none"
         attrs.suggestDisplay = "inline"
 

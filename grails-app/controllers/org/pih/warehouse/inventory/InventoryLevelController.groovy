@@ -68,7 +68,6 @@ class InventoryLevelController {
         def inventoryLevelInstance = new InventoryLevel(params)
         if (inventoryLevelInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
-            //redirect(action: "list", id: inventoryLevelInstance.id)
             redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id)
         } else {
             render(view: "create", model: [inventoryLevelInstance: inventoryLevelInstance])
@@ -92,10 +91,8 @@ class InventoryLevelController {
             def productInstance = Product.get(params.id)
             inventoryLevelInstance = InventoryLevel.findByProduct(productInstance)
         }
-        //def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (!inventoryLevelInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
-            //redirect(action: "list")
             redirect(action: "create")
         } else {
             return [inventoryLevelInstance: inventoryLevelInstance]
@@ -116,7 +113,6 @@ class InventoryLevelController {
             inventoryLevelInstance.properties = params
             if (!inventoryLevelInstance.hasErrors() && inventoryLevelInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
-                //redirect(action: "list", id: inventoryLevelInstance.id)
                 redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id)
 
             } else {

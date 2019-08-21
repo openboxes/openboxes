@@ -32,10 +32,6 @@ class UrlMappings {
             controller = { "categoryApi" }
             action = [GET: "read", POST: "save", PUT: "save", DELETE: "delete"]
         }
-//        "/api/products/$id/associatedProducts" {
-//            controller = { "productApi" }
-//            action = [GET: "associatedProducts"]
-//        }
         "/api/products/$id/$action" {
             controller = { "productApi" }
         }
