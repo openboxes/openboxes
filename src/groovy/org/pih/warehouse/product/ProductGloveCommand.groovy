@@ -8,7 +8,6 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package org.pih.warehouse.product
-// import java.io.Serializable;
 
 class ProductGloveCommand implements Serializable {
 
@@ -32,7 +31,6 @@ class ProductGloveCommand implements Serializable {
         sterility(nullable: false, inList: ["", "Sterile", "Non-Sterile", "Not Specified"])
         powder(nullable: false, inList: ["", "Powdered", "Powder-Free", "Not Specified"])
         material(nullable: false, inList: ["", "Butadiene", "Non-Chloroprene", "Cotton", "Latex", "Lead", "Naugahyde", "Natural Rubber", "Neoprene", "Nitrile", "Nylon", "Plastic", "Polyethylene", "Polyisoprene", "Polyvinyl Chloride", "Synthetic", "Terry Cloth", "Vinyl", "Other", "Not Specified"])
-        //size(inList: ["Exam", "Surgical", "Utility", "Other", "Not Specified"])
         size(nullable: false)
     }
 }

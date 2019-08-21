@@ -13,8 +13,6 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.grails.plugins.excelimport.*
 import org.grails.plugins.excelimport.ExcelImportUtils
 
-// import java.text.ParseException;
-// import java.text.SimpleDateFormat;
 class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
     def dataService
@@ -87,13 +85,11 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
 
     void validateData(ImportDataCommand command) {
-        //inventoryService.validateData(command)
         dataService.validateInventoryLevels(command)
 
     }
 
     void importData(ImportDataCommand command) {
-        //inventoryService.importData(command)
         dataService.importInventoryLevels(command)
     }
 

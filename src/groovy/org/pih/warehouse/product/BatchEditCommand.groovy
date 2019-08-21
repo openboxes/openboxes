@@ -14,23 +14,15 @@ import org.apache.commons.collections.list.LazyList
 
 class BatchEditCommand {
 
-    //Location location
     Category rootCategory
     List productInstanceList =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Product.class))
     List categoryInstanceList =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class))
 
-    //Map<Product, InventoryLevel> inventoryLevelMap = [:]
-
     static constraints = {
         //location(nullable:false)
         rootCategory(nullable: true)
     }
-
-    //InventoryLevel getInventoryLevel(Product product) {
-    //	return inventoryLevelMap[product]
-    //}
-
 }
 

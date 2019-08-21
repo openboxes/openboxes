@@ -12,7 +12,6 @@ package org.pih.warehouse.inventory
 class StockCardItem {
 
     Integer id
-    //StockCard stockCard;
     Date entryDate
     Integer startingBalance
     Integer quantityIncoming

@@ -306,8 +306,6 @@ class SubstitutionItem {
     String productId
     String productCode
     String productName
-    //Date minExpirationDate
-    //Integer quantityAvailable
     Integer quantitySelected
     Integer quantityConsumed
 

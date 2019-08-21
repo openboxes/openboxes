@@ -21,7 +21,6 @@ class Putaway {
 
     PutawayStatus putawayStatus
     List<PutawayItem> putawayItems = []
-    //LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(PutawayItem.class));
 
     static constrants = {
         origin(nullable: true)

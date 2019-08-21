@@ -9,9 +9,6 @@
  **/
 package org.pih.warehouse.product
 
-// import java.io.Serializable;
-// import java.util.Map;
-
 class ProductSearchCommand implements Serializable {
     String searchTerms
     Integer startIndex = 1

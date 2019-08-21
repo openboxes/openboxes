@@ -65,7 +65,6 @@ class InventoryReportEntryCommand {
             totals.quantityTransferredOut += it.quantityTransferredOut
             totals.quantityConsumed += it.quantityConsumed
             totals.quantityDamaged += it.quantityDamaged
-            //entry.quantityEnding += it.quantityEnding;
             totals.quantityExpired += it.quantityExpired
             totals.quantityFinal += it.quantityFinal
             totals.quantityFound += it.quantityFound

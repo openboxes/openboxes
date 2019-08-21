@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.product
 
-// import java.io.Serializable;
-
 class ProductDetailsCommand implements Serializable {
 
     // Google properties

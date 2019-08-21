@@ -12,8 +12,6 @@ package org.pih.warehouse.importer
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.grails.plugins.excelimport.ExcelImportUtils
 
-// import java.text.ParseException;
-// import java.text.SimpleDateFormat;
 class InventoryItemExcelImporter extends AbstractExcelImporter {
 
     def dataService

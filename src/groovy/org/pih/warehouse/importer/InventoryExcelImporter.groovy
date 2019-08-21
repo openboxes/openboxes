@@ -14,9 +14,6 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExcelImportUtils
 
-// import java.text.ParseException;
-// import java.text.SimpleDateFormat;
-
 class InventoryExcelImporter extends AbstractExcelImporter {
 
     def inventoryService

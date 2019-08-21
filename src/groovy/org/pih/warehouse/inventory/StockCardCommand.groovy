@@ -51,15 +51,6 @@ class StockCardCommand {
         transactionType(nullable: true)
     }
 
-    /**
-     * Return the total quantity for all inventory items.
-     *
-     * @return the sum of quantities across all transaction entries
-     */
-    //Integer getTotalQuantity() {
-    //	return quantityByInventoryItemMap?.values() ? quantityByInventoryItemMap?.values().sum() : 0
-    //}
-
     Map getAllTransactionLogMap() {
         return transactionEntryList.groupBy { it.transaction }
     }
@@ -73,26 +64,7 @@ class StockCardCommand {
      */
     Map getTransactionLogMap(Boolean enableFilter) {
 
-        //println "transaction entries " + transactionEntryList
         def filteredTransactionLog = transactionEntryList
-        /*
-        if (enableFilter) {
-            if (startDate) {
-                filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate >= startDate}
-            }
-
-            // Need to add +1 to endDate because date comparison includes time
-            // TODO Should set endDate to midnight of the date to be more accurate
-            if (endDate) {
-                filteredTransactionLog = filteredTransactionLog.findAll{it.transaction.transactionDate <= endDate+1}
-            }
-
-            // Filter by transaction type (0 = return all types)
-            if (transactionType && transactionType?.id != 0) {
-                filteredTransactionLog = filteredTransactionLog.findAll{it?.transaction?.transactionType?.id == transactionType?.id}
-            }
-        }
-        */
 
         return filteredTransactionLog.groupBy { it.transaction }
     }

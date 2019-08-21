@@ -9,9 +9,6 @@
  **/
 package org.pih.warehouse.shipping
 
-// import java.io.Serializable;
-// import java.util.Date;
-
 import org.pih.warehouse.inventory.Transaction
 
 class SendShipmentCommand implements Serializable {

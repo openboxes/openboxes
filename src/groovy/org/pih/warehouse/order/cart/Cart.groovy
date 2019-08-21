@@ -12,7 +12,6 @@ package org.pih.warehouse.order.cart
 class Cart implements Serializable {
 
     // Key: item id, value: item count
-    //def items = new HashMap<Long,Integer>()
     def items = new ArrayList<CartItem>()
 
 

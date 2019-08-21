@@ -27,17 +27,13 @@ class DynamicSubjectSMTPAppender extends SMTPAppender {
         try {
             MimeBodyPart part = new MimeBodyPart()
 
-            //ThreadGroupRenderer stackTraceRenderer = new ThreadGroupRenderer();
-            //println("First 100 Chars of Stack Trace: " + stackTraceRenderer.(cb.get(cb.length()-1).getMessage()).substring(0,99));
             int length = cb.length()
-            // def message = cb.get(length-1).getMessage()
 
             StringBuffer sbuf = new StringBuffer()
             String t = layout.getHeader()
             if (t != null) sbuf.append(t)
             int len = cb.length()
             for (int i = 0; i < len; i++) {
-                // sbuf.append(MimeUtility.encodeText(layout.format(cb.get())));
                 LoggingEvent event = cb.get()
 
                 // setting the subject
