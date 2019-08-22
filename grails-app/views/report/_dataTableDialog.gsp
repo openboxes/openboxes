@@ -40,6 +40,17 @@
             "sScrollY": 400,
             "sPaginationType": "two_button",
             "sAjaxSource": "${url}",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback,
+                    "timeout": 30000,
+                    "error": handleAjaxError
+                })
+            },
             "fnServerParams": function (data) {
                 $("#locationId").val();
                 $("#startDate").val();

@@ -1431,8 +1431,7 @@ class JsonController {
         render(["aaData": data] as JSON)
     }
 
-    def getInventoryBalanceReport = { InventoryBalanceReportCommand command ->
-        log.info "getInventoryBalanceReport: " + params
+    def getTransactionReport = { TransactionReportCommand command ->
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
 
@@ -1455,23 +1454,23 @@ class JsonController {
 
 
         // Get starting balance
-        def balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate)
+        def balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByProduct(location, startDate)
         if (balanceOpeningMap.empty) {
             inventorySnapshotService.populateInventorySnapshots(startDate, location)
-            balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate)
+            balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByProduct(location, startDate)
         }
 
         // Get ending balance
-        def balanceClosingMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate)
+        def balanceClosingMap = inventorySnapshotService.getQuantityOnHandByProduct(location, endDate)
         if (balanceClosingMap.empty) {
             inventorySnapshotService.populateInventorySnapshots(endDate, location)
-            balanceClosingMap = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate)
+            balanceClosingMap = inventorySnapshotService.getQuantityOnHandByProduct(location, endDate)
         }
 
         // We need all products that
         def products = new HashSet()
-        products.addAll(balanceOpeningMap.collect { it.product })
-        products.addAll(balanceClosingMap.collect { it.product })
+        products.addAll(balanceOpeningMap.keySet())
+        products.addAll(balanceClosingMap.keySet())
 
         // Get all transactions between start and end dates
         def transactionsByTransactionCode = TransactionFact.createCriteria().list {
@@ -1507,28 +1506,15 @@ class JsonController {
         def data = products.collect { Product product ->
 
             // Get balances by product
-            def balanceOpening = balanceOpeningMap.findAll { it.product == product }.sum {
-                it?.quantity ?: 0
-            } ?: 0
-            def balanceClosing = balanceClosingMap.findAll { it.product == product }.sum {
-                it?.quantity ?: 0
-            } ?: 0
+            def balanceOpening = balanceOpeningMap.get(product)?:0
+            def balanceClosing = balanceClosingMap.get(product)?:0
 
             // Get quantity by transaction
             def inbound = transactionsByTransactionCode.find {
-                it.productCode == product.productCode && it.transactionTypeName.startsWith("Transfer In")
+                it.productCode == product.productCode && it.transactionCode.equals("CREDIT")
             }
             def outbound = transactionsByTransactionCode.find {
-                it.productCode == product.productCode && it.transactionTypeName.startsWith("Transfer Out")
-            }
-            def expired = transactionsByTransactionCode.find {
-                it.productCode == product.productCode && it.transactionTypeName.startsWith("Expired")
-            }
-            def damaged = transactionsByTransactionCode.find {
-                it.productCode == product.productCode && it.transactionTypeName.startsWith("Damaged")
-            }
-            def adjusted = transactionsByTransactionCode.find {
-                it.productCode == product.productCode && it.transactionTypeName.startsWith("Adjust")
+                it.productCode == product.productCode && it.transactionCode.equals("DEBIT")
             }
             def cycleCountOccurred = transactionsByTransactionCode.find {
                 it.productCode == product.productCode && it.transactionTypeName.contains("Inventory")
@@ -1536,18 +1522,12 @@ class JsonController {
 
             def quantityInbound = inbound?.quantity ?: 0
             def quantityOutbound = outbound?.quantity ?: 0
-            def quantityExpired = expired?.quantity ?: 0
-            def quantityDamaged = damaged?.quantity ?: 0
-            def quantityAdjusted = adjusted?.quantity ?: 0
 
             // Calculate discrepancy
             def quantityDiscrepancy = balanceClosing -
                     balanceOpening -
                     quantityInbound +
-                    quantityOutbound +
-                    quantityExpired +
-                    quantityDamaged +
-                    quantityAdjusted
+                    quantityOutbound
 
             // Transform data into inventory balance rows
             [
@@ -1555,11 +1535,9 @@ class JsonController {
                     "Name"           : product.name,
                     "Cycle Count"    : cycleCountOccurred ? true : "",
                     "Opening Balance": balanceOpening,
-                    "Transferred In" : quantityInbound,
-                    "Transferred Out": quantityOutbound,
-                    "Expired"        : quantityExpired,
-                    "Damaged"        : quantityDamaged,
-                    "Adjustment"     : quantityAdjusted + quantityDiscrepancy,
+                    "Inbound": quantityInbound,
+                    "Outbound": quantityOutbound,
+                    "Adjustments": quantityDiscrepancy,
                     "Closing Balance": balanceClosing,
 
             ]
@@ -1592,8 +1570,7 @@ class JsonController {
         render(template: "/report/showTransactionReportMetadata", model: model)
     }
 
-    def getInventoryBalanceReportDetails = { InventoryBalanceReportCommand command ->
-        log.info "getInventoryBalanceReport: " + params
+    def getTransactionReportDetails = { TransactionReportCommand command ->
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
         Product product = Product.findByProductCode(params.productCode)
@@ -1634,8 +1611,8 @@ class JsonController {
         }
 
 
-        def balanceOpening = balanceOpeningBinLocations.quantity?.sum()
-        def balanceClosing = balanceClosingBinLocations.quantity?.sum()
+        def balanceOpening = balanceOpeningBinLocations.quantity?.sum()?:0
+        def balanceClosing = balanceClosingBinLocations.quantity?.sum()?:0
         def balanceRunning = balanceOpening
         transactionsByTransactionCode = transactionsByTransactionCode.collect {
             def quantity = it[4]
@@ -1841,7 +1818,7 @@ class JsonController {
 }
 
 
-class InventoryBalanceReportCommand {
+class TransactionReportCommand {
     Date startDate
     Date endDate
     Location location
