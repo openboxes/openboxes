@@ -242,7 +242,7 @@ class JsonController {
 
         log.info "localization.toJson() = " + (localization.toJson() as JSON)
 
-        render localization.toJson() as JSON
+		render localization.toJson() as JSON
     }
 
     def saveLocalization = {
@@ -258,7 +258,7 @@ class JsonController {
             localization = Localization.findByCodeAndLocale(data.code, locale?.toString())
             if (!localization) {
                 log.info "Nope. Creating empty localization "
-                localization = new Localization()
+			    localization = new Localization()
             }
         }
 
@@ -467,31 +467,31 @@ class JsonController {
     }
 
 
-    def findTags = {
-        def searchTerm = "%" + params.term + "%"
+	def findTags = {
+		def searchTerm = "%" + params.term + "%"
         def c = Tag.createCriteria()
-        def tags = c.list {
-            projections { property "tag" }
-            ilike("tag", searchTerm)
-        }
+		def tags = c.list {
+			projections { property "tag" }
+			ilike("tag", searchTerm)
+		}
 
-        def results = tags.unique().collect { [value: it, label: it] }
-        render results as JSON
+		def results = tags.unique().collect { [ value: it, label: it ] }
+		render results as JSON
     }
 
     def autoSuggest = {
         log.info "autoSuggest: " + params
-        def searchTerm = "%" + params.term + "%"
+		def searchTerm = "%" + params.term + "%"
         def c = Product.createCriteria()
-        def results = c.list {
-            projections {
-                property "${params.field}"
-            }
+		def results = c.list {
+			projections {
+				property "${params.field}"
+			}
             eq("active", true)
-            ilike("${params.field}", searchTerm)
-        }
-        results = results.unique().collect { [value: it, label: it] }
-        render results as JSON
+			ilike("${params.field}", searchTerm)
+		}
+		results = results.unique().collect { [ value: it, label: it ] }
+		render results as JSON
     }
 
     def autoSuggestProductGroups = {
@@ -513,70 +513,70 @@ class JsonController {
     }
 
 
-    def findProductNames = {
-        def searchTerm = "%" + params.term + "%"
+	def findProductNames = {
+		def searchTerm = "%" + params.term + "%"
         def c = Product.createCriteria()
-        def productNames = c.list {
-            projections {
-                property "name"
-            }
+		def productNames = c.list {
+			projections {
+				property "name"
+			}
             eq("active", true)
             ilike("name", searchTerm)
         }
 
-        def results = productNames.unique().collect { [value: it, label: it] }
-        render results as JSON
+		def results = productNames.unique().collect { [ value: it, label: it ] }
+		render results as JSON
     }
 
     def findPrograms = {
         log.info "find programs " + params
-        def searchTerm = params.term + "%"
+		def searchTerm = params.term + "%"
         def c = Requisition.createCriteria()
 
-        def names = c.list {
-            projections {
-                property "recipientProgram"
-            }
-            ilike("recipientProgram", searchTerm)
-        }
-        // Try again
-        if (names.isEmpty()) {
-            searchTerm = "%" + params.term + "%"
+		def names = c.list {
+			projections {
+				property "recipientProgram"
+			}
+			ilike("recipientProgram", searchTerm)
+		}
+		// Try again
+		if (names.isEmpty()) {
+			searchTerm = "%" + params.term + "%"
             c = Requisition.createCriteria()
-            names = c.list {
-                projections {
-                    property "recipientProgram"
-                }
-                ilike("recipientProgram", searchTerm)
-            }
-        }
+			names = c.list {
+				projections {
+					property "recipientProgram"
+				}
+				ilike("recipientProgram", searchTerm)
+			}
+		}
 
         if (names.isEmpty()) {
             names = []
             names << params.term
         }
 
-        def results = names.collect { [value: it, label: it] }
-        render results as JSON
+		def results = names.collect { [ value: it, label: it ] }
+		render results as JSON
     }
 
 
-    def getInventoryItem = {
-        render InventoryItem.get(params.id).toJson() as JSON
+	def getInventoryItem = {
+		render InventoryItem.get(params.id).toJson() as JSON
     }
 
-    def getQuantity = {
-        log.info params
-        def quantity = 0
-        def location = Location.get(session.warehouse.id)
+	def getQuantity = {
+		log.info params
+		def quantity = 0
+		def location = Location.get(session.warehouse.id)
         def lotNumber = (params.lotNumber) ? (params.lotNumber) : ""
         def product = (params.productId) ? Product.get(params.productId) : null
 
         def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, lotNumber)
         if (inventoryItem) {
-            quantity = inventoryService.getQuantity(location?.inventory, inventoryItem)
-        }
-        log.info "quantity by lotnumber '" + lotNumber + "' and product '" + product + "' = " + quantity
+			quantity = inventoryService.getQuantity(location?.inventory, inventoryItem)
+		}
+		log.info "quantity by lotnumber '" + lotNumber + "' and product '" + product + "' = " + quantity
         render quantity ?: "N/A"
     }
 
@@ -607,14 +607,14 @@ class JsonController {
         render(text: "", contentType: "text/plain")
     }
 
-    /**
-     * Ajax method for the Record Inventory page.
-     */
-    def getInventoryItems = {
-        log.info params
-        def productInstance = Product.get(params?.product?.id)
+	/**
+	 * Ajax method for the Record Inventory page.
+	 */
+	def getInventoryItems = {
+		log.info params
+		def productInstance = Product.get(params?.product?.id)
         def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
-        render inventoryItemList as JSON
+		render inventoryItemList as JSON
     }
 
 
@@ -624,8 +624,8 @@ class JsonController {
     def findInventoryItems = {
         log.info params
         long startTime = System.currentTimeMillis()
-        def inventoryItems = []
-        def location = Location.get(session.warehouse.id)
+		def inventoryItems = []
+		def location = Location.get(session.warehouse.id)
         if (params.term) {
 
             // Improved the performance of the auto-suggest by moving
@@ -691,28 +691,28 @@ class JsonController {
             inventoryItems = inventoryItems.sort { it.expirationDate }
         }
 
-        render inventoryItems as JSON
+		render inventoryItems as JSON
     }
 
-    def findLotsByName = {
-        log.info params
-        // Constrain by product id if the productId param is passed in
-        def items = new TreeSet()
+	def findLotsByName = {
+		log.info params
+		// Constrain by product id if the productId param is passed in
+		def items = new TreeSet()
         if (params.term) {
-            def searchTerm = "%" + params.term + "%"
+			def searchTerm = "%" + params.term + "%"
             items = InventoryItem.withCriteria {
-                and {
-                    or {
-                        ilike("lotNumber", searchTerm)
-                    }
-                    // Search within the inventory items for a specific product
-                    if (params?.productId) {
-                        eq("product.id", params.productId)
-                    }
-                }
-            }
+				and {
+					or {
+						ilike("lotNumber", searchTerm)
+					}
+					// Search within the inventory items for a specific product
+					if (params?.productId) {
+						eq("product.id", params.productId)
+					}
+				}
+			}
 
-            def warehouse = Location.get(session.warehouse.id)
+			def warehouse = Location.get(session.warehouse.id)
             def quantitiesByInventoryItem = inventoryService.getQuantityForInventory(warehouse?.inventory)
 
             if (items) {
@@ -722,18 +722,18 @@ class JsonController {
 
                     def localizedName = localizationService.getLocalizedString(item.product.name)
 
-                    [
-                            id            : item.id,
-                            value         : item.lotNumber,
-                            label         : localizedName + " --- Item: " + item.lotNumber + " --- Qty: " + quantity + " --- ",
-                            valueText     : item.lotNumber,
-                            lotNumber     : item.lotNumber,
-                            expirationDate: item.expirationDate
-                    ]
-                }
-            }
-        }
-        render items as JSON
+					[
+						id: item.id,
+						value: item.lotNumber,
+						label:  localizedName + " --- Item: " + item.lotNumber + " --- Qty: " + quantity + " --- ",
+						valueText: item.lotNumber,
+						lotNumber: item.lotNumber,
+						expirationDate: item.expirationDate
+					]
+				}
+			}
+		}
+		render items as JSON
     }
 
 
@@ -765,9 +765,9 @@ class JsonController {
 
     }
 
-    def findPersonByName = {
-        log.info "findPersonByName: " + params
-        def items = new TreeSet()
+	def findPersonByName = {
+		log.info "findPersonByName: " + params
+		def items = new TreeSet()
         try {
 
             if (params.term) {
@@ -811,8 +811,8 @@ class JsonController {
 
     def findProductByName = {
 
-        log.info("find products by name " + params)
-        def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT)
+		log.info("find products by name " + params)
+		def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT)
         def products = new TreeSet()
 
         if (params.term) {
@@ -892,8 +892,8 @@ class JsonController {
             products << [value: null, label: warehouse.message(code: 'product.noProductsFound.message')]
         }
 
-        log.info "Returning " + products.size() + " results for search " + params.term
-        render products as JSON
+		log.info "Returning " + products.size() + " results for search " + params.term
+		render products as JSON
     }
 
     def findRequestItems = {
@@ -940,8 +940,8 @@ class JsonController {
             items << [value: null, label: warehouse.message(code: 'product.noProductsFound.message')]
         }
 
-        log.info "Returning " + items.size() + " results for search " + params.term
-        render items as JSON
+		log.info "Returning " + items.size() + " results for search " + params.term
+		render items as JSON
     }
 
 
@@ -1455,22 +1455,17 @@ class JsonController {
 
         // Get starting balance
         def balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByProduct(location, startDate)
-        if (balanceOpeningMap.empty) {
+        if (balanceOpeningMap.isEmpty()) {
             inventorySnapshotService.populateInventorySnapshots(startDate, location)
             balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByProduct(location, startDate)
         }
 
         // Get ending balance
         def balanceClosingMap = inventorySnapshotService.getQuantityOnHandByProduct(location, endDate)
-        if (balanceClosingMap.empty) {
+        if (balanceClosingMap.isEmpty()) {
             inventorySnapshotService.populateInventorySnapshots(endDate, location)
             balanceClosingMap = inventorySnapshotService.getQuantityOnHandByProduct(location, endDate)
         }
-
-        // We need all products that
-        def products = new HashSet()
-        products.addAll(balanceOpeningMap.keySet())
-        products.addAll(balanceClosingMap.keySet())
 
         // Get all transactions between start and end dates
         def transactionsByTransactionCode = TransactionFact.createCriteria().list {
@@ -1501,6 +1496,11 @@ class JsonController {
                     quantity           : it[3]
             ]
         }
+
+        // We need all products that have either an opening balance or closing balance
+        def products = new HashSet()
+        products.addAll(balanceOpeningMap.keySet())
+        products.addAll(balanceClosingMap.keySet())
 
         // Flatten the data to make it easier to display
         def data = products.collect { Product product ->
