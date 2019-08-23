@@ -9,11 +9,6 @@
  * */
 package org.pih.warehouse.reporting
 
-import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.product.ProductService
-
 class IndicatorController {
 
     def scaffold = Indicator
@@ -31,10 +26,6 @@ class IndicatorController {
         // String code, boolean captureStdout, request
         render consoleService.eval(code, true, request)
     }
-
-
-
-
 }
 
 

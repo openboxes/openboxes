@@ -28,13 +28,6 @@
 
             <g:set var="shipmentItemsSorted" value="${shipmentInstance.sortShipmentItems()}"/>
 
-            <%-- If there's no selected item, we should select the first item from the list --%>
-            <%--
-            <g:if test="${!shipmentItemSelected}">
-                <g:set var="shipmentItemSelected" value="${shipmentItemsSorted?.iterator().next()}"></g:set>
-            </g:if>
-            --%>
-
             <g:hasErrors bean="${command}">
                 <div class="errors">
                     <g:renderErrors bean="${command}" as="list" />

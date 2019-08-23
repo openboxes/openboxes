@@ -2,10 +2,6 @@
 <div class="box">
     <h2>
         <warehouse:message code="inventory.value.label" default="Stock Value"/>
-        <%--
-        <g:remoteLink controller="json" action="refreshTotalStockValue" onSuccess="refresh();" onFailure="showError();">
-            <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_refresh_small.png')}" alt="Refresh" style="vertical-align: middle" /></g:remoteLink>
-        --%>
     </h2>
     <div class="widget-content" style="padding:0; margin:0">
 
@@ -103,15 +99,12 @@
     });
 
     $(window).load(function(){
-        //$( "#progressbar" ).progressbar({ value: 0 });
-        //$( "#progressPercentage").html('')
         loadData();
         loadTableData();
     });
 
     function refresh() {
         loadData();
-        //loadTableData();
         $('#stockValueDetailsTable').dataTable().ajax.reload();
     }
 
@@ -137,7 +130,6 @@
             dataType: "json",
             timeout: 120000,
             url: "${request.contextPath}/json/getTotalStockValue?location.id=${session.warehouse.id}",
-            //data: data,
             success: function (data) {
                 console.log(data);
                 var value = data.totalStockValue?formatCurrency(data.totalStockValue.toFixed(0)):0;
@@ -157,9 +149,6 @@
 
             },
             error: function(xhr, status, error) {
-                //console.log(xhr);
-                //console.log(status);
-                //console.log(error);
                 $('#totalStockValue').html('ERROR');
                 $("#totalStockSummary").html('Unable to calculate total value due to error: ' + error + " " + status + " " + xhr);
             }
@@ -180,13 +169,7 @@
             "sScrollY": 150,
             "sPaginationType": "two_button",
             "sAjaxSource": "${request.contextPath}/json/getStockValueByProduct",
-            "fnServerParams": function (data) {
-                //console.log("server data " + data);
-                //var locationId = $("#locationId").val();
-                //var date = $("#date").val();
-                //data.push({ name: "location.id", value: locationId });
-                //data.push({ name: "date", value: date })
-            },
+            "fnServerParams": function (data) {},
             "fnServerData": function (sSource, aoData, fnCallback) {
                 $.ajax({
                     "dataType": 'json',
@@ -198,40 +181,22 @@
                     "error": handleAjaxError // this sets up jQuery to give me errors
                 });
             },
-//            "fnServerData": function ( sSource, aoData, fnCallback ) {
-//                $.getJSON( sSource, aoData, function (json) {
-//                    console.log(json);
-//                    fnCallback(json);
-//                });
-//            },
             "oLanguage": {
                 "sZeroRecords": "No records found",
                 "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
             },
-            //"fnInitComplete": fnInitComplete,
-            //"iDisplayLength" : -1,
             "aLengthMenu": [
                 [5, 10, 25, 100, 1000, -1],
                 [5, 10, 25, 100, 1000, "All"]
             ],
             "aoColumns": [
-
-                //{ "mData": "id", "bVisible":false }, // 0
-                //{"mData": "rank", "sWidth": "1%"}, // 1
                 {"mData": "productCode", "sWidth": "1%"}, // 2
                 {"mData": "productName"}, // 3
-                //{"mData": "unitPrice"}, // 4
                 {"mData": "totalValue", "sWidth": "5%", "sType": 'numeric'} // 5
-                //
-
             ],
             "bUseRendered": false,
             "aaSorting": [[2, "desc"]],
             "fnRowCallback": function (nRow, aData, iDisplayIndex) {
-                //console.log(nRow);
-                //console.log(aData);
-                //console.log(iDisplayIndex);
-
                 $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' +
                         aData["productName"] + '</a>');
                 return nRow;

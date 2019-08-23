@@ -50,9 +50,6 @@
                                     <label for="quantity"><warehouse:message code="requisitionItem.quantityRequested.label" default="Quantity requested" /></label>
                                     <div>
                                     ${requisitionItemInstance?.quantity }
-                                    <%--
-                                    <g:textField name="quantity" class="text" size="10" value="${fieldValue(bean: requisitionItemInstance, field: 'quantity')}" />
-                                    --%>
                                     ${requisitionItemInstance?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label') }
                                     </div>
                                 </div>
@@ -261,21 +258,9 @@
         </div>
     </div>
 		<script>
-			$(document).ready(function() {				
-		    	
+			$(document).ready(function() {
                 $(".tabs").tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
                 $(".tabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
-		    	//$("#quantityOnHand").load('${request.contextPath}/json/getQuantityOnHand?location.id=${session.warehouse.id}&product.id=${requisitionItem?.product?.id}');
-		    	//$("#quantityAvailableToPromise").load('${request.contextPath}/json/getQuantityAvailableToPromise?location.id=${session.warehouse.id}&product.id=${requisitionItem?.product?.id}');
-		    	
-	    		/*
-		    	$(".reloadQuantityOnHand").click(function(event) {
-		    		//setInterval(refreshQuantity, 1000);
-		    		refreshQuantity();
-			    });
-
-				refreshQuantity();
-			    */
 			});	
 		</script>        
         

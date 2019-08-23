@@ -12,7 +12,7 @@ enum RatingTypeCode {
     int sortOrder
 
     RatingTypeCode(int sortOrder) {
-        [this.sortOrder = sortOrder ]
+        [this.sortOrder = sortOrder]
     }
 
     static int compare(RatingTypeCode a, RatingTypeCode b) {
@@ -20,7 +20,7 @@ enum RatingTypeCode {
     }
 
     static list() {
-        [ OUTSTANDING, GOOD, FAIR, POOR, NOT_RATED ]
+        [OUTSTANDING, GOOD, FAIR, POOR, NOT_RATED]
     }
 
     String getName() { return name() }

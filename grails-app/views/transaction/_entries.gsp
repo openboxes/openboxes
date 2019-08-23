@@ -29,20 +29,6 @@
 
                         </td>
                         <td style="text-align: left;">
-                            <%--
-                            <g:if test="${params?.showAll || !params.product }">
-                                <g:link controller="inventory" action="showTransaction" id="${transactionInstance.id}" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="${warehouse.message(code: 'transaction.showSingleProduct.label') }" style="vertical-align: middle"/>
-                                </g:link>
-                            </g:if>
-                            <g:else>
-                                <g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount || params?.product?.id }">
-                                    <a href="?showAll=true">
-                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'transaction.showAllProducts.label') }" style="vertical-align: middle"/>
-                                    </a>
-                                </g:if>
-                            </g:else>
-                            --%>
                             <g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
                                 ${transactionEntry?.inventoryItem?.product?.productCode}
                                 <format:product product="${transactionEntry?.inventoryItem?.product}"/>
@@ -62,15 +48,6 @@
                         </td>
                     </tr>
                 </g:each>
-            <%--
-            <g:if test="${transactionInstance?.transactionEntries?.size() > transactionCount || params?.product?.id }">
-                <tr>
-                    <td>
-                        <a href="?showAll=true">show all</a>
-                    </td>
-                </tr>
-            </g:if>
-            --%>
             </g:if>
             <g:else>
                 <tr>

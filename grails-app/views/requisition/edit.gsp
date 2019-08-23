@@ -57,11 +57,6 @@
                                     <th class="list-header middle">
                                         ${warehouse.message(code: 'requisitionItem.status.label')}
                                     </th>
-                                    <%--
-                                    <th class="list-header">
-                                        ${warehouse.message(code: 'requisitionItem.comment.label')}
-                                    </th>
-                                     --%>
                                     <th class="center">
                                         ${warehouse.message(code: 'requisitionItem.delete.label')}
                                     </th>
@@ -70,8 +65,6 @@
                             <tbody data-bind="foreach: requisition.requisitionItems">
                                 <tr class="requisitionItemsRow prop">
                                     <td class="middle list-header">
-
-                                        <%--Debugging: <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>--%>
                                         <input type="hidden" data-bind="value: productPackageId, uniqueName: true" class="productPackageId"/>
                                         <input type="hidden" data-bind="value: productId, uniqueName: true" class="productId" />
                                         <input type="text" name="product" size="80"
@@ -181,28 +174,12 @@
 			if(program != "") {
 				description += " - " + program;
 			}
-			//if(requestedBy != "") {
-			//    description += " - " + requestedBy;
-			//}
 			description += " - " + dateRequested;
 			viewModel.requisition.name(description);
 		};
 
-
 		// Update the description, when changing any value that is a component of the description
 		$(".value").change(updateDescription);
-
-		// Set the interval to save locally every 3 seconds
-		//setInterval(function () {
-		//	openboxes.requisition.saveRequisitionToLocal(viewModel.requisition);
-		//}, 3000);
-
-		//$("#cancelRequisition").click(function() {
-		//	if(confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}')) {
-		//		openboxes.requisition.deleteRequisitionFromLocal(requisitionFromServer.id);
-		//		return true;
-		//	}
-		//});
 
         // Make sure quantity is a digit
 		$("input.quantity").keyup(function(){

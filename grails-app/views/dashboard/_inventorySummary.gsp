@@ -2,25 +2,6 @@
     <h2><warehouse:message code="inventory.label" args="[session.warehouse.name]"/></h2>
     <div class="widget-content" style="padding:0; margin:0">
         <div id="inventorySummary">
-            <%--
-			<div style="padding-top:0px;">
-				<g:form method="GET" controller="inventory" action="browse">
-					<div>
-							
-						<g:textField id="dashboardSearchBox" name="searchTerms" style="width: 60%" value="${params.searchTerms }"
-							class="globalSearch"/>						
-						<g:hiddenField name="resetSearch" value="true"/>							
-						<g:hiddenField name="categoryId" value="${rootCategory.id }"/>							
-						<g:hiddenField name="showHiddenProducts" value="on"/>
-						<g:hiddenField name="showOutOfStockProducts" value="on"/>
-						<button type="submit" class="button icon search">
-							<warehouse:message code="default.search.label"/>
-						</button>
-							
-					</div>
-				</g:form>
-            </div>
-            --%>
             <table class="zebra">
                 <tbody>
                     <tr>
@@ -76,12 +57,10 @@
 
 $(window).load(function(){
     $( "#progressbar" ).progressbar({ value: 0 });
-        //$( "#progressPercentage").html('')
         $.ajax({
             dataType: "json",
             timeout: 120000,
             url: "${request.contextPath}/json/getTotalStockValue?location.id=${session.warehouse.id}",
-            //data: data,
             success: function (data) {
                 console.log(data);
                 var value = data.totalStockValue?formatCurrency(data.totalStockValue.toFixed(0)):0;
@@ -104,9 +83,6 @@ $(window).load(function(){
 
             },
             error: function(xhr, status, error) {
-                //console.log(xhr);
-                //console.log(status);
-                //console.log(error);
                 $('#totalStockValue').html('ERROR');
                 $("#totalStockSummary").html('Unable to calculate total value due to error: ' + error + " " + status + " " + xhr);
             }

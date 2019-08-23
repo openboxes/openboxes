@@ -235,7 +235,6 @@
 		// Add a new row to the table
 		$("#newRowTemplate").tmpl(inventoryItem).appendTo('#inventoryItemsTable');
 
-		//$('#inventoryItemsTable tbody tr:last').find('.lotNumber').focus();
 		$('#inventoryItemsTable tbody tr:last').find('.lotNumber').focus();
 	}
 
@@ -324,7 +323,6 @@
 				changeYear: true,
 				buttonImage: '${request.contextPath }/images/icons/silk/calendar.png'
 			});
-			//$(this).datepicker()
 		});
 
 		// Bind the click event to the up buttons and call the change quantity function
@@ -421,10 +419,6 @@
 
 			}
 		</style>
-        <%--
-		<g:hiddenField id="expirationDate{{= getIndex()}}-hidden" name="recordInventoryRows[{{= getIndex()}}].expirationDate" value="{{= ExpirationDate}}"/>
-		<g:textField id="expirationDate{{= getIndex()}}" class="expirationDate date text" name="recordInventoryRows[{{= getIndex()}}].expirationDate-text" value="{{= ExpirationDate}}" size="10" />
-        --%>
 <g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
 <g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate"
               default="none" noSelection="['': '']" years="${currentYear - 10..currentYear + 20}"

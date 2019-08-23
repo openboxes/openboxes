@@ -16,7 +16,7 @@ class CalculateQuantityJob {
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron name: 'calculateQuantityCronTrigger',
+        cron name: 'calculateQuantityCronTrigger',
                 cronExpression: CH.config.openboxes.jobs.calculateQuantityJob.cronExpression
     }
 
@@ -37,8 +37,8 @@ class CalculateQuantityJob {
         def product = Product.get(context.mergedJobDataMap.get('productId'))
         def location = Location.get(context.mergedJobDataMap.get('locationId'))
         def user = User.get(context.mergedJobDataMap.get('userId'))
-        boolean includeAllDates = context.mergedJobDataMap.get('includeAllDates')?
-                Boolean.parseBoolean(context.mergedJobDataMap.get('includeAllDates')):false
+        boolean includeAllDates = context.mergedJobDataMap.get('includeAllDates') ?
+                Boolean.valueOf(context.mergedJobDataMap.get('includeAllDates')) : false
 
         log.info "includeAllDates: " + includeAllDates
 
@@ -50,8 +50,7 @@ class CalculateQuantityJob {
         log.info "Executing calculate quantity job for date=${includeAllDates ? 'ALL' : date}, user=${user?.id}, location=${location?.id}, product=${product?.id}, mergedJobDataMap=${context.mergedJobDataMap}"
         if (includeAllDates) {
             inventorySnapshotService.populateInventorySnapshots()
-        }
-        else {
+        } else {
             // Triggered by ?
             if (product && date && location) {
                 log.info "Triggered job for product ${product?.id} at ${location?.id} on ${date}"
@@ -82,7 +81,7 @@ class CalculateQuantityJob {
         }
 
         def elapsedTime = (System.currentTimeMillis() - startTime)
-        log.info "Successfully completed job for location=${location?:"ALL"}, product=${product?.id?:"ALL"}, ${date?:"ALL"}): " + elapsedTime + " ms"
+        log.info "Successfully completed job for location=${location ?: "ALL"}, product=${product?.id ?: "ALL"}, ${date ?: "ALL"}): " + elapsedTime + " ms"
         println "=".multiply(180)
     }
 

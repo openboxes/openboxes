@@ -91,11 +91,13 @@
 						<div class="buttons">
 							<button class="submit-button button">
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'play_blue.png')}" />
-								${g.message(code: 'default.button.run.label')}
+								<g:set var="reportLabel" value="${g.message(code:'default.report.label', default: 'Report')}"/>
+								${g.message(code: 'default.run.label', args: [reportLabel])}
 							</button>
 							<button class="download-button button">
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
-								${g.message(code: 'default.button.download.label')}
+								<g:set var="dataLabel" value="${g.message(code:'default.data.label', default: 'Data')}"/>
+								${g.message(code: 'default.download.label', args: [dataLabel])}
 							</button>
 						</div>
 					</div>
@@ -109,48 +111,34 @@
 						${warehouse.message(code:'report.transactionReport.label', default: "Transaction Report")}
 					</h2>
 
-					<div>
-						<table id="inventoryBalanceReport" class="dataTable">
-
-							<thead>
-							<tr>
-								<th><warehouse:message code="product.productCode.label"/></th>
-								<th><warehouse:message code="product.label"/></th>
-								<th><warehouse:message code="inventoryBalance.cycleCount.label" default="Cycle Count"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.openingBalance.label" default="Opening Balance"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.inbound.label" default="Transferred In"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.outbound.label" default="Transferred Out"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.expired.label" default="Expired"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.damaged.label" default="Damaged"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.adjusted.label" default="Adjustment"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.closingBalance.label" default="Closing Balance"/></th>
-							</tr>
-							</thead>
-							<tbody>
-							<tr>
-								<td colspan="11" class="empty fade center">
-									${g.message(code: 'default.noResults.label')}
-
-								</td>
-							</tr>
-							</tbody>
-							<tfoot>
-							<tr>
-								<th><warehouse:message code="product.productCode.label"/></th>
-								<th><warehouse:message code="product.label"/></th>
-								<th><warehouse:message code="inventoryBalance.cycleCount.label" default="Cycle Count"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.openingBalance.label" default="Opening Balance"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.inbound.label" default="Transferred In"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.outbound.label" default="Transferred Out"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.expired.label" default="Expired"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.damaged.label" default="Damaged"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.adjusted.label" default="Adjustment"/></th>
-								<th class="center"><warehouse:message code="inventoryBalance.closingBalance.label" default="Closing Balance"/></th>
-							</tr>
-							</tfoot>
-						</table>
-
-					</div>
+                    <table id="transactionReport" class="dataTable">
+                        <thead>
+                        <tr>
+                            <th><warehouse:message code="product.productCode.label"/></th>
+                            <th><warehouse:message code="product.label"/></th>
+                            <th><warehouse:message code="transactionReport.cycleCount.label" default="Cycle Count"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.openingBalance.label" default="Opening Balance"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.inbound.label" default="Inbound"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.outbound.label" default="Outbound"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.adjustments.label" default="Adjustments"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing Balance"/></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th><warehouse:message code="product.productCode.label"/></th>
+                            <th><warehouse:message code="product.label"/></th>
+                            <th><warehouse:message code="transactionReport.cycleCount.label" default="Cycle Count"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.openingBalance.label" default="Opening Balance"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.inbound.label" default="Inbound"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.outbound.label" default="Outbound"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.adjustments.label" default="Adjustments"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing Balance"/></th>
+                        </tr>
+                        </tfoot>
+                    </table>
 					<div class="buttons right">
 						<a href="javascript:void(0);" class="btn-show-dialog button"
 						   data-title="${g.message(code:'default.show.label', args: [g.message(code: 'default.metadata.label')])}"
@@ -170,17 +158,15 @@
         if (status === 'timeout') {
             errorMessage('The server took too long to send the data.');
         } else {
-
             if (xhr.responseText) {
                 var errorMessage = JSON.parse(xhr.responseText).errorMessage;
                 alert(errorMessage);
             }
         }
-        destroyDataTable();
     }
 
     function destroyDataTable() {
-    	$('#inventoryBalanceReport').dataTable().fnDestroy();
+    	$('#transactionReport').dataTable().fnDestroy();
 	}
 
 	function initializeDataTable() {
@@ -195,7 +181,7 @@
 			"bScrollInfinite": true,
 			"sScrollY": 500,
 			"sPaginationType": "two_button",
-			"sAjaxSource": "${request.contextPath}/json/getInventoryBalanceReport",
+			"sAjaxSource": "${request.contextPath}/json/getTransactionReport",
 			"fnServerParams": function ( data ) {
 				data.push({ name: "location.id", value: $("#locationId").val() });
 				data.push({ name: "startDate", value: $("#startDate").val() });
@@ -216,8 +202,6 @@
 				"sZeroRecords": "No records found",
 				"sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
 			},
-			//"fnInitComplete": fnInitComplete,
-			//"iDisplayLength" : -1,
 			"aLengthMenu": [
 				[5, 15, 25, 50, 100, 500, 1000, -1],
 				[5, 15, 25, 50, 100, 500, 1000, "All"]
@@ -227,58 +211,47 @@
 				{"mData": "Name", "sWidth": "250px"},
 				{"mData": "Cycle Count"},
 				{"mData": "Opening Balance", "sType": 'numeric'},
-				{"mData": "Transferred In", "sType": 'numeric'},
-				{"mData": "Transferred Out", "sType": 'numeric'},
-				{"mData": "Expired", "sType": 'numeric'},
-				{"mData": "Damaged", "sType": 'numeric'},
-				{"mData": "Adjustment", "sType": 'numeric'},
+				{"mData": "Inbound", "sType": 'numeric'},
+				{"mData": "Outbound", "sType": 'numeric'},
+				{"mData": "Adjustments", "sType": 'numeric'},
 				{"mData": "Closing Balance", "sType": 'numeric'}
 			],
 			"bUseRendered": false,
 			"dom": '<"top"i>rt<"bottom"flp><"clear">',
-            "fnRowCallback": function( nRow, aData) {
+            "fnRowCallback": function (nRow, aData) {
                 $('td:eq(3)', nRow).html(Number(aData["Opening Balance"]).toLocaleString('en-US'));
-                $('td:eq(4)', nRow).html(Number(aData["Transferred In"]).toLocaleString('en-US'));
-                $('td:eq(5)', nRow).html(Number(aData["Transferred Out"]).toLocaleString('en-US'));
-                $('td:eq(6)', nRow).html(Number(aData["Expired"]).toLocaleString('en-US'));
-                $('td:eq(7)', nRow).html(Number(aData["Damaged"]).toLocaleString('en-US'));
-                $('td:eq(8)', nRow).html(Number(aData["Adjustment"]).toLocaleString('en-US'));
-                $('td:eq(9)', nRow).html(Number(aData["Closing Balance"]).toLocaleString('en-US'));
+                $('td:eq(4)', nRow).html(Number(aData["Inbound"]).toLocaleString('en-US'));
+                $('td:eq(5)', nRow).html(Number(aData["Outbound"]).toLocaleString('en-US'));
+                $('td:eq(6)', nRow).html(Number(aData["Adjustments"]).toLocaleString('en-US'));
+                $('td:eq(7)', nRow).html(Number(aData["Closing Balance"]).toLocaleString('en-US'));
 
-                if (aData["Transferred In"] > 0) {
-                  $('td:eq(4)', nRow).css('color', 'green')
+                if (aData["Inbound"] > 0) {
+                  $('td:eq(4)', nRow).addClass('credit')
                 }
 
-			    if (aData["Transferred Out"] > 0) {
-				  $('td:eq(5)', nRow).css('color', 'red')
-			    }
-
-                if (aData["Expired"] > 0) {
-                  $('td:eq(6)', nRow).css('color', 'red')
+                if (aData["Outbound"] > 0) {
+                  $('td:eq(5)', nRow).addClass('debit')
                 }
 
-                if (aData["Damaged"] > 0) {
-                  $('td:eq(7)', nRow).css('color', 'red')
-                }
-
-                if (aData["Adjustment"] > 0) {
-                  $('td:eq(8)', nRow).css('color', 'green')
-                } else if (aData["Adjustment"] < 0) {
-                  $('td:eq(8)', nRow).html(Number(aData["Adjustment"]).toString().replace("-", "(")).append(")").css('color', 'red')
+                if (aData["Adjustments"] > 0) {
+                  $('td:eq(6)', nRow).addClass('credit')
+                } else if (aData["Adjustments"] < 0) {
+                  var normalized = 0 - Number(aData["Adjustments"]);
+                  $('td:eq(6)', nRow).html(normalized).addClass('debit')
 			    }
 
             return nRow;
           }
-			//"aaSorting": [[ 2, "desc" ], [3, "desc"]],
 
 		};
 
-		$('#inventoryBalanceReport').dataTable(options);
+		$('#transactionReport').dataTable(options);
 	}
 
 
 	$(document).ready(function() {
 
+		$('#transactionReport').dataTable({"bJQueryUI": true});
 
 		$(".submit-button").click(function(event){
 			event.preventDefault();
@@ -321,10 +294,10 @@
 				format: "text/csv"
 			};
 			var queryString = $.param(params);
-			window.location.href = '${request.contextPath}/json/getInventoryBalanceReport?' + queryString;
+			window.location.href = '${request.contextPath}/json/getTransactionReport?' + queryString;
 		});
 
-		$('#inventoryBalanceReport tbody').on('click', 'tr', function () {
+		$('#transactionReport tbody').on('click', 'tr', function () {
 			var nTds = $('td', this);
 			var productCode = $(nTds[0]).text();
 			var productName = $(nTds[1]).text();

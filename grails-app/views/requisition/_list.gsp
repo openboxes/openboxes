@@ -22,13 +22,6 @@
             <g:sortableColumn property="dateRequested" params="${pageParams}"
                               title="${warehouse.message(code: 'requisition.dateRequested.label', default: 'Date requested')}" />
 
-            <%--
-            <g:sortableColumn property="type" params="${pageParams}"
-                              title="${warehouse.message(code: 'default.type.label', default: 'Type')}" />
-
-            <g:sortableColumn property="commodityClass" params="${pageParams}"
-                              title="${warehouse.message(code: 'requisition.commodityClass.label', default: 'Commodity class')}" />
-            --%>
 			<g:sortableColumn property="description" params="${pageParams}"
 				title="${warehouse.message(code: 'default.description.label', default: 'Description')}" />
 
@@ -43,22 +36,6 @@
             <th>
                 <warehouse:message code="default.updated.label"/>
             </th>
-            <%--
-
-			<g:sortableColumn property="createdBy" params="${pageParams}"
-				title="${warehouse.message(code: 'default.createdBy.label', default: 'Created by')}" />
-
-            <g:sortableColumn property="updatedBy" params="${pageParams}"
-                              title="${warehouse.message(code: 'default.updatedBy.label', default: 'Updated by')}" />
-
-            <g:sortableColumn property="dateCreated" params="${pageParams}"
-                              title="${warehouse.message(code: 'default.dateCreated.label', default: 'Date created')}" />
-
-            <g:sortableColumn property="lastUpdated" params="${pageParams}"
-                              title="${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}" />
-            --%>
-
-
 		</tr>
 	</thead>
 	<tbody>
@@ -80,11 +57,6 @@
 
 
                 <div class="dialog-box" title="${requisition.requestNumber } ${requisition?.name}" id="dialog-box-${requisition?.id}" style="display:none;">
-                    <%--
-                       <div class="summary">
-                           <g:render template="header" model="[requisition:requisition]"/>
-                       </div>
-                    --%>
                     <table class="box">
                         <tr class="prop">
                             <td class="name"><label><warehouse:message
@@ -207,10 +179,6 @@
                 </td>
                 <td class="left bottom">
                     <div class="count">${requisition?.requisitionItems?.size()?:0}</div>
-
-                    <%--
-                    ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
-                    --%>
                 </td>
 				<td>
                     <g:render template="/requisition/actions" model="[requisition:requisition]"/>
@@ -227,14 +195,6 @@
                 <td>
                     <format:date obj="${requisition.dateRequested}"/>
                 </td>
-                <%--
-                <td>
-                    <format:metadata obj="${requisition?.type}"/>
-                </td>
-                <td>
-                    <format:metadata obj="${requisition?.commodityClass?:warehouse.message(code:'default.none.label')}"/>
-                </td>
-                --%>
 				<td>
 					<g:link action="show" id="${requisition.id}">						
 						${fieldValue(bean: requisition, field: "name")}
@@ -247,15 +207,6 @@
 				<td>${requisition.requestedBy?:warehouse.message(code:'default.none.label')}</td>
                 <td>${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
                 <td>${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>
-
-                <%--
-                <td>${requisition.createdBy}</td>
-                <td>${requisition.updatedBy}</td>
-				<td><format:datetime obj="${requisition.dateCreated}" /></td>
-                <td><format:datetime obj="${requisition.lastUpdated}" /></td>
-                --%>
-
-
 			</tr>
 		</g:each>
 	</tbody>

@@ -5,27 +5,14 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <title>Browse inventory</title>
-        <%-- 
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.popover',file:'jquery.popover.css')}" type="text/css" media="screen, projection" />    
-		<script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
-    	<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
-    	--%>
     </head>    
     <body>
         <div class="body">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-            <%-- 
-            <g:hasErrors bean="${command}">
-	            <div class="errors">
-	                <g:renderErrors bean="${command}" as="list" />
-	            </div>
-            </g:hasErrors>   
-            --%>
             
 			<div>
-        	
 	            <div class="yui-gf">
 					<div class="yui-u first">
 						<div class="box">
@@ -50,9 +37,6 @@
                                 </div>
                             </g:form>
 						</div>
-	       				<%--
-	       				<g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>						
-						 --%>
 					</div>
 					<div class="yui-u">
 						<div class="box">
@@ -102,12 +86,8 @@
 										</td>
 										<td class="center middle">
                                             0
-										<%-- 
-											${inventorySnapshot.quantityAvailableToPromise }
-										--%>
 										</td>
 										<td>
-
 											<g:formatDate date="${inventorySnapshot.lastUpdated }" format="hh:mm:ss a"/>
 										</td>
 									</tr>							
@@ -119,9 +99,6 @@
                             <g:set var="pageParams"
                                    value="${['location.id': params?.location?.id, 'category.id': params?.category?.id, q: params.q].findAll {it.value}}"/>
 
-                            <%--
-                                   params="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"
-                            --%>
                             <g:paginate total="${inventorySnapshots.totalCount}"
                                         action="list" max="${params.max}" offset="${params.offset}" params="${pageParams}"/>
 

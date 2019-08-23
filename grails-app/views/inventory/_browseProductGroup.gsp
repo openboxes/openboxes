@@ -4,18 +4,7 @@
 			<img src="${resource(dir: 'images', file: 'default-product.png')}" />		
 		</div>
 	</td>
-	<%-- 
-	<td class="middle center">
-		<g:checkBox id="${inventoryItem?.productGroup?.id }" name="productGroup.id" 
-				class="checkbox" style="top:0em;" checked="${false }" 
-					value="${inventoryItem?.productGroup?.id }" disabled="true"/>
-	</td>																
-	--%>
 	<td class="middle">
-		<%-- 
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="" class="middle"/>
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_toggle_minus.png')}" alt="" class="middle"/>
-		--%>
 		<span class="action-menu">
 			<button class="action-btn">
 				<img
@@ -48,21 +37,6 @@
 		</span>
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_down.png')}" 
 			id="${inventoryItem?.productGroup?.id }" class="expandable" alt="" class="middle"/>
-		
-		
-		<%--
-		${inventoryItem?.productGroup?.products }
-		--%>
-		<%-- 
-		<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-			<g:if test="${inventoryItem?.product?.name?.trim()}">
-				<format:product product="${inventoryItem?.product}"/> 
-			</g:if>
-			<g:else>
-				<warehouse:message code="product.untitled.label"/>
-			</g:else>
-		</g:link> 
-		--%>
 	</td>
 	<td class="checkable middle left">
 		<span class="fade">

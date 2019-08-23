@@ -334,11 +334,6 @@
                     </div>
                     <div id="tabs-7">
                         <div class="box">
-
-                            %{--<h2>Cache</h2>--}%
-                            %{--<g:each in="${springcacheService.properties}" var="property">--}%
-                                %{--<li>${property}</li>--}%
-                            %{--</g:each>--}%
                             <table>
                                 <tr>
                                     <th>name</th>

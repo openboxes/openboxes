@@ -3,11 +3,6 @@
 	<table class="dataTable">
 		<thead>
 			<tr>
-                <%--
-				<th style="width: 1%">
-					${warehouse.message(code: 'default.actions.label')}
-				</th>
-				--%>
 				<th>
 				</th>
 				<th>
@@ -45,20 +40,6 @@
 
 			<g:each var="shipmentInstance" in="${shipments}" status="i">
 				<tr >
-                    <%--
-					<td>
-						<div class="action-menu">
-							<button class="action-btn">
-								<img
-									src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
-							</button>
-							<div class="actions" style="position: absolute; display: none;">
-								<g:render template="listShippingMenuItems"
-									model="[shipmentInstance:shipmentInstance]" />
-							</div>
-						</div>
-					</td>
-					--%>
                     <td>
                         <g:checkBox class="shipment-item ${shipmentInstance?.status.code}" name="shipment.id" value="${shipmentInstance.id}" checked="${params['shipment.id']}" />
                     </td>

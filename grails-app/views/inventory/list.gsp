@@ -169,8 +169,6 @@
                     "sZeroRecords": "No records found",
                     "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
                 },
-                //"fnInitComplete": fnInitComplete,
-                //"iDisplayLength" : -1,
                 "aLengthMenu": [
                     [5, 15, 25, 50, 100, 500, 1000, -1],
                     [5, 15, 25, 50, 100, 500, 1000, "All"]
@@ -193,7 +191,6 @@
                 ],
                 "bUseRendered": false,
                 "dom": '<"top"i>rt<"bottom"flp><"clear">'
-                //"aaSorting": [[ 2, "desc" ], [3, "desc"]],
 
             };
 
@@ -213,30 +210,6 @@
             });
 
         });
-
-        /*
-        function handleAjaxError( xhr, status, error ) {
-            if ( status === 'timeout' ) {
-                alert( 'The server took too long to send the data.' );
-            }
-            else {
-                // User probably refreshed page or clicked on a link, so this isn't really an error
-                if(xhr.readyState == 0 || xhr.status == 0) {
-                    return;
-                }
-
-                if (xhr.responseText) {
-                    var error = eval("(" + xhr.responseText + ")");
-                    alert("An error occurred on the server.  Please contact your system administrator.\n\n" + error.errorMessage);
-                } else {
-                    alert('An unknown error occurred on the server.  Please contact your system administrator.');
-                }
-            }
-            console.log(dataTable);
-            dataTable.fnProcessingDisplay( false );
-        }
-        */
-
     </script>
 
 	</body>

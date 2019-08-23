@@ -104,20 +104,6 @@
                                     <g:textArea name="address.description" value="${locationGroupInstance?.address?.description}" class="text" rows="6" cols="80"/>
                                 </td>
                             </tr>
-                        <%--
-                            <tr class="prop">
-                                <td class="name">
-
-                                </td>
-                                <td class="value">
-                                    <ul>
-                                        <g:each in="${locationGroupInstance.locations}" var="location">
-                                            <li>${location.name }</li>
-                                        </g:each>
-                                    </ul>
-                                </td>
-                            </tr>
-                        --%>
                         </tbody>
                         <tfoot>
                             <tr class="prop">
@@ -161,23 +147,7 @@
 						}
 					}
 				}
-			}						
-	    	/*
-	        $(document).ready(function() {
-	            $('#bgColor').colorpicker({
-	                size: 20,
-	                label: '',
-	                hide: true
-	            });
-
-	            $('#fgColor').colorpicker({
-	                size: 20,
-	                label: '',
-	                hide: true
-	            });
-			
-	        });
-	        */
+			}
 	    </script>        
     </body>
 </html>

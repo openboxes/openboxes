@@ -163,17 +163,12 @@
         }
 
         $(document).ready(function() {
-            $(".tabs").tabs({
-//                cookie : {
-//                    expires : 1
-//                }
-            });
+            $(".tabs").tabs({});
 
             $(".button-dialog").click(function (event) {
                 var dialog = $(this).data('dialog');
                 console.log(dialog);
                 $(dialog).dialog({autoOpen: true, modal: true});
-                //$("#import-dialog").dialog('open');
             });
 
             $('.dataTable').livequery(function () {

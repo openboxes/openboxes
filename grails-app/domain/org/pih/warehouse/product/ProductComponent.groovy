@@ -22,7 +22,7 @@ class ProductComponent {
     Date lastUpdated
 
 
-    static belongsTo = [assemblyProduct:Product]
+    static belongsTo = [assemblyProduct: Product]
 
     static mapping = {
         id generator: 'uuid'
@@ -32,6 +32,6 @@ class ProductComponent {
         componentProduct(nullable: false)
         quantity(nullable: false)
         unitOfMeasure(nullable: false)
-        assemblyProduct(nullable:false)
+        assemblyProduct(nullable: false)
     }
 }

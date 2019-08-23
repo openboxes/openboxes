@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.core
 
 class LocationGroupController {
@@ -33,8 +33,7 @@ class LocationGroupController {
         if (locationGroupInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), locationGroupInstance.id])}"
             redirect(action: "list", id: locationGroupInstance.id)
-        }
-        else {
+        } else {
             render(view: "create", model: [locationGroupInstance: locationGroupInstance])
         }
     }
@@ -44,8 +43,7 @@ class LocationGroupController {
         if (!locationGroupInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             [locationGroupInstance: locationGroupInstance]
         }
     }
@@ -55,8 +53,7 @@ class LocationGroupController {
         if (!locationGroupInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             return [locationGroupInstance: locationGroupInstance]
         }
     }
@@ -74,26 +71,24 @@ class LocationGroupController {
             }
 
 
-			def address = Address.get(params.address.id)
+            def address = Address.get(params.address.id)
             if (!address) {
                 address = new Address(params.address)
             }
-			address.save(flush:true)
+            address.save(flush: true)
 
             locationGroupInstance.properties = params
-			if (address) {
-				locationGroupInstance.address = address
+            if (address) {
+                locationGroupInstance.address = address
 
-			}
-			if (!locationGroupInstance.hasErrors() && locationGroupInstance.save(flush: true)) {
+            }
+            if (!locationGroupInstance.hasErrors() && locationGroupInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), locationGroupInstance.id])}"
                 redirect(action: "list", id: locationGroupInstance.id)
-            }
-            else {
+            } else {
                 render(view: "edit", model: [locationGroupInstance: locationGroupInstance])
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
         }
@@ -111,8 +106,7 @@ class LocationGroupController {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
         }

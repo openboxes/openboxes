@@ -9,17 +9,16 @@
  * */
 package org.pih.warehouse.core
 
-// import java.util.Date;
 
 class Role implements Serializable, Comparable<Role> {
 
     String id
-    RoleType roleType;
+    RoleType roleType
     String name
-    String description;
+    String description
 
     static constraints = {
-        name(nullable:false)
+        name(nullable: false)
         roleType(nullable: false)
         description(nullable: true, maxSize: 255)
     }
@@ -28,7 +27,7 @@ class Role implements Serializable, Comparable<Role> {
         id generator: 'uuid'
     }
 
-    String toString() { return "${roleType.name}"; }
+    String toString() { return "${roleType.name}" }
 
     static Role superuser() {
         Role.findByRoleType(RoleType.ROLE_SUPERUSER)
@@ -51,7 +50,7 @@ class Role implements Serializable, Comparable<Role> {
     }
 
     @Override
-    public int compareTo(Role role) {
+    int compareTo(Role role) {
         if (role) {
             return this?.roleType?.sortOrder?.compareTo(role?.roleType?.sortOrder)
         }

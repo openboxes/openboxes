@@ -24,7 +24,7 @@ class GoodsReceiptNoteController {
             throw new IllegalStateException("Unable to locate a shipment associated with stock movement ${params.id}")
         }
 
-        [shipment:shipment, currentLocation:currentLocation]
+        [shipment: shipment, currentLocation: currentLocation]
     }
 
 }

@@ -13,38 +13,6 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<%-- 
-			<table>
-				<tr>
-            		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
-			            <g:form action="listLowStock" method="get">
-			            	<table >
-			            		<tr>
-			            			<th><warehouse:message code="category.label"/></th>
-			            			<th><warehouse:message code="inventory.showUnsupportedProducts.label"/></th>
-			            			<th>&nbsp;</th>
-			            		</tr>
-			            		<tr>
-						           	<td class="filter-list-item">
-						           		<g:select name="category"
-														from="${categories}"
-														optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
-														noSelection="['':'--All--']" />   
-									</td>			
-									 <td>	
-						           		<g:checkBox name="showUnsupportedProducts" value="${showUnsupportedProducts }" } />
-						           	</td>	           	
-									<td class="filter-list-item" style="height: 100%; width: 70%; vertical-align: bottom">
-										<button name="filter">
-											<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> </button>
-									</td>							           	
-								</tr>
-							</table>
-			            </g:form>
-            		</td>
-            	</tr>
-			</table>
-			--%>
 				
 			<table>
 				<tr>					

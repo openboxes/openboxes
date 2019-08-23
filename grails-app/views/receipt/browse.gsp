@@ -94,7 +94,6 @@
 							                        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}" style="height: 3.5em">
 							                        	            
 														<td style="text-align: left">										
-															<%--<g:link action="show" id="${productInstance.id}">${fieldValue(bean: productInstance, field: "id")}</g:link> --%>
 															<g:if test="${productInstance.class.simpleName == 'DrugProduct'}">															
 																<img src="${createLinkTo(dir:'images/icons/silk',file: 'pill.png')}"/>
 															</g:if>

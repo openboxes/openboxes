@@ -1,10 +1,7 @@
 package org.pih.warehouse.core
 
-// import groovy.util.GroovyTestCase;
-
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test
-// import com.dumbster.smtp.SimpleSmtpServer
 
 class IdentifierServiceTests extends GroovyTestCase{
   
@@ -44,7 +41,6 @@ class IdentifierServiceTests extends GroovyTestCase{
 		def message = shouldFail(IllegalArgumentException) {
 			def identifier = identifierService.generateIdentifier("")
 		}
-		//assertEquals "Format string must be specified", message
 	}
 
 	@Test
@@ -52,19 +48,5 @@ class IdentifierServiceTests extends GroovyTestCase{
 		def message = shouldFail(IllegalArgumentException) {
 			def identifier = identifierService.generateIdentifier(null)
 		}
-		//assertEquals "Format string must be specified", message
 	}
-	
-	/*
-	void test_generateIdentifier_shouldNotCollide() {
-		def identifierMap = [:]
-		
-		for (int i = 0; i<100; i++) {
-			def identifier = productService.generateIdentifier(4)
-			println identifier
-		}
-	}
-	*/
-	
-	
 }

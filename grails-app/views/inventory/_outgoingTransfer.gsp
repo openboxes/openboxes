@@ -21,12 +21,6 @@
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
-                    <%--
-					<span>
-						<g:jqueryDatePicker id="transactionDate" name="transactionInstance.transactionDate"
-								value="${command?.transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-					</span>
-				    --%>
                     <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
 				</td>
 			</tr>	

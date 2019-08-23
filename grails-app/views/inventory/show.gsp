@@ -14,19 +14,6 @@
                 <div class="box" style="height:100%;">
                     <h2 class="middle">
                         Baseline QoH Report
-                        <%--
-                        <g:if test="${command?.locations}">
-                            <g:each var="location" in="${command?.locations}">
-                                &rsaquo; ${location?.name}
-                            </g:each>
-                        </g:if>
-                        <g:if test="${command?.tag}">
-                            &rsaquo; ${command?.tag?.tag}
-                        </g:if>
-                        <g:if test="${command?.startDate}">
-                            &rsaquo; ${command?.startDate.format("MMM dd yyyy")}
-                        </g:if>
-                        --%>
                     </h2>
                     <g:form controller="inventory" action="search">
                         <div class="filters">
@@ -152,18 +139,5 @@
 
     </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
 </body>
 </html>

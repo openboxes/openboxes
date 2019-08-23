@@ -18,14 +18,14 @@ enum ProductTypeCode {
 
     int sortOrder
 
-    ProductTypeCode(int sortOrder) { [ this.sortOrder = sortOrder ] }
+    ProductTypeCode(int sortOrder) { [this.sortOrder = sortOrder] }
 
     static int compare(ProductTypeCode a, ProductTypeCode b) {
         return a.sortOrder <=> b.sortOrder
     }
 
     static list() {
-        [ GOOD, SERVICE, FIXED_ASSET, ASSET_USAGE ]
+        [GOOD, SERVICE, FIXED_ASSET, ASSET_USAGE]
     }
 
 

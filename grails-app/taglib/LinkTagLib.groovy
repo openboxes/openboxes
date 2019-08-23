@@ -7,8 +7,8 @@ class LinkTagLib extends ApplicationTagLib {
 
     def link = { attrs, body ->
 
-        boolean disabled = attrs.disabled?:false
-        String disabledMessage = attrs.disabledMessage?:'Access denied'
+        boolean disabled = attrs.disabled ?: false
+        String disabledMessage = attrs.disabledMessage ?: 'Access denied'
         def actionName = attrs.action
         def controllerName = attrs.controller ?: ""
         if (!SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName)) {

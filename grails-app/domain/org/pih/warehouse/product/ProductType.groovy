@@ -18,7 +18,7 @@ class ProductType {
     Date lastUpdated
 
     static constraints = {
-        name(blank:false)
-        productTypeCode(nullable:false)
+        name(blank: false)
+        productTypeCode(nullable: false)
     }
 }

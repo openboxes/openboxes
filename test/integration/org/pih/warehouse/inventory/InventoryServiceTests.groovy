@@ -598,19 +598,4 @@ class InventoryServiceTests extends GroovyTestCase {
         }
 
     }
-
-
-
-	/*
-	@Test
-	void getQuantityByInventoryAndProduct_shouldReturnBlah() { 
-		basicTestFixture();
-		def results = inventoryService.getQuantityByInventoryAndProduct(haitiInventory, false)
-		println results
-		
-	}
-	*/
-
-
-
 }

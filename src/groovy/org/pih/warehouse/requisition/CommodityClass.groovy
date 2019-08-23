@@ -11,41 +11,41 @@ package org.pih.warehouse.requisition
 
 enum CommodityClass {
 
-	CONSUMABLES(0),
+    CONSUMABLES(0),
     MEDICATION(1),
     MIXED(2),
     COLD_CHAIN(3),
-	CONTROLLED_SUBSTANCE(4),
-	HAZARDOUS_MATERIAL(5),
+    CONTROLLED_SUBSTANCE(4),
+    HAZARDOUS_MATERIAL(5),
     DURABLE(6),
-	NONE(7)
+    NONE(7)
 
-	int sortOrder
+    int sortOrder
 
-	CommodityClass(int sortOrder) {
-		[
-			this.sortOrder = sortOrder
-		]
-	}
+    CommodityClass(int sortOrder) {
+        [
+                this.sortOrder = sortOrder
+        ]
+    }
 
-	static int compare(CommodityClass a, CommodityClass b) {
-		return a.sortOrder <=> b.sortOrder
-	}
+    static int compare(CommodityClass a, CommodityClass b) {
+        return a.sortOrder <=> b.sortOrder
+    }
 
-	static list() {
-		[
-				NONE,
-				CONSUMABLES,
-				MEDICATION,
-				DURABLE,
-				MIXED,
-				COLD_CHAIN,
-				CONTROLLED_SUBSTANCE,
-				HAZARDOUS_MATERIAL
-		]
-	}
+    static list() {
+        [
+                NONE,
+                CONSUMABLES,
+                MEDICATION,
+                DURABLE,
+                MIXED,
+                COLD_CHAIN,
+                CONTROLLED_SUBSTANCE,
+                HAZARDOUS_MATERIAL
+        ]
+    }
 
-	String toString() {
-		return name()
-	}
+    String toString() {
+        return name()
+    }
 }

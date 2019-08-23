@@ -3,7 +3,6 @@ package org.pih.warehouse.jobs
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
-
 import util.LiquibaseUtil
 
 @DisallowConcurrentExecution
@@ -15,7 +14,7 @@ class CalculateHistoricalQuantityJob {
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron name:'calculateHistoricalQuantityCronTrigger',
+        cron name: 'calculateHistoricalQuantityCronTrigger',
                 cronExpression: CH.config.openboxes.jobs.calculateHistoricalQuantityJob.cronExpression
     }
 
@@ -43,15 +42,14 @@ class CalculateHistoricalQuantityJob {
                 dates = transactionDates.reverse()
                 log.info "Refreshing ${dates.size()} dates"
 
-        } else {
-            log.info "There are ${dates.size()} remaining to be processed"
-        }
+            } else {
+                log.info "There are ${dates.size()} remaining to be processed"
+            }
 
             def nextDate = dates.pop()
             // We need the next date that has not already been processed
             // FIXME This could get stuck if there's a date that generates 0 inventory snapshot records (but that should not happen)
             log.info "Triggering inventory snapshot for date ${nextDate}"
-            //CalculateQuantityJob.triggerNow([date: nextDate, includeInventoryItemSnapshot: false])
             inventorySnapshotService.populateInventorySnapshots(nextDate)
         }
     }

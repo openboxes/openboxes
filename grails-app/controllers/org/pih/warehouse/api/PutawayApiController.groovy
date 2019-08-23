@@ -1,20 +1,20 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
-import org.pih.warehouse.order.Order
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.order.Order
 
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
@@ -33,8 +33,8 @@ class PutawayApiController {
             throw new IllegalArgumentException("Must provide location.id as request parameter")
         }
         List putawayItems = putawayService.getPutawayCandidates(location)
-        render ([data:putawayItems.collect { it.toJson() }] as JSON)
-	}
+        render([data: putawayItems.collect { it.toJson() }] as JSON)
+    }
 
     def read = {
         Order order = Order.get(params.id)
@@ -50,7 +50,7 @@ class PutawayApiController {
             putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
             putawayItem.quantityAvailable = inventoryService.getQuantity(putawayItem.currentFacility.inventory, putawayItem.currentLocation, putawayItem.inventoryItem)
         }
-        render ([data:putaway?.toJson()] as JSON)
+        render([data: putaway?.toJson()] as JSON)
     }
 
 
@@ -83,7 +83,7 @@ class PutawayApiController {
             putawayItem.quantityAvailable = inventoryService.getQuantity(putawayItem.currentFacility.inventory, putawayItem.currentLocation, putawayItem.inventoryItem)
         }
 
-        render ([data:putaway?.toJson()] as JSON)
+        render([data: putaway?.toJson()] as JSON)
     }
 
 
@@ -121,7 +121,6 @@ class PutawayApiController {
 
         return putaway
     }
-
 
 
 }

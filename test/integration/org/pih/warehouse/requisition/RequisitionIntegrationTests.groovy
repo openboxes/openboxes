@@ -33,7 +33,6 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         assertTrue requisition.hasErrors()
         println requisition.errors
         assertEquals 3, requisition.errors.errorCount
-        //assertTrue requisition.errors.hasFieldErrors("commodityClass")
         assertTrue requisition.errors.hasFieldErrors("destination")
         assertTrue requisition.errors.hasFieldErrors("origin")
         assertTrue requisition.errors.hasFieldErrors("requestedBy")
@@ -112,40 +111,4 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         println "Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 
     }
-
-//    Commented out because test not needed at this moment
-//    void testGetPendingRequisitions() {
-//        def person = Person.list().first()
-//        def location = Location.list().first()
-//        def location2 = Location.list().last()
-//
-//        def requisition1 = new Requisition(id:"requisition1", status: RequisitionStatus.CREATED,
-//                origin: location, destination: location, name:"oldRequisition1",
-//                description: "oldDescription1", requestedBy: person, dateRequested: new Date(), requestedDeliveryDate: new Date().plus(1))
-//        def requisition2 = new Requisition(id:"requisition2", status: RequisitionStatus.OPEN,
-//                origin: location, destination: location, name:"oldRequisition2",
-//                description: "oldDescription2", requestedBy: person, dateRequested: new Date(), requestedDeliveryDate: new Date().plus(1))
-//        def requisition3 = new Requisition(id:"requisition3", status: RequisitionStatus.OPEN,
-//                origin: location2, destination: location2, name:"oldRequisition3",
-//                description: "oldDescription3", requestedBy: person, dateRequested: new Date(), requestedDeliveryDate: new Date().plus(1))
-//        def requisition4 = new Requisition(id:"requisition4", status: RequisitionStatus.CANCELED,
-//                origin: location, destination: location, name:"oldRequisition4",
-//                description: "oldDescription4", requestedBy: person, dateRequested: new Date(), requestedDeliveryDate: new Date().plus(1))
-//
-//        assert requisition1.save(flush:true)
-//        assert requisition2.save(flush:true)
-//        assert requisition3.save(flush:true)
-//        assert requisition4.save(flush:true)
-//
-//        def service = new RequisitionService()
-//        def collection = service.getPendingRequisitions(location)
-//
-//        assert collection.size() == 2
-//        assert collection.find {it.id == requisition1.id}
-//        assert collection.find {it.id == requisition2.id}
-//        assert !collection.find {it.id == requisition3.id}
-//        assert !collection.find {it.id == requisition4.id}
-//
-//    }
-
 }

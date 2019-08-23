@@ -143,18 +143,6 @@
 
                     <g:hiddenField name="stacktrace" value="${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}"/>
 
-                    <%--
-                    <tr class="prop">
-                        <td class="name">
-                            <label><warehouse:message code="error.stacktrace.label" default="Stacktrace"/></label>
-                        </td></div>
-                        <td>
-                            <g:if test="${exception}">
-                                <g:textArea name="stacktrace" cols="120" rows="10" readonly="readonly"><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}</g:each></g:textArea>
-                            </g:if>
-                        </td>
-                    </tr>
-                    --%>
                     <tr class="prop">
                         <td class="name"></td>
                         <td class="value">
@@ -193,10 +181,6 @@
 	        return false;
 		});
 		$(".open-dialog").click(function() {
-			//var dom = document.getElementsByTagName('html')[0].innerHTML;
-			//dom = "<html>" + dom + "</html>"
-			//$("#dom").val(dom);
-			
 			$("#error-dialog").dialog({ 
 				autoOpen: true, 
 				modal: true, 

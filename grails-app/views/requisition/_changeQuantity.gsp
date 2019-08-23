@@ -29,9 +29,6 @@
                 </td>
                 <td class="middle">
                     <g:textField id="quantity" name="quantity" value="" class="text" size="5"/>
-                    <%--
-                    <g:selectUnitOfMeasure name="productPackage.id" product="${selectedRequisitionItem?.product}" class="chzn-select" style="width:300px;"/>
-                    --%>
                     EA/1
                 </td>
             </tr>

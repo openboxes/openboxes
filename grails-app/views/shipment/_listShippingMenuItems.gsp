@@ -48,12 +48,6 @@
 					<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" class="middle" />&nbsp;
 					<warehouse:message code="shipping.sendShipment.label"/>
 				</g:link>
-				<%-- old link
-				<g:link controller="shipment" action="sendShipment" id="${shipmentInstance.id}">
-					<img src="${createLinkTo(dir:'images/icons',file:'truck.png')}" class="middle" />&nbsp;
-					<warehouse:message code="shipping.sendShipment.label"/>
-				</g:link>
-				--%>
 			</g:if>
 			<g:else>
 				<g:set var="message" value="Shipment cannot be sent yet"/>
@@ -73,24 +67,6 @@
 			</g:else>
 		</div>
 	</g:if>
-	<%--
-	<g:if test="${shipmentInstance?.hasShipped() && !shipmentInstance.wasReceived() }">
-		<div class="action-menu-item">
-			<g:link controller="shipment" action="markAsReceived" id="${shipmentInstance?.id }">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
-					alt="Mark as received" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.markAsReceived.label"/>
-			</g:link>
-		</div>
-	</g:if>
-	--%>
-	<%--
-	<div class="action-menu-item">
-		<g:link controller="shipment" action="showPackingList" id="${shipmentInstance.id}" >
-			<img src="${createLinkTo(dir:'images/icons/silk',file:'page.png')}"
-				alt="View Packing List" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.viewPackingList.label"/>
-		</g:link>
-	</div>
-	--%>
 </g:if>
 <g:each in="${shipmentInstance.documents}" var="document" status="j">
 	<div class="action-menu-item">
@@ -105,14 +81,6 @@
 		</g:link>
 	</div>
 </g:each>
-<%--
-<div class="action-menu-item">
-	<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">
-		<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}"
-			alt="Download Certificate of Donation" style="vertical-align: middle"/>&nbsp;<warehouse:message code="shipping.downloadCertificateOfDonation.label"/> (.docx)
-	</g:link>
-</div>
---%>
 <div class="action-menu-item">
 	<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">
 		<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}"

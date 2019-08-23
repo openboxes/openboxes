@@ -1,8 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <%--
-    <meta name="layout" content="dialog" />--%>
     <title><g:message code="shipping.splitShipmentItem.label"/></title>
 </head>
 

@@ -32,14 +32,7 @@
 						<div class="buttons left">
 							<g:submitButton name="addBoxToContainer" value="${warehouse.message(code:'shipping.addBoxToThis.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"></g:submitButton>
 							<g:submitButton name="addItemToContainer" value="${warehouse.message(code:'shipping.addItemToThis.label')} ${container ? format.metadata(obj:container?.containerType).toLowerCase() : format.metadata(obj:containerTypeToAdd).toLowerCase()}"></g:submitButton>
-						</div>
-						
-						<!--  
-						<div class="buttons">
-							<g:submitButton name="cloneContainer" value="Clone ${container ? container?.containerType?.name : containerTypeToAdd?.name}"></g:submitButton> Quantity: <g:textField id="cloneQuantity" name="cloneQuantity" size="3" value="0"/> 
-						</div>
-						-->
-						
+						</div>						
 					</td>
 				</tr>
 			</tbody>

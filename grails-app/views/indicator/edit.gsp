@@ -55,9 +55,7 @@
 								<td valign="top" class="value ${hasErrors(bean: indicatorInstance, field: 'expression', 'errors')}">
 									<g:textArea class="text" rows="30" name="expression" value="${indicatorInstance?.expression}" />
 								</td>
-							</tr>
-
-						
+							</tr>				
 
 							<tr class="prop">
 								<td valign="top"></td>
