@@ -225,7 +225,7 @@ class ReportController {
     }
 
     def showTransactionReportDialog = {
-        def url = createLink(controller: "json", action: "getInventoryBalanceReportDetails", params: params)
+        def url = createLink(controller: "json", action: "getTransactionReportDetails", params:params)
         render(template: "dataTableDialog", model: [url: url])
     }
 
