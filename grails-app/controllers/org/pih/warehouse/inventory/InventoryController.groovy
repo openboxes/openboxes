@@ -121,15 +121,6 @@ class InventoryController {
 
     }
 
-    def analyze = {
-        /* single page app using */
-    }
-
-    def pivot = {
-        /* single page app using angularjs */
-    }
-
-
     /**
      * Allows a user to browse the inventory for a particular warehouse.
      */
