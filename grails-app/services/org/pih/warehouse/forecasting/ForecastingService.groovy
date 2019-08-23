@@ -1,19 +1,19 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.forecasting
 
-
 import groovy.sql.Sql
-import java.sql.Timestamp
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
+
+import java.sql.Timestamp
 
 class ForecastingService {
 
@@ -21,7 +21,6 @@ class ForecastingService {
 
     def dataSource
     def grailsApplication
-
 
 
     def getDemand(Location origin, Product product) {
@@ -36,12 +35,12 @@ class ForecastingService {
             def dailyDemand = (totalDemand && totalDays) ? (totalDemand / totalDays) : 0
             def monthlyDemand = dailyDemand * 30
             return [
-                    dateRange    : [ startDate: startDate, endDate  : endDate ],
+                    dateRange    : [startDate: startDate, endDate: endDate],
                     totalDemand  : totalDemand,
                     totalDays    : totalDays,
                     dailyDemand  : dailyDemand,
                     monthlyDemand: monthlyDemand
-            ];
+            ]
         }
     }
 
@@ -120,7 +119,9 @@ class ForecastingService {
                 List allMonths = getMonths(startDate, endDate)
 
                 data = allMonths.collect { monthYear ->
-                    def row = rows.find { it.request_year == monthYear.year && it.request_month == monthYear.month }
+                    def row = rows.find {
+                        it.request_year == monthYear.year && it.request_month == monthYear.month
+                    }
                     [
                             dateKey          : "${monthYear?.month}/${monthYear?.year}",
                             year             : monthYear?.year,
@@ -140,7 +141,7 @@ class ForecastingService {
 
     def getMonths(Date startDate, Date endDate) {
         return (startDate..endDate).collect {
-            [ year: it[Calendar.YEAR], month: it[Calendar.MONTH]+1 ]
+            [year: it[Calendar.YEAR], month: it[Calendar.MONTH] + 1]
         }.unique()
     }
 

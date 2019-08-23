@@ -216,8 +216,6 @@
 				"sZeroRecords": "No records found",
 				"sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
 			},
-			//"fnInitComplete": fnInitComplete,
-			//"iDisplayLength" : -1,
 			"aLengthMenu": [
 				[5, 15, 25, 50, 100, 500, 1000, -1],
 				[5, 15, 25, 50, 100, 500, 1000, "All"]
@@ -269,7 +267,6 @@
 
             return nRow;
           }
-			//"aaSorting": [[ 2, "desc" ], [3, "desc"]],
 
 		};
 

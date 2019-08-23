@@ -111,17 +111,6 @@
                                     <g:checkBox name="allowOther" value="${attributeInstance?.allowOther}" />
                                 </td>
                             </tr>
-                            <%--
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="allowMultiple"><g:message code="attribute.allowMultiple.label" default="Allow Multiple" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'allowMultiple', 'errors')}">
-                                    <g:checkBox name="allowMultiple" value="${attributeInstance?.allowMultiple}" disabled="true"/>
-                                    <span class="fade"><g:message code="default.button.notSupported.message"/></span>
-                                </td>
-                            </tr>
-                            --%>
 						</tbody>
 						<tfoot>
 							<tr class="prop">

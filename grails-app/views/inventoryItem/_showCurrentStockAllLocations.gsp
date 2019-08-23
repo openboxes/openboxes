@@ -104,9 +104,5 @@
     </table>
 </div>
 
-
-%{--<script src="${createLinkTo(dir:'js/pivottable', file:'pivot.js')}" type="text/javascript" ></script>--}%
-%{--<script src="${createLinkTo(dir:'js/', file:'pivot.js')}" type="text/javascript" ></script>--}%
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.min.js" type="text/javascript" ></script>
 

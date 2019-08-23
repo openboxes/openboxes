@@ -56,7 +56,6 @@
                                 </a>
                             </li>
 
-                            %{--<li><a href="#tabs-productGroups"><g:message code="product.substitutions.label" default="Substitutes"/></a></li>--}%
 							<li><a href="#tabs-packages"><g:message code="packages.label" default="Packages"/></a></li>
 							<li><a href="#tabs-documents"><g:message code="product.documents.label" default="Documents"/></a></li>
                             <g:if test="${grailsApplication.config.openboxes.bom.enabled}">
@@ -106,9 +105,6 @@
                                                 code="product.title.label" /></label></td>
                                             <td valign="top"
                                                 class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
-                                                <%--
-                                                <g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />
-                                                --%>
                                                 <g:autoSuggestString id="name" name="name" size="80" class="text"
                                                     jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name?.encodeAsHTML()}"
                                                     placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
@@ -132,9 +128,6 @@
                                                 code="product.unitOfMeasure.label" /></label></td>
                                             <td
                                                 class="value ${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
-                                                <%--
-                                                <g:textField name="unitOfMeasure" value="${productInstance?.unitOfMeasure}" size="15" class="medium text"/>
-                                                --%>
                                                 <g:autoSuggestString id="unitOfMeasure" name="unitOfMeasure" size="80" class="text"
                                                     jsonUrl="${request.contextPath}/json/autoSuggest"
                                                     value="${productInstance?.unitOfMeasure}" placeholder="e.g. each, tablet, tube, vial"/>
@@ -401,11 +394,6 @@
             </div>
         </g:each>
 
-
-
-    <%--
-        <g:render template='category' model="['category':null,'i':'_clone','hidden':true]"/>
-    --%>
 		<script type="text/javascript">
 
 

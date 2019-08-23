@@ -11,11 +11,11 @@ class ProductCatalogItem implements Comparable, Serializable {
     Date lastUpdated
 
     static constraints = {
-        product(nullable:false)
-        active(nullable:false)
+        product(nullable: false)
+        active(nullable: false)
     }
 
-    static belongsTo = [productCatalog:ProductCatalog]
+    static belongsTo = [productCatalog: ProductCatalog]
 
     static mapping = {
         id generator: 'uuid'
@@ -28,7 +28,7 @@ class ProductCatalogItem implements Comparable, Serializable {
      * @return
      */
     String toString() {
-        return "${id}";
+        return "${id}"
     }
 
     /**
@@ -36,13 +36,13 @@ class ProductCatalogItem implements Comparable, Serializable {
      */
     int compareTo(obj) {
         def sortOrder = id <=> obj?.id
-        return sortOrder;
+        return sortOrder
     }
 
     static PROPERTIES = [
-            "productCatalogCode":"productCatalog.code",
-            "productCode":"product.productCode",
-            "productName":"product.name",
+            "productCatalogCode": "productCatalog.code",
+            "productCode"       : "product.productCode",
+            "productName"       : "product.name",
     ]
 
 }

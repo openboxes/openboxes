@@ -63,13 +63,6 @@
 									<span class="location" id="shipmentOrigin">
 										${fieldValue(bean: shipmentInstance, field: "origin.name")}
 									</span>
-									<%--
-									<span class="fade">
-										<g:if test="${shipmentInstance.expectedShippingDate && !shipmentInstance.hasShipped()}">
-											- <format:date obj="${shipmentInstance?.expectedShippingDate}"/>
-										</g:if>
-									</span>
-									--%>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -85,13 +78,6 @@
 									<span id="shipmentDestination">
 										${fieldValue(bean: shipmentInstance, field: "destination.name")}
 									</span>
-									<%--
-									<span class="fade">
-										<g:if test="${shipmentInstance.expectedDeliveryDate && !shipmentInstance?.wasReceived()}">
-											- <format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
-										</g:if>
-									</span>
-									--%>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -116,23 +102,6 @@
 										</td>
 									</tr>
 								</g:if>
-							<%--
-							<g:if test="${!shipmentWorkflow?.isExcluded('statedValue')}">
-								<tr class="prop">
-									<td valign="top" class="name">
-										<label><warehouse:message code="shipping.statedValue.label" /></label><br/>
-									</td>
-									<td valign="top" class="value">
-										<g:if test="${shipmentInstance.statedValue}">
-											$<g:formatNumber format="#,##0.00" number="${shipmentInstance.statedValue}" /><br/>
-										</g:if>
-										<g:else>
-											<span class="fade"><warehouse:message code="default.na.label"/></span>
-										</g:else>
-									</td>
-								</tr>
-							</g:if>
-							--%>
 							</g:if>
 
 							<g:if test="${!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier}">
@@ -190,48 +159,6 @@
 									</tr>
 								</g:each>
 							</g:if>
-
-							<%--
-								<g:if test="${!shipmentWorkflow?.isExcluded('shipmentMethod.shipper')}">
-									<tr class="prop">
-										<td valign="top" class="name"><label><warehouse:message
-										code="shipping.freightForwarder.label" default="Freight Forwarder" /></label>
-										</td>
-										<td valign="top" >
-											<g:if test="${shipmentInstance?.shipmentMethod?.shipper}">
-												${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipper.name")}
-												${fieldValue(bean: shipmentInstance, field: "shipmentMethod.shipperService.name")}
-											</g:if>
-										</td>
-										<td>
-											<g:if test="${shipmentInstance?.shipmentMethod?.trackingNumber}">
-												<span class="fade">
-													Tracking # <b>${fieldValue(bean: shipmentInstance, field: "shipmentMethod.trackingNumber")}</b>
-												</span>
-											</g:if>
-										</td>
-									</tr>
-								</g:if>
-
-								<g:if test="${!shipmentWorkflow?.isExcluded('recipient')}">
-									<tr class="prop">
-										<td class="name"  >
-											<label><warehouse:message code="shipping.recipient.label" default="Recipient" /></label>
-										</td>
-										<td  style="width: 30%;">
-											<g:if test="${shipmentInstance?.recipient}">
-												<span>
-													${fieldValue(bean: shipmentInstance, field: "recipient.firstName")}
-													${fieldValue(bean: shipmentInstance, field: "recipient.lastName")}
-												</span>
-											</g:if>
-										</td>
-										<td>
-											<span class="fade">${fieldValue(bean: shipmentInstance, field: "recipient.email")}</span>
-										</td>
-									</tr>
-								</g:if>
-								--%>
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message
@@ -307,18 +234,6 @@
 
                                                 </td>
                                             </tr>
-                                            <%--
-                                            <tr class="even">
-                                                <td>
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" class="middle"/>
-                                                </td>
-                                                <td>
-                                                    <g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">
-                                                        <label><g:message code="shipping.certificateOfDonation" default="Certificate of Donation"/></label>
-                                                    </g:link>
-                                                </td>
-                                            </tr>
-                                            --%>
                                             <g:each in="${shipmentInstance.documents + shipmentWorkflow.documentTemplates}" var="document" status="i">
                                                 <tr id="document-${document.id}" class="${i%2==0?'even':'odd'}">
                                                     <td class="middle">
@@ -720,18 +635,6 @@
                                                 <g:link controller="document" action="download" id="${document.id}" params="[shipmentId:shipmentInstance?.id]" title="${document?.filename}">
                                                     <label><format:metadata obj="${document?.name}"/></label>
                                                 </g:link>
-                                            <%--
-                                            <div class="">
-                                                <g:link controller="document" action="download" id="${document.id}">
-                                                    <warehouse:message code="default.button.download.label"/></g:link>
-                                                ·
-                                                <g:link action="editDocument" params="[documentId:document.id,shipmentId:shipmentInstance.id]">
-                                                    <warehouse:message code="default.button.edit.label"/></g:link>
-                                                ·
-                                                <g:link class="remove" action="deleteDocument" id="${document?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteDocument.message')}')" style="color: #666">
-                                                    <warehouse:message code="default.button.delete.label"/></g:link>
-                                            </div>
-                                            --%>
                                             </td>
                                             <td class="right">
 
@@ -805,18 +708,6 @@
 
                                 <table>
                                     <tbody>
-
-
-                                    <%--
-                                    <g:unless test="${shipmentInstance.comments}">
-
-                                        <tr>
-                                            <td colspan="2">
-                                                <div class="fade center empty"><warehouse:message code="default.noComments.label" /></div>
-                                            </td>
-                                        </tr>
-                                    </g:unless>
-                                    --%>
                                     <g:each in="${shipmentInstance.comments}" var="comment" status="i">
                                         <tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}" >
                                             <td width="1%">
@@ -850,18 +741,7 @@
 
                                             </td>
                                             <td>
-                                                <p class="fade right">
-                                                    <%--
-                                                    <g:link class="fade" action="editComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]">
-                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle"/>
-                                                    </g:link>
-                                                    --%>
-                                                    <%--
-                                                    <g:link class="fade" action="deleteComment" id="${comment?.id}" params="[shipmentId:shipmentInstance.id]" onclick="return confirm('${warehouse.message(code:'shipping.confirm.deleteNote.message')}')">
-                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" style="vertical-align: middle"/>
-                                                    </g:link>
-                                                    --%>
-                                                </p>
+                                                <p class="fade right"></p>
                                             </td>
                                         </tr>
 
@@ -948,14 +828,6 @@
                                                 <g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventCode.RECEIVED }">
 
                                                 </g:if>
-                                                <%--
-                                                <g:link action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle"/>
-                                                </g:link>
-                                                <g:link action="deleteEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="Delete" style="vertical-align: middle"/>
-                                                </g:link>
-                                                --%>
                                             </td>
                                         </tr>
                                     </g:each>
@@ -1000,9 +872,6 @@
                                         <tr class="prop">
                                             <td valign="top" class="name"><label><warehouse:message code="shipping.eventDate.label" /></label></td>
                                             <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
-                                                <%--
-                                                <g:jqueryDatePicker name="eventDate" value="${eventInstance?.eventDate}" format="MM/dd/yyyy" />
-                                                --%>
                                                 <g:datePicker name="eventDate" value="${eventInstance?.eventDate}" precision="minute"/>
                                             </td>
                                         </tr>

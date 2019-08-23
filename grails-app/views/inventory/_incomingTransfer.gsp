@@ -275,19 +275,7 @@
 		var cloneRow = function($table, $tableRow) { 
 			// Replace all rows 
 			var newTableRow = $tableRow.clone().find("input,select").each(function() {
-		    	//var nextIndex = $("tr.row").length;
-			    //var oldName = $(this).attr('name');
-			    //var newName = oldName.replace("/(transactionEntries\[)(\d+)(\])/", function(f, p1, p2, p3) {
-			    //	return p1 + nextIndex + p3;
-			    //});
-		        //$(this).attr('name', newName);
 		    }).end();
-
-			// Remove the add button
-			//newTableRow.find("img.add").remove();
-			
-			// Remove product name
-			//newTableRow.find("span.productName").remove();
 			
 			// Show the lot number selector 
 			newTableRow.find(".lotNumberSelector").show().find(".inventoryItem").val("");
@@ -384,8 +372,6 @@
 						readonlySpan.find(".expirationDate").text("(${warehouse.message(code: 'default.expires.label')} " + expMonth + " " + expYear + ")");
 					}					
 				});
-
-
 				
 				// Show new lot number and hide existing lot number
 				// TODO Rename existingLotNumber to lotNumberSelect 
@@ -393,10 +379,6 @@
 				$(this).closest(".lotNumberSelector").hide();
 				$(this).parent().siblings(".lotNumberReadonly").show();
 				$(this).parent().siblings(".lotNumberEditor").hide();
-				// Tab to the next field
-				//var currentIndex = $(":input").index(this);
-				//alert(currentIndex);
-				//$(":input:eq(" +  (currentIndex + 1) + ")").focus();
 			}
 		});
 

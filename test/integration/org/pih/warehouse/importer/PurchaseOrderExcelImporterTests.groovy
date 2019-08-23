@@ -26,19 +26,5 @@ class PurchaseOrderExcelImporterTests extends GroovyTestCase {
         assert data != null
 
         println data
-        /*
-        data.eachWithIndex { row, index ->
-            println "${index}: ${row}"
-
-            def product = Product.findByProductCode(row.productCode)
-            assert product
-            //assert product.name == row.product
-            println "Levenshtein distnace: " + StringUtils.getLevenshteinDistance(product.name, row.product)
-        }
-        */
-
-
-
-
     }
 }

@@ -12,10 +12,10 @@ package org.pih.warehouse.inventory
 class InventoryBrowserController {
 
     def index = {
-        redirect(action:"list")
+        redirect(action: "list")
     }
 
 
-    def list = { }
+    def list = {}
 
 }

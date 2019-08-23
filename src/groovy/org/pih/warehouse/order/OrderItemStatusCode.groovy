@@ -11,7 +11,7 @@ enum OrderItemStatusCode {
     final Integer sortOrder
 
     OrderItemStatusCode(Integer sortOrder) {
-        this.sortOrder = sortOrder;
+        this.sortOrder = sortOrder
     }
 
     static list() {

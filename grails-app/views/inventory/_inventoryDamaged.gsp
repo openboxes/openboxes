@@ -11,13 +11,6 @@
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
-
-                    <%--
-					<span>
-						<g:jqueryDatePicker id="transactionDate" name="transactionInstance.transactionDate"
-								value="${command?.transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-					</span>
-					--%>
                     <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
 
                 </td>
@@ -99,29 +92,6 @@
 									
 								</g:each>
 							</tbody>
-							<%-- 
-							<tbody>
-								<g:each var="transactionEntry" in="${transactionInstance?.transactionEntries}" status="i">
-									<g:hiddenField name="transactionEntries[${i }].inventoryItem.id" value="${transactionEntry?.inventoryItem?.id }"/>
-									<tr>
-										<td>${transactionEntry?.inventoryItem?.product }</td>
-										<td>${transactionEntry?.inventoryItem?.lotNumber }</td>
-										<td>${transactionEntry?.inventoryItem?.expirationDate }</td>
-										<td>${quantityMap[transactionEntry?.inventoryItem] }</td>
-										<td><g:textField name="transactionEntries[${i }].quantity"
-												value="${transactionEntry.quantity }" size="1" />
-										</td>
-									</tr>
-								</g:each>
-								<g:unless test="${!transactionInstance?.transactionEntries }">
-									<tr class="empty">
-										<td colspan="5" style="text-align: center; display:none;" id="noItemsRow">
-											<span class="fade"><warehouse:message code="transaction.noItems.message"/></span>
-										</td>
-									</tr>
-								</g:unless>
-							</tbody>
-							--%>
 						</table>
 					</div>	
 				</td>

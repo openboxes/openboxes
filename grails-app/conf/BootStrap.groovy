@@ -31,7 +31,6 @@ import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.FileService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -70,194 +69,221 @@ class BootStrap {
     def init = { servletContext ->
 
         // Static data
-        JSON.registerObjectMarshaller(ContainerType) { ContainerType containerType -> [
-                id: containerType.id,
-                name: containerType.name,
-                description: containerType.description
-        ]}
+        JSON.registerObjectMarshaller(ContainerType) { ContainerType containerType ->
+            [
+                    id         : containerType.id,
+                    name       : containerType.name,
+                    description: containerType.description
+            ]
+        }
 
-        JSON.registerObjectMarshaller(LocationType) { LocationType locationType -> [
-                id: locationType.id,
-                name: locationType.name,
-                description: locationType.description,
-                locationTypeCode: locationType?.locationTypeCode?.name()
-        ]}
+        JSON.registerObjectMarshaller(LocationType) { LocationType locationType ->
+            [
+                    id              : locationType.id,
+                    name            : locationType.name,
+                    description     : locationType.description,
+                    locationTypeCode: locationType?.locationTypeCode?.name()
+            ]
+        }
 
-        JSON.registerObjectMarshaller(ShipmentType) { ShipmentType shipmentType -> [
-                id: shipmentType.id,
-                name: shipmentType.name,
-                description: shipmentType.description
-        ]}
+        JSON.registerObjectMarshaller(ShipmentType) { ShipmentType shipmentType ->
+            [
+                    id         : shipmentType.id,
+                    name       : shipmentType.name,
+                    description: shipmentType.description
+            ]
+        }
 
 
         // Master data
 
-        JSON.registerObjectMarshaller(Category) { Category category -> [
-                id: category.id,
-                name: category.name,
-                parentCategory: category?.parentCategory
-        ]}
+        JSON.registerObjectMarshaller(Category) { Category category ->
+            [
+                    id            : category.id,
+                    name          : category.name,
+                    parentCategory: category?.parentCategory
+            ]
+        }
 
-        JSON.registerObjectMarshaller(Container) { Container container -> [
-                id: container.id,
-                name: container.name,
-                containerNumber: container.containerNumber,
-                containerType: container.containerType,
-                recipient: container.recipient,
-                sortOrder: container.sortOrder,
-                shipmentItems: container.shipmentItems
-        ]}
+        JSON.registerObjectMarshaller(Container) { Container container ->
+            [
+                    id             : container.id,
+                    name           : container.name,
+                    containerNumber: container.containerNumber,
+                    containerType  : container.containerType,
+                    recipient      : container.recipient,
+                    sortOrder      : container.sortOrder,
+                    shipmentItems  : container.shipmentItems
+            ]
+        }
 
-        JSON.registerObjectMarshaller(LocationGroup) { LocationGroup locationGroup -> [
-                id: locationGroup.id,
-                name: locationGroup.name
-        ]}
+        JSON.registerObjectMarshaller(LocationGroup) { LocationGroup locationGroup ->
+            [
+                    id  : locationGroup.id,
+                    name: locationGroup.name
+            ]
+        }
 
-        JSON.registerObjectMarshaller(InventoryItem) { InventoryItem inventoryItem -> [
-                id: inventoryItem.id,
-                product: [
-                        id: inventoryItem?.product?.id,
-                        name: inventoryItem?.product?.name,
-                        productCode: inventoryItem?.product?.productCode
-                ],
-                lotNumber: inventoryItem.lotNumber,
-                expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy")
-        ]}
+        JSON.registerObjectMarshaller(InventoryItem) { InventoryItem inventoryItem ->
+            [
+                    id            : inventoryItem.id,
+                    product       : [
+                            id         : inventoryItem?.product?.id,
+                            name       : inventoryItem?.product?.name,
+                            productCode: inventoryItem?.product?.productCode
+                    ],
+                    lotNumber     : inventoryItem.lotNumber,
+                    expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy")
+            ]
+        }
 
-        JSON.registerObjectMarshaller(Location) { Location location -> [
-                id: location.id,
-                name: location.name,
-                description: location.description,
-                locationNumber: location.locationNumber,
-                locationGroup: location.locationGroup,
-                parentLocation: location.parentLocation,
-                locationType: location.locationType,
-                sortOrder: location.sortOrder,
-                hasBinLocationSupport: location.hasBinLocationSupport()
-        ]}
+        JSON.registerObjectMarshaller(Location) { Location location ->
+            [
+                    id                   : location.id,
+                    name                 : location.name,
+                    description          : location.description,
+                    locationNumber       : location.locationNumber,
+                    locationGroup        : location.locationGroup,
+                    parentLocation       : location.parentLocation,
+                    locationType         : location.locationType,
+                    sortOrder            : location.sortOrder,
+                    hasBinLocationSupport: location.hasBinLocationSupport()
+            ]
+        }
 
         JSON.registerObjectMarshaller(Person) { Person person ->
             return person.toJson()
         }
 
 
-        JSON.registerObjectMarshaller(Picklist) { Picklist picklist -> [
-                id: picklist.id,
-                name: picklist.name,
-                description: picklist.description,
-                picker: picklist.picker,
-                datePicked: picklist.datePicked?.format("MM/dd/yyyy"),
-                picklistItems: picklist.picklistItems,
-                "requisition.id": picklist?.requisition?.id
-        ]}
+        JSON.registerObjectMarshaller(Picklist) { Picklist picklist ->
+            [
+                    id              : picklist.id,
+                    name            : picklist.name,
+                    description     : picklist.description,
+                    picker          : picklist.picker,
+                    datePicked      : picklist.datePicked?.format("MM/dd/yyyy"),
+                    picklistItems   : picklist.picklistItems,
+                    "requisition.id": picklist?.requisition?.id
+            ]
+        }
 
-        JSON.registerObjectMarshaller(PicklistItem) { PicklistItem picklistItem -> [
-                id: picklistItem.id,
-                status: picklistItem.status,
-                "picklist.id": picklistItem?.picklist?.id,
-                "requisitionItem.id": picklistItem?.requisitionItem?.id,
-                "inventoryItem.id": picklistItem.inventoryItem?.id,
-                "product.name": picklistItem?.inventoryItem?.product?.name,
-                "productCode": picklistItem?.inventoryItem?.product?.productCode,
-                lotNumber: picklistItem?.inventoryItem?.lotNumber,
-                expirationDate: picklistItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                "binLocation.id": picklistItem?.binLocation?.id,
-                "binLocation.name": picklistItem?.binLocation?.name,
-                quantityPicked: picklistItem.quantity,
-                reasonCode: picklistItem.reasonCode,
-                comment: picklistItem.comment
-        ]}
-
-
-        JSON.registerObjectMarshaller(Product) { Product product -> [
-                id: product.id,
-                productCode: product.productCode,
-                name: product.name,
-                description: product.description
-//                "category.id": product?.category?.id,
-//                "category.name": product?.category?.name
-        ]}
-
-        JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation -> [
-                id: productAssociation.id,
-                type: productAssociation?.code?.name(),
-                product: productAssociation.product,
-                associatedProduct: productAssociation.associatedProduct,
-                quantity: productAssociation.quantity,
-                comments: productAssociation.comments
-        ]}
+        JSON.registerObjectMarshaller(PicklistItem) { PicklistItem picklistItem ->
+            [
+                    id                  : picklistItem.id,
+                    status              : picklistItem.status,
+                    "picklist.id"       : picklistItem?.picklist?.id,
+                    "requisitionItem.id": picklistItem?.requisitionItem?.id,
+                    "inventoryItem.id"  : picklistItem.inventoryItem?.id,
+                    "product.name"      : picklistItem?.inventoryItem?.product?.name,
+                    "productCode"       : picklistItem?.inventoryItem?.product?.productCode,
+                    lotNumber           : picklistItem?.inventoryItem?.lotNumber,
+                    expirationDate      : picklistItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                    "binLocation.id"    : picklistItem?.binLocation?.id,
+                    "binLocation.name"  : picklistItem?.binLocation?.name,
+                    quantityPicked      : picklistItem.quantity,
+                    reasonCode          : picklistItem.reasonCode,
+                    comment             : picklistItem.comment
+            ]
+        }
 
 
+        JSON.registerObjectMarshaller(Product) { Product product ->
+            [
+                    id         : product.id,
+                    productCode: product.productCode,
+                    name       : product.name,
+                    description: product.description
+            ]
+        }
 
-        JSON.registerObjectMarshaller(Receipt) { Receipt receipt -> [
-                id: receipt.id,
-                expectedDeliveryDate: receipt.expectedDeliveryDate,
-                actualDeliveryDate: receipt.actualDeliveryDate,
-                recipient: receipt.recipient,
-                shipment: receipt.shipment,
-                recipientItems: receipt.receiptItems
-        ]}
+        JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation ->
+            [
+                    id               : productAssociation.id,
+                    type             : productAssociation?.code?.name(),
+                    product          : productAssociation.product,
+                    associatedProduct: productAssociation.associatedProduct,
+                    quantity         : productAssociation.quantity,
+                    comments         : productAssociation.comments
+            ]
+        }
 
-        JSON.registerObjectMarshaller(ReceiptItem) { ReceiptItem receiptItem -> [
-                id: receiptItem.id,
-                receipt: receiptItem.receipt,
-                product: receiptItem.inventoryItem.product,
-                inventoryItem: receiptItem.inventoryItem,
-                quantityReceived: receiptItem.quantityReceived,
-                quantityShipped: receiptItem.quantityShipped,
-                binLocation: receiptItem.binLocation,
-                recipient: receiptItem.recipient
-        ]}
+
+        JSON.registerObjectMarshaller(Receipt) { Receipt receipt ->
+            [
+                    id                  : receipt.id,
+                    expectedDeliveryDate: receipt.expectedDeliveryDate,
+                    actualDeliveryDate  : receipt.actualDeliveryDate,
+                    recipient           : receipt.recipient,
+                    shipment            : receipt.shipment,
+                    recipientItems      : receipt.receiptItems
+            ]
+        }
+
+        JSON.registerObjectMarshaller(ReceiptItem) { ReceiptItem receiptItem ->
+            [
+                    id              : receiptItem.id,
+                    receipt         : receiptItem.receipt,
+                    product         : receiptItem.inventoryItem.product,
+                    inventoryItem   : receiptItem.inventoryItem,
+                    quantityReceived: receiptItem.quantityReceived,
+                    quantityShipped : receiptItem.quantityShipped,
+                    binLocation     : receiptItem.binLocation,
+                    recipient       : receiptItem.recipient
+            ]
+        }
 
         JSON.registerObjectMarshaller(Requisition) { Requisition requisition ->
             def defaultName = requisition?.isTemplate ? "Stocklist ${requisition?.id}" : null
             [
-                id: requisition.id,
-                name: requisition.name?:defaultName,
-                requisitionNumber: requisition.requestNumber,
-                description: requisition.description,
-                isTemplate: requisition.isTemplate,
-                type: requisition?.type?.name(),
-                status: requisition?.status?.name(),
-                commodityClass: requisition?.commodityClass?.name(),
-                dateRequested: requisition.dateRequested?.format("MM/dd/yyyy"),
-                dateReviewed: requisition.dateReviewed?.format("MM/dd/yyyy"),
-                dateVerified: requisition.dateVerified?.format("MM/dd/yyyy"),
-                dateChecked: requisition.dateChecked?.format("MM/dd/yyyy"),
-                dateDelivered: requisition.dateDelivered?.format("MM/dd/yyyy HH:mm XXX"),
-                dateIssued: requisition.dateIssued?.format("MM/dd/yyyy"),
-                dateReceived: requisition.dateReceived?.format("MM/dd/yyyy"),
-                origin: requisition.origin,
-                destination: requisition.destination,
-                requestedBy: requisition.requestedBy,
-                reviewedBy: requisition.reviewedBy,
-                verifiedBy: requisition.verifiedBy,
-                checkedBy: requisition.checkedBy,
-                deliveredBy: requisition.deliveredBy,
-                issuedBy: requisition.issuedBy,
-                receivedBy: requisition.receivedBy,
-                recipient: requisition.recipient,
-                requisitionItems: requisition.requisitionItems
-        ]}
+                    id               : requisition.id,
+                    name             : requisition.name ?: defaultName,
+                    requisitionNumber: requisition.requestNumber,
+                    description      : requisition.description,
+                    isTemplate       : requisition.isTemplate,
+                    type             : requisition?.type?.name(),
+                    status           : requisition?.status?.name(),
+                    commodityClass   : requisition?.commodityClass?.name(),
+                    dateRequested    : requisition.dateRequested?.format("MM/dd/yyyy"),
+                    dateReviewed     : requisition.dateReviewed?.format("MM/dd/yyyy"),
+                    dateVerified     : requisition.dateVerified?.format("MM/dd/yyyy"),
+                    dateChecked      : requisition.dateChecked?.format("MM/dd/yyyy"),
+                    dateDelivered    : requisition.dateDelivered?.format("MM/dd/yyyy HH:mm XXX"),
+                    dateIssued       : requisition.dateIssued?.format("MM/dd/yyyy"),
+                    dateReceived     : requisition.dateReceived?.format("MM/dd/yyyy"),
+                    origin           : requisition.origin,
+                    destination      : requisition.destination,
+                    requestedBy      : requisition.requestedBy,
+                    reviewedBy       : requisition.reviewedBy,
+                    verifiedBy       : requisition.verifiedBy,
+                    checkedBy        : requisition.checkedBy,
+                    deliveredBy      : requisition.deliveredBy,
+                    issuedBy         : requisition.issuedBy,
+                    receivedBy       : requisition.receivedBy,
+                    recipient        : requisition.recipient,
+                    requisitionItems : requisition.requisitionItems
+            ]
+        }
 
-        JSON.registerObjectMarshaller(RequisitionItem) { RequisitionItem requisitionItem -> [
-                id: requisitionItem.id,
-                status: requisitionItem.status?.name(),
-                "requisition.id": requisitionItem?.requisition.id,
-                product: requisitionItem.product,
-                inventoryItem: requisitionItem.inventoryItem,
-                quantity: requisitionItem.quantity,
-                quantityApproved: requisitionItem.quantityApproved,
-                quantityCanceled: requisitionItem.quantityCanceled,
-                cancelReasonCode: requisitionItem.cancelReasonCode,
-                cancelComments: requisitionItem.cancelComments,
-                orderIndex: requisitionItem.orderIndex,
-                changes: requisitionItem.change?[requisitionItem.change]:[],
-                modification: requisitionItem.modificationItem,
-                substitution: requisitionItem.substitutionItem,
-                picklistItems: requisitionItem.picklistItems,
-        ]}
-
+        JSON.registerObjectMarshaller(RequisitionItem) { RequisitionItem requisitionItem ->
+            [
+                    id              : requisitionItem.id,
+                    status          : requisitionItem.status?.name(),
+                    "requisition.id": requisitionItem?.requisition.id,
+                    product         : requisitionItem.product,
+                    inventoryItem   : requisitionItem.inventoryItem,
+                    quantity        : requisitionItem.quantity,
+                    quantityApproved: requisitionItem.quantityApproved,
+                    quantityCanceled: requisitionItem.quantityCanceled,
+                    cancelReasonCode: requisitionItem.cancelReasonCode,
+                    cancelComments  : requisitionItem.cancelComments,
+                    orderIndex      : requisitionItem.orderIndex,
+                    changes         : requisitionItem.change ? [requisitionItem.change] : [],
+                    modification    : requisitionItem.modificationItem,
+                    substitution    : requisitionItem.substitutionItem,
+                    picklistItems   : requisitionItem.picklistItems,
+            ]
+        }
 
 
         JSON.registerObjectMarshaller(Shipment) { Shipment shipment ->
@@ -267,41 +293,43 @@ class BootStrap {
                 containerList << [id: container?.id, name: container?.name, type: container?.containerType?.name, shipmentItems: shipmentItems]
             }
             return [
-                    id: shipment.id,
-                    name: shipment.name,
-                    status: shipment?.status?.code?.name(),
-                    origin: [
-                            id: shipment.origin?.id,
+                    id                  : shipment.id,
+                    name                : shipment.name,
+                    status              : shipment?.status?.code?.name(),
+                    origin              : [
+                            id  : shipment.origin?.id,
                             name: shipment?.origin?.name,
                             type: shipment?.origin?.locationType?.locationTypeCode?.name()
                     ],
-                    destination: [
-                            id: shipment?.destination?.id,
+                    destination         : [
+                            id  : shipment?.destination?.id,
                             name: shipment?.destination?.name,
                             type: shipment?.destination?.locationType?.locationTypeCode?.name()
 
                     ],
                     expectedShippingDate: shipment.expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
-                    actualShippingDate: shipment.actualShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
+                    actualShippingDate  : shipment.actualShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
                     expectedDeliveryDate: shipment.expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
-                    actualDeliveryDate: shipment.actualDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
-                    shipmentItems: shipment.shipmentItems,
-                    containers: containerList
-        ]}
+                    actualDeliveryDate  : shipment.actualDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+                    shipmentItems       : shipment.shipmentItems,
+                    containers          : containerList
+            ]
+        }
 
         JSON.registerObjectMarshaller(ShipmentItem) { ShipmentItem shipmentItem ->
             def container = shipmentItem?.container ? [
-                    id: shipmentItem?.container?.id,
+                    id  : shipmentItem?.container?.id,
                     name: shipmentItem?.container?.name,
-                    type: shipmentItem?.container?.containerType?.name ] : null
+                    type: shipmentItem?.container?.containerType?.name] : null
             [
-                id: shipmentItem.id,
-                inventoryItem: shipmentItem?.inventoryItem,
-                quantity: shipmentItem.quantity,
-                recipient: shipmentItem.recipient,
-                shipment: [id: shipmentItem?.shipment?.id, name: shipmentItem?.shipment?.name],
-                container: container
-        ]}
+                    id           : shipmentItem.id,
+                    inventoryItem: shipmentItem?.inventoryItem,
+                    quantity     : shipmentItem.quantity,
+                    recipient    : shipmentItem.recipient,
+                    shipment     : [id: shipmentItem?.shipment?.id, name: shipmentItem?.shipment?.name],
+                    container    : container
+            ]
+        }
 
 
         JSON.registerObjectMarshaller(User) { User user ->
@@ -395,8 +423,6 @@ class BootStrap {
         // Migrating existing data to the new data model is still a work in progress, but you can
         // use the previous versions changelogs.
         //
-        //if (GrailsUtil.environment == 'test' || GrailsUtil.environment == 'development' ||
-        //GrailsUtil.environment == 'client' || GrailsUtil.environment == 'root') {
         log.info("Running liquibase changelog(s) ...")
         Liquibase liquibase = null
         try {
@@ -405,11 +431,9 @@ class BootStrap {
             if (connection == null) {
                 throw new RuntimeException("Connection could not be created.")
             }
-            //LiquibaseUtil.class.getClassLoader();
             def classLoader = getClass().classLoader
             def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
 
-            //def fileOpener = new ClassLoaderFileOpener()
             def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
             boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
             log.info("Liquibase running: " + isRunningMigrations)
@@ -436,17 +460,12 @@ class BootStrap {
         }
         log.info("Finished running liquibase changelog(s)!")
 
-		def enableFixtures = Boolean.valueOf(grailsApplication.config.openboxes.fixtures.enabled?:true)
+        def enableFixtures = Boolean.valueOf(grailsApplication.config.openboxes.fixtures.enabled ?: true)
         log.info("Insert test fixtures?  " + enableFixtures)
-		if (enableFixtures) {
+        if (enableFixtures) {
             log.info("Inserting test fixtures ...")
             insertTestFixture()
         }
-
-        //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
-        //TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
-        //log.info("Default TimeZone set to " + TimeZone.getDefault().displayName)
-
 
         // Debug logging used to figure out what log4j properties are ruining it for the rest of us
         getClass().getClassLoader().getResources("log4j.properties").each {
@@ -454,7 +473,7 @@ class BootStrap {
         }
 
         getClass().getClassLoader().getResources("log4j.xml").each {
-            log.info "log4j.xml => " +  it
+            log.info "log4j.xml => " + it
         }
 
         // Create uploads directory if it doesn't already exist
@@ -587,7 +606,6 @@ class BootStrap {
             addInventoryItem(product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
         }
     }
-
 
 
     private def addInventoryItem(product, expirationDate, quantity) {

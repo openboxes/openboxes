@@ -57,26 +57,6 @@
 								</td>
 							</tr>
 
-							<%--
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label for="dateCreated"><warehouse:message code="indicator.dateCreated.label" default="Date Created" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: indicatorInstance, field: 'dateCreated', 'errors')}">
-									<g:datePicker name="dateCreated" precision="minute" value="${indicatorInstance?.dateCreated}"  />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label for="lastUpdated"><warehouse:message code="indicator.lastUpdated.label" default="Last Updated" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: indicatorInstance, field: 'lastUpdated', 'errors')}">
-									<g:datePicker name="lastUpdated" precision="minute" value="${indicatorInstance?.lastUpdated}"  />
-								</td>
-							</tr>
-							--%>
-
-
 							<tr class="prop">
 								<td valign="top"></td>
 								<td valign="top">

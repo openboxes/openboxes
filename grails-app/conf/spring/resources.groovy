@@ -7,18 +7,13 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
+
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
-import org.springframework.cache.ehcache.EhCacheFactoryBean
 
 beans = {
 
     customPropertyEditorRegistrar(util.CustomPropertyEditorRegistrar)
-
-    //localeResolver(org.springframework.web.servlet.i18n.SessionLocaleResolver) {
-    //	defaultLocale = new Locale("de","DE")
-    //	java.util.Locale.setDefault(defaultLocale)
-    //}
 
     /**
      * c3P0 pooled data source that allows 'DB keepalive' queries

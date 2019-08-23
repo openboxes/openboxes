@@ -93,13 +93,6 @@
 									</td>
 								</tr>
 								
-								<!--  
-								<tr class="prop">
-									<td valign="top" class="name"><label><warehouse:message code="shipment.loadingDate.label" default="Loading Date" /></td>
-									<td>&nbsp;</td>
-								</tr>
-								-->
-								
 								<tr class="prop">
 									<td valign="top" class="name"><label><warehouse:message code="shipping.expectedShippingDate.label"/></label></td>
 									<td class="value ${hasErrors(bean: shipmentInstance, field: 'expectedShippingDate', 'errors')}"> 

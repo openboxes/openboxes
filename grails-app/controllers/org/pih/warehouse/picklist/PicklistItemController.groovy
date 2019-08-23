@@ -13,27 +13,22 @@ class PicklistItemController {
 
     def scaffold = PicklistItem
 
-	def picklistService
+    def picklistService
 
-	def delete = {
-		def picklistItem = PicklistItem.get(params.id)
-		if (picklistItem) {
-			
-			try {
-				//picklistItem.picklist.removeFromPicklistItems(picklistItem)
-				picklistItem.delete()
-				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
-			}
-		}
-		else {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
-		}
-		redirect(controller: "requisition", action: "pick", id:picklistItem?.picklist?.requisition?.id, params: ['requisitionItem.id':picklistItem?.requisitionItem?.id])
-	}
-	
-	
-	
+    def delete = {
+        def picklistItem = PicklistItem.get(params.id)
+        if (picklistItem) {
+
+            try {
+                picklistItem.delete()
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
+            }
+        } else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
+        }
+        redirect(controller: "requisition", action: "pick", id: picklistItem?.picklist?.requisition?.id, params: ['requisitionItem.id': picklistItem?.requisitionItem?.id])
+    }
 }

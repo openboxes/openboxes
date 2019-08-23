@@ -202,18 +202,15 @@
 				$('.checkable').toggle(
 					function(event) {
 						$(this).parent().find('input').click();
-						//$(this).parent().addClass('checked');
 						return false;
 					},
 					function(event) {
 						$(this).parent().find('input').click();
-						//$(this).parent().removeClass('checked');
 						return false;
 					}
 				);
 				
 				$("#toggleCheckbox").click(function(event) {
-					//$(".checkbox").attr("checked", $(this).attr("checked"));
                     var checked = ($(this).attr("checked") == 'checked');
                     $(".checkbox").attr("checked", checked);
 				});	

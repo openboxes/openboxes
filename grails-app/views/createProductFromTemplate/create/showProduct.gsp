@@ -27,13 +27,7 @@
 						<g:link controller="createProductFromTemplate" action="index" class="create">
 							Create another product
 						</g:link>
-					</span>					
-					
-					<%--
-                    <g:submitButton class="back" name="back" value="Back" />
-                    <g:submitButton class="next" name="next" value="Next" />
-                    <g:submitButton class="cancel" name="cancel" value="Cancel" />
-					 --%>
+					</span>
 				</div>			
 				<div class="dialog box">
 					<table>
@@ -107,21 +101,11 @@
 								<td class="value">		
 									${product.size }
 								</td>
-							</tr>									
-																
-								
+							</tr>
 						</tbody>								
 					</table>				
-				</div>			
-				
+				</div>				
             </g:form>
-        </div>
-        
-        
-        
-		<script>			
-			//$(document).ready(function() {
-			//});
-		</script> 				
+        </div>				
     </body>
 </html>

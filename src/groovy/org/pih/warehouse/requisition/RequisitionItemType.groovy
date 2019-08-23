@@ -9,36 +9,36 @@
  **/
 package org.pih.warehouse.requisition
 
-public enum RequisitionItemType {
+enum RequisitionItemType {
     ORIGINAL(0),
     SUBSTITUTION(1),
-	QUANTITY_CHANGE(2),
-	PACKAGE_CHANGE(3),
+    QUANTITY_CHANGE(2),
+    PACKAGE_CHANGE(3),
     ADDITION(4)
 
-	int sortOrder
+    int sortOrder
 
     RequisitionItemType(int sortOrder) {
-		[
-			this.sortOrder = sortOrder
-		]
-	}
+        [
+                this.sortOrder = sortOrder
+        ]
+    }
 
-	static int compare(RequisitionItemType a, RequisitionItemType b) {
-		return a.sortOrder <=> b.sortOrder
-	}
+    static int compare(RequisitionItemType a, RequisitionItemType b) {
+        return a.sortOrder <=> b.sortOrder
+    }
 
-	static list() {
-		[
-            ORIGINAL,
-            SUBSTITUTION,
-            QUANTITY_CHANGE,
-            PACKAGE_CHANGE,
-            ADDITION
-		]
-	}
+    static list() {
+        [
+                ORIGINAL,
+                SUBSTITUTION,
+                QUANTITY_CHANGE,
+                PACKAGE_CHANGE,
+                ADDITION
+        ]
+    }
 
-	String toString() {
-		return name()
-	}
+    String toString() {
+        return name()
+    }
 }

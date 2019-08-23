@@ -86,23 +86,8 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
 
         println controller.response
 
-        //println controller.renderArgs
-        //println controller.modelAndView.view
-        //println controller.modelAndView.viewName
-        //println controller.modelAndView.model
-        //println controller.modelAndView.modelMap
-
-
         println "Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 
         println sessionFactory.getStatistics()
-        //def requisition = Requisition.findByRequestNumber("508BSK")
-        //assertEquals controller.modelAndView.model.requisition, requisition
-        //assertEquals controller.modelAndView.viewName, "/requisition/review"
-
-
-
     }
-
-
 }

@@ -22,7 +22,6 @@
 			selectFirst: true,
 			scroll: true,
 			autoFill: true,
-			//scrollHeight: 300,
 			//define callback to format results
 			source: function(req, add){
 				//pass request to server

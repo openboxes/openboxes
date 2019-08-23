@@ -78,9 +78,6 @@
 											<td colspan="6" class="even center">
 												<div class="fade padded">
 													<warehouse:message code="transaction.noTransactions.label"/>
-													<%-- 
-													<warehouse:message code="transaction.noTransactions.message" args="[format.metadata(obj:commandInstance?.transactionType),commandInstance?.startDate,commandInstance?.endDate]"/>
-													--%>
 												</div>
 											</td>
 										</tr>
@@ -134,19 +131,7 @@
 													</span>
 												</td>												
 											</tr>
-										</g:each>
-										<%-- 
-										<!-- Commented out because it's a little confusing --> 
-										<tr class="prop" style="height: 3em;">
-											<td colspan="3" style="text-align: right; font-size: 1.5em; vertical-align: middle;">
-												Recent changes
-											</td>
-											<td style="text-align: center; font-size: 1.5em; vertical-align: middle">
-												<g:if test="${totalQuantityChange>0}">${totalQuantityChange}</g:if>
-												<g:else><span style="color: red;">${totalQuantityChange}</span></g:else>	
-											</td>
-										</tr>
-										--%>															
+										</g:each>															
 									</g:else>
 								</tbody>
 							</table>
@@ -165,12 +150,5 @@
 			<warehouse:message code="transactionLog.showAll.label"/>
 		</g:link>
 	</g:if>
-	<%-- 
-	<g:else>
-		<g:link controller="inventoryItem" action="showStockCard" id="${commandInstance?.productInstance?.id }" fragment="transactionLog">
-			<warehouse:message code="transactionLog.reset.label"/>
-		</g:link>
-	</g:else>
-	--%>	
 </div>
 	

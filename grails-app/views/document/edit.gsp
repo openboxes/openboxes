@@ -58,17 +58,6 @@
                                         </td>
                                     </tr>
 
-
-                                <%--
-                                    <tr class="prop">
-                                        <td valign="top" class="name">
-                                          <label for="fileContents"><warehouse:message code="document.fileContents.label" default="File Contents" /></label>
-                                        </td>
-                                        <td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
-                                            <input type="file" id="fileContents" name="fileContents" />
-                                        </td>
-                                    </tr>
-                                --%>
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                           <label for="extension"><warehouse:message code="document.extension.label" default="Extension" /></label>
@@ -104,8 +93,6 @@
                                             <g:textField class="text" size="100" name="documentNumber" cols="40" rows="5" value="${documentInstance?.documentNumber}" />
                                         </td>
                                     </tr>
-
-
 
                                     <tr class="prop">
                                         <td valign="top"></td>

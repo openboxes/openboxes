@@ -49,17 +49,6 @@
 
 								<table>
 									<tbody>
-										<%--
-										<tr class="prop">
-											<td valign="top" class="name"><label><warehouse:message
-												code="shipping.shipmentNumber.label" /></label>
-											</td>
-											<td colspan="3" valign="top"
-												class="value ${hasErrors(bean: shipmentInstance, field: 'name', 'errors')}">
-												<span style="line-height: 1.5em">${shipmentInstance?.shipmentNumber}</span>
-											</td>
-										</tr>
-										--%>
 										<tr class="prop">
 											<td valign="middle" class="name"><label><warehouse:message
 												code="default.type.label" default="Type" /></label></td>

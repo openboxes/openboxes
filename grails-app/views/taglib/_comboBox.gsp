@@ -116,4 +116,4 @@
 $(function() {
 	$( ".comboBox" ).livequery(function(){ $(this).combobox(); });		
 });
-</script> 	
+</script>

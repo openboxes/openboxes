@@ -55,7 +55,6 @@
 										<tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''}">
 											<g:if test="${newContainer }">
 												<td class="container top left" rowspan="${rowspan }">
-													<%-- <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" style="vertical-align: middle"/>&nbsp;--%>
 													<label>
 														<g:if test="${shipmentItem?.container?.parentContainer}">${shipmentItem?.container?.parentContainer?.name } &rsaquo;</g:if>
 														<g:if test="${shipmentItem?.container?.name }">${shipmentItem?.container?.name }</g:if>
@@ -95,19 +94,6 @@
 											</td>
 											<g:if test="${shipmentInstance?.wasReceived()}">
                                                 ${shipmentItem?.quantityReceived() }
-												<%--
-												<g:set var="totalQtyReceived" value="${shipmentItem?.totalQuantityReceived()}"/>
-												<td style="white-space:nowrap;${shipmentItem?.receiptItem?.quantityReceived != shipmentItem?.quantity ? ' color:red;' : ''}">
-													${shipmentItem?.receiptItem?.quantityReceived }
-												</td>
-												<td>
-													<g:set var="totalQuantityReceived" value="${0 }"/>
-													<g:findAll in="${shipmentItem?.shipment?.receipt?.receiptItems}" expr="it.product == shipmentItem?.product && it.lotNumber == shipmentItem?.lotNumber">
-														<g:set var="totalQuantityReceived" value="${totalQuantityReceived += it.quantityReceived }"/>
-													</g:findAll> 
-													${totalQuantityReceived }
-												</td>
-												--%>
 											</g:if>														
 											<td>
 												${shipmentItem?.recipient?.name}

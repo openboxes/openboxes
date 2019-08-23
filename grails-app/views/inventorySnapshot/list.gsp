@@ -20,8 +20,6 @@
     <table id="dataTable">
         <thead>
             <tr>
-                <%--
-                <th>Date</th>--%>
                 <th>Location</th>
                 <th>SKU</th>
                 <th>Product</th>
@@ -59,16 +57,6 @@
             event.preventDefault();
             refreshData(event);
         });
-
-        //$("#refreshme-button").click(function(event) {
-        //    event.preventDefault();
-        //    var link = $(this).data("link");
-        //    var location = $("#locationid").val();
-        //    var date = $("#date").val();
-        //    link += "?date=" + date + "&location.id=" + location;
-        //    window.location.href = link;
-        //});
-
 
         $("#download-button").click(function(event) {
             event.preventDefault();
@@ -143,12 +131,6 @@
                     "error": handleAjaxError // this sets up jQuery to give me errors
                 } );
             },
-//            "fnServerData": function ( sSource, aoData, fnCallback ) {
-//                $.getJSON( sSource, aoData, function (json) {
-//                    console.log(json);
-//                    fnCallback(json);
-//                });
-//            },
             "oLanguage": {
                 "sZeroRecords": "No records found",
                 "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner-large.gif' /><br/>Loading..."
@@ -160,7 +142,6 @@
                 [10, 25, 50, 100, 500, 1000, "All"]
             ],
             "aoColumns": [
-               // { "mData": "date" }, // 0
                 { "mData": "location" }, // 1
                 { "mData": "productCode" }, // 2
                 { "mData": "product" }, // 2
@@ -169,21 +150,6 @@
                 { "mData": "tags" }, // 2
                 { "mData": "quantityOnHand" }, // 2
                 { "mData": "unitOfMeasure" } // 2
-                //
-                //{ "mData": "id", "bSearchable": false, "bVisible": false },
-                //{ "mData": "inventoryLevelId", "bSearchable": false, "bVisible": false },
-                //{ "mData": "status" }, // 0
-                //{ "mData": "name" }, // 1
-                //{ "mData": "productCodes" }, // 2
-                //{ "mData": "minQuantity" }, // 3
-                //{ "mData": "reorderQuantity" }, // 4
-                //{ "mData": "maxQuantity" }, // 5
-                //{ "mData": "onHandQuantity" }, //6
-                //{ "mData": "totalValue" }, // 7
-                //{ "mData": "hasProductGroup" },  // 8
-                //{ "mData": "hasInventoryLevel" } // 9
-                //{ "mData": "numProducts" }, // 2
-                //{ "mData": "inventoryStatus" }, // 3
 
             ]
         });
@@ -196,7 +162,6 @@
         $('#do-btn').click( function (event) {
             event.preventDefault();
             console.log($("#dataTable tbody tr.selected"));
-            //alert( dataTable.rows('.selected').data().length +' row(s) selected' );
         });
 
 
@@ -204,7 +169,6 @@
             console.log("refreshing data ");
             console.log(event);
             event.preventDefault();
-            //var dataTable = $('#dataTable').dataTable();
             dataTable.fnClearTable();
             dataTable.fnReloadAjax('${request.contextPath}/inventorySnapshot/findByDateAndLocation');
             dataTable.fnDraw();
@@ -243,7 +207,6 @@
             else {
                 if (xhr.responseText) {
                     var error = eval("(" + xhr.responseText + ")");
-                    //alert("An error occurred on the server.  Please contact your system administrator.\n\n" + error.errorMessage);
                     errorMessage("<div>An error occurred on the server.  Please contact your system administrator.</div>" + error.errorMessage);
                 } else {
                     errorMessage('An unknown error occurred on the server.  Please contact your system administrator.');
@@ -272,34 +235,17 @@
             // no op
         }
 
-
-
-        //$('#startDate').datepicker();
-        //$('#endDate').datepicker();
-        //$('#location\\.id').chosen({disable_search_threshold: 30});
         function onDateChange(event) {
             console.log("date picker change");
             console.log(event);
             refreshData(event);
         }
 
-        //$('#refresh-btn').click( function (event) {
-        //    event.preventDefault();
-        //
-        //    refreshData(event);
-        //});
-
-
         $("#trigger-btn").click( function(event) {
             event.preventDefault();
             alert("This may take some time ...");
             triggerServerUpdate(event);
         });
-
-
-
-
-
     });
 
 </r:script>

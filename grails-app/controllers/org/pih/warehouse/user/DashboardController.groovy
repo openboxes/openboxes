@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.user
 
 import grails.converters.JSON
@@ -29,86 +29,83 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.SimpleDateFormat
 
 class DashboardController {
 
-	def orderService
-	def shipmentService
-	def inventoryService
-	def dashboardService
-	def productService
+    def orderService
+    def shipmentService
+    def inventoryService
+    def dashboardService
+    def productService
     def requisitionService
-	def userService
-	def sessionFactory
-	def grailsApplication
-	def locationService
+    def userService
+    def sessionFactory
+    def grailsApplication
+    def locationService
 
-	def showCacheStatistics = {
-		def statistics = sessionFactory.statistics
-		log.info(statistics)
-		render statistics
-	}
+    def showCacheStatistics = {
+        def statistics = sessionFactory.statistics
+        log.info(statistics)
+        render statistics
+    }
 
 
     def globalSearch = {
 
-		def transaction = Transaction.findByTransactionNumber(params.searchTerms)
-		if (transaction) {
-			redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
-			return;
-		}
+        def transaction = Transaction.findByTransactionNumber(params.searchTerms)
+        if (transaction) {
+            redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
+            return
+        }
 
-		def product = Product.findByProductCodeOrId(params.searchTerms, params.searchTerms)
-		if (product) {
-			redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
-			return;
-		}
+        def product = Product.findByProductCodeOrId(params.searchTerms, params.searchTerms)
+        if (product) {
+            redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
+            return
+        }
 
-		def inventoryItem = InventoryItem.findByLotNumber(params.searchTerms)
-		if (inventoryItem) {
-			redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id)
-			return;
-		}
+        def inventoryItem = InventoryItem.findByLotNumber(params.searchTerms)
+        if (inventoryItem) {
+            redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id)
+            return
+        }
 
-		def requisition = Requisition.findByRequestNumber(params.searchTerms)
-		if (requisition) {
-			if (requisition.type == RequisitionType.DEFAULT) {
-				redirect(controller: "stockMovement", action: "show", id: requisition.id)
-			}
-			else {
-				redirect(controller: "requisition", action: "show", id: requisition.id)
-			}
-			return;
-		}
+        def requisition = Requisition.findByRequestNumber(params.searchTerms)
+        if (requisition) {
+            if (requisition.type == RequisitionType.DEFAULT) {
+                redirect(controller: "stockMovement", action: "show", id: requisition.id)
+            } else {
+                redirect(controller: "requisition", action: "show", id: requisition.id)
+            }
+            return
+        }
 
-		def shipment = Shipment.findByShipmentNumber(params.searchTerms)
-		if (shipment) {
+        def shipment = Shipment.findByShipmentNumber(params.searchTerms)
+        if (shipment) {
             if (shipment?.isStockMovement()) {
                 redirect(controller: "stockMovement", action: "show", id: shipment?.requisition?.id)
-            }
-            else {
+            } else {
                 redirect(controller: "shipment", action: "showDetails", id: shipment.id)
             }
-			return;
-		}
+            return
+        }
 
-		def receipt = Receipt.findByReceiptNumber(params.searchTerms)
-		if (receipt) {
-			redirect(controller: "receipt", action: "show", id: receipt.id)
-			return;
-		}
+        def receipt = Receipt.findByReceiptNumber(params.searchTerms)
+        if (receipt) {
+            redirect(controller: "receipt", action: "show", id: receipt.id)
+            return
+        }
         def order = Order.findByOrderNumber(params.searchTerms)
         if (order) {
             redirect(controller: "order", action: "show", id: order.id)
-            return;
+            return
         }
 
-		redirect(controller: "inventory", action: "browse", params:params)
+        redirect(controller: "inventory", action: "browse", params: params)
 
-	}
+    }
     def throwException = {
         println "Configuration: " + ConfigurationHolder.config.grails
         println "Configuration: " + ConfigurationHolder.config.grails.mail
@@ -120,36 +117,34 @@ class DashboardController {
         }
     }
 
-    //@Cacheable("dashboardControllerCache")
-	def index = {
+    def index = {
 
         def startTime = System.currentTimeMillis()
-		if (!session.warehouse) {
-			redirect(action: "chooseLocation")
-		}
+        if (!session.warehouse) {
+            redirect(action: "chooseLocation")
+        }
 
-	    def currentUser = User.get(session?.user?.id)
-		def location = Location.get(session?.warehouse?.id);
-		def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
-		def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
+        def currentUser = User.get(session?.user?.id)
+        def location = Location.get(session?.warehouse?.id)
+        def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
+        def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
 
         log.info "dashboard.index Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		def newsItems = ConfigurationHolder.config.openboxes.dashboard.newsSummary.newsItems
+        def newsItems = ConfigurationHolder.config.openboxes.dashboard.newsSummary.newsItems
 
 
-		[
-				newsItems                : newsItems,
-				rootCategory             : productService.getRootCategory(),
-				requisitionStatistics    : requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine ? currentUser : null, null, [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED] as List),
-				requisitions             : [],
-				outgoingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentOutgoingShipments),
-				incomingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentIncomingShipments),
-				tags                     : productService?.getPopularTags(50),
-				catalogs                 : productService?.getAllCatalogs()
-		]
-	}
-
+        [
+                newsItems                : newsItems,
+                rootCategory             : productService.getRootCategory(),
+                requisitionStatistics    : requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine ? currentUser : null, null, [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED] as List),
+                requisitions             : [],
+                outgoingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentOutgoingShipments),
+                incomingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentIncomingShipments),
+                tags                     : productService?.getPopularTags(50),
+                catalogs                 : productService?.getAllCatalogs()
+        ]
+    }
 
 
     def expirationSummary = {
@@ -162,154 +157,152 @@ class DashboardController {
     def hideTag = {
         Tag tag = Tag.get(params.id)
         tag.isActive = false
-        tag.save(flush:true)
-        redirect(controller: "dashboard", action: "index", params: [editTags:true])
+        tag.save(flush: true)
+        redirect(controller: "dashboard", action: "index", params: [editTags: true])
     }
 
-	def hideCatalog = {
-		ProductCatalog productCatalog = ProductCatalog.get(params.id)
-		productCatalog.isActive = false
-		productCatalog.save(flush:true)
-		redirect(controller: "dashboard", action: "index", params: [editCatalogs:true])
-	}
+    def hideCatalog = {
+        ProductCatalog productCatalog = ProductCatalog.get(params.id)
+        productCatalog.isActive = false
+        productCatalog.save(flush: true)
+        redirect(controller: "dashboard", action: "index", params: [editCatalogs: true])
+    }
 
-	def status = {
-		def admin = User.get(1)
-		def comments = Comment.findAllBySenderAndRecipient(admin, admin)
+    def status = {
+        def admin = User.get(1)
+        def comments = Comment.findAllBySenderAndRecipient(admin, admin)
 
-		def results = comments.collect {
-			if (it.dateSent > new Date()) {
-				[ id: it.id, comment: warehouse.message(code:it.comment, args: [format.datetime(obj: it.dateSent)]), dateSent: it.dateSent ]
-			}
-		}
-		render results as JSON
-	}
+        def results = comments.collect {
+            if (it.dateSent > new Date()) {
+                [id: it.id, comment: warehouse.message(code: it.comment, args: [format.datetime(obj: it.dateSent)]), dateSent: it.dateSent]
+            }
+        }
+        render results as JSON
+    }
 
     @Cacheable("megamenuCache")
-	def megamenu = {
+    def megamenu = {
 
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
 
-		//def startTime = System.currentTimeMillis()
-
         // Inbound Shipments
-		def inboundShipmentsTotal = Shipment.countByDestination(location)
-		def inboundShipmentsCount = Shipment.executeQuery(
-				"""	select shipment.currentStatus, count(*) 
+        def inboundShipmentsTotal = Shipment.countByDestination(location)
+        def inboundShipmentsCount = Shipment.executeQuery(
+                """	select shipment.currentStatus, count(*) 
 							from Shipment as shipment
 							where shipment.destination = :destination
-							group by shipment.currentStatus""", [destination:location])
+							group by shipment.currentStatus""", [destination: location])
 
-		inboundShipmentsCount = inboundShipmentsCount.collect { [status: it[0], count: it[1]] }
+        inboundShipmentsCount = inboundShipmentsCount.collect { [status: it[0], count: it[1]] }
 
-		// Outbound Shipments
-		def outboundShipmentsTotal = Shipment.countByOrigin(location)
-		def outboundShipmentsCount = Shipment.executeQuery(
-				"""	select shipment.currentStatus, count(*) 
+        // Outbound Shipments
+        def outboundShipmentsTotal = Shipment.countByOrigin(location)
+        def outboundShipmentsCount = Shipment.executeQuery(
+                """	select shipment.currentStatus, count(*) 
 							from Shipment as shipment 
 							where shipment.origin = :origin 
-							group by shipment.currentStatus""", [origin:location])
+							group by shipment.currentStatus""", [origin: location])
 
-		outboundShipmentsCount = outboundShipmentsCount.collect { [status: it[0], count: it[1]] }
+        outboundShipmentsCount = outboundShipmentsCount.collect { [status: it[0], count: it[1]] }
 
-		// Orders
-		def incomingOrders = Order.executeQuery('select o.status, count(*) as count from Order as o where o.destination = ? group by o.status', [location])
+        // Orders
+        def incomingOrders = Order.executeQuery('select o.status, count(*) as count from Order as o where o.destination = ? group by o.status', [location])
 
         // Requisitions
-        def requisitionStatistics = requisitionService.getRequisitionStatistics(location, null, user, new Date()-30)
+        def requisitionStatistics = requisitionService.getRequisitionStatistics(location, null, user, new Date() - 30)
 
         def categories = []
-		def category = productService.getRootCategory()
-		categories = category.categories
-		categories = categories.groupBy { it?.parentCategory }
+        def category = productService.getRootCategory()
+        categories = category.categories
+        categories = categories.groupBy { it?.parentCategory }
 
-		[
-				categories            : categories,
-				isSuperuser			  : userService.isSuperuser(session?.user),
-				megamenuConfig        : grailsApplication.config.openboxes.megamenu,
-				inboundShipmentsTotal : inboundShipmentsTotal ?: 0,
-				inboundShipmentsCount : inboundShipmentsCount,
-				outboundShipmentsTotal: outboundShipmentsTotal ?: 0,
-				outboundShipmentsCount: outboundShipmentsCount,
-				incomingOrders        : incomingOrders,
-				requisitionStatistics : requisitionStatistics,
-				quickCategories       : productService.getQuickCategories(),
-				tags                  : productService.getAllTags()
-		]
-	}
+        [
+                categories            : categories,
+                isSuperuser           : userService.isSuperuser(session?.user),
+                megamenuConfig        : grailsApplication.config.openboxes.megamenu,
+                inboundShipmentsTotal : inboundShipmentsTotal ?: 0,
+                inboundShipmentsCount : inboundShipmentsCount,
+                outboundShipmentsTotal: outboundShipmentsTotal ?: 0,
+                outboundShipmentsCount: outboundShipmentsCount,
+                incomingOrders        : incomingOrders,
+                requisitionStatistics : requisitionStatistics,
+                quickCategories       : productService.getQuickCategories(),
+                tags                  : productService.getAllTags()
+        ]
+    }
 
     @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
-			"binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
-			"selectTagsCache", "selectCategoryCache", "selectCatalogsCache"])
+            "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
+            "selectTagsCache", "selectCategoryCache", "selectCatalogsCache"])
     def flushCache = {
         flash.message = "All data caches have been flushed"
         CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
         redirect(action: "index")
     }
 
-	def triggerCalculateQuantityJob = {
-		CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
-	}
+    def triggerCalculateQuantityJob = {
+        CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
+    }
 
     @CacheFlush(["megamenuCache"])
     def flushMegamenu = {
-        flash.message = "${g.message(code:'dashboard.cacheFlush.message', args: [g.message(code: 'dashboard.megamenu.label')])}"
+        flash.message = "${g.message(code: 'dashboard.cacheFlush.message', args: [g.message(code: 'dashboard.megamenu.label')])}"
         redirect(action: "index")
     }
 
-	def chooseLayout = {
-		if (params.layout) {
-			session.layout = params.layout
-		}
-		redirect(controller:'dashboard', action:'index')
-	}
+    def chooseLayout = {
+        if (params.layout) {
+            session.layout = params.layout
+        }
+        redirect(controller: 'dashboard', action: 'index')
+    }
 
-	def chooseLocation = {
+    def chooseLocation = {
 
-		// If the user has selected a new location from the topnav bar, we need
-		// to retrieve the location to make sure it exists
-		User user = User.get(session.user.id);
-		Location warehouse = params.id ? Location.get(params.id) : null
+        // If the user has selected a new location from the topnav bar, we need
+        // to retrieve the location to make sure it exists
+        User user = User.get(session.user.id)
+        Location warehouse = params.id ? Location.get(params.id) : null
 
-		// If a warehouse has been selected
-		if (warehouse) {
+        // If a warehouse has been selected
+        if (warehouse) {
 
-			// Save the warehouse selection to the session
-			session.warehouse = warehouse;
+            // Save the warehouse selection to the session
+            session.warehouse = warehouse
 
-			// Save the warehouse selection for "last logged into" information
-			if (user) {
-				//userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
-				user.lastLoginDate = new Date();
-				user.warehouse = warehouse
-				user.save(flush:true);
-				session.user = user;
-			}
+            // Save the warehouse selection for "last logged into" information
+            if (user) {
+                //userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
+                user.lastLoginDate = new Date()
+                user.warehouse = warehouse
+                user.save(flush: true)
+                session.user = user
+            }
 
-			// Successfully logged in and selected a warehouse
-			// Try to redirect to the previous action before session timeout
-			if (session.targetUri || params.targetUri) {
-				def targetUri = params.targetUri ?: session.targetUri
-				if (targetUri && !targetUri.contains("chooseLocation") && !targetUri.contains("errors")) {
-					redirect(uri: targetUri);
-					return;
-				}
-			}
-			redirect(controller:'dashboard', action:'index')
-			return
-		}
+            // Successfully logged in and selected a warehouse
+            // Try to redirect to the previous action before session timeout
+            if (session.targetUri || params.targetUri) {
+                def targetUri = params.targetUri ?: session.targetUri
+                if (targetUri && !targetUri.contains("chooseLocation") && !targetUri.contains("errors")) {
+                    redirect(uri: targetUri)
+                    return
+                }
+            }
+            redirect(controller: 'dashboard', action: 'index')
+            return
+        }
 
-		[savedLocations: [user.warehouse], loginLocationsMap:locationService.getLoginLocationsMap(user, warehouse)]
-	}
+        [savedLocations: [user.warehouse], loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)]
+    }
 
 
-	def changeLocation = {
-		User user = User.get(session.user.id);
-		Map loginLocationsMap = locationService.getLoginLocationsMap(user, null)
-		List savedLocations = [user?.warehouse, session?.warehouse].unique()
-		render(template: "loginLocations", model: [savedLocations: savedLocations, loginLocationsMap:loginLocationsMap])
-	}
+    def changeLocation = {
+        User user = User.get(session.user.id)
+        Map loginLocationsMap = locationService.getLoginLocationsMap(user, null)
+        List savedLocations = [user?.warehouse, session?.warehouse].unique()
+        render(template: "loginLocations", model: [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap])
+    }
 
     def downloadGenericProductSummaryAsCsv = {
         def location = Location.get(session?.warehouse?.id)
@@ -319,13 +312,15 @@ class DashboardController {
                 genericProductSummary.values().flatten() :
                 genericProductSummary[params.status]
 
-		// Rename columns and filter out debugging columns
-		data = data.collect { ["Status":it.status,
-							   "Generic Product":it.name,
-							   "Minimum Qty":it.minQuantity,
-							   "Reorder Qty":it.reorderQuantity,
-							   "Maximum Qty":it.maxQuantity,
-							   "Available Qty":it.currentQuantity]}
+        // Rename columns and filter out debugging columns
+        data = data.collect {
+            ["Status"         : it.status,
+             "Generic Product": it.name,
+             "Minimum Qty"    : it.minQuantity,
+             "Reorder Qty"    : it.reorderQuantity,
+             "Maximum Qty"    : it.maxQuantity,
+             "Available Qty"  : it.currentQuantity]
+        }
 
         def sw = new StringWriter()
         if (data) {
@@ -335,11 +330,9 @@ class DashboardController {
                 def values = row.values().collect { value ->
                     if (value?.toString()?.isNumber()) {
                         value
-                    }
-                    else if (value instanceof Collection) {
+                    } else if (value instanceof Collection) {
                         StringEscapeUtils.escapeCsv(value.toString())
-                    }
-                    else {
+                    } else {
                         StringEscapeUtils.escapeCsv(value.toString())
                     }
                 }
@@ -348,13 +341,13 @@ class DashboardController {
             }
         }
         response.setHeader("Content-disposition", "attachment; filename=\"GenericProductSummary-${params.status}-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv\"")
-        render(contentType: "text/csv", text:sw.toString())
-        return;
+        render(contentType: "text/csv", text: sw.toString())
+        return
     }
 
     def downloadFastMoversAsCsv = {
         println "exportFastMoversAsCsv: " + params
-        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+        def location = Location.get(params?.location?.id ?: session?.warehouse?.id)
 
         def date = new Date()
         if (params.date) {
@@ -375,24 +368,21 @@ class DashboardController {
                 def values = row.values().collect { value ->
                     if (value?.toString()?.isNumber()) {
                         value
-                    }
-                    else if (value instanceof Collection) {
+                    } else if (value instanceof Collection) {
                         StringEscapeUtils.escapeCsv(value.toString())
-                    }
-                    else {
+                    } else {
                         StringEscapeUtils.escapeCsv(value.toString())
                     }
                 }
                 sw.append(values?.join(","))
                 sw.append("\n")
             }
-        }
-        else {
-            sw.append("${warehouse.message(code:'fastMovers.empty.message')}")
+        } else {
+            sw.append("${warehouse.message(code: 'fastMovers.empty.message')}")
         }
         response.setHeader("Content-disposition", "attachment; filename=\"FastMovers-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv\"")
-        render(contentType: "text/csv", text:sw.toString())
-        return;
+        render(contentType: "text/csv", text: sw.toString())
+        return
     }
 
 }

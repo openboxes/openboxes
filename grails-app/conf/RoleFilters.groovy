@@ -11,29 +11,29 @@ class RoleFilters {
     def userService
     def dependsOn = [SecurityFilters]
     def static changeActions = ['delete', 'create', 'add', 'process', 'save',
-            'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
+                                'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
     def static changeControllers = ['createProductFromTemplate']
 
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
     def static adminActions = [
-            'product': ['create'],
-            'person': ['list'],
-            'user': ['list'],
-            'location': ['edit'],
-            'shipper': ['create'],
+            'product'      : ['create'],
+            'person'       : ['list'],
+            'user'         : ['list'],
+            'location'     : ['edit'],
+            'shipper'      : ['create'],
             'locationGroup': ['create'],
-            'locationType': ['create']
+            'locationType' : ['create']
     ]
 
     def static superuserControllers = []
     def static superuserActions = [
-            '*': ['delete'],
-            'console':['index','execute'],
-            'inventory': ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
-            'inventoryItem': ['adjustStock', 'transferStock'],
-            'productCatalog':['create', 'importProductCatalog'],
+            '*'               : ['delete'],
+            'console'         : ['index', 'execute'],
+            'inventory'       : ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
+            'inventoryItem'   : ['adjustStock', 'transferStock'],
+            'productCatalog'  : ['create', 'importProductCatalog'],
             'transactionEntry': ['edit', 'delete', 'save', 'update'],
-            'user': ['impersonate']
+            'user'            : ['impersonate']
     ]
 
     def filters = {
@@ -53,8 +53,8 @@ class RoleFilters {
                 def missSuperuser = needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
 
                 if (missBrowser || missManager || missAdmin || missSuperuser) {
-                    log.info ("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
-                    redirect(controller:"errors", action:"handleForbidden")
+                    log.info("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
+                    redirect(controller: "errors", action: "handleForbidden")
                     return false
                 }
                 return true
@@ -63,15 +63,21 @@ class RoleFilters {
     }
 
     static Boolean needSuperuser(controllerName, actionName) {
-        superuserControllers?.contains(controllerName) || superuserActions[controllerName]?.contains(actionName) || superuserActions['*'].any { actionName?.startsWith(it) }
+        superuserControllers?.contains(controllerName) || superuserActions[controllerName]?.contains(actionName) || superuserActions['*'].any {
+            actionName?.startsWith(it)
+        }
     }
 
     static Boolean needAdmin(controllerName, actionName) {
-        adminControllers?.contains(controllerName) || adminActions[controllerName]?.contains(actionName) || adminActions['*'].any { actionName?.startsWith(it) }
+        adminControllers?.contains(controllerName) || adminActions[controllerName]?.contains(actionName) || adminActions['*'].any {
+            actionName?.startsWith(it)
+        }
     }
 
     static Boolean needManager(controllerName, actionName) {
-        changeActions.any { actionName?.startsWith(it) } || controllerName?.contains("Workflow") || changeControllers?.contains(controllerName)
+        changeActions.any {
+            actionName?.startsWith(it)
+        } || controllerName?.contains("Workflow") || changeControllers?.contains(controllerName)
     }
 
 

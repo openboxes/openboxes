@@ -1,13 +1,13 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
-package org.pih.warehouse.core;
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
+package org.pih.warehouse.core
 
 /**
  * Reasons for changing request:
@@ -68,34 +68,34 @@ enum ReasonCode {
     final Integer sortOrder
 
     ReasonCode(Integer sortOrder) {
-        this.sortOrder = sortOrder;
+        this.sortOrder = sortOrder
     }
 
     static list() {
-        [       STOCKOUT,
-                LOW_STOCK,
-                EXPIRED,
-                DAMAGED,
-                SUBSTITUTION,
-                SUBSTITUTION_WITHIN_PRODUCT_GROUP,
-                PACKAGE_SIZE,
-                CLINICAL_OVERRIDE,
-                INSUFFICIENT_CONSUMPTION,
-                REPLACED_BY_FORMULARY_ITEM,
-                CANCELED_BY_REQUESTER,
-                NON_FORMULARY_NO_SUBSTITUTION,
-                NOT_STOCKED,
-                AVAILABLE_STOCK_RESERVED,
-                COULD_NOT_LOCATE,
-                DIFFERENT_LOCATION,
-                DATA_ENTRY_ERROR,
-                SUPPLY_MAX_QUANTITY,
-                NOT_ON_STOCK_LIST,
-                INSUFFICIENT_QUANTITY_RECONDITIONED,
-                SUPPLIED_BY_GOVERNMENT,
-                APPROVED_CHANGE,
-                EARLIER_EXPIRATION_DATE,
-                OTHER
+        [STOCKOUT,
+         LOW_STOCK,
+         EXPIRED,
+         DAMAGED,
+         SUBSTITUTION,
+         SUBSTITUTION_WITHIN_PRODUCT_GROUP,
+         PACKAGE_SIZE,
+         CLINICAL_OVERRIDE,
+         INSUFFICIENT_CONSUMPTION,
+         REPLACED_BY_FORMULARY_ITEM,
+         CANCELED_BY_REQUESTER,
+         NON_FORMULARY_NO_SUBSTITUTION,
+         NOT_STOCKED,
+         AVAILABLE_STOCK_RESERVED,
+         COULD_NOT_LOCATE,
+         DIFFERENT_LOCATION,
+         DATA_ENTRY_ERROR,
+         SUPPLY_MAX_QUANTITY,
+         NOT_ON_STOCK_LIST,
+         INSUFFICIENT_QUANTITY_RECONDITIONED,
+         SUPPLIED_BY_GOVERNMENT,
+         APPROVED_CHANGE,
+         EARLIER_EXPIRATION_DATE,
+         OTHER
         ]
     }
 
@@ -132,7 +132,7 @@ enum ReasonCode {
     }
 
     static listRequisitionQuantityChangeReasonCodes() {
-		[
+        [
                 PACKAGE_SIZE,
                 STOCKOUT,
                 LOW_STOCK,
@@ -150,7 +150,7 @@ enum ReasonCode {
                 SUPPLIED_BY_GOVERNMENT,
                 OTHER
         ]
-	}
+    }
 
 
     static listRequisitionSubstitutionReasonCodes() {

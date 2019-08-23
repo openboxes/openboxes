@@ -33,7 +33,7 @@ class PartialReceiptItem {
             return 0
         }
         def receiptItems = getReceiptItemsByStatus([ReceiptStatusCode.RECEIVED] as ReceiptStatusCode[])
-        return receiptItems ? receiptItems?.sum { it?.quantityReceived?:0 } : 0
+        return receiptItems ? receiptItems?.sum { it?.quantityReceived ?: 0 } : 0
     }
 
     Integer getQuantityCanceled() {
@@ -41,14 +41,14 @@ class PartialReceiptItem {
             return 0
         }
         def receiptItems = getReceiptItemsByStatus([ReceiptStatusCode.RECEIVED] as ReceiptStatusCode[])
-        return receiptItems ? receiptItems?.sum { it?.quantityCanceled?:0 } : 0
+        return receiptItems ? receiptItems?.sum { it?.quantityCanceled ?: 0 } : 0
     }
 
     Integer getQuantityRemaining() {
-        Integer quantityCanceled = quantityCanceled?:0
-        Integer quantityReceiving = quantityReceiving?:0
-        Integer quantityReceived = quantityReceived?:0
-        Integer quantityRemaining = (quantityShipped?:0) - (quantityReceiving + quantityReceived + quantityCanceled)
+        Integer quantityCanceled = quantityCanceled ?: 0
+        Integer quantityReceiving = quantityReceiving ?: 0
+        Integer quantityReceived = quantityReceived ?: 0
+        Integer quantityRemaining = (quantityShipped ?: 0) - (quantityReceiving + quantityReceived + quantityCanceled)
         return !cancelRemaining ? quantityRemaining : 0
     }
 
@@ -70,28 +70,28 @@ class PartialReceiptItem {
     Map toJson() {
         return [
 
-                "receiptItemId": receiptItem?.id,
-                "shipmentItemId": shipmentItem?.id,
-                "container.id": shipmentItem?.container?.id,
-                "container.name": shipmentItem?.container?.name,
-                "parentContainer.id": shipmentItem?.container?.parentContainer?.id,
+                "receiptItemId"       : receiptItem?.id,
+                "shipmentItemId"      : shipmentItem?.id,
+                "container.id"        : shipmentItem?.container?.id,
+                "container.name"      : shipmentItem?.container?.name,
+                "parentContainer.id"  : shipmentItem?.container?.parentContainer?.id,
                 "parentContainer.name": shipmentItem?.container?.parentContainer?.name,
-                "product.id": inventoryItem?.product?.id,
-                "product.productCode": inventoryItem?.product?.productCode,
-                "product.name": inventoryItem?.product?.name,
-                "lotNumber": lotNumber,
-                "expirationDate": expirationDate?.format("MM/dd/yyyy"),
-                "binLocation.id": binLocation?.id,
-                "binLocation.name": binLocation?.name,
-                "recipient.id": recipient?.id,
-                "recipient.name": recipient?.name,
-                quantityShipped: quantityShipped,
-                quantityReceived: quantityReceived,
-                quantityCanceled: quantityCanceled,
-                quantityReceiving: quantityReceiving,
-                quantityRemaining: quantityRemaining,
-                cancelRemaining: cancelRemaining,
-                comment: comment
+                "product.id"          : inventoryItem?.product?.id,
+                "product.productCode" : inventoryItem?.product?.productCode,
+                "product.name"        : inventoryItem?.product?.name,
+                "lotNumber"           : lotNumber,
+                "expirationDate"      : expirationDate?.format("MM/dd/yyyy"),
+                "binLocation.id"      : binLocation?.id,
+                "binLocation.name"    : binLocation?.name,
+                "recipient.id"        : recipient?.id,
+                "recipient.name"      : recipient?.name,
+                quantityShipped       : quantityShipped,
+                quantityReceived      : quantityReceived,
+                quantityCanceled      : quantityCanceled,
+                quantityReceiving     : quantityReceiving,
+                quantityRemaining     : quantityRemaining,
+                cancelRemaining       : cancelRemaining,
+                comment               : comment
         ]
     }
 

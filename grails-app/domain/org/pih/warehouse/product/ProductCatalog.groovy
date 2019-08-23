@@ -9,14 +9,14 @@ class ProductCatalog implements Comparable, Serializable {
     Boolean active = Boolean.TRUE
 
     static hasMany = [
-        productCatalogItems: ProductCatalogItem
+            productCatalogItems: ProductCatalogItem
     ]
 
     static constraints = {
-        code(nullable:false, unique: true)
-        name(nullable:false)
-        description(nullable:true)
-        active(nullable:true)
+        code(nullable: false, unique: true)
+        name(nullable: false)
+        description(nullable: true)
+        active(nullable: true)
     }
 
     // Auditing fields
@@ -28,7 +28,7 @@ class ProductCatalog implements Comparable, Serializable {
         description type: 'text'
         code index: 'code_idx'
         cache true
-        productCatalogItems sort:'product'
+        productCatalogItems sort: 'product'
     }
 
     static namedQueries = {
@@ -64,7 +64,7 @@ class ProductCatalog implements Comparable, Serializable {
      * @return
      */
     String toString() {
-        return "${name}";
+        return "${name}"
     }
 
     /**
@@ -74,15 +74,15 @@ class ProductCatalog implements Comparable, Serializable {
         def sortOrder =
                 name <=> obj?.name ?:
                         id <=> obj?.id
-        return sortOrder;
+        return sortOrder
 
     }
 
     static PROPERTIES = [
-            "id":"id",
-            "code":"code",
-            "name":"name",
-            "description":"description"
+            "id"         : "id",
+            "code"       : "code",
+            "name"       : "name",
+            "description": "description"
     ]
 
 }

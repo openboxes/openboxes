@@ -1,6 +1,3 @@
-<%-- 
-<input id="value-${attrs.id}" class="value" type="hidden" name="${attrs.id}" value="${attrs.value}"/>
---%>
 <input id="autosuggest-${attrs.id}"
     data-bind="${attrs.dataBind ?: ''}"
 	type="text" size="${attrs.size }" 
@@ -25,16 +22,6 @@
 			focus: function(event, ui) {
 				return false;
 			},
-			/*
-			change: function(event, ui) {
-				// If the user does not select a value, we remove the value
-				if (!ui.item) { 
-					$(this).prev().val("null");  // set the user.id to null
-					$(this).val("");				// set the value in the textbox to empty string
-				}
-				return false;
-			},
-			*/
 			select: function(event, ui) {	
 				var continueWithUpdate = true;
 				var promptOnMatch = "${attrs.promptOnMatch}";
