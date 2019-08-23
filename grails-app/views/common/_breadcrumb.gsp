@@ -1,5 +1,3 @@
-
-
 <ul class="breadcrumb">
     <li>
         <g:link controller="dashboard" action="index">
@@ -28,7 +26,6 @@
             <a href="#">${g.layoutTitle()}</a>
         </li>
     </g:if>
-
 </ul>
 
 
