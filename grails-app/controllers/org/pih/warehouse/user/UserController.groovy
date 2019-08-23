@@ -547,6 +547,7 @@ class UserController {
         }
     }
 
+    // TODO Consider moving this to a utility or service
     static resize = { bytes, out, maxW, maxH ->
         AWTImage ai = new ImageIcon(bytes).image
         int width = ai.getWidth(null)

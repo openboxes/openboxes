@@ -683,6 +683,29 @@ class ShipmentService {
         return true
     }
 
+	Integer getQuantityAllocated(Location location, Location binLocation, InventoryItem inventoryItem) {
+
+		def results = ShipmentItem.createCriteria().list {
+			projections {
+				sum("quantity")
+			}
+            shipment {
+                eq("origin", location)
+				eq("currentStatus", ShipmentStatusCode.PENDING)
+            }
+			if (binLocation) {
+				eq("binLocation", binLocation)
+			}
+			else {
+				isNull("binLocation")
+			}
+			eq("inventoryItem", inventoryItem)
+		}
+
+        return results[0] ?: 0
+
+    }
+
     Integer getDuplicatedShipmentItemsQuantity(Shipment shipment, Location binLocation, InventoryItem inventoryItem) {
 
         def results = ShipmentItem.createCriteria().list {

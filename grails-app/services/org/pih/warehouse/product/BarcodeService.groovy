@@ -22,6 +22,12 @@ class BarcodeService {
     static transactional = false
     MultiFormatWriter barCodeWriter = new MultiFormatWriter()
 
+    void renderImage(response, String data, int width, int height, BarcodeFormat format = BarcodeFormat.QR_CODE) {
+        Hashtable hints = [(EncodeHintType.CHARACTER_SET): 'UTF8']
+        BitMatrix bitMatrix = barCodeWriter.encode(data, format, width, height, hints)
+        MatrixToImageWriter.writeToStream(bitMatrix, "png", response.outputStream)
+    }
+
     void renderImageToFile(File file, String data, int width, int height, BarcodeFormat format = BarcodeFormat.QR_CODE) {
         Hashtable hints = [(EncodeHintType.CHARACTER_SET): 'UTF8']
         BitMatrix bitMatrix = barCodeWriter.encode(data, format, width, height, hints)
