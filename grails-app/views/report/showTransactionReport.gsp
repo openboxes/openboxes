@@ -218,7 +218,7 @@
 			],
 			"bUseRendered": false,
 			"dom": '<"top"i>rt<"bottom"flp><"clear">',
-          "fnRowCallback": function (nRow, aData) {
+            "fnRowCallback": function (nRow, aData) {
                 $('td:eq(3)', nRow).html(Number(aData["Opening Balance"]).toLocaleString('en-US'));
                 $('td:eq(4)', nRow).html(Number(aData["Inbound"]).toLocaleString('en-US'));
                 $('td:eq(5)', nRow).html(Number(aData["Outbound"]).toLocaleString('en-US'));
@@ -229,15 +229,15 @@
                   $('td:eq(4)', nRow).addClass('credit')
                 }
 
-            if (aData["Outbound"] > 0) {
-				  $('td:eq(5)', nRow).addClass('debit')
-            }
+                if (aData["Outbound"] > 0) {
+                  $('td:eq(5)', nRow).addClass('debit')
+                }
 
                 if (aData["Adjustments"] > 0) {
                   $('td:eq(6)', nRow).addClass('credit')
                 } else if (aData["Adjustments"] < 0) {
-                	var normalized = 0 - Number(aData["Adjustments"]);
-                	$('td:eq(6)', nRow).html(normalized).addClass('debit')
+                  var normalized = 0 - Number(aData["Adjustments"]);
+                  $('td:eq(6)', nRow).html(normalized).addClass('debit')
 			    }
 
             return nRow;
