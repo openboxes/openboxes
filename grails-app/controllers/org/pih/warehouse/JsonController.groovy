@@ -459,7 +459,6 @@ class JsonController {
         render results as JSON
     }
 
-
     def findTags = {
         def searchTerm = "%" + params.term + "%"
         def c = Tag.createCriteria()
@@ -1051,6 +1050,7 @@ class JsonController {
         items.unique { it.id }
         def json = items.collect { Product product ->
             def quantity = quantityMap[product] ?: 0
+            def color = product.productCatalogs.find { it.color }?.color
             quantity = " [" + quantity + " " + (product?.unitOfMeasure ?: "EA") + "]"
             def type = product.class.simpleName.toLowerCase()
             [
@@ -1058,7 +1058,8 @@ class JsonController {
                     type : product.class,
                     url  : request.contextPath + "/" + type + "/redirect/" + product.id,
                     value: product.name,
-                    label: product.productCode + " " + product.name + " " + quantity
+                    label: product.productCode + " " + product.name + " " + quantity,
+                    color: color
             ]
         }
         render json as JSON
