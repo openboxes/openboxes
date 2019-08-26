@@ -44,6 +44,7 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
+        headerAlign: 'left',
         flexWidth: '0.6',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
