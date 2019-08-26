@@ -224,9 +224,13 @@ class PackingPage extends Component {
    * Transition to next stock movement status
    * @public
    */
-  transitionToNextStep() {
+  transitionToNextStep(status) {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'CHECKING' };
+    let payload = [];
+
+    if (status !== 'CHECKING') {
+      payload = { status: 'CHECKING' };
+    }
 
     return apiClient.post(url, payload);
   }
@@ -252,7 +256,7 @@ class PackingPage extends Component {
     this.props.showSpinner();
     this.savePackingData(formValues.packPageItems)
       .then(() => {
-        this.transitionToNextStep()
+        this.transitionToNextStep(formValues.statusCode)
           .then(() => {
             this.props.hideSpinner();
             this.props.onSubmit(formValues);
