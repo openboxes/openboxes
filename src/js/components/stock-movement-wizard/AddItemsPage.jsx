@@ -556,6 +556,7 @@ class AddItemsPage extends Component {
     this.fetchLineItems().then((resp) => {
       const { lineItems } = resp.data.data;
       const { hasManageInventory } = resp.data.data;
+      const { statusCode } = resp.data.data;
       let lineItemsData;
       if (!lineItems.length) {
         lineItemsData = new Array(1).fill({ sortOrder: 100 });
@@ -580,6 +581,7 @@ class AddItemsPage extends Component {
           ...this.state.values,
           lineItems: lineItemsData,
           hasManageInventory,
+          statusCode,
         },
         sortOrder,
       }, () => this.props.hideSpinner());
@@ -863,7 +865,10 @@ class AddItemsPage extends Component {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status };
 
-    return apiClient.post(url, payload);
+    if (this.state.values.statusCode === 'CREATED') {
+      return apiClient.post(url, payload);
+    }
+    return Promise.resolve();
   }
 
   /**
