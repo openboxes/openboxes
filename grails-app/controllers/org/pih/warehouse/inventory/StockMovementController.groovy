@@ -128,9 +128,9 @@ class StockMovementController {
                         destination  : stockMov.destination?.name ?: "",
                         stocklist    : stockMov.stocklist?.name ?: "",
                         requestedBy  : stockMov.requestedBy ?: warehouse.message(code: 'default.none.label'),
-                        dateRequested: stockMov.dateRequested ?: "",
-                        dateCreated  : stockMov.requisition?.dateCreated ?: "",
-                        dateShipepd  : stockMov.shipment?.expectedShippingDate ?: "",
+                        dateRequested: stockMov.dateRequested.format("MM-dd-yyyy") ?: "",
+                        dateCreated  : stockMov.requisition?.dateCreated?.format("MM-dd-yyyy") ?: "",
+                        dateShipepd  : stockMov.shipment?.expectedShippingDate?.format("MM-dd-yyyy") ?: "",
                 ]
             }
 
