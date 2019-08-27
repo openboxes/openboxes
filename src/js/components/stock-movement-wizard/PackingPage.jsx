@@ -173,8 +173,10 @@ class PackingPage extends Component {
   fetchAllData() {
     this.fetchLineItems().then((resp) => {
       const { packPageItems } = resp.data.data.packPage;
-      this.setState({ values: { ...this.state.values, packPageItems } }, () =>
-        this.props.hideSpinner());
+      const { statusCode } = resp.data.data;
+      this.setState({ values: { ...this.state.values, statusCode, packPageItems } }, () => {
+        this.props.hideSpinner();
+      });
     }).catch(() => {
       this.props.hideSpinner();
     });
@@ -224,15 +226,15 @@ class PackingPage extends Component {
    * Transition to next stock movement status
    * @public
    */
-  transitionToNextStep(status) {
+  transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    let payload = [];
+    const status = 'CHECKING';
+    const payload = { status };
 
-    if (status !== 'CHECKING') {
-      payload = { status: 'CHECKING' };
+    if (this.state.values.statusCode !== status) {
+      return apiClient.post(url, payload);
     }
-
-    return apiClient.post(url, payload);
+    return Promise.resolve();
   }
 
   /**
@@ -256,7 +258,7 @@ class PackingPage extends Component {
     this.props.showSpinner();
     this.savePackingData(formValues.packPageItems)
       .then(() => {
-        this.transitionToNextStep(formValues.statusCode)
+        this.transitionToNextStep()
           .then(() => {
             this.props.hideSpinner();
             this.props.onSubmit(formValues);

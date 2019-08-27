@@ -28,7 +28,7 @@ const initialState = {
   user: {
     username: '',
   },
-  isImpersonated: '',
+  isImpersonated: false,
   grailsVersion: '',
   appVersion: '',
   branchName: '',

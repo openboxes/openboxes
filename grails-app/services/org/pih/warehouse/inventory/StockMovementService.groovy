@@ -81,7 +81,7 @@ class StockMovementService {
         Requisition requisition = Requisition.get(id)
         if (status == RequisitionStatus.CHECKING) {
             Shipment shipment = requisition.shipment
-            shipment.expectedShippingDate = new Date()
+            shipment?.expectedShippingDate = new Date()
         }
         if (!status in RequisitionStatus.list()) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
