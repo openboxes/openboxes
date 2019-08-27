@@ -237,7 +237,7 @@
                   $('td:eq(6)', nRow).addClass('credit')
                 } else if (aData["Adjustments"] < 0) {
                   var normalized = 0 - Number(aData["Adjustments"]);
-                  $('td:eq(6)', nRow).html(normalized).addClass('debit')
+                  $('td:eq(6)', nRow).html(normalized.toLocaleString('en-US')).addClass('debit')
 			    }
 
             return nRow;
