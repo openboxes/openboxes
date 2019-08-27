@@ -470,6 +470,9 @@ openboxes.scannerDetection.enabled = false
 openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
+// Send stock alerts
+openboxes.jobs.sendStockAlertsJob.enabled = true
+
 // Refresh inventory snapshots
 openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 

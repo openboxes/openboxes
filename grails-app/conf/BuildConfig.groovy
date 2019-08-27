@@ -146,6 +146,7 @@ grails.project.dependency.resolution = {
         compile(":springcache:1.3.1")
         compile(":webflow:1.3.8")
         compile(":yui:2.8.2.1")
+        compile(":spring-events:1.2")
         //compile(":bubbling:2.1.4")
 
         // Not critical to application (might require code changes)
