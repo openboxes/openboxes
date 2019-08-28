@@ -25,13 +25,11 @@ import util.ReportUtil
 class ReportController {
 
     def documentService
-    def dataService
     def inventoryService
     def productService
     def reportService
     def messageService
     def inventorySnapshotService
-    StdScheduler quartzScheduler
 
     def refreshTransactionFact = {
         RefreshTransactionFactJob.triggerNow([:])

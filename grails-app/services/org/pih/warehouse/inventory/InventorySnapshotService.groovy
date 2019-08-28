@@ -16,7 +16,6 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
-
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 

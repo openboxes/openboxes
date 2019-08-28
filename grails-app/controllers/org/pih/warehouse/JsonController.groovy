@@ -1552,7 +1552,6 @@ class JsonController {
         def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob"))
         def nextFireTime = triggers*.nextFireTime.max()
         def locationKey = LocationDimension.findByLocationId(session.warehouse.id)
-        //org.pih.warehouse.reporting.TransactionFact.maxTransactionDate.list()
         def model = [
                 locationKey       : locationKey,
                 transactionCount  : TransactionFact.countByLocationKey(locationKey),

@@ -42,7 +42,6 @@ class ReportService implements ApplicationContextAware {
     def grailsApplication
     def userService
 
-
     ApplicationContext applicationContext
 
     boolean transactional = false
@@ -531,13 +530,15 @@ class ReportService implements ApplicationContextAware {
     }
 
 
+
+
     void buildTransactionTypeDimension() {
         String insertStatement = """
             INSERT into transaction_type_dimension (version, transaction_code, transaction_type_name, transaction_type_id)
             SELECT 0, transaction_type.transaction_code, transaction_type.name, transaction_type.id
             FROM transaction_type
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
     void buildLotDimension() {
@@ -547,7 +548,7 @@ class ReportService implements ApplicationContextAware {
             FROM inventory_item
             JOIN product ON product.id = inventory_item.product_id;
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
     void buildProductDimension() {
