@@ -145,6 +145,14 @@
 						</table>
 
 					</div>
+					<div class="buttons right">
+						<a href="javascript:void(0);" class="btn-show-dialog button"
+						   data-title="${g.message(code:'default.show.label', args: [g.message(code: 'default.metadata.label')])}"
+						   data-url="${request.contextPath}/json/showTransactionReportMetadata">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'application_key.png')}" />&nbsp;
+							<g:message code="default.show.label" args="[g.message(code: 'default.metadata.label')]"/>
+						</a>
+					</div>
 				</div>
 			</div>
 		</div>
