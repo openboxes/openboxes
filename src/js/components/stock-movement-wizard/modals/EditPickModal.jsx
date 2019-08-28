@@ -166,8 +166,8 @@ class EditPickModal extends Component {
         'inventoryItem.id': avItem['inventoryItem.id'],
         'binLocation.id': avItem['binLocation.id'] || '',
         quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
-        reasonCode: values.reasonCode || '',
       })),
+      reasonCode: values.reasonCode || '',
     };
 
     return apiClient.post(url, payload)

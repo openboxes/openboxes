@@ -84,6 +84,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     User createdBy
     User updatedBy
 
+    // Picking
+    String pickReasonCode
+
 
     static transients = ["type", "substitutionItems", "monthlyDemand", 'totalCost', 'quantityIssued', 'quantityAdjusted']
 
@@ -132,7 +135,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         parentRequisitionItem(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
-    }
+        pickReasonCode(nullable: true)
+	}
 
     /**
      * @return

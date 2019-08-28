@@ -218,12 +218,10 @@
     </g:if>
     <g:if test="${requestTab}">
         <td class="middle center">
-            <g:set var="pickReasonCode" value="${requisitionItem?.picklistItems?.find { it.reasonCode } ?:
-                    requisitionItem?.modificationItem?.picklistItems?.find { it.reasonCode } ?:
-                    requisitionItem?.substitutionItem?.picklistItems?.find { it.reasonCode } }"/>
+            <g:set var="pickReasonCode" value="${requisitionItem?.pickReasonCode}"/>
             <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
                 <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}
-${pickReasonCode ? 'Pick reason code: ' + pickReasonCode?.reasonCode : ''}">
+${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}">
                     <img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" />
                 </div>
             </g:if>
