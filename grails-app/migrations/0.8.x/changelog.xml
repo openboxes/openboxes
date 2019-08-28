@@ -49,5 +49,5 @@
     <include file="0.8.x/changelog-2019-05-01-2141-inventory-level-improvements.xml"/>
     <include file="0.8.x/changelog-2019-05-31-2311-drop-inventory-snapshot-key.xml"/>
     <include file="0.8.x/changelog-2019-06-18-1035-add-inventory-item-comments.xml"/>
-
+    <include file="0.8.x/changelog-2019-08-15-1229-alter-table-inventory-snapshot-add-unique-index.xml"/>
 </databaseChangeLog>

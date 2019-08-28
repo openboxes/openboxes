@@ -202,9 +202,6 @@ class RequisitionService {
     def getRequisitions(Requisition requisition, Map params) {
         println "Get requisitions: " + params
 
-        def isRelatedToMe = Boolean.parseBoolean(params?.isRelatedToMe)
-        def commodityClassIsNull = Boolean.parseBoolean(params?.commodityClassIsNull)
-
         def issuedDateRange = DateUtil.parseDateRange(params?.issuedDateRange, "d/MMM/yyyy", "-")
         def requestedDateRange = DateUtil.parseDateRange(params?.requestedDateRange, "d/MMM/yyyy", "-")
 

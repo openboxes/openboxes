@@ -395,8 +395,9 @@
         $(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
 
         // Chozen select default
-        $(".chzn-select").chosen({ width: '100%', search_contains: true });
+      $(".chzn-select").chosen({search_contains: true});
         $(".chzn-select-deselect").chosen({ allow_single_deselect:true, width: '100%', search_contains: true });
+      $(".chzn-select-readonly").chosen().prop("disabled", "disabled").trigger("chosen:updated");
         $(".chzn-select-deselect").livequery(function(){
             $(this).chosen({allow_single_deselect:true, width:'100%', search_contains: true});
         });

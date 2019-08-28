@@ -65,7 +65,7 @@ class BootStrap {
     def identifierService
     def grailsApplication
     FileService fileService
-    DataSource dataSource;
+    DataSource dataSource
 
     def init = { servletContext ->
 
@@ -403,10 +403,10 @@ class BootStrap {
 
             def connection = dataSource.getConnection()
             if (connection == null) {
-                throw new RuntimeException("Connection could not be created.");
+                throw new RuntimeException("Connection could not be created.")
             }
             //LiquibaseUtil.class.getClassLoader();
-            def classLoader = getClass().classLoader;
+            def classLoader = getClass().classLoader
             def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
 
             //def fileOpener = new ClassLoaderFileOpener()
@@ -421,12 +421,12 @@ class BootStrap {
 
             //If nothing has been created yet, let's create all new database objects with the install scripts
             if (!ranChangeSets) {
-                liquibase = new Liquibase("install/install.xml", fileOpener, database);
+                liquibase = new Liquibase("install/install.xml", fileOpener, database)
                 liquibase.update(null)
             }
 
             // Run through the updates in the master changelog
-            liquibase = new Liquibase("changelog.xml", fileOpener, database);
+            liquibase = new Liquibase("changelog.xml", fileOpener, database)
             liquibase.update(null)
         }
         finally {
@@ -436,7 +436,7 @@ class BootStrap {
         }
         log.info("Finished running liquibase changelog(s)!")
 
-		def enableFixtures = Boolean.parseBoolean(grailsApplication.config.openboxes.fixtures.enabled?:"true");
+		def enableFixtures = Boolean.valueOf(grailsApplication.config.openboxes.fixtures.enabled?:true)
         log.info("Insert test fixtures?  " + enableFixtures)
 		if (enableFixtures) {
             log.info("Inserting test fixtures ...")
@@ -598,7 +598,7 @@ class BootStrap {
         item.expirationDate = expirationDate
         item.save(failOnError: true, flush: true)
 
-        Location boston = Location.findByName("Boston Headquarters");
+        Location boston = Location.findByName("Boston Headquarters")
         assert boston != null
 
         Transaction transaction = new Transaction()
