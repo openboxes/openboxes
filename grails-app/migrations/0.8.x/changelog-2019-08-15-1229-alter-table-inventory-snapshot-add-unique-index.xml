@@ -2,7 +2,11 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-
+    <changeSet author="jmiranda (generated)" id="1565890211110-0">
+        <sql>
+            SET FOREIGN_KEY_CHECKS = 0;
+        </sql>
+    </changeSet>
     <changeSet author="jmiranda (generated)" id="1565890211110-1">
         <validCheckSum>62b8ef93f3591ba291ce9f907cc497</validCheckSum>
         <preConditions onFail="MARK_RAN">
@@ -82,5 +86,10 @@
         <addForeignKeyConstraint baseColumnNames="bin_location_id" baseTableName="inventory_snapshot"
           constraintName="FK740B54769DB749D" deferrable="false" initiallyDeferred="false"
           referencedColumnNames="id" referencedTableName="location"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1565890211110-7">
+        <sql>
+            SET FOREIGN_KEY_CHECKS = 1;
+        </sql>
     </changeSet>
 </databaseChangeLog>
