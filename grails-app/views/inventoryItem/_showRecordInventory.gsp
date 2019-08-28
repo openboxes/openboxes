@@ -411,21 +411,21 @@
 		<g:textField id="lotNumber-{{= getIndex()}}" class="lotNumber text" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="25" />
 	</td>
 	<td class="nowrap">
-		<style>
-			.expirationDate {
-				background-image: url('${request.contextPath }/images/icons/silk/calendar.png');
-				background-repeat: no-repeat;
-				background-position: center right;
+        <style>
+            .expirationDate {
+                background-image: url('${request.contextPath }/images/icons/silk/calendar.png');
+                background-repeat: no-repeat;
+                background-position: center right;
 
-			}
-		</style>
-<g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
-<g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate"
-              default="none" noSelection="['': '']" years="${currentYear - 10..currentYear + 20}"
-              precision="day"/>
+            }
+        </style>
+        <g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
+        <g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate"
+                      default="none" noSelection="['': '']" years="${currentYear - 10..currentYear + 20}"
+                      precision="day"/>
 
 
-        </td>
+    </td>
 	<td style="text-align: center; vertical-align: middle;">
 		{{= Qty}}
 		<g:hiddenField id="oldQuantity-{{= getIndex()}}" class="oldQuantity"
