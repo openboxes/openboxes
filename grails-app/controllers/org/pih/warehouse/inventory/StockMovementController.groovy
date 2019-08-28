@@ -138,8 +138,11 @@ class StockMovementController {
             render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
         }
 
-        render(view: "list", params: params, model: [stockMovements: stockMovements, statistics: statistics, incoming: incoming])
+        if (params.submitted) {
+            flash.message = "${warehouse.message(code:'request.submitMessage.label')} ${params.movementNumber}"
+        }
 
+        render(view: "list", params: params, model: [stockMovements: stockMovements, statistics: statistics, incoming: incoming])
     }
 
     def rollback = {

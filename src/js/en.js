@@ -143,6 +143,11 @@ const en = {
           label: 'List Inbound Stock Movements',
           link: '/openboxes/stockMovement/list?direction=INBOUND',
         },
+        request: {
+          configName: 'stockMovement',
+          label: 'Request Stock',
+          link: '/openboxes/stockMovement/create?type=REQUEST',
+        },
         createPutAway: {
           configName: 'stockMovement',
           label: 'Create Putaway',
