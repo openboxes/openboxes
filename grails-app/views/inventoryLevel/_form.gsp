@@ -53,7 +53,7 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="inventory.id"><warehouse:message code="inventoryLevel.binLocation.label" default="Bin location" /></label>
+                    <label for="binLocation"><warehouse:message code="inventoryLevel.binLocation.label" default="Bin location" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'binLocation', 'errors')}">
                     <g:textField name="binLocation" value="${inventoryLevelInstance?.binLocation }" class="text large"/>
@@ -61,7 +61,7 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="inventory.id"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class" /></label>
+                    <label for="abcClass"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'abcClass', 'errors')}">
                     <g:textField name="abcClass" value="${inventoryLevelInstance?.abcClass }" size="5" class="text large"/>
@@ -69,7 +69,7 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="inventory.id"><warehouse:message code="inventoryLevel.comments.label" default="Comments" /></label>
+                    <label for="comments"><warehouse:message code="inventoryLevel.comments.label" default="Comments" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'comments', 'errors')}">
                     <g:textField name="comments" value="${inventoryLevelInstance?.comments }" class="text large"/>
