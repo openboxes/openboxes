@@ -16,19 +16,6 @@
                             ${fieldValue(bean: userInstance, field: "firstName")} ${fieldValue(bean: userInstance, field: "lastName")}
                         </g:link>
                     </div>
-                    <%--
-                    <span style="font-size: 1.2em">
-                        <b>${userInstance?.active ? warehouse.message(code: 'user.active.label') : warehouse.message(code: 'user.inactive.label')}</b>
-                        <g:if test="${userInstance?.active}">
-                            <img class="photo" src="${resource(dir: 'images/icons/silk', file: 'status_online.png') }"
-                                style="vertical-align: bottom;" />
-                        </g:if>
-                        <g:else>
-                            <img class="photo" src="${resource(dir: 'images/icons/silk', file: 'status_offline.png') }"
-                                style="vertical-align: bottom;" />
-                        </g:else>
-                    </span>
-                    --%>
                 </td>
                 <td class="top right">
                     <div class="right">

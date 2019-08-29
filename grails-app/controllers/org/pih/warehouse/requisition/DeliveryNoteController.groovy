@@ -18,7 +18,7 @@ class DeliveryNoteController {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
-        [requisition:requisition, picklist: picklist, location:location]
+        [requisition: requisition, picklist: picklist, location: location]
     }
 
 }

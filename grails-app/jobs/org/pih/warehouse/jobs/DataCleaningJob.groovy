@@ -11,11 +11,11 @@ class DataCleaningJob {
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {
-		cron name:'dataCleaningCronTrigger',
+        cron name: 'dataCleaningCronTrigger',
                 cronExpression: CH.config.openboxes.jobs.dataCleaningJob.cronExpression
     }
 
-	def execute(context) {
+    def execute(context) {
 
         Boolean enabled = CH.config.openboxes.jobs.dataCleaningJob.enabled
         if (!enabled) {

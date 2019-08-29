@@ -100,13 +100,6 @@
 					
 				</div>
             </g:form>
-        </div>
-        
-        
-        
-		<script>			
-			//$(document).ready(function() {
-			//});
-		</script> 				
+        </div>    				
     </body>
 </html>

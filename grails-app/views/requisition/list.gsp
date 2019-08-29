@@ -200,27 +200,6 @@
 
                             <g:sortableColumn property="dateIssued" params="${pageParams}"
                                               title="${warehouse.message(code: 'requisition.dateIssued.label', default: 'Date issued')}" />
-
-                            <%--
-                            <th>
-                                <warehouse:message code="default.created.label"/>
-                            </th>
-                            <th>
-                                <warehouse:message code="default.updated.label"/>
-                            </th>
-
-                            <g:sortableColumn property="createdBy" params="${pageParams}"
-                                title="${warehouse.message(code: 'default.createdBy.label', default: 'Created by')}" />
-
-                            <g:sortableColumn property="updatedBy" params="${pageParams}"
-                                              title="${warehouse.message(code: 'default.updatedBy.label', default: 'Updated by')}" />
-
-                            <g:sortableColumn property="dateCreated" params="${pageParams}"
-                                              title="${warehouse.message(code: 'default.dateCreated.label', default: 'Date created')}" />
-
-                            <g:sortableColumn property="lastUpdated" params="${pageParams}"
-                                              title="${warehouse.message(code: 'default.lastUpdated.label', default: 'Last updated')}" />
-                            --%>
                             <th>
                                 <g:message code="requisition.timeToProcess.label"/>
                             </th>
@@ -252,10 +231,6 @@
 
                                 <td class="left middle">
                                     <div class="count">${requisition?.requisitionItems?.size()?:0}</div>
-
-                                    <%--
-                                    ${warehouse.message(code: 'requisition.numRequisitionItems.label', args:[requisition?.requisitionItems?.size()?:0]) }
-                                    --%>
                                 </td>
                                 <td class="middle">
                                     <label class="status"><format:metadata obj="${requisition?.status}"/></label>
@@ -304,25 +279,9 @@
                                     </g:elseif>
                                 </td>
 
-                                <%--
-                                <td class="middle center">${requisition.createdBy?:warehouse.message(code:'default.none.label')}</td>
-                                <td class="middle center">${requisition.updatedBy?:warehouse.message(code:'default.none.label')}</td>
-                                --%>
-                                <%--
-                                <td>${requisition.createdBy}</td>
-                                <td>${requisition.updatedBy}</td>
-                                <td><format:datetime obj="${requisition.dateCreated}" /></td>
-                                <td><format:datetime obj="${requisition.lastUpdated}" /></td>
-                                --%>
-
                                 <td class="middle center">
 
                                     <div class="dialog-box" title="${requisition.requestNumber } ${requisition?.name}" id="dialog-box-${requisition?.id}" style="display:none;">
-                                        <%--
-                                           <div class="summary">
-                                               <g:render template="header" model="[requisition:requisition]"/>
-                                           </div>
-                                        --%>
                                         <div class="list">
 
                                             <table class="box">
@@ -450,30 +409,7 @@
                         </g:each>
                     </tbody>
                 </table>
-
-
             </div>
-                <%--
-                <g:set var="requisitions" value="${requisitions?.sort { it.status }}"/>
-                <g:set var="requisitionMap" value="${requisitions?.groupBy { it.status }}"/>
-                <div class="tabs">
-                    <ul>
-                        <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list() }">
-                            <li>
-                                <a href="#${format.metadata(obj: status) }">
-                                    <format:metadata obj="${status }"/>
-                                    <span class="fade">(${requisitionMap[status]?.size()?:0})</span>
-                                </a>
-                            </li>
-                        </g:each>
-                    </ul>
-                    <g:each var="status" in="${org.pih.warehouse.requisition.RequisitionStatus.list() }">
-                        <div id="${format.metadata(obj: status) }">
-                            <g:render template="list" model="[requisitions:requisitionMap[status]]"/>
-                        </div>
-                    </g:each>
-                </div>
-                --%>
                 <div class="paginateButtons">
                     <g:paginate total="${requisitions.totalCount}" controller="requisition" action="list" max="${params.max}"
                         params="${pageParams.findAll {it.value}}"/>

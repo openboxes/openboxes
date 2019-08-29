@@ -20,6 +20,10 @@ import { showSpinner, hideSpinner } from '../../actions';
 import { debounceUsersFetch, debounceLocationsFetch } from '../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
+const request = queryString.parse(window.location.search).type === 'REQUEST';
+const inbound = queryString.parse(window.location.search).direction === 'INBOUND';
+const outbound = queryString.parse(window.location.search).direction === 'OUTBOUND';
+
 function validate(values) {
   const errors = {};
   if (!values.description) {
@@ -76,7 +80,7 @@ const FIELDS = {
           props.fetchStockLists(value, props.destination);
         }
       },
-      disabled: queryString.parse(window.location.search).direction === 'OUTBOUND' && !props.isSuperuser,
+      disabled: outbound && !props.isSuperuser,
     }),
   },
   destination: {
@@ -100,7 +104,7 @@ const FIELDS = {
           props.fetchStockLists(props.origin, value);
         }
       },
-      disabled: queryString.parse(window.location.search).direction === 'INBOUND' && !props.isSuperuser,
+      disabled: (inbound || request) && !props.isSuperuser,
     }),
   },
   stocklist: {
@@ -151,7 +155,7 @@ class CreateStockMovement extends Component {
     super(props);
     this.state = {
       stocklists: [],
-      setInitialLocations: true,
+      setInitialValues: true,
       values: this.props.initialValues,
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
@@ -170,16 +174,16 @@ class CreateStockMovement extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!this.props.match.params.stockMovementId && this.state.setInitialLocations
+    if (!this.props.match.params.stockMovementId && this.state.setInitialValues
       && nextProps.location.id) {
-      this.setInitialLocations(nextProps.location);
+      this.setInitialValues(nextProps.location, nextProps.user);
     }
   }
 
-  setInitialLocations(location) {
+  setInitialValues(location, user) {
     const { id, locationType, name } = location;
 
-    if (queryString.parse(window.location.search).direction === 'INBOUND') {
+    if (inbound) {
       const values = {
         destination: {
           id,
@@ -188,10 +192,10 @@ class CreateStockMovement extends Component {
           label: `${name} [${locationType ? locationType.description : null}]`,
         },
       };
-      this.setState({ values, setInitialLocations: false });
+      this.setState({ values, setInitialValues: false });
     }
 
-    if (queryString.parse(window.location.search).direction === 'OUTBOUND') {
+    if (outbound) {
       const values = {
         origin: {
           id,
@@ -200,7 +204,26 @@ class CreateStockMovement extends Component {
           label: `${name} [${locationType ? locationType.description : null}]`,
         },
       };
-      this.setState({ values, setInitialLocations: false });
+      this.setState({ values, setInitialValues: false });
+    }
+
+
+    if (request) {
+      const values = {
+        destination: {
+          id,
+          type: locationType ? locationType.locationTypeCode : null,
+          name,
+          label: `${name} [${locationType ? locationType.description : null}]`,
+        },
+        requestedBy: {
+          id: user.id,
+          name: user.name,
+          label: `${user.name}`,
+        },
+        dateRequested: moment(new Date()).format('MM/DD/YYYY'),
+      };
+      this.setState({ values, setInitialValues: false });
     }
   }
 
@@ -280,7 +303,7 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(`/openboxes/stockMovement/create/${resp.id}`);
+            this.props.history.push(`/openboxes/stockMovement/create/${resp.id}${request ? '?type=REQUEST' : ''}`);
             this.props.onSubmit({
               ...values,
               stockMovementId: resp.id,
@@ -380,6 +403,7 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  user: state.session.user,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -428,4 +452,9 @@ CreateStockMovement.propTypes = {
   translate: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  user: PropTypes.shape({
+    username: PropTypes.string,
+    id: PropTypes.string,
+    name: PropTypes.string,
+  }).isRequired,
 };

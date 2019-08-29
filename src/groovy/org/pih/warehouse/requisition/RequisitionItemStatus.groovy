@@ -9,31 +9,31 @@
  **/
 package org.pih.warehouse.requisition
 
-public enum RequisitionItemStatus {
-	PENDING(0),
+enum RequisitionItemStatus {
+    PENDING(0),
     APPROVED(1),
     SUBSTITUTED(2),
     CHANGED(3),
-	CANCELED(4),
-	COMPLETED(5)
+    CANCELED(4),
+    COMPLETED(5)
 
-	int sortOrder
+    int sortOrder
 
     RequisitionItemStatus(int sortOrder) {
-		[
-			this.sortOrder = sortOrder
-		]
-	}
+        [
+                this.sortOrder = sortOrder
+        ]
+    }
 
-	static int compare(RequisitionItemStatus a, RequisitionItemStatus b) {
-		return a.sortOrder <=> b.sortOrder
-	}
+    static int compare(RequisitionItemStatus a, RequisitionItemStatus b) {
+        return a.sortOrder <=> b.sortOrder
+    }
 
-	static list() {
-		[ PENDING, APPROVED, SUBSTITUTED, CHANGED, CANCELED, COMPLETED ]
-	}
+    static list() {
+        [PENDING, APPROVED, SUBSTITUTED, CHANGED, CANCELED, COMPLETED]
+    }
 
-	String toString() {
-		return name()
-	}
+    String toString() {
+        return name()
+    }
 }

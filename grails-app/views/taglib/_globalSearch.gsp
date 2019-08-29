@@ -3,11 +3,11 @@
 		<g:textField id="${attrs.id}" name="searchTerms" class="globalSearch top" type="text" size="${attrs.size}"
             placeholder="${warehouse.message(code:'globalSearch.placeholder.label')}"
 			value="${attrs.value}"/>
-		<g:hiddenField name="resetSearch" value="${true }"/>							
-		<g:hiddenField name="categoryId" value="${session?.rootCategory?.id }"/>	
+		<g:hiddenField name="resetSearch" value="${true }"/>
+		<g:hiddenField name="categoryId" value="${session?.rootCategory?.id }"/>
 		<g:hiddenField name="searchPerformed" value="${true }"/>
 		<g:hiddenField name="showHiddenProducts" value="on"/>
-		<g:hiddenField name="showOutOfStockProducts" value="on"/>			
+		<g:hiddenField name="showOutOfStockProducts" value="on"/>
 	</g:form>
 </span>
 <script>
@@ -30,13 +30,16 @@
                 return false;
             },
             focus: function(event, ui) {
-                //$( "#${attrs.id}" ).val( ui.item.label );
-                //return false;
-
                 this.value = ui.item.label;
                 event.preventDefault(); // Prevent the default focus behavior.
             }
-        });
+        }).data("autocomplete")._renderItem = function( ul, item ) {
+          var link = $("<a></a>").text(item.label).css("color", item.color);
+          return $( "<li></li>" )
+          .data("item.autocomplete", item)
+          .append(link)
+          .appendTo(ul);
+        };
     });
 </script>
-</span>		
+</span>

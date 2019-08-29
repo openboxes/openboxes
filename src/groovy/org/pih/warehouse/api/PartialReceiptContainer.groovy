@@ -14,15 +14,15 @@ class PartialReceiptContainer {
 
     Map toJson() {
         return [
-                "container.id": container?.id,
-                "container.name": container?.name,
-                "parentContainer.id": container?.parentContainer?.id,
+                "container.id"        : container?.id,
+                "container.name"      : container?.name,
+                "parentContainer.id"  : container?.parentContainer?.id,
                 "parentContainer.name": container?.parentContainer?.name,
-                "container.type": container?.containerType?.name,
-                shipmentItems: partialReceiptItems. sort { a,b ->
+                "container.type"      : container?.containerType?.name,
+                shipmentItems         : partialReceiptItems.sort { a, b ->
                     a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
-                        a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
-                                a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
+                            a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
+                                    a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
                 }
         ]
     }

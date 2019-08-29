@@ -28,20 +28,6 @@
             </g:elseif>
         </td>
     </g:if>
-    <%--
-    <td>
-        <g:set var="value" value="${formatNumber(number:requisitionItem.calculatePercentageCompleted(),maxFractionDigits: 0) }" />
-        <div id="progressbar-${requisitionItem?.id }" class="progressbar" style="width: 100px;"></div>
-        <script type="text/javascript">
-            $(function() {
-                $( "#progressbar-${requisitionItem?.id }" ).progressbar({value: ${value}});
-            });
-        </script>
-    </td>
-    <td>
-        ${value }%
-    </td>
-    --%>
     <td class="middle">
         <div class="tag ${requisitionItem.isCanceled() ? 'tag-danger' : requisitionItem.isSubstituted() || requisitionItem.isReduced() ? 'tag-warning' : 'tag-alert'}">
             <g:if test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
@@ -87,11 +73,6 @@
         </td>
     </g:if>
     <td class="middle">
-        <%--
-        <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id }">
-            <img src="${resource(dir:'images/icons/silk',file:'clipboard.png')}"/>
-        </g:link>
-        --%>
         <g:if test="${requisitionItem?.isCanceled()}">
             <div class="canceled">
                 <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
@@ -237,12 +218,10 @@
     </g:if>
     <g:if test="${requestTab}">
         <td class="middle center">
-            <g:set var="pickReasonCode" value="${requisitionItem?.picklistItems?.find { it.reasonCode } ?:
-                    requisitionItem?.modificationItem?.picklistItems?.find { it.reasonCode } ?:
-                    requisitionItem?.substitutionItem?.picklistItems?.find { it.reasonCode } }"/>
+            <g:set var="pickReasonCode" value="${requisitionItem?.pickReasonCode}"/>
             <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
                 <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}
-${pickReasonCode ? 'Pick reason code: ' + pickReasonCode?.reasonCode : ''}">
+${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}">
                     <img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" />
                 </div>
             </g:if>

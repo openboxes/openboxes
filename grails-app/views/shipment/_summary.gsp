@@ -66,14 +66,6 @@
 								<label>${format.metadata(obj:shipmentInstance?.destination)}</label>
 							</span>
 						</g:if>
-						<%--
-						<g:if test="${shipmentInstance?.status?.code }">
-							<span class="shipment-status">
-								<warehouse:message code="shipping.status.label"/>:
-								<label class="status"><format:metadata obj="${shipmentInstance?.status?.code}"/></label>
-							</span>
-						</g:if>
-						--%>
 						<g:if test="${!shipmentInstance?.hasShipped() }">
 							<g:if test="${shipmentInstance?.expectedShippingDate }">
 								<span class="expectedShippingDate">

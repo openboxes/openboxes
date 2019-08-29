@@ -63,16 +63,6 @@
 										<g:textField name="email" value="${userInstance?.email}" class="text" size="40"/>
 									</td>
 								</tr>
-								<%--
-					            <tr class="prop">
-					                <td class="name middle right">
-					                    <label for="username"><warehouse:message code="user.username.label" default="Username" /></label>
-					                </td>
-					                <td class="${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-					                    <g:textField name="username" value="${userInstance?.username}" class="text"  size="40" />
-					                </td>
-					            </tr>
-								--%>
 	
 					            <tr class="prop">
 					                <td class="name middle right">

@@ -42,33 +42,7 @@
 	<div>
 		<label for="title">Title:</label>
 		<input type="text" id="title" name="title" class="text" size="80" value="" readonly="readonly" />
-	</div>		
-<%--			
-				
-	<div>
-		<label for="description">Description:</label>
-		<input type="text" id="description" name="description" class="text medium" value="${product.description}" />
-	</div>	
-	
-	<div>		
-		<label for="brandName">Brand name:</label>				
-		<input type="text" id="brandName" name="brandName" class="text large" value="" /></td>
 	</div>
-	
-	<div>		
-		<label for="manufacturer">Manufacturer:</label>
-		<input type="text" id="manufacturer"
-			name="manufacturer" class="text large"
-			value="${product.manufacturer}" /></td>
-	</div>
-	<div>	
-		<label for="manufacturerCode">Manufacturer
-				Code:</label></td>
-		<input type="text" id="manufacturerCode"
-			name="manufacturerCode" class="text large"
-			value="${product.manufacturerCode}" /></td>
-	</div>	
- --%>
 
 </div>
 
@@ -82,9 +56,6 @@ $(document).ready(function() {
 		$('.required').each(function(index) {			
 			if ($(this).val() && $(this).val() != 'Not Specified') { 
 				title.push($(this).val());
-			}
-			else { 
-				//title.push("<span class='fade'>[unspecified]</span>");
 			}
 		});
 		

@@ -20,21 +20,6 @@
                         <li><a href="${createLink(uri: '/inventorySnapshot/index')}">Inventory Periodic Snapshots</a></li>
                     </ul>
                 </li>
-
-                <%--
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li class="divider"></li>
-                        <li class="dropdown-header">Nav header</li>
-                        <li><a href="#">Separated link</a></li>
-                        <li><a href="#">One more separated link</a></li>
-                    </ul>
-                </li>
-                --%>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
@@ -85,16 +70,6 @@
                                 </g:link>
                             </li>
                         </g:isUserAdmin>
-                    <%--
-                    <g:if test="${session?.warehouse}">
-
-                        <li>
-                            <a href="javascript:void(0);" class="warehouse-switch">
-                                <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
-                            </a>
-                        </li>
-                    </g:if>
-                    --%>
                         <li class="divider"></li>
                         <li>
                             <g:link class="list" controller="auth" action="logout">

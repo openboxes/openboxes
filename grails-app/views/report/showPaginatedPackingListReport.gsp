@@ -9,7 +9,6 @@
         </style>
         <style>
         	.filter { padding-right: 30px; border-right: 1px solid lightgrey; }
-        	/*th { text-transform: uppercase; }*/
         	.title { text-align: center; padding: 5px; font-size: 3em; }
         	.subtitle { text-align: center; padding: 15px; font-size: 2em; }
         	.underline { border-bottom: 1px dashed black; }
@@ -34,12 +33,6 @@
 	   	<g:if test="${!params.print}">
 			<div class="dialog box" >
 				<g:form controller="report" action="showShippingReport" method="GET">
-					<%--
-					<span class="filter">
-						<label>Location</label>
-						<g:selectLocation class="filter" name="location.id" noSelection="['null':'']" value="${command?.location?.id}"/>
-					</span>
-					--%>
 					<table>
 						<tr>
 							<td>
@@ -48,19 +41,6 @@
 								</label>
 								<g:selectShipment class="filter" name="shipment.id" noSelection="['null':'']" value="${command?.shipment?.id}"/>
 							</td>
-							<%--
-							<span class="filter">
-								<label>Start date</label>
-								<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
-							</span>
-							<span class="filter">
-								<label>End date</label>
-								<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
-							</span>
-							<span>
-								<button type="submit" class="btn">Run Report</button>
-							</span>
-							--%>
 						</tr>
 				    	<tr class="prop">
 				    		<td>
@@ -73,12 +53,6 @@
 						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.pdf.label"/>
 						   			</g:link>
-						   			<%--
-						   			|
-						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
-						   				<warehouse:message code="report.exportAs.docx.label"/>
-						   			</g:link>
-						   			--%>
 						   		</g:if>
 						   		<g:else>
 						   			<warehouse:message code="report.selectShipment.label"/>
@@ -119,58 +93,7 @@
 						</td>
 					</tr>
 				</table>
-
-
 				<hr/>
-
-				<%--
-				<table>
-					<tr>
-						<td class="label">
-							<label>
-								<warehouse:message code="report.containerNumber.label"/>
-							</label>
-						</td>
-						<td class="value underline">
-							<span class="value">
-								${command?.shipment?.name?.encodeAsHTML() }
-							</span>
-						</td>
-						<td class="spacer">
-
-						</td>
-						<td class="label">
-							<label>
-								<warehouse:message code="report.plate.label"/>
-							</label>
-						</td>
-						<td class="value underline">
-							<span class="value">${command?.shipment?.getReferenceNumber('License Plate Number')?.identifier }</span>
-						</td>
-					</tr>
-					<tr>
-						<td class="label">
-							<label>
-								<warehouse:message code="report.origin.label"/>
-							</label>
-						</td>
-						<td class="value underline">
-							<span class="value">${command?.shipment?.origin?.name?.encodeAsHTML() }</span>
-						</td>
-						<td class="spacer">
-
-						</td>
-						<td class="label">
-							<label>
-								<warehouse:message code="report.destination.label"/>
-							</label>
-						</td>
-						<td class="value underline">
-							<span class="value">${command?.shipment?.destination?.name?.encodeAsHTML()  }</span>
-						</td>
-					</tr>
-				</table>
-				--%>
 				<div class="dialog">
 		   			<g:set var="status" value="${0 }"/>
 			    	<g:set var="packingListByContainer" value="${command?.checklistReportEntryList?.groupBy { it?.shipmentItem?.container } }"/>

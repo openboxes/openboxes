@@ -9,7 +9,7 @@
  **/
 package openboxes
 
-import grails.plugins.raven.RavenClient
+
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.User
@@ -42,7 +42,7 @@ class SentryFilters {
                         log.info("Unable to set the user data for sentry due to the following error " + e.message)
                     }
                 } else {
-                    ravenClient.setUserData([is_authenticated:false])
+                    ravenClient.setUserData([is_authenticated: false])
                 }
             }
         }

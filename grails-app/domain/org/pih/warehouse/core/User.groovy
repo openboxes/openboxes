@@ -10,26 +10,25 @@
 package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
-import org.pih.warehouse.auth.AuthService
 import util.StringUtil
 
-// import java.util.Date
 
 class User extends Person {
 
     String id
-    Boolean active = false;                // default = false?
-    String username;            // email or username
-    String password;            // encrypted password
-    String passwordConfirm;        // password confirm used on signup and password reset
-    Locale locale;                // the user's locale
+    Boolean active = false                // default = false?
+    String username            // email or username
+    String password            // encrypted password
+    String passwordConfirm        // password confirm used on signup and password reset
+    Locale locale                // the user's locale
     String timezone
 
-    Date lastLoginDate;            // keep track of the user's last login
-    Location warehouse;        // keep track of the user's last warehouse
+    Date lastLoginDate            // keep track of the user's last login
+    Location warehouse        // keep track of the user's last warehouse
     //Boolean useSavedLocation		// indicates whether we should use this warehouse when user logs in
-    User manager;                // the user's designated manager
-    Boolean rememberLastLocation    // indicates whether user would like for the system to remember where they last logged into
+    User manager                // the user's designated manager
+    Boolean rememberLastLocation
+    // indicates whether user would like for the system to remember where they last logged into
     byte[] photo                // profile photo
 
     List locationRoles
@@ -51,7 +50,7 @@ class User extends Person {
         })
         passwordConfirm(blank: false)
         locale(nullable: true)
-        timezone(nullable:true)
+        timezone(nullable: true)
         lastLoginDate(nullable: true)
         //useSavedLocation(nullable:true)
         warehouse(nullable: true)
@@ -61,10 +60,8 @@ class User extends Person {
     }
 
 
-
-
     /**
-     * @return  the highest role for this user
+     * @return the highest role for this user
      */
     def getHighestRole(Location currentLocation) {
         def roles = getEffectiveRoles(currentLocation)
@@ -73,12 +70,12 @@ class User extends Person {
 
 
     def getRolesByCurrentLocation(Location currentLocation) {
-        if(!currentLocation) return []
-        return locationRoles?.findAll{it.location == currentLocation}?.collect{it.role} ?: []
+        if (!currentLocation) return []
+        return locationRoles?.findAll { it.location == currentLocation }?.collect { it.role } ?: []
     }
 
     def getEffectiveRoles(Location currentLocation) {
-        def defaultRoles = roles?.collect{it} ?: []
+        def defaultRoles = roles?.collect { it } ?: []
         def rolesByLocation = getRolesByCurrentLocation(currentLocation)
         defaultRoles.addAll(rolesByLocation)
         return defaultRoles
@@ -90,7 +87,7 @@ class User extends Person {
     }
 
     /**
-     * @return  all location role pairs for this user
+     * @return all location role pairs for this user
      */
     def locationRolePairs() {
         def pairs = [:]
@@ -101,7 +98,7 @@ class User extends Person {
     }
 
     /**
-     * @return  all location role pairs for display
+     * @return all location role pairs for display
      */
     def locationRolesDescription() {
         def roleArray = locationRoles.collect { "${it.location?.name}: ${it.role?.roleType?.name}" }
@@ -113,12 +110,12 @@ class User extends Person {
         boolean anonymize = CH.config.openboxes.anonymize.enabled
 
         return [
-                "id": id,
-                "name": name,
+                "id"       : id,
+                "name"     : name,
                 "firstName": firstName,
-                "lastName": (anonymize) ? lastInitial : lastName,
-                "email": anonymize ? StringUtil.mask(email) : email,
-                "username": anonymize ? StringUtil.mask(username) : username
+                "lastName" : (anonymize) ? lastInitial : lastName,
+                "email"    : anonymize ? StringUtil.mask(email) : email,
+                "username" : anonymize ? StringUtil.mask(username) : username
         ]
     }
 

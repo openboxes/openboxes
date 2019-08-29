@@ -7,24 +7,19 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.shipping;
+package org.pih.warehouse.shipping
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.*
 
-import grails.converters.JSON;
+import grails.converters.JSON
 import grails.test.*
-import grails.validation.ValidationException;
+import grails.validation.ValidationException
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.LocationType;
-import org.pih.warehouse.inventory.InventoryItem;
-import org.pih.warehouse.product.Category;
-import org.pih.warehouse.product.Product;
-
-import testutils.DbHelper;
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 
 class ShipmentServiceTests extends GroovyTestCase {
 
@@ -77,8 +72,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 		shipment3.shipmentType = ShipmentType.findByName("Ground");
 		shipment3.origin = Location.findByName("Origin")
 		shipment3.destination = Location.findByName("Destination")
-		
-		//shipment3.save(failOnError: true)
+
 		shipmentService.saveShipment(shipment3)
 		assertNotNull shipment3.id;		
 		assertNotNull Shipment.findByName("New Shipment 3");
@@ -148,13 +142,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 		printShipment("After move", shipment1)
 		printShipment("After move", shipment2)
 
-		// def testPallet = Container.findByName("Pallet 1")
 		assertEquals shipment2, pallet1.shipment
-				
-		// Assertion fails because the moveContainer method simply changes the 
-		// ShipmentItem.container and "Ground"Container.parentContainer references 
-		//def testShipment1 = Shipment.findByName("New Shipment 1")
-		//assertEquals 0, testShipment1.containers.size()
 		
 		// Postconditions		
 		assertEquals "Should have 0 containers", 0, shipment1?.containers?.size()?:0
@@ -193,9 +181,6 @@ class ShipmentServiceTests extends GroovyTestCase {
 		assertEquals "Should have 1 shipment items", 1, shipment2?.shipmentItems?.size()?:0
 		assertEquals "Pallet1 should container 1 shipment items", 1, Container.findByName("Pallet 1")?.shipmentItems?.size()?:0
 		assertEquals "Pallet shipment should equal Shipment 2", shipment2, Container.findByName("Pallet 1")?.shipment
-
-		
-
 	}
 		
 	/**
@@ -210,9 +195,7 @@ class ShipmentServiceTests extends GroovyTestCase {
 
 	   def box1 = pallet1.addNewContainer(ContainerType.findByName("Box"))
 	   box1.name = "Box 1"
-	   pallet1.addToContainers(box1)	   
-	   //shipmentService.saveContainer(pallet1)
-	   
+	   pallet1.addToContainers(box1)
 	   
 	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: box1)
 	   shipment1.addToShipmentItems(shipmentItem1)
@@ -226,8 +209,6 @@ class ShipmentServiceTests extends GroovyTestCase {
 		   shipmentService.moveContainer(pallet1, shipment2)
 	   }
 	   
-	   //printShipment("After move container", shipment2)
-	   
 	   assertEquals "Pallet's shipment should still be shipment 1", shipment1, Container.findByName("Pallet 1").shipment
    }
 
@@ -238,17 +219,13 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   def shipment1 = Shipment.findByName("New Shipment 1")	   
 	   def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))	   
 	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1, container: pallet1)
-	   //pallet1.addToShipmentItems(shipmentItem1)
 	   shipment1.addToShipmentItems(shipmentItem1)
 	   shipment1.addToContainers(pallet1);
 	   shipment1.save(flush:true)
 
        def shipmentId = shipment1.id
-
-	   //def testShipment = Shipment.findByName("New Shipment 1")
 	   assertEquals 1, shipment1.shipmentItems.size()
 	   assertEquals 1, shipment1.containers.size()
-	   //assertEquals 1, shipment1.containers.toArray()[0].shipmentItems.size()
 	   def numberOfShipmentsBeforeDelete = Shipment.count()
 	   def numberOfContainersBeforeDelete = Container.count()
        def shipmentToDelete = Shipment.get(shipmentId)
@@ -307,14 +284,12 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   	   
 	   def shipmentAfter = Shipment.findByName("New Shipment 1")
 	   assertEquals 0, shipmentAfter.shipmentItems.size()
-	   //assertEquals "Should be equal to # of shipment items before delete", numberOfShipmentItemsBeforeDelete, ShipmentItem.count()
 	   assertEquals "Should be equal to # of containers before delete minus 1", numberOfContainersBeforeDelete-1, Container.count()
 	   
    }
 
    void test_deleteShipmentItem_shouldDeleteShipmentItemFromShipment() {
 	   def shipment = Shipment.findByName("New Shipment 1")
-	   //def pallet1 = new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet"))
 	   def shipmentItem1 = new ShipmentItem(product: Product.findByName("Product"), quantity: 1)
 	   shipment.addToShipmentItems(shipmentItem1)	      
 	   assertEquals "Should be equal to 1", 1, shipment?.shipmentItems?.size()?:0
@@ -340,39 +315,6 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   assertEquals "Should be equal to 0", 0, Container.findByName("Pallet 1")?.getShipmentItems()?.size()?:0
 	   assertEquals "Should be equal to 1", shipmentItemCount-1, ShipmentItem.count()
    }
-     
-   /*
-   void test_findShipmentItems() { 
-	   def product = DbHelper.createProductIfNotExists("Ibuprofen, 200 mg, tablet", "Medicines")
-	   def shipment = DbHelper.createShipment("New Shipment", "Sea")
-	   def inventoryItem = DbHelper.createInventoryItem(product, "ABC-1234", new Date()+365)
-	   def pallet1 = DbHelper.createPallet(shipment, "Pallet 1")
-	   def shipmentItem = DbHelper.createShipmentItem(shipment, pallet1, product, "ABC-1234", 100)
-	   
-	   def shipmentItemLookup = shipmentService.findShipmentItem(shipment, container, product, lotNumber)
-	   assertNotNull shipmentItemLookup
-	   assertNotNull shipmentItemLookup.inventoryItem
-	   assertNotNull shipmentItemLookup.inventoryItem  
-   }
-   */
-   
-    
-   /*
-   void test_addToShipment_shouldSetInventoryItem() { 
-	   ItemListCommand itemListCommand = new ItemListCommand();
-	   ItemCommand itemCommand1 = new ItemCommand();
-	   ItemCommand itemCommand2 = new ItemCommand();
-	   ItemCommand itemCommand3 = new ItemCommand();
-	   
-	   itemListCommand.items = []
-	   itemListCommand.items.add(itemCommand1)
-	   itemListCommand.items.add(itemCommand2)
-	   
-	   def addedAtLeastOne = shipmentService.addToShipment(itemListCommand)
-	   assertTrue(addedAtLeastOne)
-   }
-   */   
- 
    	
    void printShipment(text, shipment) { 
 	   println "===================== ${text} :: ${shipment.name} [${shipment.class.name}] ====================="
@@ -394,6 +336,5 @@ class ShipmentServiceTests extends GroovyTestCase {
 	   println shipmentItem as JSON
 	   println "---------------------------------------------------"
    }
-
 }
 

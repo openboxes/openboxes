@@ -7,49 +7,83 @@
 
 <div id="content" class="box">
     <h2>Inventory Snapshot</h2>
+    <g:set var="minQuantity" value="${product?.getInventoryLevel(session.warehouse.id)?.minQuantity?:0}"/>
+    <g:set var="reorderQuantity" value="${product?.getInventoryLevel(session.warehouse.id)?.reorderQuantity?:0}"/>
+    <g:set var="maxQuantity" value="${product?.getInventoryLevel(session.warehouse.id)?.maxQuantity?:0}"/>
     <input type="hidden" id="productId" name="productId" value="${product.id}"/>
     <input type="hidden" id="locationId" name="locationId" value="${session.warehouse.id}"/>
-    <input type="hidden" id="minQuantity" name="minQuantity" value="${product?.getInventoryLevel(session.warehouse.id)?.minQuantity?:0}"/>
-    <input type="hidden" id="reorderQuantity" name="reorderQuantity" value="${product?.getInventoryLevel(session.warehouse.id)?.reorderQuantity?:0}"/>
-    <input type="hidden" id="maxQuantity" name="maxQuantity" value="${product?.getInventoryLevel(session.warehouse.id)?.maxQuantity?:0}"/>
+    <input type="hidden" id="minQuantity" name="minQuantity" value="${minQuantity}"/>
+    <input type="hidden" id="reorderQuantity" name="reorderQuantity" value="${reorderQuantity}"/>
+    <input type="hidden" id="maxQuantity" name="maxQuantity" value="${maxQuantity}"/>
 
-    <table style="width: auto;">
-        <tr>
-            <td class="middle right">
+    <table>
+        <tr class="prop">
+            <td class="name middle right">
                 <label for="numMonths">
                     <warehouse:message code="default.duration.label" default="Duration"/></label>
             </td>
-            <td class="middle">
-                <g:select id="numMonths" name="numMonths" value="${params.numMonths?:12}"
-                          from="[1:'Last 1 month', 2:'Last 2 months',3:'Last 3 months',6:'Last 6 months',9:'Last 9 months',12:'Last 12 months',18:'Last 18 months',24:'Last 2 years',36:'Last 3 years',48:'Last 4 years',60:'Last 5 years',60:'Last 5 years',72:'Last 6 years',84:'Last 7 years',96:'Last 8 years',108:'Last 9 years',120:'Last 10 years']" optionKey="key" optionValue="value"></g:select>
+            <td class="value middle">
+                <g:select id="numMonths" name="numMonths" value="${params.numMonths?:12}" class="chzn-select-deselect"
+                          from="[1:'Last 1 month', 2:'Last 2 months',3:'Last 3 months',6:'Last 6 months',9:'Last 9 months',12:'Last 12 months',18:'Last 18 months',24:'Last 2 years',36:'Last 3 years',48:'Last 4 years',60:'Last 5 years',60:'Last 5 years',120:'Last 10 years']" optionKey="key" optionValue="value"></g:select>
             </td>
         </tr>
+        <tr class="prop">
+            <td class="name top right">
+                <label><g:message code="inventoryLevel.label"/></label>
+            </td>
+            <!-- e6beff, aaffc3 fffac8, ffd8b1, fabebe -->
+            <td class="value middle">
 
+                <g:if test="${maxQuantity}">
+                    <div style="background-color: #fffac8">
+                        <label><g:message code="inventory.listOverStock.label" default="Overstock"/></label>
+                        Greater than ${maxQuantity}
+                    </div>
+                </g:if>
+                <g:if test="${reorderQuantity || maxQuantity || minQuantity}">
+                    <div style="background-color: #aaffc3">
+                        <label><g:message code="inventoryLevel.idealQuantity.label" default="Ideal"/></label>
+                        <g:if test="${reorderQuantity && maxQuantity}"> Between ${reorderQuantity} and ${maxQuantity}</g:if>
+                        <g:elseif test="${minQuantity && maxQuantity}"> Between ${minQuantity} and ${maxQuantity}</g:elseif>
+                        <g:elseif test="${reorderQuantity}">Greater than ${reorderQuantity}</g:elseif>
+                        <g:elseif test="${minQuantity}">Greater than ${minQuantity}</g:elseif>
+                        <g:else>Less than ${maxQuantity}</g:else>
+                    </div>
+                </g:if>
+                <g:if test="${reorderQuantity}">
+                    <div style="background-color: #ffd8b1">
+                        <label><g:message code="inventoryLevel.reorderQuantity.label"/></label>
+                        <g:if test="${minQuantity && reorderQuantity}"> Between ${minQuantity} and ${reorderQuantity}</g:if>
+                        <g:elseif test="${reorderQuantity}">Less than ${reorderQuantity}</g:elseif>
+                        <g:elseif test="${minQuantity}">Less than ${minQuantity}</g:elseif>
+                        <g:else>Less than ${minQuantity}</g:else>
+                    </div>
+                </g:if>
+                <g:if test="${minQuantity}">
+                    <div style="background-color: #fabebe">
+                        <label><g:message code="inventoryLevel.minimumQuantity.label"/></label>
+                        Less than ${minQuantity}
+                    </div>
+                </g:if>
+            </td>
+        </tr>
     </table>
+
 
     <div class="demo-container">
         <div id="placeholder" class="demo-placeholder" style="height:400px; padding: 10px"></div>
     </div>
     <div class="right" style="margin:5px;">
-
-        <%--
-        <a href="javascript:downloadGraph();" class="button icon graph">Download graph</a>
-        --%>
-        <g:remoteLink controller="inventorySnapshot" action="triggerCalculateQuantityOnHandJob"
-                      class="button icon reload"
-                      params="['product.id':product.id,'location.id':session.warehouse.id]">Refresh data</g:remoteLink>
-
+        <g:isSuperuser>
+            <g:remoteLink controller="inventorySnapshot" action="triggerCalculateQuantityOnHandJob"
+                          class="button icon reload"
+                          params="['product.id':product.id,'location.id':session.warehouse.id]">Refresh data</g:remoteLink>
+        </g:isSuperuser>
     </div>
-
 </div>
 
-
-
-
-
-<%--<script src="${createLinkTo(dir:'js/flot/', file:'jquery.js')}" type="text/javascript" ></script>--%>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.categories.js')}" type="text/javascript" ></script>
+<script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.time.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.canvas.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.resize.js')}" type="text/javascript" ></script>
 
@@ -61,100 +95,128 @@
             var numMonths = $(this).val();
             plotGraph(numMonths);
         });
-
-
-//        var options = {
-//            lines: { show: true },
-//            points: { show: true },
-//            xaxis: { tickDecimals: 0, tickSize: 1 }
-//        };
-
-
-
-
-        //$.plot(placeholder, data, options);
         plotGraph(12);
 
-
+        $('<div id="tooltip"></div>').css( {
+            position: 'absolute',
+            display: 'none',
+            border: '1px solid #fdd',
+            padding: '5px',
+            'background-color': '#fff',
+            opacity: 0.80
+        }).appendTo("body");
     });
 
     var minQuantity = $("#minQuantity").val();
     var reorderQuantity = $("#reorderQuantity").val();
     var maxQuantity = $("#maxQuantity").val();
-    var options = {
-        series: {
-            points: { show: true },
-            lines: {
-                show: true,
-                barWidth: 0.3,
-                align: "center",
-                label: {show: true}
-            }
-        },
-        xaxis: {
-            mode: "categories",
-            tickLength: 0
-        },
-        yaxis: { min: 1000 },
-        legend: {show: true},
-        crosshair: {
-            mode: "x"
-        },
-        grid: {
-            hoverable: true,
-            autoHighlight: true,
-            clickable: true,
-            markings: [
-                {yaxis: {from: minQuantity, to: minQuantity}, color: "#F7977A", lineWidth: 2},
-                {yaxis: {from: reorderQuantity, to: reorderQuantity}, color: "#FDC68A", lineWidth: 2},
-                {yaxis: {from: maxQuantity, to: maxQuantity}, color: "#82CA9D", lineWidth: 2}
-            ]
-        }
+    var markings = [];
+    // below minimum
+    if (minQuantity >= 0) {
+        markings.push(
+            {yaxis: {from: 0, to: minQuantity}, color: "#fabebe", lineWidth: 0});
+        markings.push(
+            {yaxis: {from: minQuantity, to: minQuantity}, color: "red", lineWidth: 0});
+    }
+    // below reorder
+    if (reorderQuantity > 0) {
+      markings.push(
+          {yaxis: {from: minQuantity, to: reorderQuantity}, color: "#ffd8b1", lineWidth: 0});
+      markings.push(
+          {yaxis: {from: reorderQuantity, to: reorderQuantity}, color: "orange", lineWidth: 1});
+    }
+    if (maxQuantity > 0) {
+      // ideal quantity
+      markings.push(
+          {yaxis: {from: reorderQuantity, to: maxQuantity}, color: "#aaffc3", lineWidth: 0});
+      markings.push(
+          {yaxis: {from: maxQuantity, to: maxQuantity }, color: "green", lineWidth: 1});
+      // overstock
+      markings.push(
+          {yaxis: {from: maxQuantity}, color: "#fffac8", lineWidth: 0});
     }
 
-    var myGraph;
+      var options = {
+        series: {
+          points: {
+            show: true,
+            fill: false
+          },
+          lines: {
+            show: true,
+            fill: false,
+            barWidth: 1.0,
+            align: "center",
+            label: {
+              show: true
+            }
+          }
+        },
+        xaxis: {
+          mode: "time",
+          tickLength: 0
+        },
+        yaxis: {
+          //min: 0,
+          lines: {show: true}
+        },
+        legend: {
+          show: false
+        },
+        crosshair: {
+          mode: "x"
+        },
+        grid: {
+          color: "#999999",
+          backgroundColor: {colors: ["#aaffc3", "#aaffc3"]},
+          hoverable: true,
+          autoHighlight: true,
+          clickable: true,
+          markings: markings
+        }
+      };
 
-    function plotGraph(numMonths) {
+      var myGraph;
+
+      function plotGraph(numMonths) {
         var placeholder = $("#placeholder");
         var locationId = $("#locationId").val();
         var productId = $("#productId").val();
-        var chartData = []; //[["January", 10], ["February", 8], ["March", 4], ["April", 13], ["May", 17], ["June", 9]];
-
-
+        var chartData = [];
         $.ajax({
-            dataType: "json",
-            url: "${request.contextPath}/json/getQuantityOnHandByMonth",
-            data: { 'location.id': locationId, 'product.id': productId, numMonths: numMonths  },
-            success: function (resp) {
-                console.log(resp);
-                chartData.push(resp);
-                console.log(chartData);
-                //if (chartData.length==1){
-                //    $('#placeholder').html("<div style='text-align: center; vertical-align: middle;'>No data was found to graph</div>");
-                //}
-                //else {
-                myGraph = $.plot(placeholder, chartData, options);
-                //}
-            },
-            error: function(xhr, status, error) {
-                alert("error");
-                console.log(xhr);
-                console.log(status);
-                console.log(error);
-
-
-            }
+          dataType: "json",
+          url: "${request.contextPath}/json/getQuantityOnHandByMonth",
+          data: {'location.id': locationId, 'product.id': productId, numMonths: numMonths},
+          success: function (resp) {
+            chartData.push(resp);
+            myGraph = $.plot(placeholder, chartData, options);
+          },
+          error: function (xhr, status, error) {
+            console.log(xhr, status, error);
+          }
         });
-    }
+        placeholder.bind("plothovercleanup", function (event, pos, item) {
+          $("#tooltip").hide();
+        });
+        placeholder.bind("plotclick", function (event, pos, item) {
+          if (item) {
+            myGraph.highlight(item.series, item.datapoint);
+          }
+        });
+        placeholder.bind("plothover", function (event, pos, item) {
+          if (item) {
+            var x = item.datapoint[0].toFixed(2), y = item.datapoint[1].toFixed(2);
+            showTooltip(item.pageX, item.pageY, y);
+          } else {
+            $("#tooltip").hide();
+          }
+        });
+      }
 
-    function downloadGraph() {
-        var graph = $("#placeholder");
-        var myCanvas = graph.getCanvas();
-                //var myCanvas = myGraph.getCanvas();
-        var image = myCanvas.toDataURL();
-        image = image.replace("image/png","image/octet-stream");
-        document.location.href=image;
+      function showTooltip(pageX, pageY, contents) {
+        $("#tooltip").html(contents).css({top: pageY, left: pageX + 20}).fadeIn(200);
+      }
 
-    }
+
 
 </script>

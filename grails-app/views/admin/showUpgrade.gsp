@@ -49,16 +49,7 @@
 										<warehouse:message code="upgrade.progress.label"/>
 									</label>
 								</td>
-								<td class="value">										
-									<%-- 
-									<g:link controller="admin" action="reloadWar">[Reload]</g:link>
-									<g:if test='${!session.future || session.future.isDone() || session.future.isCancelled()}'>
-										<g:link controller="admin" action="updateWar">[Download]</g:link>
-									</g:if>				
-									<g:else>
-										[Update] [<g:link controller="admin" action="cancelUpdateWar">Cancel</g:link>]
-									</g:else>
-								--%>
+								<td class="value">
 									<div>
 										<label>Downloading file:</label> <b>${command?.remoteWebArchiveUrl }</b> 
 									</div>

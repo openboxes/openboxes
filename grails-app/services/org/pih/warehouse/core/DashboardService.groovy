@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.core
 
 import org.grails.plugins.csv.CSVWriter
@@ -17,7 +17,6 @@ import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.requisition.RequisitionItem
-import org.springframework.transaction.annotation.Transactional
 
 import java.text.SimpleDateFormat
 
@@ -35,45 +34,46 @@ class DashboardService {
      * @param max
      * @return
      */
-    //@Transactional(readOnly = true)
     def getFastMovers(Location location, Date date, Integer max) {
         def startTime = System.currentTimeMillis()
         def data = [:]
         try {
             data.location = location.id
-            data.startDate = date-30
+            data.startDate = date - 30
             data.endDate = date
 
             def criteria = RequisitionItem.createCriteria()
             def results = criteria.list {
                 requisition {
                     eq("origin", location)
-                    between("dateRequested", date-30, date)
+                    between("dateRequested", date - 30, date)
                 }
                 projections {
                     groupProperty("product")
                     countDistinct('id', "occurrences")
                     sum("quantity", "quantity")
                 }
-                order('occurrences','desc')
-                order('quantity','desc')
-                if (max) { maxResults(max) }
+                order('occurrences', 'desc')
+                order('quantity', 'desc')
+                if (max) {
+                    maxResults(max)
+                }
             }
 
             def quantityMap = inventorySnapshotService.getCurrentInventory(location)
 
-            def count = 1;
+            def count = 1
             data.results = results.collect {
 
-                def quantityOnHand = quantityMap[it[0]]?:0
+                def quantityOnHand = quantityMap[it[0]] ?: 0
                 [
-                        rank: count++,
-                        id: it[0].id,
-                        productCode: it[0].productCode,
-                        name: it[0].name,
-                        requisitionCount: it[1],
+                        rank             : count++,
+                        id               : it[0].id,
+                        productCode      : it[0].productCode,
+                        name             : it[0].name,
+                        requisitionCount : it[1],
                         quantityRequested: it[2],
-                        quantityOnHand: quantityOnHand,
+                        quantityOnHand   : quantityOnHand,
                 ]
             }
             data.responseTime = (System.currentTimeMillis() - startTime) + " ms"
@@ -95,7 +95,9 @@ class DashboardService {
         }
 
         // FIXME Clean this up a bit
-        expirationSummary["totalExpiring"] = expirationSummary.findAll { it.key != "never" }.values().sum()
+        expirationSummary["totalExpiring"] = expirationSummary.findAll {
+            it.key != "never"
+        }.values().sum()
 
         return expirationSummary
     }
@@ -109,9 +111,9 @@ class DashboardService {
         quantityMap.each { key, value ->
             if (value > 0) {
                 def daysToExpiry = key.expirationDate ? (key.expirationDate - today) : null
-                expirationAlerts << [ id:  key.id, lotNumber: key.lotNumber, quantity: value,
-                                      expirationDate: key.expirationDate, daysToExpiry: daysToExpiry,
-                                      product: key.product.toJson(), inventoryItem: key.toJson()
+                expirationAlerts << [id            : key.id, lotNumber: key.lotNumber, quantity: value,
+                                     expirationDate: key.expirationDate, daysToExpiry: daysToExpiry,
+                                     product       : key.product.toJson(), inventoryItem: key.toJson()
                 ]
             }
         }
@@ -134,7 +136,7 @@ class DashboardService {
         long startTime = System.currentTimeMillis()
 
         // Stock that has already expired
-        def expiredStock = InventoryItem.findAllByExpirationDateLessThan(new Date(), [sort: 'expirationDate', order: 'desc']);
+        def expiredStock = InventoryItem.findAllByExpirationDateLessThan(new Date(), [sort: 'expirationDate', order: 'desc'])
 
         log.debug expiredStock
 
@@ -162,9 +164,9 @@ class DashboardService {
     List getExpiringStock(Category category, Location location, String expirationStatus) {
         long startTime = System.currentTimeMillis()
 
-        def today = new Date();
+        def today = new Date()
         // Get all stock expiring ever (we'll filter later)
-        def expiringStock = InventoryItem.findAllByExpirationDateGreaterThan(today + 1, [sort: 'expirationDate', order: 'asc']);
+        def expiringStock = InventoryItem.findAllByExpirationDateGreaterThan(today + 1, [sort: 'expirationDate', order: 'asc'])
         def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
         if (category) {
@@ -207,9 +209,9 @@ class DashboardService {
 
 
     def getTotalStockValue(Location location) {
-        def hitCount = 0;
-        def missCount = 0;
-        def totalCount = 0;
+        def hitCount = 0
+        def missCount = 0
+        def totalCount = 0
         def totalStockValue = 0.0
         def stockValueByProduct = [:]
         if (location.inventory) {
@@ -222,14 +224,13 @@ class DashboardService {
                         totalStockValue += stockValueForProduct
                     }
                     hitCount++
-                }
-                else {
+                } else {
                     missCount++
                 }
             }
             totalCount = quantityMap?.keySet()?.size()
         }
-        return [totalStockValue:totalStockValue, hitCount: hitCount, missCount: missCount, totalCount:totalCount, stockValueByProduct:stockValueByProduct]
+        return [totalStockValue: totalStockValue, hitCount: hitCount, missCount: missCount, totalCount: totalCount, stockValueByProduct: stockValueByProduct]
 
     }
 
@@ -238,7 +239,7 @@ class DashboardService {
         def sw = new StringWriter()
 
 
-        def quantityMap = getTotalStock(location);
+        def quantityMap = getTotalStock(location)
         def statusMap = getInventoryStatus(location)
         def products = quantityMap.keySet()
 
@@ -281,16 +282,16 @@ class DashboardService {
 
         products.each { product ->
             def latestInventoryDate = latestInventoryDateMap[product.id]
-            def row =  [
-                    productCode: product.productCode?:"",
-                    name: product.name,
-                    unitOfMeasure: product.unitOfMeasure?:"",
-                    abcClass: inventoryLevelMap[product]?.abcClass?:"",
-                    binLocation: inventoryLevelMap[product]?.binLocation?:"",
-                    latestInventoryDate: latestInventoryDate?"${formatDate.format(latestInventoryDate)}":"",
-                    quantityOnHand: quantityMap[product]?:"",
-                    dateCreated: product.dateCreated?"${formatDate.format(product.dateCreated)}":"",
-                    lastUpdated: product.lastUpdated?"${formatDate.format(product.lastUpdated)}":"",
+            def row = [
+                    productCode        : product.productCode ?: "",
+                    name               : product.name,
+                    unitOfMeasure      : product.unitOfMeasure ?: "",
+                    abcClass           : inventoryLevelMap[product]?.abcClass ?: "",
+                    binLocation        : inventoryLevelMap[product]?.binLocation ?: "",
+                    latestInventoryDate: latestInventoryDate ? "${formatDate.format(latestInventoryDate)}" : "",
+                    quantityOnHand     : quantityMap[product] ?: "",
+                    dateCreated        : product.dateCreated ? "${formatDate.format(product.dateCreated)}" : "",
+                    lastUpdated        : product.lastUpdated ? "${formatDate.format(product.lastUpdated)}" : "",
             ]
             csvWriter << row
         }
@@ -303,20 +304,21 @@ class DashboardService {
 
         long startTime = System.currentTimeMillis()
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
+            it.product
+        }
 
         def totalStock = quantityMap
         def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
         def onHandQuantityZero = quantityMap.findAll { it.value <= 0 }
         def inStock = quantityMap.findAll { it.value > 0 }
 
-        //def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
         def outOfStock = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
         }
 
-        def lowStock = quantityMap.findAll { product,quantity ->
+        def lowStock = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
             def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity > 0 && quantity <= minQuantity
@@ -363,61 +365,58 @@ class DashboardService {
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == null
         }
 
-
-
-        //println lowStock.keySet().size()
         log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
-        //return lowStock
 
-        [   lowStock: lowStock.keySet().size(),
-            lowStockCost: getTotalCost(lowStock),
-            reorderStock: reorderStock.keySet().size(),
-            reorderStockCost: getTotalCost(reorderStock),
-            overStock: overStock.keySet().size(),
-            overStockCost: getTotalCost(overStock),
-            totalStock: totalStock.keySet().size(),
-            totalStockCost: getTotalCost(totalStock),
-            reconditionedStock: reconditionedStock.keySet().size(),
-            reconditionedStockCost: getTotalCost(reconditionedStock),
-            healthyStock: healthyStock.keySet().size(),
-            healthyStockCost: getTotalCost(healthyStock),
-            outOfStock:outOfStock.keySet().size(),
-            outOfStockCost: getTotalCost(outOfStock),
-            outOfStockClassA:outOfStockClassA.keySet().size(),
-            outOfStockCostClassA: getTotalCost(outOfStockClassA),
-            outOfStockClassB:outOfStockClassB.keySet().size(),
-            outOfStockCostClassB: getTotalCost(outOfStockClassB),
-            outOfStockClassC:outOfStockClassC.keySet().size(),
-            outOfStockCostClassC: getTotalCost(outOfStockClassC),
-            outOfStockClassNone:outOfStockClassNone.keySet().size(),
-            outOfStockCostClassNone: getTotalCost(outOfStockClassNone),
+        [lowStock               : lowStock.keySet().size(),
+         lowStockCost           : getTotalCost(lowStock),
+         reorderStock           : reorderStock.keySet().size(),
+         reorderStockCost       : getTotalCost(reorderStock),
+         overStock              : overStock.keySet().size(),
+         overStockCost          : getTotalCost(overStock),
+         totalStock             : totalStock.keySet().size(),
+         totalStockCost         : getTotalCost(totalStock),
+         reconditionedStock     : reconditionedStock.keySet().size(),
+         reconditionedStockCost : getTotalCost(reconditionedStock),
+         healthyStock           : healthyStock.keySet().size(),
+         healthyStockCost       : getTotalCost(healthyStock),
+         outOfStock             : outOfStock.keySet().size(),
+         outOfStockCost         : getTotalCost(outOfStock),
+         outOfStockClassA       : outOfStockClassA.keySet().size(),
+         outOfStockCostClassA   : getTotalCost(outOfStockClassA),
+         outOfStockClassB       : outOfStockClassB.keySet().size(),
+         outOfStockCostClassB   : getTotalCost(outOfStockClassB),
+         outOfStockClassC       : outOfStockClassC.keySet().size(),
+         outOfStockCostClassC   : getTotalCost(outOfStockClassC),
+         outOfStockClassNone    : outOfStockClassNone.keySet().size(),
+         outOfStockCostClassNone: getTotalCost(outOfStockClassNone),
 
-            onHandQuantityZero:onHandQuantityZero.keySet().size(),
-            onHandQuantityZeroCost: getTotalCost(onHandQuantityZero),
-            inStock:inStock.keySet().size(),
-            inStockCost: getTotalCost(inStock),
+         onHandQuantityZero     : onHandQuantityZero.keySet().size(),
+         onHandQuantityZeroCost : getTotalCost(onHandQuantityZero),
+         inStock                : inStock.keySet().size(),
+         inStockCost            : getTotalCost(inStock),
         ]
     }
 
 
     def getTotalCost(quantityMap) {
-        def totalCost = 0;
-        quantityMap.each { k,v ->
-            totalCost += k.pricePerUnit?:0 * v?:0
+        def totalCost = 0
+        quantityMap.each { k, v ->
+            totalCost += k.pricePerUnit ?: 0 * v ?: 0
         }
-        return totalCost;
+        return totalCost
     }
 
     def getInventoryStatus(Location location) {
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
+            it.product
+        }
         def inventoryStatusMap = [:]
         quantityMap.each { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
             if (inventoryLevel) {
-                inventoryStatusMap[product] = inventoryLevel?.statusMessage(quantity)?:"${inventoryLevel?.id}"
-            }
-            else {
+                inventoryStatusMap[product] = inventoryLevel?.statusMessage(quantity) ?: "${inventoryLevel?.id}"
+            } else {
                 inventoryStatusMap[product] = quantity > 0 ? "IN_STOCK" : "STOCK_OUT"
             }
 
@@ -433,64 +432,23 @@ class DashboardService {
      */
     def getInventoryStatusAndLevel(Location location) {
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
+            it.product
+        }
         def inventoryStatusMap = [:]
         quantityMap.each { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
-            def status = inventoryLevel?.statusMessage(quantity)?:"NONE"
-            inventoryStatusMap[product] = [inventoryLevel:inventoryLevel,status:status,onHandQuantity:quantity]
+            def status = inventoryLevel?.statusMessage(quantity) ?: "NONE"
+            inventoryStatusMap[product] = [inventoryLevel: inventoryLevel, status: status, onHandQuantity: quantity]
         }
         return inventoryStatusMap
     }
 
-    /**
-     * Get inventory status for a single inventory level
-     *
-     * @param inventoryLevel
-     * @param quantity
-     * @return
-     */
-    /*
-    def getInventoryStatus(inventoryLevel, quantity) {
-        def status = ""
-        if (inventoryLevel?.status >= InventoryStatus.SUPPORTED  || !inventoryLevel?.status) {
-            if (quantity <= 0) {
-                status = "STOCK_OUT"
-            }
-            else if (inventoryLevel?.minQuantity && quantity <= inventoryLevel?.minQuantity) {
-                status = "LOW_STOCK"
-            }
-            else if (inventoryLevel?.reorderQuantity && quantity <= inventoryLevel?.reorderQuantity ) {
-                status = "REORDER"
-            }
-            else if (inventoryLevel?.maxQuantity && quantity > inventoryLevel?.maxQuantity && inventoryLevel?.maxQuantity > 0) {
-                status = "OVERSTOCK"
-            }
-            else {
-                status = "IN_STOCK"
-            }
-        }
-        else if (inventoryLevel?.status == InventoryStatus.NOT_SUPPORTED) {
-            status = "NOT_SUPPORTED"
-        }
-        else if (inventoryLevel?.status == InventoryStatus.SUPPORTED_NON_INVENTORY) {
-            status = "SUPPORTED_NON_INVENTORY"
-        }
-        else {
-            status = "UNAVAILABLE"
-        }
-        return status
-    }*/
-
-
     def getQuantityOnHandZero(Location location) {
         long startTime = System.currentTimeMillis()
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-        //def stockOut = quantityMap.findAll { it.value <= 0 }
 
-        //def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
         def stockOut = quantityMap.findAll { product, quantity ->
-            //def inventoryLevel = inventoryLevelMap[product]?.first()
             quantity <= 0
         }
 
@@ -502,9 +460,10 @@ class DashboardService {
     def getOutOfStock(Location location, String abcClass) {
         long startTime = System.currentTimeMillis()
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-        //def stockOut = quantityMap.findAll { it.value <= 0 }
 
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
+            it.product
+        }
         def stockOut = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
             if (abcClass)
@@ -517,16 +476,16 @@ class DashboardService {
         return stockOut
     }
 
-
     def getLowStock(Location location) {
         long startTime = System.currentTimeMillis()
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-        log.info ("getQuantityByProductMap: " + (System.currentTimeMillis() - startTime) + " ms")
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-        log.info ("getInventoryLevelMap: " + (System.currentTimeMillis() - startTime) + " ms")
+        log.info("getQuantityByProductMap: " + (System.currentTimeMillis() - startTime) + " ms")
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
+            it.product
+        }
+        log.info("getInventoryLevelMap: " + (System.currentTimeMillis() - startTime) + " ms")
         log.info inventoryLevelMap.keySet().size()
-        //def lowStock = quantityMap.findAll { it.value <= it?.key?.getInventoryLevel(location?.id)?.minQuantity }
-        def lowStock = quantityMap.findAll { product,quantity ->
+        def lowStock = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
             def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity <= minQuantity
@@ -538,7 +497,9 @@ class DashboardService {
     def getReorderStock(Location location) {
         long startTime = System.currentTimeMillis()
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
+            it.product
+        }
         def reorderStock = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
             def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
@@ -551,8 +512,9 @@ class DashboardService {
     def getOverStock(Location location) {
         long startTime = System.currentTimeMillis()
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-        //def overStock = quantityMap.findAll { it.value > it?.key?.getInventoryLevel(location?.id)?.maxQuantity }
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
+            it.product
+        }
         def overStock = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
             def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
@@ -565,9 +527,9 @@ class DashboardService {
     def getHealthyStock(Location location) {
         long startTime = System.currentTimeMillis()
         def quantityMap = inventorySnapshotService.getCurrentInventory(location)
-        //def overStock = quantityMap.findAll { it.value > it?.key?.getInventoryLevel(location?.id)?.maxQuantity }
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy { it.product }
-
+        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
+            it.product
+        }
 
         def healthyStock = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
@@ -578,8 +540,4 @@ class DashboardService {
         log.info "Get healthy stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return healthyStock
     }
-
-
-
-
 }

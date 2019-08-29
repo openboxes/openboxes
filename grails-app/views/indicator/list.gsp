@@ -24,7 +24,6 @@
                     <table>
                         <thead>
                             <tr>
-
                                 <g:sortableColumn property="name" title="${warehouse.message(code: 'indicator.name.label', default: 'Name')}" />
 
                                 <g:sortableColumn property="description" title="${warehouse.message(code: 'indicator.description.label', default: 'Description')}" />
@@ -34,8 +33,6 @@
                                 <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'indicator.dateCreated.label', default: 'Date Created')}" />
 
                                 <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'indicator.lastUpdated.label', default: 'Last Updated')}" />
-                            
-
                             </tr>
                         </thead>
                         <tbody>

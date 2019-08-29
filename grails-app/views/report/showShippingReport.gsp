@@ -10,7 +10,6 @@
         <style>
 			table { -fs-table-paginate: paginate; }
 			.filter { padding-right: 30px; border-right: 1px solid lightgrey; }
-        	/*th { text-transform: uppercase; }*/
         	.title { text-align: center; padding: 5px; font-size: 3em; }
         	.subtitle { text-align: center; padding: 15px; font-size: 2em; }
         	.underline { border-bottom: 1px dashed black; }
@@ -35,12 +34,6 @@
 	   	<g:if test="${!params.print}">
 			<div class="form box" >
 				<g:form controller="report" action="showShippingReport" method="GET">
-					<%--
-					<span class="filter">
-						<label>Location</label>
-						<g:selectLocation class="filter" name="location.id" noSelection="['null':'']" value="${command?.location?.id}"/>
-					</span>
-					--%>
 					<table>
 						<tr>
 							<td>
@@ -49,19 +42,6 @@
 								</label>
 								<g:selectShipment class="filter" name="shipment.id" noSelection="['null':'']" value="${command?.shipment?.id}"/>
 							</td>
-							<%--
-							<span class="filter">
-								<label>Start date</label>
-								<g:jqueryDatePicker class="filter" id="startDate" name="startDate" value="${command?.startDate }" format="MM/dd/yyyy"/>
-							</span>
-							<span class="filter">
-								<label>End date</label>
-								<g:jqueryDatePicker class="filter" id="endDate" name="endDate" value="${command?.endDate }" format="MM/dd/yyyy"/>
-							</span>
-							<span>
-								<button type="submit" class="btn">Run Report</button>
-							</span>
-							--%>
 						</tr>
 				    	<tr class="prop">
 				    		<td>
@@ -74,12 +54,6 @@
 						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'pdf',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
 						   				<warehouse:message code="report.exportAs.pdf.label"/>
 						   			</g:link>
-						   			<%--
-						   			|
-						   			<g:link target="_blank" controller="report" action="downloadShippingReport" params="[format:'docx',url:request.forwardURI,'shipment.id':command?.shipment?.id]">
-						   				<warehouse:message code="report.exportAs.docx.label"/>
-						   			</g:link>
-						   			--%>
 						   		</g:if>
 						   		<g:else>
 						   			<warehouse:message code="report.selectShipment.label"/>
@@ -189,11 +163,6 @@
 					    					<th rowspan="2" class="center bottom">
 					    						<warehouse:message code="report.expirationDate.label"/><!-- Exp, Expiration date -->
 					    					</th>
-					    					<%--
-					    					<th rowspan="2" class="center bottom">
-					    						<warehouse:message code="report.quantityPerBox.label"/><!-- Qté en caisse, Qty in case -->
-					    					</th>
-					    					--%>
 					    					<th colspan="2" class="center bottom">
 												<warehouse:message code="report.quantityDelivered.label"/><!-- Livré, Delivered -->
 											</th>
@@ -247,11 +216,6 @@
 													<format:expirationDate obj="${checklistEntry?.shipmentItem?.expirationDate }"/>
 
 												</td>
-												<%--
-												<td>
-
-												</td>
-												--%>
 												<td>
 
 												</td>

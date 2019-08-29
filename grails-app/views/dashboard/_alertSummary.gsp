@@ -19,70 +19,6 @@
 
                         </td>
                     </tr>
-                <%--
-                    <tr>
-                        <td class="center" style="width: 1%">
-
-                        </td>
-                        <td>
-                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
-                            <g:link controller="inventory" action="listOutOfStock" params="['abcClass':'A']">
-                                <warehouse:message code="inventory.classA.label" default="Class A"/>
-                            </g:link>
-                        </td>
-                        <td class="right">
-                            <div id="outOfStockCountClassA"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="center" style="width: 1%">
-
-                        </td>
-                        <td>
-                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
-                            <g:link controller="inventory" action="listOutOfStock" params="['abcClass':'B']">
-                                <warehouse:message code="inventory.classB.label" default="Class B"/>
-                            </g:link>
-                        </td>
-                        <td class="right">
-                            <div id="outOfStockCountClassB"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="center" style="width: 1%">
-
-                        </td>
-                        <td>
-                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
-                            <g:link controller="inventory" action="listOutOfStock" params="['abcClass':'C']">
-                                <warehouse:message code="inventory.classC.label" default="Class C"/>
-                            </g:link>
-                        </td>
-                        <td class="right">
-                            <div id="outOfStockCountClassC"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                        </td>
-                    </tr>
-                --%>
-                <%--
-                    <tr>
-                        <td class="center" style="width: 1%">
-
-                        </td>
-                        <td>
-                            <img src="${createLinkTo(dir:'images/icons/indent.gif')}" class="middle"/>
-                            <g:link controller="inventory" action="listOutOfStock">
-                                <warehouse:message code="inventory.classNone.label" default="No class"/>
-                            </g:link>
-                        </td>
-                        <td class="right">
-                            <div id="outOfStockCountClassNone"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-
-                        </td>
-                    </tr>
-                --%>
                     <tr>
                         <td class="center" style="width: 1%">
                             <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
@@ -151,7 +87,6 @@
             dataType: "json",
             timeout: 120000,
             url: "${request.contextPath}/json/getDashboardAlerts?location.id=${session.warehouse.id}",
-            //data: data,
             success: function (data) {
                 console.log(data);
                 var outOfStockCount = data.outOfStock?data.outOfStock:0;
@@ -161,11 +96,7 @@
                 var totalStockCount = data.outOfStock?data.outOfStock:0;
                 var totalStockCount = data.outOfStock?data.outOfStock:0;
 
-
                 $("#outOfStockCount").html("<a href='${request.contextPath}/inventory/listOutOfStock>" + count + "</a>");
-
-
-                // {"lowStock":103,"reorderStock":167,"overStock":38,"totalStock":1619,"reconditionedStock":54,"stockOut":271,"inStock":1348}
                 $('#lowStockCount').html();
                 $('#overStockCount').html(data.overStock?data.overStock:0);
                 $('#reconditionedStockCount').html(data.reconditionedStock?data.reconditionedStock:0);
@@ -173,10 +104,6 @@
                 $('#inStockCount').html(data.inStock?data.inStock:0);
                 $('#onHandQuantityZeroCount').html(data.onHandQuantityZero?data.onHandQuantityZero:0);
                 $('#outOfStockCount').html();
-                //$('#outOfStockCountClassA').html(data.outOfStockClassA?data.outOfStockClassA:0);
-                //$('#outOfStockCountClassB').html(data.outOfStockClassB?data.outOfStockClassB:0);
-                //$('#outOfStockCountClassC').html(data.outOfStockClassC?data.outOfStockClassC:0);
-                //$('#outOfStockCountClassNone').html(data.outOfStockClassNone?data.outOfStockClassNone:0);
                 $('#reorderStockCount').html(data.reorderStock?data.reorderStock:0);
 
             },
@@ -191,10 +118,6 @@
                 $('#totalStockCount').html("ERROR " + error);
                 $('#inStockCount').html("ERROR " + error);
                 $('#outOfStockCount').html("ERROR " + error);
-                //$('#outOfStockCountClassA').html("ERROR: " + error);
-                //$('#outOfStockCountClassB').html("ERROR: " + error);
-                //$('#outOfStockCountClassC').html("ERROR: " + error);
-                //$('#outOfStockCountClassNone').html("ERROR: " + error);
                 $('#reorderStockCount').html("ERROR " + error);
 
             }

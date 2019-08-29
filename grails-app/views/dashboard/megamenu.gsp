@@ -222,6 +222,11 @@
                                 <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
                             </g:link>
                         </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="stockMovement" action="create" params="[type:'REQUEST']">
+                                <warehouse:message code="request.label"/>
+                            </g:link>
+                        </div>
                         <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
                         <div class="mm-menu-item">
                             <g:link controller="putAway" action="index">
@@ -397,11 +402,6 @@
                             <warehouse:message code="inventoryLevel.export.label" default="Export inventory levels"/>
                         </g:link>
                     </div>
-                    <%--
-                    <div class="mm-menu-item">
-                        <g:link controller="requisitionItem" action="listPending" class=""><warehouse:message code="requisitionItem.listPending.label" default="List pending items"/></g:link>
-                    </div>
-                    --%>
                     <div class="mm-menu-item">
                         <g:link controller="requisition" action="export" class="list">
                             <warehouse:message code="default.export.label" default="Export {0}" args="${['requisitions'] }"/>
@@ -431,19 +431,6 @@
                 <div class="mm-item-content" style="min-width: 200px;">
 
                     <div class="mm-content-section">
-                        <%--
-                        <g:if test="${session.productsViewed }">
-                            <div>
-                                <g:each var="product" in="${session?.productsViewed?.values() }">
-                                    <div class="mm-menu-item">
-                                        <g:link controller="inventoryItem" action="showStockCard" id="${product.id }" class="product">
-                                            ${product.name }
-                                        </g:link>
-                                    </div>
-                                </g:each>
-                            </div>
-                        </g:if>
-                        --%>
                         <div class="mm-menu-item">
                             <g:link controller="attribute" action="list" class="list">
                                 <warehouse:message code="attributes.label"/></g:link>
@@ -501,14 +488,6 @@
                                 <g:link controller="product" action="create" class="create">
                                     <warehouse:message code="product.create.label"/></g:link>
                             </div>
-                            <%--
-                            <div class="mm-menu-item">
-                                <g:link controller="createProductFromTemplate" action="index" class="create"><warehouse:message code="product.createFromTemplate.label"/></g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="createProduct" action="index" class="create"><warehouse:message code="product.createFromGoogle.label"/></g:link>
-                            </div>
-                            --%>
                             <div class="mm-menu-item">
                                 <g:link controller="product" action="batchEdit" class="create">
                                     <warehouse:message code="product.batchEdit.label"/>
@@ -535,16 +514,6 @@
                                 </g:link>
                             </div>
                         </div>
-
-                        <%--
-                        <div class="mm-menu-item">
-                            <g:link controller="batch" action="importData" params="[type:'productPrice']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'product.label')]"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="batch" action="importData" params="[type:'productPrice']" class="inventory"><warehouse:message code="default.import.label" args="[warehouse.message(code:'productPrice.label')]"/></g:link>
-                        </div>
-                        --%>
-
                     </g:isUserAdmin>
                 </div>
             </li>

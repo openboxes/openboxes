@@ -138,13 +138,6 @@
                                             ${isSubstitution?'Substitution':''}
                                             ${requisitionItem.cancelReasonCode}
                                             <p>${requisitionItem?.cancelComments }</p>
-                                            <%--
-                                            <g:if test="${requisitionItem.quantity > quantityPicked}">
-                                                <g:select name="reasonCode" from="['Stockout','Damaged','Expired','Reserved']"
-                                                    id="reasonCode" name='reasonCode' value=""
-                                                    noSelection="${['null':'Select One...']}"/>
-                                            </g:if>
-                                            --%>
                                         </td>
                                     </tr>
                                 </g:each>

@@ -11,7 +11,7 @@ package org.pih.warehouse.core
 
 import java.beans.PropertyEditorSupport
 
-class LocationEditor  extends PropertyEditorSupport {
+class LocationEditor extends PropertyEditorSupport {
     void setAsText(String text) {
         value = Location.get(text)
     }

@@ -123,23 +123,6 @@
                                                   noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
-                        <%--
-
-                        <div class="filter-list-item">
-                            <label><warehouse:message code="stockMovement.dateRequested.label"/></label>
-                            <p>
-                                <g:textField id="requestedDateRange" name="requestedDateRange" style="width:100%" class="daterange text" value="${params.requestedDateRange}"/>
-                            </p>
-                        </div>
-
-                        <div class="filter-list-item">
-                            <label><warehouse:message code="stockMovement.dateIssued.label"/></label>
-                            <p>
-                                <g:textField id="issuedDateRange" name="issuedDateRange" style="width:100%" class="daterange text" value="${params.issuedDateRange}"/>
-                            </p>
-                        </div>
-
-                        --%>
                         <div class="filter-list-item">
                             <label><warehouse:message code="requisition.requestedBy.label"/></label>
                             <p>

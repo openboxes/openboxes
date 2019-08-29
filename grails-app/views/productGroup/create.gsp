@@ -94,10 +94,6 @@
                                                        value="${productGroupInstance?.category?.id }" />
                                     </g:if>
                                     <g:else>
-                                    <%--
-                                    <g:categorySelect id="category" name="category.id"
-                                        value="${productGroupInstance?.category?.id}"/>
-                                    --%>
                                         <g:selectCategory name="category.id" class="chzn-select" noSelection="['null':'']"
                                                           value="${productGroupInstance?.category?.id}" />
                                     </g:else>
@@ -160,27 +156,6 @@
 									</td>
 								</tr>
 							</g:if>
-							
-							
-							<%-- 
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                    <label for="dateCreated"><warehouse:message code="productGroup.dateCreated.label" default="Date Created" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'dateCreated', 'errors')}">
-	                                    <g:datePicker name="dateCreated" precision="minute" value="${productGroupInstance?.dateCreated}"  />
-	                                </td>
-	                            </tr>
-	                        
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                    <label for="lastUpdated"><warehouse:message code="productGroup.lastUpdated.label" default="Last Updated" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: productGroupInstance, field: 'lastUpdated', 'errors')}">
-	                                    <g:datePicker name="lastUpdated" precision="minute" value="${productGroupInstance?.lastUpdated}"  />
-	                                </td>
-	                            </tr>
-	                        	--%>
 
 							<tr class="prop">
 								<td valign="top center" colspan="2">

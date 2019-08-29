@@ -76,32 +76,6 @@
 					</div>
 				</td>
 			</tr>
-
-			<%--
-			<tr class="prop">
-				<td class="name">
-					<label>
-						<warehouse:message code="package.name.label"/>
-					</label>
-				</td>
-				<td class="value">
-					<g:textField name="name" value="${packageInstance?.name }" class="medium text"/>
-				</td>
-			</tr>
-			<tr class="prop">
-				<td class="name">
-					<label>
-						<warehouse:message code="package.description.label"/>
-					</label>
-				</td>
-				<td class="value">
-					<g:textField name="description" value="${packageInstance?.description }" class="medium text"/>
-				</td>
-			</tr>
-			--%>
-
-
-
 		</tbody>
 	</table>
 	<hr/>

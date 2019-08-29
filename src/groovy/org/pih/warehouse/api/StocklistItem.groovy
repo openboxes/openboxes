@@ -22,19 +22,19 @@ class StocklistItem {
     Map toJson() {
         return [
                 "requisitionItem.id": requisitionItem?.id,
-                stocklistId: requisitionItem?.requisition?.id,
-                name: requisitionItem?.requisition?.name,
-                "location.id": requisitionItem?.requisition?.origin?.id,
-                "location.name": requisitionItem?.requisition?.origin?.name,
-                "locationGroup.id": requisitionItem?.requisition?.origin?.locationGroup?.id,
+                stocklistId         : requisitionItem?.requisition?.id,
+                name                : requisitionItem?.requisition?.name,
+                "location.id"       : requisitionItem?.requisition?.origin?.id,
+                "location.name"     : requisitionItem?.requisition?.origin?.name,
+                "locationGroup.id"  : requisitionItem?.requisition?.origin?.locationGroup?.id,
                 "locationGroup.name": requisitionItem?.requisition?.origin?.locationGroup?.name,
-                "manager.id": requisitionItem?.requisition?.requestedBy?.id,
-                "manager.name": requisitionItem?.requisition?.requestedBy?.name,
-                "manager.email": requisitionItem?.requisition?.requestedBy?.email,
-                uom: requisitionItem?.product?.unitOfMeasure,
-                maxQuantity: requisitionItem?.quantity,
-                replenishmentPeriod: requisitionItem?.requisition?.replenishmentPeriod,
-                monthlyDemand: monthlyDemand,
+                "manager.id"        : requisitionItem?.requisition?.requestedBy?.id,
+                "manager.name"      : requisitionItem?.requisition?.requestedBy?.name,
+                "manager.email"     : requisitionItem?.requisition?.requestedBy?.email,
+                uom                 : requisitionItem?.product?.unitOfMeasure,
+                maxQuantity         : requisitionItem?.quantity,
+                replenishmentPeriod : requisitionItem?.requisition?.replenishmentPeriod,
+                monthlyDemand       : monthlyDemand,
         ]
     }
 }

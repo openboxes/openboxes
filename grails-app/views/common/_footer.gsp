@@ -10,7 +10,6 @@
 		<g:message code="application.buildDate.label"/>: <b><g:meta name="app.buildDate"/></b>&nbsp;&nbsp;
     </div>
     <div class="center" style="line-height: 2em;">
-		<%-- <warehouse:message code="default.date.label"/>: <b>${new Date() }</b>&nbsp;&nbsp; | &nbsp;&nbsp;--%>
 		<g:message code="default.locale.label"/>: &nbsp;
 		<!-- show all supported locales -->
 		<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
@@ -58,19 +57,5 @@
                 <b>${(request?.viewDuration?:0)/1000}s</b>
             </span>
         </g:if>
-
-    <%--
-    &nbsp;&nbsp; | &nbsp;&nbsp;
-    <warehouse:message code="default.layout.label"/>: &nbsp;
-    <g:link controller="dashboard" action="chooseLayout" params="['layout':'custom']">custom</g:link>&nbsp;
-    <g:link controller="dashboard" action="chooseLayout" params="['layout':'mega']">mobile</g:link>
-    --%>
 	</div>
-
-    <%--
-    <div class="center">
-        <a href="https://twitter.com/justinmiranda" class="twitter-follow-button" data-show-count="false">Follow @justinmiranda</a>
-        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-    </div>
-    --%>
 </div>

@@ -5,19 +5,6 @@
 		<button class="action-btn ">
             <img src="${createLinkTo(dir:'images/icons/silk',file:'cog.png')}" />
 		</button>
-
-		<%--
-
-		<g:if test="${requisition?.isPending() }">
-		</g:if>
-		<g:else>
-			<div class="actions" style="min-width: 300px;">
-				<div class="action-menu-item center">
-					<a href="#">No actions available for ${requisition?.status }</a>
-				</div>
-			</div>
-		</g:else>
-		--%>
 			<div class="actions" >
 				<g:if test="${!request.request.requestURL.toString().contains('requisition/list')}">
 					<div class="action-menu-item">
@@ -101,26 +88,8 @@
                 <div class="action-menu-item">
                     <hr/>
                 </div>
-
-
-    <%--
-    <div class="action-menu-item">
-        <g:link controller="requisition" action="printDraft" id="${requisition?.id}" target="_blank">
-            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-            &nbsp;${warehouse.message(code: 'requisition.print.label', default: 'Print requisition')}
-        </g:link>
-    </div>
-    --%>
 				<g:if test="${session?.warehouse?.id == requisition?.origin?.id }">
 					<g:isUserManager>
-                        <%--
-						<div class="action-menu-item">
-							<g:link controller="requisition" name="processRequisition" action="pick" id="${requisition?.id}">
-								<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
-								&nbsp;${warehouse.message(code: 'requisition.process.label', default: 'Process requisition')}
-							</g:link>
-						</div>
-                        --%>
 						<g:if test="${requisition.status == RequisitionStatus.CANCELED }">
 							<div class="action-menu-item">
 								<g:link controller="requisition" action="undoCancel" id="${requisition?.id}" onclick="return confirm('${warehouse.message(code: 'default.button.cancel.confirm.message', default: 'Are you sure?')}');">
@@ -175,30 +144,6 @@
                         </div>
 
                     </g:isUserAdmin>
-
-					<%--
-					<div class="action-menu-item">
-						<hr/>
-					</div>
-					<div class="action-menu-item">
-						<g:link controller="requisition" action="printDraft" id="${requisition?.id}" target="_blank">
-							<img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
-							&nbsp;${warehouse.message(code: 'picklist.print.label', default: 'Print picklist')}
-						</g:link>
-					</div>
-					<div class="action-menu-item">
-						<g:link controller="requisition" action="confirm" id="${requisition?.id}">
-							<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />
-							&nbsp;${warehouse.message(code: 'requisition.confirm.label', default: 'Confirm picklist')}
-						</g:link>
-					</div>
-					<div class="action-menu-item">
-						<g:link controller="requisition" action="issue" id="${requisition?.id}">
-							<img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />
-							&nbsp;${warehouse.message(code: 'requisition.issue.label', default: 'Issue stock')}
-						</g:link>
-					</div>
-					--%>
 				</g:if>
 			</div>
 	</span>

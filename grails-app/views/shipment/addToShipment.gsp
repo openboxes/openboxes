@@ -29,22 +29,6 @@
 
 		<div class="dialog" >			
 			<g:form action="addToShipmentPost">
-				
-					<%-- 
-					<div class="action-menu" style="padding: 10px;">
-						<button class="action-btn">
-							<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle"/>
-						</button>
-						<div class="actions">
-							<div class="action-menu-item">
-								<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}">
-									<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="${warehouse.message(code: 'shipping.returnToInventoryBrowser.label') }" style="vertical-align: middle" />	
-									&nbsp; <warehouse:message code="shipping.returnToInventoryBrowser.label"/>
-								</g:link>
-							</div>
-						</div>
-					</div>					
-					--%>
 					<table class="box">
 					
 						<tr class="prop">
@@ -127,62 +111,8 @@
 																0
 															</g:else>
 														</td>
-														<%-- 
-														<td class="left middle" style="padding: 0">							
-															<g:selectContainer name="items[${status }].container.id"
-																noSelection="${['null':warehouse.message(code:'shipping.selectShipment.label')]}" 
-																value="${item?.shipment?.id }"
-																from="${shipments}"
-																optionKey="id" optionValue="name" groupBy="shipment"/>										
-															<!--
-															<g:select name="items[${status }].shipment.id" from="${shipments }" 
-																noSelection="${['null':warehouse.message(code:'shipping.selectShipment.label')]}" value="${item?.shipment?.id }"
-																optionKey="id" optionValue="name" />
-															<g:set var="status" value="${status+1 }"/>
-															-->
-														</td>
-														--%>
 													</tr>
-													<g:set var="listStatus" value="${listStatus+1 }"/>
-												
-												<%-- 
-												<g:else>
-													<tr class="${rowStatus++%2?'even':'odd' } prop">
-												
-														<g:if test="${j==0 }">
-															<td rowspan="${items.size() }">
-																<g:link controller="inventoryItem" action="showStockCard" id="${product?.id }" target="_blank">
-																	<format:product product="${product}"/>
-																</g:link>
-															</td>
-														</g:if>
-														<td>
-															${item?.lotNumber }
-														</td>
-														<td nowrap="nowrap">
-															<g:if test="${item?.inventoryItem?.expirationDate }">
-																<g:formatDate date="${item?.inventoryItem?.expirationDate }" format="d MMM yyyy"/>
-															</g:if>
-															<g:else>
-																<span class="fade">${warehouse.message(code: 'default.never.label')}</span>
-															</g:else>
-														</td>
-														<td class="center">
-															<span class="${item?.quantityShipping?'':'fade'}">${item?.quantityShipping?:0}</span>
-														</td>
-														<td class="center">
-															<span class="${item?.quantityReceiving?'':'fade'}">${item?.quantityReceiving?:0}</span>
-														</td>
-														<td class="center">
-															<span class="${item?.quantityOnHand?'':'fade'}">${item?.quantityOnHand?:0}</span>
-														</td>
-														<td class="center" style="border-left: 1px solid lightgrey;">
-															${item?.quantityOnHand?:0}
-														</td>
-														
-													</tr>
-												</g:else>
-												--%>
+													<g:set var="listStatus" value="${listStatus+1 }"/>												
 											</g:each>					
 											<g:unless test="${itemsGroupedByProduct[product]}">
 												<tr class="${rowStatus++%2?'even':'odd' } prop">

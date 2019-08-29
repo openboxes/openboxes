@@ -71,18 +71,10 @@
                     "error": handleFastMoversAjaxError // this sets up jQuery to give me errors
                 } );
             },
-//            "fnServerData": function ( sSource, aoData, fnCallback ) {
-//                $.getJSON( sSource, aoData, function (json) {
-//                    console.log(json);
-//                    fnCallback(json);
-//                });
-//            },
             "oLanguage": {
                 "sZeroRecords": "No records found",
                 "sProcessing": "Loading ... <img alt='spinner' src='${request.contextPath}/images/spinner.gif' />"
             },
-            //"fnInitComplete": fnInitComplete,
-            //"iDisplayLength" : -1,
             "aLengthMenu": [
                 [5, 10, 25, 100, 1000, -1],
                 [5, 10, 25, 100, 1000, "All"]

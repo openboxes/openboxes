@@ -41,7 +41,6 @@ class ReportControllerTests extends ControllerUnitTestCase {
 
         assert controller.response.contentAsString != null
         assert controller.response.contentAsString.contains("You cannot")
-        //assert controller.response.contentAsString.split("\n").size() == 11
     }
 
 

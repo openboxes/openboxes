@@ -51,5 +51,8 @@
     <include file="0.8.x/changelog-2019-06-18-1035-add-inventory-item-comments.xml"/>
     <include file="0.8.x/changelog-2019-08-01-2114-refactor-adjustment-transaction-type.xml"/>
     <include file="0.8.x/changelog-2019-08-01-2153-add-column-transaction-entry-reason-code.xml"/>
+    <include file="0.8.x/changelog-2019-08-15-1229-alter-table-inventory-snapshot-add-unique-index.xml"/>
+    <include file="0.8.x/changelog-2019-08-16-2243-add-column-product-catalog-color.xml"/>
+    <include file="0.8.x/changelog-2019-08-20-1521-add-column-requisition-item-pick-reason-code.xml"/>
 
 </databaseChangeLog>

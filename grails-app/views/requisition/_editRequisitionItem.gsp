@@ -5,16 +5,6 @@
 <g:set var="shouldCancel" value="${requisitionItem.quantity > quantityAvailable && !substitutionAvailable}"/>
 <g:set var="shouldSubstitute" value="${requisitionItem.quantity > quantityAvailable && substitutionAvailable}"/>
 
-
-<%--
-quantityAvailable=${quantityAvailable}
-substitutionAvailable=${substitutionAvailable}
-shouldApprove=${shouldApprove}
-shouldChange=${shouldChange}
-shouldCancel=${shouldCancel}
-shouldSubstitute=${shouldSubstitute}
---%>
-
 <g:if test="${flash.message}">
     <div class="message">${flash.message}</div>
 </g:if>
@@ -48,12 +38,6 @@ shouldSubstitute=${shouldSubstitute}
                 </td>
                 <td class="middle center">
                     ${requisitionItem.orderIndex+1} out of ${requisitionItem.requisition.requisitionItemCount}
-                    <%--
-                    <b>
-                        ${requisitionItem?.product?.productCode}
-                        ${requisitionItem?.product}
-                    </b>
-                    --%>
                 </td>
                 <td class="middle right">
                     <div class="button-container">
@@ -303,24 +287,6 @@ shouldSubstitute=${shouldSubstitute}
                         </div>
                     </g:else>
                 </div>
-
-                <%--
-                <div class="button-container">
-                    <div class="button-group">
-                        <g:remoteLink controller="requisition" action="previousRequisitionItem" id="${requisitionItem?.requisition?.id }"
-                                      onFailure="alert('An error has occurred.  Please contact your system administrator (${requisition.requestNumber}).')"
-                                      params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems" class="button icon arrowleft">
-                            <warehouse:message code="default.button.previous.label" default="Previous"/>
-                        </g:remoteLink>
-                        <g:remoteLink controller="requisition" action="nextRequisitionItem" id="${requisitionItem?.requisition?.id }"
-                                      onFailure="alert('An error has occurred.  Please contact your system administrator (${requisition.requestNumber}).')"
-                                      params="['requisitionItem.id':requisitionItem?.id, actionType:'show']" update="requisitionItems" class="button icon arrowright">
-                            <warehouse:message code="default.button.next.label" default="Next"/>
-                        </g:remoteLink>
-                    </div>
-                </div>
-                --%>
-
             </td>
         </tr>
     </table>
@@ -565,12 +531,6 @@ shouldSubstitute=${shouldSubstitute}
                         <label><warehouse:message code="requisitionItem.substitution.label" default="Substitution"/></label>
                     </td>
                     <td class="middle">
-                        <%--
-                        <g:autoSuggest id="substitution" name="substitution" jsonUrl="${request.contextPath }/json/findProductByName"
-                                       width="500" styleClass="text" valueId="${requisitionItem?.product?.id}" valueName="${requisitionItem?.product?.productCode + ' ' + requisitionItem?.product?.name}"
-                                       placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
-                        --%>
-
                         <table style="width:auto;" class="box">
                             <tr>
                                 <th><warehouse:message code="product.productCode.label"/></th>
@@ -636,9 +596,6 @@ shouldSubstitute=${shouldSubstitute}
                     <td class="middle">
                         <g:textField id="quantity" name="quantity" value="${requisitionItem?.quantity}" class="text" size="5"/>
                         EA/1
-                        <%--
-                        <g:selectUnitOfMeasure name="productPackage.id" product="${requisitionItem?.product}" class="chzn-select" style="width:300px;"/>
-                        --%>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -729,7 +686,6 @@ shouldSubstitute=${shouldSubstitute}
 <g:if test="${params.actionType=='cancel'}">
     <div class='box'>
         <h2>Cancel requisition item</h2>
-        <%--onSuccess="alert('success')" onComplete="alert('complete')" onFailure="alert('failure')"--%>
         <g:formRemote id="changeQuantityForm" name="changeQuantityForm"
                       onFailure="alert('failure')"
                       url="[controller: 'requisition', action:'saveRequisitionItem']"

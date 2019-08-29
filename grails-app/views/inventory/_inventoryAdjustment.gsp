@@ -114,10 +114,6 @@
                             <img data-id="${status}" class="reset"
                                  src="${createLinkTo(dir:'images/icons/silk',file:'arrow_undo.png')}"
                                  alt="${g.message(code: 'default.button.reset.label') }"/>
-%{--                            <img class="delete"--}%
-%{--                                 src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}"--}%
-%{--                                 title="${g.message(code: 'default.button.delete.label') }"--}%
-%{--                                 onclick="return confirm('Are you sure you want to delete this item?')"/>--}%
                         </div>
                     </td>
                     <td class="middle">

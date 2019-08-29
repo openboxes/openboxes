@@ -89,13 +89,6 @@
 									<td>${transaction.inventory }</td>
 									<td>${transaction.source }</td>
 									<td>${transaction.destination }</td>
-									<%-- 
-									<td><g:link controller="inventory" action="showTransaction" id="${transaction.id }">show</g:link></td>
-									<td><g:link controller="inventory" action="editTransaction" id="${transaction.id }">edit</g:link></td>
-									<td><g:link controller="location" action="deleteTransaction" id="${transaction.id }" 
-										onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-										params="['location.id':locationInstance?.id]" fragment="tabs-transactions">delete</g:link></td>
-										--%>
 								</tr>
 							</g:each>
 						</table>
@@ -312,10 +305,7 @@
 			                                   
 		                                   	
 		                                </td>
-		                            </tr>
-		                            
-		                            
-					                            
+		                            </tr>      
 		                            
 		                            <tr class="prop">
 		                                <td valign="top" class="name">
@@ -333,38 +323,6 @@
 		                                   	
 		                                </td>
 		                            </tr>
-		                            
-		                            <%-- 
-		                            <tr class="prop">
-		                                <td valign="top" class="name">
-		                                  <label for="parentLocation"><warehouse:message code="warehouse.parentLocation.label" default="Parent Location" /></label>
-		                                </td>
-		                                <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'parentLocation', 'errors')}">
-											<g:select name="parentLocation.id" from="${org.pih.warehouse.core.Location.list()}" 
-												optionKey="id" optionValue="name" value="" noSelection="['null': '']" />							
-		                                </td>
-		                            </tr>
-		                            --%>
-		                            <%-- 
-		                            <tr class="prop">
-		                            
-		                            	<td valign="top" class="name">
-		                            	
-		                            	</td>
-		                            	<td class="value">
-											<div class="buttons left">
-							                   <button type="submit">								
-													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" class="top"/>
-													<warehouse:message code="default.button.save.label"/>
-												</button>
-												&nbsp;
-												<g:link action="list">
-													${warehouse.message(code: 'default.button.cancel.label')}						
-												</g:link>			
-											</div>
-										</td>
-									</tr>
-		                            --%>
 		                        </tbody>
 		                    </table>
 		                

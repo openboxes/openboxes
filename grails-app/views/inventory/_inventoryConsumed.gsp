@@ -256,14 +256,12 @@
         var quantityField = $("#newQuantity-" + id);
         quantityField.val(oldQuantity);
         animate(quantityField);
-        //quantityField.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
     }
 
     function resetQuantity(id) {
         var quantityField = $("#newQuantity-" + id);
         quantityField.val(0);
         animate(quantityField);
-        //quantityField.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
     }
 
     function changeQuantity(id, delta) {

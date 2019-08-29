@@ -91,25 +91,11 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		
 		// Only searches products, not product groups any longer
 		assert result.size() == 2
-		//[[ff8081813d20ed97013d20ee12e1025c, boo floweree 250mg, null], [ff8081813d20ed97013d20ee13d40263, buhoo floweree root, null]]
 		assert result.any{ it[1] == "boo floweree 250mg" && it[2] == null && it[0] == product1.id}
-		//assert result.any{ it[1] == "boo floweree 250mg" && it[2] == "Hoo moodiccina" && it[0] == product1.id && it[3] == group1.id}
-		//assert result.any{ it[1] == "boo pill" && it[2] == "Boo floweree" && it[0] == product2.id && it[3] == group2.id}
-		//assert result.any{ it[1] == "goomoon" &&  it[2] == "Boo floweree" && it[0] == product5.id && it[3] == group2.id}
 		assert result.any{ it[1] == "buhoo floweree root" &&  it[2] == null && it[0] == product6.id}
 	
 	}
 
-	/*
-	void test_import_shouldFailWhenFormatIsInvalid() {		
-		def csv = """\"ID\"\t\"Name\"\t\"Category\"\t\"Description\"\t\"Product Code\"\t\"Unit of Measure\"\t\"Manufacturer\"\t\"Manufacturer Code\"\t\"Cold Chain\"\t\"UPC\"\t\"NDC\"\t\"Date Created\"\t\"Date Updated\"\n\"1235\"\t\"product 1235\"\t\"category 123\"\t\"\"\t\"\"\t\"\"\t\"\"\t\"\"\t\"false\"\t\"\"\t\"\"\t\"\"\t\"\""""
-		def service = new ProductService()
-		def message = shouldFail(RuntimeException) {
-			service.importProducts(csv)
-		}
-		assertEquals("Invalid format", message)		
-	}
-	*/
     @Test
 	void validateProducts_shouldFailWhenProductNameIsMissing() {
 		def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","tag1,tag2","0.01","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
@@ -291,59 +277,6 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		def delimiter = productService.getDelimiter(csv)
 		assertEquals ";", delimiter
 	}
-	/*
-	void test_getDelimiter_shouldFailOnInvalidDelimiter() {
-		def csv = """"ID"&"Name"&"Category"&"Description"&"Product Code"&"Unit of Measure"&"Manufacturer"&"Manufacturer Code"&"Cold Chain"&"UPC"&"NDC"&"Date Created"&"Date Updated"\n"${product1.id}"&"Sudafed 2"&"Medicines"&"Sudafed description"&"00001"&"each"&"Acme"&"ACME-249248"&"true"&"UPC-1202323"&"NDC-122929-39292"&""&"""""
-		def service = new ProductService()
-		def message = shouldFail(RuntimeException) {
-			service.getDelimiter(csv)
-		}
-		assertEquals("Invalid format", message)
-	}
-	*/
-
-		
-
-	/*
-	void test_import_shouldFailWhenExistingProductHasChangedOnServer() {		
-		// Create a new product 
-		def today = new Date()
-		def product1 = DbHelper.createProductIfNotExists("Sudafed");
-		assertNotNull product1.id
-		assertNotNull product1.lastUpdated
-		assertEquals "Product should have been updated on server today", product1.lastUpdated.clearTime(), today.clearTime()
-				
-		// Attempt to import should fail due to the fact that the product's lastUpdated date is after the lastUpdated date in the CSV
-		def csv = """"ID","Name","Category","Description","Product Code","Unit of Measure","Manufacturer","Manufacturer Code","Cold Chain","UPC","NDC","Date Created","Date Updated"\n"${product1.id}","Sudafed 2","Medicines","","","","","","false","","","2010-08-25 00:00:00.0","2013-01-01 00:00:00.0""""
-		def service = new ProductService()
-		def message = shouldFail(RuntimeException) {
-			service.importProducts(csv)
-		}		
-		assertEquals("Product has been modified on server", message)		
-	}
-	*/
-	
-	/*
-	void test_import_shouldFailWhenExistingProductCategoryHasChanged() {
-		// Create a new product
-		def today = new Date()
-		def product1 = DbHelper.createProductIfNotExists("Sudafed");
-		assertNotNull product1.id
-		assertNotNull product1.lastUpdated
-		assertEquals "Product should have been updated on server today", product1.lastUpdated.clearTime(), today.clearTime()
-				
-		// Attempt to import should fail due to the fact that the product's lastUpdated date is after the lastUpdated date in the CSV
-		def csv = """"ID","Name","Category","Description","Product Code","Unit of Measure","Manufacturer","Manufacturer Code","Cold Chain","UPC","NDC","Date Created","Date Updated"\n"${product1.id}","Sudafed 2","Supplies","","","","","","false","","","","""""
-		def service = new ProductService()
-		def message = shouldFail(RuntimeException) {
-			service.importProducts(csv)
-		}		
-		assertEquals("Product category cannot be modified", message)
-
-		def product2 = Product.findByName("Sudafed")
-		assertEquals product2.category.name, "Medicines"				
-	}
-	*/
 
     @Test
 	void findOrCreateCategory_shouldReturnExistingCategory() {
@@ -461,15 +394,9 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
     @Ignore
 	void getPopularTags() {
-		//def service = new ProductService();
-		
 		def popularTagMap = productService.getPopularTags()
-		
-	// 	def expectedProduct = Product.findByName("Ibuprofen 200mg tablet")
 		def expectedTags = ["favorite", "fever reducer", "nsaid", "pain", "pain reliever"]
-	//	def excludedTags = ["tagwithnoproducts"]
-		
-		
+
 		println popularTagMap
 		assertNotNull popularTagMap
 		assertEquals 5, popularTagMap.keySet().size()
@@ -479,7 +406,6 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		assertEquals 2, popularTagMap[Tag.findByTag("nsaid")]
 		assertEquals 3, popularTagMap[Tag.findByTag("pain")]
 		assertEquals 2, popularTagMap[Tag.findByTag("pain reliever")]
-		//assertEquals expectedProduct, popularTagMap["favorite"][0]
 	}
 
     @Test
@@ -611,13 +537,6 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         assertNotNull product.errors.getFieldError("name")
         assertNotNull product.errors.getFieldError("category")
         assertNull product.errors.getFieldError("description")
-        //println product.errors['name']
-        //println product.errors['category']
-        //assertEquals 'Name is blank.', 'blank', product.errors['name']
-        //assertEquals 'NickName is blank.', 'blank', user.errors['category']
-
-        //product.errors
-
     }
 
     @Test
@@ -644,19 +563,6 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         assertNotNull product.id
         assertNotNull product.tags
         assertEquals 3, product.tags.size()
-
-
-        // The following tests don't work because tags are not sorted in any particular order
-        // so they are returned in random order.
-        //assertEquals "a tag,another tag,the next tag", product.tagsToString()
-        //assertEquals "a tag", product.tags.iterator().next().tag
-        //assertEquals "another tag", product.tags.iterator().next().tag
-        //assertEquals "the next tag", product.tags.iterator().next().tag
-
-        // Lookup the product using the newly saved product id
-        //def returnValue = Product.get(product.id)
-        //assertNotNull returnValue
-
     }
 
     @Test

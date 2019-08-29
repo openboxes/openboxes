@@ -14,20 +14,18 @@ class ReportUtil {
      */
     static getCsv(list) {
 
-        def csv = "";
+        def csv = ""
 
-        csv+= "Status,"
-        csv+= "Product group,"
-        csv+= "Product codes,"
-        csv+= "Min,"
-        csv+= "Reorder,"
-        csv+= "Max,"
-        csv+= "QoH,"
-        csv+= "Value"
-        csv+= "\n"
+        csv += "Status,"
+        csv += "Product group,"
+        csv += "Product codes,"
+        csv += "Min,"
+        csv += "Reorder,"
+        csv += "Max,"
+        csv += "QoH,"
+        csv += "Value"
+        csv += "\n"
 
-        //StringEscapeUtils.escapeCsv(product?.name?:"")
-        // "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}"
         list.each { row ->
             csv += row.status + ","
             csv += StringEscapeUtils.escapeCsv(row.name) + ","
@@ -40,7 +38,7 @@ class ReportUtil {
             csv += "\n"
         }
 
-        return csv;
+        return csv
     }
 
 

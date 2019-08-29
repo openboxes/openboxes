@@ -59,23 +59,6 @@
                                 data-placeholder="Choose a reason code ..."
                                 noSelection="['':'']"
                                 value="${selectedRequisitionItem?.cancelReasonCode }"/>
-
-                        <%--
-                        <g:select name="reasonCode"
-                                  style="width: 450px"
-                                  class="chzn-select"
-                                  from="['Package size',
-                                          'Stock out',
-                                          'Substituted',
-                                          'Damaged',
-                                          'Expired',
-                                          'Reserved',
-                                          'Cancelled by requestor',
-                                          'Clinical adjustment',
-                                          'Other']"
-                                  noSelection="['':'']"
-                                  value="${selectedRequisitionItem.cancelReasonCode?:'Substituted' }"/>
-                        --%>
                     </td>
                 </tr>
                 <tr>

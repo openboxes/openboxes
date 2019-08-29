@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.min.css" type="text/css">
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footable.css')}" type="text/css" media="all" />
 
-    <%--<link rel="stylesheet" href="${createLinkTo(dir:'js/feedback',file:'feedback.css')}" type="text/css" media="all" />--%>
     <!-- Include javascript files -->
     <g:javascript library="application"/>
 
@@ -112,12 +111,6 @@
         <div id="breadcrumb">
             <g:render template="/common/breadcrumb"/>
         </div>
-        <%--
-        <div class="box center" style="margin:0;">
-            <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms"
-                            jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
-        </div>
-        --%>
     </g:if>
 
 
@@ -194,16 +187,11 @@
             self.locale = ko.observable(data.locale);
             self.text = ko.observable(data.text);
             self.translation = ko.observable(data.translation);
-            //self.deleteUrl = ko.observable("${request.contextPath}/json/deleteLocalization?id=" + data.id);
-            //self.resolvedText = ko.observablae(data.resolvedText);
-            //self.lastUpdated = ko.observable(data.lastUpdated);
-            //self.version = ko.observable(data.version);
         };
 
         $(document).ready(function() {
             // Initialize the localization dialog
             $("#localization-dialog").dialog({ autoOpen: false, modal: true, width: '600px' });
-
 
             // Instantiate a new localization object to be used
             var data = { id:"", code: "", text: "", translation: "" };
@@ -254,16 +242,11 @@
                     dataType: "json",
                     data: {text: viewModel.text, src: "en", dest: "fr"},
                     success: function(data) {
-                        //alert("success: " + data);
                         console.log(data);
                         viewModel.translation = data;
-                        //ko.applyBindings(viewModel);
                     },
                     error: function(data) {
-                        //console.log(data);
-                        //alert("error");
                         viewModel.translation = "Error. Try again.";
-                        //ko.applyBindings(viewModel);
                     }
                 });
             });
@@ -282,12 +265,10 @@
                     dataType: "json",
                     data: jsonData,
                     success: function(data) {
-                        //alert("success");
                         $("#localization-dialog").dialog("close");
                         location.reload();
                     },
                     error: function(data) {
-                        //alert("fail");
                         $("#localization-dialog").dialog("close");
                         location.reload();
                     }
@@ -382,28 +363,19 @@
 <script type="text/javascript">
     $(document).ready(function() {
 
-        //Feedback({
-        //    h2cPath: "${createLinkTo(dir:'js/html2canvas/', file:'html2canvas.js')}",
-        //    url: '${createLink(controller: 'errors', action: 'sendFeedback')}',
-        //    label: "Send feedback",
-        //    header: "Send us your feedback!",
-        //    messageSuccess: "Your issue has been submitted.  Thank you!",
-        //    messageError: "Uh oh... something went wrong. Please try again."
-        //});
-
         // Megamenu
         $(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
 
         // Chozen select default
-        $(".chzn-select").chosen({ width: '100%', search_contains: true });
+      $(".chzn-select").chosen({search_contains: true});
         $(".chzn-select-deselect").chosen({ allow_single_deselect:true, width: '100%', search_contains: true });
+      $(".chzn-select-readonly").chosen().prop("disabled", "disabled").trigger("chosen:updated");
         $(".chzn-select-deselect").livequery(function(){
             $(this).chosen({allow_single_deselect:true, width:'100%', search_contains: true});
         });
 
 
         $(".warehouse-switch").click(function() {
-            //$("#warehouse-menu").toggle();
             $("#warehouseMenu").dialog({
                 autoOpen: true,
                 modal: true,
@@ -412,9 +384,7 @@
         });
 
 
-        function showActions() {
-            //$(this).children(".actions").show();
-        }
+        function showActions() {}
 
         function hideActions() {
             $(this).children(".actions").hide();
@@ -439,19 +409,6 @@
                 out: hideActions       // function = onMouseOut callback (required)
             });
         });
-
-
-        // Create an action button that toggles the action menu on click
-        //button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} }).
-        /*
-         $(".action-btn").click(function(event) {
-         $(this).parent().children(".actions").toggle();
-         event.preventDefault();
-         });
-         */
-        /*
-         $(".action-btn").button({ text: false, icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'} });
-         */
 
         $(".action-btn").live('click', function(event) {
             //show the menu directly over the placeholder
@@ -491,7 +448,6 @@
                 my: "right top",
                 at: "right bottom",
                 of: $(this).closest(".action-hover-btn"),
-                //offset: "0 0"
                 collision: "flip"
             });
 
@@ -535,11 +491,7 @@
                 });
             });
 
-            scanner.bind('scannerDetectionError',function(event,data){
-                //console.log("Error detecting barcode scanner input", event, data);
-                //console.log(event);
-                //console.log(data);
-            });
+            scanner.bind('scannerDetectionError',function(event,data){});
         });
     </script>
 </g:if>
@@ -567,20 +519,6 @@
             email: '${session?.user?.email}',
             name: '${session?.user?.name}',
             created_at: '${session?.user?.dateCreated?.time}'
-
-            //email:      'john.doe@example.com', // User’s email address
-            //name:       'John Doe', // User’s real name
-            //created_at: 1364406966, // Unix timestamp for the date the user signed up
-            //id:         123, // Optional: Unique id of the user (if set, this should not change)
-            //type:       'Owner', // Optional: segment your users by type
-            //account: {
-            //  id:           123, // Optional: associate multiple users with a single account
-            //  name:         'Acme, Co.', // Account name
-            //  created_at:   1364406966, // Unix timestamp for the date the account was created
-            //  monthly_rate: 9.99, // Decimal; monthly rate of the account
-            //  ltv:          1495.00, // Decimal; lifetime value of the account
-            //  plan:         'Enhanced' // Plan name for the account
-            //}
         }]);
 
         // Add default trigger to the bottom-right corner of the window:
@@ -588,17 +526,9 @@
             mode: 'contact',
             trigger_style: 'tab',
             trigger_position: '${grailsApplication.config.openboxes.uservoice.widget.position?:"bottom-right"}',
-            //accent_color: '#448dd6',
-            //trigger_color: '#448dd6',
             trigger_background_color: '#448dd6',
             locale: '${session?.user?.locale?:"en"}'
         }]);
-
-        // Or, use your own custom trigger:
-        //UserVoice.push(['addTrigger', '#user-voice-trigger', { mode: 'contact' }]);
-
-        // Autoprompt for Satisfaction and SmartVote (only displayed under certain conditions)
-        //UserVoice.push(['autoprompt', {}]);
     </script>
 </g:if>
 <!-- Live Chat -->

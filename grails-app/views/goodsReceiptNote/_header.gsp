@@ -42,23 +42,6 @@
                         <g:formatDate date="${shipment?.actualShippingDate}" format="d MMMMM yyyy hh:mma"/>
                     </td>
                 </tr>
-                %{--<tr>--}%
-                    %{--<td class="name right">--}%
-                        %{--<label><warehouse:message code="shipping.actualDeliveryDate.label"/>:</label>--}%
-                    %{--</td>--}%
-                    %{--<td>--}%
-                        %{--<g:if test="${shipment?.actualDeliveryDate}">--}%
-                            %{--<g:formatDate date="${shipment?.actualDeliveryDate}" format="d MMMMM yyyy hh:mma"/>--}%
-                        %{--</g:if>--}%
-                        %{--<g:elseif test="${shipment?.expectedDeliveryDate}">--}%
-                            %{--${warehouse.message(code: 'default.expected.label')}--}%
-                            %{--<g:prettyDateFormat date="${shipment?.expectedDeliveryDate}"></g:prettyDateFormat>--}%
-                        %{--</g:elseif>--}%
-                        %{--<g:else>--}%
-                            %{--${warehouse.message(code: 'default.unknown.label')}--}%
-                        %{--</g:else>--}%
-                    %{--</td>--}%
-                %{--</tr>--}%
                 <tr>
                     <td class="name right">
                         <label><warehouse:message code="default.datePrinted.label" default="Date printed"/>:</label>

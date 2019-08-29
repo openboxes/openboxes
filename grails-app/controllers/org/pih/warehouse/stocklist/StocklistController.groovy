@@ -15,66 +15,63 @@ import org.pih.warehouse.inventory.InventoryLevel
 
 class StocklistController {
 
-	def stocklistService
-	def documentService
+    def stocklistService
+    def documentService
 
-	def show = {
-		println "stocklist " + params
-		def location = Location.get(params.id)
-		//def inventory = Inventory.findByLocation(location)
-		def inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
+    def show = {
+        println "stocklist " + params
+        def location = Location.get(params.id)
+        def inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
 
-
-		[location:location, inventoryLevels: inventoryLevels]
-
-	}
+        [location: location, inventoryLevels: inventoryLevels]
+    }
 
 
-	def renderHtml = {
-		Stocklist stocklist = stocklistService.getStocklist(params.id)
-		render(
-				template: "/stocklist/print",
-				model: [stocklist:stocklist])
-	}
+    def renderHtml = {
+        Stocklist stocklist = stocklistService.getStocklist(params.id)
+        render(
+                template: "/stocklist/print",
+                model: [stocklist: stocklist])
+    }
 
-	def renderPdf = {
-		Stocklist stocklist = stocklistService.getStocklist(params.id)
+    def renderPdf = {
+        Stocklist stocklist = stocklistService.getStocklist(params.id)
 
-		renderPdf(
-			template: "/stocklist/print",
-			model: [stocklist:stocklist],
-			filename: "Stocklist - ${stocklist?.requisition?.name}.pdf"
-		)
-	}
+        renderPdf(
+                template: "/stocklist/print",
+                model: [stocklist: stocklist],
+                filename: "Stocklist - ${stocklist?.requisition?.name}.pdf"
+        )
+    }
 
-	def generateCsv = {
-		Stocklist stocklist = stocklistService.getStocklist(params.id)
+    def generateCsv = {
+        Stocklist stocklist = stocklistService.getStocklist(params.id)
 
-		render ""
+        render ""
 
-		def filename = "Stocklist - " + stocklist?.requisition?.name + ".xls"
+        def filename = "Stocklist - " + stocklist?.requisition?.name + ".xls"
 
-		response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-		response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+        response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-		log.info response
-		documentService.generateStocklistCsv(response.outputStream, stocklist)
-	}
+        log.info response
+        documentService.generateStocklistCsv(response.outputStream, stocklist)
+    }
 
-	def sendMail = {
-		Stocklist stocklist = stocklistService.getStocklist(params.id)
+    def sendMail = {
+        Stocklist stocklist = stocklistService.getStocklist(params.id)
 
-		if (!params.recipients || !params.id || !params.body || !params.subject) {
-			flash.error="${warehouse.message(code:'email.noParams.message')}"
-			redirect(controller: "requisitionTemplate", action: "sendMail", params:[id: params.id])
-		} else if (!Arrays.asList(params.recipients).contains(stocklist.requestedBy.email)) {
-			flash.error="${warehouse.message(code:'stockList.noManagerSelected.label')}"
-			redirect(controller: "requisitionTemplate", action: "sendMail", params:[id: params.id])
-		} else {
-			def emailBody = params.body + "\n\n" + "Sent by " + session.user.name
-			stocklistService.sendMail(params.id, params.subject, emailBody, [params.recipients], params.includePdf == "on", params.includeXls == "on")
-			flash.message = "${warehouse.message(code:'email.sent.message')}"
-			redirect(controller: "requisitionTemplate", action: "show", params:[id: params.id])
-		}
-	}
+        if (!params.recipients || !params.id || !params.body || !params.subject) {
+            flash.error = "${warehouse.message(code: 'email.noParams.message')}"
+            redirect(controller: "requisitionTemplate", action: "sendMail", params: [id: params.id])
+        } else if (!Arrays.asList(params.recipients).contains(stocklist.requestedBy.email)) {
+            flash.error = "${warehouse.message(code: 'stockList.noManagerSelected.label')}"
+            redirect(controller: "requisitionTemplate", action: "sendMail", params: [id: params.id])
+        } else {
+            def emailBody = params.body + "\n\n" + "Sent by " + session.user.name
+            stocklistService.sendMail(params.id, params.subject, emailBody, [params.recipients], params.includePdf == "on", params.includeXls == "on")
+            flash.message = "${warehouse.message(code: 'email.sent.message')}"
+            redirect(controller: "requisitionTemplate", action: "show", params: [id: params.id])
+        }
+    }
 }

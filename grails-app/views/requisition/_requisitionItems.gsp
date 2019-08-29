@@ -49,15 +49,11 @@
 <g:set var="requisitionStartTime" value="${System.currentTimeMillis()}"/>
 
 <g:if test="${!requisitionItem.parentRequisitionItem}">
-<%--
-<g:render template="reviewRequisitionItem" model="[requisitionItem:requisitionItem, i:count++]"/>
---%>
 <g:set var="selected" value="${requisitionItem == selectedRequisitionItem}"/>
 <g:set var="quantityOnHand" value="${quantityOnHandMap[requisitionItem?.product?.id]} "/>
 <g:set var="substitution" value="${requisitionItem?.substitution}"/>
 <g:set var="quantityOnHandForSubstitution" value="${quantityOnHandMap[substitution?.product?.id]} "/>
 <g:set var="quantityRemaining" value="${(requisitionItem?.quantity?:0)-(requisitionItem?.calculateQuantityPicked()?:0)}" />
-<%-- Need to hack this in since the quantityOnHand value was a String --%>
 <g:set var="isCanceled" value="${requisitionItem?.isCanceled()}"/>
 <g:set var="isChanged" value="${requisitionItem?.isChanged()}"/>
 <g:set var="hasSubstitution" value="${requisitionItem?.hasSubstitution()}"/>
@@ -96,10 +92,6 @@
                     ${requisitionItem.calculatePercentageCompleted()}
                 </div>
                 <div>
-                    <%--
-                Requisition items: ${requisitionItem?.requisitionItems?.size()}
-
-                --%>
                 </div>
                 <div>
                     <label>Substitution:</label>
@@ -115,11 +107,6 @@
 </td>
 <td class="left">
     <a name="${requisitionItem?.id}"></a>
-
-
-    <%--
-    <g:render template="/requisitionItem/actions" model="[requisition:requisition,requisitionItem:requisitionItem]"/>
-    --%>
 
     <div class="action-menu">
         <button name="actionButtonDropDown" class="action-btn" id="requisitionItem-${requisitionItem?.id }-action">
@@ -194,11 +181,6 @@
 
 </td>
 <td class="center middle">
-    <%--
-    <div class="${isCanceled?'canceled':''}" title="${requisitionItem?.cancelReasonCode}">
-        <format:metadata obj="${requisitionItem.status}" />
-    </div>
-    --%>
     <format:metadata obj="${requisitionItem.status}" />
 </td>
 <td class="center middle">
@@ -221,11 +203,6 @@
 
 
 <td class="product middle">
-<%--
-<g:if test="${isChild }">
-    <img src="${resource(dir: 'images/icons', file: 'indent.gif')}" class="middle"/>
-</g:if>
---%>
     <g:if test="${isCanceled||hasSubstitution}">
         <div class="canceled">
             <format:metadata obj="${requisitionItem?.product?.name}" />
@@ -250,53 +227,18 @@
         <p>${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}</p>
         <p class="fade">${requisitionItem?.cancelComments}</p>
     </g:if>
-
-<%--
-<g:if test="${requisitonItem?.isApproved()}">
-    <warehouse:message code="enum.RequisitionItemStatus.APPROVED" default="Approved"/>
-</g:if>
-
-<g:if test="${requisitionItem?.isCanceled()}">
-    <warehouse:message code="enum.RequisitionItemStatus.CANCELLED" default="Cancelled"/>
-    <g:if test="${requisitionItem?.isSubstitution()}">
-        <warehouse:message code="enum.requisitionItemStatus.SUBSTITUTED" default="Substituted"/>
-    </g:if>
-</g:if>
-<g:elseif test="${requisitionItem?.isChanged()}">
-    <warehouse:message code="enum.requisitionItemStatus.CHANGED" default="Changed"/>
-</g:elseif>
-<g:else>
-    ${warehouse.message(code:'default.pending.label')}
-</g:else>
---%>
 </td>
 <td class="quantity center middle">
     <div class="${isCanceled||isChanged?'canceled':''}">
         ${requisitionItem?.quantity} EA/1
-        <%--
-        ${requisitionItem?.productPackage?.uom?.code?:"EA" }/${requisitionItem?.productPackage?.quantity?:"1" }
-        --%>
     </div>
     <g:if test="${requisitionItem?.change}">
         ${requisitionItem?.change?.quantity}
         EA/1
-    <%--
-    ${requisitionItem?.change?.productPackage?.uom?.code?:"EA"}/${requisitionItem?.change?.productPackage?.quantity?:"1"}
-    --%>
     </g:if>
 
 
 </td>
-<%--
-<td class="center middle">
-    <div class="${isCanceled||isChanged?'canceled':''}">
-        ${requisitionItem?.totalQuantity()}
-    </div>
-    <g:if test="${requisitionItem?.change}">
-        ${requisitionItem?.change?.totalQuantity()}
-    </g:if>
-</td>
---%>
 <td class="center middle">
     <g:if test="${isAvailable||isAvailableForSubstitution}">
         <div class="box available">
@@ -332,7 +274,6 @@
 <tr class="${!selectedRequisitionItem?'':selected?'selected':'unselected'}">
 <td colspan="9">
 <g:if test="${params?.actionType=='changeQuantity'}">
-<%--<g:render template="changeQuantity" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
     <div class="box" id="changeQuantity">
         <h2>${warehouse.message(code:'requisitionItem.changeQuantity.label', default:'Change quantity')}</h2>
 
@@ -355,9 +296,6 @@
                     </td>
                     <td class="middle">
                         <g:textField id="quantity" name="quantity" value="" class="text" size="5"/>
-                        <%--
-                        <g:selectUnitOfMeasure name="productPackage.id" product="${selectedRequisitionItem?.product}" class="chzn-select" style="width:300px;"/>
-                        --%>
                         EA/1
                     </td>
                 </tr>
@@ -418,7 +356,6 @@
 
 </g:if>
 <g:elseif test="${params?.actionType=='changePackageSize'}">
-<%--<g:render template="changePackageSize" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
     <div class="box">
         <h2>${warehouse.message(code:'requisitionItem.changePackageSize.label', default:'Change package size')}</h2>
         <g:form controller="requisition" action="changeQuantity" fragment="${selectedRequisitionItem?.id}">
@@ -480,7 +417,6 @@
     </script>
 </g:elseif>
 <g:elseif test="${params?.actionType=='cancelQuantity'}">
-<%--<g:render template="cancelQuantity" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
     <div class="box" class="cancelQuantity">
         <h2>${warehouse.message(code:'requisitionItem.cancel.label', default:'Cancel requisition item')}</h2>
 
@@ -493,9 +429,6 @@
 
 
         <g:form controller="requisitionItem" action="cancelQuantity" fragment="${selectedRequisitionItem?.id}">
-        <%--
-        <g:hiddenField name="id" value="${selectedRequisitionItem?.requisition?.id }"/>
-        --%>
             <g:hiddenField name="id" value="${selectedRequisitionItem?.id }"/>
             <g:hiddenField name="redirectAction" value="${actionName}"/>
             <g:hiddenField name="actionType" value="${params.actionType }"/>
@@ -570,7 +503,6 @@
     </script>
 </g:elseif>
 <g:elseif test="${params?.actionType=='chooseSubstitute'}">
-<%--<g:render template="chooseSubstitute" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
     <div class="box" id="chooseSubstitute">
         <h2>${warehouse.message(code:'requisitionItem.chooseSubstitute.label', default: 'Choose substitute') }</h2>
         <div class="dialog">
@@ -632,23 +564,6 @@
                                     data-placeholder="Choose a reason code ..."
                                     noSelection="['':'']"
                                     value="${selectedRequisitionItem?.cancelReasonCode }"/>
-
-                            <%--
-                            <g:select name="reasonCode"
-                                      style="width: 450px"
-                                      class="chzn-select"
-                                      from="['Package size',
-                                              'Stock out',
-                                              'Substituted',
-                                              'Damaged',
-                                              'Expired',
-                                              'Reserved',
-                                              'Cancelled by requestor',
-                                              'Clinical adjustment',
-                                              'Other']"
-                                      noSelection="['':'']"
-                                      value="${selectedRequisitionItem.cancelReasonCode?:'Substituted' }"/>
-                            --%>
                         </td>
                     </tr>
                     <tr>
@@ -720,7 +635,6 @@
     </script>
 </g:elseif>
 <g:elseif test="${params?.actionType=='supplementProduct'}">
-<%--<g:render template="supplementProduct" model="[selectedRequisitionItem:selectedRequisitionItem]"/>--%>
     <div class="box">
         <h2>${warehouse.message(code:'requisitionItem.addAddition.label') }</h2>
         <div class="dialog">

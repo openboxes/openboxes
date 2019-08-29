@@ -11,49 +11,6 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<%-- 
-			<div>
-				<table>
-					<tr>
-	            		<td style="border: 1px solid lightgrey; background-color: #f5f5f5;">
-				            <g:form action="listExpiringStock" method="get">
-				            	<table>
-				            		<tr>
-				            			<th><warehouse:message code="category.label"/></th>
-				            			<th><warehouse:message code="inventory.expiresWithin.label"/></th>
-				            			<th><warehouse:message code="inventory.excludeExpired.label"/></th>
-				            		</tr>
-				            		<tr>
-							           	<td class="filter-list-item">
-							           		<g:select name="category"
-															from="${categories}"
-															optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
-															noSelection="['':'--All--']" />   
-										</td>
-										<td>
-							           		<g:select name="threshold"
-															from="['1':'one week', '14':'two weeks', '30':'one month', 
-																'60':'two months', '90':'three months',
-																'180': 'six months', '365':'one year']"
-															optionKey="key" optionValue="value" value="${thresholdSelected}" 
-															noSelection="['':'--All--']" />  
-							           	</td>
-							           	<td>	
-							           		<g:checkBox name="excludeExpired" value="${excludeExpired }" } />
-							           	
-							           	</td>						           	
-										<td class="filter-list-item" style="height: 100%; vertical-align: bottom">
-											<button name="filter">
-												<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}"/>&nbsp;<warehouse:message code="default.button.filter.label"/> </button>
-										</td>							           	
-									</tr>
-								</table>
-				            </g:form>
-	            		</td>
-	            	</tr>
-				</table>
-			</div>			
-			--%>
 			
 			<div>	
 				

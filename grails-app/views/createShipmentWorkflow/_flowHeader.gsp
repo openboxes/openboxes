@@ -37,21 +37,6 @@
     </div>
     <div class="right">
         <g:if test="${currentState=='Picking'}">
-
-            <%--
-            <g:if test="${!quantityMap}">
-                <g:link controller="createShipmentWorkflow" action="createShipment" event="checkPickStatus" id="${shipmentInstance?.id}" class="button">
-                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'tick.png')}" class="middle"/>&nbsp;
-                    <warehouse:message code="shipping.checkPickStatus.label" default="Check Pick Status"/>
-                </g:link>
-            </g:if>
-            <g:else>
-                <g:link controller="createShipmentWorkflow" action="createShipment" event="disablePickStatus" id="${shipmentInstance?.id}" class="button">
-                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'disconnect.png')}" class="middle"/>&nbsp;
-                    <warehouse:message code="shipping.disablePickStatus.label" default="Disable Pick Status"/>
-                </g:link>
-            </g:else>
-            --%>
             <g:link target="_blank" controller="report" action="printPickListReport" class="button"
                     params="['shipment.id': shipmentInstance?.id]">
                 <img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_list.png')}" class="middle"/>&nbsp;
