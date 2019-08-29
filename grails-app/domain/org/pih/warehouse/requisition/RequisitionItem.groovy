@@ -521,7 +521,13 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         long startTime = System.currentTimeMillis()
         def quantityPicked = 0
         try {
-            quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+            if (substitutionItems) {
+                substitutionItems.each { substitutionItem ->
+                    quantityPicked += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { it.quantity }
+                }
+            } else {
+                quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+            }
         } catch (Exception e) {
 
         }
@@ -544,7 +550,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         def quantityRemaining = totalQuantity() - (totalQuantityPicked() + totalQuantityCanceled())
 
 
-        return quantityRemaining
+        return Math.max(0,quantityRemaining)
     }
 
     def calculateNumInventoryItem(Inventory inventory) {
@@ -598,13 +604,23 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     Integer getQuantityIssued() {
-        return requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == this }?.sum {
-            it.quantity
-        } ?: 0
+        return substitutionItems ? substitutionItems?.sum { it.quantityIssued } ?: 0 :
+                requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == this }?.sum { it.quantity } ?: 0
     }
 
     Integer getQuantityAdjusted() {
-        return modificationItem ? (modificationItem.quantityIssued - quantity) : (quantityIssued - quantity)
+        def quantityAdjusted = 0
+
+        if (modificationItem) {
+            quantityAdjusted = modificationItem.quantityIssued - quantity
+        } else if (substitutionItems) {
+            def subQuantityIssued = substitutionItems.sum { it.quantityIssued }
+            quantityAdjusted = subQuantityIssued - quantity
+        } else {
+            quantityAdjusted = quantityIssued - quantity
+        }
+
+        return quantityAdjusted
     }
 
     def next() {
