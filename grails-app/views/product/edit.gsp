@@ -366,7 +366,7 @@
                             <g:render template="productPackages" model="[productInstance:productInstance]"/>
 						</div>
                         <div id="inventory-level-dialog" class="dialog hidden" title="Add a new stock level">
-                            <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new InventoryLevel(),inventory:inventory]"/>
+                            <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new InventoryLevel()]"/>
                         </div>
                         <div id="uom-class-dialog" class="dialog hidden" title="Add a unit of measure class">
                             <g:render template="uomClassDialog" model="[productInstance:productInstance]"/>
