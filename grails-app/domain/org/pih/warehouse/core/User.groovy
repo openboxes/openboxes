@@ -81,6 +81,11 @@ class User extends Person {
         return defaultRoles
     }
 
+    boolean hasPrimaryRole(Location currentLocation) {
+        def roles = getEffectiveRoles(currentLocation)
+        return roles.roleType.find { RoleType.listPrimaryRoleTypes().contains(it) }
+    }
+
     /**
      * @return all location role pairs for this user
      */

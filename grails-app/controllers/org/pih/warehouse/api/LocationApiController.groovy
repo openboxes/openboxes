@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 
 class LocationApiController extends BaseDomainApiController {
 
@@ -26,12 +27,11 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         Location currentLocation = Location.get(session?.warehouse?.id)
+        User currentUser = User.get(session?.user?.id)
         boolean isSuperuser = userService.isSuperuser(session?.user)
         String direction = params?.direction
         def fields = params.fields ? params.fields.split(",") : null
-        def locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation)
-        render([data: locations] as JSON)
-    }
-
-
+        def locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+        render ([data:locations] as JSON)
+     }
 }
