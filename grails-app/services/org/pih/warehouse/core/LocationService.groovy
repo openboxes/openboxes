@@ -21,101 +21,104 @@ import javax.xml.bind.ValidationException
 
 class LocationService {
 
-	def grailsApplication
-	boolean transactional = true
+    def grailsApplication
+    boolean transactional = true
 
 
-	Location findInternalLocation(Location parentLocation, String[] names) {
-		return Location.createCriteria().get {
-			eq("parentLocation", parentLocation)
-			'in'("name", names)
-		}
-	}
+    Location findInternalLocation(Location parentLocation, String[] names) {
+        return Location.createCriteria().get {
+            eq("parentLocation", parentLocation)
+            'in'("name", names)
+        }
+    }
 
-	Location findOrCreateInternalLocation(String shipmentNumber, String locationNumber, LocationType locationType, Location parentLocation) {
-		log.info "find or create internal location name=${shipmentNumber}, type=${locationType}"
-		if (!shipmentNumber || !locationNumber || !locationType || !parentLocation) {
-			throw new IllegalArgumentException("Must specify name, location number, location type, and parent location in order to create internal location")
-		}
+    Location findOrCreateInternalLocation(String shipmentNumber, String locationNumber, LocationType locationType, Location parentLocation) {
+        log.info "find or create internal location name=${shipmentNumber}, type=${locationType}"
+        if (!shipmentNumber || !locationNumber || !locationType || !parentLocation) {
+            throw new IllegalArgumentException("Must specify name, location number, location type, and parent location in order to create internal location")
+        }
 
-		String name = getReceivingLocationName(shipmentNumber)
-		String[] receivingLocationNames = [name, "Receiving ${shipmentNumber}"]
-		Location location = findInternalLocation(parentLocation, receivingLocationNames)
-		if (!location) {
-			log.info "creating internal location name=${name}, type=${locationType}"
-			location = new Location()
-			location.name = name
-			location.locationNumber = locationNumber
-			location.locationType = locationType
-			location.parentLocation = parentLocation
-			location.save(failOnError: true)
-		}
-		return location
-	}
+        String name = getReceivingLocationName(shipmentNumber)
+        String[] receivingLocationNames = [name, "Receiving ${shipmentNumber}"]
+        Location location = findInternalLocation(parentLocation, receivingLocationNames)
+        if (!location) {
+            log.info "creating internal location name=${name}, type=${locationType}"
+            location = new Location()
+            location.name = name
+            location.locationNumber = locationNumber
+            location.locationType = locationType
+            location.parentLocation = parentLocation
+            location.save(failOnError: true)
+        }
+        return location
+    }
 
 
+    def getAllLocations() {
+        return getLocations(null, [:])
+    }
 
-	def getAllLocations() {
-		return getLocations(null, [:])
-	}
+    def getLocations(String[] fields, Map params) {
 
-	def getLocations(String [] fields, Map params) {
+        LocationTypeCode locationTypeCode = params.locationTypeCode ?: null
 
-		LocationTypeCode locationTypeCode = params.locationTypeCode?:null
+        def locations = Location.createCriteria().list() {
+            if (fields) {
+                projections {
+                    fields.each { field ->
+                        property(field)
+                    }
+                }
+            }
 
-		def locations = Location.createCriteria().list() {
-			if (fields) {
-				projections {
-					fields.each { field ->
-						property(field)
-					}
-				}
-			}
+            if (params.name) {
+                ilike("name", "%" + params.name + "%")
+            }
 
-			if (params.name) {
-				ilike("name", "%" + params.name + "%")
-			}
+            if (params.locationTypeCode) {
+                locationType {
+                    eq("locationTypeCode", locationTypeCode)
+                }
+            }
 
-			if (params.locationTypeCode) {
-				locationType {
-					eq("locationTypeCode", locationTypeCode)
-				}
-			}
+            eq("active", Boolean.TRUE)
+            isNull("parentLocation")
+        }
+        return locations
+    }
 
-			eq("active", Boolean.TRUE)
-			isNull("parentLocation")
-		}
-		return locations
-	}
+    def getLocations(String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User user) {
 
-	def getLocations(String [] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User user) {
+        def locations = new HashSet()
+        locations += getLocations(fields, params)
 
-		def locations = new HashSet()
-		locations += getLocations(fields, params)
+        if (params.applyUserFilter) {
+            locations = locations.findAll { location -> user.hasPrimaryRole(location) }
+        }
 
-		if (params.applyUserFilter) {
-			locations = locations.findAll { location -> user.hasPrimaryRole(location) }
-		}
+        if (!isSuperuser) {
+            if (direction == "INBOUND") {
+                return locations.findAll {
+                    it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER
+                }
+            }
+            if (direction == "OUTBOUND") {
+                return locations.findAll {
+                    (it.locationGroup == currentLocation.locationGroup) ||
+                            (it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT)
+                }
+            }
+        }
 
-		if (!isSuperuser) {
-			if (direction == "INBOUND") {
-				return locations.findAll { it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER }
-			}
-			if (direction == "OUTBOUND") {
-				return locations.findAll { (it.locationGroup == currentLocation.locationGroup) ||
-						(it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT) }
-			}
-		}
+        if (params.locationTypeCode) {
+            LocationTypeCode locationTypeCode = params.locationTypeCode as LocationTypeCode
+            return locations.findAll { it.locationType.locationTypeCode == locationTypeCode }
+        }
 
-		if (params.locationTypeCode) {
-			LocationTypeCode locationTypeCode = params.locationTypeCode as LocationTypeCode
-			return locations.findAll { it.locationType.locationTypeCode == locationTypeCode }
-		}
+        return locations
+    }
 
-		return locations
-	}
-
-	def getLocations(LocationType locationType, LocationGroup locationGroup, String query, Integer max, Integer offset) {
+    def getLocations(LocationType locationType, LocationGroup locationGroup, String query, Integer max, Integer offset) {
         log.info "Location type " + locationType?.locationTypeCode
         def terms = "%" + query + "%"
         def locations = Location.createCriteria().list(max: max, offset: offset) {
@@ -169,16 +172,16 @@ class LocationService {
         def nullHigh = new NullComparator(true)
         def locations = getLoginLocations(currentLocation)
         if (locations) {
-			locations = locations.findAll { Location location -> user.hasPrimaryRole(location) }
-			locations = locations.collect { Location location ->
-				[
-						id           : location?.id,
-						name         : location?.name,
-						locationType : location.locationType?.name,
-						locationGroup: location?.locationGroup?.name,
+            locations = locations.findAll { Location location -> user.hasPrimaryRole(location) }
+            locations = locations.collect { Location location ->
+                [
+                        id           : location?.id,
+                        name         : location?.name,
+                        locationType : location.locationType?.name,
+                        locationGroup: location?.locationGroup?.name,
 
-				]
-			}
+                ]
+            }
             locationMap = locations.groupBy { it?.locationGroup }
             locationMap = locationMap.sort { a, b -> nullHigh.compare(a?.key, b?.key) }
         }
