@@ -61,11 +61,13 @@ class InventoryLevelController {
     def create = {
         def inventoryLevelInstance = new InventoryLevel()
         inventoryLevelInstance.properties = params
-        return [inventoryLevelInstance: inventoryLevelInstance, inventory: inventory]
+        return [inventoryLevelInstance: inventoryLevelInstance]
     }
 
     def save = {
+        def location = Location.get(params.location.id)
         def inventoryLevelInstance = new InventoryLevel(params)
+        inventoryLevelInstance.inventory = location.inventory
         if (inventoryLevelInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
             redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id)
