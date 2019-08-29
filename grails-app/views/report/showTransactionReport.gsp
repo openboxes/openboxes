@@ -86,7 +86,22 @@
 													autocomplete="off"/>
 
 							</div>
-
+							<div class="filter-list-item">
+								<label><warehouse:message code="category.label"/></label>
+								<p>
+									<g:selectCategory id="category"
+													  class="chzn-select-deselect filter"
+													  data-placeholder="Select a category"
+													  name="category"
+													  noSelection="['':'']"
+													  value="${params?.category?.id}"
+									/>
+								</p>
+								<p>
+									<g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="true"/>
+									<label>${warehouse.message(code:'search.includeCategoryChildren.label', default: 'Include all products in all subcategories.')}</label>
+								</p>
+							</div>
 						</div>
 						<div class="buttons">
 							<button class="submit-button button">
@@ -186,6 +201,10 @@
 				data.push({ name: "location.id", value: $("#locationId").val() });
 				data.push({ name: "startDate", value: $("#startDate").val() });
 				data.push({ name: "endDate", value: $("#endDate").val() });
+				data.push({ name: "category", value: $("#category").val() });
+				if($('#includeCategoryChildren').is(':checked')) {
+					data.push({ name: "includeCategoryChildren", value: $("#includeCategoryChildren").val() });
+				}
 			},
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 $.ajax({
@@ -291,6 +310,8 @@
 				locationId: $("#locationId").val(),
 				startDate: $("#startDate").val(),
 				endDate: $("#endDate").val(),
+				category: $("#category").val(),
+				includeCategoryChildren: $("#includeCategoryChildren").val(),
 				format: "text/csv"
 			};
 			var queryString = $.param(params);
