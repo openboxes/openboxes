@@ -17,6 +17,7 @@ class LocationApiController extends BaseDomainApiController {
 
     def locationService
     def userService
+    def grailsApplication
 
     def list = {
 
