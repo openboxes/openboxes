@@ -262,6 +262,29 @@ class UserService {
         return users
     }
 
+    def findUsersByLocationRole(Location location, RoleType roleType) {
+        def users = []
+        def role = Role.findByRoleType(roleType)
+        if (role) {
+            def criteria = User.createCriteria()
+            users = criteria.listDistinct {
+                eq("active", true)
+                or {
+                    roles {
+                        eq("id", role.id)
+                    }
+                    if (location) {
+                        locationRoles {
+                            'in'("role.id", role.id)
+                            eq("location.id", location.id)
+                        }
+                    }
+                }
+            }
+        }
+        return users
+    }
+
     private def getEffectiveRoles(User user) {
         def currentLocation = AuthService.currentLocation?.get()
         return user.getEffectiveRoles(currentLocation)
@@ -306,4 +329,10 @@ class UserService {
         }
         return false
     }
+
+
+    def findUserInRoles(Location location, RoleType roleType) {
+
+    }
+
 }

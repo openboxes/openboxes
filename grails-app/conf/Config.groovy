@@ -472,6 +472,7 @@ openboxes.typeahead.minLength = 3
 
 // Send stock alerts
 openboxes.jobs.sendStockAlertsJob.enabled = true
+openboxes.jobs.sendStockAlertsJob.daysUntilExpiry = 60
 
 // Refresh inventory snapshots
 openboxes.jobs.refreshInventorySnapshotJob.enabled = true

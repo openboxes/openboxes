@@ -29,7 +29,10 @@ enum ActivityCode {
     // Requisition reason codes
     SUBSTITUTE_REQUISITION_ITEM('SUBSTITUTE_REQUISITION_ITEM'),
     MODIFY_REQUISITION_ITEM('MODIFY_REQUISITION_ITEM'),
-    MODIFY_PICKLIST_ITEM('MODIFY_PICKLIST_ITEM')
+    MODIFY_PICKLIST_ITEM('MODIFY_PICKLIST_ITEM'),
+
+    // Notifications
+    ENABLE_NOTIFICATIONS('ENABLE_NOTIFICATIONS')
 
 
     final String id
@@ -49,7 +52,8 @@ enum ActivityCode {
                 CROSS_DOCKING,
                 PUTAWAY_STOCK,
                 PICK_STOCK,
-                EXTERNAL
+                EXTERNAL,
+                ENABLE_NOTIFICATIONS
         ]
     }
 }

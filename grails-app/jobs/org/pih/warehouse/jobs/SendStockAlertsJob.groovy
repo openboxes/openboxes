@@ -9,27 +9,40 @@
  **/
 package org.pih.warehouse.jobs
 
+import groovyx.gpars.GParsPool
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
-import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
 class SendStockAlertsJob {
 
     def concurrent = false
     def grailsApplication
-    def inventorySnapshotService
+    def locationService
+    def notificationService
 
-    // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}
 
     def execute(JobExecutionContext context) {
 
         log.info "Executing ${this.class} at ${new Date()}"
-        Boolean enabled = grailsApplication.config.openboxes.jobs.sendStockAlertsJob.enabled
+        Boolean enabled = Boolean.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.enabled)
+        Integer daysUntilExpiry = grailsApplication.config.openboxes.jobs.sendStockAlertsJob.daysUntilExpiry?:60
+
         if (enabled) {
             def startTime = System.currentTimeMillis()
             log.info("Send stock alerts: " + context.mergedJobDataMap)
-
+            GParsPool.withPool {
+                def depotLocations = locationService.getDepots()
+                depotLocations.eachParallel { Location location ->
+                    if (location.active && location.supports(ActivityCode.ENABLE_NOTIFICATIONS)) {
+                        notificationService.sendExpiryAlertsByLocation(location, daysUntilExpiry)
+                    }
+                    else {
+                        log.warn "Notifications disabled for ${location.name}"
+                    }
+                }
+            }
             log.info "Sent stock alerts ${(System.currentTimeMillis() - startTime)} ms"
         }
     }

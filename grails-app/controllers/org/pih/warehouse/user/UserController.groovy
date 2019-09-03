@@ -11,11 +11,15 @@ package org.pih.warehouse.user
 
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.validation.ValidationException
-import org.pih.warehouse.core.*
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationRole
+import org.pih.warehouse.core.MailService
+import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.User
 
 import javax.imageio.ImageIO as IIO
-import javax.swing.*
-import java.awt.*
+import javax.swing.ImageIcon
+import java.awt.Graphics2D
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
 

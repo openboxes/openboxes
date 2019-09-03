@@ -16,10 +16,19 @@ enum DocumentCode {
     PRODUCT_MANUAL,
     SHIPPING_DOCUMENT,
     SHIPPING_TEMPLATE,
-    ZEBRA_TEMPLATE
+    ZEBRA_TEMPLATE,
+    EMAIL_TEMPLATE,
 
     static list() {
-        [SHIPPING_TEMPLATE, THUMBNAIL, PRODUCT_MANUAL, SHIPPING_DOCUMENT, SHIPPING_TEMPLATE, ZEBRA_TEMPLATE]
+        [
+                SHIPPING_TEMPLATE,
+                THUMBNAIL,
+                PRODUCT_MANUAL,
+                SHIPPING_DOCUMENT,
+                SHIPPING_TEMPLATE,
+                ZEBRA_TEMPLATE,
+                EMAIL_TEMPLATE,
+        ]
     }
 
 }

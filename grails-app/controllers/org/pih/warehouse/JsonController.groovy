@@ -20,6 +20,7 @@ import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
+import org.pih.warehouse.jobs.SendStockAlertsJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
@@ -57,6 +58,20 @@ class JsonController {
     def inventorySnapshotService
     def forecastingService
     StdScheduler quartzScheduler
+
+
+
+    def triggerStockAlerts = {
+        SendStockAlertsJob.triggerNow([:])
+        flash.message = "Triggered send stock alerts job in background"
+        redirect(controller: "dashboard")
+    }
+
+    def findUsersByLocationRole = {
+        def location = Location.get(params?.location?.id)
+        def users = userService.findUsersByLocationRole(location, RoleType.ROLE_ITEM_ALL_NOTIFICATION)
+        render (users as JSON)
+    }
 
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
