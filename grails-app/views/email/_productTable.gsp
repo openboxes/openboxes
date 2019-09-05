@@ -1,8 +1,20 @@
-<table width="100%">
+<table border="1">
     <thead>
         <tr>
             <th>
                 <g:message code="product.label"/>
+            </th>
+            <th>
+                <g:message code="inventoryLevel.minimumQuantity.label"/>
+            </th>
+            <th>
+                <g:message code="inventoryLevel.minimumQuantity.label"/>
+            </th>
+            <th>
+                <g:message code="inventoryLevel.maximumQuantity.label"/>
+            </th>
+            <th>
+                <g:message code="inventory.previousQuantity.label"/>
             </th>
             <th>
                 <g:message code="default.quantityOnHand.label"/>
@@ -16,7 +28,19 @@
                     ${row.product_code}
                     ${row.product_name}
                 </td>
-                <td>
+                <td style="text-align: center">
+                    ${row.min_quantity}
+                </td>
+                <td style="text-align: center">
+                    ${row.reorder_quantity}
+                </td>
+                <td style="text-align: center">
+                    ${row.max_quantity}
+                </td>
+                <td style="text-align: center">
+                    ${row.previous_quantity}
+                </td>
+                <td style="text-align: center">
                     ${row.current_quantity}
                 </td>
             </tr>

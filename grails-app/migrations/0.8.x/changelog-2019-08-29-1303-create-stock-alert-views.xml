@@ -133,6 +133,7 @@
           bin.name AS bin_name,
           product.id AS product_id,
           product.product_code AS product_code,
+          product.name as product_name,
           inventory_item.id AS inventory_item_id,
           inventory_item.lot_number AS lot_number,
           inventory_item.expiration_date AS expiration_date,
@@ -144,24 +145,6 @@
         JOIN inventory_item on inventory_item.id = inventory_snapshot.inventory_item_id
         JOIN product on inventory_item.product_id = product.id
         WHERE date = (select max(date) from inventory_snapshot);
-      ]]>
-    </createView>
-  </changeSet>
-  <changeSet author="jmiranda (generated)" id="1567101942662-6" runOnChange="true"
-    failOnError="false">
-    <createView viewName="product_inventory_extended_expiry_view" replaceIfExists="true">
-      <![CDATA[
-        select
-          *,
-          CASE WHEN days_until_expiry < 365 then true else false end as under_365,
-          CASE WHEN days_until_expiry < 180 then true else false end as under_180,
-          CASE WHEN days_until_expiry < 90 then true else false end as under_90,
-          CASE WHEN days_until_expiry < 60 then true else false end as under_60,
-          CASE WHEN days_until_expiry < 30 then true else false end as under_30,
-          CASE WHEN days_until_expiry < 14 then true else false end as under_14,
-          CASE WHEN days_until_expiry < 7 then true else false end as under_7,
-          CASE WHEN days_until_expiry <= 0 then true else false end as expired
-        FROM product_inventory_expiry_view
       ]]>
     </createView>
   </changeSet>

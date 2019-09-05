@@ -28,7 +28,7 @@ class NotificationService {
     def getExpiryAlertsByLocation(Location location, Integer daysUntilExpiry = 0) {
         String query = """
             select * 
-            from product_inventory_extended_expiry_view 
+            from product_inventory_expiry_view 
             where days_until_expiry <= ${daysUntilExpiry} 
             and location_id = '${location.id}'
             and quantity_on_hand > 0
@@ -42,7 +42,7 @@ class NotificationService {
             select * 
             from product_inventory_compare_view 
             where location_id = '${location.id}'
-            and current_quantity != previous_quantity
+            order by product_name asc
             """
         return dataService.executeQuery(query)
     }
@@ -54,10 +54,10 @@ class NotificationService {
             log.info "Skipped ${subject} email for location ${location} because there are no alerts"
             return
         }
-        def expiring = expiryAlerts.findAll { it.days_until_expiry > 0 }
-        def expired = expiryAlerts.findAll { it.days_until_expiry <= 0 }
         def subscribers = userService.findUsersByRoleTypes(location, roleTypes)
         def csv = dataService.generateCsv(expiryAlerts)
+        def expired = expiryAlerts.findAll { it.days_until_expiry <= 0 }
+        def expiring = expiryAlerts.findAll { it.days_until_expiry > 0 }
         def model = [location: location, expiring: expiring, expired: expired, daysUntilExpiry: daysUntilExpiry]
         log.info "Sending ${expiryAlerts.size()} ${subject} alerts and ${subscribers.size()} subscribers for location ${location}"
         sendAlerts(subject, "/email/expiryAlerts", model, subscribers, csv)
@@ -97,7 +97,9 @@ class NotificationService {
 
         def renderTagLib = new RenderTagLib()
         String body = renderTagLib.render(template: template, model: model)
-        if (!csv) {
+
+        // Send email with attachment (if csv exists)
+        if (csv) {
             mailService.sendHtmlMailWithAttachment(toList, [], subject, body, csv.bytes, "${subject}.csv", "text/csv")
         }
         else {

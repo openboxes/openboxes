@@ -4,13 +4,13 @@
 </head>
 <body>
     <h1>${location.name}</h1>
-    <h2>Expired</h2>
+    <h2>Expired (${expired?.size()})</h2>
     <p class="lead">
         The following items have expired.
     </p>
     <g:render template="/email/inventoryItemTable" model="[inventoryItems:expired]"/>
 
-    <h2>Expiring Within ${daysUntilExpiry} Days</h2>
+    <h2>Expiring Within ${daysUntilExpiry} Days (${expiring?.size()})</h2>
     <p class="lead">
         The following items will expire within ${daysUntilExpiry} days.
     </p>

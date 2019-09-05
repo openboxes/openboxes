@@ -29,6 +29,7 @@
                 </td>
                 <td>
                     ${row.product_code}
+                    ${row.product_name}
                 </td>
                 <td>
                     ${row.lot_number}
@@ -36,10 +37,10 @@
                 <td>
                     ${row.expiration_date}
                 </td>
-                <td style="text-align: right">
+                <td style="text-align: center">
                     ${row.days_until_expiry}
                 </td>
-                <td style="text-align: right">
+                <td style="text-align: center">
                     ${row.quantity_on_hand}
                 </td>
             </tr>
