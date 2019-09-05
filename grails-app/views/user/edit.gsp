@@ -185,19 +185,6 @@
 
                                 <table>
                                     <tbody>
-                                        <g:isUserAdmin>
-                                            <tr class="prop">
-                                                <td valign="top" class="name">
-                                                    <label for="roles"><warehouse:message code="user.roles.label" /></label>
-                                                </td>
-                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
-                                                    <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
-                                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
-                                                              optionKey="id" value="${userInstance?.roles}"
-                                                              noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
-                                                </td>
-                                            </tr>
-                                        </g:isUserAdmin>
                                         <tr class="prop">
                                             <td valign="top" class="name">
                                                 <label for="email"><warehouse:message code="user.defaultLocation.label" /></label>
@@ -214,6 +201,17 @@
                                             </td>
                                         </tr>
                                         <g:isUserAdmin>
+                                            <tr class="prop">
+                                                <td valign="top" class="name">
+                                                    <label for="roles"><warehouse:message code="user.roles.label" /></label>
+                                                </td>
+                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
+                                                    <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
+                                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
+                                                              optionKey="id" value="${userInstance?.roles}"
+                                                              noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
+                                                </td>
+                                            </tr>
                                             <tr class="prop" id="locationRoles">
                                                 <td valign="top" class="name">
                                                     <label><warehouse:message code="user.locationRoles.label"/></label>
@@ -261,13 +259,14 @@
                                                                         </td>
                                                                         <td>
                                                                             <div class="button-group">
-                                                                                <a href="javascript:void(0);"
+                                                                                <%-- FIXME Temporarily disabled until I can figure out how to edit without causing list index to break --%>
+                                                                                <%--<a href="javascript:void(0);"
                                                                                    class="button btn-show-dialog"
                                                                                    data-title="${g.message(code:'default.edit.label', args: [g.message(code: 'user.locationRole.label')])}"
                                                                                    data-url="${request.contextPath}/user/editLocationRole?id=${locationRole?.id}">
                                                                                     <g:message code="default.button.edit.label" />
-                                                                                </a>
-                                                                                <g:link controller="user" action="deleteLocationRole" id="${locationRole?.id}" class="button">
+                                                                                </a>--%>
+                                                                                <g:link controller="user" action="deleteLocationRole" id="${locationRole?.id}">
                                                                                     <g:message code="default.button.delete.label" />
                                                                                 </g:link>
                                                                             </div>
@@ -286,7 +285,7 @@
                                                         </tbody>
                                                         <tfoot>
                                                             <tr>
-                                                                <td colspan="5">
+                                                                <td colspan="5" class="buttons">
                                                                     <a href="javascript:void(0);"
                                                                        class="button btn-show-dialog"
                                                                        data-title="${g.message(code:'default.add.label', args: [g.message(code: 'user.locationRoles.label')])}"

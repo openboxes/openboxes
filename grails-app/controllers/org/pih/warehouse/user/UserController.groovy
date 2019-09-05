@@ -471,7 +471,7 @@ class UserController {
         else {
             List<LocationRole> locationRoles = LocationRole.findAllByUserAndLocation(user, location)
             roles.each { role ->
-                LocationRole foundLocationRole = locationRoles.find { it.role == role }
+                LocationRole foundLocationRole = locationRoles.find { it.role?.id == role?.id }
                 if (!foundLocationRole) {
                     foundLocationRole = new LocationRole()
                     foundLocationRole.role = role

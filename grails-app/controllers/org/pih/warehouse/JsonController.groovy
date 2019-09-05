@@ -59,12 +59,6 @@ class JsonController {
     def forecastingService
     StdScheduler quartzScheduler
 
-    def findUsersByLocationRole = {
-        def location = Location.get(params?.location?.id)
-        def users = userService.findUsersByLocationRole(location, RoleType.ROLE_ITEM_ALL_NOTIFICATION)
-        render (users as JSON)
-    }
-
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
         if (indicator) {

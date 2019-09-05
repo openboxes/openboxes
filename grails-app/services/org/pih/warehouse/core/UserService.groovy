@@ -264,9 +264,8 @@ class UserService {
 
     def findUsersByRoleTypes(Location location, List<RoleType> roleTypes) {
         def users = []
-        def userRoles = Role.findAllByRoleTypeInList(roleTypes)
-        def roleIds = userRoles.collect { it.id }
-        log.info ("roles: " + roleIds)
+        def roleList = Role.findAllByRoleTypeInList(roleTypes)
+        def roleIds = roleList.collect { it.id }
         if (roleIds) {
             users = User.createCriteria().listDistinct {
                 eq("active", true)
