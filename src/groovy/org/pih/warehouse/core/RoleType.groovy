@@ -30,13 +30,12 @@ enum RoleType {
     ROLE_USER_NOTIFICATION('User Notifications', 100),
 
     // Notification roles for stock alerts
-    ROLE_ITEM_ALL_NOTIFICATION('All Item Notifications', 100),
-    ROLE_ITEM_EXPIRING_NOTIFICATION('Expiring Item Notifications', 100),
-    ROLE_ITEM_EXPIRED_NOTIFICATION('Expired Item Notifications', 100),
+    ROLE_ITEM_ALL_NOTIFICATION('All Stock Notifications', 100),
+    ROLE_ITEM_EXPIRY_NOTIFICATION('Expiry Notifications', 100),
     ROLE_ITEM_OVERSTOCK_NOTIFICATION('Overstock Notifications', 100),
-    ROLE_ITEM_REORDER_NOTIFICATION('Reorder Item Notifications', 100),
-    ROLE_ITEM_LOW_STOCK_NOTIFICATION('Low Stock Item Notifications', 100),
-    ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION('Out of Stock Item Notifications', 100),
+    ROLE_ITEM_REORDER_NOTIFICATION('Reorder Notifications', 100),
+    ROLE_ITEM_LOW_STOCK_NOTIFICATION('Low Stock Notifications', 100),
+    ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION('Out of Stock Notifications', 100),
 
 
     // Employee role types
@@ -105,7 +104,12 @@ enum RoleType {
                 ROLE_PRODUCT_NOTIFICATION,
                 ROLE_ORDER_NOTIFICATION,
                 ROLE_SHIPMENT_NOTIFICATION,
-                ROLE_ITEM_ALL_NOTIFICATION
+                ROLE_ITEM_ALL_NOTIFICATION,
+                ROLE_ITEM_EXPIRY_NOTIFICATION,
+                ROLE_ITEM_OVERSTOCK_NOTIFICATION,
+                ROLE_ITEM_REORDER_NOTIFICATION,
+                ROLE_ITEM_LOW_STOCK_NOTIFICATION,
+                ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION
         ]
     }
 
@@ -122,8 +126,8 @@ enum RoleType {
 
     static listStockNotifications() {
         [
-                ROLE_ITEM_EXPIRING_NOTIFICATION,
-                ROLE_ITEM_EXPIRED_NOTIFICATION,
+                ROLE_ITEM_ALL_NOTIFICATION,
+                ROLE_ITEM_EXPIRY_NOTIFICATION,
                 ROLE_ITEM_OVERSTOCK_NOTIFICATION,
                 ROLE_ITEM_REORDER_NOTIFICATION,
                 ROLE_ITEM_LOW_STOCK_NOTIFICATION,
@@ -132,6 +136,12 @@ enum RoleType {
     }
 
     static listPrimaryRoleTypes() {
-        [ROLE_BROWSER, ROLE_ASSISTANT, ROLE_MANAGER, ROLE_ADMIN, ROLE_SUPERUSER]
+        [
+                ROLE_BROWSER,
+                ROLE_ASSISTANT,
+                ROLE_MANAGER,
+                ROLE_ADMIN,
+                ROLE_SUPERUSER
+        ]
     }
 }

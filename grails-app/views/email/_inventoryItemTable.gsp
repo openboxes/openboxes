@@ -1,4 +1,4 @@
-<table>
+<table width="100%" border="1">
     <thead>
         <tr>
             <th>
@@ -36,14 +36,21 @@
                 <td>
                     ${row.expiration_date}
                 </td>
-                <td>
+                <td style="text-align: right">
                     ${row.days_until_expiry}
                 </td>
-                <td>
+                <td style="text-align: right">
                     ${row.quantity_on_hand}
                 </td>
             </tr>
         </g:each>
+        <g:unless test="${inventoryItems}">
+            <tr>
+                <td colspan="6" style="text-align: center">
+                    <g:message code="default.noResults.label"/>
+                </td>
+            </tr>
+        </g:unless>
     </tbody>
 </table>
 

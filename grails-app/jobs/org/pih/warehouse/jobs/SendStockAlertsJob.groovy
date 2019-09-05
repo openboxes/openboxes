@@ -12,6 +12,7 @@ package org.pih.warehouse.jobs
 import groovyx.gpars.GParsPool
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.quartz.JobExecutionContext
 
 class SendStockAlertsJob {
@@ -27,7 +28,8 @@ class SendStockAlertsJob {
 
         log.info "Executing ${this.class} at ${new Date()}"
         Boolean enabled = Boolean.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.enabled)
-        Integer daysUntilExpiry = grailsApplication.config.openboxes.jobs.sendStockAlertsJob.daysUntilExpiry?:60
+        Boolean skipOnEmpty = Boolean.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.skipOnEmpty)
+        Integer daysUntilExpiry = Integer.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.daysUntilExpiry?:60)
 
         if (enabled) {
             def startTime = System.currentTimeMillis()
@@ -36,9 +38,17 @@ class SendStockAlertsJob {
                 def depotLocations = locationService.getDepots()
                 depotLocations.eachParallel { Location location ->
                     if (location.active && location.supports(ActivityCode.ENABLE_NOTIFICATIONS)) {
-                        notificationService.sendExpiryAlertsByLocation(location, daysUntilExpiry)
-                    }
-                    else {
+                        notificationService.sendExpiryAlerts(location, daysUntilExpiry,
+                                [RoleType.ROLE_ITEM_ALL_NOTIFICATION, RoleType.ROLE_ITEM_EXPIRY_NOTIFICATION], skipOnEmpty)
+                        notificationService.sendStockAlerts(location, "out_of_stock",
+                                [RoleType.ROLE_ITEM_ALL_NOTIFICATION, RoleType.ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION], skipOnEmpty)
+                        notificationService.sendStockAlerts(location, "low_stock",
+                                [RoleType.ROLE_ITEM_ALL_NOTIFICATION, RoleType.ROLE_ITEM_LOW_STOCK_NOTIFICATION], skipOnEmpty)
+                        notificationService.sendStockAlerts(location, "reorder_stock",
+                                [RoleType.ROLE_ITEM_ALL_NOTIFICATION, RoleType.ROLE_ITEM_REORDER_NOTIFICATION], skipOnEmpty)
+                        notificationService.sendStockAlerts(location, "over_stock",
+                                [RoleType.ROLE_ITEM_ALL_NOTIFICATION, RoleType.ROLE_ITEM_OVERSTOCK_NOTIFICATION], skipOnEmpty)
+                    } else {
                         log.warn "Notifications disabled for ${location.name}"
                     }
                 }

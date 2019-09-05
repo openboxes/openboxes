@@ -1,6 +1,6 @@
 <html>
 <head>
-
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
     <h1>Expired</h1>
@@ -14,6 +14,5 @@
         The following items will expire within ${daysUntilExpiry} days.
     </p>
     <g:render template="/email/inventoryItemTable" model="[inventoryItems:expiring]"/>
-
 </body>
 </html>

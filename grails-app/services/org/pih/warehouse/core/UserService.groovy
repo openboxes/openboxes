@@ -262,20 +262,21 @@ class UserService {
         return users
     }
 
-    def findUsersByLocationRole(Location location, RoleType roleType) {
+    def findUsersByRoleTypes(Location location, List<RoleType> roleTypes) {
         def users = []
-        def role = Role.findByRoleType(roleType)
-        if (role) {
-            def criteria = User.createCriteria()
-            users = criteria.listDistinct {
+        def userRoles = Role.findAllByRoleTypeInList(roleTypes)
+        def roleIds = userRoles.collect { it.id }
+        log.info ("roles: " + roleIds)
+        if (roleIds) {
+            users = User.createCriteria().listDistinct {
                 eq("active", true)
                 or {
                     roles {
-                        eq("id", role.id)
+                        'in'("id", roleIds)
                     }
                     if (location) {
                         locationRoles {
-                            'in'("role.id", role.id)
+                            'in'("role.id", roleIds)
                             eq("location.id", location.id)
                         }
                     }

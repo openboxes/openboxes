@@ -13,6 +13,7 @@ import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 
@@ -29,22 +30,61 @@ class NotificationService {
             select * 
             from product_inventory_extended_expiry_view 
             where days_until_expiry <= ${daysUntilExpiry} 
-            and facility_id = '${location.id}'
+            and location_id = '${location.id}'
             and quantity_on_hand > 0
             order by days_until_expiry asc
             """
         return dataService.executeQuery(query)
     }
 
-    def sendExpiryAlertsByLocation(Location location, Integer daysUntilExpiry) {
-        def expiryAlerts = getExpiryAlertsByLocation(location, daysUntilExpiry)
-        def subscribers = userService.findUsersByLocationRole(location, RoleType.ROLE_ITEM_ALL_NOTIFICATION)
-        log.info "Sending ${expiryAlerts.size()} alerts and ${subscribers.size()} subscribers for location ${location} "
+    def getStockAlertsByLocation(Location location) {
+        String query = """
+            select * 
+            from product_inventory_compare_view 
+            where location_id = '${location.id}'
+            and current_quantity != previous_quantity
+            """
+        return dataService.executeQuery(query)
+    }
 
-        // Render template
-        //String templateContent = "${'<h1>Expiry Alert</h1>${data}'}"
-        //String body = templateService.renderTemplate(templateContent, "Expiry Alerts", [data:expiryAlerts])
-        //def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+    def sendExpiryAlerts(Location location, Integer daysUntilExpiry = 60, List<RoleType> roleTypes, Boolean skipOnEmpty) {
+        def subject = "Expiry Alerts"
+        def expiryAlerts = getExpiryAlertsByLocation(location, daysUntilExpiry)
+        if (expiryAlerts.isEmpty() && skipOnEmpty) {
+            log.info "Skipped ${subject} email for location ${location} because there are no alerts"
+            return
+        }
+        def expiring = expiryAlerts.findAll { it.days_until_expiry > 0 }
+        def expired = expiryAlerts.findAll { it.days_until_expiry <= 0 }
+        def subscribers = userService.findUsersByRoleTypes(location, roleTypes)
+        def csv = dataService.generateCsv(expiryAlerts)
+        def model = [location: location, expiring: expiring, expired: expired, daysUntilExpiry: daysUntilExpiry]
+        log.info "Sending ${expiryAlerts.size()} alerts and ${subscribers.size()} subscribers for location ${location}"
+        sendAlerts(subject, "/email/expiryAlerts", model, subscribers, csv)
+    }
+
+    def sendStockAlerts(Location location, String status, List<RoleType> roleTypes, Boolean skipOnEmpty) {
+        def subject = "Stock Alerts - ${status}"
+        def stockAlerts = getStockAlertsByLocation(location)
+        def products = stockAlerts.findAll { it.status == status }
+        if (products.isEmpty() && skipOnEmpty) {
+            log.info "Skipped ${subject} email for location ${location} because there are no alerts"
+            return
+        }
+        def subscribers = userService.findUsersByRoleTypes(location, roleTypes)
+        def model = [location: location, status: status, products: products]
+        def csv = dataService.generateCsv(products)
+        log.info "Sending ${products.size()} alerts and ${subscribers.size()} subscribers for location ${location} "
+        sendAlerts(subject, "/email/stockAlerts", model, subscribers, csv)
+    }
+
+    def sendAlerts(String subject, String template, Map model, List<User> subscribers, String csv) {
+
+        Collection toList = subscribers.collect { it.email }.findAll{ it != null }.toArray()
+        if (toList.isEmpty()) {
+            log.info("Skipped ${subject} email because there are no subscribers")
+            return
+        }
 
         // FIXME Need to fix this when we migrate to grails 3
         // Hack to ensure that the GSP template engine has access to a request.
@@ -55,18 +95,16 @@ class NotificationService {
             grails.util.GrailsWebUtil.bindMockWebRequest(applicationContext)
         }
 
-        def expiring = expiryAlerts.findAll {it.days_until_expiry > 0}
-        def expired = expiryAlerts.findAll {it.days_until_expiry <= 0}
         def renderTagLib = new RenderTagLib()
-        String body = renderTagLib.render(template: "/email/expiryAlerts",
-                model: [location: location, expiring: expiring, expired:expired, daysUntilExpiry: daysUntilExpiry])
-
-        // Send email
-        if (subscribers) {
-            Collection toList = subscribers.collect { it.email }.findAll{ it != null }.toArray()
-            mailService.sendHtmlMail("Expiry Alerts", "${body}",  toList)
+        String body = renderTagLib.render(template: template, model: model)
+        if (!csv) {
+            mailService.sendHtmlMailWithAttachment(toList, [], subject, body, csv.bytes, "${subject}.csv", "text/csv")
+        }
+        else {
+            mailService.sendHtmlMail(subject, body, toList)
         }
 
-
     }
+
+
 }
