@@ -321,7 +321,7 @@ class ReceivingPage extends Component {
           mutators={{ ...arrayMutators }}
           initialValues={formData}
           render={({ handleSubmit, values, form }) => (
-            <div>
+            <div className="main-container">
               {values.shipment && values.shipment.shipmentNumber &&
               <h2 className="my-2 text-center">
                 {`${values.shipment.shipmentNumber} ${values.shipment.name}`}

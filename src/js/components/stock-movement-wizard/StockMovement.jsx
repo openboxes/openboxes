@@ -262,7 +262,7 @@ class StockMovements extends Component {
     const stepList = this.getStepList(values.statusCode);
 
     return (
-      <div>
+      <div className="content-wrap">
         <div>
           <WizardSteps steps={stepList} currentStep={page} />
         </div>
