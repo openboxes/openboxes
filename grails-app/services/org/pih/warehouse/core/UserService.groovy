@@ -329,10 +329,4 @@ class UserService {
         }
         return false
     }
-
-
-    def findUserInRoles(Location location, RoleType roleType) {
-
-    }
-
 }

@@ -23,14 +23,9 @@ class TemplateService {
         renderTemplate(templateContent, document.name, model)
     }
 
-
     String renderTemplate(String templateContent, String pageName, Map model) {
-
         Template template =
                 groovyPagesTemplateEngine.createTemplate(templateContent, pageName)
-
-        log.info "Template content: " + templateContent
-        log.info "Model: " + model
 
         Writable renderedTemplate = template.make(model)
         StringWriter stringWriter = new StringWriter()
