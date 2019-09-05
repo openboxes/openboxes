@@ -25,7 +25,6 @@ class RefreshInventorySnapshotJob {
 
     def execute(JobExecutionContext context) {
 
-        log.info "Executing ${this.class} at ${new Date()}"
         Boolean enabled = grailsApplication.config.openboxes.jobs.refreshInventorySnapshotJob.enabled
         if (enabled) {
             log.info("Refresh inventory snapshots with data: " + context.mergedJobDataMap)
