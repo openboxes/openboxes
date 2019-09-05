@@ -185,19 +185,6 @@
 
                                 <table>
                                     <tbody>
-                                        <g:isUserAdmin>
-                                            <tr class="prop">
-                                                <td valign="top" class="name">
-                                                    <label for="roles"><warehouse:message code="user.roles.label" /></label>
-                                                </td>
-                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
-                                                    <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
-                                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
-                                                              optionKey="id" value="${userInstance?.roles}"
-                                                              noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
-                                                </td>
-                                            </tr>
-                                        </g:isUserAdmin>
                                         <tr class="prop">
                                             <td valign="top" class="name">
                                                 <label for="email"><warehouse:message code="user.defaultLocation.label" /></label>
@@ -214,6 +201,17 @@
                                             </td>
                                         </tr>
                                         <g:isUserAdmin>
+                                            <tr class="prop">
+                                                <td valign="top" class="name">
+                                                    <label for="roles"><warehouse:message code="user.roles.label" /></label>
+                                                </td>
+                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
+                                                    <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
+                                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
+                                                              optionKey="id" value="${userInstance?.roles}"
+                                                              noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
+                                                </td>
+                                            </tr>
                                             <tr class="prop" id="locationRoles">
                                                 <td valign="top" class="name">
                                                     <label><warehouse:message code="user.locationRoles.label"/></label>
@@ -222,9 +220,9 @@
                                                     <table>
                                                         <thead>
                                                             <tr class="odd">
+                                                                <th><warehouse:message code="location.label"/></th>
                                                                 <th><warehouse:message code="location.locationGroup.label"/></th>
                                                                 <th><warehouse:message code="location.locationType.label"/></th>
-                                                                <th><warehouse:message code="location.label"/></th>
                                                                 <th><warehouse:message code="user.role.label"/></th>
                                                                 <th><g:message code="default.actions.label"/></th>
                                                             </tr>
@@ -238,17 +236,17 @@
                                                                     <tr class="${status%2==0?'even':'odd'} ${inactive?'fade':''}">
                                                                         <td>
                                                                             <g:if test="${innerStatus==0}">
+                                                                            ${locationRole?.location?.name}
+                                                                            </g:if>
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:if test="${innerStatus==0}">
                                                                             ${locationRole?.location?.locationGroup?.name}
                                                                             </g:if>
                                                                         </td>
                                                                         <td>
                                                                             <g:if test="${innerStatus==0}">
                                                                             <format:metadata obj="${locationRole?.location?.locationType}"/>
-                                                                            </g:if>
-                                                                        </td>
-                                                                        <td>
-                                                                            <g:if test="${innerStatus==0}">
-                                                                            ${locationRole?.location?.name}
                                                                             </g:if>
                                                                         </td>
                                                                         <td>
@@ -261,13 +259,14 @@
                                                                         </td>
                                                                         <td>
                                                                             <div class="button-group">
-                                                                                <a href="javascript:void(0);"
+                                                                                <%-- FIXME Temporarily disabled until I can figure out how to edit without causing list index to break --%>
+                                                                                <%--<a href="javascript:void(0);"
                                                                                    class="button btn-show-dialog"
                                                                                    data-title="${g.message(code:'default.edit.label', args: [g.message(code: 'user.locationRole.label')])}"
                                                                                    data-url="${request.contextPath}/user/editLocationRole?id=${locationRole?.id}">
                                                                                     <g:message code="default.button.edit.label" />
-                                                                                </a>
-                                                                                <g:link controller="user" action="deleteLocationRole" id="${locationRole?.id}" class="button">
+                                                                                </a>--%>
+                                                                                <g:link controller="user" action="deleteLocationRole" id="${locationRole?.id}">
                                                                                     <g:message code="default.button.delete.label" />
                                                                                 </g:link>
                                                                             </div>
@@ -277,22 +276,27 @@
                                                             </g:each>
                                                             <g:unless test="${userInstance.locationRoles}">
                                                                 <tr>
-                                                                    <td colspan="4" class="empty fade center">
+                                                                    <td colspan="5" class="empty fade center">
                                                                         <g:message code="default.results.message"
                                                                                    args="[userInstance?.locationRoles?.size()?:0, g.message(code:'user.locationRoles.label')]"/>
                                                                     </td>
                                                                 </tr>
                                                             </g:unless>
                                                         </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td colspan="5" class="buttons">
+                                                                    <a href="javascript:void(0);"
+                                                                       class="button btn-show-dialog"
+                                                                       data-title="${g.message(code:'default.add.label', args: [g.message(code: 'user.locationRoles.label')])}"
+                                                                       data-url="${request.contextPath}/user/createLocationRoles?user.id=${userInstance?.id}">
+                                                                        <g:message code="default.add.label" args="[g.message(code: 'user.locationRoles.label')]"/>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tfoot>
                                                     </table>
-                                                    <div class="buttons">
-                                                        <a href="javascript:void(0);"
-                                                           class="button btn-show-dialog"
-                                                           data-title="${g.message(code:'default.add.label', args: [g.message(code: 'user.locationRoles.label')])}"
-                                                           data-url="${request.contextPath}/user/createLocationRoles?user.id=${userInstance?.id}">
-                                                            <g:message code="default.add.label" args="[g.message(code: 'user.locationRoles.label')]"/>
-                                                        </a>
-                                                    </div>
+
 
                                                 </td>
                                             </tr>

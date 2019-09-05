@@ -7,29 +7,12 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.core
+package org.pih.warehouse.inventory
 
-enum DocumentCode {
+import org.springframework.context.ApplicationEvent
 
-    IMAGE,
-    THUMBNAIL,
-    PRODUCT_MANUAL,
-    SHIPPING_DOCUMENT,
-    SHIPPING_TEMPLATE,
-    ZEBRA_TEMPLATE,
-    EMAIL_TEMPLATE,
-
-    static list() {
-        [
-                SHIPPING_TEMPLATE,
-                THUMBNAIL,
-                PRODUCT_MANUAL,
-                SHIPPING_DOCUMENT,
-                SHIPPING_TEMPLATE,
-                ZEBRA_TEMPLATE,
-                EMAIL_TEMPLATE,
-        ]
+class TransactionEvent extends ApplicationEvent {
+    TransactionEvent(Transaction source) {
+        super(source)
     }
-
 }
-

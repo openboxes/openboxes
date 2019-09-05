@@ -276,18 +276,19 @@
                             </table>
                         </div>
                     </div>
-
-
                     <div id="tabs-6">
-
                         <div class="box">
-
                             <h2> ${quartzScheduler.schedulerName} ${quartzScheduler.schedulerInstanceId}</h2>
-                            <div class="message">
-                                <pre>${quartzScheduler.metaData}</pre>
-                            </div>
-
                             <table>
+                                <tr class="prop">
+                                    <td class="name">
+                                        <label><warehouse:message code="jobs.scheduler.metadata.label" default="Scheduler Metadata"/></label>
+                                    </td>
+                                    <td class="value">
+                                        <pre>${quartzScheduler.metaData}</pre>
+                                    </td>
+                                </tr>
+
                                 <g:each var="externalProperty" in="${externalConfigProperties}" >
                                     <g:each var="property" in="${externalProperty}">
                                         <g:if test="${property?.key?.contains('jobs')}">
@@ -307,29 +308,48 @@
                                         </g:if>
                                     </g:each>
                                 </g:each>
-
-
                                 <tr class="prop">
                                     <td class="name">
                                         <label>
-                                            <warehouse:message code="admin.calculateHistoricalQuantityJob.status" default="Calculate Historical Quantity Job Status"></warehouse:message>
+                                            <warehouse:message code="admin.calculateHistoricalQuantityJob.status"
+                                                               default="Calculate Historical Quantity Job Status">
+                                            </warehouse:message>
                                         </label>
                                     </td>
                                     <td class="value">
-                                        <span id="jobStatus">unknown</span>
+                                        <span id="jobStatus"></span>
                                         <g:remoteLink class="button" controller="json" action="statusCalculateHistoricalQuantityJob" update="jobStatus">Show Status</g:remoteLink>
                                         <g:remoteLink class="button" controller="json" action="enableCalculateHistoricalQuantityJob">Enable</g:remoteLink>
                                         <g:remoteLink class="button" controller="json" action="disableCalculateHistoricalQuantityJob">Disable</g:remoteLink>
 
                                     </td>
                                 </tr>
+                                <tr class="prop">
+                                    <td class="name">
+                                        <label>
+                                            <warehouse:message code="jobs.sendStockAlertsJob.label"
+                                                               default="Send Stock Alerts Job">
+                                            </warehouse:message>
+                                        </label>
+                                    </td>
+                                    <td class="value">
+                                        <g:link class="button" controller="admin" action="triggerStockAlerts">
+                                            <warehouse:message code="default.button.trigger.label" default="Trigger"/>
+                                        </g:link>
+                                    </td>
+                                </tr>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="buttons">
+                                                <g:link controller="jobs" action="index" class="button">
+                                                    ${g.message(code:'jobs.backgroundJobs.label', default: 'Background Jobs')}
+                                                </g:link>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
                             </table>
-
-
-                            <div class="buttons">
-                                <g:link controller="jobs" action="index" class="button">${g.message(code:'backgroundJobs.label', default: 'Background Jobs')}</g:link>
-                            </div>
-
                         </div>
                     </div>
                     <div id="tabs-7">

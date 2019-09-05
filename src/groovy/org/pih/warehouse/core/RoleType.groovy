@@ -20,12 +20,23 @@ enum RoleType {
 
     // Complementary roles that provide additional functionality
     ROLE_FINANCE('Financial User', 100),
-    ROLE_USER_NOTIFICATION('User Notification Recipient', 100),
-    ROLE_PRODUCT_NOTIFICATION('Product Notification Recipient', 100),
-    ROLE_ORDER_NOTIFICATION('Order Notification Recipient', 100),
-    ROLE_SHIPMENT_NOTIFICATION('Shipment Notification Recipient', 100),
-    ROLE_FEEDBACK_NOTIFICATION('Feedback Notification Recipient', 100),
-    ROLE_ERROR_NOTIFICATION('Error Notification Recipient', 100),
+
+    // Notification roles for general system events
+    ROLE_ERROR_NOTIFICATION('Error Notification', 100),
+    ROLE_FEEDBACK_NOTIFICATION('Feedback Notifications', 100),
+    ROLE_PRODUCT_NOTIFICATION('Product Notifications', 100),
+    ROLE_ORDER_NOTIFICATION('Order Notifications', 100),
+    ROLE_SHIPMENT_NOTIFICATION('Shipment Notifications', 100),
+    ROLE_USER_NOTIFICATION('User Notifications', 100),
+
+    // Notification roles for stock alerts
+    ROLE_ITEM_ALL_NOTIFICATION('All Stock Notifications', 100),
+    ROLE_ITEM_EXPIRY_NOTIFICATION('Expiry Notifications', 100),
+    ROLE_ITEM_OVERSTOCK_NOTIFICATION('Overstock Notifications', 100),
+    ROLE_ITEM_REORDER_NOTIFICATION('Reorder Notifications', 100),
+    ROLE_ITEM_LOW_STOCK_NOTIFICATION('Low Stock Notifications', 100),
+    ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION('Out of Stock Notifications', 100),
+
 
     // Employee role types
     ROLE_EMPLOYEE('Employee', 50),
@@ -81,11 +92,56 @@ enum RoleType {
         return list().findAll { it.sortOrder <= roleType.sortOrder }
     }
 
-	static list() {
-		[ROLE_BROWSER, ROLE_ASSISTANT, ROLE_MANAGER, ROLE_ADMIN, ROLE_SUPERUSER, ROLE_FINANCE, ROLE_USER_NOTIFICATION, ROLE_PRODUCT_NOTIFICATION, ROLE_ORDER_NOTIFICATION, ROLE_SHIPMENT_NOTIFICATION]
-	}
+    static list() {
+        [
+                ROLE_BROWSER,
+                ROLE_ASSISTANT,
+                ROLE_MANAGER,
+                ROLE_ADMIN,
+                ROLE_SUPERUSER,
+                ROLE_FINANCE,
+                ROLE_USER_NOTIFICATION,
+                ROLE_PRODUCT_NOTIFICATION,
+                ROLE_ORDER_NOTIFICATION,
+                ROLE_SHIPMENT_NOTIFICATION,
+                ROLE_ITEM_ALL_NOTIFICATION,
+                ROLE_ITEM_EXPIRY_NOTIFICATION,
+                ROLE_ITEM_OVERSTOCK_NOTIFICATION,
+                ROLE_ITEM_REORDER_NOTIFICATION,
+                ROLE_ITEM_LOW_STOCK_NOTIFICATION,
+                ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION
+        ]
+    }
+
+    static listSystemNotifications() {
+        [
+                ROLE_ERROR_NOTIFICATION,
+                ROLE_FEEDBACK_NOTIFICATION,
+                ROLE_PRODUCT_NOTIFICATION,
+                ROLE_ORDER_NOTIFICATION,
+                ROLE_SHIPMENT_NOTIFICATION,
+                ROLE_USER_NOTIFICATION,
+        ]
+    }
+
+    static listStockNotifications() {
+        [
+                ROLE_ITEM_ALL_NOTIFICATION,
+                ROLE_ITEM_EXPIRY_NOTIFICATION,
+                ROLE_ITEM_OVERSTOCK_NOTIFICATION,
+                ROLE_ITEM_REORDER_NOTIFICATION,
+                ROLE_ITEM_LOW_STOCK_NOTIFICATION,
+                ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION
+        ]
+    }
 
     static listPrimaryRoleTypes() {
-        [ROLE_BROWSER, ROLE_ASSISTANT, ROLE_MANAGER, ROLE_ADMIN, ROLE_SUPERUSER]
+        [
+                ROLE_BROWSER,
+                ROLE_ASSISTANT,
+                ROLE_MANAGER,
+                ROLE_ADMIN,
+                ROLE_SUPERUSER
+        ]
     }
 }

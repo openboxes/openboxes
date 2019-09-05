@@ -11,8 +11,8 @@ import util.LiquibaseUtil
 @DisallowConcurrentExecution
 class CalculateQuantityJob {
 
+    def concurrent = false
     def inventorySnapshotService
-    def mailService
 
     // cron job needs to be triggered after the staging deployment
     static triggers = {

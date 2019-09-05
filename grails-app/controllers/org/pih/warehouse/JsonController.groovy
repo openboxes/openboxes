@@ -20,6 +20,7 @@ import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
+import org.pih.warehouse.jobs.SendStockAlertsJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category

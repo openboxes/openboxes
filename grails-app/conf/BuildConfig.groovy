@@ -71,6 +71,7 @@ grails.project.dependency.resolution = {
         compile "fr.w3blog:zebra-zpl:0.0.3"
 
         // Required by rendering plugin (NoClassDefFoundError: org/springframework/mock/web/MockHttpServletRequest)
+        // and also for the SendStockAlertsJob which needs to use the GSP template engine
         runtime 'org.springframework:spring-test:3.0.5.RELEASE'
 
         // Required for functional tests
@@ -146,6 +147,7 @@ grails.project.dependency.resolution = {
         compile(":springcache:1.3.1")
         compile(":webflow:1.3.8")
         compile(":yui:2.8.2.1")
+        compile(":spring-events:1.2")
         //compile(":bubbling:2.1.4")
 
         // Not critical to application (might require code changes)

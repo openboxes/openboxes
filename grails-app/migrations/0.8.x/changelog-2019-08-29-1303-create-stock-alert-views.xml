@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda (generated)" id="1567101942662-0">
+    <comment>Add new notification roles</comment>
+    <insert tableName="role">
+      <column name="id" value="ff8081816cdefc9d016cdf09a9ee0001"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="name" value="All Stock Notifications"/>
+      <column name="description" value="Role that represents users who should receive notifications about orders."/>
+      <column name="role_type" value="ROLE_ITEM_ALL_NOTIFICATION"/>
+    </insert>
+    <insert tableName="role">
+      <column name="id" value="ff8081816cfeeaf0016cff174ca70001"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="name" value="Expiry Notifications"/>
+      <column name="description" value="Role that represents users who should receive notifications about expiring/expired items."/>
+      <column name="role_type" value="ROLE_ITEM_EXPIRY_NOTIFICATION"/>
+    </insert>
+    <insert tableName="role">
+      <column name="id" value="ff8081816cfeeaf0016cff18057e0002"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="name" value="Overstock Notifications"/>
+      <column name="description" value="Role that represents users who should receive notifications about overstocked items."/>
+      <column name="role_type" value="ROLE_ITEM_OVERSTOCK_NOTIFICATION"/>
+    </insert>
+    <insert tableName="role">
+      <column name="id" value="ff8081816cfeeaf0016cff1834080003"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="name" value="Reorder Notifications"/>
+      <column name="description" value="Role that represents users who should receive notifications about reorder items."/>
+      <column name="role_type" value="ROLE_ITEM_REORDER_NOTIFICATION"/>
+    </insert>
+    <insert tableName="role">
+      <column name="id" value="ff8081816cfeeaf0016cff18617d0004"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="name" value="Low Stock Notifications"/>
+      <column name="description" value="Role that represents users who should receive notifications about low stock items."/>
+      <column name="role_type" value="ROLE_ITEM_LOW_STOCK_NOTIFICATION"/>
+    </insert>
+    <insert tableName="role">
+      <column name="id" value="ff8081816cfeeaf0016cff1b6e780005"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="name" value="Out of Stock Notifications"/>
+      <column name="description" value="Role that represents users who should receive notifications about stockouts."/>
+      <column name="role_type" value="ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION"/>
+    </insert>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1567101942662-1" runOnChange="true"
+    failOnError="false">
+    <createView viewName="product_inventory_snapshot_view" replaceIfExists="true">
+      <![CDATA[
+        SELECT
+          inventory_snapshot.product_id AS product_id,
+          inventory_snapshot.location_id AS location_id,
+          inventory_snapshot.date AS date,
+        SUM(inventory_snapshot.quantity_on_hand) AS quantity_on_hand
+        FROM inventory_snapshot
+        WHERE date BETWEEN timestamp(current_date) AND timestamp(current_date+1)
+        GROUP BY date, location_id, product_id
+      ]]>
+    </createView>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1567101942662-2" runOnChange="true"
+    failOnError="false">
+    <createView viewName="product_inventory_extended_view" replaceIfExists="true">
+      <![CDATA[
+        SELECT
+          product_inventory_snapshot_view.product_id AS product_id,
+          product_inventory_snapshot_view.location_id AS location_id,
+          product_inventory_snapshot_view.date AS date,
+          CASE WHEN date = timestamp(current_date) THEN quantity_on_hand END AS previous_quantity,
+          CASE WHEN date = timestamp(current_date+1) THEN quantity_on_hand END AS current_quantity
+        FROM product_inventory_snapshot_view
+      ]]>
+    </createView>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1567101942662-3" runOnChange="true"
+    failOnError="false">
+    <createView viewName="product_inventory_pivot_view" replaceIfExists="true">
+      <![CDATA[
+        SELECT
+          product_id,
+          location_id,
+          sum(previous_quantity) AS previous_quantity,
+          sum(current_quantity) AS current_quantity
+        FROM product_inventory_extended_view
+        GROUP BY product_id, location_id
+      ]]>
+    </createView>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1567101942662-4" runOnChange="true"
+    failOnError="false">
+    <createView viewName="product_inventory_compare_view" replaceIfExists="true">
+      <![CDATA[
+        SELECT
+          product.id as product_id,
+          product.product_code,
+          product.name as product_name,
+		      location.id as location_id,
+          location.name as location_name,
+          case
+            when current_quantity <= 0 then "out_of_stock"
+            when current_quantity <= min_quantity and min_quantity != 0 then "low_stock"
+            when current_quantity <= reorder_quantity and reorder_quantity != 0 then "reorder_stock"
+            when current_quantity >= max_quantity and max_quantity != 0 then "over_stock"
+            else "in_stock"
+          end as status,
+          coalesce(inventory_level.min_quantity, 0) as min_quantity,
+          coalesce(inventory_level.reorder_quantity, 0) as reorder_quantity,
+          coalesce(inventory_level.max_quantity, 0) as max_quantity,
+          product_inventory_pivot_view.previous_quantity,
+          product_inventory_pivot_view.current_quantity
+        FROM product_inventory_pivot_view
+        JOIN product on product.id = product_inventory_pivot_view.product_id
+        JOIN location on location.id = product_inventory_pivot_view.location_id
+        LEFT JOIN inventory_level on (inventory_level.product_id = product.id
+          AND inventory_level.inventory_id = location.inventory_id)
+      ]]>
+    </createView>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1567101942662-5" runOnChange="true"
+    failOnError="false">
+    <createView viewName="product_inventory_expiry_view" replaceIfExists="true">
+      <![CDATA[
+        SELECT
+          location.id AS location_id,
+          location.name AS location_name,
+          bin.id AS bin_id,
+          bin.name AS bin_name,
+          product.id AS product_id,
+          product.product_code AS product_code,
+          product.name as product_name,
+          inventory_item.id AS inventory_item_id,
+          inventory_item.lot_number AS lot_number,
+          inventory_item.expiration_date AS expiration_date,
+          datediff(inventory_item.expiration_date, now()) as days_until_expiry,
+          quantity_on_hand
+        FROM inventory_snapshot
+        JOIN location on inventory_snapshot.location_id = location.id
+        LEFT JOIN location bin on inventory_snapshot.bin_location_id = bin.id
+        JOIN inventory_item on inventory_item.id = inventory_snapshot.inventory_item_id
+        JOIN product on inventory_item.product_id = product.id
+        WHERE date = (select max(date) from inventory_snapshot);
+      ]]>
+    </createView>
+  </changeSet>
+</databaseChangeLog>
