@@ -401,7 +401,8 @@
         $(".tabs").tabs({
             cookie : {
                 expires : 1
-            }
+            },
+            selected: ${stockMovement?.shipment?.currentStatus >= ShipmentStatusCode.SHIPPED} ? 1 : 0
         });
     });
 </script>
