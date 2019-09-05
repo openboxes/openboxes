@@ -59,14 +59,6 @@ class JsonController {
     def forecastingService
     StdScheduler quartzScheduler
 
-
-
-    def triggerStockAlerts = {
-        SendStockAlertsJob.triggerNow([:])
-        flash.message = "Triggered send stock alerts job in background"
-        redirect(controller: "dashboard")
-    }
-
     def findUsersByLocationRole = {
         def location = Location.get(params?.location?.id)
         def users = userService.findUsersByLocationRole(location, RoleType.ROLE_ITEM_ALL_NOTIFICATION)

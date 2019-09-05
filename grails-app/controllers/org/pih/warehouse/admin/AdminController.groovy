@@ -13,6 +13,7 @@ import grails.util.GrailsUtil
 import net.sf.ehcache.Cache
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.MailService
+import org.pih.warehouse.jobs.SendStockAlertsJob
 import org.springframework.web.multipart.MultipartFile
 
 import javax.print.Doc
@@ -272,6 +273,13 @@ class AdminController {
 
         redirect(action: "showSettings")
     }
+
+    def triggerStockAlerts = {
+        SendStockAlertsJob.triggerNow([:])
+        flash.message = "Triggered send stock alerts job in background"
+        redirect(controller: "admin", action: "showSettings")
+    }
+
 }
 
 class UpgradeCommand {

@@ -222,9 +222,9 @@
                                                     <table>
                                                         <thead>
                                                             <tr class="odd">
+                                                                <th><warehouse:message code="location.label"/></th>
                                                                 <th><warehouse:message code="location.locationGroup.label"/></th>
                                                                 <th><warehouse:message code="location.locationType.label"/></th>
-                                                                <th><warehouse:message code="location.label"/></th>
                                                                 <th><warehouse:message code="user.role.label"/></th>
                                                                 <th><g:message code="default.actions.label"/></th>
                                                             </tr>
@@ -238,17 +238,17 @@
                                                                     <tr class="${status%2==0?'even':'odd'} ${inactive?'fade':''}">
                                                                         <td>
                                                                             <g:if test="${innerStatus==0}">
+                                                                            ${locationRole?.location?.name}
+                                                                            </g:if>
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:if test="${innerStatus==0}">
                                                                             ${locationRole?.location?.locationGroup?.name}
                                                                             </g:if>
                                                                         </td>
                                                                         <td>
                                                                             <g:if test="${innerStatus==0}">
                                                                             <format:metadata obj="${locationRole?.location?.locationType}"/>
-                                                                            </g:if>
-                                                                        </td>
-                                                                        <td>
-                                                                            <g:if test="${innerStatus==0}">
-                                                                            ${locationRole?.location?.name}
                                                                             </g:if>
                                                                         </td>
                                                                         <td>
@@ -277,22 +277,27 @@
                                                             </g:each>
                                                             <g:unless test="${userInstance.locationRoles}">
                                                                 <tr>
-                                                                    <td colspan="4" class="empty fade center">
+                                                                    <td colspan="5" class="empty fade center">
                                                                         <g:message code="default.results.message"
                                                                                    args="[userInstance?.locationRoles?.size()?:0, g.message(code:'user.locationRoles.label')]"/>
                                                                     </td>
                                                                 </tr>
                                                             </g:unless>
                                                         </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td colspan="5">
+                                                                    <a href="javascript:void(0);"
+                                                                       class="button btn-show-dialog"
+                                                                       data-title="${g.message(code:'default.add.label', args: [g.message(code: 'user.locationRoles.label')])}"
+                                                                       data-url="${request.contextPath}/user/createLocationRoles?user.id=${userInstance?.id}">
+                                                                        <g:message code="default.add.label" args="[g.message(code: 'user.locationRoles.label')]"/>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tfoot>
                                                     </table>
-                                                    <div class="buttons">
-                                                        <a href="javascript:void(0);"
-                                                           class="button btn-show-dialog"
-                                                           data-title="${g.message(code:'default.add.label', args: [g.message(code: 'user.locationRoles.label')])}"
-                                                           data-url="${request.contextPath}/user/createLocationRoles?user.id=${userInstance?.id}">
-                                                            <g:message code="default.add.label" args="[g.message(code: 'user.locationRoles.label')]"/>
-                                                        </a>
-                                                    </div>
+
 
                                                 </td>
                                             </tr>

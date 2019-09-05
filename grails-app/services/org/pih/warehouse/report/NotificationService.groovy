@@ -48,7 +48,7 @@ class NotificationService {
     }
 
     def sendExpiryAlerts(Location location, Integer daysUntilExpiry = 60, List<RoleType> roleTypes, Boolean skipOnEmpty) {
-        def subject = "Expiry Alerts"
+        def subject = "Expiry Alerts - ${location.name}"
         def expiryAlerts = getExpiryAlertsByLocation(location, daysUntilExpiry)
         if (expiryAlerts.isEmpty() && skipOnEmpty) {
             log.info "Skipped ${subject} email for location ${location} because there are no alerts"
@@ -59,12 +59,12 @@ class NotificationService {
         def subscribers = userService.findUsersByRoleTypes(location, roleTypes)
         def csv = dataService.generateCsv(expiryAlerts)
         def model = [location: location, expiring: expiring, expired: expired, daysUntilExpiry: daysUntilExpiry]
-        log.info "Sending ${expiryAlerts.size()} alerts and ${subscribers.size()} subscribers for location ${location}"
+        log.info "Sending ${expiryAlerts.size()} ${subject} alerts and ${subscribers.size()} subscribers for location ${location}"
         sendAlerts(subject, "/email/expiryAlerts", model, subscribers, csv)
     }
 
     def sendStockAlerts(Location location, String status, List<RoleType> roleTypes, Boolean skipOnEmpty) {
-        def subject = "Stock Alerts - ${status}"
+        def subject = "Stock Alerts - Status ${status} - ${location.name}"
         def stockAlerts = getStockAlertsByLocation(location)
         def products = stockAlerts.findAll { it.status == status }
         if (products.isEmpty() && skipOnEmpty) {
@@ -74,7 +74,7 @@ class NotificationService {
         def subscribers = userService.findUsersByRoleTypes(location, roleTypes)
         def model = [location: location, status: status, products: products]
         def csv = dataService.generateCsv(products)
-        log.info "Sending ${products.size()} alerts and ${subscribers.size()} subscribers for location ${location} "
+        log.info "Sending ${products.size()} ${subject} alerts and ${subscribers.size()} subscribers for location ${location} "
         sendAlerts(subject, "/email/stockAlerts", model, subscribers, csv)
     }
 

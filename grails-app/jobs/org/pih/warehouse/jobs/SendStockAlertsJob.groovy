@@ -10,6 +10,7 @@
 package org.pih.warehouse.jobs
 
 import groovyx.gpars.GParsPool
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -22,11 +23,13 @@ class SendStockAlertsJob {
     def locationService
     def notificationService
 
-    static triggers = {}
+    static triggers = {
+        cron name: 'sendStockAlertsCronTrigger',
+                cronExpression: ConfigurationHolder.config.openboxes.jobs.sendStockAlertsJob.cronExpression
+    }
 
     def execute(JobExecutionContext context) {
 
-        log.info "Executing ${this.class} at ${new Date()}"
         Boolean enabled = Boolean.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.enabled)
         Boolean skipOnEmpty = Boolean.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.skipOnEmpty)
         Integer daysUntilExpiry = Integer.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.daysUntilExpiry?:60)

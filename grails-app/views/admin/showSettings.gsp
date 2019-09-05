@@ -327,13 +327,15 @@
                                 <tr class="prop">
                                     <td class="name">
                                         <label>
-                                            <warehouse:message code="jobs.triggerStockAlerts.label"
-                                                               default="Trigger Stock Alerts">
+                                            <warehouse:message code="jobs.sendStockAlertsJob.label"
+                                                               default="Send Stock Alerts Job">
                                             </warehouse:message>
                                         </label>
                                     </td>
                                     <td class="value">
-                                        <g:remoteLink class="button" controller="json" action="triggerStockAlerts">Trigger</g:remoteLink>
+                                        <g:link class="button" controller="admin" action="triggerStockAlerts">
+                                            <warehouse:message code="default.button.trigger.label" default="Trigger"/>
+                                        </g:link>
                                     </td>
                                 </tr>
                                 <tfoot>
