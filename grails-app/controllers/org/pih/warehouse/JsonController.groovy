@@ -1331,9 +1331,21 @@ class JsonController {
     def getTransactionReport = { TransactionReportCommand command ->
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
+        String categoryId = params.category ?: "ROOT"
+        Category category = Category.get(categoryId)
 
         Date startDate = command.startDate
         Date endDate = command.endDate
+
+        Boolean includeCategoryChildren = params.includeCategoryChildren
+        List<Category> categories = []
+
+        if (includeCategoryChildren) {
+            categories = category.children
+            categories << category
+        } else {
+            categories << category
+        }
 
         // FIXME Command validation not working so we're doing it manually
 
@@ -1400,7 +1412,7 @@ class JsonController {
         products.addAll(balanceClosingMap.keySet())
 
         // Flatten the data to make it easier to display
-        def data = products.collect { Product product ->
+        def data = products.findAll { categories.contains(it.category) }.collect { Product product ->
 
             // Get balances by product
             def balanceOpening = balanceOpeningMap.get(product) ?: 0
@@ -1430,13 +1442,14 @@ class JsonController {
             [
                     "Code"           : product.productCode,
                     "Name"           : product.name,
+                    "Category": product.category.name,
                     "Cycle Count"    : cycleCountOccurred ? true : "",
                     "Opening Balance": balanceOpening,
                     "Inbound"        : quantityInbound,
                     "Outbound"       : quantityOutbound,
                     "Adjustments"    : quantityDiscrepancy,
                     "Closing Balance": balanceClosing,
-
+                    "Unit cost": product.pricePerUnit ?: '',
             ]
         }
 
