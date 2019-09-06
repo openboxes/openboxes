@@ -72,6 +72,7 @@ class StockMovementServiceTests extends GroovyTestCase {
 
 
 		stockMovement = new StockMovement(
+				id: requisition.id,
 				origin: origin,
 				destination: destination,
 				requestedBy: person,
