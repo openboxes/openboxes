@@ -156,6 +156,9 @@ environments {
     development {
     }
     test {
+        quartz {
+            autoStartup = false
+        }
     }
     loadtest {
     }
