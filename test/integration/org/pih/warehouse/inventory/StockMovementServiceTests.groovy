@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
+import org.junit.Test
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -26,79 +27,108 @@ import static org.junit.Assert.assertNotNull
 class StockMovementServiceTests extends GroovyTestCase {
 
 	def stockMovementService
-	def requisition
+	Requisition requisition
 	StockMovement stockMovement
 	StockMovement stockMovementEmpty
-	
+
 	protected void setUp() {
 		super.setUp()
 
-		def location = Location.list().first()
+		def origin = Location.findByName("Boston Headquarters")
+		assertNotNull(origin)
+		def destination = Location.findByName("Miami Warehouse")
+		assertNotNull(destination)
 		def product1 = Product.findByName("Advil 200mg")
+		assertNotNull(product1)
 		def product2 = Product.findByName("Tylenol 325mg")
+		assertNotNull(product2)
 		def item1 = new RequisitionItem(id: "item1", description: "item1", product: product1, quantity: 10)
+		assertNotNull(item1)
 		def item2 = new RequisitionItem(id: "item2", description: "item2", product: product2, quantity: 20)
-		def person = Person.list().first()
-		def requisition = new Requisition(
+		assertNotNull(item2)
+		def person = Person.findById("1")
+		assertNotNull(person)
+
+		requisition = new Requisition(
 				id: "requisitionID",
-				name: "testRequisition"+ UUID.randomUUID().toString()[0..5],
+				requestNumber: "ABC123",
+				name: "testRequisition" + UUID.randomUUID().toString()[0..5],
 				commodityClass: CommodityClass.MEDICATION,
-				type:  RequisitionType.NON_STOCK,
-				origin: location,
-				destination: location,
+				type: RequisitionType.DEFAULT,
+				origin: origin,
+				destination: destination,
 				requestedBy: person,
 				dateRequested: new Date(),
 				requestedDeliveryDate: new Date().plus(1),
-				status: RequisitionStatus.VERIFYING)
-
+				status: RequisitionStatus.CREATED)
 		requisition.addToRequisitionItems(item1)
 		requisition.addToRequisitionItems(item2)
-		requisition.save(flush:true)
+		requisition.save(failOnError: true)
 
-		stockMovement = new StockMovement(id: "requisitionID", name: "TestSM", identifier: "SM1", statusCode: "SM2")
+		println "Requisition: " + requisition.toJson()
+		assertNotNull(requisition)
+
+
+		stockMovement = new StockMovement(
+				name: "TestSM",
+				identifier: "ABC123",
+				origin: origin,
+				destination: destination,
+				requestedBy: person,
+				dateRequested: new Date(),
+		)
 		stockMovementEmpty = new StockMovement(id: "1")
 	}
 
+	@Test
 	void test_createStockMovement_shouldThrowExceptionOnInvalid() {
 	 	shouldFail (ValidationException) {
 			stockMovementService.createStockMovement(stockMovementEmpty)
 		}
 	}
 
+	@Test
 	void test_createStockMovement_shouldCreateStockMovement() {
 		def sm = stockMovementService.createStockMovement(stockMovement)
 		assertNotNull sm
 	}
 
+	@Test
 	void test_updateStatus_shouldThrowExceptionIfStatusNotInList() {
 		shouldFail (IllegalStateException) {
-			stockMovementService.updateStatus("requisitionID", RequisitionStatus.ERROR)
+			stockMovementService.updateStatus(requisition.id, RequisitionStatus.ERROR)
 		}
 	}
 
+	@Test
 	void test_updateStatus_shouldUpdateStatus() {
-		stockMovementService.updateStatus("requisitionID", RequisitionStatus.CANCELED)
+
+		stockMovementService.updateStatus(requisition.id, RequisitionStatus.CANCELED)
 		assert requisition.status == RequisitionStatus.CANCELED
 	}
 
+	@Test
 	void test_updateRequisition_shouldThrowExceptionIfNoRequisition() {
 		shouldFail (ObjectNotFoundException) {
 			stockMovementService.updateRequisition(stockMovementEmpty)
 		}
 	}
 
+	@Test
 	void test_updateRequisition_shouldUpdateRequisition() {
 		stockMovement.description = "changed"
 		def updated = stockMovementService.updateRequisition(stockMovement)
 		assert updated.description == "changed"
 	}
 
+	@Test
 	void test_updateRequisitionWhenShipmentChanged_shouldThrowExceptionIfNoRequisitio() {
 		shouldFail (ObjectNotFoundException) {
 			stockMovementService.updateRequisitionWhenShipmentChanged(stockMovementEmpty)
 		}
 	}
 
+	@Test
 	void test_getStockMovements_shouldReturnStockMovements() {
 		def maxResults = 2
 		def offset = 0
@@ -107,39 +137,45 @@ class StockMovementServiceTests extends GroovyTestCase {
 		assert stockMovements.size() == 1
 	}
 
+	@Test
 	void test_getStockMovement_shouldReturnOneStockMovement() {
-		def sm = stockMovementService.getStockMovement("requisitionID")
+		def sm = stockMovementService.getStockMovement(requisition.id)
 		assertNotNull sm
 		assert sm.name == "TestSM"
 		assert sm.identifier == "SM1"
 		assert sm.statusCode == "SM2"
 	}
 
+	@Test
 	void test_getStockMovementItem_shouldReturnStockMovementItem() {
 		def item = stockMovementService.getStockMovementItem("item1")
 		assertNotNull item
 		assert item.quantityRequested == 10
 	}
 
+	@Test
 	void test_clearPicklist_shouldClearPicklist() {
 		def item = stockMovementService.getStockMovementItem("item1")
 		stockMovementService.clearPicklist(item)
 	}
 
+	@Test
 	void test_getEditPage_shouldGetEditPage() {
-		def editPage = stockMovementService.getEditPage("requisitionID")
+		def editPage = stockMovementService.getEditPage(requisition.id)
 		assertNotNull editPage
 		assertNotNull editPage.editPageItems.size() == 2
 	}
 
+	@Test
 	void test_getPickPage_shouldGetPickPage() {
-		def pickPage = stockMovementService.getPickPage("requisitionID")
+		def pickPage = stockMovementService.getPickPage(requisition.id)
 		assertNotNull pickPage
 		assertNotNull pickPage.pickPageItems.size() == 2
 	}
 
+	@Test
 	void test_getPackPage_shouldGetPackPage() {
-		def packPage = stockMovementService.getPackPage("requisitionID")
+		def packPage = stockMovementService.getPackPage(requisition.id)
 		assertNotNull packPage
 		assertNotNull packPage.packPageItems.size() == 2
 	}
