@@ -51,7 +51,7 @@ class StockMovementServiceTests extends GroovyTestCase {
 
 		requisition = new Requisition(
 				id: "requisitionID",
-				requestNumber: "ABC123",
+				requestNumber: "SM1",
 				name: "testRequisition" + UUID.randomUUID().toString()[0..5],
 				commodityClass: CommodityClass.MEDICATION,
 				type: RequisitionType.DEFAULT,
@@ -70,8 +70,6 @@ class StockMovementServiceTests extends GroovyTestCase {
 
 
 		stockMovement = new StockMovement(
-				name: "TestSM",
-				identifier: "ABC123",
 				origin: origin,
 				destination: destination,
 				requestedBy: person,
@@ -141,9 +139,9 @@ class StockMovementServiceTests extends GroovyTestCase {
 	void test_getStockMovement_shouldReturnOneStockMovement() {
 		def sm = stockMovementService.getStockMovement(requisition.id)
 		assertNotNull sm
-		assert sm.name == "TestSM"
+		assert sm.name == requisition.name
 		assert sm.identifier == "SM1"
-		assert sm.statusCode == "SM2"
+		assert sm.statusCode == "CREATED"
 	}
 
 	@Test
