@@ -83,7 +83,7 @@ class StockMovementService {
             Shipment shipment = requisition.shipment
             shipment?.expectedShippingDate = new Date()
         }
-        if (!status in RequisitionStatus.list()) {
+        if (!(status in RequisitionStatus.list())) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
         } else if (status < requisition.status) {
             // Ignore backwards state transitions since it occurs normally when users go back and edit pages earlier in the workflow
