@@ -123,17 +123,17 @@ const FIELDS = {
     type: TextField,
     label: 'react.stockMovement.trackingNumber.label',
     defaultMessage: 'Tracking number',
-    getDynamicAttr: ({ issued }) => ({
-      disabled: issued || showOnly,
-    }),
+    attributes: {
+      disabled: showOnly,
+    },
   },
   driverName: {
     type: TextField,
     label: 'react.stockMovement.driverName.label',
     defaultMessage: 'Driver name',
-    getDynamicAttr: ({ issued }) => ({
-      disabled: issued || showOnly,
-    }),
+    attributes: {
+      disabled: showOnly,
+    },
   },
   comments: {
     type: TextField,
@@ -241,6 +241,8 @@ class SendMovementPage extends Component {
         'destination.id': values.destination.id,
         description: values.description,
         'shipmentType.id': values.shipmentType,
+        trackingNumber: values.trackingNumber || '',
+        driverName: values.driverName || '',
         comments: values.comments || '',
       };
     }
