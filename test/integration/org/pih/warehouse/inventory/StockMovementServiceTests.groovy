@@ -28,6 +28,8 @@ class StockMovementServiceTests extends GroovyTestCase {
 
 	def stockMovementService
 	Requisition requisition
+	RequisitionItem requisitionItem1
+	RequisitionItem requisitionItem2
 	StockMovement stockMovement
 	StockMovement stockMovementEmpty
 
@@ -42,10 +44,10 @@ class StockMovementServiceTests extends GroovyTestCase {
 		assertNotNull(product1)
 		def product2 = Product.findByName("Tylenol 325mg")
 		assertNotNull(product2)
-		def item1 = new RequisitionItem(id: "item1", description: "item1", product: product1, quantity: 10)
-		assertNotNull(item1)
-		def item2 = new RequisitionItem(id: "item2", description: "item2", product: product2, quantity: 20)
-		assertNotNull(item2)
+		requisitionItem1 = new RequisitionItem(id: "item1", description: "item1", product: product1, quantity: 10)
+		assertNotNull(requisitionItem1)
+		requisitionItem2 = new RequisitionItem(id: "item2", description: "item2", product: product2, quantity: 20)
+		assertNotNull(requisitionItem2)
 		def person = Person.findById("1")
 		assertNotNull(person)
 
@@ -61,8 +63,8 @@ class StockMovementServiceTests extends GroovyTestCase {
 				dateRequested: new Date(),
 				requestedDeliveryDate: new Date().plus(1),
 				status: RequisitionStatus.CREATED)
-		requisition.addToRequisitionItems(item1)
-		requisition.addToRequisitionItems(item2)
+		requisition.addToRequisitionItems(requisitionItem1)
+		requisition.addToRequisitionItems(requisitionItem2)
 		requisition.save(failOnError: true)
 
 		println "Requisition: " + requisition.toJson()
@@ -146,14 +148,14 @@ class StockMovementServiceTests extends GroovyTestCase {
 
 	@Test
 	void test_getStockMovementItem_shouldReturnStockMovementItem() {
-		def item = stockMovementService.getStockMovementItem("item1")
+		def item = stockMovementService.getStockMovementItem(requisitionItem1.id)
 		assertNotNull item
 		assert item.quantityRequested == 10
 	}
 
 	@Test
 	void test_clearPicklist_shouldClearPicklist() {
-		def item = stockMovementService.getStockMovementItem("item1")
+		def item = stockMovementService.getStockMovementItem(requisitionItem1.id)
 		stockMovementService.clearPicklist(item)
 	}
 
