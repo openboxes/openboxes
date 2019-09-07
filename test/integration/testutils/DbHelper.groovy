@@ -44,7 +44,7 @@ class DbHelper {
 	static Product createProductIfNotExists(productName, categoryName){
 		def existingOne = Product.findByName(productName)
 		if(existingOne) return existingOne
-		def newOne = new Product(name:productName)
+		def newOne = new Product(name:productName, productCode: productName)
 		newOne.category = createCategoryIfNotExists(categoryName)
 		newOne.save(flush:true)
 		newOne
@@ -53,7 +53,7 @@ class DbHelper {
     static Product createProductWithGroups(def name, def groupNames) {
         Product product = Product.findByName(name)
         if (!product) {
-            product = new Product(name: name, category: createCategoryIfNotExists("Integration"))
+            product = new Product(name: name, productCode: name, category: createCategoryIfNotExists("Integration"))
             product.save(failOnError: true, flush: true)
         }
         groupNames.each { groupName ->
@@ -149,7 +149,7 @@ class DbHelper {
 	static Product createProductWithTags(name, tags){
 		Product product = Product.findByName(name)
 		if(!product){
-			product = new Product(name: name, category: createCategoryIfNotExists("Integration"))
+			product = new Product(name: name, productCode: name, category: createCategoryIfNotExists("Integration"))
 			product.save(failOnError:true,flush:true)
 		}
 		tags.each{ tagName ->
