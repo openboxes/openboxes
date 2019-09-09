@@ -1501,7 +1501,7 @@ class StockMovementService {
         } else if (requisitionItem.picklistItems) {
             // if there is picklist created check if quantity picked is equal to quantity requested if there was no reason code given(items canceled during pick or picked partially have reason code)
             if (requisitionItem.totalQuantityPicked() != requisitionItem.quantity && !requisitionItem.picklistItems.reasonCode) {
-                throw new ValidationException("Quantity picked does not match quantity requested for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name, requisitionItem.errors)
+                throw new ValidationException("Please change the pick qty for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name + " or enter reason code.", requisitionItem.errors)
             }
         }
     }
