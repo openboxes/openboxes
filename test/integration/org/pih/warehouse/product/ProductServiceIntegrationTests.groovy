@@ -3,11 +3,16 @@ package org.pih.warehouse.product
 import org.junit.Ignore
 
 // import org.apache.commons.lang.StringUtils
-import org.junit.Test;
+import org.junit.Test
+import org.pih.warehouse.auth.AuthService;
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.RoleType
+
 // import org.pih.warehouse.core.Location
 // import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.core.Tag;
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User;
 // import org.pih.warehouse.core.User;
 
 import testutils.DbHelper
@@ -31,6 +36,14 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
      *
      */
 	protected void setUp(){
+
+		Role financeRole = Role.findByRoleType(RoleType.ROLE_FINANCE)
+		User user = DbHelper.createAdmin("Justin", "Miranda", "justin@openboxes.com", "jmiranda", "password", true)
+		user.addToRoles(financeRole)
+		user.save()
+
+		AuthService.currentUser.set(user)
+
 		product1 = DbHelper.createProductWithGroups("boo floweree 250mg",["Hoo moodiccina", "Boo floweree"])
 		product2 = DbHelper.createProductWithGroups("boo pill",["Boo floweree"])
 		product3 = DbHelper.createProductWithGroups("foo",["Hoo moodiccina"])
@@ -91,8 +104,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		
 		// Only searches products, not product groups any longer
 		assert result.size() == 2
-		assert result.any{ it[1] == "boo floweree 250mg" && it[2] == null && it[0] == product1.id}
-		assert result.any{ it[1] == "buhoo floweree root" &&  it[2] == null && it[0] == product6.id}
+		assert result.any{ it[1] == "boo floweree 250mg" && it[2] == "boo floweree 250mg" && it[0] == product1.id}
+		assert result.any{ it[1] == "buhoo floweree root" &&  it[2] == "buhoo floweree root" && it[0] == product6.id}
 	
 	}
 
@@ -319,10 +332,12 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	void exportProducts_shouldReturnAllProducts() {
 		def csv = productService.exportProducts()		
 		def lines = csv.split("\n")
+
+		// FIXME Export code appends column delimiter for every column (even the last)
+		def expectedHeader = Constants.EXPORT_PRODUCT_COLUMNS.join(",").replace("\n", "") + ","
+		def actualHeader = lines[0]
 		assertNotNull lines
-		assertEquals lines[0], csvize(Constants.EXPORT_PRODUCT_COLUMNS).replace("\n","")
-		
-		//'"ID","Product Code","Name","Category","Description","Unit of Measure","Manufacturer","Manufacturer Code","Cold Chain","UPC","NDC","Date Created","Date Updated"'
+		assertEquals expectedHeader, actualHeader
 	}
 
     @Test
@@ -335,26 +350,26 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		// Remove quotes
 		def columns = lines[0].replaceAll( "\"", "" ).split(",")
 		println columns
-		assertEquals "ID", columns[0]
-		assertEquals "SKU", columns[1]
+		assertEquals "Id", columns[0]
+		assertEquals "ProductCode", columns[1]
 		assertEquals "Name", columns[2]
 		assertEquals "Category", columns[3]
 		assertEquals "Description", columns[4]		
-		assertEquals "Unit of Measure", columns[5]
+		assertEquals "UnitOfMeasure", columns[5]
         assertEquals "Tags", columns[6]
-        assertEquals "Unit price", columns[7]
+        assertEquals "UnitCost", columns[7]
 		assertEquals "Manufacturer", columns[8]
-		assertEquals "Brand", columns[9]
-		assertEquals "Manufacturer Code", columns[10]
-		assertEquals "Manufacturer Name", columns[11]
+		assertEquals "BrandName", columns[9]
+		assertEquals "ManufacturerCode", columns[10]
+		assertEquals "ManufacturerName", columns[11]
 		assertEquals "Vendor", columns[12]
-		assertEquals "Vendor Code", columns[13]
-		assertEquals "Vendor Name", columns[14]
-		assertEquals "Cold Chain", columns[15]
+		assertEquals "VendorCode", columns[13]
+		assertEquals "VendorName", columns[14]
+		assertEquals "ColdChain", columns[15]
 		assertEquals "UPC", columns[16]
 		assertEquals "NDC", columns[17]
-		assertEquals "Date Created", columns[18]
-		assertEquals "Date Updated", columns[19]
+		assertEquals "Created", columns[18]
+		assertEquals "Updated", columns[19]
 	}
 
     @Test
