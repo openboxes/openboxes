@@ -649,6 +649,11 @@ class RequisitionService {
             }
             eq("product", product)
         }
+
+        if (destination) {
+            return requisitionItems.findAll { it.quantityIssued > 0 }
+        }
+
         return requisitionItems
     }
 
