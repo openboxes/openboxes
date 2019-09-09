@@ -301,6 +301,10 @@ class StockMovementService {
 
     void clearPicklist(StockMovementItem stockMovementItem) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        clearPicklist(requisitionItem)
+    }
+
+    void clearPicklist(RequisitionItem requisitionItem) {
         if (requisitionItem.modificationItem) {
             requisitionItem = requisitionItem.modificationItem
         }
@@ -388,17 +392,19 @@ class StockMovementService {
         }
     }
 
+    void createPicklist(StockMovementItem stockMovementItem) {
+        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
+
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        createPicklist(requisitionItem)
+    }
+
     /**
      * Create an automated picklist for the given stock movement item.
      *
      * @param id
      */
-    void createPicklist(StockMovementItem stockMovementItem) {
-
-        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
-
-        // This is kind of a hack, but it's the only way I could figure out how to get the origin field
-        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+    void createPicklist(RequisitionItem requisitionItem) {
         Product product = requisitionItem.product
         Location location = requisitionItem?.requisition?.origin
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
@@ -412,9 +418,9 @@ class StockMovementService {
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
             if (suggestedItems) {
-                clearPicklist(stockMovementItem)
+                clearPicklist(requisitionItem)
                 for (SuggestedItem suggestedItem : suggestedItems) {
-                    createOrUpdatePicklistItem(stockMovementItem,
+                    createOrUpdatePicklistItem(requisitionItem,
                             null,
                             suggestedItem.inventoryItem,
                             suggestedItem.binLocation,
@@ -431,6 +437,13 @@ class StockMovementService {
                                     Integer quantity, String reasonCode, String comment) {
 
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantity, reasonCode, comment)
+    }
+
+    void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
+                                    InventoryItem inventoryItem, Location binLocation,
+                                    Integer quantity, String reasonCode, String comment) {
+
         Requisition requisition = requisitionItem.requisition
 
         Picklist picklist = Picklist.findByRequisition(requisition)
@@ -467,7 +480,7 @@ class StockMovementService {
             picklistItem.quantity = quantity
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
-            picklistItem.sortOrder = stockMovementItem.sortOrder
+            picklistItem.sortOrder = requisitionItem.orderIndex
         }
         picklist.save(flush: true)
     }
@@ -795,6 +808,10 @@ class StockMovementService {
      */
     PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
 
+        if (!requisitionItem.picklistItems || (requisitionItem.picklistItems && requisitionItem.totalQuantityPicked() != requisitionItem.quantity &&
+                !requisitionItem.picklistItems.reasonCode)) {
+            createPicklist(requisitionItem)
+        }
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
