@@ -311,9 +311,11 @@
 				startDate: $("#startDate").val(),
 				endDate: $("#endDate").val(),
 				category: $("#category").val(),
-				includeCategoryChildren: $("#includeCategoryChildren").val(),
 				format: "text/csv"
 			};
+			if($('#includeCategoryChildren').is(':checked')) {
+				params.includeCategoryChildren = $("#includeCategoryChildren").val();
+			}
 			var queryString = $.param(params);
 			window.location.href = '${request.contextPath}/json/getTransactionReport?' + queryString;
 		});

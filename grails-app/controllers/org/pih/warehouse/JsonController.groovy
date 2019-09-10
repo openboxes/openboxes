@@ -1443,13 +1443,13 @@ class JsonController {
                     "Code"           : product.productCode,
                     "Name"           : product.name,
                     "Category": product.category.name,
+                    "Unit cost": product.pricePerUnit ?: '',
                     "Cycle Count"    : cycleCountOccurred ? true : "",
                     "Opening Balance": balanceOpening,
                     "Inbound"        : quantityInbound,
                     "Outbound"       : quantityOutbound,
                     "Adjustments"    : quantityDiscrepancy,
                     "Closing Balance": balanceClosing,
-                    "Unit cost": product.pricePerUnit ?: '',
             ]
         }
 
