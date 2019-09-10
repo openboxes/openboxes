@@ -113,35 +113,35 @@ const FIELDS = {
     attributes: {
       required: true,
       showValueTooltip: true,
-      disabled: showOnly,
     },
-    getDynamicAttr: ({ shipmentTypes }) => ({
+    getDynamicAttr: ({ shipmentTypes, received }) => ({
       options: shipmentTypes,
+      disabled: showOnly || received,
     }),
   },
   trackingNumber: {
     type: TextField,
     label: 'react.stockMovement.trackingNumber.label',
     defaultMessage: 'Tracking number',
-    attributes: {
-      disabled: showOnly,
-    },
+    getDynamicAttr: ({ received }) => ({
+      disabled: showOnly || received,
+    }),
   },
   driverName: {
     type: TextField,
     label: 'react.stockMovement.driverName.label',
     defaultMessage: 'Driver name',
-    attributes: {
-      disabled: showOnly,
-    },
+    getDynamicAttr: ({ received }) => ({
+      disabled: showOnly || received,
+    }),
   },
   comments: {
     type: TextField,
     label: 'react.stockMovement.comments.label',
     defaultMessage: 'Comments',
-    attributes: {
-      disabled: showOnly,
-    },
+    getDynamicAttr: ({ received }) => ({
+      disabled: showOnly || received,
+    }),
   },
 };
 
@@ -592,6 +592,7 @@ class SendMovementPage extends Component {
                   renderFormField(fieldConfig, fieldName, {
                     shipmentTypes: this.state.shipmentTypes,
                     issued: values.statusCode === 'ISSUED',
+                    received: values.shipmentStatus === 'RECEIVED',
                   }))}
               </div>
               <div>
