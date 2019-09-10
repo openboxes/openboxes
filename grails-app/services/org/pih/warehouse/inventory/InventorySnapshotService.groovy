@@ -455,18 +455,12 @@ class InventorySnapshotService {
     }
 
     List getQuantityOnHandByBinLocation(Location location) {
-        return getQuantityOnHandByBinLocation(location, null, null)
+        Date date = getMostRecentInventorySnapshotDate()
+        return getQuantityOnHandByBinLocation(location, date)
     }
 
-    List getQuantityOnHandByBinLocation(Location location, String status) {
-        return getQuantityOnHandByBinLocation(location, null, status)
-    }
-
-    List getQuantityOnHandByBinLocation(Location location, Date date, String status) {
+    List getQuantityOnHandByBinLocation(Location location, Date date) {
         def data = []
-
-        // Use the date provided or use latest inventory snapshot date
-        date = date ?: getMostRecentInventorySnapshotDate()
 
         if (location) {
             def results = InventorySnapshot.executeQuery("""
@@ -498,10 +492,6 @@ class InventorySnapshotService {
                         binLocation  : binLocation,
                         quantity     : quantity
                 ]
-            }
-
-            if (status) {
-                data = data.findAll { it.status == status }
             }
         }
         return data
