@@ -335,7 +335,8 @@ class InventoryController {
             def date = startDate
             def end = endDate
             use(TimeCategory) {
-                end = endDate.plus(1.day)
+                date = date.plus(1.day)
+                end = endDate.plus(2.day)
             }
             while (date.before(end)) {
                 println "Start date = " + date + " endDate = " + endDate
