@@ -9,6 +9,7 @@ import fileDownload from 'js-file-download';
 import update from 'immutability-helper';
 import Alert from 'react-s-alert';
 import queryString from 'query-string';
+import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -428,6 +429,31 @@ class PickPage extends Component {
       });
   }
 
+  /**
+   * Refetch the data, all not saved changes will be lost.
+   * @public
+   */
+  refresh() {
+    confirmAlert({
+      title: this.props.translate('react.stockMovement.message.confirmRefresh.label', 'Confirm refresh'),
+      message: this.props.translate(
+        'react.stockMovement.confirmPickRefresh.message',
+        'This button will redo the autopick on all items that have not been previously edited. Are you sure you want to continue?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            this.fetchAllData(true);
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
   render() {
     return (
       <Form
@@ -472,7 +498,7 @@ class PickPage extends Component {
                 </a>
                 <button
                   type="button"
-                  onClick={() => this.fetchAllData(true)}
+                  onClick={() => this.refresh()}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
                   <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
