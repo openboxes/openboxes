@@ -75,23 +75,27 @@ http://bamboo.pih-emr.org:8085/browse/OPENBOXES-SDONS
 But if that doesn't happen within a few minutes just go to the build plan and trigger it manually.
 
 ### QA Process
-Once the latest release branch has been deployed to OBNAVSTAGE we can start the QA pass. During this process we might add a few Bug tickets, but there should be no new features. Developers should either create branches off of release/0.8.4 or commit directly to the release branch.
+Once the latest release branch has been deployed to OBNAVSTAGE we can start the QA pass. During 
+this process we might add a few Bug tickets, but there should be no new features. Developers 
+should either create branches off of release/0.8.9 or commit directly to the release branch.
 
-Once the QA pass has been completed and there are no more bugs, we can start to finalize the release
-* Close any tickets that have been completed
-* Move remaining tickets to the next sprint
-* Remove or change the fixVersion of any open tickets (0.8.9 -> 0.8.10) 
-* Go to Agile board > Active Sprints and close the current sprint (i.e. Sprint 30) using the current date as the End Date.
-* Go to Kanban board and click on the Release ... link in the top-right corner 
-* Version name should be something like 0.8.9-kanban1
-* Go to Versions page and merge 0.8.9 and 0.8.9-kanban1
 
 ### Finalize Release
 Finalizing the release involves making the following changes to JIRA and Github.
 
-1. Jira > Agile Board > Complete Sprint 
-1. Jira > Kanban Board > Release Kanban board
+Once the QA pass has been completed and there are no more bugs, we can start to finalize the 
+release. 
+1. Close any tickets that have been completed
+1. Move remaining tickets to the next sprint
+1. Remove or change the fixVersion of any open tickets (0.8.9 -> 0.8.10) 
+1. Go to Agile board > Active Sprints and close the current sprint (i.e. Sprint 30) using the 
+current date as the End Date.
+1. Jira > Agile Board > Complete Sprint
+1. Jira > Kanban Board > Release 
+1. Go to Versions page and merge 0.8.9 and 0.8.9-kanban1
 1. Github > Create new release with release notes (use WAR from Bamboo)
 1. Publish Release Notes to openboxes.com
-1. Git > Tag release (http://docs.openboxes.com/en/latest/developer-guide/tagging/)
-
+1. Git > Merge release/0.8.9 into master
+1. Git > Tag release/0.8.9 (http://docs.openboxes.com/en/latest/developer-guide/tagging/)
+1. Bamboo > Change openboxes-release back to master 
+1. Git > Delete release/0.8.9 branch
