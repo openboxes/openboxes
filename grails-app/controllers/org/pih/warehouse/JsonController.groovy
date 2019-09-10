@@ -1296,11 +1296,7 @@ class JsonController {
         log.info "binLocationReport: " + params
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
-        def data = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
-
-        if (params.status) {
-            data = data.findAll { it.status == params.status }
-        }
+        def data = inventorySnapshotService.getQuantityOnHandByBinLocation(location, params.status)
 
         def hasRoleFinance = userService.hasRoleFinance(session?.user)
 

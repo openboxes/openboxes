@@ -455,14 +455,20 @@ class InventorySnapshotService {
     }
 
     List getQuantityOnHandByBinLocation(Location location) {
-        Date date = getMostRecentInventorySnapshotDate()
-        return getQuantityOnHandByBinLocation(location, date)
+        return getQuantityOnHandByBinLocation(location, null, null)
     }
 
+    List getQuantityOnHandByBinLocation(Location location, String status) {
+        return getQuantityOnHandByBinLocation(location, null, status)
+    }
 
-    List getQuantityOnHandByBinLocation(Location location, Date date) {
+    List getQuantityOnHandByBinLocation(Location location, Date date, String status) {
         def data = []
-        if (location && date) {
+
+        // Use the date provided or use latest inventory snapshot date
+        date = date ?: getMostRecentInventorySnapshotDate()
+
+        if (location) {
             def results = InventorySnapshot.executeQuery("""
 						select 
 						    iis.product, 
@@ -476,7 +482,9 @@ class InventorySnapshotService {
 						and iis.date = :date
 						group by iis.product, iis.inventoryItem, iis.binLocation
 						""", [location: location, date: date])
-            //data = results
+
+            def getStatus = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
+
             data = results.collect {
                 def product = it[0]
                 def inventoryItem = it[1]
@@ -484,11 +492,16 @@ class InventorySnapshotService {
                 def quantity = it[3]
 
                 [
+                        status       : getStatus(quantity),
                         product      : product,
                         inventoryItem: inventoryItem,
                         binLocation  : binLocation,
                         quantity     : quantity
                 ]
+            }
+
+            if (status) {
+                data = data.findAll { it.status == status }
             }
         }
         return data
