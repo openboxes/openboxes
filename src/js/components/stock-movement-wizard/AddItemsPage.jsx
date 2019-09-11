@@ -327,7 +327,7 @@ function validate(values) {
     if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
       errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
     }
-    if (!_.isNil(item.boxName) && _.isNil(item.palletName)) {
+    if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
       errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
     }
   });
