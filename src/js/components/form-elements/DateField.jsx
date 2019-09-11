@@ -45,6 +45,8 @@ class DateField extends Component {
           className={`form-control form-control-xs ${className}`}
           {...attributes}
           selected={moment(value, dateFormat).isValid() ? moment(value, dateFormat) : null}
+          highlightDates={[!moment(value, dateFormat).isValid() ?
+            moment(new Date(), dateFormat) : {}]}
           onChange={date => onChange(date)}
           onChangeRaw={onChangeRaw}
           onSelect={() => {
