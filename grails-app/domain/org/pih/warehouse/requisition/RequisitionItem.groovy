@@ -405,6 +405,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return totalQuantityCanceled() == totalQuantity() && !modificationItem && !substitutionItem && !requisitionItems
     }
 
+    def isCanceledDuringPick() {
+        return requisition.status >= RequisitionStatus.PICKED && (modificationItem ? modificationItem.calculateQuantityPicked() == 0 : calculateQuantityPicked() == 0)
+    }
+
     /**
      * @return true if the requisition item has any child requisition items or has any quantity canceled
      */
