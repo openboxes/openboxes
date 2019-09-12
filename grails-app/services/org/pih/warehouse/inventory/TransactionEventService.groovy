@@ -23,6 +23,6 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
         def transactionDate = transaction?.transactionDate
         def locationId = transaction?.inventory?.warehouse?.id
         log.info "Refresh inventory snapshot date=$transactionDate, location=$locationId, transaction=$transactionId"
-        RefreshInventorySnapshotJob.triggerNow([startDate: transactionDate, location: locationId])
+        RefreshInventorySnapshotJob.triggerNow([location: locationId])
     }
 }

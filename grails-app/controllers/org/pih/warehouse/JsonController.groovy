@@ -1230,6 +1230,23 @@ class JsonController {
         render([url: url, type: type, barcode: barcode] as JSON)
     }
 
+
+    def getInventorySnapshotDetails = { InventorySnapshotCommand command ->
+        def data = inventorySnapshotService.getInventorySnapshots(command.product, command.location, command.date)
+        def defaultLabel = "${g.message(code: 'default.label')}"
+        def defaultExpirationDate = "${g.message(code: 'default.never.label')}"
+        data = data.collect {
+            [
+                    date          : it.date?.format(Constants.DEFAULT_DATE_FORMAT),
+                    lotNumber     : it.inventoryItem?.lotNumber ?: defaultLabel,
+                    expirationDate: it.inventoryItem?.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT) ?: defaultExpirationDate,
+                    binLocation   : it.binLocation?.name ?: defaultLabel,
+                    quantityOnHand: it.quantityOnHand
+            ]
+        }
+        render([data: data] as JSON)
+    }
+
     def getQuantityOnHandByMonth = {
         log.info params
         def numMonths = (params.numMonths as int) ?: 12
@@ -1727,6 +1744,18 @@ class JsonController {
     }
 }
 
+
+class InventorySnapshotCommand {
+
+    Date date
+    Location location
+    Product product
+    InventoryItem inventoryItem
+    Location binLocation
+    BigDecimal quantity
+
+
+}
 
 class TransactionReportCommand {
     Date startDate
