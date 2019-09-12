@@ -29,13 +29,12 @@
         </td>
     </g:if>
     <td class="middle">
-        <div class="tag ${requisitionItem.isCanceled() || requisitionItem.requisition.status >= RequisitionStatus.PICKED &&
-                requisitionItem.calculateQuantityPicked() == 0 ? 'tag-danger' :
+        <div class="tag ${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick() ? 'tag-danger' :
                 requisitionItem.isSubstituted() || requisitionItem.isReduced() ? 'tag-warning' : 'tag-alert'}">
             <g:if test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
                 <format:metadata obj="${requisitionItem?.requisition?.status}"/>
             </g:if>
-            <g:elseif test="${requisitionItem.requisition.status >= RequisitionStatus.PICKED && requisitionItem.calculateQuantityPicked() == 0}">
+            <g:elseif test="${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick()}">
                 <g:message code="enum.RequisitionItemStatus.CANCELED"/>
             </g:elseif>
             <g:elseif test="${requisitionItem.isReduced()}">
