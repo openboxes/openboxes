@@ -55,4 +55,5 @@
     <include file="0.8.x/changelog-2019-08-16-2243-add-column-product-catalog-color.xml"/>
     <include file="0.8.x/changelog-2019-08-20-1521-add-column-requisition-item-pick-reason-code.xml"/>
     <include file="0.8.x/changelog-2019-08-29-1303-create-stock-alert-views.xml"/>
+    <include file="0.8.x/changelog-2019-09-12-2110-update-inventory-snapshot-id.xml"/>
 </databaseChangeLog>
