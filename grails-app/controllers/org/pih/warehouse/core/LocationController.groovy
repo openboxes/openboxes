@@ -87,7 +87,7 @@ class LocationController {
                     }
 
                     boolean useDefault = params.useDefault as boolean
-                    if (useDefault) {
+                    if (useDefault && locationInstance?.supportedActivities) {
                         locationInstance.supportedActivities.clear()
                     }
 
