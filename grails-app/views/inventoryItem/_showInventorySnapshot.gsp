@@ -159,7 +159,11 @@
         }).appendTo("body");
 
         plotGraph(1);
-        createDataTable([]);
+
+        // Initialize data table with the most recent inventory snapshot data point
+        var locationId = $("#locationId").val();
+        var productId = $("#productId").val();
+        getInventorySnapshots(productId, locationId, null)
     });
 
     var minQuantity = $("#minQuantity").val();
@@ -283,6 +287,10 @@
         });
       }
 
+      function showTooltip(pageX, pageY, contents) {
+        $("#tooltip").html(contents).css({top: pageY, left: pageX + 20}).fadeIn(200);
+      }
+
       function plotGraph(numMonths) {
         var placeholder = $("#placeholder");
         var locationId = $("#locationId").val();
@@ -323,11 +331,4 @@
           }
         });
       }
-
-      function showTooltip(pageX, pageY, contents) {
-        $("#tooltip").html(contents).css({top: pageY, left: pageX + 20}).fadeIn(200);
-      }
-
-
-
 </script>
