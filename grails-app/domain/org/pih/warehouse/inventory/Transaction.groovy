@@ -51,17 +51,21 @@ class Transaction implements Comparable, Serializable {
         }
     }
 
-    def publishPersistenceEvent = {
+    def publishSaveEvent = {
         publishEvent(new TransactionEvent(this))
     }
 
-    // ID won't be available until after the record is inserted
-    def afterInsert = publishPersistenceEvent
+    def publishDeleteEvent = {
+        publishEvent(new TransactionEvent(this, true))
+    }
 
-    def afterUpdate = publishPersistenceEvent
+    // ID won't be available until after the record is inserted
+    def afterInsert = publishSaveEvent
+
+    def afterUpdate = publishSaveEvent
 
     // This probably needs to be "before" since the transaction will not be around after
-    def afterDelete = publishPersistenceEvent
+    def afterDelete = publishDeleteEvent
 
     String id
     TransactionType transactionType

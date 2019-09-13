@@ -187,12 +187,11 @@ class InventorySnapshotService {
                     String binLocationName = entry?.binLocation?.name ?
                             "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
 
-                    // '${UUID.randomUUID().toString()}'
                     def insertStmt =
-                            "INSERT INTO inventory_snapshot (version, date, location_id, product_id, product_code, " +
+                            "INSERT INTO inventory_snapshot (id, version, date, location_id, product_id, product_code, " +
                                     "inventory_item_id, lot_number, expiration_date, bin_location_id, bin_location_name, " +
                                     "quantity_on_hand, date_created, last_updated) " +
-                                    "values (0, '${dateString}', '${location?.id}', " +
+                                    "values ('${UUID.randomUUID().toString()}', 0, '${dateString}', '${location?.id}', " +
                                     "'${productId}', '${productCode}', " +
                                     "${inventoryItemId}, ${lotNumber}, ${expirationDate}, " +
                                     "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) " +
@@ -550,6 +549,18 @@ class InventorySnapshotService {
             eq("location", location)
             between("date", startDate, endDate)
             order("date", "asc")
+        }
+    }
+
+
+    List getInventorySnapshots(Product product, Location location, Date date) {
+
+        log.info "Find inventory snapshots by product ${product} location ${location} and date ${date}"
+        return InventorySnapshot.createCriteria().list {
+            eq("product", product)
+            eq("location", location)
+            eq("date", date)
+            order("binLocation", "asc")
         }
     }
 

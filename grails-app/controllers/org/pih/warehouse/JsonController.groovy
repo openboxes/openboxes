@@ -1230,12 +1230,37 @@ class JsonController {
         render([url: url, type: type, barcode: barcode] as JSON)
     }
 
+
+    def getInventorySnapshotDetails = { InventorySnapshotCommand command ->
+
+        // Get the most recent inventory snapshot data for data table
+        if (!command.date) {
+            command.date = inventorySnapshotService.getMostRecentInventorySnapshotDate()
+        }
+
+        def data = inventorySnapshotService.getInventorySnapshots(command.product, command.location, command.date)
+        def defaultLabel = "${g.message(code: 'default.label')}"
+        def defaultExpirationDate = "${g.message(code: 'default.never.label')}"
+        data = data.collect {
+            [
+                    date          : it.date?.format(Constants.DEFAULT_DATE_FORMAT),
+                    lotNumber     : it.inventoryItem?.lotNumber ?: defaultLabel,
+                    expirationDate: it.inventoryItem?.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT) ?: defaultExpirationDate,
+                    binLocation   : it.binLocation?.name ?: defaultLabel,
+                    quantityOnHand: it.quantityOnHand
+            ]
+        }
+        render([data: data] as JSON)
+    }
+
     def getQuantityOnHandByMonth = {
-        log.info params
-        def numMonths = (params.numMonths as int) ?: 12
-        def location = Location.get(params.location.id)
-        def product = Product.get(params.product.id)
-        def endDate = new Date(), startDate = new Date()
+        Location location = Location.get(params.location.id)
+        Product product = Product.get(params.product.id)
+
+        // Determine date range for inventory snapshot graph
+        Integer numMonths = (params.numMonths as int) ?: 12
+        Date startDate = new Date()
+        Date endDate = inventorySnapshotService.getMostRecentInventorySnapshotDate()?:new Date()
         use(TimeCategory) { startDate = startDate - numMonths.months }
 
         // Retrieve and transform data for time-series graph
@@ -1727,6 +1752,18 @@ class JsonController {
     }
 }
 
+
+class InventorySnapshotCommand {
+
+    Date date
+    Location location
+    Product product
+    InventoryItem inventoryItem
+    Location binLocation
+    BigDecimal quantity
+
+
+}
 
 class TransactionReportCommand {
     Date startDate
