@@ -64,15 +64,17 @@
                         </h2>
                         <table>
                             <tbody>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="default.id.label"/></label>
-                                </td>
-                                <td valign="top"
-                                    class="value ${hasErrors(bean: locationInstance, field: 'id', 'errors')}">
-                                        ${locationInstance?.id}
-                                </td>
-                            </tr>
+                            <g:if test="${locationInstance?.id}">
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="name"><warehouse:message code="default.id.label"/></label>
+                                    </td>
+                                    <td valign="top"
+                                        class="value ${hasErrors(bean: locationInstance, field: 'id', 'errors')}">
+                                            ${locationInstance?.id}
+                                    </td>
+                                </tr>
+                            </g:if>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="name"><warehouse:message code="location.name.label"
