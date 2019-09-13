@@ -29,11 +29,16 @@ class RefreshInventorySnapshotJob {
         if (enabled) {
             log.info("Refresh inventory snapshots with data: " + context.mergedJobDataMap)
 
+            boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh")
             def startTime = System.currentTimeMillis()
             def startDate = context.mergedJobDataMap.get('startDate')
             def locationId = context.mergedJobDataMap.get('location')
 
             Location location = Location.get(locationId)
+
+            if (forceRefresh) {
+                inventorySnapshotService.deleteInventorySnapshots(location)
+            }
 
             // Refresh inventory snapshot for tomorrow
             inventorySnapshotService.populateInventorySnapshots(location)
