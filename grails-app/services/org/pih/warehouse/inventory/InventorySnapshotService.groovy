@@ -29,16 +29,8 @@ class InventorySnapshotService {
     def inventoryService
     def persistenceInterceptor
 
-    def populateInventorySnapshots() {
-        def transactionDates = getTransactionDates()
-        for (Date date : transactionDates) {
-            populateInventorySnapshots(date)
-        }
-    }
-
     def populateInventorySnapshots(Date date) {
         def results
-
         def startTime = System.currentTimeMillis()
 
         // Compute bin locations from transaction entries for given location and date
@@ -86,6 +78,17 @@ class InventorySnapshotService {
         saveInventorySnapshots(date, location, binLocations)
     }
 
+    def populateInventorySnapshots(Location location, Product product) {
+        def transactionDates = getTransactionDates(location, product)
+        for (Date date : transactionDates) {
+            populateInventorySnapshots(date, location, product)
+        }
+    }
+
+    def populateInventorySnapshots(Date date, Location location, Product product) {
+        def binLocations = calculateBinLocations(location, product)
+        saveInventorySnapshots(date, location, binLocations)
+    }
 
     def calculateBinLocations(Location location, Date date) {
         def binLocations = inventoryService.getBinLocationDetails(location, date)
@@ -112,6 +115,11 @@ class InventorySnapshotService {
     def deleteInventorySnapshots(Location location) {
         Date date = getMostRecentInventorySnapshotDate() ?: new Date() + 1
         deleteInventorySnapshots(date, location)
+    }
+
+    def deleteInventorySnapshots(Location location, Product product) {
+        Date date = getMostRecentInventorySnapshotDate() ?: new Date() + 1
+        deleteInventorySnapshots(date, location, product)
     }
 
     def deleteInventorySnapshots(Date date, Location location) {
@@ -209,12 +217,10 @@ class InventorySnapshotService {
     }
 
     def getTransactionDates() {
-        return Transaction.executeQuery("select distinct(date(transactionDate)) from Transaction order by transactionDate desc")
+        return Transaction.executeQuery("select distinct(date(transactionDate)) from Transaction order by date(transactionDate) desc")
     }
 
-
     def getTransactionDates(Location location, Product product) {
-
         String query = """
             select distinct(date(t.transactionDate)) 
             from TransactionEntry as te 
@@ -222,7 +228,7 @@ class InventorySnapshotService {
             join te.inventoryItem as ii
             where ii.product = :product
             and t.inventory = :inventory
-            order by t.transactionDate desc
+            order by date(t.transactionDate) desc
         """
         return TransactionEntry.executeQuery(query, [product: product, inventory: location.inventory])
     }

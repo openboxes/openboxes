@@ -342,6 +342,7 @@
     $(document).ready(function() {
 
         $(".btn-show-dialog").live("click", function (event) {
+            event.preventDefault();
             var url = $(this).data("url");
             var title = $(this).data("title");
             var target = $(this).data("target") || "#dlgShowDialog";

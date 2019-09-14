@@ -77,7 +77,7 @@
                                 <g:elseif test="${minQuantity}">Less than ${minQuantity}</g:elseif>
                                 <g:else>Less than ${minQuantity}</g:else>
                             </td>
-                        </div>
+                        </tr>
                     </g:if>
                     <g:if test="${minQuantity}">
                         <tr style="background-color: #fabebe">
@@ -115,25 +115,25 @@
     </table>
 </div>
 %{--FIXME Need to make sure these buttons work properly --}%
-%{--<div class="buttons">--}%
-%{--    <g:isSuperuser>--}%
-%{--        <g:remoteLink controller="inventorySnapshot" action="triggerCalculateQuantityOnHandJob"--}%
-%{--                      class="button"--}%
-%{--                      params="['product.id':product.id,'location.id':session.warehouse.id]">--}%
-%{--            <img src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" />&nbsp;--}%
-%{--            ${g.message(code: "default.reload.label", args: [g.message(code: "default.data.label")])}--}%
-%{--        </g:remoteLink>--}%
-%{--    </g:isSuperuser>--}%
-%{--    <g:if test="${inventoryLevel}">--}%
-%{--        <g:set var="redirectUrl">${g.createLink(controller: "inventoryItem", action: "showStockCard", id: product?.id)}</g:set>--}%
-%{--        <a href class="button btn-show-dialog"--}%
-%{--            data-title="${g.message(code: 'default.edit.label', args: [g.message(code:'inventoryLevel.label')])}"--}%
-%{--            data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevel?.id}?redirectUrl=${redirectUrl}">--}%
-%{--            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />&nbsp;--}%
-%{--            ${g.message(code: 'default.edit.label', args: [g.message(code:'inventoryLevel.label')])}--}%
-%{--        </a>--}%
-%{--    </g:if>--}%
-%{--</div>--}%
+<div class="buttons">
+    <g:isSuperuser>
+        <g:remoteLink class="button"
+                      controller="inventorySnapshot" action="triggerCalculateQuantityOnHandJob"
+                      params="['product.id':product.id,'location.id':session.warehouse.id]" onSuccess="javascript:refreshPage();">
+            <img src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" />&nbsp;
+            ${g.message(code: "default.reload.label", args: [g.message(code: "default.data.label")])}
+        </g:remoteLink>
+    </g:isSuperuser>
+    <g:if test="${inventoryLevel}">
+        <g:set var="redirectUrl">${g.createLink(controller: "inventoryItem", action: "showStockCard", id: product?.id)}</g:set>
+        <a href class="button btn-show-dialog"
+            data-title="${g.message(code: 'default.edit.label', args: [g.message(code:'inventoryLevel.label')])}"
+            data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevel?.id}?redirectUrl=${redirectUrl}">
+            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />&nbsp;
+            ${g.message(code: 'default.edit.label', args: [g.message(code:'inventoryLevel.label')])}
+        </a>
+    </g:if>
+</div>
 
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/flot/', file:'jquery.flot.time.js')}" type="text/javascript" ></script>
@@ -245,6 +245,10 @@
       };
 
       var myGraph;
+
+      function refreshPage() {
+        location.reload()
+      }
 
       function createDataTable(data) {
         $("#inventorySnapshotsTable").dataTable({
