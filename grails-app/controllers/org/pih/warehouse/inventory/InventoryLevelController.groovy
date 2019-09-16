@@ -12,6 +12,8 @@ package org.pih.warehouse.inventory
 import grails.orm.PagedResultList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product
 
 class InventoryLevelController {
 
@@ -65,9 +67,7 @@ class InventoryLevelController {
     }
 
     def save = {
-        def location = Location.get(params.location.id)
         def inventoryLevelInstance = new InventoryLevel(params)
-        inventoryLevelInstance.inventory = location.inventory
         if (inventoryLevelInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
             redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id)

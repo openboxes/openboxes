@@ -13,6 +13,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -53,13 +54,15 @@ class PurchaseOrderWorkflowController {
 
         enterOrderDetails {
             on("next") {
-                log.info "Save order details " + params
+                log.info "Enter order details " + params
+
                 flow.order.properties = params
+                log.info "Order " + flow.order.properties
                 try {
                     if (!orderService.saveOrder(flow.order)) {
                         return error()
                     }
-                } catch (ValidationException e) {
+                } catch (Exception e) {
                     return error()
                 }
             }.to("showOrderItems")
