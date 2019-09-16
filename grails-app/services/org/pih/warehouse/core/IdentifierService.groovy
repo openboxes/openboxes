@@ -13,11 +13,11 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 import org.apache.commons.lang.RandomStringUtils
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.shipping.Shipment
 
 class IdentifierService {
 

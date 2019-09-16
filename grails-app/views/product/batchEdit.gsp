@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.core.User; org.pih.warehouse.product.Product" %>
+<%@ page import="org.pih.warehouse.core.User; org.pih.warehouse.core.User; org.pih.warehouse.core.User; org.pih.warehouse.product.Product" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -297,13 +297,13 @@
                         <g:if test="${params.createdById}">
                             <span class="tag">
                                 <label><warehouse:message code="default.createdBy.label"/></label>
-                                ${User.get(params.createdById)?.name}
+                                ${org.pih.warehouse.core.User.get(params.createdById)?.name}
                             </span>
                         </g:if>
                         <g:if test="${params.updatedById}">
                             <span class="tag">
                                 <label><warehouse:message code="default.updatedBy.label" /></label>
-                                ${User.get(params.updatedById)?.name}
+                                ${org.pih.warehouse.core.User.get(params.updatedById)?.name}
                             </span>
                         </g:if>
 
@@ -435,7 +435,7 @@
                                             </tr>
 
                                         <%--
-                                        <g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
+                                        <g:each var="attribute" in="${Attribute.list()}" status="status">
                                             <tr class="prop">
                                                 <td valign="top" class="name"><label for="attributes">
                                                 ${attribute.name }

@@ -90,7 +90,7 @@
 			(5,0,'2010-08-16 20:10:27',NULL,'2010-05-27 00:30:00',2,92,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
 			(6,0,'2010-08-16 20:10:27',NULL,'2010-05-27 13:30:00',2,91,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
 			(7,0,'2010-08-16 20:10:27',NULL,'2010-05-28 09:30:00',3,92,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent'),
-			(8,0,'2010-08-16 20:10:27',NULL,'2010-05-28 10:30:00',3,93,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent');						
+			(8,0,'2010-08-16 20:10:27',NULL,'2010-05-28 10:30:00',3,93,'2010-08-16 20:10:27',1,NULL,'org.pih.warehouse.shipping.ShipmentEvent');
 		
 		</sql>
 	</changeSet>

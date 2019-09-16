@@ -11,6 +11,11 @@ package org.pih.warehouse.order
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.*
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 
 class Order implements Serializable {
 

@@ -32,7 +32,7 @@
 										</td>
 										<td valign='top'>
 											<div class="ui-widget">
-												<g:select class="comboBox" name="shipment.id" from="${org.pih.warehouse.shipping.Shipment.list()}" 
+												<g:select class="comboBox" name="shipment.id" from="${org.pih.warehouse.shipping.Shipment.list()}"
 													optionKey="id" optionValue="name" value="" noSelection="['':'']" />
 											</div>									
 										</td>
