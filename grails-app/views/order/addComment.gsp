@@ -39,7 +39,7 @@
 								<td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
 									<div style="width:300px">
 										<g:select id="recipient.id" class="chzn-select-deselect" name='recipient.id' noSelection="${['':'Select one ...']}"
-												  from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="name" value="${commentInstance?.recipient?.id }"></g:select>
+                                                  from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="name" value="${commentInstance?.recipient?.id }"></g:select>
 									</div>
 								</td>
 							</tr>

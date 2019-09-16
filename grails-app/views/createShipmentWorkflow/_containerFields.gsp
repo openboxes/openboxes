@@ -17,7 +17,7 @@ $(function() {
 	</td>                            
 	<td valign="top" class="value">
 		<g:textField id="weight" name="weight" size="6" class="text" value="${container ? container?.weight : box?.weight}"/>&nbsp;
-		<g:select name="weightUnits" from="${org.pih.warehouse.core.Constants.WEIGHT_UNITS}" value="${container ? container?.weightUnits : box?.weightUnits}" />	
+		<g:select name="weightUnits" from="${org.pih.warehouse.core.Constants.WEIGHT_UNITS}" value="${container ? container?.weightUnits : box?.weightUnits}" />
 	</td>
 </tr>
 <tr class="prop">
