@@ -13,9 +13,9 @@ import grails.validation.ValidationException
 import groovy.xml.Namespace
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.importer.ImportDataCommand
 import util.ReportUtil
 
 import java.text.SimpleDateFormat
@@ -724,7 +724,7 @@ class ProductService {
 
         def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
         def attributes = Attribute.findAllByExportableAndActive(true, true)
-        def formatTagLib = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+        def formatTagLib = grailsApplication.mainContext.getBean('FormatTagLib')
         boolean hasRoleFinance = userService.hasRoleFinance()
 
         def rows = []

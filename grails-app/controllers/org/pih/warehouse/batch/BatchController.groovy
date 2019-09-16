@@ -9,24 +9,10 @@
  **/
 package org.pih.warehouse.batch
 
-
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
+import org.pih.warehouse.importer.*
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.importer.CategoryExcelImporter
-import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.importer.InventoryExcelImporter
-import org.pih.warehouse.importer.InventoryLevelExcelImporter
-import org.pih.warehouse.importer.LocationExcelImporter
-import org.pih.warehouse.importer.PersonExcelImporter
-import org.pih.warehouse.importer.ProductCatalogExcelImporter
-import org.pih.warehouse.importer.ProductCatalogItemExcelImporter
-import org.pih.warehouse.importer.ProductExcelImporter
-import org.pih.warehouse.importer.ProductSupplierExcelImporter
-import org.pih.warehouse.importer.TagExcelImporter
-import org.pih.warehouse.importer.UserExcelImporter
-import org.pih.warehouse.importer.UserLocationExcelImporter
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
-
 
 class BatchController {
 

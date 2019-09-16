@@ -13,42 +13,25 @@ import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
-import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.api.DocumentGroupCode
-import org.pih.warehouse.api.EditPage
-import org.pih.warehouse.api.EditPageItem
-import org.pih.warehouse.api.PackPage
-import org.pih.warehouse.api.PackPageItem
-import org.pih.warehouse.api.PickPage
-import org.pih.warehouse.api.PickPageItem
-import org.pih.warehouse.api.StockMovement
-import org.pih.warehouse.api.StockMovementItem
-import org.pih.warehouse.api.SubstitutionItem
-import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.api.*
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.DocumentCode
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
+import org.pih.warehouse.core.*
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
+import org.pih.warehouse.requisition.*
+import org.pih.warehouse.shipping.*
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.requisition.RequisitionItemSortByCode
-import org.pih.warehouse.requisition.RequisitionItemStatus
-import org.pih.warehouse.requisition.RequisitionItemType
-import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 
@@ -81,7 +64,7 @@ class StockMovementService {
         Requisition requisition = Requisition.get(id)
         if (status == RequisitionStatus.CHECKING) {
             Shipment shipment = requisition.shipment
-            shipment?.expectedShippingDate = new Date()
+            shipment.expectedShippingDate = new Date()
         }
         if (!(status in RequisitionStatus.list())) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
@@ -301,18 +284,9 @@ class StockMovementService {
 
     void clearPicklist(StockMovementItem stockMovementItem) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        clearPicklist(requisitionItem)
-    }
-
-    void clearPicklist(RequisitionItem requisitionItem) {
         if (requisitionItem.modificationItem) {
             requisitionItem = requisitionItem.modificationItem
         }
-
-        if (requisitionItem.pickReasonCode) {
-            requisitionItem.pickReasonCode = null
-        }
-
         Picklist picklist = requisitionItem?.requisition?.picklist
         log.info "Clear picklist"
         if (picklist) {
@@ -392,19 +366,17 @@ class StockMovementService {
         }
     }
 
-    void createPicklist(StockMovementItem stockMovementItem) {
-        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
-
-        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createPicklist(requisitionItem)
-    }
-
     /**
      * Create an automated picklist for the given stock movement item.
      *
      * @param id
      */
-    void createPicklist(RequisitionItem requisitionItem) {
+    void createPicklist(StockMovementItem stockMovementItem) {
+
+        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
+
+        // This is kind of a hack, but it's the only way I could figure out how to get the origin field
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
         Product product = requisitionItem.product
         Location location = requisitionItem?.requisition?.origin
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
@@ -418,9 +390,9 @@ class StockMovementService {
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
             if (suggestedItems) {
-                clearPicklist(requisitionItem)
+                clearPicklist(stockMovementItem)
                 for (SuggestedItem suggestedItem : suggestedItems) {
-                    createOrUpdatePicklistItem(requisitionItem,
+                    createOrUpdatePicklistItem(stockMovementItem,
                             null,
                             suggestedItem.inventoryItem,
                             suggestedItem.binLocation,
@@ -437,13 +409,6 @@ class StockMovementService {
                                     Integer quantity, String reasonCode, String comment) {
 
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantity, reasonCode, comment)
-    }
-
-    void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
-                                    InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment) {
-
         Requisition requisition = requisitionItem.requisition
 
         Picklist picklist = Picklist.findByRequisition(requisition)
@@ -456,11 +421,6 @@ class StockMovementService {
         if (!picklistItem) {
             picklistItem = new PicklistItem()
             picklist.addToPicklistItems(picklistItem)
-        }
-
-        // Set pick reason code if it is different than the one that has already been added to the item
-        if (reasonCode && requisitionItem.pickReasonCode != reasonCode) {
-            requisitionItem.pickReasonCode = reasonCode
         }
 
         // Remove from picklist
@@ -480,7 +440,7 @@ class StockMovementService {
             picklistItem.quantity = quantity
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
-            picklistItem.sortOrder = requisitionItem.orderIndex
+            picklistItem.sortOrder = stockMovementItem.sortOrder
         }
         picklist.save(flush: true)
     }
@@ -808,10 +768,6 @@ class StockMovementService {
      */
     PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
 
-        if (!requisitionItem.picklistItems || (requisitionItem.picklistItems && requisitionItem.totalQuantityPicked() != requisitionItem.quantity &&
-                !requisitionItem.picklistItems.reasonCode)) {
-            createPicklist(requisitionItem)
-        }
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
@@ -1504,7 +1460,7 @@ class StockMovementService {
         } else if (requisitionItem.picklistItems) {
             // if there is picklist created check if quantity picked is equal to quantity requested if there was no reason code given(items canceled during pick or picked partially have reason code)
             if (requisitionItem.totalQuantityPicked() != requisitionItem.quantity && !requisitionItem.picklistItems.reasonCode) {
-                throw new ValidationException("Please change the pick qty for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name + " or enter reason code.", requisitionItem.errors)
+                throw new ValidationException("Quantity picked does not match quantity requested for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name, requisitionItem.errors)
             }
         }
     }

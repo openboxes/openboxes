@@ -12,6 +12,9 @@ package org.pih.warehouse.order
 
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
+import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
@@ -20,6 +23,7 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.core.Location
 
 class OrderService {
 
