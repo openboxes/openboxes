@@ -15,19 +15,18 @@ import org.apache.poi.hssf.usermodel.*
 import org.apache.poi.ss.usermodel.*
 import org.grails.plugins.csv.CSVWriter
 import org.grails.plugins.excelimport.ExcelImportUtils
-import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.core.UnitOfMeasureClass
-import org.pih.warehouse.core.UnitOfMeasureType
+import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
+import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.product.Category
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.UnitOfMeasureClass
+import org.pih.warehouse.product.Product
 
 import java.text.SimpleDateFormat
 
@@ -536,7 +535,7 @@ class DataService {
             "ID" { it.id }
             "SKU" { it.productCode }
             "Name" { it.name }
-            org.pih.warehouse.product.Category { it.category }
+            Category { it.category }
             "Description" { it.description }
             "Unit of Measure" { it.unitOfMeasure }
             "Manufacturer" { it.manufacturer }
@@ -589,7 +588,7 @@ class DataService {
         def csv = new CSVWriter(sw, {
             "Product Code" { it.productCode }
             "Product Name" { it.productName }
-            "Inventory" { it.inventory }
+            Inventory { it.inventory }
             "Status" { it.status }
             "Bin Location" { it.binLocation }
             "Preferred" { it.preferred }

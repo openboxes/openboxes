@@ -11,7 +11,6 @@ package org.pih.warehouse.order
 
 import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 class OrderWorkflowController {

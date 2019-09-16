@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.inventory.InventoryLevel; org.pih.warehouse.product.Product" %>
+<%@ page import="org.pih.warehouse.inventory.InventoryLevel; org.pih.warehouse.inventory.InventoryLevel; org.pih.warehouse.product.Product" %>
 <html>
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -443,7 +443,7 @@
                             <g:render template="productPackages" model="[productInstance:productInstance]"/>
 						</div>
                         <div id="inventory-level-dialog" class="dialog hidden" title="Add a new stock level">
-                            <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new InventoryLevel()]"/>
+                            <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new org.pih.warehouse.inventory.InventoryLevel()]"/>
                         </div>
                         <div id="uom-class-dialog" class="dialog hidden" title="Add a unit of measure class">
                             <g:render template="uomClassDialog" model="[productInstance:productInstance]"/>

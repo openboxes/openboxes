@@ -13,6 +13,7 @@ import grails.converters.JSON
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.UnresolvableObjectException
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Location
 
 class BinLocationApiController {
 

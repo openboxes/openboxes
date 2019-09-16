@@ -11,6 +11,7 @@ package org.pih.warehouse.user
 
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.validation.ValidationException
+import org.pih.warehouse.core.*
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.MailService
@@ -18,8 +19,8 @@ import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
 
 import javax.imageio.ImageIO as IIO
-import javax.swing.ImageIcon
-import java.awt.Graphics2D
+import javax.swing.*
+import java.awt.*
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
 
@@ -476,7 +477,7 @@ class UserController {
         else {
             List<LocationRole> locationRoles = LocationRole.findAllByUserAndLocation(user, location)
             roles.each { role ->
-                LocationRole foundLocationRole = locationRoles.find { it.role?.id == role?.id }
+                LocationRole foundLocationRole = locationRoles.find { it.role == role }
                 if (!foundLocationRole) {
                     foundLocationRole = new LocationRole()
                     foundLocationRole.role = role

@@ -11,6 +11,7 @@ package org.pih.warehouse.picklist
 
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.Requisition
 
 class PicklistService {
 

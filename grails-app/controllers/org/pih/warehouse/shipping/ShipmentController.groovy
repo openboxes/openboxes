@@ -14,11 +14,19 @@ import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.krysalis.barcode4j.impl.code128.Code128Bean
 import org.pih.warehouse.core.*
-import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionException
+import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventType
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.MailService
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
-import org.pih.warehouse.receiving.ReceiptItem
 
 class ShipmentController {
 
@@ -227,7 +235,7 @@ class ShipmentController {
                 return
             }
 
-            def eventTypes = org.pih.warehouse.core.EventType.list()
+            def eventTypes = EventType.list()
             def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
             [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, shippingEventTypes: eventTypes]
         }

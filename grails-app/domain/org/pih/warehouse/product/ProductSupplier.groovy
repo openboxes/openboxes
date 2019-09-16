@@ -13,6 +13,7 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.Organization
 
 class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 

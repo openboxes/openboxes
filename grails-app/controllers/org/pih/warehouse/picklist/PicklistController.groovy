@@ -12,6 +12,8 @@ package org.pih.warehouse.picklist
 import grails.converters.JSON
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.requisition.Requisition
 
 class PicklistController {
 

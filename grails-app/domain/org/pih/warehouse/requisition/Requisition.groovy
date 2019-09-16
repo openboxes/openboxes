@@ -9,15 +9,15 @@
  * */
 package org.pih.warehouse.requisition
 
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.Shipment
 
 class Requisition implements Comparable<Requisition>, Serializable {
 
@@ -151,7 +151,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         requestedDeliveryDate(nullable: false)
 
         // FIXME Even though Grails complains that "derived properties may not be constrained", when you remove the constraint there are validation errors on Requisition
-        // OB-3180 Derived properties may not be constrained. Property [monthRequested] of domain class org.pih.warehouse.requisition.Requisition will not be checked during validation.
+        // OB-3180 Derived properties may not be constrained. Property [monthRequested] of domain class Requisition will not be checked during validation.
         monthRequested(nullable: true)
         dateCreated(nullable: true)
         dateChecked(nullable: true)

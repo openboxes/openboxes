@@ -157,7 +157,7 @@ https://openboxes.ngrok.io/openboxes/api/generic/product
 	"errorMessage": "Validation errors",
 	"data": {
 		"errors": [{
-			"object": "org.pih.warehouse.product.Product",
+			"object": "Product",
 			"field": "category",
 			"rejected-value": null,
 			"message": "Property [category] of class [Product] cannot be null"

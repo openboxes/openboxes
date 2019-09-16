@@ -43,7 +43,7 @@
                                     <label for="product"><warehouse:message code="productAssociation.product.label" default="Product" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: productAssociationInstance, field: 'product', 'errors')}">
-                                    %{--<g:select class="chzn-select-deselect" name="product.id" from="${org.pih.warehouse.product.Product.list()}" optionKey="id" value="${productAssociationInstance?.product?.id}"  />--}%
+                                    %{--<g:select class="chzn-select-deselect" name="product.id" from="${Product.list()}" optionKey="id" value="${productAssociationInstance?.product?.id}"  />--}%
                                     <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName" styleClass="text"/>
                                 </td>
                             </tr>
@@ -53,7 +53,7 @@
 									<label for="associatedProduct"><warehouse:message code="productAssociation.associatedProduct.label" default="Associated Product" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productAssociationInstance, field: 'associatedProduct', 'errors')}">
-									%{--<g:select class="chzn-select-deselect" name="associatedProduct.id" from="${org.pih.warehouse.product.Product.list()}" optionKey="id" value="${productAssociationInstance?.associatedProduct?.id}"  />--}%
+									%{--<g:select class="chzn-select-deselect" name="associatedProduct.id" from="${Product.list()}" optionKey="id" value="${productAssociationInstance?.associatedProduct?.id}"  />--}%
                                     <g:autoSuggest id="associatedProduct" name="associatedProduct" jsonUrl="${request.contextPath }/json/findProductByName" styleClass="text" />
 								</td>
 							</tr>

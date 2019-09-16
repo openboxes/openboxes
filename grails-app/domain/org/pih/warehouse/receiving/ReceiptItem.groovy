@@ -14,6 +14,11 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.ShipmentItem
 
 
 class ReceiptItem implements Comparable<ReceiptItem>, Serializable {

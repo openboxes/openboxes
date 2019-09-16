@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.product.Product
 
 class PartialReceivingApiController {
 

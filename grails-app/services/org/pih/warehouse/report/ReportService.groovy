@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.report
 
-
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
@@ -22,6 +21,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
+import org.pih.warehouse.core.Location
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import util.InventoryUtil
@@ -36,6 +36,7 @@ class ReportService implements ApplicationContextAware {
     def dashboardService
     def grailsApplication
     def userService
+
 
     ApplicationContext applicationContext
 
@@ -369,15 +370,13 @@ class ReportService implements ApplicationContextAware {
     }
 
 
-
-
     void buildTransactionTypeDimension() {
         String insertStatement = """
             INSERT into transaction_type_dimension (version, transaction_code, transaction_type_name, transaction_type_id)
             SELECT 0, transaction_type.transaction_code, substring_index(transaction_type.name, '|', 1), transaction_type.id
             FROM transaction_type
         """
-        dataService.executeStatements([insertStatement])
+        executeStatements([insertStatement])
     }
 
     void buildLotDimension() {
@@ -387,7 +386,7 @@ class ReportService implements ApplicationContextAware {
             FROM inventory_item
             JOIN product ON product.id = inventory_item.product_id;
         """
-        dataService.executeStatements([insertStatement])
+        executeStatements([insertStatement])
     }
 
     void buildProductDimension() {

@@ -15,17 +15,15 @@ import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
+import org.pih.warehouse.order.*
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.OrderItemStatusCode
-import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.order.OrderTypeCode
 
 class PutawayService {
 

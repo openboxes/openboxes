@@ -10,7 +10,7 @@
 </script>	   
 <div id="dlgAddLocation" title="${warehouse.message(code:'default.add.label', args: [warehouse.message(code: 'location.label')])}" style="padding: 10px; display: none;" >
 
-	<jqvalui:renderValidationScript for="org.pih.warehouse.core.Location" form="addLocation" 
+	<jqvalui:renderValidationScript for="org.pih.warehouse.core.Location" form="addLocation"
 		renderErrorsOnTop="true"/>
 
 	<jqvalui:renderErrors/>				
@@ -36,7 +36,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}" 
+						<g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
 							optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${locationInstance?.locationType?.id}" noSelection="['':'']" />
 	                                							
 						

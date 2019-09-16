@@ -9,11 +9,11 @@
  * */
 package org.pih.warehouse.reporting
 
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.core.Location
 
 class GoodsReceiptNoteController {
 

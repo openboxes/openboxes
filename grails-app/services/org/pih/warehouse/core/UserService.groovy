@@ -9,29 +9,10 @@
  **/
 package org.pih.warehouse.core
 
-import com.unboundid.ldap.sdk.BindRequest
-import com.unboundid.ldap.sdk.BindResult
-import com.unboundid.ldap.sdk.DN
-import com.unboundid.ldap.sdk.DNEntrySource
-import com.unboundid.ldap.sdk.DereferencePolicy
-import com.unboundid.ldap.sdk.Entry
-import com.unboundid.ldap.sdk.Filter
-import com.unboundid.ldap.sdk.LDAPConnection
-import com.unboundid.ldap.sdk.LDAPException
-import com.unboundid.ldap.sdk.ResultCode
-import com.unboundid.ldap.sdk.SearchRequest
-import com.unboundid.ldap.sdk.SearchResult
-import com.unboundid.ldap.sdk.SearchResultEntry
-import com.unboundid.ldap.sdk.SearchScope
-import com.unboundid.ldap.sdk.SimpleBindRequest
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
 import org.pih.warehouse.auth.AuthService
-import util.StringUtil
-
-import javax.net.SocketFactory
-import java.security.GeneralSecurityException
 
 class UserService {
 
@@ -276,29 +257,6 @@ class UserService {
                 eq("active", true)
                 roles {
                     eq("id", role.id)
-                }
-            }
-        }
-        return users
-    }
-
-    def findUsersByRoleTypes(Location location, List<RoleType> roleTypes) {
-        def users = []
-        def roleList = Role.findAllByRoleTypeInList(roleTypes)
-        def roleIds = roleList.collect { it.id }
-        if (roleIds) {
-            users = User.createCriteria().listDistinct {
-                eq("active", true)
-                or {
-                    roles {
-                        'in'("id", roleIds)
-                    }
-                    if (location) {
-                        locationRoles {
-                            'in'("role.id", roleIds)
-                            eq("location.id", location.id)
-                        }
-                    }
                 }
             }
         }

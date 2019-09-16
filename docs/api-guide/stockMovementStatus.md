@@ -246,11 +246,11 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d '{"status":
       "class": "org.springframework.validation.ObjectError",
       "code": "shipment.invalid.alreadyShipped",
       "codes": [
-        "shipment.invalid.alreadyShipped.org.pih.warehouse.shipping.Shipment",
+        "shipment.invalid.alreadyShipped.Shipment",
         "shipment.invalid.alreadyShipped"
       ],
       "defaultMessage": "Shipment has already shipped",
-      "objectName": "org.pih.warehouse.shipping.Shipment"
+      "objectName": "Shipment"
     }
   ]
 }

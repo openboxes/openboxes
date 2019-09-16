@@ -182,7 +182,7 @@ class ProductController {
 
         println "Create product: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		render(view: "edit", model: [productInstance : productInstance, rootCategory: rootCategory, locationInstance: location])
+	render(view: "edit", model: [productInstance : productInstance, rootCategory: rootCategory, locationInstance: location])
         println "After render create.gsp for product: " + (System.currentTimeMillis() - startTime) + " ms"
     }
 
@@ -313,7 +313,7 @@ class ProductController {
                 productInstance.attributes.clear()
                 productInstance = Product.read(params.id)
                 productInstance.errors = e.errors
-                render view: "edit", model: [productInstance:productInstance]
+                render view: "edit", model: [productInstance: productInstance]
                 return
             }
         } else {
@@ -467,12 +467,12 @@ class ProductController {
             redirect(action: "edit", id: productInstance?.id)
         } else {
             def location = Location.get(session.warehouse.id)
-			def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
+            def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
             if (!inventoryLevelInstance) {
                 inventoryLevelInstance = new InventoryLevel()
             }
 
-			render(view: "edit", model: [productInstance: productInstance, inventoryLevelInstance: inventoryLevelInstance, packageInstance: packageInstance, rootCategory: productService.getRootCategory()])
+            render(view: "edit", model: [productInstance: productInstance, inventoryLevelInstance: inventoryLevelInstance, packageInstance: packageInstance, rootCategory: productService.getRootCategory()])
         }
     }
 

@@ -12,9 +12,9 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -59,7 +59,6 @@ class StockMovementItemApiController {
 
         log.debug("Updating picklist items")
         List picklistItems = jsonObject.remove("picklistItems")
-        String reasonCode = jsonObject.reasonCode
 
         if (!picklistItems) {
             throw new IllegalArgumentException("Must specifiy picklistItems")
@@ -78,6 +77,7 @@ class StockMovementItemApiController {
             BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
                     new BigDecimal(picklistItemMap.quantityPicked) : null
 
+            String reasonCode = picklistItemMap.reasonCode
             String comment = picklistItemMap.comment
 
             stockMovementService.createOrUpdatePicklistItem(stockMovementItem, picklistItem, inventoryItem, binLocation,

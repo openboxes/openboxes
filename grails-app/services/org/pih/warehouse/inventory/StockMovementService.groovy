@@ -874,7 +874,12 @@ class StockMovementService {
      *
      * @param id
      */
-    void createPicklist(RequisitionItem requisitionItem) {
+    void createPicklist(StockMovementItem stockMovementItem) {
+
+        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
+
+        // This is kind of a hack, but it's the only way I could figure out how to get the origin field
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
         Product product = requisitionItem.product
         Location location = requisitionItem?.requisition?.origin
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
@@ -888,9 +893,9 @@ class StockMovementService {
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
             if (suggestedItems) {
-                clearPicklist(requisitionItem)
+                clearPicklist(stockMovementItem)
                 for (SuggestedItem suggestedItem : suggestedItems) {
-                    createOrUpdatePicklistItem(requisitionItem,
+                    createOrUpdatePicklistItem(stockMovementItem,
                             null,
                             suggestedItem.inventoryItem,
                             suggestedItem.binLocation,
@@ -907,13 +912,6 @@ class StockMovementService {
                                     Integer quantity, String reasonCode, String comment) {
 
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantity, reasonCode, comment)
-    }
-
-    void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
-                                    InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment) {
-
         Requisition requisition = requisitionItem.requisition
 
         Picklist picklist = Picklist.findByRequisition(requisition)
@@ -926,11 +924,6 @@ class StockMovementService {
         if (!picklistItem) {
             picklistItem = new PicklistItem()
             picklist.addToPicklistItems(picklistItem)
-        }
-
-        // Set pick reason code if it is different than the one that has already been added to the item
-        if (reasonCode && requisitionItem.pickReasonCode != reasonCode) {
-            requisitionItem.pickReasonCode = reasonCode
         }
 
         // Remove from picklist
@@ -950,7 +943,7 @@ class StockMovementService {
             picklistItem.quantity = quantity
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
-            picklistItem.sortOrder = requisitionItem.orderIndex
+            picklistItem.sortOrder = stockMovementItem.sortOrder
         }
         picklist.save(flush: true)
     }

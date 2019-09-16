@@ -9,9 +9,9 @@
  **/
 package org.pih.warehouse.shipping
 
-import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.Document
 
 class ShipmentWorkflowController {
 
