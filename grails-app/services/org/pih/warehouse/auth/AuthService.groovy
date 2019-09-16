@@ -11,6 +11,8 @@ package org.pih.warehouse.auth
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 
 class AuthService {
 

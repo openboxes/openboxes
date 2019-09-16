@@ -27,7 +27,6 @@ import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
 import org.docx4j.convert.out.pdf.viaXSLFO.Conversion
 import org.docx4j.jaxb.Context
-import org.docx4j.openpackaging.io.SaveToZipFile
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart
 import org.docx4j.openpackaging.parts.relationships.Namespaces
@@ -62,7 +61,6 @@ import javax.xml.bind.JAXBException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
-
 class DocumentService {
 
     def grailsApplication
@@ -71,15 +69,15 @@ class DocumentService {
 
 
     private getMessageTagLib() {
-        return grailsApplication.mainContext.getBean('org.pih.warehouse.MessageTagLib')
+        return grailsApplication.mainContext.getBean('MessageTagLib')
     }
 
     private getFormatTagLib() {
-        return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+        return grailsApplication.mainContext.getBean('FormatTagLib')
     }
 
 
-    File writeImage(org.pih.warehouse.core.Document document) {
+    File writeImage(Document document) {
         File file
         try {
             file = new File(document.filename)
@@ -94,7 +92,7 @@ class DocumentService {
     }
 
 
-    void scaleImage(org.pih.warehouse.core.Document document, OutputStream outputStream, String width, String height) {
+    void scaleImage(Document document, OutputStream outputStream, String width, String height) {
 
         log.info("Scale image " + document.filename + " width=" + width + " height=" + height + " contentType=" + document.contentType)
         File file

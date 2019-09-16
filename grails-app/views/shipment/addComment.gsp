@@ -36,8 +36,8 @@
 										<tr class="prop">
 				                            <td valign="top" class="name"><label><warehouse:message code="default.to.label" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
-												<g:select id="recipientId" name='recipientId' noSelection="['':warehouse.message(code:'default.selectOne.label')]" 
-			                                    	from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="username"></g:select>
+												<g:select id="recipientId" name='recipientId' noSelection="['':warehouse.message(code:'default.selectOne.label')]"
+                                                          from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="username"></g:select>
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">

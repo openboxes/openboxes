@@ -18,7 +18,7 @@ class IndicatorController {
     def evaluate = {
 
         String code = """
-            import org.pih.warehouse.product.Product;
+            import Product;
             def products = Product.list();
             return products.size()
         """

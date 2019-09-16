@@ -1,0 +1,432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<title>jQuery Watermark 3.1.3 Demo</title>
+
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+	<script type="text/javascript">google.load("jquery", "1.5.1");</script>
+	<script type="text/javascript" src="jquery.watermark.js"></script>
+
+	<style type="text/css" media="screen">
+		.watermark {
+			color: #999 !important;
+		}
+		.watermark2 {
+			color: #999 !important;
+			font-style: italic !important;
+		}
+		.watermark3 {
+			color: #c77 !important;
+		}
+
+		html {
+			color: #000;
+			background: #fff;
+		}
+		body {
+			margin: 10px;
+			font: 12px Verdana, Geneva, sans-serif;
+		}
+		h1 {
+			margin: 30px 0 10px;
+			font: bold 24px "Segoe UI", Arial, Helvetica, sans-serif;
+		}
+		h2 {
+			margin: 10px 0 20px;
+			font: bold 18px "Segoe UI", Arial, Helvetica, sans-serif;
+		}
+		h3 {
+			margin: 30px 0 10px;
+			font: bold 22px "Segoe UI", Arial, Helvetica, sans-serif;
+		}
+		form.cmxform fieldset {
+			margin-bottom: 10px;
+		}
+		form.cmxform legend {
+			padding: 0 5px;
+			font: bold 16px "Segoe UI", Arial, Helvetica, sans-serif;
+		}
+		form.cmxform label {
+			display: inline-block;
+			line-height: 1.8;
+			vertical-align: top;
+		}
+		form.cmxform fieldset ol {
+			margin: 10px 4px;
+			padding: 0;
+		}
+		form.cmxform fieldset li {
+			list-style: none;
+			padding: 3px;
+			margin: 0;
+		}
+		form.cmxform fieldset fieldset {
+			border: none;
+			margin: 3px 0 0;
+		}
+		form.cmxform fieldset fieldset legend {
+			padding: 0 0 5px;
+			font-weight: normal;
+		}
+		form.cmxform fieldset fieldset label {
+			display: block;
+			width: auto;
+		}
+		form.cmxform em {
+			font-weight: bold;
+			font-style: normal;
+			color: #f00;
+		}
+		form.cmxform label {
+			width: 130px; /* Width of labels */
+		}
+		form.cmxform input[type=text],
+		form.cmxform input[type=password] {
+			width: 160px;
+			font: 14px "Segoe UI", Arial, Helvetica, sans-serif;
+		}
+		form.cmxform textarea {
+			width: 400px;
+			font: 14px/22px "Segoe UI", Arial, Helvetica, sans-serif;
+		}
+		#toc li {
+			margin: 4px 0;
+		}
+		#toc a {
+			text-decoration: none;
+			border-bottom: 1px solid #66c;
+			color: #00c;
+			outline: none;
+		}
+		a.top {
+			position: absolute;
+			right: 10px;
+			text-decoration: none;
+			border: 1px solid #99f;
+			border-top-color: #ddf;
+			border-left-color: #ddf;
+			padding: 3px 6px;
+			color: #00c;
+			outline: none;
+		}
+		#foot {
+			margin: 100px 0 30px;
+			border-top: 1px solid #ccc;
+			padding-top: 4px;
+			font: 11px Verdana, Geneva, sans-serif;
+		}
+		#foot p {
+			margin: 4px 0;
+		}
+		#foot h1 {
+			margin: 20px 0 4px;
+			font: bold 13px "Segoe UI", Arial, Helvetica, sans-serif;
+		}
+		#foot ul,
+		#foot li {
+			margin: 4px 0;
+		}
+		#foot a {
+			text-decoration: none;
+			border-bottom: 1px solid #66c;
+			color: #00c;
+			outline: none;
+		}
+	</style>
+<head>
+<body>
+
+<h1>jQuery Watermark Plugin</h1>
+<h2>v 3.1.3</h2>
+
+<fieldset id="summary">
+	<p>This jQuery plugin will easily create watermark hints in input and textarea elements.</p>
+	<p><strong>Features:</strong></p>
+	<ul>
+		<li>Watermark style is controlled by CSS classes</li>
+		<li>Each input element can have its own independent watermark text and class/style</li>
+		<li>Plugin automatically removes all watermarks prior to form submission</li>
+		<li>Both watermark text and CSS class name can be changed dynamically</li>
+		<li>Visual Studio Intellisense-compatible documentation included in source</li>
+		<li>Comes with jQuery selector extension ":data(...)" (documented in source)</li>
+		<li>Password input automatically switches back to obfuscated text when focused</li>
+		<li>Minified version is very compact &mdash; under 4,400 bytes</li>
+	</ul>
+	<p><strong>Demonstrations:</strong></p>
+	<ul id="toc">
+		<li><a href="#1">Demo 1</a> &ndash; Simple watermark</li>
+		<li><a href="#2">Demo 2</a> &ndash; Several watermarks created with one statement + different class name</li>
+		<li><a href="#3">Demo 3</a> &ndash; Watermark changed dynamically (countdown timer)</li>
+		<li><a href="#4">Demo 4</a> &ndash; Multi-line watermark in a TEXTAREA tag</li>
+		<li><a href="#5">Demo 5</a> &ndash; Watermark in a password input element</li>
+		<li><a href="#6">Demo 6</a> &ndash; Support for WebKit search element (type=&quot;search&quot;)</li>
+		<li><a href="#7">Demo 7</a> &ndash; .val() gets/sets underlying element value</li>
+	</ul>
+</fieldset>
+
+<form id="demo1" action="" method="GET" class="cmxform">
+	<h3>Demonstration 1</h3>
+	<fieldset>
+		<legend>Country uses simple watermark</legend>
+		<ol>
+			<li><label for="d1-name">Name <em>*</em></label> <input id="d1-name" /></li>
+			<li><label for="d1-address1">Address <em>*</em></label> <input id="d1-address1" /></li>
+			<li><label for="d1-town-city">Town/City <em>*</em></label> <input id="d1-town-city" /></li>
+			<li><label for="d1-state">State/Province <em>*</em></label> <input id="d1-state" /></li>
+			<li><label for="d1-postcode">Zip/Postcode <em>*</em></label> <input id="d1-postcode" /></li>
+			<li><label for="d1-country">Country</label> <input id="d1-country" name="d1-country" /></li>
+			<li><label></label> <input type="submit" value="Submit" /> &nbsp; <input id="d1-countryFocus" type="button" value="Set Focus to Country" /></li>
+			<li><label></label> &bull; This is a normal <strong>type=&quot;submit&quot;</strong> button.</li>
+			<li><label></label> &bull; Check the QueryString after clicking to verify that a watermark value is never submitted.</li>
+		</ol>
+	</fieldset>
+</form>
+
+<form id="demo2" action="" method="GET" class="cmxform">
+	<h3>Demonstration 2</h3>
+	<fieldset>
+		<legend>Several watermarks created with one statement + different class name</legend>
+		<ol>
+			<li><label for="d2-name">Name</label> <input id="d2-name" name="d2-name" class="required" /></li>
+			<li><label for="d2-address1">Address</label> <input id="d2-address1" name="d2-address1" class="required" /></li>
+			<li><label for="d2-town-city">Town/City</label> <input id="d2-town-city" name="d2-town-city" class="required" /></li>
+			<li><label for="d2-state">State/Province</label> <input id="d2-state" name="d2-state" class="required" /></li>
+			<li><label for="d2-postcode">Zip/Postcode</label> <input id="d2-postcode" name="d2-postcode" maxlength="5" class="required" /> (maxlength=5, but watermark is longer)</li>
+			<li><label for="d2-country">Country</label> <input id="d2-country" /></li>
+			<li><label></label> <input id="d2-submit" type="button" value="Submit" /></li>
+			<li><label></label> &bull; This Submit button issues a call to the <strong>form (DOM object) submit() function</strong> (programmatic submit).</li>
+			<li><label></label> &bull; Check the QueryString after clicking to verify that a watermark value is never submitted.</li>
+		</ol>
+	</fieldset>
+</form>
+
+<form id="demo3" action="" method="GET" class="cmxform">
+	<h3>Demonstration 3</h3>
+	<fieldset>
+		<legend>Shows how watermark can be changed dynamically</legend>
+		<ol>
+			<li><label for="d3-name">Name <em>*</em></label> <input id="d3-name" /></li>
+			<li><label for="d3-address1">Address <em>*</em></label> <input id="d3-address1" /></li>
+			<li><label for="d3-town-city">Town/City <em>*</em></label> <input id="d3-town-city" /></li>
+			<li><label for="d3-state">State/Province <em>*</em></label> <input id="d3-state" /></li>
+			<li><label for="d3-postcode">Zip/Postcode <em>*</em></label> <input id="d3-postcode" /></li>
+			<li><label for="d3-country">Country</label> <input id="d3-country" name="d3-country" /> <em id="d3-tip" style="display:none;">Clear input to restart timer</em></li>
+			<li><label></label> <input id="d3-submit" type="button" value="Submit" /></li>
+			<li><label></label> &bull; This Submit button issues a call to the <strong>jQuery submit() trigger</strong> (programmatic submit).</li>
+			<li><label></label> &bull; Check the QueryString after clicking to verify that a watermark value is never submitted.</li>
+			<li><label></label> &bull; Uses the <strong>useNative: false</strong> option so that a class name can be applied.</li>
+		</ol>
+	</fieldset>
+</form>
+
+<form id="demo4" action="" method="GET" class="cmxform">
+	<h3>Demonstration 4</h3>
+	<fieldset>
+		<legend>Multi-line watermark in a TEXTAREA tag</legend>
+		<ol>
+			<li><label for="d4-name">Name <em>*</em></label> <input id="d4-name" /></li>
+			<li><label for="d4-address">Address <em>*</em></label> <textarea id="d4-address" name="d4-address" rows="4" cols="60"></textarea></li>
+			<li><label for="d4-country">Country</label> <input id="d4-country" /></li>
+			<li><label></label> <input type="submit" value="Submit" /></li>
+			<li><label></label> &bull; This is a normal <strong>type=&quot;submit&quot;</strong> button.</li>
+			<li><label></label> &bull; Check the QueryString after clicking to verify that a watermark value is never submitted.</li>
+		</ol>
+	</fieldset>
+</form>
+
+<form id="demo5" action="" method="GET" class="cmxform">
+	<h3>Demonstration 5</h3>
+	<fieldset>
+		<legend>Watermark in a password input element</legend>
+		<ol>
+			<li><label for="d5-username">Username <em>*</em></label> <input id="d5-username" name="d5-username" /></li>
+			<li><label for="d5-password">Password <em>*</em></label> <input id="d5-password" name="d5-password" type="password" maxlength="10" /></li>
+			<li><label></label> <input type="submit" value="Submit" /></li>
+			<li><label></label> &bull; <strong>Do not enter any real passwords here!</strong>&nbsp; Use something like &quot;test&quot;.</li>
+			<li><label></label> &bull; It is not safe to set a watermarked password programmatically, so it's best to avoid.</li>
+			<li><label></label> &bull; This is a normal <strong>type=&quot;submit&quot;</strong> button.</li>
+			<li><label></label> &bull; Check the QueryString after clicking to verify that a watermark value is never submitted.</li>
+		</ol>
+	</fieldset>
+</form>
+
+<form id="demo6" action="" method="GET" class="cmxform">
+	<h3>Demonstration 6</h3>
+	<fieldset>
+		<legend>Support for WebKit search element (type=&quot;search&quot;)</legend>
+		<ol>
+			<li><label for="d6-nativesearch">Search <em>*</em></label> <input id="d6-nativesearch" name="d6-nativesearch" type="search" /></li>
+			<li><label for="d6-nativesearchhistory">Search w/ History <em>*</em></label> <input id="d6-nativesearchhistory" name="d6-nativesearchhistory" type="search" results="5" /></li>
+			<li><label for="d6-search">Search</label> <input id="d6-search" name="d6-search" type="search" /></li>
+			<li><label for="d6-searchhistory">Search w/ History</label> <input id="d6-searchhistory" name="d6-searchhistory" type="search" results="5" /></li>
+			<li><label></label> <input type="submit" value="Submit" /></li>
+			<li><label></label> &bull; This example is for WebKit browsers and any other browser that supports <strong style="white-space:nowrap">&lt;input type=&quot;search&quot; ... /&gt;</strong>.</li>
+			<li><label></label> &bull; The first two input elements (marked with <em>*</em>) use the native watermark capability (if available).</li>
+			<li><label></label> &bull; The 3rd and 4th input elements use the plugin [non-native] watermark functionality.</li>
+			<li><label></label> &bull; WebKit native watermark support is buggy for drag-and-drop into and between Search fields (try it).</li>
+			<li><label></label> &bull; Current recommendation is to set <strong>useNative: false</strong> for elements with type=&quot;search&quot;.</li>
+		</ol>
+	</fieldset>
+</form>
+
+<form id="demo7" action="" method="GET" class="cmxform">
+	<h3>Demonstration 7</h3>
+	<fieldset>
+		<legend>.val() gets/sets underlying element value</legend>
+		<ol>
+			<li><label for="d7-name">Name</label> <input id="d7-name" /></li>
+			<li><label for="d7-address1">Address</label> <input id="d7-address1" /></li>
+			<li><label for="d7-town-city">Town/City</label> <input id="d7-town-city" /></li>
+			<li><label for="d7-state">State/Province</label> <input id="d7-state" /></li>
+			<li><label for="d7-postcode">Zip/Postcode</label> <input id="d7-postcode" /></li>
+			<li><label for="d7-country">Country</label> <input id="d7-country" /></li>
+			<li><label></label> <input id="d7-show-values" type="button" value="Show Values" /> &nbsp; <input id="d7-set-values" type="button" value="Set Values" /></li>
+			<li><label></label> &bull; This demonstration uses jQuery's <strong>.val()</strong> to retrieve all element values.</li>
+			<li><label></label> &bull; After clicking Show Values, when you see &lt;empty&gt; displayed, it is correctly ignoring a watermark value.</li>
+			<li><label></label> &bull; Click Set Values to use .val() to set some elements to a value and others to a blank string. Watermarks/classes should be set.</li>
+			<li><label></label> &bull; Zip/Postcode and Country are configured with <strong>useNative: false</strong> so both native and non-native watermarks can be tested.</li>
+		</ol>
+	</fieldset>
+</form>
+<div id="foot">
+	<p>Watermark plugin for jQuery</p>
+	<p>Copyright &copy; 2009-2011 Todd Northrop</p>
+	<p>Visit Speednet Group at <a href="http://www.speednet.biz/">www.speednet.biz</a></p>
+	<h1>Some of our projects:</h1>
+	<ul>
+		<li><a href="http://jquery-if.googlecode.com/">IF plugin for jQuery</a></li>
+		<li><a href="http://jquery-watermark.googlecode.com/">Watermark plugin for jQuery</a></li>
+		<li><a href="http://topzindex.googlecode.com/">TopZIndex plugin for jQuery</a></li>
+		<li><a href="http://jquery-unwrap.googlecode.com/">Unwrap plugin for jQuery</a></li>
+		<li><a href="http://tinyautosave.googlecode.com/">Auto-Save plugin for TinyMCE</a></li>
+		<li><a href="http://www.lotterypost.com/gadget">Lottery Results Gagdet for Windows&nbsp;7&nbsp;&amp; Windows&nbsp;Vista</a></li>
+	</ul>
+</div>
+
+<script type="text/javascript">
+	// ** DEMO 1 *************
+	$(function () {
+		$("#d1-country").watermark("Leave blank for USA");
+		$("#d1-countryFocus").click(
+			function () {
+				$("#d1-country")[0].focus();
+			}
+		);
+	});
+
+	// ** DEMO 2 *************
+	$(function () {
+		$("#demo2 .required").watermark("Required", "watermark2");
+		$("#d2-submit").click(
+			function () {
+				this.form.submit();
+			}
+		);
+	});
+
+	// ** DEMO 3 *************
+	var $d3 = $("#d3-country"),
+		$d3tip = $("#d3-tip"),
+		c = 11,
+		timer;
+	
+	function countdown() {
+		if (--c == 0) {
+			$d3.val("United States").watermark();
+			$d3tip.show();
+		}
+		else {
+			$d3.watermark("Auto-select in: " + c, {
+				useNative: false,
+				className: (c>5)? "watermark" : "watermark3"
+			});
+			timer = window.setTimeout(countdown, 1000);
+		}
+	}
+	
+	$(function () {
+		timer = window.setTimeout(countdown, 1000);
+		$d3.focus(
+			function () {
+				if (timer) {
+					window.clearTimeout(timer);
+				}
+			}
+		).blur(
+			function () {
+				if ($d3.val().length == 0) {
+					c = 11;
+					$d3tip.hide();
+					countdown();
+				}
+			}
+		);
+		$("#d3-submit").click(
+			function () {
+				$(this.form).submit();
+			}
+		);
+	});
+	
+	// ** DEMO 4 *************
+	$(function () {
+		$("#d4-address").watermark("Full street address\nCity, state and zip\nUse as many lines as necessary.");
+	});
+
+	// ** DEMO 5 *************
+	$(function () {
+		$("#d5-username").watermark("Enter your username");
+		$("#d5-password").watermark("Enter your password");
+	});
+
+	// ** DEMO 6 *************
+	$(function () {
+		$("#d6-nativesearch").watermark("Search");
+		$("#d6-nativesearchhistory").watermark("Enter keyword(s) or select from past searches");
+		$("#d6-search").watermark("Search", {useNative: false});
+		$("#d6-searchhistory").watermark("Enter keyword(s) or select from past searches", {useNative: false});
+	});
+
+	// ** DEMO 7 *************
+	$(function () {
+		$("#d7-name,#d7-address1,#d7-town-city,#d7-state").watermark("Optional");
+		$("#d7-postcode,#d7-country").watermark( "Optional", { useNative: false } );
+		$("#d7-show-values").click(function () {
+			alert(
+				"Name:  " + ($("#d7-name").val() || "<empty>") + "\n"
+				+ "Address:  " + ($("#d7-address1").val() || "<empty>") + "\n"
+				+ "Town/City:  " + ($("#d7-town-city").val() || "<empty>") + "\n"
+				+ "State/Province:  " + ($("#d7-state").val() || "<empty>") + "\n"
+				+ "Zip/Postcode:  " + ($("#d7-postcode").val() || "<empty>") + "\n"
+				+ "Country:  " + ($("#d7-country").val() || "<empty>") + "\n"
+			);
+		});
+		$("#d7-set-values").click(function () {
+			$("#d7-name").val("John Doe");
+			$("#d7-address1").val("");
+			$("#d7-town-city").val("Someplace");
+			$("#d7-state").val("");
+			$("#d7-postcode").val("00000");
+			$("#d7-country").val("");
+		});
+	});
+
+	// ** Table of Contents *************
+	$("#toc li a").each(function () {
+		var i = this.hash.slice(1), y = $("#demo" + i).offset().top;
+		
+		$(this).click(function () {
+			window.scrollTo(0, y - 20);
+			return false;
+		});
+		
+		$('<a href="#" class="top">&uArr; Top of page</a>').appendTo("body").css("top", y + 20).click(function () {
+			window.scrollTo(0, 0);
+			return false;
+		});
+	});
+</script>
+	
+</body>
+</html>

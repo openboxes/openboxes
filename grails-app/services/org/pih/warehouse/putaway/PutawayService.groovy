@@ -17,6 +17,7 @@ import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
@@ -27,8 +28,8 @@ import org.pih.warehouse.order.OrderType
 
 class PutawayService {
 
-    def locationService
-    def inventoryService
+    LocationService locationService
+    InventoryService inventoryService
     def productAvailabilityService
     def grailsApplication
 
