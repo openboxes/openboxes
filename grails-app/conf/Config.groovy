@@ -118,8 +118,9 @@ grails.spring.bean.packages = []
 grails.exceptionresolver.params.exclude = ['password']
 
 grails.validateable.packages = [
-        'org.pih.warehouse.inventory',
+        'org.pih.warehouse.api',
         'org.pih.warehouse.fulfillment',
+        'org.pih.warehouse.inventory',
         'org.pih.warehouse.order',
         'org.pih.warehouse.request',
         'org.pih.warehouse.shipment',
@@ -155,6 +156,9 @@ environments {
     development {
     }
     test {
+        quartz {
+            autoStartup = false
+        }
     }
     loadtest {
     }

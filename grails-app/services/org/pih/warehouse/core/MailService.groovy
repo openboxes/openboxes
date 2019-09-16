@@ -33,7 +33,7 @@ class MailService {
     }
 
     Integer getDefaultPort() {
-        Integer.parseInt(config.grails.mail.port)
+        Integer.valueOf(config.grails.mail.port)
     }
 
     String getUsername() {
@@ -162,7 +162,7 @@ class MailService {
      * @return
      */
     def sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) {
-        log.info "Sending email with subject ${subject} to ${to}"
+        log.info "Sending email with subject ${subject} to ${to} from ${getDefaultFrom()} via ${defaultHost}:${port?:defaultPort}"
         if (isMailEnabled() || override) {
             log.info "Sending html email '" + subject + "' to " + to
             try {

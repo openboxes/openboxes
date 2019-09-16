@@ -48,7 +48,7 @@ export function fetchUsers() {
 }
 
 export function fetchSessionInfo() {
-  const url = '/openboxes/api/getSession';
+  const url = '/openboxes/api/getAppContext';
   const request = apiClient.get(url);
 
   return {

@@ -72,7 +72,7 @@ class ProductIntegrationTests extends GroovyTestCase{
       def sevenDaysAgo = new Date().minus(7)
       DbHelper.recordProductInventory(product, boston, "tets1234234", new Date().plus(100), 300, tenDaysAgo)
       DbHelper.recordProductInventory(product, boston, "tets1234234", new Date().plus(100), 300, sevenDaysAgo)
-      DbHelper.recordInventory(product, miami, "tets12323412", new Date().plus(100), 300, fiveDaysAgo)
+      DbHelper.recordProductInventory(product, miami, "tets12323412", new Date().plus(100), 300, fiveDaysAgo)
       DbHelper.transferStock(product, boston, "tets1234234", 999, threeDaysAgo, miami)
 
       def dateForBoston = product.latestInventoryDate(boston.id)

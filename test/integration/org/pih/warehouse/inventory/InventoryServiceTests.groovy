@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.inventory
 
+import org.junit.Ignore
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.core.Constants
@@ -106,11 +107,10 @@ class InventoryServiceTests extends GroovyTestCase {
 
         basicTestFixture()
 
-        transaction1 = new Transaction(transactionType: transactionType_inventory, transactionDate: new Date() - 5, inventory: bostonInventory)
+        transaction1 = new Transaction(transactionType: transactionType_productInventory, transactionDate: new Date() - 5, inventory: bostonInventory)
         transaction1.addToTransactionEntries(new TransactionEntry(quantity: 10, inventoryItem: aspirinItem1))
         transaction1.addToTransactionEntries(new TransactionEntry(quantity: 25, inventoryItem: aspirinItem2))
         transaction1.addToTransactionEntries(new TransactionEntry(quantity: 36, inventoryItem: tylenolItem))
-
 
         transaction2 = new Transaction(transactionType: transactionType_consumptionDebit, transactionDate: new Date() - 4, inventory: bostonInventory)
         transaction2.addToTransactionEntries(new TransactionEntry(quantity: 2, inventoryItem: aspirinItem1))
@@ -119,7 +119,6 @@ class InventoryServiceTests extends GroovyTestCase {
 
         transaction3 = new Transaction(transactionType: transactionType_productInventory, transactionDate: new Date() - 3, inventory: bostonInventory)
         transaction3.addToTransactionEntries(new TransactionEntry(quantity: 100, inventoryItem: aspirinItem1))
-
 
         transaction4 = new Transaction(transactionType: transactionType_transferIn, transactionDate: new Date() - 2, inventory: bostonInventory, source: haitiLocation)
         transaction4.addToTransactionEntries(new TransactionEntry(quantity: 24, inventoryItem: aspirinItem1))
@@ -133,8 +132,8 @@ class InventoryServiceTests extends GroovyTestCase {
 
         def transactions = [transaction1, transaction2, transaction3, transaction4, transaction5]
         transactions.each {
-            if(!it.save(flush: true)){
-              it.errors.allErrors.each {
+            if (!it.save(flush: true)) {
+                it.errors.allErrors.each {
                     println it
                 }
             }
@@ -238,6 +237,7 @@ class InventoryServiceTests extends GroovyTestCase {
         level6.save(flush:true)
     }
 
+    @Ignore // FIXME We removed the showHidden feature awhile back
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsNoInventoryLevelsAtCurrentInventory() {
         inventoryLevelTestFixture()
         //def inventoryService = new InventoryService()
@@ -250,6 +250,7 @@ class InventoryServiceTests extends GroovyTestCase {
         assert result.contains(advilProduct)
     }
 
+    @Ignore // FIXME We removed the showHidden feature awhile back
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsNotSupported() {
         inventoryLevelTestFixture()
         //def inventoryService = new InventoryService()
@@ -262,6 +263,7 @@ class InventoryServiceTests extends GroovyTestCase {
         assert !result.contains(ibuprofenProduct)
     }
 
+    @Ignore // FIXME We removed the showHidden feature awhile back
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsSupported() {
         inventoryLevelTestFixture()
         //def inventoryService = new InventoryService()
@@ -347,18 +349,18 @@ class InventoryServiceTests extends GroovyTestCase {
     void getQuantity(){
         transactionEntryTestFixture()
 
-        assert inventoryService.getQuantity(bostonInventory, aspirinItem1) == 94
-        assert inventoryService.getQuantity(bostonInventory, aspirinItem2) == 3
-        assert inventoryService.getQuantity(bostonInventory, tylenolItem) == 25
+        assert inventoryService.getQuantity(bostonInventory, (Location) null, aspirinItem1) == 94
+        assert inventoryService.getQuantity(bostonInventory, (Location) null, aspirinItem2) == 3
+        assert inventoryService.getQuantity(bostonInventory, (Location) null, tylenolItem) == 25
     }
 
     @Test
     void getQuantity_shouldHandleTransactionsForSameDay(){
         transactionEntryTestFixture2()
 
-        assert inventoryService.getQuantity(bostonInventory, aspirinItem1) == 94
-        assert inventoryService.getQuantity(bostonInventory, aspirinItem2) == 3
-        assert inventoryService.getQuantity(bostonInventory, tylenolItem) == 25
+        assert inventoryService.getQuantity(bostonInventory, (Location) null, aspirinItem1) == 94
+        assert inventoryService.getQuantity(bostonInventory, (Location) null, aspirinItem2) == 3
+        assert inventoryService.getQuantity(bostonInventory, (Location) null, tylenolItem) == 25
     }
 
 
@@ -510,9 +512,7 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_getProductsByTags() {
         productTagTestFixture()
         //def inventoryService = new InventoryService()
-        def tags = new ArrayList()
-        tags.add("thistag")
-        tags.add("thattag")
+        def tags = ["thistag", "thattag"].collect { Tag.findByTag(it).id }
 
         def results = inventoryService.getProductsByTags(tags, 10, 0)
         assertEquals 2, results.size()
@@ -532,10 +532,8 @@ class InventoryServiceTests extends GroovyTestCase {
     @Test
     void getProductsByTag_shouldNotFailDueToSQLGrammarException() {
         productTagTestFixture()
-        def tags = Tag.list()
-
-        assertEquals 2, tags.size()
-        def results = inventoryService.getProductsByTags(["thistag"] as List, -1, 0)
+        def tags = ["thistag"].collect { Tag.findByTag(it).id }
+        def results = inventoryService.getProductsByTags(tags, -1, 0)
         assertEquals 1, results.size()
     }
 
