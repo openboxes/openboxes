@@ -1,0 +1,7 @@
+version 1.1:
+    -new: added options to work with http://imageresizing.net/ server-side effects. 
+        View options page here: http://www.garralab.com/nailthumb-options.php 
+        or the live demo here: http://www.garralab.com/nailthumb-serverside-demo.php
+    -fix: fixed a css problem that prevented IE7 from working correctly. 
+        IE7 need the container to have positon:relative for overflow:hidden to work properly.
+    

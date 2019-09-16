@@ -11,6 +11,7 @@ package org.pih.warehouse
 
 
 import org.pih.warehouse.core.Localization
+import org.pih.warehouse.core.Localization
 
 import java.text.MessageFormat
 

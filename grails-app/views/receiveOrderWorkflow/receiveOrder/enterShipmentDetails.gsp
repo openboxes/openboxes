@@ -54,7 +54,7 @@
 								<td valign='top'class='value'>
 									<div style="width:300px">
 										<g:select name="shipmentType.id" from="${org.pih.warehouse.shipping.ShipmentType.list()}" class="chzn-select-deselect"
-												  optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
+                                                  optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${orderCommand?.shipmentType?.id }" noSelection="['':'']" />
 
 									</div>
 								</td>
