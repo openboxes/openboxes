@@ -9,16 +9,9 @@
  **/
 package org.pih.warehouse.core
 
-
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.CreationHelper
-import org.apache.poi.ss.usermodel.Font
-import org.apache.poi.ss.usermodel.Row
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddress
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.docx4j.TextUtils
@@ -26,37 +19,20 @@ import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
 import org.docx4j.convert.out.pdf.viaXSLFO.Conversion
 import org.docx4j.jaxb.Context
-import org.docx4j.openpackaging.io.SaveToZipFile
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart
 import org.docx4j.openpackaging.parts.relationships.Namespaces
-import org.docx4j.wml.Body
-import org.docx4j.wml.BooleanDefaultTrue
-import org.docx4j.wml.Document
-import org.docx4j.wml.P
-import org.docx4j.wml.R
-import org.docx4j.wml.RPr
-import org.docx4j.wml.Tbl
-import org.docx4j.wml.TblGrid
-import org.docx4j.wml.TblGridCol
-import org.docx4j.wml.TblPr
-import org.docx4j.wml.TblWidth
-import org.docx4j.wml.Tc
-import org.docx4j.wml.TcPr
-import org.docx4j.wml.Text
-import org.docx4j.wml.Tr
-import org.docx4j.wml.TrPr
+import org.docx4j.wml.*
 import org.groovydev.SimpleImageBuilder
 import org.pih.warehouse.api.Stocklist
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 
 import javax.xml.bind.JAXBException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-
 
 class DocumentService {
 
@@ -66,15 +42,15 @@ class DocumentService {
 
 
     private getMessageTagLib() {
-        return grailsApplication.mainContext.getBean('org.pih.warehouse.MessageTagLib')
+        return grailsApplication.mainContext.getBean('MessageTagLib')
     }
 
     private getFormatTagLib() {
-        return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+        return grailsApplication.mainContext.getBean('FormatTagLib')
     }
 
 
-    File writeImage(org.pih.warehouse.core.Document document) {
+    File writeImage(Document document) {
         File file
         try {
             file = new File(document.filename)
@@ -89,7 +65,7 @@ class DocumentService {
     }
 
 
-    void scaleImage(org.pih.warehouse.core.Document document, OutputStream outputStream, String width, String height) {
+    void scaleImage(Document document, OutputStream outputStream, String width, String height) {
 
         log.info("Scale image " + document.filename + " width=" + width + " height=" + height + " contentType=" + document.contentType)
         File file

@@ -9,7 +9,7 @@
 	});
 </script>	   
 <div id="dlgAddShipper" title="${warehouse.message(code:'default.add.label', args: [warehouse.message(code: 'shipper.label')])}" style="padding: 10px; display: none;" >
-	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Shipper" form="addShipper" 
+	<jqvalui:renderValidationScript for="org.pih.warehouse.shipping.Shipper" form="addShipper"
 		renderErrorsOnTop="true"/>
 
 	<jqvalui:renderErrors/>			
