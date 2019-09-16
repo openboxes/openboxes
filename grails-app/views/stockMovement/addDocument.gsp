@@ -41,7 +41,7 @@
 							code="document.type.label" /></label></td>
 					<td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
 						<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list().sort { it.name }}" noSelection="['':'']"
-								  class="chzn-select-deselect" value="${documentInstance?.documentType?.id}" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
+                                  class="chzn-select-deselect" value="${documentInstance?.documentType?.id}" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
 					</td>
 				</tr>
 				<tr class="prop">

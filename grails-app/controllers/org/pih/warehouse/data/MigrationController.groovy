@@ -13,12 +13,13 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.jobs.DataMigrationJob
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.reporting.*
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.reporting.ConsumptionFact
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.reporting.LocationDimension

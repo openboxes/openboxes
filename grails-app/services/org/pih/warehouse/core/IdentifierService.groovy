@@ -17,11 +17,11 @@ import org.apache.commons.text.StringSubstitutor
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.shipping.Shipment
 
 class IdentifierService {
 

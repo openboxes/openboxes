@@ -9,10 +9,10 @@
  **/
 package org.pih.warehouse.data
 
-import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.User
 import org.springframework.validation.BeanPropertyBindingResult
 
 class UserDataService {

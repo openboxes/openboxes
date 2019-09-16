@@ -15,15 +15,15 @@ import grails.validation.ValidationException
 import org.apache.commons.io.FilenameUtils
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.hibernate.Criteria
+import org.pih.warehouse.core.*
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
-import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
@@ -181,7 +181,7 @@ class ProductController {
 
         println "Create product: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		render(view: "edit", model: [productInstance : productInstance, rootCategory: rootCategory])
+        render(view: "edit", model: [productInstance: productInstance, rootCategory: rootCategory])
         println "After render create.gsp for product: " + (System.currentTimeMillis() - startTime) + " ms"
     }
 
@@ -225,11 +225,13 @@ class ProductController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventory", action: "browse")
         } else {
+
             def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
             if (!inventoryLevelInstance) {
                 inventoryLevelInstance = new InventoryLevel()
             }
-			[productInstance: productInstance, inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
+
+            [productInstance: productInstance, inventoryInstance: location.inventory, inventoryLevelInstance: inventoryLevelInstance]
         }
     }
 
@@ -313,7 +315,7 @@ class ProductController {
                 productInstance.attributes.clear()
                 productInstance = Product.read(params.id)
                 productInstance.errors = e.errors
-                render view: "edit", model: [productInstance:productInstance]
+                render view: "edit", model: [productInstance: productInstance]
                 return
             }
         } else {
@@ -467,12 +469,12 @@ class ProductController {
             redirect(action: "edit", id: productInstance?.id)
         } else {
             def location = Location.get(session.warehouse.id)
-			def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
+            def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
             if (!inventoryLevelInstance) {
                 inventoryLevelInstance = new InventoryLevel()
             }
 
-			render(view: "edit", model: [productInstance: productInstance, inventoryLevelInstance: inventoryLevelInstance, packageInstance: packageInstance, rootCategory: productService.getRootCategory()])
+            render(view: "edit", model: [productInstance: productInstance, inventoryLevelInstance: inventoryLevelInstance, packageInstance: packageInstance, rootCategory: productService.getRootCategory()])
         }
     }
 
