@@ -1244,9 +1244,10 @@ class JsonController {
         data = data.collect {
             [
                     date          : it.date?.format(Constants.DEFAULT_DATE_FORMAT),
-                    lotNumber     : it.inventoryItem?.lotNumber ?: defaultLabel,
+                    productCode   : it?.productCode,
+                    lotNumber     : it?.lotNumber ?: defaultLabel,
                     expirationDate: it.inventoryItem?.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT) ?: defaultExpirationDate,
-                    binLocation   : it.binLocation?.name ?: defaultLabel,
+                    binLocation   : it.binLocationName ?: defaultLabel,
                     quantityOnHand: it.quantityOnHand
             ]
         }

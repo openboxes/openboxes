@@ -106,7 +106,7 @@
             <td class="value">
                 <table id="inventorySnapshotsTable" class="dataTable">
                     <tfoot>
-                    <th colspan="4" class="right"><g:message code="default.total.label"/></th>
+                    <th colspan="5" class="right"><g:message code="default.total.label"/></th>
                     <th></th>
                     </tfoot>
                 </table>
@@ -259,6 +259,7 @@
           "iDisplayLength": -1,
           "aoColumns": [
             {"mData": "date", sTitle: "Date"},
+            {"mData": "productCode", sTitle: "Product Code"},
             {"mData": "binLocation", sTitle: "Bin Location"},
             {"mData": "lotNumber", sTitle: "Lot Number"},
             {"mData": "expirationDate", sTitle: "Expiration Date"},
