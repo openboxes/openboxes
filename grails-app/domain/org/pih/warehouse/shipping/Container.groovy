@@ -111,7 +111,7 @@ class Container implements Comparable, java.io.Serializable {
     }
 
     /**
-     * Avoid collection [org.pih.warehouse.core.User.locationRoles] was not processed by flush().
+     * Avoid collection [User.locationRoles] was not processed by flush().
      *
      * FIXME Refactor method above once this works, but I didn't want to break the code above since it's used all over the place.
      *

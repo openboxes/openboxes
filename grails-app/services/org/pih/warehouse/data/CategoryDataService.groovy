@@ -10,7 +10,6 @@
 package org.pih.warehouse.data
 
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.product.Category
 import org.springframework.validation.BeanPropertyBindingResult
 
 class CategoryDataService {

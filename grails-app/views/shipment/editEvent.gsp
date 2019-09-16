@@ -37,8 +37,8 @@
 							   <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventType', 'errors')}">
 									<g:if test="${!eventInstance?.eventType}">
 										<g:select id="eventType.id" name='eventType.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]"
-											from='${org.pih.warehouse.core.EventType.list()}' optionKey="id"
-											optionValue="name" value="${eventInstance.eventType}" >
+                                                  from='${org.pih.warehouse.core.EventType.list()}' optionKey="id"
+                                                  optionValue="name" value="${eventInstance.eventType}" >
 										</g:select>
 									</g:if>
 									<g:else>
@@ -60,8 +60,8 @@
 							   <td valign="top" class="name"><label><warehouse:message code="location.label" /></label></td>
 							   <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'location', 'errors')}">
 								<g:select id="eventLocation.id" name='eventLocation.id' noSelection="['':warehouse.message(code:'default.selectOne.label')]"
-									from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"
-									value="${eventInstance?.eventLocation?.id}" class="chzn-select-deselect">
+                                          from='${org.pih.warehouse.core.Location.list()}' optionKey="id" optionValue="name"
+                                          value="${eventInstance?.eventLocation?.id}" class="chzn-select-deselect">
 									</g:select>
 								  </td>
 							</tr>

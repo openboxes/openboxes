@@ -14,6 +14,7 @@ import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.product.Product
 
 class StocklistItemService {
 

@@ -9,8 +9,8 @@
  **/
 package org.pih.warehouse.product
 
-import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.Document
 import org.springframework.web.multipart.MultipartFile
 
 class DocumentCommand {

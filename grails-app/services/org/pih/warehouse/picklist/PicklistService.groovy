@@ -20,6 +20,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.Requisition
 
 class PicklistService {
 

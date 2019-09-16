@@ -189,7 +189,7 @@ $ github_changelog_generator openboxes/openboxes --token «your-40-digit-github-
 
 - Shipment event dates should not be set to midnight [\#61](https://github.com/openboxes/openboxes/issues/61)
 - Sending the email to the following server failed : smtp.mandrillapp.com:587 [\#60](https://github.com/openboxes/openboxes/issues/60)
-- TransientObjectException: object references an unsaved transient instance - save the transient instance before flushing: org.pih.warehouse.core.Person [\#58](https://github.com/openboxes/openboxes/issues/58)
+- TransientObjectException: object references an unsaved transient instance - save the transient instance before flushing: Person [\#58](https://github.com/openboxes/openboxes/issues/58)
 
 ## [v0.6.9](https://github.com/openboxes/openboxes/tree/v0.6.9) (2015-04-07)
 [Full Changelog](https://github.com/openboxes/openboxes/compare/v0.6.8...v0.6.9)
