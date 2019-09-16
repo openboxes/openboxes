@@ -560,7 +560,6 @@ class InventorySnapshotService {
 
 
     List getInventorySnapshots(Product product, Location location, Date date) {
-
         log.info "Find inventory snapshots by product ${product} location ${location} and date ${date}"
         return InventorySnapshot.createCriteria().list {
             eq("product", product)
@@ -568,6 +567,48 @@ class InventorySnapshotService {
             eq("date", date)
             order("binLocation", "asc")
         }
+    }
+
+    void updateInventorySnapshots(InventoryItem inventoryItem) {
+        def results = InventorySnapshot.executeUpdate(
+                "update InventorySnapshot a " +
+                        "set a.lotNumber=:lotNumber " +
+                        "where a.inventoryItem.id = :inventoryItemId " +
+                        "and a.lotNumber != :lotNumber",
+                [
+                        inventoryItemId: inventoryItem.id,
+                        lotNumber      : inventoryItem.lotNumber
+                ]
+        )
+        log.info "Updated ${results} inventory snapshots for inventory item ${inventoryItem}"
+    }
+
+    void updateInventorySnapshots(Location binLocation) {
+        def results = InventorySnapshot.executeUpdate(
+                "update InventorySnapshot a " +
+                        "set a.binLocationName = :binLocationName " +
+                        "where a.binLocation.id = :binLocationId " +
+                        "and a.binLocationName != :binLocationName",
+                [
+                        binLocationId  : binLocation.id,
+                        binLocationName: binLocation.name
+                ]
+        )
+        log.info "Updated ${results} inventory snapshots for bin location ${binLocation}"
+    }
+
+    void updateInventorySnapshots(Product product) {
+        def results = InventorySnapshot.executeUpdate(
+                "update InventorySnapshot a " +
+                        "set a.productCode = :productCode " +
+                        "where a.product.id = :productId " +
+                        "and a.productCode != :productCode",
+                [
+                        productId  : product.id,
+                        productCode: product.productCode
+                ]
+        )
+        log.info "Updated ${results} inventory snapshots for product ${product}"
     }
 
 }
