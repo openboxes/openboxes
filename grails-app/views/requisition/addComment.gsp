@@ -37,8 +37,8 @@
 										<tr class="prop">
 				                            <td valign="top" class="name"><label><warehouse:message code="default.to.label" default="To" /></label></td>                            
 				                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
-												<g:select id="recipient.id" class="comboBox" name='recipient.id' noSelection="${['':'Select one ...']}" 
-			                                    	from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="name" value="${commentInstance?.recipient?.id }"></g:select>
+												<g:select id="recipient.id" class="comboBox" name='recipient.id' noSelection="${['':'Select one ...']}"
+                                                          from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="name" value="${commentInstance?.recipient?.id }"></g:select>
 			                                </td>
 				                        </tr>  	          
 										<tr class="prop">

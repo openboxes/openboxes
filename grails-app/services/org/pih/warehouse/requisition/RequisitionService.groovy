@@ -634,7 +634,6 @@ class RequisitionService {
             }
             eq("product", product)
         }
-
         return requisitionItems
     }
 

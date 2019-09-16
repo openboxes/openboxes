@@ -12,6 +12,9 @@ package org.pih.warehouse.product
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.User
 
 
 class ProductPackage implements Comparable<ProductPackage>, Serializable {

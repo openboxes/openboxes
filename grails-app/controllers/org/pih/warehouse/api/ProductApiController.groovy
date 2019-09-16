@@ -10,10 +10,10 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
-import org.pih.warehouse.product.ProductAssociationTypeCode
 
 class ProductApiController extends BaseDomainApiController {
 

@@ -32,7 +32,7 @@
 								showTrigger="false" />
 			
 							<g:select name="transactionType.id" 
-								from="${org.pih.warehouse.inventory.TransactionType.list()}" 
+								from="${org.pih.warehouse.inventory.TransactionType.list()}"
 								optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${commandInstance?.transactionType?.id }" 
 								noSelection="['0': warehouse.message(code:'default.all.label')]" /> 
 						
