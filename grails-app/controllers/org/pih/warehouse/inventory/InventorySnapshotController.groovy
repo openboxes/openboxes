@@ -56,7 +56,8 @@ class InventorySnapshotController {
                 [
                         productId      : params.product.id,
                         locationId     : params.location.id,
-                        includeAllDates: true
+                        includeAllDates: false,
+                        forceRefresh   : true
                 ]
         )
         render([started: true, results: results] as JSON)
@@ -107,8 +108,6 @@ class InventorySnapshotController {
 
             List data = inventorySnapshotService.findInventorySnapshotByDateAndLocation(date, location)
             render(["aaData": data, "iTotalRecords": data.size() ?: 0, "iTotalDisplayRecords": data.size() ?: 0, "sEcho": 1] as JSON)
-
-
         }
         catch (Exception e) {
             log.error("Exception occurred: " + e.message, e)

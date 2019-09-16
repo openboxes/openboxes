@@ -37,6 +37,7 @@ class CalculateQuantityJob {
         def product = Product.get(context.mergedJobDataMap.get('productId'))
         def location = Location.get(context.mergedJobDataMap.get('locationId'))
         def user = User.get(context.mergedJobDataMap.get('userId'))
+        boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh") ?: false
         boolean includeAllDates = context.mergedJobDataMap.get('includeAllDates') ?
                 Boolean.valueOf(context.mergedJobDataMap.get('includeAllDates')) : false
 
@@ -56,16 +57,25 @@ class CalculateQuantityJob {
             // Triggered by ?
             if (product && location) {
                 log.info "Triggered job for product ${product?.id} at ${location?.id} on ${date}"
+                if (forceRefresh) {
+                    inventorySnapshotService.deleteInventorySnapshots(date, location, product)
+                }
                 inventorySnapshotService.populateInventorySnapshots(date, location, product)
             }
             // Triggered by the Inventory Snapshot page
             else if (location) {
                 log.info "Triggered calculate quantity job for all products at ${location?.id} on ${date}"
+                if (forceRefresh) {
+                    inventorySnapshotService.deleteInventorySnapshots(date, location)
+                }
                 inventorySnapshotService.populateInventorySnapshots(date, location)
             }
             // Triggered by the CalculateQuantityJob
             else {
                 log.info "Triggered calculate quantity job for all locations and products on ${date}"
+                if (forceRefresh) {
+                    inventorySnapshotService.deleteInventorySnapshots(date)
+                }
                 inventorySnapshotService.populateInventorySnapshots(date)
             }
         }
