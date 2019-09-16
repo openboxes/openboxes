@@ -14,12 +14,18 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
+import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Location
 
 
 /**

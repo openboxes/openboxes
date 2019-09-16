@@ -16,6 +16,10 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 import org.springframework.web.multipart.MultipartFile
 
 class OrderController {

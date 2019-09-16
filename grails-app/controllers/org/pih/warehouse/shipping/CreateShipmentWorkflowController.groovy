@@ -11,9 +11,15 @@ package org.pih.warehouse.shipping
 
 import grails.validation.ValidationException
 import org.pih.warehouse.core.*
+import org.pih.warehouse.core.MailService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionException
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.Transaction
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 import org.springframework.web.multipart.MultipartFile
 
@@ -1285,7 +1291,7 @@ class CreateShipmentWorkflowController {
                             container: container,
                             inventoryItem: inventoryItem)
 
-                    // FIXME Property [shipment] of class [class org.pih.warehouse.shipping.ShipmentItem] cannot be null
+                    // FIXME Property [shipment] of class [class ShipmentItem] cannot be null
                     //shipmentItem.shipment = flow.shipmentInstance
 
                     // Bind the form parameters to the shipment item
