@@ -3,12 +3,14 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" class="middle"/>
 		</button>
 		<div class="actions">
-			<div class="action-menu-item">					
-				<g:link controller="product" action="edit" id="${product?.id }">
-					<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-					<warehouse:message code="product.edit.label"/>
-				</g:link>
-			</div>
+			<g:if test="${isSuperuser}">
+				<div class="action-menu-item">
+					<g:link controller="product" action="edit" id="${product?.id }">
+						<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+						<warehouse:message code="product.edit.label"/>
+					</g:link>
+				</div>
+			</g:if>
 			<g:if test="${actionName != 'showStockCard' }">
 				<div class="action-menu-item">					
 					<g:link controller="inventoryItem" action="showStockCard" params="['product.id': product?.id]">
