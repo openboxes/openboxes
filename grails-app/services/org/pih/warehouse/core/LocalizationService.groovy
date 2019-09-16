@@ -29,12 +29,12 @@ class LocalizationService {
 
 
     String formatMetadata(Object object) {
-        def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+        def format = grailsApplication.mainContext.getBean('FormatTagLib')
         return format.metadata(obj: object)
     }
 
     String formatDate(Date date) {
-        def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+        def format = grailsApplication.mainContext.getBean('FormatTagLib')
         return format.date(obj: date)
     }
 

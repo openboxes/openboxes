@@ -14,20 +14,20 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pih.warehouse.jobs.CalculateQuantityJob
+import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.jobs.CalculateQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 
 import java.text.SimpleDateFormat

@@ -9,7 +9,7 @@
 	});
 </script>	   
 <div id="dlgAddPerson" title="${warehouse.message(code:'default.add.label', args: [warehouse.message(code: 'person.label')])}" style="padding: 10px; display: none;" >
-	<jqvalui:renderValidationScript for="org.pih.warehouse.core.Person" form="addPerson" 
+	<jqvalui:renderValidationScript for="org.pih.warehouse.core.Person" form="addPerson"
 		renderErrorsOnTop="true"/>
 
 	<jqvalui:renderErrors/>			

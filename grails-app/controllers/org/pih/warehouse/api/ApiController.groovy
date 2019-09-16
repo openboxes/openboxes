@@ -15,6 +15,9 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
+import org.pih.warehouse.product.Product
 
 class ApiController {
 

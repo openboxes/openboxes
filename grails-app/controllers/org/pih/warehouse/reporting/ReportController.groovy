@@ -29,6 +29,7 @@ class ReportController {
 
     def dataService
     def documentService
+    def dataService
     def inventoryService
     def productService
     def reportService

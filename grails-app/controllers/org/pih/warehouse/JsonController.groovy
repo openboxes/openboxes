@@ -22,6 +22,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionType
@@ -34,6 +35,7 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.reporting.Indicator
+import org.pih.warehouse.reporting.LocationDimension
 import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -41,6 +43,8 @@ import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.util.LocalizationUtil
+import org.quartz.JobKey
+import org.quartz.impl.StdScheduler
 
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -60,6 +64,7 @@ class JsonController {
     def userService
     def inventorySnapshotService
     def forecastingService
+    StdScheduler quartzScheduler
 
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)

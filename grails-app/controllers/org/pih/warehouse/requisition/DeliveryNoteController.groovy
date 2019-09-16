@@ -9,8 +9,8 @@
  * */
 package org.pih.warehouse.requisition
 
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.core.Location
 
 class DeliveryNoteController {
 
