@@ -1,7 +1,5 @@
 package org.pih.warehouse
 
-import org.codehaus.groovy.grails.plugins.web.taglib.FormatTagLib
-
 class FormatDateTagLib extends FormatTagLib {
 
     static namespace = "g"

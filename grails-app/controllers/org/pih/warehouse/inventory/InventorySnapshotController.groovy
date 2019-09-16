@@ -61,6 +61,21 @@ class InventorySnapshotController {
         render([started: true, results: results] as JSON)
     }
 
+
+    def dates = {
+        Location location = Location.get(session.warehouse.id)
+        def dates = inventorySnapshotService.getTransactionDates()
+        render(dates as JSON)
+    }
+
+    def locations = {
+        def locations = inventorySnapshotService.getDepotLocations()
+
+        render(locations as JSON)
+
+    }
+
+
     def refresh = {
         log.info("Refresh inventory snapshot data: " + params)
         User user = User.get(session?.user?.id)

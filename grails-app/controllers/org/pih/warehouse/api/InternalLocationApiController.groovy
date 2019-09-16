@@ -13,6 +13,7 @@ import grails.converters.JSON
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.Location
 
 class InternalLocationApiController {
 

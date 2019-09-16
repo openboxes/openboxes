@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.data
 
-
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.hibernate.criterion.CriteriaSpecification
@@ -20,8 +19,10 @@ import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PartyType
+import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry

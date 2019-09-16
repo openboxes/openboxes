@@ -12,7 +12,6 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
-import org.pih.warehouse.product.Category
 
 class CategoryApiController {
 
