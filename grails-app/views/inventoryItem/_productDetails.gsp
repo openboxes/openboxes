@@ -9,8 +9,8 @@
     font: 10px/1.5 Verdana, Helvetica, sans-serif;
     float: left;
     margin: 2px;
-} 
- 
+}
+
 .galleryItem img {
     max-width: 100%;
     -webkit-border-radius: 5px;
@@ -103,6 +103,19 @@
                                 ${warehouse.message(code:'default.each.label') }
                             </g:else>
 
+                        </td>
+                    </tr>
+                </g:if>
+                <g:if test="${inventoryLevel?.forecastQuantity}">
+                    <tr class="prop">
+                        <td class="label">
+                            <label><warehouse:message code="inventoryLevel.forecastQuantity.label"/></label>
+                        </td>
+                        <td class="value" id="forecastQuantity">
+                            <div>
+                                ${g.formatNumber(number: inventoryLevel?.monthlyForecastQuantity?:0, format: '###,###,###') }
+                                <g:message code="default.perMonth.label" default="per month"/>
+                            </div>
                         </td>
                     </tr>
                 </g:if>
@@ -406,13 +419,13 @@
         </tbody>
     </table>
 </div>
-		
+
 </div>
 <script>
-	function openDialog(dialogId, imgId) { 
+	function openDialog(dialogId, imgId) {
 		$(dialogId).dialog({autoOpen: true, modal: true, width: 600, height: 400});
 	}
-	function closeDialog(dialogId, imgId) { 
+	function closeDialog(dialogId, imgId) {
 		$(dialogId).dialog('close');
 	}
 </script>
