@@ -210,6 +210,7 @@
                                                     <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
                                                               optionKey="id" value="${userInstance?.roles}"
                                                               noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
+                                                    <span class="fade"><g:message code="user.clearDefaultRole.message"/></span>
                                                 </td>
                                             </tr>
                                             <tr class="prop" id="locationRoles">
