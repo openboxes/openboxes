@@ -1910,8 +1910,7 @@ class InventoryService implements ApplicationContextAware {
             transaction.addToTransactionEntries(transactionEntry)
 
             if (!transaction.save()) {
-                log.info("Errors saving transaction: " + transaction.errors)
-                command.errors.addAllErrors(transaction.errors)
+                throw new ValidationException("Error saving transaction", transaction.errors)
             }
         }
         return command
