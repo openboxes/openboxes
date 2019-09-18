@@ -14,13 +14,16 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.pih.warehouse.core.*
+import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.Localization
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
-import org.pih.warehouse.jobs.SendStockAlertsJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
@@ -28,7 +31,6 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.reporting.Indicator
-import org.pih.warehouse.reporting.LocationDimension
 import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -36,8 +38,6 @@ import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.util.LocalizationUtil
-import org.quartz.JobKey
-import org.quartz.impl.StdScheduler
 
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -57,7 +57,6 @@ class JsonController {
     def userService
     def inventorySnapshotService
     def forecastingService
-    StdScheduler quartzScheduler
 
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
@@ -1355,17 +1354,18 @@ class JsonController {
     }
 
     def getTransactionReport = { TransactionReportCommand command ->
-        String locationId = params?.location?.id ?: session?.warehouse?.id
-        Location location = Location.get(locationId)
-        String categoryId = params.category ?: "ROOT"
-        Category category = Category.get(categoryId)
 
         Date startDate = command.startDate
         Date endDate = command.endDate
+        Location location = command.location ?: Location.get(session.warehouse.id)
 
-        Boolean includeCategoryChildren = params.includeCategoryChildren
+        Category category = command.category
+        if (!category) {
+            category = productService.getRootCategory()
+        }
+
         List<Category> categories = []
-
+        Boolean includeCategoryChildren = params.includeCategoryChildren
         if (includeCategoryChildren) {
             categories = category.children
             categories << category
@@ -1374,8 +1374,7 @@ class JsonController {
         }
 
         // FIXME Command validation not working so we're doing it manually
-
-        if (!startDate || !endDate || !locationId) {
+        if (!startDate || !endDate || !location) {
             throw new IllegalArgumentException("All parameter fields are required")
         }
 
@@ -1387,97 +1386,9 @@ class JsonController {
             throw new IllegalArgumentException("End date must occur on or before today")
         }
 
-
-        // Get starting balance
-        def balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByProduct(location, startDate)
-        if (balanceOpeningMap.isEmpty()) {
-            inventorySnapshotService.populateInventorySnapshots(startDate, location)
-            balanceOpeningMap = inventorySnapshotService.getQuantityOnHandByProduct(location, startDate)
-        }
-
-        // Get ending balance
-        def balanceClosingMap = inventorySnapshotService.getQuantityOnHandByProduct(location, endDate)
-        if (balanceClosingMap.isEmpty()) {
-            inventorySnapshotService.populateInventorySnapshots(endDate, location)
-            balanceClosingMap = inventorySnapshotService.getQuantityOnHandByProduct(location, endDate)
-        }
-
-        // Get all transactions between start and end dates
-        def transactionsByTransactionCode = TransactionFact.createCriteria().list {
-            projections {
-                productKey {
-                    groupProperty("productCode")
-                }
-                transactionTypeKey {
-                    groupProperty("transactionCode")
-                    groupProperty("transactionTypeName")
-                }
-                sum("quantity")
-            }
-
-            transactionDateKey {
-                between("date", startDate, endDate)
-            }
-            locationKey {
-                eq("locationId", location.id)
-            }
-        }
-
-        transactionsByTransactionCode = transactionsByTransactionCode.collect {
-            [
-                    productCode        : it[0],
-                    transactionCode    : it[1],
-                    transactionTypeName: it[2],
-                    quantity           : it[3]
-            ]
-        }
-
-        // We need all products that have either an opening balance or closing balance
-        def products = new HashSet()
-        products.addAll(balanceOpeningMap.keySet())
-        products.addAll(balanceClosingMap.keySet())
-
-        // Flatten the data to make it easier to display
-        def data = products.findAll { categories.contains(it.category) }.collect { Product product ->
-
-            // Get balances by product
-            def balanceOpening = balanceOpeningMap.get(product) ?: 0
-            def balanceClosing = balanceClosingMap.get(product) ?: 0
-
-            // Get quantity by transaction
-            def inbound = transactionsByTransactionCode.find {
-                it.productCode == product.productCode && it.transactionCode.equals("CREDIT")
-            }
-            def outbound = transactionsByTransactionCode.find {
-                it.productCode == product.productCode && it.transactionCode.equals("DEBIT")
-            }
-            def cycleCountOccurred = transactionsByTransactionCode.find {
-                it.productCode == product.productCode && it.transactionTypeName.contains("Inventory")
-            }
-
-            def quantityInbound = inbound?.quantity ?: 0
-            def quantityOutbound = outbound?.quantity ?: 0
-
-            // Calculate discrepancy
-            def quantityDiscrepancy = balanceClosing -
-                    balanceOpening -
-                    quantityInbound +
-                    quantityOutbound
-
-            // Transform data into inventory balance rows
-            [
-                    "Code"           : product.productCode,
-                    "Name"           : product.name,
-                    "Category": product.category.name,
-                    "Unit cost": product.pricePerUnit ?: '',
-                    "Cycle Count"    : cycleCountOccurred ? true : "",
-                    "Opening Balance": balanceOpening,
-                    "Inbound"        : quantityInbound,
-                    "Outbound"       : quantityOutbound,
-                    "Adjustments"    : quantityDiscrepancy,
-                    "Closing Balance": balanceClosing,
-            ]
-        }
+        def data = (params.format == "text/csv") ?
+                inventorySnapshotService.getTransactionReportDetails(location, categories, command.startDate, command.endDate) :
+                inventorySnapshotService.getTransactionReportSummary(location, categories, command.startDate, command.endDate)
 
         if (params.format == "text/csv") {
             String csv = dataService.generateCsv(data)
@@ -1485,25 +1396,7 @@ class JsonController {
             render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
             return
         }
-
         render(["aaData": data] as JSON)
-    }
-
-
-    def showTransactionReportMetadata = {
-        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob"))
-        def nextFireTime = triggers*.nextFireTime.max()
-        def locationKey = LocationDimension.findByLocationId(session.warehouse.id)
-        //org.pih.warehouse.reporting.TransactionFact.maxTransactionDate.list()
-        def model = [
-                locationKey       : locationKey,
-                transactionCount  : TransactionFact.countByLocationKey(locationKey),
-                minTransactionDate: TransactionFact.minTransactionDate.list(),
-                maxTransactionDate: TransactionFact.maxTransactionDate.list(),
-                nextFireTime      : nextFireTime
-        ]
-
-        render(template: "/report/showTransactionReportMetadata", model: model)
     }
 
     def getTransactionReportDetails = { TransactionReportCommand command ->
@@ -1770,4 +1663,6 @@ class TransactionReportCommand {
     Date startDate
     Date endDate
     Location location
+    List<TransactionType> transactionTypes
+    Category category
 }

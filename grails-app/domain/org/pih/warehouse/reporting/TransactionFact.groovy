@@ -43,16 +43,34 @@ class TransactionFact {
     }
 
     static namedQueries = {
-        minTransactionDate {
+        minTransactionDate { locationId ->
             projections {
                 min 'transactionDate'
+            }
+            locationKey {
+                eq("locationId", locationId)
             }
             uniqueResult = true
         }
 
-        maxTransactionDate {
+        maxTransactionDate { locationId ->
             projections {
                 max 'transactionDate'
+            }
+            locationKey {
+                eq("locationId", locationId)
+            }
+            uniqueResult = true
+        }
+
+        countDistinctProducts { locationId ->
+            projections {
+                productKey {
+                    countDistinct 'productId'
+                }
+            }
+            locationKey {
+                eq("locationId", locationId)
             }
             uniqueResult = true
         }

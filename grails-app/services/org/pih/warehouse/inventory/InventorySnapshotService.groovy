@@ -15,7 +15,9 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.reporting.TransactionFact
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -611,4 +613,155 @@ class InventorySnapshotService {
         log.info "Updated ${results} inventory snapshots for product ${product}"
     }
 
+    def getTransactionReportData(Location location, Date startDate, Date endDate) {
+
+        def transactionCodes = [TransactionCode.DEBIT, TransactionCode.CREDIT].collect { it.toString() }
+        // Get all transactions between start and end dates for the given location
+        def transactions = TransactionFact.createCriteria().list {
+            projections {
+                productKey {
+                    groupProperty("productCode")
+                }
+                transactionTypeKey {
+                    groupProperty("transactionCode")
+                    groupProperty("transactionTypeName")
+                }
+                sum("quantity")
+            }
+            transactionTypeKey {
+                'in'("transactionCode", transactionCodes)
+            }
+            transactionDateKey {
+                between("date", startDate, endDate+1)
+            }
+            locationKey {
+                eq("locationId", location.id)
+            }
+        }
+
+        // Transform transaction facts
+        transactions = transactions.collect {
+            [
+                    productCode        : it[0],
+                    transactionCode    : it[1],
+                    transactionTypeName: it[2],
+                    quantity           : it[3]
+            ]
+        }
+        return transactions
+    }
+
+    def getTransactionReportDetails(Location location, List<Category> categories, Date startDate, Date endDate) {
+
+        def transactionData = getTransactionReportData(location, startDate, endDate)
+
+        def transactionTypeNames = transactionData.collect { it.transactionTypeName }.unique().sort()
+
+        // Get starting balance
+        def balanceOpeningMap = getQuantityOnHandByProduct(location, startDate)
+        if (balanceOpeningMap.isEmpty()) {
+            throw new IllegalStateException("No inventory snapshot for ${startDate}")
+        }
+
+        // Get ending balance
+        def balanceClosingMap = getQuantityOnHandByProduct(location, endDate)
+        if (balanceClosingMap.isEmpty()) {
+            throw new IllegalStateException("No inventory snapshot for ${endDate}")
+        }
+
+
+        // We need all products that have either an opening balance or closing balance
+        def products = new HashSet()
+        products.addAll(balanceOpeningMap.keySet())
+        products.addAll(balanceClosingMap.keySet())
+
+        def data = products.findAll { categories.contains(it.category) }.collect { Product product ->
+
+            // Get balances by product
+            def balanceOpening = balanceOpeningMap.get(product) ?: 0
+            def balanceClosing = balanceClosingMap.get(product) ?: 0
+
+            def row = [
+                    "Code"       : product.productCode,
+                    "Name"       : product.name,
+                    "Category"   : product.category.name,
+                    "Unit Cost"  : product.pricePerUnit ?: ''
+            ]
+            row.put("Opening", balanceOpening)
+            transactionTypeNames.each { transactionTypeName ->
+                def quantity =
+                        transactionData.find {
+                            it.productCode == product.productCode && it.transactionTypeName == transactionTypeName
+                        }?.quantity?:0
+                row[transactionTypeName] = quantity
+            }
+
+            row.put("Closing", balanceClosing)
+            return row;
+        }
+        data = data.sort { it."Code" }
+        return data
+    }
+
+    def getTransactionReportSummary(Location location, List<Category> categories, Date startDate, Date endDate) {
+
+        // Get starting balance
+        def balanceOpeningMap = getQuantityOnHandByProduct(location, startDate)
+        if (balanceOpeningMap.isEmpty()) {
+            throw new IllegalStateException("No inventory snapshot for ${startDate}")
+        }
+
+        // Get ending balance
+        def balanceClosingMap = getQuantityOnHandByProduct(location, endDate)
+        if (balanceClosingMap.isEmpty()) {
+            throw new IllegalStateException("No inventory snapshot for ${endDate}")
+        }
+
+        // We need all products that have either an opening balance or closing balance
+        def products = new HashSet()
+        products.addAll(balanceOpeningMap.keySet())
+        products.addAll(balanceClosingMap.keySet())
+
+        def transactionData = getTransactionReportData(location, startDate, endDate)
+
+        // FIXME Category filtering should happen in the query but we need to add a category dimension
+        // Flatten the data to make it easier to display
+        def data = products.findAll { categories.contains(it.category) }.collect { Product product ->
+
+            // Get balances by product
+            def balanceOpening = balanceOpeningMap.get(product) ?: 0
+            def balanceClosing = balanceClosingMap.get(product) ?: 0
+
+            // Get quantity by transaction
+            def credits = transactionData.find {
+                it.productCode == product.productCode && it.transactionCode.equals("CREDIT")
+            }
+            def debits = transactionData.find {
+                it.productCode == product.productCode && it.transactionCode.equals("DEBIT")
+            }
+
+            def quantityInbound = credits?.quantity ?: 0
+            def quantityOutbound = debits?.quantity ?: 0
+
+            // Calculate discrepancy
+            def quantityAdjustments = balanceClosing -
+                    balanceOpening -
+                    quantityInbound +
+                    quantityOutbound
+
+            // Transform data into inventory balance rows
+            [
+                    "Code"       : product.productCode,
+                    "Name"       : product.name,
+                    "Category"   : product.category.name,
+                    "Unit Cost"  : product.pricePerUnit ?: '',
+                    "Opening"    : balanceOpening,
+                    "Credits"    : quantityInbound,
+                    "Debits"     : quantityOutbound,
+                    "Adjustments": quantityAdjustments,
+                    "Closing"    : balanceClosing,
+            ]
+        }
+        return data
+    }
 }
