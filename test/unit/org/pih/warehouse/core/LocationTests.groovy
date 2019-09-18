@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import grails.test.*
 import org.junit.Ignore
 import org.junit.Test
+import org.springframework.context.ApplicationEvent
 
 class LocationTests extends GrailsUnitTestCase {
     Location location1
@@ -34,6 +35,7 @@ class LocationTests extends GrailsUnitTestCase {
 
         mockDomain(LocationType, [depot, supplier, ward])
         mockDomain(Location, [location1, location2, location3, location4])
+        Location.metaClass.publishEvent = { ApplicationEvent event -> }
     }
 
     void test_supports() {
