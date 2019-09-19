@@ -1388,6 +1388,13 @@ class JsonController {
             throw new IllegalArgumentException("End date must occur on or before today")
         }
 
+        if (command.refreshBalances) {
+            log.info "Refreshing inventory snapshot for ${command.startDate} and location ${location}"
+            inventorySnapshotService.populateInventorySnapshots(command.startDate, command.location)
+            log.info "Refreshing inventory snapshot for ${command.endDate} and location ${location}"
+            inventorySnapshotService.populateInventorySnapshots(command.endDate, command.location)
+        }
+
         def data = (params.format == "text/csv") ?
                 inventorySnapshotService.getTransactionReportDetails(location, categories, command.startDate, command.endDate) :
                 inventorySnapshotService.getTransactionReportSummary(location, categories, command.startDate, command.endDate)
@@ -1667,4 +1674,5 @@ class TransactionReportCommand {
     Location location
     List<TransactionType> transactionTypes
     Category category
+    Boolean refreshBalances = Boolean.FALSE
 }

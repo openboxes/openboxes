@@ -681,6 +681,23 @@ class InventorySnapshotService {
             def balanceOpening = balanceOpeningMap.get(product) ?: 0
             def balanceClosing = balanceClosingMap.get(product) ?: 0
 
+            // Get quantity by transaction
+            def credits = transactionData.find {
+                it.productCode == product.productCode && it.transactionCode.equals("CREDIT")
+            }
+            def debits = transactionData.find {
+                it.productCode == product.productCode && it.transactionCode.equals("DEBIT")
+            }
+
+            def quantityInbound = credits?.quantity ?: 0
+            def quantityOutbound = debits?.quantity ?: 0
+
+            // Calculate discrepancy
+            def quantityAdjustments = balanceClosing -
+                    balanceOpening -
+                    quantityInbound +
+                    quantityOutbound
+
             def row = [
                     "Code"       : product.productCode,
                     "Name"       : product.name,
@@ -696,6 +713,7 @@ class InventorySnapshotService {
                 row[transactionTypeName] = quantity
             }
 
+            row.put("Adjustments", quantityAdjustments)
             row.put("Closing", balanceClosing)
             return row;
         }
@@ -733,15 +751,15 @@ class InventorySnapshotService {
             def balanceClosing = balanceClosingMap.get(product) ?: 0
 
             // Get quantity by transaction
-            def credits = transactionData.find {
+            def credits = transactionData.findAll {
                 it.productCode == product.productCode && it.transactionCode.equals("CREDIT")
             }
-            def debits = transactionData.find {
+            def debits = transactionData.findAll {
                 it.productCode == product.productCode && it.transactionCode.equals("DEBIT")
             }
 
-            def quantityInbound = credits?.quantity ?: 0
-            def quantityOutbound = debits?.quantity ?: 0
+            def quantityInbound = credits?.sum { it.quantity } ?: 0
+            def quantityOutbound = debits?.sum { it.quantity } ?: 0
 
             // Calculate discrepancy
             def quantityAdjustments = balanceClosing -

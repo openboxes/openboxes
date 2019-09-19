@@ -222,6 +222,7 @@ class ReportController {
         command.rootCategory = productService.getRootCategory()
 
         def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob"))
+        def previousFireTime = triggers*.previousFireTime.max()
         def nextFireTime = triggers*.nextFireTime.max()
         def locationKey = LocationDimension.findByLocationId(command?.location?.id)
         def model = [
@@ -231,6 +232,7 @@ class ReportController {
                 productCount      : TransactionFact.countDistinctProducts(locationKey?.locationId).list(),
                 minTransactionDate: TransactionFact.minTransactionDate(locationKey?.locationId).list(),
                 maxTransactionDate: TransactionFact.maxTransactionDate(locationKey?.locationId).list(),
+                previousFireTime  : previousFireTime,
                 nextFireTime      : nextFireTime,
         ]
 

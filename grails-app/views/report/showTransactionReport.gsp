@@ -71,7 +71,10 @@
 													value="${command?.endDate }"
 													format="MM/dd/yyyy"
 													autocomplete="off"/>
-
+								<label>
+									<g:checkBox id="refreshBalances" name="refreshBalances" value="${params?.refreshBalances}" checked="false"/>
+									<warehouse:message code="transactionReport.refreshBalances.label" default="Refresh balances (slow)"/>
+								</label>
 							</div>
 							<div class="filter-list-item">
 								<label>
@@ -97,8 +100,10 @@
 													  value="${params?.category?.id?:command?.rootCategory?.id}"/>
 								</p>
 								<p>
-									<g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="true"/>
-									<label>${warehouse.message(code:'search.includeCategoryChildren.label', default: 'Include all products in all subcategories.')}</label>
+									<label>
+										<g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="true"/>
+										${warehouse.message(code:'search.includeCategoryChildren.label', default: 'Include all products in all subcategories.')}
+									</label>
 								</p>
 							</div>
 						</div>
@@ -197,6 +202,9 @@
 				data.push({ name: "startDate", value: $("#startDate").val() });
 				data.push({ name: "endDate", value: $("#endDate").val() });
 				data.push({ name: "category", value: $("#category").val() });
+				if($('#refreshBalances').is(':checked')) {
+					data.push({name: "refreshBalances", value: $("#refreshBalances").val()});
+				}
 				if($('#includeCategoryChildren').is(':checked')) {
 					data.push({ name: "includeCategoryChildren", value: $("#includeCategoryChildren").val() });
 				}
