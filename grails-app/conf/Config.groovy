@@ -417,6 +417,9 @@ springcache {
 grails.plugins.raven.active = false
 grails.plugin.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PROJECT_ID}"
 
+// Default Ajax request timeout
+openboxes.ajaxRequest.timeout = 120000
+
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
@@ -464,7 +467,6 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 
 // Barcode scanner (disabled by default)
 openboxes.scannerDetection.enabled = false
-
 
 // Default delay and min length for typeahead components
 openboxes.typeahead.delay = 300

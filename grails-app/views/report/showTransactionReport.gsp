@@ -365,7 +365,7 @@
 					url: url,
 					data: {},
 					cache: false,
-					timeout: 90000,
+					timeout: ${grailsApplication.config.openboxes.ajaxRequest.timeout},
 					success: function (html) {
 						console.log(html);
 						alert("Data has been refreshed")
