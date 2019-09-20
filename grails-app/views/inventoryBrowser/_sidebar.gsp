@@ -20,7 +20,4 @@
     </div>
     <button id="refresh-btn" class="btn btn-primary">Refresh</button>
     <button id="cancel-btn" class="btn btn-default">Cancel</button>
-    <%--
-    <button id="export-btn" class="btn btn-default" target="_blank">Export</button>
-    --%>
 </form>

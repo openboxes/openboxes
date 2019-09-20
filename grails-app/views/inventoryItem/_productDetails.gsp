@@ -77,10 +77,6 @@
                     </td>
                     <td class="value" id="demand">
                         <div>
-                            <g:formatNumber number="${demand?.dailyDemand}" maxFractionDigits="1"/>
-                            <g:message code="default.perDay.label" default="per day"/>
-                        </div>
-                        <div>
                             <g:formatNumber number="${demand?.monthlyDemand}" maxFractionDigits="1"/>
                             <g:message code="default.perMonth.label" default="per month"/>
                         </div>

@@ -6,19 +6,6 @@
                     <warehouse:message code="default.actions.label"/>
                 </th>
             </g:isUserAdmin>
-
-            <%--
-			<g:sortableColumn property="status"
-				title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
-
-
-			<g:sortableColumn property="requestNumber"
-				title="${warehouse.message(code: 'requisition.requestNumber.label', default: 'Request number')}" />
-
-
-			<g:sortableColumn property="description"
-				title="${warehouse.message(code: 'default.description.label', default: 'Description')}" />
-			--%>
             <th>
                 <warehouse:message code="requisition.isPublished.label"/>
             </th>

@@ -197,11 +197,8 @@
 
             $(".sortable tbody").sortable({
                 handle : '.sorthandle',
-                //axis : "y",
-                //helper: "clone",
                 forcePlaceholderSize: true,
                 placeholder: "ui-state-highlight",
-                //connectWith: ".connectable",
                 update : function() {
                     var updateUrl = "${createLink(controller:'json', action:'sortRequisitionItems') }";
                     var sortOrder = $(this).sortable('serialize');
@@ -210,48 +207,6 @@
                             .filter(":even").addClass("even");
                 }
             });
-
-            /*
-            //$('.selectable').selectable();
-            $('.draggable').draggable({
-                handle		: ".draghandle",
-                helper		: "clone",
-                //helper		: function( event ) { return $("<div class='ui-widget-header'>I'm a custom helper</div>"); },
-                revert		: true,
-                zIndex		: 2700,
-                autoSize	: true,
-                ghosting	: true,
-                onStart		: function ( event ) { alert("started") },
-                onStop		: function() { $('.droppable').each(function() { this.expanded = false; }); }
-            });
-            */
-            /*
-            $('.droppable').droppable( {
-                accept: '.draggable',
-                tolerance: 'intersect',
-                //greedy: true,
-                over: function(event, ui) {
-                    $( this ).addClass( "ui-state-highlight" );
-                },
-                out: function(event, ui) {
-                    $( this ).removeClass( "ui-state-highlight" );
-                },
-                drop: function( event, ui ) {
-                    //alert("dropped");
-                    //ui.draggable.hide();
-                    ui.draggable.addClass( "strikethrough" );
-                    $( this ).removeClass( "ui-state-highlight" );
-                    var requisitionItem = ui.draggable.attr("data-requisitionItem");
-                    var container = $(this).attr("container");
-                    $("#shipmentItemRow-" + shipmentItem).hide();
-                    moveShipmentItemToContainer(shipmentItem, container);
-                    window.location.reload();
-                    //alert("Move item " + shipmentItem + " to container " + container);
-                }
-            });
-            */
-
-
         });
     </script>
 </body>

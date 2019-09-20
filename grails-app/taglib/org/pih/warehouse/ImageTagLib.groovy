@@ -10,7 +10,6 @@
 package org.pih.warehouse
 
 import com.google.zxing.BarcodeFormat
-import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.Location
 
 class ImageTagLib {
@@ -27,14 +26,14 @@ class ImageTagLib {
 
         // Use custom location logo if one exists
         Location location = Location.get(session?.warehouse?.id)
-        if(location?.logo) {
-            logoUrl = "${createLink(controller:'location', action:'viewLogo', id:session?.warehouse?.id)}"
+        if (location?.logo) {
+            logoUrl = "${createLink(controller: 'location', action: 'viewLogo', id: session?.warehouse?.id)}"
         }
         attrs.logoUrl = logoUrl
         attrs.logoLabel = logoLabel
-        attrs.showLabel = (attrs.showLabel!=null)?attrs.showLabel:true
+        attrs.showLabel = (attrs.showLabel != null) ? attrs.showLabel : true
 
-        out << g.render(template: '/taglib/displayLogo', model: [attrs:attrs]);
+        out << g.render(template: '/taglib/displayLogo', model: [attrs: attrs])
     }
 
 
@@ -43,9 +42,9 @@ class ImageTagLib {
         // For the report logo we'll use the logo config unless there's no logo,
         // then we'll try to use the location logo
         attrs.logoUrl = grailsApplication.config.openboxes.report.logo.url
-        attrs.showLabel = (attrs.showLabel!=null)?attrs.showLabel:true
+        attrs.showLabel = (attrs.showLabel != null) ? attrs.showLabel : true
 
-        out << g.render(template: '/taglib/displayLogo', model: [attrs:attrs]);
+        out << g.render(template: '/taglib/displayLogo', model: [attrs: attrs])
     }
 
 
@@ -56,7 +55,7 @@ class ImageTagLib {
             try {
                 attrs.format = BarcodeFormat.valueOf(defaultFormat)
             } catch (Exception e) {
-                println ("Unable to locate default barcode format ${defaultFormat}")
+                println("Unable to locate default barcode format ${defaultFormat}")
             }
         }
 
@@ -65,7 +64,7 @@ class ImageTagLib {
             try {
                 attrs.height = Integer.parseInt(defaultHeight)
             } catch (Exception e) {
-                println ("Unable to parse default barcode height ${defaultHeight}")
+                println("Unable to parse default barcode height ${defaultHeight}")
             }
         }
 
@@ -74,14 +73,14 @@ class ImageTagLib {
             try {
                 attrs.width = Integer.parseInt(defaultWidth)
             } catch (Exception e) {
-                println ("Unable to parse default barcode width ${defaultWidth}")
+                println("Unable to parse default barcode width ${defaultWidth}")
             }
         }
 
-        attrs.showData = (attrs.showData!=null)?attrs.showData:true
+        attrs.showData = (attrs.showData != null) ? attrs.showData : true
 
 
-        out << g.render(template: '/taglib/displayBarcode', model: [attrs:attrs])
+        out << g.render(template: '/taglib/displayBarcode', model: [attrs: attrs])
 
     }
 }

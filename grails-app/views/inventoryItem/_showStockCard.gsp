@@ -21,9 +21,11 @@
 </g:hasErrors>
 
 <g:if test="${commandInstance?.inventoryLevel?.status == InventoryStatus.SUPPORTED }">
-	<div id="transactionLogTabs" class="tabs">												
+    <div id="transactionLogTabs" class="tabs">
 		<ul>
-			<li><a href="${request.contextPath}/inventoryItem/showCurrentStock/${commandInstance?.product?.id}" id="current-stock-tab"><warehouse:message code="inventory.currentStockCurrentLocation.label" default="Current Location"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showCurrentStock/${commandInstance?.product?.id}"
+                   id="current-stock-tab"><warehouse:message code="inventory.listInStock.label" default="In stock"/></a>
+            </li>
 			<li><a href="${request.contextPath}/inventoryItem/showStockHistory/${commandInstance?.product?.id}"><warehouse:message code="inventory.stockHistory.label"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showCurrentStockAllLocations/${commandInstance?.product?.id}"><warehouse:message code="inventory.currentStockAllLocations.label" default="All Locations"/></a></li>
 			<li><a href="${request.contextPath}/inventoryItem/showSuppliers/${commandInstance?.product?.id}"><warehouse:message code="product.sources.label" default="Sources"/></a></li>
@@ -47,7 +49,7 @@
 			<warehouse:message code="product.edit.label"/>
 		</g:link>
 	</div>
-</g:elseif>								
+</g:elseif>
 <g:elseif test="${commandInstance?.inventoryLevel?.status == InventoryStatus.SUPPORTED_NON_INVENTORY }">
 	<div class="padded center box">
 		<h4 class="fade"><g:message code="enum.InventoryStatus.SUPPORTED_NON_INVENTORY"/></h4>

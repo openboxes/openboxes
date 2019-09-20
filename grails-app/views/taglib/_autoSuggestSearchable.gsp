@@ -19,12 +19,9 @@
             minLength: ${attrs.minLength},
             dataType: 'json',
             highlight: true,
-            //selectFirst: true,
             scroll: true,
             autoFocus: true,
             autoFill: true,
-            //scrollHeight: 300,
-            //define callback to format results
             source: function(request, response){
                 $.getJSON('${attrs.jsonUrl}', request, function(data) {
                         var suggestions = [];
@@ -51,7 +48,6 @@
                 $("#productId").val(ui.item.productId);
                 $("#lotNumber-suggest").val(ui.item.lotNumber);
                 $("#inventoryItemId").val(ui.item.id);
-                //$("#quantity").val(ui.item.quantity);
 
                 // Update on hand quantity
                 updateQuantityOnHand();

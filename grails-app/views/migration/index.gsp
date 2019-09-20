@@ -94,8 +94,6 @@
                     <td>
                         <div class="button-group">
                             <g:link controller="organization" action="index" class="button">List</g:link>
-                            %{--<g:remoteLink action="migrateOrganizations" params="[preview:true]" class="button" update="status"--}%
-                                          %{--onLoading="onLoading()" onComplete="onComplete()">Preview</g:remoteLink>--}%
                             <g:remoteLink action="migrateOrganizations" class="button" update="status"
                                 onLoading="onLoading()" onComplete="onComplete()">Migrate</g:remoteLink>
                             <g:remoteLink action="deleteOrganizations" class="button" update="status">Delete</g:remoteLink>
@@ -110,8 +108,6 @@
                     <td>
                         <div class="button-group">
                         <g:link controller="productSupplier" action="index" class="button">List</g:link>
-                        %{--<g:remoteLink action="migrateProductSuppliers" params="[preview:true]" class="button" update="status"--}%
-                                      %{--onLoading="onLoading()" onComplete="onComplete()">Preview</g:remoteLink>--}%
                         <g:remoteLink action="migrateProductSuppliers" class="button" update="status"
                                       onLoading="onLoading()" onComplete="onComplete()">Migrate</g:remoteLink>
                         <g:remoteLink action="deleteProductSuppliers" class="button" update="status"

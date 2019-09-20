@@ -30,7 +30,6 @@
 			      {key:"population", formatter:YAHOO.widget.DataTable.formatNumber, sortable:true, resizeable:true},
 			      {key:"gdp", formatter:YAHOO.widget.DataTable.formatCurrency, sortable:true, resizeable:true}
 			  ];
-			  //var myDataSource = new YAHOO.util.DataSource(YAHOO.example.Data.bookorders);
 			  var myDataSource = new YAHOO.util.DataSource("${createLink(controller: 'country', action: 'listData')}?");
 			  myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
 			  myDataSource.connXhrMode = "queueRequests";

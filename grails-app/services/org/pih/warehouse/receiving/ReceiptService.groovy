@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.receiving
 
 import grails.validation.ValidationException
@@ -22,7 +22,6 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -53,8 +52,7 @@ class ReceiptService {
         if (receipt) {
             boolean includeShipmentItems = stepNumber == "1"
             partialReceipt = getPartialReceiptFromReceipt(receipt, includeShipmentItems)
-        }
-        else {
+        } else {
             partialReceipt = getPartialReceiptFromShipment(shipment)
         }
         return partialReceipt
@@ -81,7 +79,7 @@ class ReceiptService {
         def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
 
-            PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer(container:container)
+            PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer(container: container)
             partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
 
             shipmentItems.each { ShipmentItem shipmentItem ->
@@ -144,7 +142,7 @@ class ReceiptService {
         }
         partialReceiptItem.lotNumber = shipmentItem.inventoryItem?.lotNumber
         partialReceiptItem.expirationDate = shipmentItem.inventoryItem?.expirationDate
-        partialReceiptItem.quantityShipped = shipmentItem?.quantity?:0
+        partialReceiptItem.quantityShipped = shipmentItem?.quantity ?: 0
 
         return partialReceiptItem
     }
@@ -159,7 +157,7 @@ class ReceiptService {
 
         partialReceiptItem.lotNumber = receiptItem.inventoryItem?.lotNumber
         partialReceiptItem.expirationDate = receiptItem.inventoryItem?.expirationDate
-        partialReceiptItem.quantityShipped = receiptItem?.quantityShipped?:0
+        partialReceiptItem.quantityShipped = receiptItem?.quantityShipped ?: 0
         partialReceiptItem.isSplitItem = receiptItem.isSplitItem
         partialReceiptItem.comment = receiptItem.comment
 
@@ -249,7 +247,7 @@ class ReceiptService {
         }
 
         // Save shipment
-        shipment.save(flush:true)
+        shipment.save(flush: true)
     }
 
     void saveAndCompletePartialReceipt(PartialReceipt partialReceipt) {
@@ -270,8 +268,7 @@ class ReceiptService {
                         EventCode.RECEIVED,
                         shipment.destination)
             }
-        }
-        else {
+        } else {
 
             // Create received shipment event
             if (!shipment.wasPartiallyReceived()) {
@@ -322,7 +319,7 @@ class ReceiptService {
                     inventoryService.findOrCreateInventoryItem(it.product, it.lotNumber, it.expirationDate)
 
             if (inventoryItem.hasErrors()) {
-                inventoryItem.errors.allErrors.each { error->
+                inventoryItem.errors.allErrors.each { error ->
                     def errorObj = [inventoryItem, error.field, error.rejectedValue] as Object[]
                     shipment.errors.reject("inventoryItem.invalid",
                             errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ")
@@ -345,7 +342,7 @@ class ReceiptService {
 
         // Associate the incoming transaction with the shipment
         shipment.addToIncomingTransactions(creditTransaction)
-        shipment.save(flush:true)
+        shipment.save(flush: true)
 
         return creditTransaction
     }
@@ -381,14 +378,18 @@ class ReceiptService {
     }
 
     void rollbackLastReceipt(Shipment shipment) {
-        List<Receipt> receivedReceipts = shipment.receipts.findAll { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.RECEIVED }.sort { it.dateCreated }
+        List<Receipt> receivedReceipts = shipment.receipts.findAll { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.RECEIVED }.sort {
+            it.dateCreated
+        }
 
         if (receivedReceipts) {
             Receipt lastReceipt = receivedReceipts.last()
 
             validateReceiptForRollback(lastReceipt)
 
-            Transaction transaction = shipment.incomingTransactions.find { it.receipt?.id == lastReceipt?.id }
+            Transaction transaction = shipment.incomingTransactions.find {
+                it.receipt?.id == lastReceipt?.id
+            }
             if (transaction) {
                 shipment.removeFromIncomingTransactions(transaction)
                 transaction.delete()

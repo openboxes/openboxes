@@ -22,14 +22,6 @@
 			<td class="right">
 				<div class="right">
                     <span class="tag">
-                        <%--
-                        <g:if test="${locationInstance?.active}">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'accept.png') }" class="middle" />
-                        </g:if>
-                        <g:else>
-                            <img src="${resource(dir: 'images/icons/silk', file: 'decline.png') }" class="middle" />
-                        </g:else>
-                        --%>
                         ${locationInstance?.active ? warehouse.message(code:'warehouse.active.label') : warehouse.message(code:'warehouse.inactive.label')}
                     </span>
                 </div>

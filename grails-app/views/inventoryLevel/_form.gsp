@@ -1,9 +1,9 @@
-
+<%@ page import="org.pih.warehouse.core.Location; org.pih.warehouse.core.ActivityCode; org.pih.warehouse.inventory.Inventory;" %>
 <g:form method="post" controller="inventoryLevel" action="save" autocomplete="off">
     <div>
         <g:hiddenField name="id" value="${inventoryLevelInstance?.id}" />
         <g:hiddenField name="version" value="${inventoryLevelInstance?.version}" />
-
+        <g:hiddenField name="redirectUrl" value="${params.redirectUrl}"/>
         <table>
             <tbody>
 
@@ -29,13 +29,13 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="inventory.id"><warehouse:message code="inventoryLevel.inventory.label" default="Inventory" /></label>
+                    <label for="location.id"><warehouse:message code="location.label" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'inventory', 'errors')}">
-                    <g:select id="${inventoryLevelInstance?.id?'edit':'save'}-${inventoryLevelInstance?.id}-inventory-id" name="inventory.id" from="${org.pih.warehouse.inventory.Inventory.list()}" optionKey="id"
-                                style="width: 300px;"
-                                noSelection="['null':warehouse.message(code:'inventoryLevel.chooseInventory.label',default:'Choose inventory')]"
-                                value="${inventoryLevelInstance?.inventory?.id}" class="chzn-select-deselect" />
+                    <g:selectLocation name="location.id"
+                                      class="chzn-select-deselect"
+                                      value="${inventoryLevelInstance?.inventory?.warehouse?.id ?: session?.warehouse?.id}"
+                                      activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"/>
                 </td>
             </tr>
             <tr class="prop">
@@ -53,7 +53,7 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="inventory.id"><warehouse:message code="inventoryLevel.binLocation.label" default="Bin location" /></label>
+                    <label for="binLocation"><warehouse:message code="inventoryLevel.binLocation.label" default="Bin location" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'binLocation', 'errors')}">
                     <g:textField name="binLocation" value="${inventoryLevelInstance?.binLocation }" class="text large"/>
@@ -61,7 +61,7 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="inventory.id"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class" /></label>
+                    <label for="abcClass"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Analysis Class" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'abcClass', 'errors')}">
                     <g:textField name="abcClass" value="${inventoryLevelInstance?.abcClass }" size="5" class="text large"/>
@@ -69,7 +69,7 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="inventory.id"><warehouse:message code="inventoryLevel.comments.label" default="Comments" /></label>
+                    <label for="comments"><warehouse:message code="inventoryLevel.comments.label" default="Comments" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'comments', 'errors')}">
                     <g:textField name="comments" value="${inventoryLevelInstance?.comments }" class="text large"/>
@@ -134,9 +134,6 @@
         </g:if>
         <g:else>
             <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-            <%--
-            <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-            --%>
         </g:else>
 
 

@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import grails.test.*
 import org.pih.warehouse.core.User
+import org.springframework.context.ApplicationEvent
 
 // import org.pih.warehouse.core.Document;
 // import org.pih.warehouse.inventory.InventoryItem
@@ -21,7 +22,7 @@ class ProductGroupTests extends GrailsUnitTestCase {
 
         Product.metaClass.static.withNewSession = {Closure c -> c.call() }
         User.metaClass.static.withNewSession = {Closure c -> c.call() }
-
+        Product.metaClass.publishEvent = { ApplicationEvent event -> }
     }
 
 	protected void tearDown() {

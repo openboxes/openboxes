@@ -288,19 +288,10 @@
                                                                    <g:else>
                                                                        <span class="fade"><warehouse:message code="default.na.label"/></span>
                                                                    </g:else>
-
-                                                               <%--
-                                                               <div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"></div>
-                                                               --%>
                                                                </td>
                                                            </tr>
 
                                                        </g:if>
-                                                       <%--
-                                                       <g:elseif test="${inventoryItem.productGroup }">
-                                                           <g:render template="browseProductGroup" model="[counter:counter,inventoryItem:inventoryItem,cssClass:'productGroup']"/>
-                                                       </g:elseif>
-                                                       --%>
                                                        <g:set var="counter" value="${counter+1 }"/>
 
                                                    </g:each>
@@ -355,38 +346,21 @@
 				$('.checkable').toggle(
 					function(event) {
 						$(this).parent().find('input').click();
-						//$(this).parent().addClass('checked');
 						return false;
 					},
 					function(event) {
 						$(this).parent().find('input').click();
-						//$(this).parent().removeClass('checked');
 						return false;
 					}
 				);
-
-				
-				//$(".megamenu").megamenu();
 				
 				$("#toggleCheckbox").click(function(event) {
                     var checked = ($(this).attr("checked") == 'checked');
 		            $(".checkbox").attr("checked", checked);
 				});
 
-
-		    	//$(".tabs").tabs(
-	    		//	{
-	    		//		cookie: {
-	    		//			// store cookie for a day, without, it would be a session cookie
-	    		//			expires: 1
-	    		//		}
-	    		//	}
-				//);
-
-
 		    	$(".isRelated").hide();
 		    	$(".expandable").click(function(event) {
-			    	//$("#productGroup-"+event.target.id).css('background-color', '#E5ECF9');
 			    	var isVisible = $(".productGroup-"+event.target.id).is(":visible");
 			    	if (isVisible) { 
 				    	$("#productGroup-"+event.target.id).removeClass("showRelated");
@@ -396,7 +370,6 @@
 				    	$("#productGroup-"+event.target.id).addClass("showRelated");
 				    	$("#productGroup-"+event.target.id).removeClass("hideRelated");
 			    	}
-			    	//$("#productGroup-"+event.target.id).removeClass("hideRelated");
 		    		$(".productGroup-"+event.target.id).toggle();
 					
 		    	});
@@ -418,19 +391,16 @@
 
 		    	function refreshQuantity() {
 			    	$.each($(".quantityOnHand"), function(index, value) {
-						//$(this).html('Loading ...');
 						var productId = $(this).attr("data-product-id");
 						$(this).load('${request.contextPath}/json/getQuantityOnHand?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
 			    	});
 
 			    	$.each($(".quantityToShip"), function(index, value) {
-						//$(this).html('Loading ...');
 						var productId = $(this).attr("data-product-id");
 						$(this).load('${request.contextPath}/json/getQuantityToShip?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
 			    	});
 
 			    	$.each($(".quantityToReceive"), function(index, value) {
-						//$(this).html('Loading ...');
 						var productId = $(this).attr("data-product-id");
 						$(this).load('${request.contextPath}/json/getQuantityToReceive?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
 			    	});			    	

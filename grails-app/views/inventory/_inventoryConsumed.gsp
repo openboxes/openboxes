@@ -1,18 +1,11 @@
 <div class="box">
-    <h2><format:metadata obj="${command?.transactionInstance?.transactionType?.name}"/></h2>
+    <h2>
+        <g:message code="default.create.label" args="[g.message(code: 'transaction.label')]"/>
+    </h2>
 	<g:form action="saveDebitTransaction">
 		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
-		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
 		<table>
-            <tr class="prop">
-                <td class="name">
-                    <label><warehouse:message code="transaction.transactionType.label"/></label>
-                </td>
-                <td class="value">
-                    <format:metadata obj="${command?.transactionInstance?.transactionType?.name}"/>
-                </td>
-            </tr>
             <tr class="prop">
                 <td class="name">
                     <label><warehouse:message code="transaction.inventory.label"/></label>
@@ -22,16 +15,8 @@
                 </td>
             </tr>
             <tr class="prop">
-                <td class="name">
-                    <label><warehouse:message code="transaction.createdBy.label"/></label>
-                </td>
-                <td class="value">
-                    ${session.user.name}
-                </td>
-            </tr>
-            <tr class="prop">
 				<td class="name">
-					<label><warehouse:message code="transaction.date.label"/></label>
+					<label><warehouse:message code="default.date.label"/></label>
 				</td>
 				<td class="value">
                     <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
@@ -40,11 +25,39 @@
 			</tr>
             <tr class="prop">
                 <td class="name">
+                    <label><warehouse:message code="transaction.transactionType.label"/></label>
+                </td>
+                <td class="value">
+                    <g:selectTransactionType name="transactionInstance.transactionType.id"
+                                             value="${command?.transactionInstance?.transactionType?.id}"
+                                             noSelection="['':'']"
+                                             transactionCode="${org.pih.warehouse.inventory.TransactionCode.DEBIT}"
+                                             class="chzn-select-deselect"/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">
+                    <label><warehouse:message code="transaction.destination.label"/> <br/><span class="fade">(optional)</span></label>
+                </td>
+                <td class="value">
+                    <g:selectTransactionDestination name="destination.id" noSelection="['':'']" class="chzn-select-deselect"/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">
+                    <label><warehouse:message code="transaction.createdBy.label"/></label>
+                </td>
+                <td class="value">
+                    <g:selectUser name="createdBy.id" value="${session?.user?.id}" class="chzn-select-deselect"/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">
                     <label><warehouse:message code="transaction.comment.label"/></label>
                 </td>
                 <td class="value">
                     <span class="value">
-                        <g:textArea cols="120" rows="5" name="transactionInstance.comment"
+                        <g:textArea cols="120" rows="2" name="transactionInstance.comment"
                                     value="${command?.transactionInstance?.comment }" style="width:100%"></g:textArea>
 
                     </span>
@@ -64,8 +77,8 @@
 									<th><warehouse:message code="location.binLocation.label"/></th>
 									<th><warehouse:message code="product.lotNumber.label"/></th>
 									<th><warehouse:message code="default.expires.label"/></th>
-									<th><warehouse:message code="inventory.onHandQuantity.label"/></th>
-									<th><format:metadata obj="${command?.transactionInstance?.transactionType?.name}"/></th>
+									<th><warehouse:message code="default.quantityOnHand.label"/></th>
+									<th><g:message code="default.quantityToDebit.label"/></th>
 									<th class="center middle">
 
                                         <img data-id="all" class="plus action" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" title="${g.message(code: 'default.button.increment.label') }"/>
@@ -243,14 +256,12 @@
         var quantityField = $("#newQuantity-" + id);
         quantityField.val(oldQuantity);
         animate(quantityField);
-        //quantityField.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
     }
 
     function resetQuantity(id) {
         var quantityField = $("#newQuantity-" + id);
         quantityField.val(0);
         animate(quantityField);
-        //quantityField.fadeTo(100, 0.3, function() { $(this).fadeTo(500, 1.0); });
     }
 
     function changeQuantity(id, delta) {

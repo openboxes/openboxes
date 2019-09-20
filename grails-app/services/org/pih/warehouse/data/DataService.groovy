@@ -1,39 +1,35 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.data
 
-import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
+import org.apache.poi.hssf.usermodel.*
+import org.apache.poi.ss.usermodel.*
 import org.grails.plugins.csv.CSVWriter
 import org.grails.plugins.excelimport.ExcelImportUtils
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.core.UnitOfMeasureType
-import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 
 import java.text.SimpleDateFormat
-import org.apache.poi.ss.usermodel.*
-import org.apache.poi.hssf.usermodel.*
 
 class DataService {
 
@@ -45,7 +41,7 @@ class DataService {
     def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
 
-    private void cleanUpGorm()  {
+    private void cleanUpGorm() {
         def session = sessionFactory.currentSession
         session.flush()
         session.clear()
@@ -59,19 +55,20 @@ class DataService {
     }
 
     void executeStatements(List statementList) {
-		Sql sql = new Sql(dataSource)
+        Sql sql = new Sql(dataSource)
         sql.withTransaction {
             try {
                 statementList.each { String statement ->
+                    log.info "Executing statement " + statement
                     sql.execute(statement)
                 }
                 sql.commit()
             } catch (Exception e) {
-                sql.rollback();
+                sql.rollback()
                 log.error("Error while executing statements: " + e.message, e)
             }
         }
-	}
+    }
 
 
     /**
@@ -89,8 +86,8 @@ class DataService {
      * @return
      */
     def validateInventoryLevels(location, fileName) {
-        InventoryLevelExcelImporter importer = new InventoryLevelExcelImporter(fileName);
-        def inventoryLevelList = importer.getData();
+        InventoryLevelExcelImporter importer = new InventoryLevelExcelImporter(fileName)
+        def inventoryLevelList = importer.getData()
         inventoryLevelList.each { row ->
             if (!validateInventoryLevel(row)) {
                 return false
@@ -101,25 +98,16 @@ class DataService {
 
     def validateInventoryLevel(row) {
         row.each { key, value ->
-
-            //println key + " = " + value + " " + row
             def expectedType = InventoryLevelExcelImporter.propertyMap.get(key).expectedType
             switch (expectedType) {
-                //case  ExcelImportUtils.PROPERTY_TYPE_STRING:
-                //    assert !value || value instanceof String || value instanceof Boolean, "Value [${value}] for column [${key}] must be a String or Boolean but was ${value?.class?.name} (" + row + ").";
-                //    break;
-
                 case ExcelImportUtils.PROPERTY_TYPE_INT:
-                    assert !value || value instanceof Number || value instanceof Boolean, "Value [${value}] for column [${key}] must be a Number or Boolean but was ${value?.class?.name} (" + row + ").";
-                    break;
-
+                    assert !value || value instanceof Number || value instanceof Boolean, "Value [${value}] for column [${key}] must be a Number or Boolean but was ${value?.class?.name} (" + row + ")."
+                    break
                 case ExcelImportUtils.PROPERTY_TYPE_DATE:
-                    assert !value || value instanceof Date, "Value [${value}] for column [${key}] must be a Date but was ${value?.class?.name} (" + row + ").";
-                    break;
-
-
+                    assert !value || value instanceof Date, "Value [${value}] for column [${key}] must be a Date but was ${value?.class?.name} (" + row + ")."
+                    break
                 default:
-                    break;
+                    break
             }
         }
         return true
@@ -140,8 +128,8 @@ class DataService {
      */
     def importInventoryLevels(location, filename) {
         println "Import inventory levels " + location + " filename " + filename
-        InventoryLevelExcelImporter importer = new InventoryLevelExcelImporter(filename);
-        def inventoryLevelList = importer.getData();
+        InventoryLevelExcelImporter importer = new InventoryLevelExcelImporter(filename)
+        def inventoryLevelList = importer.getData()
         inventoryLevelList.eachWithIndex { row, index ->
             if (validateInventoryLevel(row)) {
                 importInventoryLevel(location, row, index)
@@ -163,15 +151,9 @@ class DataService {
         Product.withNewSession {
 
             def product = findProduct(row)
-            //def tags = findOrCreateTags(row.tags)
 
             // Modify product attributes (name, manufacturer, manufacturerCode, vendor, vendorCode, unitOfMeasure, etc)
             updateProduct(product, row)
-
-            // Add tags that don't currently exist
-            //if(row.tags) {
-            //    addTagsToProduct(product, row.tags)
-            //}
 
             // Create inventory level for current location, include bin location
             if (location.inventory) {
@@ -224,7 +206,6 @@ class DataService {
         if (uomCode) {
             def productPackage = findOrCreateProductPackage(product, uomCode, quantity as Integer, price as Float)
             product.addToPackages(productPackage)
-            //product = product.merge()
         }
     }
 
@@ -289,7 +270,7 @@ class DataService {
 
         def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
         if (!inventoryLevel) {
-            inventoryLevel = new InventoryLevel();
+            inventoryLevel = new InventoryLevel()
             inventoryLevel.inventory = inventory
             product.addToInventoryLevels(inventoryLevel)
 
@@ -334,8 +315,8 @@ class DataService {
         productPackage.product = product
         productPackage.gtin = ""
         productPackage.uom = unitOfMeasure
-        productPackage.price = price?:0.0
-        productPackage.quantity = quantity?:1
+        productPackage.price = price ?: 0.0
+        productPackage.quantity = quantity ?: 1
         productPackage = productPackage.merge()
 
         log.info "findOrCreateProductPackage: ${productPackage}"
@@ -376,7 +357,7 @@ class DataService {
 
 
     def findTags(tagNames) {
-        return Tag.findAll("from Tag as t where t.tag in (:tagNames)",[tagNames: tagNames])
+        return Tag.findAll("from Tag as t where t.tag in (:tagNames)", [tagNames: tagNames])
     }
 
     def findProduct(row) {
@@ -419,26 +400,17 @@ class DataService {
      * @return
      */
     def updateProduct(product, row) {
-        // Change category
-        //        def category = productService.findOrCreateCategory(row.category)
-        //        if (product.category != category && category) {
-        //            product.category = category
-        //        }
-                // Change product name
-        //        if (row.productName != product.name && product.name != null) {
-        //            product.name = row.productName
-        //        }
-        // Change all other attributes if they exist
+        // Change attributes other than name and category if they exist
         if (row.manufacturer) {
             product.manufacturer = row.manufacturer
         }
         if (row.manufacturerCode) {
             product.manufacturerCode = row.manufacturerCode
         }
-        if (row.vendor){
+        if (row.vendor) {
             product.vendor = row.vendor
         }
-        if (row.vendorCode){
+        if (row.vendorCode) {
             product.vendorCode = row.vendorCode
         }
         // If the user-entered unit price is different from the current unit price validate the user is allowed to make the change
@@ -462,7 +434,7 @@ class DataService {
         } catch (NumberFormatException e) {
             log.error("Error converting string ${str} to float.")
 
-            throw e;
+            throw e
         }
         return 0.0
     }
@@ -503,8 +475,7 @@ class DataService {
         // Check if the product already has the given tag
         def alreadyHasTag = product.tags.find { it.tag == tagName }
         if (!alreadyHasTag) {
-            //tag = Tag.findByTag(tagName)
-            def foundTag = Tag.executeQuery( "select distinct t from Tag t where t.tag = :tagName", [tagName:tagName, max:1] );
+            def foundTag = Tag.executeQuery("select distinct t from Tag t where t.tag = :tagName", [tagName: tagName, max: 1])
             if (foundTag) {
                 product.addToTags(foundTag[0])
                 product.merge()
@@ -517,29 +488,29 @@ class DataService {
      *
      * @return
      */
-	def importData() { 
-		def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
-		def people = sql.dataSet("PERSON")
-		new File("users.csv").splitEachLine(",") {fields ->
-			people.add(
-				first_name: fields[0],
-				last_name: fields[1],
-				email: fields[2]
-			)
-		}
-	}
+    def importData() {
+        def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
+        def people = sql.dataSet("PERSON")
+        new File("users.csv").splitEachLine(",") { fields ->
+            people.add(
+                    first_name: fields[0],
+                    last_name: fields[1],
+                    email: fields[2]
+            )
+        }
+    }
 
     /**
      * Export data to CSV using groovy Sql classes.
      */
-	def exportData() { 
-		def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
-		def people = sql.dataSet("PERSON")
-		
-		people.each { 
-			log.info it;
-		}
-	}
+    def exportData() {
+        def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
+        def people = sql.dataSet("PERSON")
+
+        people.each {
+            log.info it
+        }
+    }
 
     /**
      * Export the given products to CSV
@@ -573,25 +544,25 @@ class DataService {
         })
 
         products.each { product ->
-            def row =  [
-                    id: product?.id,
-                    productCode: product.productCode?:'',
-                    name: product.name,
-                    category: product?.category?.name,
-                    description: product?.description?:'',
-                    unitOfMeasure: product.unitOfMeasure?:'',
-                    manufacturer: product.manufacturer?:'',
-                    brandName: product.brandName?:'',
-                    manufacturerCode: product.manufacturerCode?:'',
-                    manufacturerName: product.manufacturerName?:'',
-                    vendor: product.vendor?:'',
-                    vendorCode: product.vendorCode?:'',
-                    vendorName: product.vendorName?:'',
-                    coldChain: product.coldChain?:Boolean.FALSE,
-                    upc: product.upc?:'',
-                    ndc: product.ndc?:'',
-                    dateCreated: product.dateCreated?"${formatDate.format(product.dateCreated)}":"",
-                    lastUpdated: product.lastUpdated?"${formatDate.format(product.lastUpdated)}":"",
+            def row = [
+                    id              : product?.id,
+                    productCode     : product.productCode ?: '',
+                    name            : product.name,
+                    category        : product?.category?.name,
+                    description     : product?.description ?: '',
+                    unitOfMeasure   : product.unitOfMeasure ?: '',
+                    manufacturer    : product.manufacturer ?: '',
+                    brandName       : product.brandName ?: '',
+                    manufacturerCode: product.manufacturerCode ?: '',
+                    manufacturerName: product.manufacturerName ?: '',
+                    vendor          : product.vendor ?: '',
+                    vendorCode      : product.vendorCode ?: '',
+                    vendorName      : product.vendorName ?: '',
+                    coldChain       : product.coldChain ?: Boolean.FALSE,
+                    upc             : product.upc ?: '',
+                    ndc             : product.ndc ?: '',
+                    dateCreated     : product.dateCreated ? "${formatDate.format(product.dateCreated)}" : "",
+                    lastUpdated     : product.lastUpdated ? "${formatDate.format(product.lastUpdated)}" : "",
             ]
             // We just want to make sure that these match because we use the same format to
             // FIXME It would be better if we could drive the export off of this array of columns,
@@ -606,35 +577,35 @@ class DataService {
     String exportInventoryLevels(List inventoryLevels) {
         def sw = new StringWriter()
         def csv = new CSVWriter(sw, {
-            "Product Code" {it.productCode}
-            "Product Name" {it.productName}
-            "Inventory" {it.inventory}
-            "Status" {it.status}
-            "Bin Location" {it.binLocation}
-            "Preferred" {it.preferred}
-            "ABC Class" {it.abcClass}
-            "Min Quantity" {it.minQuantity}
-            "Reorder Quantity" {it.reorderQuantity}
-            "Max Quantity" {it.maxQuantity}
-            "Forecast Quantity" {it.forecastQuantity}
-            "Forecast Period" {it.forecastPeriodDays}
-            "UOM" {it.unitOfMeasure}
+            "Product Code" { it.productCode }
+            "Product Name" { it.productName }
+            "Inventory" { it.inventory }
+            "Status" { it.status }
+            "Bin Location" { it.binLocation }
+            "Preferred" { it.preferred }
+            "ABC Class" { it.abcClass }
+            "Min Quantity" { it.minQuantity }
+            "Reorder Quantity" { it.reorderQuantity }
+            "Max Quantity" { it.maxQuantity }
+            "Forecast Quantity" { it.forecastQuantity }
+            "Forecast Period" { it.forecastPeriodDays }
+            "UOM" { it.unitOfMeasure }
         })
         inventoryLevels.each { inventoryLevel ->
             csv << [
-                    productCode: inventoryLevel.product.productCode,
-                    productName: inventoryLevel.product.name,
-                    inventory: inventoryLevel.inventory.warehouse.name,
-                    status: inventoryLevel.status,
-                    binLocation: inventoryLevel.binLocation?:"",
-                    preferred: inventoryLevel.preferred?:"",
-                    abcClass: inventoryLevel.abcClass?:"",
-                    minQuantity: inventoryLevel.minQuantity?:"",
-                    reorderQuantity: inventoryLevel.reorderQuantity?:"",
-                    maxQuantity: inventoryLevel.maxQuantity?:"",
-                    forecastQuantity: inventoryLevel.forecastQuantity?:"",
-                    forecastPeriodDays: inventoryLevel.forecastPeriodDays?:"",
-                    unitOfMeasure: inventoryLevel?.product?.unitOfMeasure?:"EA"
+                    productCode       : inventoryLevel.product.productCode,
+                    productName       : inventoryLevel.product.name,
+                    inventory         : inventoryLevel.inventory.warehouse.name,
+                    status            : inventoryLevel.status,
+                    binLocation       : inventoryLevel.binLocation ?: "",
+                    preferred         : inventoryLevel.preferred ?: "",
+                    abcClass          : inventoryLevel.abcClass ?: "",
+                    minQuantity       : inventoryLevel.minQuantity ?: "",
+                    reorderQuantity   : inventoryLevel.reorderQuantity ?: "",
+                    maxQuantity       : inventoryLevel.maxQuantity ?: "",
+                    forecastQuantity  : inventoryLevel.forecastQuantity ?: "",
+                    forecastPeriodDays: inventoryLevel.forecastPeriodDays ?: "",
+                    unitOfMeasure     : inventoryLevel?.product?.unitOfMeasure ?: "EA"
             ]
         }
         return csv.writer.toString()
@@ -660,67 +631,67 @@ class DataService {
             "Origin" { it.origin }
             "Destination" { it.destination }
 
-            "Requested by" { it?.requestedBy?.name?:"" }
+            "Requested by" { it?.requestedBy?.name ?: "" }
             "Date Requested" { it.dateRequested }
 
-            "Verified" { it?.verifiedBy?.name?:"" }
+            "Verified" { it?.verifiedBy?.name ?: "" }
             "Date Verified" { it.dateVerified }
 
-            "Picked" { it?.pickedBy?.name?:"" }
+            "Picked" { it?.pickedBy?.name ?: "" }
             "Date Picked" { it.datePicked }
 
-            "Checked" { it?.checkedBy?.name?:"" }
+            "Checked" { it?.checkedBy?.name ?: "" }
             "Date Checked" { it.dateChecked }
 
-            "Issued" { it?.issuedBy?.name?:"" }
+            "Issued" { it?.issuedBy?.name ?: "" }
             "Date Issued" { it.dateIssued }
 
-            "Created" { it?.createdBy?.name?:"" }
+            "Created" { it?.createdBy?.name ?: "" }
             "Date Created" { it.dateCreated }
 
-            "Updated" { it?.updatedBy?.name?:"" }
+            "Updated" { it?.updatedBy?.name ?: "" }
             "Date Updated" { it.lastUpdated }
         })
 
         requisitions.each { requisition ->
-            def row =  [
+            def row = [
                     requisitionNumber: requisition.requestNumber,
-                    type: requisition?.type,
-                    commodityClass: requisition?.commodityClass,
-                    status: requisition.status,
-                    name: requisition.name,
-                    origin: requisition.origin,
-                    destination: requisition.destination,
+                    type             : requisition?.type,
+                    commodityClass   : requisition?.commodityClass,
+                    status           : requisition.status,
+                    name             : requisition.name,
+                    origin           : requisition.origin,
+                    destination      : requisition.destination,
 
-                    requestedBy: requisition.requestedBy,
-                    dateRequested: requisition.dateRequested?"${formatDate.format(requisition.dateRequested)}":"",
+                    requestedBy      : requisition.requestedBy,
+                    dateRequested    : requisition.dateRequested ? "${formatDate.format(requisition.dateRequested)}" : "",
 
-                    reviewedBy: requisition.reviewedBy,
-                    dateReviewed: requisition.dateReviewed?"${formatDate.format(requisition.dateReviewed)}":"",
+                    reviewedBy       : requisition.reviewedBy,
+                    dateReviewed     : requisition.dateReviewed ? "${formatDate.format(requisition.dateReviewed)}" : "",
 
-                    verifiedBy: requisition.verifiedBy,
-                    dateVerified: requisition.dateVerified?"${formatDate.format(requisition.dateVerified)}":"",
+                    verifiedBy       : requisition.verifiedBy,
+                    dateVerified     : requisition.dateVerified ? "${formatDate.format(requisition.dateVerified)}" : "",
 
-                    checkedBy: requisition.checkedBy,
-                    dateChecked: requisition.dateChecked?"${formatDate.format(requisition.dateChecked)}":"",
+                    checkedBy        : requisition.checkedBy,
+                    dateChecked      : requisition.dateChecked ? "${formatDate.format(requisition.dateChecked)}" : "",
 
-                    deliveredBy: requisition.deliveredBy,
-                    dateDelivered: requisition.dateDelivered?"${formatDate.format(requisition.dateDelivered)}":"",
+                    deliveredBy      : requisition.deliveredBy,
+                    dateDelivered    : requisition.dateDelivered ? "${formatDate.format(requisition.dateDelivered)}" : "",
 
-                    pickedBy: requisition?.picklist?.picker,
-                    datePicked: requisition?.picklist?.datePicked?"${formatDate.format(requisition?.picklist?.datePicked)}":"",
+                    pickedBy         : requisition?.picklist?.picker,
+                    datePicked       : requisition?.picklist?.datePicked ? "${formatDate.format(requisition?.picklist?.datePicked)}" : "",
 
-                    issuedBy: requisition.issuedBy,
-                    dateIssued: requisition.dateIssued?"${formatDate.format(requisition.dateIssued)}":"",
+                    issuedBy         : requisition.issuedBy,
+                    dateIssued       : requisition.dateIssued ? "${formatDate.format(requisition.dateIssued)}" : "",
 
-                    receivedBy: requisition.receivedBy,
-                    dateReceived: requisition.dateReceived?"${formatDate.format(requisition.dateReceived)}":"",
+                    receivedBy       : requisition.receivedBy,
+                    dateReceived     : requisition.dateReceived ? "${formatDate.format(requisition.dateReceived)}" : "",
 
-                    createdBy: requisition.createdBy,
-                    dateCreated: requisition.dateCreated?"${formatDate.format(requisition.dateCreated)}":"",
+                    createdBy        : requisition.createdBy,
+                    dateCreated      : requisition.dateCreated ? "${formatDate.format(requisition.dateCreated)}" : "",
 
-                    updatedBy: requisition.updatedBy,
-                    lastUpdated: requisition.lastUpdated?"${formatDate.format(requisition.lastUpdated)}":"",
+                    updatedBy        : requisition.updatedBy,
+                    lastUpdated      : requisition.lastUpdated ? "${formatDate.format(requisition.lastUpdated)}" : "",
             ]
             csvWriter << row
         }
@@ -742,40 +713,38 @@ class DataService {
             "Requested by" { it?.requestedBy?.name }
             "Date Requested" { it.dateRequested }
             "Product code" { it.productCode }
-            "Product name" {it.productName }
-            "Status" { it.itemStatus?:"" }
-            "Requested" { it.quantity?:"" }
-            "Approved" { it.quantityApproved?:"" }
-            "Picked" { it.quantityPicked?:"" }
-            "Canceled" { it.quantityCanceled?:"" }
-            "Reason Code" { it.reasonCode?: "" }
-            "Comments" { it.comments?: "" }
+            "Product name" { it.productName }
+            "Status" { it.itemStatus ?: "" }
+            "Requested" { it.quantity ?: "" }
+            "Approved" { it.quantityApproved ?: "" }
+            "Picked" { it.quantityPicked ?: "" }
+            "Canceled" { it.quantityCanceled ?: "" }
+            "Reason Code" { it.reasonCode ?: "" }
+            "Comments" { it.comments ?: "" }
 
         })
 
         requisitions.each { requisition ->
             requisition.requisitionItems.each { requisitionItem ->
-                def row =  [
+                def row = [
                         requisitionNumber: requisition.requestNumber,
-                        type: requisition?.type,
-                        commodityClass: requisition?.commodityClass,
-                        status: requisition.status,
-                        name: requisition.name,
-                        requestedBy: requisition.requestedBy?:"",
-                        dateRequested: requisition.dateRequested?"${formatDate.format(requisition.dateRequested)}":"",
-                        origin: requisition.origin,
-                        destination: requisition.destination,
-                        productCode: requisitionItem.product.productCode,
-                        productName: requisitionItem.product.name,
-                        itemStatus: requisitionItem.status,
-                        quantity: requisitionItem.quantity,
-                        quantityCanceled: requisitionItem.quantityCanceled,
-                        quantityApproved: requisitionItem.quantityApproved,
-                        quantityPicked: requisitionItem.calculateQuantityPicked(),
-                        reasonCode: requisitionItem.cancelReasonCode,
-                        comments: requisitionItem.cancelComments,
-
-
+                        type             : requisition?.type,
+                        commodityClass   : requisition?.commodityClass,
+                        status           : requisition.status,
+                        name             : requisition.name,
+                        requestedBy      : requisition.requestedBy ?: "",
+                        dateRequested    : requisition.dateRequested ? "${formatDate.format(requisition.dateRequested)}" : "",
+                        origin           : requisition.origin,
+                        destination      : requisition.destination,
+                        productCode      : requisitionItem.product.productCode,
+                        productName      : requisitionItem.product.name,
+                        itemStatus       : requisitionItem.status,
+                        quantity         : requisitionItem.quantity,
+                        quantityCanceled : requisitionItem.quantityCanceled,
+                        quantityApproved : requisitionItem.quantityApproved,
+                        quantityPicked   : requisitionItem.calculateQuantityPicked(),
+                        reasonCode       : requisitionItem.cancelReasonCode,
+                        comments         : requisitionItem.cancelComments,
 
 
                 ]
@@ -803,8 +772,8 @@ class DataService {
     def transformObject(Object object, Map includeFields) {
         Map properties = [:]
         includeFields.each { fieldName, property ->
-            def value = property.tokenize('.').inject(object) {v, k -> v?."$k"}
-            properties[fieldName] = value?:""
+            def value = property.tokenize('.').inject(object) { v, k -> v?."$k" }
+            properties[fieldName] = value ?: ""
         }
         return properties
     }
@@ -823,9 +792,7 @@ class DataService {
                 def values = row.values().collect { value ->
                     if (value?.toString()?.isNumber()) {
                         value
-                    }
-                    else {
-                        //'"' + value.toString().replace('"','""') + '"'
+                    } else {
                         StringEscapeUtils.escapeCsv(value.toString())
                     }
                 }
@@ -845,7 +812,7 @@ class DataService {
     def getFileProperties(uploadFile) {
         def fileProps = [:]
         println "content type:        " + uploadFile.contentType
-        switch(uploadFile.contentType) {
+        switch (uploadFile.contentType) {
             case "text/csv":
                 fileProps.type = "csv"
                 break
@@ -879,11 +846,11 @@ class DataService {
         //def numOfSheets = wb.getNumberOfSheets()
         Sheet sheet = wb.getSheetAt(0)
         def xlsData = [:]
-        sheet.iterator().eachWithIndex{row, rowNum ->
-            if(!ignoredRows.contains(rowNum)) {
+        sheet.iterator().eachWithIndex { row, rowNum ->
+            if (!ignoredRows.contains(rowNum)) {
                 xlsData[rowNum] = [:]
-                row.iterator().eachWithIndex{col, colNum ->
-                    switch ( columTypes[colNum] ) {
+                row.iterator().eachWithIndex { col, colNum ->
+                    switch (columTypes[colNum]) {
                     //case ["number","num","int","integer",0, 'inList']
                         case "number":
                             xlsData[rowNum][colNum] = col.getNumericCellValue()
@@ -897,31 +864,10 @@ class DataService {
                         default:
                             xlsData[rowNum][colNum] = ''
                     }
-                    //log.debug xlsData[rowNum][colNum] + " - class: "xlsData[rowNum][colNum].class
                 }
-            }
-            else log.debug "ignoring row ${rowNum}"
+            } else log.debug "ignoring row ${rowNum}"
         }
         return xlsData
-    }
-
-    /**
-     * Saves an uploaded file to disk.
-     *
-     * @param uploadFile
-     * @return
-     */
-    def saveFileToDisk(uploadFile) {
-        def localFile
-        try {
-            localFile = new File("uploads/" + uploadFile?.originalFilename);
-            localFile.mkdirs()
-            uploadFile?.transferTo(localFile);
-        } catch (IOException e ) {
-            log.error("Error saving uploaded file: " + e.message, e)
-            throw e;
-        }
-        return localFile
     }
 
 }

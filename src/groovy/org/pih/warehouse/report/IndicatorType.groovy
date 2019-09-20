@@ -9,31 +9,31 @@
  **/
 package org.pih.warehouse.report
 
-public enum IndicatorType {
+enum IndicatorType {
 
-	DASHBOARD(0),
+    DASHBOARD(0),
     STOCKCARD(1),
 
-	int sortOrder
+    int sortOrder
 
     IndicatorType(int sortOrder) {
-		[
-			this.sortOrder = sortOrder
-		]
-	}
+        [
+                this.sortOrder = sortOrder
+        ]
+    }
 
-	static int compare(IndicatorType a, IndicatorType b) {
-		return a.sortOrder <=> b.sortOrder
-	}
+    static int compare(IndicatorType a, IndicatorType b) {
+        return a.sortOrder <=> b.sortOrder
+    }
 
-	static list() {
-		[
-            DASHBOARD,
-            STOCKCARD,
-		]
-	}
+    static list() {
+        [
+                DASHBOARD,
+                STOCKCARD,
+        ]
+    }
 
-	String toString() {
-		return name()
-	}
+    String toString() {
+        return name()
+    }
 }

@@ -69,10 +69,6 @@
 												<label><warehouse:message code="transaction.date.label"/></label>
 											</td>
 											<td class="value">
-                                                <%--
-												<g:jqueryDatePicker id="transactionDate" name="transactionDate"
-														value="${transactionInstance?.transactionDate}" format="MM/dd/yyyy"/>
-											    --%>
                                                 <g:datePicker id="transactionDate" name="transactionDate"
                                                               value="${transactionInstance?.transactionDate}"
                                                                 precision="minute"/>
@@ -84,9 +80,13 @@
 											</td>
 											<td class="value">
 												<span class="value">
-													<g:select id="transactionTypeSelector" name="transactionType.id" class="chzn-select-deselect"
-                                                              from="${transactionTypeList}"
-							                       		optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${transactionInstance.transactionType?.id}" noSelection="['': '']" />
+													<g:selectTransactionType id="transactionTypeSelector"
+																			 name="transactionType.id"
+																			 class="chzn-select-deselect"
+																			 optionKey="id"
+																			 optionValue="${{format.metadata(obj:it)}}"
+																			 value="${transactionInstance.transactionType?.id}"
+																			 noSelection="['': '']" />
 						                       	</span>
 											</td>
 										</tr>
@@ -200,12 +200,6 @@
                                                             value="${transactionEntry?.quantity }" size="6"/>
 			                                    	</td>
 			                                    	<td class="center">
-		                                    			
-		                                    			<%-- 
-		                                    			<g:link controller="transactionEntry" action="show" id="${transactionEntry?.id }">
-		                                    				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" /></g:link>
-														&nbsp;
-														--%>
 		                                    			<g:link controller="transactionEntry" action="delete" id="${transactionEntry?.id }" onclick="return confirm('Are you sure?');">
 			                                    			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png')}" />
 			                                    		</g:link>
@@ -219,43 +213,6 @@
 													</td>
 												</tr>											
 											</g:unless>
-											<%-- 
-											<tr class="empty">
-												<td colspan="7" style="text-align: center; display:none;" id="noItemsRow">
-													<span class="fade"><warehouse:message code="transaction.noItems.message"/></span>
-												</td>
-											</tr>
-		                                    <tr id="itemRowTemplate" style="display:none;">
-		                                    	<td>
-		                                    		 <g:hiddenField class="entryIdField" name="transactionEntryId" value=""/>
-		                                    		 <g:hiddenField class="entryDeleteField" name="deleteEntry" value="false"/>
-		                                    		 <g:hiddenField class="productIdField" name="productId" value=""/>
-		                                    		 <g:hiddenField class="inventoryItemIdField" name="inventoryItemId" value=""/> 
-		                                    		 <span class="productNameLabel"></span>
-		                                    	</td>
-		                                    	<td class="center">
-		                                    		<span class="lotNumberFieldSection" style="display:none;">
-		                                    			<g:textField class="lotNumber lotNumberField" name="lotNumber" size="15" value=""/>
-		                                    		</span>
-		                                    		<span class="lotNumberLabel"></span>
-		                                    	</td>
-		                                    	<td class="center">
-		                                    		<span class="expirationFieldSection" style="display:none;">
-		                                    			<g:datePicker class="expirationDateField" name="expirationDate" precision="day" default="none" noSelection="['':'']"/>
-		                                    		</span>
-		                                    		<span class="expirationLabel"></span>
-		                                    	</td>
-		                                    	<td class="center" class="onHandQtyLabel"></td>
-		                                    	<td class="center"><g:textField class="quantityField" name="quantity" value="" size="6"/></td>
-		                                    	<td class="actionsCell center">
-	                                    			<g:link controller="transactionEntry" action="edit" id="${transactionEntry?.id }">
-	                                    				<img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" class="rowEditButton" />
-	                                    			</g:link>
-	
-	                                    			<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}" class="rowDeleteButton" />
-		                                    	</td>
-		                                    </tr>
-		                                    --%>
 										</tbody>
 										<tfoot>
 											<tr>
@@ -287,8 +244,5 @@
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript">
-	    	//$(document).ready(function() { });
-        </script>
     </body>
 </html>

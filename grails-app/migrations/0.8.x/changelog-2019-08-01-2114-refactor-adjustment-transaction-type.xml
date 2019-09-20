@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1564712113471-2">
+        <sql>
+            UPDATE transaction_type
+            SET name = 'Adjustment|fr:Ajustement'
+            WHERE id = '3'
+            AND name like 'Adjustment - Credit%';
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1564712113471-3">
+        <sql>
+            UPDATE transaction_type
+            SET name = 'Expired|fr:Expiré'
+            WHERE id = '4'
+            AND name like 'Expired%';
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1564712113471-4">
+        <sql>
+            UPDATE transaction_type
+            SET name = 'Damaged|fr:Endommagé'
+            WHERE id = '5'
+            AND name like 'Damaged%';
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1564712113471-5">
+        <sql>
+            UPDATE transaction_type
+            SET name = 'Transfer In|fr:Transfert Entrée'
+            WHERE id = '8'
+            AND name like 'Transfer In%';
+        </sql>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1564712113471-6">
+        <sql>
+            UPDATE transaction_type
+            SET name = 'Transfer Out|fr:Transfert Sortie'
+            WHERE id = '9'
+            AND name like 'Transfer Out%';
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -30,7 +30,7 @@ class StockMovementApiController {
 
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
-        int offset = params.offset? params.int("offset") : 0
+        int offset = params.offset ? params.int("offset") : 0
         def stockMovements = stockMovementService.getStockMovements(max, offset)
         stockMovements = stockMovements.collect { StockMovement stockMovement ->
             Map json = stockMovement.toJson()
@@ -42,7 +42,7 @@ class StockMovementApiController {
             }
             return json
         }
-        render ([data:stockMovements] as JSON)
+        render([data: stockMovements] as JSON)
     }
 
     def read = {
@@ -52,7 +52,7 @@ class StockMovementApiController {
         JSONObject jsonObject = new JSONObject(stockMovement.toJson())
 
         log.debug "read " + jsonObject.toString(4)
-        render ([data:stockMovement] as JSON)
+        render([data: stockMovement] as JSON)
     }
 
     def create = { StockMovement stockMovement ->
@@ -62,8 +62,8 @@ class StockMovementApiController {
 
         stockMovement = stockMovementService.createStockMovement(stockMovement)
         response.status = 201
-        render ([data:stockMovement] as JSON)
-	}
+        render([data: stockMovement] as JSON)
+    }
 
     def updateRequisition = { //StockMovement stockMovement ->
 
@@ -101,7 +101,7 @@ class StockMovementApiController {
 
     def status = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        render ([data:stockMovement?.status] as JSON)
+        render([data: stockMovement?.status] as JSON)
     }
 
     def deleteStatus = {
@@ -137,8 +137,7 @@ class StockMovementApiController {
 
         if (status && statusOnly) {
             stockMovementService.updateStatus(params.id, status)
-        }
-        else {
+        } else {
             if (rollback) {
                 stockMovementService.rollbackStockMovement(params.id)
             }
@@ -194,7 +193,7 @@ class StockMovementApiController {
 
         List<EditPageItem> revisedItems = stockMovementService.reviseItems(stockMovement)
 
-        render ([data:revisedItems] as JSON)
+        render([data: revisedItems] as JSON)
     }
 
     def updateItems = {
@@ -207,7 +206,7 @@ class StockMovementApiController {
 
         stockMovement = stockMovementService.updateItems(stockMovement)
 
-        render ([data:stockMovement] as JSON)
+        render([data: stockMovement] as JSON)
     }
 
     def updateShipmentItems = {
@@ -220,7 +219,7 @@ class StockMovementApiController {
 
         stockMovement = stockMovementService.updatePackPageItems(stockMovement)
 
-        render ([data:stockMovement] as JSON)
+        render([data: stockMovement] as JSON)
     }
 
     def updateAdjustedItems = {
@@ -230,7 +229,7 @@ class StockMovementApiController {
 
         stockMovement = stockMovementService.getStockMovement(params.id, "4")
 
-        render ([data:stockMovement] as JSON)
+        render([data: stockMovement] as JSON)
     }
 
     def exportPickListItems = {
@@ -248,15 +247,15 @@ class StockMovementApiController {
         def lineItems = picklistItems.collect {
             [
                     requisitionItemId: it?.requisitionItem?.id ?: "",
-                    lotNumber: it?.inventoryItem?.lotNumber ?:"",
-                    expirationDate: it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                    binLocation: it?.binLocation?.name ?: "",
-                    quantity: it?.quantity ?: "",
+                    lotNumber        : it?.inventoryItem?.lotNumber ?: "",
+                    expirationDate   : it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    binLocation      : it?.binLocation?.name ?: "",
+                    quantity         : it?.quantity ?: "",
             ]
         }
         String csv = dataService.generateCsv(lineItems)
         response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
-        render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
     def importPickListItems = { ImportDataCommand command ->
@@ -291,15 +290,17 @@ class StockMovementApiController {
                             "Please reformat field with Lot Number: \"${lotNumber}\" to a number format")
                 }
 
-                PickPageItem pickPageItem = stockMovement?.pickPage?.pickPageItems?.find { it.requisitionItem?.id == requisitionItemId }
+                PickPageItem pickPageItem = stockMovement?.pickPage?.pickPageItems?.find {
+                    it.requisitionItem?.id == requisitionItemId
+                }
 
                 if (!pickPageItem) {
                     throw new IllegalArgumentException("Requisition item id: ${requisitionItemId} not found")
                 }
 
-		// FIXME Should find bin location by name and parent and inventory item by lot number and expiration date
-		// and compare object equality (or at least PK equality) rather than comparing various components
-		AvailableItem availableItem = pickPageItem.availableItems?.find {
+                // FIXME Should find bin location by name and parent and inventory item by lot number and expiration date
+                // and compare object equality (or at least PK equality) rather than comparing various components
+                AvailableItem availableItem = pickPageItem.availableItems?.find {
                     (binLocation ? it.binLocation?.name == binLocation : !it.binLocation) && lotNumber == (it.inventoryItem?.lotNumber ?: null) &&
                             expirationDate == (it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : null)
                 }
@@ -330,7 +331,7 @@ class StockMovementApiController {
             // FIXME The global error handler does not return JSON for multipart uploads
             log.warn("Error occurred while importing CSV: " + e.message, e)
             response.status = 500
-            render([errorCode: 500, errorMessage: e?.message?:"An unknown error occurred during import"] as JSON)
+            render([errorCode: 500, errorMessage: e?.message ?: "An unknown error occurred during import"] as JSON)
             return
         }
 

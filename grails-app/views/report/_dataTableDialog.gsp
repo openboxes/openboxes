@@ -4,7 +4,8 @@
             <th><g:message code="default.date.label"/></th>
             <th><g:message code="default.time.label"/></th>
             <th><g:message code="transaction.transactionType.label"/></th>
-            <th><g:message code="transactionTpye.transactionCode.label" default="Transaction Code"/></th>
+            <th><g:message code="transactionType.transactionCode.label"
+                           default="Transaction Code"/></th>
             <th><g:message code="default.quantity.label"/></th>
             <th><g:message code="default.balance.label" default="Balance"/></th>
         </tr>
@@ -40,6 +41,17 @@
             "sScrollY": 400,
             "sPaginationType": "two_button",
             "sAjaxSource": "${url}",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback,
+                    "timeout": 30000,
+                    "error": handleAjaxError
+                })
+            },
             "fnServerParams": function (data) {
                 $("#locationId").val();
                 $("#startDate").val();

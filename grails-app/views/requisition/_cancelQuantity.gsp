@@ -10,9 +10,6 @@
 
 
     <g:form controller="requisitionItem" action="cancelQuantity" fragment="${selectedRequisitionItem?.id}">
-        <%--
-        <g:hiddenField name="id" value="${selectedRequisitionItem?.requisition?.id }"/>
-        --%>
         <g:hiddenField name="id" value="${selectedRequisitionItem?.id }"/>
         <g:hiddenField name="redirectAction" value="${actionName}"/>
         <g:hiddenField name="actionType" value="${params.actionType }"/>

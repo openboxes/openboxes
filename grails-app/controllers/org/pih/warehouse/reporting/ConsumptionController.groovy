@@ -24,8 +24,8 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.report.ConsumptionService
 import org.pih.warehouse.report.ReportService
@@ -42,8 +42,8 @@ class ConsumptionController {
     def show = { ShowConsumptionCommand command ->
 
         if (command.hasErrors()) {
-            render(view: "show", model: [command:command])
-            return;
+            render(view: "show", model: [command: command])
+            return
         }
 
         // If any parameters have changed we need to reset filters
@@ -67,7 +67,7 @@ class ConsumptionController {
             }
         }
 
-        def tags = command.selectedTags.collect { it.tag}.asList()
+        def tags = command.selectedTags.collect { it.tag }.asList()
         def products = tags ? inventoryService.getProductsByTags(tags) : null
 
         // Add an entire day to account for the 24 hour period on the end date
@@ -85,7 +85,6 @@ class ConsumptionController {
 
         def transactions = []
         transactions.addAll(command.debits)
-        //transactions.addAll(command.credits)
 
         // Sort transaction by date ascending
         transactions = transactions.sort { it.transactionDate }
@@ -97,13 +96,14 @@ class ConsumptionController {
 
         // Some transactions don't have a destination (e.g. expired, consumed, etc)
         if (toLocationsEmpty) {
-            command.toLocations = transactions.findAll { it.destination != null }.collect { it.destination }
+            command.toLocations = transactions.findAll { it.destination != null }.collect {
+                it.destination
+            }
         }
 
         // Keep track of all the transaction types (we may want to select a subset of these)
         // FIXME Hard-code transaction types (OBPIH-2059)
         command.transactionTypes = [TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)]
-                // transactions*.transactionType
 
         // Iterate over all transactions
         transactions.each { transaction ->
@@ -131,16 +131,13 @@ class ConsumptionController {
 
                     // Add to the total transfer out per location
                     command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
-                }
-                else if (transaction.transactionType.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
+                } else if (transaction.transactionType.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
                     command.rows[product].expiredQuantity += transactionEntry.quantity
                     command.rows[product].expiredTransactions << transaction
-                }
-                else if (transaction.transactionType.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
+                } else if (transaction.transactionType.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
                     command.rows[product].damagedQuantity += transactionEntry.quantity
                     command.rows[product].damagedTransactions << transaction
-                }
-                else if (transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
+                } else if (transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
                     command.rows[product].transferInQuantity += transactionEntry.quantity
                     command.rows[product].transferInTransactions << transaction
 
@@ -152,8 +149,7 @@ class ConsumptionController {
 
                     // Add to the total transfer out per location
                     command.rows[product].transferInMap[transaction.source] += transactionEntry.quantity
-                }
-                else {
+                } else {
                     command.rows[product].otherQuantity += transactionEntry.quantity
                     command.rows[product].otherTransactions << transaction
                 }
@@ -170,8 +166,7 @@ class ConsumptionController {
                         command.rows[product].transferOutMonthlyMap[dateKey] = 0
                     }
                     command.rows[product].transferOutMonthlyMap[dateKey] += transactionEntry.quantity
-                }
-                else if (transaction.transactionType.transactionCode == TransactionCode.CREDIT) {
+                } else if (transaction.transactionType.transactionCode == TransactionCode.CREDIT) {
                     // Add to total transfer in by month (initialize transfer out by month map)
                     def transferInMonthlyQuantity = command.rows[product].transferInMonthlyMap[dateKey]
                     if (!transferInMonthlyQuantity) {
@@ -187,10 +182,7 @@ class ConsumptionController {
 
         // Calculate the on hand quantity for all products returned by the getTransactions() call above
         if (command.fromLocations) {
-
-            //def products = command.productMap.keySet().asList()
             products = command.rows.keySet().asList()
-
 
             // Filter products by tags
             if (command.selectedTags) {
@@ -229,8 +221,7 @@ class ConsumptionController {
 
                         // For each product, add to the onhand quantity map
                         products.each { product ->
-                            def onHandQuantity = onHandQuantityMap[product];
-                            //println "onHandQuantity: " + onHandQuantity
+                            def onHandQuantity = onHandQuantityMap[product]
                             if (onHandQuantity) {
                                 command.rows[product].onHandQuantity += onHandQuantity
                             }
@@ -258,16 +249,16 @@ class ConsumptionController {
 
             def csvrows = []
             command.rows.each { key, row ->
-                def csvrow =  [
-                        'Product code': row.product.productCode?:'',
-                        'Product': row.product.name,
-                        'Category': row.product?.category?.name,
-                        'UoM': row.product.unitOfMeasure?:'',
-                        'Qty transfer out': g.formatNumber(number: row.transferOutQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        'Count transfer out': g.formatNumber(number: row.transferOutTransactions.size(), format: '###.#', maxFractionDigits: 1)?:'',
-                        'Consumed monthly': g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        'Quantity on hand': g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        'Months remaining': g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1)?:'',
+                def csvrow = [
+                        'Product code'      : row.product.productCode ?: '',
+                        'Product'           : row.product.name,
+                        'Category'          : row.product?.category?.name,
+                        'UoM'               : row.product.unitOfMeasure ?: '',
+                        'Qty transfer out'  : g.formatNumber(number: row.transferOutQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Count transfer out': g.formatNumber(number: row.transferOutTransactions.size(), format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Consumed monthly'  : g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Quantity on hand'  : g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Months remaining'  : g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1) ?: '',
                 ]
 
                 if (command.selectedProperties) {
@@ -278,7 +269,7 @@ class ConsumptionController {
 
                 if (command.includeMonthlyBreakdown) {
                     command.selectedDates.each { date ->
-                        csvrow[date.toString()] = row.transferOutMonthlyMap[date]?:""
+                        csvrow[date.toString()] = row.transferOutMonthlyMap[date] ?: ""
                     }
 
                 }
@@ -286,7 +277,7 @@ class ConsumptionController {
 
                 if (command.includeLocationBreakdown) {
                     command.selectedLocations.each { location ->
-                        csvrow[location.locationNumber?:location?.name] = row.transferOutMap[location]?:""
+                        csvrow[location.locationNumber ?: location?.name] = row.transferOutMap[location] ?: ""
                     }
                 }
 
@@ -295,14 +286,15 @@ class ConsumptionController {
             }
 
             def csv = dataService.generateCsv(csvrows)
-            response.setHeader("Content-disposition", "attachment; filename=\"Consumption-${new Date().format("dd MMM yyyy hhmmss")}.csv\"")
-            render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+            response.setHeader("Content-disposition", "attachment; filename=\"Consumption-" +
+                    "${!fromLocationsEmpty && command.fromLocations.size() > 1 ? command.fromLocations : command.fromLocations.first()}" +
+                    "-${new Date().format("dd MMM yyyy hhmmss")}.csv\"")
+            render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
             return
-        }
-        else {
+        } else {
             println "Render as HTML " + params
 
-            [command:command]
+            [command: command]
         }
     }
 
@@ -315,8 +307,8 @@ class ConsumptionController {
     def delete = {
         long startTime = System.currentTimeMillis()
         Integer deletedRecords = consumptionService.deleteConsumptionRecords()
-        flash.message = "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis()-startTime}"
-        log.info "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis()-startTime}"
+        flash.message = "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis() - startTime}"
+        log.info "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis() - startTime}"
         redirect(controller: "consumption", action: "list")
     }
 
@@ -329,11 +321,11 @@ class ConsumptionController {
     def pivot = { ConsumptionCommand command ->
 
         use(TimeCategory) {
-            command.endDate = command?.endDate?:new Date()
-            command.startDate = command?.startDate?:new Date() - 6.months
+            command.endDate = command?.endDate ?: new Date()
+            command.startDate = command?.startDate ?: new Date() - 6.months
         }
 
-        [ command: command]
+        [command: command]
     }
 
 
@@ -344,8 +336,8 @@ class ConsumptionController {
         Location location = Location.get(session?.warehouse?.id)
 
         use(TimeCategory) {
-            command.endDate = command?.endDate?:new Date()
-            command.startDate = command?.startDate?:new Date() - 6.months
+            command.endDate = command?.endDate ?: new Date()
+            command.startDate = command?.startDate ?: new Date() - 6.months
         }
 
         if (command.download) {
@@ -354,45 +346,47 @@ class ConsumptionController {
             log.info "crosstab " + crosstab
             String csv = dataService.generateCsv(crosstab)
             response.setHeader("Content-disposition", "attachment; filename=Consumption-${location.name}-${new Date().format("dd-MMM-yyyy-hhmmss")}.csv")
-            render(contentType:"text/csv", text: csv.toString(), encoding:"UTF-8")
+            render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
             return
         }
 
-        [ command: command ]
+        [command: command]
     }
 
 
     def aggregate = { ConsumptionCommand command ->
 
-        String locationId = command?.location?.id?:session?.warehouse?.id
+        String locationId = command?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
 
         use(TimeCategory) {
-            command.endDate = command?.endDate?:new Date()
-            command.startDate = command?.startDate?:new Date() - 6.months
+            command.endDate = command?.endDate ?: new Date()
+            command.startDate = command?.startDate ?: new Date() - 6.months
         }
 
 
-        List <ConsumptionFact> results = consumptionService.listConsumption(location, command?.category, command.startDate, command.endDate)
+        List<ConsumptionFact> results = consumptionService.listConsumption(location, command?.category, command.startDate, command.endDate)
 
-        results = results.collect { [
-                id: it.id,
-                productCode: it?.productKey?.productCode,
-                productName: it.productKey?.productName,
-                categoryName: it?.productKey?.categoryName,
-                year: it?.transactionDateKey?.year,
-                month: it?.transactionDateKey?.month,
-                day: it?.transactionDateKey?.dayOfMonth,
-                quantity: it?.quantity,
-                unitCost: it?.unitCost,
-                unitPrice: it?.unitPrice
-        ]}
+        results = results.collect {
+            [
+                    id          : it.id,
+                    productCode : it?.productKey?.productCode,
+                    productName : it.productKey?.productName,
+                    categoryName: it?.productKey?.categoryName,
+                    year        : it?.transactionDateKey?.year,
+                    month       : it?.transactionDateKey?.month,
+                    day         : it?.transactionDateKey?.dayOfMonth,
+                    quantity    : it?.quantity,
+                    unitCost    : it?.unitCost,
+                    unitPrice   : it?.unitPrice
+            ]
+        }
         render results as JSON
     }
 
     def product = {
         Product product = Product.get(params.id)
-        render (template: "product", model: [product:product])
+        render(template: "product", model: [product: product])
     }
 
 }
@@ -401,12 +395,12 @@ class ConsumptionController {
 class ShowConsumptionCommand {
 
     // Map of product to ShowConsumptionRowCommand
-    def rows = new TreeMap();
+    def rows = new TreeMap()
 
     // Parameters
     Date fromDate
     Date toDate
-    List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
+    List<Location> fromLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
 
     // State
     String parametersHash
@@ -415,29 +409,29 @@ class ShowConsumptionCommand {
     List<Tag> tags = []
     List<Category> categories = []
     List<Product> products = []
-    List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
+    List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
     List<TransactionType> transactionTypes = []
     List<TransactionType> selectedTransactionTypes = []
-    List <String> selectedDates = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class));
-    List<Location> selectedLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class));
-    List<Category> selectedCategories = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class));
-    List<Tag> selectedTags = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Tag.class));
+    List<String> selectedDates = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class))
+    List<Location> selectedLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
+    List<Category> selectedCategories = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class))
+    List<Tag> selectedTags = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Tag.class))
 
     Boolean includeLocationBreakdown = Boolean.TRUE
     Boolean includeMonthlyBreakdown = Boolean.TRUE
     Boolean includeQuantityOnHand = Boolean.TRUE
 
-    def productDomain = new DefaultGrailsDomainClass( Product.class )
+    def productDomain = new DefaultGrailsDomainClass(Product.class)
 
-    def selectedProperties = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class));
+    def selectedProperties = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class))
 
     // Payload
     Set<Transaction> debits = []
     Set<Transaction> credits = []
     Set<Requisition> requisitions = []
     Set<TransactionEntry> transactionEntries = []
-    def productMap = new TreeMap();
-    def onHandQuantityMap = new TreeMap();
+    def productMap = new TreeMap()
+    def onHandQuantityMap = new TreeMap()
     def transferOutMap = [:]
 
     static constraints = {
@@ -466,11 +460,8 @@ class ShowConsumptionCommand {
     }
 
     Float getNumberOfMonths() {
-
-        //println "numberOfDays: " + numberOfDays
         return numberOfDays / 30
     }
-
 }
 
 class ShowConsumptionRowCommand {
@@ -485,7 +476,7 @@ class ShowConsumptionRowCommand {
     Integer expiredQuantity = 0
     Integer damagedQuantity = 0
     Integer otherQuantity = 0
-    Integer debitQuantity = 0;
+    Integer debitQuantity = 0
 
     Set<Transaction> transferOutTransactions = []
     Set<Transaction> expiredTransactions = []
@@ -495,12 +486,12 @@ class ShowConsumptionRowCommand {
     Set<Transaction> otherTransactions = []
 
     // Location breakdown
-    Map<Location, Integer> transferInMap = new TreeMap<Location, Integer>();
-    Map<Location, Integer> transferOutMap = new TreeMap<Location, Integer>();
+    Map<Location, Integer> transferInMap = new TreeMap<Location, Integer>()
+    Map<Location, Integer> transferOutMap = new TreeMap<Location, Integer>()
 
     // Monthly breakdown
-    Map<String, Integer> transferInMonthlyMap = new TreeMap<String, Integer>();
-    Map<String, Integer> transferOutMonthlyMap = new TreeMap<String, Integer>();
+    Map<String, Integer> transferInMonthlyMap = new TreeMap<String, Integer>()
+    Map<String, Integer> transferOutMonthlyMap = new TreeMap<String, Integer>()
 
     static constraints = {
 
@@ -523,10 +514,9 @@ class ShowConsumptionRowCommand {
     }
 
     Float getNumberOfMonthsRemaining() {
-        if (getMonthlyQuantity()>0) {
+        if (getMonthlyQuantity() > 0) {
             return onHandQuantity / getMonthlyQuantity()
-        }
-        else {
+        } else {
             return 0.0
         }
     }
@@ -536,12 +526,11 @@ class ShowConsumptionRowCommand {
         String transferOutLocations = ""
         if (locations) {
             locations.each { location ->
-                transferOutLocations += transferOutMap[location]?:'0' + ","
+                transferOutLocations += transferOutMap[location] ?: '0' + ","
             }
         }
         return transferOutLocations
     }
-
 }
 
 class ConsumptionCommand {
@@ -556,11 +545,11 @@ class ConsumptionCommand {
     Boolean download = Boolean.FALSE
 
     static constraints = {
-        category(nullable:true)
-        location(nullable:true)
-        startDate(nullable:true)
-        endDate(nullable:true)
-        groupBy(nullable:true)
+        category(nullable: true)
+        location(nullable: true)
+        startDate(nullable: true)
+        endDate(nullable: true)
+        groupBy(nullable: true)
 
     }
 }

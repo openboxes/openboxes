@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+  <changeSet author="jmiranda (generated)" id="1566013379806-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists columnName="color" tableName="product_catalog"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="product_catalog">
+      <column name="color" type="VARCHAR(255)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>
+
+

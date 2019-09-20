@@ -22,10 +22,10 @@ enum StockMovementType {
 
     String name
 
-    StockMovementType(String name) { this.name = name; }
+    StockMovementType(String name) { this.name = name }
 
     static list() {
-        [ INBOUND, OUTBOUND]
+        [INBOUND, OUTBOUND]
     }
 }
 
@@ -60,7 +60,7 @@ class StockMovement {
     PackPage packPage
 
     List<StockMovementItem> lineItems =
-            LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class));
+            LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class))
 
     Requisition stocklist
     Requisition requisition
@@ -69,55 +69,57 @@ class StockMovement {
     List documents
 
     static constraints = {
-        id(nullable:true)
-        name(nullable:true)
-        description(nullable:true)
-        statusCode(nullable:true)
-        origin(nullable:false)
-        destination(nullable:false)
-        stocklist(nullable:true)
-        requestedBy(nullable:false)
-        dateRequested(nullable:false)
-        stockMovementType(nullable:true)
-        receiptStatusCode(nullable:true)
-        shipment(nullable:true)
-        dateShipped(nullable:true)
-        shipmentType(nullable:true)
-        trackingNumber(nullable:true)
-        driverName(nullable:true)
-        comments(nullable:true)
-        totalValue(nullable:true)
+        id(nullable: true)
+        name(nullable: true)
+        description(nullable: true)
+        statusCode(nullable: true)
+        origin(nullable: false)
+        destination(nullable: false)
+        stocklist(nullable: true)
+        requestedBy(nullable: false)
+        dateRequested(nullable: false)
+        stockMovementType(nullable: true)
+        receiptStatusCode(nullable: true)
+        shipment(nullable: true)
+        dateShipped(nullable: true)
+        shipmentType(nullable: true)
+        trackingNumber(nullable: true)
+        driverName(nullable: true)
+        comments(nullable: true)
+        totalValue(nullable: true)
     }
 
 
     Map toJson() {
         return [
-                id: id,
-                name: name,
-                description: description,
-                statusCode: statusCode,
-                identifier: requisition?.requestNumber,
-                origin: origin,
-                destination: destination,
+                id                : id,
+                name              : name,
+                description       : description,
+                statusCode        : statusCode,
+                identifier        : requisition?.requestNumber,
+                origin            : origin,
+                destination       : destination,
                 hasManageInventory: origin?.supports(ActivityCode.MANAGE_INVENTORY),
-                stocklist: [id: stocklist?.id, name: stocklist?.name],
-                dateRequested: dateRequested?.format("MM/dd/yyyy"),
-                dateShipped: dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
-                shipmentType: shipmentType,
-                shipmentStatus: currentStatus,
-                trackingNumber: trackingNumber,
-                driverName: driverName,
-                comments: comments,
-                requestedBy: requestedBy,
-                lineItems: lineItems,
-                pickPage: pickPage,
-                editPage: editPage,
-                packPage: packPage,
-                associations: [
-                    requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
-                    shipment: [id: shipment?.id, shipmentNUmber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
-                    shipments: requisition?.shipments?.collect { [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()] },
-                    documents: documents
+                stocklist         : [id: stocklist?.id, name: stocklist?.name],
+                dateRequested     : dateRequested?.format("MM/dd/yyyy"),
+                dateShipped       : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
+                shipmentType      : shipmentType,
+                shipmentStatus    : currentStatus,
+                trackingNumber    : trackingNumber,
+                driverName        : driverName,
+                comments          : comments,
+                requestedBy       : requestedBy,
+                lineItems         : lineItems,
+                pickPage          : pickPage,
+                editPage          : editPage,
+                packPage          : packPage,
+                associations      : [
+                        requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
+                        shipment   : [id: shipment?.id, shipmentNUmber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
+                        shipments  : requisition?.shipments?.collect {
+                            [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
+                        },
+                        documents  : documents
                 ],
         ]
     }
@@ -137,7 +139,7 @@ class StockMovement {
      * @return
      */
     ShipmentStatusCode getShipmentStatusCode() {
-        return shipment?.status?.code?:ShipmentStatusCode.PENDING
+        return shipment?.status?.code ?: ShipmentStatusCode.PENDING
 
     }
 
@@ -148,7 +150,7 @@ class StockMovement {
      */
     Float getTotalValue() {
         def itemsWithPrice = shipment?.shipmentItems?.findAll { it.product.pricePerUnit }
-        return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum()?:0
+        return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
     }
 
     /**
@@ -158,10 +160,10 @@ class StockMovement {
      */
     String generateName() {
         final String separator =
-                ConfigurationHolder.config.openboxes.generateName.separator?:Constants.DEFAULT_NAME_SEPARATOR
+                ConfigurationHolder.config.openboxes.generateName.separator ?: Constants.DEFAULT_NAME_SEPARATOR
 
-        String originIdentifier = origin?.locationNumber?:origin?.name
-        String destinationIdentifier = destination?.locationNumber?:destination?.name
+        String originIdentifier = origin?.locationNumber ?: origin?.name
+        String destinationIdentifier = destination?.locationNumber ?: destination?.name
         String name = "${originIdentifier}${separator}${destinationIdentifier}"
         if (dateRequested) name += "${separator}${dateRequested?.format("ddMMMyyyy")}"
         if (stocklist?.name) name += "${separator}${stocklist.name}"
@@ -240,7 +242,7 @@ class PickPage {
     List<PickPageItem> pickPageItems = []
 
     static constraints = {
-        pickPageItems(nullable:true)
+        pickPageItems(nullable: true)
     }
 
     Map toJson() {
@@ -254,7 +256,7 @@ class EditPage {
     List<EditPageItem> editPageItems = []
 
     static constraints = {
-        editPageItems(nullable:true)
+        editPageItems(nullable: true)
     }
 
     Map toJson() {
@@ -268,7 +270,7 @@ class PackPage {
     List<PackPageItem> packPageItems = []
 
     static constraints = {
-        packPageItems(nullable:true)
+        packPageItems(nullable: true)
     }
 
     Map toJson() {

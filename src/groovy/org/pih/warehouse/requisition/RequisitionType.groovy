@@ -11,37 +11,37 @@ package org.pih.warehouse.requisition
 
 enum RequisitionType {
 
-	STOCK(0),
+    STOCK(0),
     ADHOC(1),
-	NON_STOCK(2),
-	DEFAULT(3),
+    NON_STOCK(2),
+    DEFAULT(3),
 
-	int sortOrder
+    int sortOrder
 
-	RequisitionType(int sortOrder) {
-		[
-			this.sortOrder = sortOrder
-		]
-	}
+    RequisitionType(int sortOrder) {
+        [
+                this.sortOrder = sortOrder
+        ]
+    }
 
-	static int compare(RequisitionType a, RequisitionType b) {
-		return a.sortOrder <=> b.sortOrder
-	}
+    static int compare(RequisitionType a, RequisitionType b) {
+        return a.sortOrder <=> b.sortOrder
+    }
 
-	static list() {
-		[
-			STOCK,
-			NON_STOCK,
-			ADHOC,
-			DEFAULT
-		]
-	}
+    static list() {
+        [
+                STOCK,
+                NON_STOCK,
+                ADHOC,
+                DEFAULT
+        ]
+    }
 
-	static listStockTypes() {
-		[STOCK]
-	}
+    static listStockTypes() {
+        [STOCK]
+    }
 
-	String toString() {
-		return name()
-	}
+    String toString() {
+        return name()
+    }
 }

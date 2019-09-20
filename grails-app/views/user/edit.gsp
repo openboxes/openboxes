@@ -85,16 +85,13 @@
                                                 <g:textField name="lastName" value="${userInstance?.lastName}" class="text" size="40" />
                                             </td>
                                         </tr>
-
-
-
                                         <tr class="prop">
                                             <td valign="top" class="name">
                                               <label for="locale"><warehouse:message code="default.locale.label"/></label>
                                             </td>
                                             <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
                                                 <g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
-                                                          optionValue="displayName" value="${userInstance?.locale}" noSelection="['null':'']" class="chzn-select-deselect"/>
+                                                          optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="chzn-select-deselect"/>
                                             </td>
                                         </tr>
                                         <tr class="prop">
@@ -188,19 +185,6 @@
 
                                 <table>
                                     <tbody>
-                                        <g:isUserAdmin>
-                                            <tr class="prop">
-                                                <td valign="top" class="name">
-                                                    <label for="roles"><warehouse:message code="user.roles.label" /></label>
-                                                </td>
-                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
-                                                    <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
-                                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
-                                                              optionKey="id" value="${userInstance?.roles}"
-                                                              noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
-                                                </td>
-                                            </tr>
-                                        </g:isUserAdmin>
                                         <tr class="prop">
                                             <td valign="top" class="name">
                                                 <label for="email"><warehouse:message code="user.defaultLocation.label" /></label>
@@ -217,41 +201,104 @@
                                             </td>
                                         </tr>
                                         <g:isUserAdmin>
+                                            <tr class="prop">
+                                                <td valign="top" class="name">
+                                                    <label for="roles"><warehouse:message code="user.roles.label" /></label>
+                                                </td>
+                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
+                                                    <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
+                                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
+                                                              optionKey="id" value="${userInstance?.roles}"
+                                                              noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
+                                                    <span class="fade"><g:message code="user.clearDefaultRole.message"/></span>
+                                                </td>
+                                            </tr>
                                             <tr class="prop" id="locationRoles">
                                                 <td valign="top" class="name">
                                                     <label><warehouse:message code="user.locationRoles.label"/></label>
                                                 </td>
-                                                <td valign="top">
-                                                    <div id="location-roles" style="overflow-y:auto; max-height:300px;">
-                                                        <table>
-                                                            <thead>
-                                                            <tr>
-                                                                <th><warehouse:message code="location.locationGroup.label"/></th>
+                                                <td valign="top" class="value" style="padding: 0px">
+                                                    <table>
+                                                        <thead>
+                                                            <tr class="odd">
                                                                 <th><warehouse:message code="location.label"/></th>
+                                                                <th><warehouse:message code="location.locationGroup.label"/></th>
                                                                 <th><warehouse:message code="location.locationType.label"/></th>
                                                                 <th><warehouse:message code="user.role.label"/></th>
+                                                                <th><g:message code="default.actions.label"/></th>
                                                             </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            <g:each var="location" in="${locations}" status="status">
-                                                                <tr class="${status % 2 ? 'even' : 'odd'}">
-                                                                    <td>${location?.locationGroup?.name}</td>
-                                                                    <td>${location.name}</td>
-                                                                    <td><format:metadata obj="${location?.locationType}"/></td>
-                                                                    <td>
-                                                                        <g:set var="defaultLabel"
-                                                                               value="${warehouse.message(code: 'default.label')}"/>
-                                                                        <g:select name="locationRolePairs.${location.id}"
-                                                                                  value="${locationRolePairs[location.id]}"
-                                                                                  from="${adminAndBrowser}"
-                                                                                class="chzn-select-deselect"
-                                                                                  optionKey="id" noSelection="${['': defaultLabel]}"/>
+                                                        </thead>
+                                                        <tbody>
+                                                            <g:set var="locationRolesByLocation" value="${userInstance?.locationRoles?.groupBy{it.location}}"/>
+                                                            <g:each var="locationRoleEntry" in="${locationRolesByLocation}" status="status">
+                                                                <g:set var="location" value="${locationRoleEntry.key}"/>
+                                                                <g:each var="locationRole" in="${locationRoleEntry.value.sort {it.role.roleType}}" status="innerStatus">
+                                                                    <g:set var="inactive" value="${!(locationRole?.role in locationRole?.user?.getHighestRole(locationRole.location))}"/>
+                                                                    <tr class="${status%2==0?'even':'odd'} ${inactive?'fade':''}">
+                                                                        <td>
+                                                                            <g:if test="${innerStatus==0}">
+                                                                            ${locationRole?.location?.name}
+                                                                            </g:if>
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:if test="${innerStatus==0}">
+                                                                            ${locationRole?.location?.locationGroup?.name}
+                                                                            </g:if>
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:if test="${innerStatus==0}">
+                                                                            <format:metadata obj="${locationRole?.location?.locationType}"/>
+                                                                            </g:if>
+                                                                        </td>
+                                                                        <td>
+                                                                            <g:if test="${inactive}">
+                                                                                <g:set var="title">Roles that are faded may not have any impact on user permissions unless they are secondary roles like notification roles.</g:set>
+                                                                            </g:if>
+                                                                            <div title="${title}">
+                                                                            ${locationRole?.role}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="button-group">
+                                                                                <%-- FIXME Temporarily disabled until I can figure out how to edit without causing list index to break --%>
+                                                                                <%--<a href="javascript:void(0);"
+                                                                                   class="button btn-show-dialog"
+                                                                                   data-title="${g.message(code:'default.edit.label', args: [g.message(code: 'user.locationRole.label')])}"
+                                                                                   data-url="${request.contextPath}/user/editLocationRole?id=${locationRole?.id}">
+                                                                                    <g:message code="default.button.edit.label" />
+                                                                                </a>--%>
+                                                                                <g:link controller="user" action="deleteLocationRole" id="${locationRole?.id}">
+                                                                                    <g:message code="default.button.delete.label" />
+                                                                                </g:link>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </g:each>
+                                                            </g:each>
+                                                            <g:unless test="${userInstance.locationRoles}">
+                                                                <tr>
+                                                                    <td colspan="5" class="empty fade center">
+                                                                        <g:message code="default.results.message"
+                                                                                   args="[userInstance?.locationRoles?.size()?:0, g.message(code:'user.locationRoles.label')]"/>
                                                                     </td>
                                                                 </tr>
-                                                            </g:each>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                                            </g:unless>
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td colspan="5" class="buttons">
+                                                                    <a href="javascript:void(0);"
+                                                                       class="button btn-show-dialog"
+                                                                       data-title="${g.message(code:'default.add.label', args: [g.message(code: 'user.locationRoles.label')])}"
+                                                                       data-url="${request.contextPath}/user/createLocationRoles?user.id=${userInstance?.id}">
+                                                                        <g:message code="default.add.label" args="[g.message(code: 'user.locationRoles.label')]"/>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+
+
                                                 </td>
                                             </tr>
                                         </g:isUserAdmin>
@@ -263,7 +310,8 @@
                                         </td>
                                         <td>
                                             <div class="buttons left">
-                                                <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+                                                <g:actionSubmit class="button icon approve" action="update"
+                                                                value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
                                                 &nbsp;
                                                 <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
                                             </div>

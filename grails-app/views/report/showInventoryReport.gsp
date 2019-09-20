@@ -3,9 +3,6 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <%--
-    <meta name="layout" content="custom" />
-    --%>
     <title><warehouse:message code="report.showInventoryReport.label" default="Inventory report" /></title>
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
@@ -56,20 +53,6 @@
                 <ul class="nav navbar-nav">
                     <li><a href="${createLink(uri: '/dashboard/index')}">Dashboard</a></li>
                     <li class="active"><a href="${createLink(uri: '/dashboard/index')}">Analytics</a></li>
-                    <%--
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">Nav header</li>
-                            <li><a href="#">Separated link</a></li>
-                            <li><a href="#">One more separated link</a></li>
-                        </ul>
-                    </li>
-                    --%>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
@@ -120,16 +103,6 @@
                                     </g:link>
                                 </li>
                             </g:isUserAdmin>
-                            <%--
-                            <g:if test="${session?.warehouse}">
-
-                                <li>
-                                    <a href="javascript:void(0);" class="warehouse-switch">
-                                        <warehouse:message code="dashboard.changeLocation.label" default="Change location"/>
-                                    </a>
-                                </li>
-                            </g:if>
-                            --%>
                             <li class="divider"></li>
                             <li>
                                 <g:link class="list" controller="auth" action="logout">
@@ -207,12 +180,6 @@
                             </li>
                         </ul>
                     </li>
-                    <%--
-                    <li class="active"><a href="./">Fixed top</a></li>
-                    --%>
-
-
-
                 </ul>
             </div><!--/.nav-collapse -->
         </div>
@@ -329,22 +296,12 @@
                         </tr>
                     </g:each>
                 </table>
-            <%--
-            <div class="prop">
-                <g:checkBox name="rememberLastLocation" value="${session.user.rememberLastLocation}"/>
-                Remember my location and log me in automatically.
-
-                ${session.user.rememberLastLocation}
-                ${session.user.warehouse }
-            </div>
-            --%>
                 <g:unless test="${session.loginLocationsMap }">
                     <div style="background-color: black; color: white;" class="warehouse button">
                         <warehouse:message code="dashboard.noWarehouse.message"/>
                     </div>
                 </g:unless>
             </div>
-            <%--</g:isUserInRole>--%>
         </div>
     </li>
 </g:if>
@@ -418,9 +375,6 @@
 
 
         $( document ).ready(function() {
-
-            //$("#dataTable").dataTable();
-
             var locationId = $("#locationId").val();
 
             var dataTable = $('#dataTable').dataTable( {
@@ -437,7 +391,6 @@
                         }
                     });
                 },
-                //"sScrollY": 500,
                 "iDisplayLength" : -1,
                 "aLengthMenu": [
                     [25, 50, 100, 500, 1000, -1],
@@ -456,8 +409,6 @@
                     { "mData": "totalValue" }, // 7
                     { "mData": "hasProductGroup" },  // 8
                     { "mData": "hasInventoryLevel" } // 9
-                    //{ "mData": "numProducts" }, // 2
-                    //{ "mData": "inventoryStatus" }, // 3
 
                 ],
                 "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
@@ -507,39 +458,10 @@
                 dataTable.fnReloadAjax('${request.contextPath}/json/getQuantityOnHandByProductGroup');
             } );
 
-            /*
-            $(':checkbox').click(function(event) {
-                //dataTable.fnReloadAjax('${request.contextPath}/json/getQuantityOnHandByProductGroup');
-
-                var $this = $(this);
-                // $this will contain a reference to the checkbox
-                if ($this.is(':checked')) {
-                    // the checkbox was checked
-                    //var dataTable = $("#dataTable").dataTable();
-                    dataTable.fnClearTable();
-                    //dataTable.fnDraw();
-                    //dataTable.fnAddData();
-                    //alert('refresh on check');
-                } else {
-                    // the checkbox was unchecked
-                    //var dataTable = $("#dataTable").dataTable();
-                    dataTable.fnClearTable();
-                    //dataTable.fnDraw();
-                    //dataTable.fnAddData();
-                    //alert('refresh uncheck');
-                }
-            });
-            */
-
-
-
-
-
             $.ajax({
                 dataType: "json",
                 timeout: 60000,
                 url: "${request.contextPath}/json/getSummaryByProductGroup?location.id=${session.warehouse.id}",
-                //data: data,
                 success: function (data) {
                     console.log("Loading data ...");
                     console.log(data);
@@ -550,11 +472,6 @@
                         $("#badge-status-" + key).html(value.numProductGroups);
                         $("#badge-percentage-" + key).html(Math.round(value.percentage * 100) + "%");
                     });
-
-                    //$("#reportContent").html(data);
-                    // {"lowStock":103,"reorderStock":167,"overStock":38,"totalStock":1619,"reconditionedStock":54,"stockOut":271,"inStock":1348}
-                    //$('#lowStockCount').html(data.lowStock?data.lowStock:0);
-
                 },
                 error: function(xhr, status, error) {
                     console.log(xhr);

@@ -6,13 +6,12 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Container
-import org.pih.warehouse.inventory.InventoryLevel
-
 
 @Validateable
 class PutawayItem {
@@ -38,13 +37,15 @@ class PutawayItem {
     List<PutawayItem> splitItems = []
 
     static constrants = {
-        quantityAvailable(nullable:true)
+        quantityAvailable(nullable: true)
     }
 
     String getCurrentBins() {
         String currentBins = ""
         if (availableItems) {
-            currentBins = availableItems?.findAll { !it?.binLocation?.supports(ActivityCode.RECEIVE_STOCK) }?.collect { it?.binLocation?.name }?.unique()?.sort()?.join(", ")
+            currentBins = availableItems?.findAll {
+                !it?.binLocation?.supports(ActivityCode.RECEIVE_STOCK)
+            }?.collect { it?.binLocation?.name }?.unique()?.sort()?.join(", ")
         }
         return currentBins
     }
@@ -69,7 +70,7 @@ class PutawayItem {
         putawayItem.currentLocation = orderItem.originBinLocation
         putawayItem.putawayFacility = orderItem.order.destination
         putawayItem.putawayLocation = orderItem.destinationBinLocation
-        putawayItem.recipient = orderItem.recipient?:orderItem.order.recipient
+        putawayItem.recipient = orderItem.recipient ?: orderItem.order.recipient
 
         orderItem.orderItems?.each { item ->
             putawayItem.splitItems.add(PutawayItem.createFromOrderItem(item))
@@ -94,34 +95,34 @@ class PutawayItem {
 
     Map toJson() {
         return [
-                id: id,
-                "stockMovement.id": currentLocation?.name,
-                "stockMovement.name": currentLocation?.name,
-                putawayStatus: putawayStatus?.name(),
-                transactionNumber: transaction?.transactionNumber,
-                "currentFacility.id": currentFacility?.id,
-                "currentFacility.name": currentFacility?.name,
-                "currentLocation.id": currentLocation?.id,
-                "currentLocation.name": currentLocation?.name,
-                container: container,
-                "product.id": product?.id,
-                "product.productCode": product?.productCode,
-                "product.name": product?.name,
-                "inventoryItem.id": inventoryItem?.id,
-                "inventoryItem.lotNumber": inventoryItem?.lotNumber,
+                id                            : id,
+                "stockMovement.id"            : currentLocation?.name,
+                "stockMovement.name"          : currentLocation?.name,
+                putawayStatus                 : putawayStatus?.name(),
+                transactionNumber             : transaction?.transactionNumber,
+                "currentFacility.id"          : currentFacility?.id,
+                "currentFacility.name"        : currentFacility?.name,
+                "currentLocation.id"          : currentLocation?.id,
+                "currentLocation.name"        : currentLocation?.name,
+                container                     : container,
+                "product.id"                  : product?.id,
+                "product.productCode"         : product?.productCode,
+                "product.name"                : product?.name,
+                "inventoryItem.id"            : inventoryItem?.id,
+                "inventoryItem.lotNumber"     : inventoryItem?.lotNumber,
                 "inventoryItem.expirationDate": inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                "recipient.id": recipient?.id,
-                "recipient.name": recipient?.name,
-                currentBins: currentBins,
-                preferredBin: preferredBin,
-                currentBinsAbbreviated: currentBinsAbbreviated,
-                "putawayFacility.id": putawayFacility?.id,
-                "putawayFacility.name": putawayFacility?.name,
-                "putawayLocation.id": putawayLocation?.id,
-                "putawayLocation.name": putawayLocation?.name,
-                quantity: quantity,
-                quantityAvailable: quantityAvailable,
-                splitItems: splitItems.collect { it?.toJson() }
+                "recipient.id"                : recipient?.id,
+                "recipient.name"              : recipient?.name,
+                currentBins                   : currentBins,
+                preferredBin                  : preferredBin,
+                currentBinsAbbreviated        : currentBinsAbbreviated,
+                "putawayFacility.id"          : putawayFacility?.id,
+                "putawayFacility.name"        : putawayFacility?.name,
+                "putawayLocation.id"          : putawayLocation?.id,
+                "putawayLocation.name"        : putawayLocation?.name,
+                quantity                      : quantity,
+                quantityAvailable             : quantityAvailable,
+                splitItems                    : splitItems.collect { it?.toJson() }
         ]
     }
 }

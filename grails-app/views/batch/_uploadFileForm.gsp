@@ -114,11 +114,6 @@
                             <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
                     </div>
-                    %{--<div class="chzn-container">--}%
-                        %{--<g:select name="type" class="chzn-select-deselect"--}%
-                                  %{--from="['product':'Product','inventory':'Inventory','inventoryLevel':'Inventory levels','productPrice':'Product price']"--}%
-                                  %{--optionKey="${{it.key}}" optionValue="${{it.value}}" noSelection="['':'']" value="${params?.type}"></g:select>--}%
-                    %{--</div>--}%
                 </td>
             </tr>
             <tr class="prop">

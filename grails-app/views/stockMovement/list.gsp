@@ -123,23 +123,6 @@
                                                   noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
-                        <%--
-
-                        <div class="filter-list-item">
-                            <label><warehouse:message code="stockMovement.dateRequested.label"/></label>
-                            <p>
-                                <g:textField id="requestedDateRange" name="requestedDateRange" style="width:100%" class="daterange text" value="${params.requestedDateRange}"/>
-                            </p>
-                        </div>
-
-                        <div class="filter-list-item">
-                            <label><warehouse:message code="stockMovement.dateIssued.label"/></label>
-                            <p>
-                                <g:textField id="issuedDateRange" name="issuedDateRange" style="width:100%" class="daterange text" value="${params.issuedDateRange}"/>
-                            </p>
-                        </div>
-
-                        --%>
                         <div class="filter-list-item">
                             <label><warehouse:message code="requisition.requestedBy.label"/></label>
                             <p>
@@ -165,6 +148,10 @@
                         <div class="filter-list-item">
                             <button class="button icon search" name="search" class="button">
                                 ${warehouse.message(code:'default.search.label')}
+                            </button>
+                            <button name="format" value="csv" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
+                                <warehouse:message code="default.button.download.label" default="Download"/>
                             </button>
                         </div>
 

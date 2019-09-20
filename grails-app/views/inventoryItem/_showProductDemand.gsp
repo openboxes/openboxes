@@ -1,11 +1,5 @@
-<div class="buttons right">
-    <g:link controller="inventoryItem" action="showProductDemand"
-            id="${product?.id}" class="button" params="['format':'csv']">
-        <g:message code="default.button.download.label"/>
-
-    </g:link>
-</div>
-<div>
+<div class="box">
+    <h2><g:message code="forecasting.demand.label"/></h2>
     <table id="productDemand" class="dataTable">
         <thead>
         <th>Request</th>
@@ -16,7 +10,7 @@
         <th>Requested</th>
         <th>Canceled</th>
         <th>Approved</th>
-        <th>Aproved Change</th>
+        <th>Approved Change</th>
         <th>Approved Substitution</th>
         <th>Demand</th>
         <th>Reason Code</th>
@@ -24,6 +18,13 @@
         <tbody>
         </tbody>
     </table>
+    <div class="buttons center">
+        <g:link controller="inventoryItem" action="showProductDemand"
+                id="${product?.id}" class="button" params="['format':'csv']">
+            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />&nbsp;
+            <g:message code="default.button.download.label"/>
+        </g:link>
+    </div>
 </div>
 <script>
 

@@ -88,17 +88,6 @@
 	                                </td>
 	                            </tr>
 
-								<%--
-	                            <tr class="prop">
-	                                <td valign="top" class="name">
-	                                    <label for="receiptItem"><warehouse:message code="shipmentItem.receiptItem.label" default="Receipt Item" /></label>
-	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'receiptItem', 'errors')}">
-	                                    <g:select name="receiptItem.id" from="${org.pih.warehouse.receiving.ReceiptItem.list()}" optionKey="id" value="${shipmentItemInstance?.receiptItem?.id}" noSelection="['null': '']" />
-	                                </td>
-	                            </tr>
-	                        	--%>
-
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                    <label for="donor"><warehouse:message code="shipmentItem.donor.label" default="Donor" /></label>

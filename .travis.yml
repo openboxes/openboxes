@@ -10,7 +10,7 @@ before_install:
 before_script:
 - npm install
 - npm run bundle
-script: 'grails test-app unit: --non-interactive'
+script: 'grails test-app unit: --non-interactive -echoOut -echoErr'
 cache:
   directories:
   - "$HOME/.grails"

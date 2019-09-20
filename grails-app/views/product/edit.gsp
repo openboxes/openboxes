@@ -9,7 +9,7 @@
 	        <title>${productInstance?.productCode } ${productInstance?.name }</title>
 		</g:if>
 		<g:else>
-	        <title><warehouse:message code="product.add.label" /></title>	
+	        <title><warehouse:message code="product.add.label" /></title>
 			<content tag="label1"><warehouse:message code="inventory.label"/></content>
 		</g:else>
 		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
@@ -31,11 +31,11 @@
 	                <g:renderErrors bean="${productInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-            
-   			<g:if test="${productInstance?.id }">         
+
+   			<g:if test="${productInstance?.id }">
 				<g:render template="summary" model="[productInstance:productInstance]"/>
 			</g:if>
-			
+
 			<div style="padding: 10px">
 
                 <div class="tabs tabs-ui">
@@ -56,7 +56,6 @@
                                 </a>
                             </li>
 
-                            %{--<li><a href="#tabs-productGroups"><g:message code="product.substitutions.label" default="Substitutes"/></a></li>--}%
 							<li><a href="#tabs-packages"><g:message code="packages.label" default="Packages"/></a></li>
 							<li><a href="#tabs-documents"><g:message code="product.documents.label" default="Documents"/></a></li>
                             <g:if test="${grailsApplication.config.openboxes.bom.enabled}">
@@ -67,7 +66,7 @@
                             </li>
 
                         </g:if>
-					</ul>	
+					</ul>
 					<div id="tabs-details" class="ui-tabs-hide">
                         <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
                         <g:form action="${formAction}" method="post">
@@ -106,9 +105,6 @@
                                                 code="product.title.label" /></label></td>
                                             <td valign="top"
                                                 class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
-                                                <%--
-                                                <g:textField name="name" value="${productInstance?.name}" size="80" class="medium text" />
-                                                --%>
                                                 <g:autoSuggestString id="name" name="name" size="80" class="text"
                                                     jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name?.encodeAsHTML()}"
                                                     placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
@@ -132,9 +128,6 @@
                                                 code="product.unitOfMeasure.label" /></label></td>
                                             <td
                                                 class="value ${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
-                                                <%--
-                                                <g:textField name="unitOfMeasure" value="${productInstance?.unitOfMeasure}" size="15" class="medium text"/>
-                                                --%>
                                                 <g:autoSuggestString id="unitOfMeasure" name="unitOfMeasure" size="80" class="text"
                                                     jsonUrl="${request.contextPath}/json/autoSuggest"
                                                     value="${productInstance?.unitOfMeasure}" placeholder="e.g. each, tablet, tube, vial"/>
@@ -401,11 +394,6 @@
             </div>
         </g:each>
 
-
-
-    <%--
-        <g:render template='category' model="['category':null,'i':'_clone','hidden':true]"/>
-    --%>
 		<script type="text/javascript">
 
 
@@ -423,7 +411,7 @@
 	    					expires: 1
 	    				}
 	    			}
-				); 
+				);
 
                 $(".open-dialog").livequery('click', function(event) {
 				    event.preventDefault();
@@ -445,12 +433,12 @@
 					}
 				});
 
-				function updateBinLocation() { 
+				function updateBinLocation() {
 					$("#binLocation").val('updated')
 				}
 
 				$(".binLocation").change(function(){ updateBinLocation() });
-				
+
 			});
 		</script>
     </body>

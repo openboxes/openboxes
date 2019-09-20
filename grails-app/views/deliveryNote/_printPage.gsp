@@ -75,7 +75,7 @@
                             <td class="center middle" rowspan="${numInventoryItem}">
                                 <g:if test="${j==0}">
                                     <div class="${requisitionItem?.status}">
-                                        ${requisitionItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                                        ${requisitionItem?.totalQuantityPicked() ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                                     </div>
                                 </g:if>
                             </td>

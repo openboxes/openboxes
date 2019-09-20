@@ -56,40 +56,42 @@ class StockMovementItem {
     Integer sortOrder = 0
 
     BigDecimal getQuantityRequired() {
-        return quantityRevised?:quantityRequested
+        return quantityRevised ?: quantityRequested
     }
 
     BigDecimal getQuantityAllowed() {
-        def stocklistItem = requisitionItem?.requisition?.requisitionTemplate?.requisitionItems?.find{ it?.product?.productCode == requisitionItem?.product?.productCode }
-        return stocklistItem?.quantity?:null
+        def stocklistItem = requisitionItem?.requisition?.requisitionTemplate?.requisitionItems?.find {
+            it?.product?.productCode == requisitionItem?.product?.productCode
+        }
+        return stocklistItem?.quantity ?: null
     }
 
 
     static constraints = {
-        id(nullable:true)
-        productCode(nullable:true)
-        product(nullable:true)
-        inventoryItem(nullable:true)
-        binLocation(nullable:true)
-        quantityRequested(nullable:false)
-        quantityAllowed(nullable:true)
-        quantityAvailable(nullable:true)
-        quantityRevised(nullable:true)
-        quantityCanceled(nullable:true)
-        quantityPicked(nullable:true)
-        statusCode(nullable:true)
-        reasonCode(nullable:true)
-        comments(nullable:true)
-        recipient(nullable:true)
-        delete(nullable:true)
-        cancel(nullable:true)
-        revert(nullable:true)
-        substitute(nullable:true)
-        lotNumber(nullable:true)
-        expirationDate(nullable:true)
-        palletName(nullable:true)
-        boxName(nullable:true)
-        sortOrder(nullable:true)
+        id(nullable: true)
+        productCode(nullable: true)
+        product(nullable: true)
+        inventoryItem(nullable: true)
+        binLocation(nullable: true)
+        quantityRequested(nullable: false)
+        quantityAllowed(nullable: true)
+        quantityAvailable(nullable: true)
+        quantityRevised(nullable: true)
+        quantityCanceled(nullable: true)
+        quantityPicked(nullable: true)
+        statusCode(nullable: true)
+        reasonCode(nullable: true)
+        comments(nullable: true)
+        recipient(nullable: true)
+        delete(nullable: true)
+        cancel(nullable: true)
+        revert(nullable: true)
+        substitute(nullable: true)
+        lotNumber(nullable: true)
+        expirationDate(nullable: true)
+        palletName(nullable: true)
+        boxName(nullable: true)
+        sortOrder(nullable: true)
     }
 
     String toString() {
@@ -99,35 +101,34 @@ class StockMovementItem {
     Map toJson() {
 
         return [
-                id: id,
-                productCode: productCode,
-                product: product,
-                lotNumber: lotNumber,
-                expirationDate: expirationDate?.format("MM/dd/yyyy"),
-                palletName: palletName,
-                boxName: boxName,
-                statusCode: statusCode,
+                id               : id,
+                productCode      : productCode,
+                product          : product,
+                lotNumber        : lotNumber,
+                expirationDate   : expirationDate?.format("MM/dd/yyyy"),
+                palletName       : palletName,
+                boxName          : boxName,
+                statusCode       : statusCode,
                 quantityRequested: quantityRequested,
-                quantityAllowed: quantityAllowed,
+                quantityAllowed  : quantityAllowed,
                 quantityAvailable: quantityAvailable,
-                quantityCanceled: quantityCanceled,
-                quantityRevised: quantityRevised,
-                quantityPicked: quantityPicked,
-                quantityRequired: quantityRequired,
-                reasonCode: reasonCode,
-                comments: comments,
-                recipient: recipient,
+                quantityCanceled : quantityCanceled,
+                quantityRevised  : quantityRevised,
+                quantityPicked   : quantityPicked,
+                quantityRequired : quantityRequired,
+                reasonCode       : reasonCode,
+                comments         : comments,
+                recipient        : recipient,
                 substitutionItems: substitutionItems,
-                sortOrder: sortOrder
+                sortOrder        : sortOrder
         ]
     }
-
 
 
     static StockMovementItem createFromShipmentItem(ShipmentItem shipmentItem) {
 
         String palletName, boxName
-        if(shipmentItem?.container?.parentContainer) {
+        if (shipmentItem?.container?.parentContainer) {
             palletName = shipmentItem?.container?.parentContainer?.name
             boxName = shipmentItem?.container?.name
         } else if (shipmentItem.container) {
@@ -150,27 +151,25 @@ class StockMovementItem {
                 reasonCode: null,
                 comments: null,
                 recipient: shipmentItem.recipient,
-                palletName:palletName,
-                boxName:boxName,
+                palletName: palletName,
+                boxName: boxName,
                 sortOrder: null
 
         )
     }
 
 
-
     static StockMovementItem createFromRequisitionItem(RequisitionItem requisitionItem) {
 
         List<StockMovementItem> substitutionItems = []
 
-        if (requisitionItem.substitutionItem) {
-            substitutionItems.push(StockMovementItem.createFromRequisitionItem(requisitionItem.substitutionItem))
-        }
-        else if (requisitionItem.substitutionItems) {
+        if (requisitionItem.substitutionItems) {
             substitutionItems = requisitionItem?.substitutionItems ?
                     requisitionItem.substitutionItems.collect {
-                return StockMovementItem.createFromRequisitionItem(it)
-            } : []
+                        return StockMovementItem.createFromRequisitionItem(it)
+                    } : []
+        } else if (requisitionItem.substitutionItem) {
+            substitutionItems.push(StockMovementItem.createFromRequisitionItem(requisitionItem.substitutionItem))
         }
 
         return new StockMovementItem(
@@ -187,10 +186,10 @@ class StockMovementItem {
                 substitutionItems: substitutionItems,
                 reasonCode: requisitionItem.cancelReasonCode,
                 comments: requisitionItem.cancelComments,
-                recipient: requisitionItem.recipient?:requisitionItem?.parentRequisitionItem?.recipient,
-                palletName: requisitionItem?.palletName?:"",
-                boxName: requisitionItem?.boxName?:"",
-                lotNumber: requisitionItem?.lotNumber?:"",
+                recipient: requisitionItem.recipient ?: requisitionItem?.parentRequisitionItem?.recipient,
+                palletName: requisitionItem?.palletName ?: "",
+                boxName: requisitionItem?.boxName ?: "",
+                lotNumber: requisitionItem?.lotNumber ?: "",
                 expirationDate: requisitionItem?.expirationDate,
                 sortOrder: requisitionItem?.orderIndex,
                 requisitionItem: requisitionItem
@@ -198,7 +197,7 @@ class StockMovementItem {
     }
 
 
-    static StockMovementItem createFromTokens(String [] tokens) {
+    static StockMovementItem createFromTokens(String[] tokens) {
         String requisitionItemId = tokens[0] ?: null
         String productCode = tokens[1] ?: null
         String productName = tokens[2] ?: null
@@ -264,9 +263,9 @@ class AvailableItem {
     BigDecimal quantityAvailable
 
     static constraints = {
-        inventoryItem(nullable:true)
-        binLocation(nullable:true)
-        quantityAvailable(nullable:true)
+        inventoryItem(nullable: true)
+        binLocation(nullable: true)
+        quantityAvailable(nullable: true)
     }
 
     Map toJson() {
@@ -291,13 +290,13 @@ class SuggestedItem extends AvailableItem {
     BigDecimal quantityPicked
 
     static constraints = {
-        quantityRequested(nullable:true)
-        quantityPicked(nullable:true)
+        quantityRequested(nullable: true)
+        quantityPicked(nullable: true)
     }
 
     Map toJson() {
         Map json = super.toJson()
-        json << [quantityRequested: quantityRequested, quantityPicked:quantityPicked]
+        json << [quantityRequested: quantityRequested, quantityPicked: quantityPicked]
         return json
     }
 }
@@ -307,16 +306,16 @@ class SubstitutionItem {
     String productId
     String productCode
     String productName
-    //Date minExpirationDate
-    //Integer quantityAvailable
     Integer quantitySelected
+    Integer quantityConsumed
 
     List availableItems
 
     Date getMinExpirationDate() {
         return availableItems ?
                 availableItems.findAll { it.inventoryItem.expirationDate != null }.collect {
-                    it.inventoryItem?.expirationDate }.min() :
+                    it.inventoryItem?.expirationDate
+                }.min() :
                 null
     }
 
@@ -326,14 +325,15 @@ class SubstitutionItem {
 
     Map toJson() {
         return [
-                productId       : productId,
+                productId        : productId,
                 productCode      : productCode,
                 productName      : productName,
                 minExpirationDate: minExpirationDate?.format("MM/dd/yyyy"),
                 quantityAvailable: quantityAvailable,
+                quantityConsumed : quantityConsumed,
                 quantitySelected : quantitySelected,
-                quantityRequested : quantitySelected,
-                availableItems: availableItems
+                quantityRequested: quantitySelected,
+                availableItems   : availableItems
         ]
     }
 }
@@ -346,14 +346,14 @@ enum SubstitutionStatusCode {
 
     int sortOrder
 
-    SubstitutionStatusCode(int sortOrder) { [ this.sortOrder = sortOrder ] }
+    SubstitutionStatusCode(int sortOrder) { [this.sortOrder = sortOrder] }
 
     static int compare(SubstitutionStatusCode a, SubstitutionStatusCode b) {
         return a.sortOrder <=> b.sortOrder
     }
 
     static list() {
-        [ EARLIER, YES, NO ]
+        [EARLIER, YES, NO]
     }
 
     String getName() { return name() }
@@ -372,7 +372,6 @@ class EditPageItem {
     RequisitionItem requisitionItem
 
     Integer quantityRequested
-    //Integer quantityAvailable
     Integer quantityConsumed
     Integer totalMonthlyQuantity
     Integer sortOrder
@@ -397,12 +396,15 @@ class EditPageItem {
     Date getMinExpirationDate() {
         return availableItems ?
                 availableItems.findAll { it.inventoryItem.expirationDate != null }.collect {
-                    it.inventoryItem?.expirationDate }.min() :
+                    it.inventoryItem?.expirationDate
+                }.min() :
                 null
     }
 
     Date getMinExpirationDateForSubstitutionItems() {
-        return availableSubstitutions ? availableSubstitutions?.collect { it.minExpirationDate }?.min() : null
+        return availableSubstitutions ? availableSubstitutions?.collect {
+            it.minExpirationDate
+        }?.min() : null
     }
 
     Boolean hasEarlierExpirationDate() {
@@ -416,9 +418,10 @@ class EditPageItem {
     String getSubstitutionStatusCode() {
         if (hasEarlierExpirationDate()) {
             return SubstitutionStatusCode.EARLIER
-        }
-        else {
-            return (!availableSubstitutions?.empty && availableSubstitutions.sum { it.quantityAvailable } > 0) ? SubstitutionStatusCode.YES : SubstitutionStatusCode.NO
+        } else {
+            return (!availableSubstitutions?.empty && availableSubstitutions.sum {
+                it.quantityAvailable
+            } > 0) ? SubstitutionStatusCode.YES : SubstitutionStatusCode.NO
         }
     }
 
@@ -497,11 +500,11 @@ class PickPageItem {
     }
 
     Integer getQuantityRequired() {
-        return requisitionItem?.calculateQuantityRequired()?:0
+        return requisitionItem?.calculateQuantityRequired() ?: 0
     }
 
     Integer getQuantityRequested() {
-        requisitionItem?.quantity?:0
+        requisitionItem?.quantity ?: 0
     }
 
     Integer getQuantityPicked() {
@@ -517,11 +520,9 @@ class PickPageItem {
 
         if (quantityRequired == quantityPicked && quantityRemaining == 0) {
             return "PICKED"
-        }
-        else if (quantityPicked > 0 && quantityRemaining > 0) {
+        } else if (quantityPicked > 0 && quantityRemaining > 0) {
             return "PARTIALLY_PICKED"
-        }
-        else {
+        } else {
             return "NOT_PICKED"
         }
     }
@@ -545,19 +546,19 @@ class PackPageItem {
 
     Map toJson() {
         return [
-                shipmentItemId    : shipmentItem?.id,
-                "product.id"      : shipmentItem?.product?.id,
-                productName       : shipmentItem?.product?.name,
-                productCode       : shipmentItem?.product?.productCode,
-                lotNumber         : shipmentItem?.lotNumber,
-                expirationDate    : shipmentItem?.expirationDate?.format("MM/dd/yyyy"),
-                binLocationName   : shipmentItem?.binLocation?.name,
-                uom               : shipmentItem?.product?.unitOfMeasure,
-                quantityShipped   : shipmentItem?.quantity,
-                recipient         : shipmentItem?.recipient,
-                palletName        : palletName,
-                boxName           : boxName,
-                sortOrder         : sortOrder,
+                shipmentItemId : shipmentItem?.id,
+                "product.id"   : shipmentItem?.product?.id,
+                productName    : shipmentItem?.product?.name,
+                productCode    : shipmentItem?.product?.productCode,
+                lotNumber      : shipmentItem?.lotNumber,
+                expirationDate : shipmentItem?.expirationDate?.format("MM/dd/yyyy"),
+                binLocationName: shipmentItem?.binLocation?.name,
+                uom            : shipmentItem?.product?.unitOfMeasure,
+                quantityShipped: shipmentItem?.quantity,
+                recipient      : shipmentItem?.recipient,
+                palletName     : palletName,
+                boxName        : boxName,
+                sortOrder      : sortOrder,
         ]
     }
 

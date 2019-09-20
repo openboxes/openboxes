@@ -98,8 +98,6 @@ class ProductIntegrationTests extends GroovyTestCase{
         def product = DbHelper.createProductIfNotExists("TestProductABC")
         def boston =  Location.findByName("Boston Headquarters")
         assertNotNull boston.inventory
-        //def inventoryLevel = DbHelper.createInventoryLevel(product, location, "A1-01-01", InventoryStatus.SUPPORTED, 0, 100, 500)
-        //assertNotNull inventoryLevel
         assertNull product.getBinLocation(boston.id)
     }
 

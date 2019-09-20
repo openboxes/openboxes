@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.api
 
 import grails.validation.ValidationException
@@ -27,7 +27,9 @@ class GenericApiService {
     GrailsApplication grailsApplication
 
     GrailsDomainClass getDomainClassByName(String className) {
-        GrailsDomainClass grailsDomainClass = grailsApplication.domainClasses.find { it.clazz.simpleName == className }
+        GrailsDomainClass grailsDomainClass = grailsApplication.domainClasses.find {
+            it.clazz.simpleName == className
+        }
         if (!grailsDomainClass) {
             throw new IllegalAccessException("Unable to locate domain ${className}")
         }
@@ -65,8 +67,7 @@ class GenericApiService {
         def domainObject
         if (jsonObject.id) {
             domainObject = getObject(resourceName, jsonObject.id)
-        }
-        else {
+        } else {
             domainObject = domainClass.newInstance()
         }
         domainObject.properties = jsonObject
@@ -104,7 +105,7 @@ class GenericApiService {
     def searchObjects(String resourceName, JSONObject jsonObject, Map params) {
         Class domainClass = getDomainClass(resourceName)
         def session = sessionFactory.currentSession
-        def criteria = session.createCriteria(domainClass);
+        def criteria = session.createCriteria(domainClass)
         jsonObject.searchAttributes.each { attr ->
             Criterion criterion = buildCriterion(attr.property, attr.operator, attr.value)
             criteria.add(criterion)
@@ -120,17 +121,17 @@ class GenericApiService {
         // Default operator should be eq
         operator = operator ?: "eq"
 
-        switch(operator) {
+        switch (operator) {
 
             case "eq":
                 Restrictions.eq(propertyName, value)
-                break;
+                break
             case "like":
                 Restrictions.like(propertyName, value)
-                break;
+                break
             case "ilike":
                 Restrictions.ilike(propertyName, value)
-                break;
+                break
             default:
                 throw new UnsupportedOperationException("Operator ${operator} is not supported at this time")
         }

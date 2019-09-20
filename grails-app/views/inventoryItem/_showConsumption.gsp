@@ -186,31 +186,6 @@
                         </td>
 
                     </tr>
-                    <%--
-                        <g:each var="requisitionItem" in="${entry.value}" status="j">
-                            <tr class="prop ${j%2?'odd':'even'}">
-                                <td>
-                                    ${requisitionItem.requisition.requestNumber} -
-                                    ${requisitionItem.requisition.status}
-                                </td>
-                                <td>
-                                    ${requisitionItem.status}
-                                </td>
-                                <td>
-                                    ${requisitionItem.cancelReasonCode}
-                                </td>
-                                <td class="center middle">
-                                    ${requisitionItem.quantity}
-                                </td>
-                                <td class="center middle">
-                                    ${requisitionItem.quantityCanceled}
-                                </td>
-                                <td class="center middle">
-                                    ${(requisitionItem.quantity?:0) - (requisitionItem.quantityCanceled?:0)}
-                                </td>
-                            </tr>
-                        </g:each>
-                        --%>
                 </g:each>
             </tbody>
 
@@ -276,7 +251,6 @@ $(function () {
     });
 
     $("#refresh-btn").click(function(ui, event) {
-        //event.preventDefault();
         $("#consumption-config-dialog").dialog('close');
 
     });

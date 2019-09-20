@@ -1,13 +1,5 @@
     <div id="requisition-header" class="box">
         <h2>
-
-            <%--
-            <a class="toggle" href="javascript:void(0);">
-                <img id="toggle-icon" src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
-            </a>
-            <h3 style="display: inline" class="toggle"><label>${requisition?.requestNumber }</label> ${requisition?.name }</h3>
-            &nbsp;
-            --%>
             <div class="box-button">
                 <g:if test="${requisition?.id }">
                     <g:link controller="requisition" action="editHeader" id="${requisition?.id }" class="button icon edit">
@@ -46,14 +38,6 @@
                     <td class="value">
                         <g:set var="itemsByStatus" value="${requisition.requisitionItems.groupBy { it.status }}"/>
                         <g:each var="status" in="${itemsByStatus.keySet()}">
-                            <%--
-                            <div class="">
-                                <g:remoteLink controller="requisition" action="showRequisitionItems" id="${requisition.id}"
-                                              params="[status:status]" update="requisitionItems">
-                                    <format:metadata obj="${status}"/> (${itemsByStatus[status].size()})</g:remoteLink>
-
-                            </div>
-                            --%>
                             <div class="">
                                 <format:metadata obj="${status}"/> (${itemsByStatus[status].size()})
                             </div>
@@ -294,19 +278,6 @@
                         </g:else>
                     </td>
                 </tr>
-
-                <%--
-                <tr class="prop">
-                    <td class="name"><label><warehouse:message
-                            code="requisition.receivedBy.label" /></label></td>
-                    <td class="value">
-                        ${requisition?.receivedBy?.name }
-                        <div class="fade">
-                            <g:formatDate date="${requisition?.dateReceived }"/>
-                        </div>
-                    </td>
-                </tr>
-                --%>
                 <tr class="prop">
                     <td class="name"><label><warehouse:message code="transactions.label" /></label></td>
                     <td class="value">

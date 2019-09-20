@@ -9,14 +9,15 @@
  * */
 package org.pih.warehouse.requisition
 
-import org.pih.warehouse.auth.AuthService;
-import org.pih.warehouse.core.Location;
-import org.pih.warehouse.core.Person;
-import org.pih.warehouse.core.User;
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.shipping.Shipment;
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Shipment
 
 class Requisition implements Comparable<Requisition>, Serializable {
 
@@ -53,8 +54,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
     // Frequency - for stock requisitions we should know how often (monthly, weekly, daily)
 
     // Requisition type, status, and commodity class
-    RequisitionType type;
-    RequisitionStatus status;
+    RequisitionType type
+    RequisitionStatus status
     CommodityClass commodityClass
     Requisition requisitionTemplate
     RequisitionItemSortByCode sortByCode
@@ -101,24 +102,18 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Date dateValidFrom
     Date dateValidTo
 
-    Fulfillment fulfillment;
-
-    //List requisitionItems
+    Fulfillment fulfillment
 
     // Audit fields
     Date dateCreated
     Date lastUpdated
     User createdBy
     User updatedBy
-    //String weekRequested
-    //String monthRequested
     String monthRequested
-    //String yearRequested
 
     Integer replenishmentPeriod = 0
 
     // Removed comments, documents, events for the time being.
-    //static hasMany = [ requisitionItems: RequisitionItem, comments : Comment, documents : Document, events : Event ]
     static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
@@ -126,13 +121,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
 
-        //week formula('WEEK(date_requested)')    //provide the exact column name of the date field
-        //month formula('MONTH(date_requested)')
         monthRequested formula: "date_format(date_requested, '%M %Y')"
-        //yearRequested formula: "date_format(date_requested, '%Y')"
-        //comments cascade: "all-delete-orphan"
-        //documents cascade: "all-delete-orphan"
-        //events cascade: "all-delete-orphan"
     }
 
     static constraints = {
@@ -154,17 +143,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
         receivedBy(nullable: true)
         picklist(nullable: true)
         dateRequested(nullable: false)
-        //validator: { value -> value <= new Date()})
         requestedDeliveryDate(nullable: false)
 
         // FIXME Even though Grails complains that "derived properties may not be constrained", when you remove the constraint there are validation errors on Requisition
         // OB-3180 Derived properties may not be constrained. Property [monthRequested] of domain class org.pih.warehouse.requisition.Requisition will not be checked during validation.
         monthRequested(nullable: true)
-        //validator: { value ->
-        //    def tomorrow = new Date().plus(1)
-        //    tomorrow.clearTime()
-        //    return value >= tomorrow
-        //})
         dateCreated(nullable: true)
         dateChecked(nullable: true)
         dateReviewed(nullable: true)
@@ -182,9 +165,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
         isTemplate(nullable: true)
         isPublished(nullable: true)
         datePublished(nullable: true)
-        requisitionTemplate(nullable:true)
-        replenishmentPeriod(nullable:true)
-        sortByCode(nullable:true)
+        requisitionTemplate(nullable: true)
+        replenishmentPeriod(nullable: true)
+        sortByCode(nullable: true)
     }
 
     def getRequisitionItemCount() {
@@ -193,32 +176,31 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
 
     def calculatePercentageCompleted() {
-        def numerator = getCompleteRequisitionItems()?.size()?:0
-        def denominator = getInitialRequisitionItems()?.size()?:1
+        def numerator = getCompleteRequisitionItems()?.size() ?: 0
+        def denominator = getInitialRequisitionItems()?.size() ?: 1
         if (denominator) {
-            return (numerator / denominator)*100
-        }
-        else {
-            return 0;
+            return (numerator / denominator) * 100
+        } else {
+            return 0
         }
     }
 
     /**
-     * @return  all requisition items that have been completed (canceled or fulfilled)
+     * @return all requisition items that have been completed (canceled or fulfilled)
      */
     def getCompleteRequisitionItems() {
         return initialRequisitionItems?.findAll { it.isCompleted() }
     }
 
     /**
-     * @return  all requisition items that have not been completed
+     * @return all requisition items that have not been completed
      */
     def getIncompleteRequisitionItems() {
         return initialRequisitionItems?.findAll { !it.isCompleted() }
     }
 
     /**
-     * @return  all requisition items that were apart of the original requisition
+     * @return all requisition items that were apart of the original requisition
      */
     def getInitialRequisitionItems() {
         return requisitionItems?.findAll { !it.parentRequisitionItem }
@@ -229,7 +211,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     /**
-     * @return  all requisition items that have been added as substitutions or supplements
+     * @return all requisition items that have been added as substitutions or supplements
      */
     def getAdditionalRequisitionItems() {
         return requisitionItems?.findAll { it.parentRequisitionItem }
@@ -244,7 +226,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     Boolean isPending() {
-        return (status in [RequisitionStatus.CREATED, RequisitionStatus.EDITING, RequisitionStatus.VERIFYING, RequisitionStatus.PICKING, RequisitionStatus.PENDING]);
+        return (status in [RequisitionStatus.CREATED, RequisitionStatus.EDITING, RequisitionStatus.VERIFYING, RequisitionStatus.PICKING, RequisitionStatus.PENDING])
     }
 
     Boolean isRequested() {
@@ -303,7 +285,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             throw new IllegalStateException("Must only be used with a stocklist")
         }
 
-        return requisitionItems.sort { a,b ->
+        return requisitionItems.sort { a, b ->
             a.product?.category?.name <=> b.product?.category?.name ?:
                     a.product?.name <=> b.product?.name ?:
                             a.orderIndex <=> b.orderIndex
@@ -311,19 +293,19 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     def getRequisitionItemsByDateCreated() {
-        return requisitionItems.sort { a,b ->
+        return requisitionItems.sort { a, b ->
             a.dateCreated <=> b.dateCreated
         }
     }
 
     def getRequisitionItemsByOrderIndex() {
-        return requisitionItems.sort { a,b ->
+        return requisitionItems.sort { a, b ->
             a.orderIndex <=> b.orderIndex
         }
     }
 
     def getRequisitionItemsByCategory() {
-        return requisitionItems.sort { a,b ->
+        return requisitionItems.sort { a, b ->
             a.product?.category?.name <=> b.product?.category?.name ?:
                     a.product?.name <=> b.product?.name ?:
                             a.orderIndex <=> b.orderIndex
@@ -356,30 +338,36 @@ class Requisition implements Comparable<Requisition>, Serializable {
      */
     BigDecimal getTotalCost() {
         def itemsWithPrice = requisitionItems?.findAll { it.product.pricePerUnit }
-        return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum()?:0
+        return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
+    }
+
+    BigDecimal getQuantityByProduct(Product product) {
+        return requisitionItems?.findAll { it.product == product }?.collect {
+            it.quantity
+        }?.sum() ?: 0
     }
 
 
     Map toJson() {
         [
-                id: id,
-                name: name,
-                version: version,
-                requestedById: requestedBy?.id,
-                requestedByName: requestedBy?.name,
-                description: description,
-                dateRequested: dateRequested.format("MM/dd/yyyy"),
+                id                   : id,
+                name                 : name,
+                version              : version,
+                requestedById        : requestedBy?.id,
+                requestedByName      : requestedBy?.name,
+                description          : description,
+                dateRequested        : dateRequested.format("MM/dd/yyyy"),
                 requestedDeliveryDate: requestedDeliveryDate.format("MM/dd/yyyy HH:mm XXX"),
-                lastUpdated: lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
-                status: status?.name(),
-                type: type?.name(),
-                originId: origin?.id,
-                originName: origin?.name,
-                destinationId: destination?.id,
-                destinationName: destination?.name,
-                recipientProgram: recipientProgram,
-                requisitionTemplate: requisitionTemplate?.toJson(),
-                requisitionItems: requisitionItems?.sort()?.collect { it?.toJson() }
+                lastUpdated          : lastUpdated?.format("dd/MMM/yyyy hh:mm a"),
+                status               : status?.name(),
+                type                 : type?.name(),
+                originId             : origin?.id,
+                originName           : origin?.name,
+                destinationId        : destination?.id,
+                destinationName      : destination?.name,
+                recipientProgram     : recipientProgram,
+                requisitionTemplate  : requisitionTemplate?.toJson(),
+                requisitionItems     : requisitionItems?.sort()?.collect { it?.toJson() }
         ]
     }
 }

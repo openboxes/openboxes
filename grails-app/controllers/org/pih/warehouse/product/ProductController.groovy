@@ -10,91 +10,76 @@
 package org.pih.warehouse.product
 
 import com.google.zxing.BarcodeFormat
-import com.mysql.jdbc.MysqlDataTruncation
 import grails.converters.JSON
 import grails.validation.ValidationException
-import org.hibernate.Criteria
-import org.pih.warehouse.core.MailService
-import org.pih.warehouse.core.UnitOfMeasure
-
-import javax.activation.MimetypesFileTypeMap
-import java.sql.SQLException
 import org.apache.commons.io.FilenameUtils
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryLevel;
+import org.pih.warehouse.inventory.InventoryLevel
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.awt.Image as AWTImage
-import javax.imageio.ImageIO as IIO
-import javax.swing.ImageIcon;
+
+import javax.activation.MimetypesFileTypeMap
 
 class ProductController {
 
     def dataService
-	def userService;
-	MailService mailService;
-	def productService;
-	def documentService;
-	def inventoryService;
-	def barcodeService
+    def userService
+    MailService mailService
+    def productService
+    def documentService
+    def inventoryService
+    def barcodeService
+    UploadService uploadService
 
-	static allowedMethods = [save: "POST", update: "POST"];
+    static allowedMethods = [save: "POST", update: "POST"]
 
 
-	def index = {
-		redirect(action: "list", params: params)
-	}
+    def index = {
+        redirect(action: "list", params: params)
+    }
 
-	def redirect = {
+    def redirect = {
         log.info("Redirecting to product " + params.id)
-		redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
-	}
+        redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
+    }
 
-	/**
-	 * Perform a bulk update of
-	 */
-	def batchEdit = { BatchEditCommand cmd ->
-		def startTime = System.currentTimeMillis()
-	//	def location = Location.get(session.warehouse.id)
+    /**
+     * Perform a bulk update of
+     */
+    def batchEdit = { BatchEditCommand cmd ->
+        def startTime = System.currentTimeMillis()
+        //	def location = Location.get(session.warehouse.id)
         def category = Category.get(params.categoryId)
         def tagIds = params.list("tagId")
 
-		log.info "Batch edit: " + params
+        log.info "Batch edit: " + params
 
         if (category || tagIds)
             cmd.productInstanceList = productService.getProducts(category, tagIds, params)
 
-        //cmd.inventoryLevelMap = inventoryService.getInventoryLevels(cmd.productInstanceList, location)
+        cmd.productInstanceList.eachWithIndex { product, index ->
+            println product.category
+            cmd.categoryInstanceList << product.category
+        }
+        cmd.rootCategory = productService.getRootCategory()
 
-		cmd.productInstanceList.eachWithIndex { product, index ->
-			println product.category
-			cmd.categoryInstanceList << product.category;
-		}
-		cmd.rootCategory = productService.getRootCategory();
+        println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        //def domainClass = new DefaultGrailsDomainClass(Product.class)
-
-		[ commandInstance : cmd, products: cmd.productInstanceList?:[], categoryInstance: category ]
-	}
+        [commandInstance: cmd, products: cmd.productInstanceList ?: [], categoryInstance: category]
+    }
 
     def batchEditProperties = {
         def startTime = System.currentTimeMillis()
-     //   def location = Location.get(session.warehouse.id)
-     //   def category = Category.get(params.categoryId)
-     //   def tagIds = params.list("tagId")
-
-      //  def products = productService.getProducts(category, tagIds, params)
 
         println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
 
@@ -102,73 +87,62 @@ class ProductController {
     }
 
 
-	def batchSave = { BatchEditCommand cmd ->
+    def batchSave = { BatchEditCommand cmd ->
 
         println "Batch save " + cmd
 
-		// If there are no products (usually when returning to batchSave after login
-		if (!cmd.productInstanceList) {
-			redirect(action: 'batchEdit')
-		}
-		// We needed to hack the category binding in order to make this work.
-		// When changing the product.category directly, we received an error
-		// from Hibernate stating that we were trying to change the primary key
-		// of the category object.
-		cmd.categoryInstanceList.eachWithIndex { cat, i ->
-			log.info "categoryInstanceList[" + i + "]: " + cat;
-			cmd.productInstanceList[i].category = Category.get(cat.id);
-		}
+        // If there are no products (usually when returning to batchSave after login
+        if (!cmd.productInstanceList) {
+            redirect(action: 'batchEdit')
+        }
+        // We needed to hack the category binding in order to make this work.
+        // When changing the product.category directly, we received an error
+        // from Hibernate stating that we were trying to change the primary key
+        // of the category object.
+        cmd.categoryInstanceList.eachWithIndex { cat, i ->
+            log.info "categoryInstanceList[" + i + "]: " + cat
+            cmd.productInstanceList[i].category = Category.get(cat.id)
+        }
 
-		cmd.productInstanceList.eachWithIndex { product, i ->
-			log.info "productInstanceList[" + i + "]: " + product.category;
-			if (!product.hasErrors() && product.save()) {
-				// saved with no errors
-			}
-			else {
-				// copy the errors from this product on to the overall command object errors
+        cmd.productInstanceList.eachWithIndex { product, i ->
+            log.info "productInstanceList[" + i + "]: " + product.category
+            if (!product.hasErrors() && product.save()) {
+                // saved with no errors
+            } else {
+                // copy the errors from this product on to the overall command object errors
                 product.errors.getAllErrors().each {
-					cmd.errors.reject(it.getCode(), it.getDefaultMessage())
-				}
-			}
-		}
+                    cmd.errors.reject(it.getCode(), it.getDefaultMessage())
+                }
+            }
+        }
 
-		if (!cmd.hasErrors()) {
-			flash.message = "${warehouse.message(code: 'product.allSavedSuccessfully.message')}"
+        if (!cmd.hasErrors()) {
+            flash.message = "${warehouse.message(code: 'product.allSavedSuccessfully.message')}"
             chain(controller: "product", action: "batchEdit", params: params)
-		}
-        else {
+        } else {
 
             def category = Category.get(params.categoryId)
             def tagIds = params.list("tagId")
             def products = productService.getProducts(category, tagIds, params)
 
-            render(view: "batchEdit", model: [commandInstance: cmd, products:  products])
+            render(view: "batchEdit", model: [commandInstance: cmd, products: products])
         }
-		//else {
-			// reset the flash message in the case of two submits in a row
-			//flash.message = null
-		//}
-
 
         println "flash " + flash.message
         println "params " + params
-		//cmd.rootCategory = productService.getRootCategory();
-		//render(view: "batchEdit", model: [commandInstance:cmd, products:  cmd.productInstanceList]);
+    }
+
+    def list = {
+        def productInstanceList = []
+        def productInstanceTotal = 0
+
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
 
-	}
-
-	def list = {
-		def productInstanceList = []
-		def productInstanceTotal = 0;
-
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-
-
-		boolean includeInactive = params.boolean('includeInactive')?:false
+        boolean includeInactive = params.boolean('includeInactive') ?: false
         def category = params.categoryId ? Category.load(params.categoryId) : null
         def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
-		def catalogs = params.catalogId ? ProductCatalog.getAll(params.list("catalogId")) : []
+        def catalogs = params.catalogId ? ProductCatalog.getAll(params.list("catalogId")) : []
         params.name = params.q
         params.description = params.q
         params.brandName = params.q
@@ -179,142 +153,85 @@ class ProductController {
         params.productCode = params.q
         params.unitOfMeasure = params.q
 
-		// If we specify a format (e.g. csv) we probably want to download everything
-		if (params.format) {
-			params.max = -1
-		}
+        // If we specify a format (e.g. csv) we probably want to download everything
+        if (params.format) {
+            params.max = -1
+        }
 
-		productInstanceList = productService.getProducts(category, catalogs, tags, includeInactive, params)
+        productInstanceList = productService.getProducts(category, catalogs, tags, includeInactive, params)
 
-		if (params.format) {
-			def date = new Date();
-			response.setHeader("Content-disposition",
-					"attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
-			response.contentType = "text/csv"
-			def csv = productService.exportProducts(productInstanceList)
-			render csv
-			return
-		}
+        if (params.format) {
+            def date = new Date()
+            response.setHeader("Content-disposition",
+                    "attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
+            response.contentType = "text/csv"
+            def csv = productService.exportProducts(productInstanceList)
+            render csv
+            return
+        }
 
-		[productInstanceList: productInstanceList, productInstanceTotal: productInstanceList.totalCount]
-	}
+        [productInstanceList: productInstanceList, productInstanceTotal: productInstanceList.totalCount]
+    }
 
 
-	def create = {
+    def create = {
         def startTime = System.currentTimeMillis()
-		def productInstance = new Product(params)
+        def productInstance = new Product(params)
         def rootCategory = productService.getRootCategory()
 
         println "Create product: " + (System.currentTimeMillis() - startTime) + " ms"
 
 		render(view: "edit", model: [productInstance : productInstance, rootCategory: rootCategory])
         println "After render create.gsp for product: " + (System.currentTimeMillis() - startTime) + " ms"
-	}
+    }
 
-	def save = {
-		println "Save product: " + params
+    def save = {
+        println "Save product: " + params
 
 
-		def productInstance = new Product();
-		productInstance.properties = params
+        def productInstance = new Product()
+        productInstance.properties = params
 
         updateTags(productInstance, params)
-        //productInstance.validate()
-
-        //render(view: "edit", model: [productInstance : productInstance, rootCategory: productService.getRootCategory()])
-        //return;
-        /*
-		if (!productInstance.productCode) {
-			productInstance.productCode = productService.generateProductIdentifier();
-		}
-		// Add tags
-		try {
-			if (params.tagsToBeAdded) {
-				params.tagsToBeAdded.split(",").each { tagText ->
-					Tag tag = Tag.findByTag(tagText)
-					if (!tag) tag = new Tag(tag:tagText)
-					productInstance.addToTags(tag)
-				}
-			}
-		} catch (Exception e) {
-			log.error("Error occurred: " + e.message)
-		}
-
-		// Add attributes
-		Attribute.list().each() {
-			String attVal = params["productAttributes." + it.id + ".value"];
-			if (attVal == "_other" || attVal == null || attVal == '') {
-				attVal = params["productAttributes." + it.id + ".otherValue"];
-			}
-			if (attVal) {
-				productInstance.getAttributes().add(new ProductAttribute(["attribute":it,"value":attVal]))
-			}
-		}
-
-		// find the phones that are marked for deletion
-		def _toBeDeleted = productInstance.categories.findAll {(it?.deleted || (it == null))}
-
-		log.info("toBeDeleted: " + _toBeDeleted )
-
-		// if there are phones to be deleted remove them all
-		if (_toBeDeleted) {
-			productInstance.categories.removeAll(_toBeDeleted)
-		}
-        */
 
         // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
         // when the session is closed.
         if (!productInstance?.id || productInstance.validate()) {
             if (!productInstance.productCode) {
-                productInstance.productCode = productService.generateProductIdentifier();
+                productInstance.productCode = productService.generateProductIdentifier()
             }
         }
 
-		if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
+        if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             log.info("saved product " + productInstance.errors)
-            def warehouseInstance = Location.get(session.warehouse.id);
-            def inventoryInstance = warehouseInstance?.inventory;
-			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product:productInstance)])}"
-			sendProductCreatedNotification(productInstance)
-			//redirect(controller: "inventoryItem", action: "showRecordInventory", params: ['productInstance.id':productInstance.id, 'inventoryInstance.id': inventoryInstance?.id])
-			//redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id, params:params)
-            //return;
-		}
+            def warehouseInstance = Location.get(session.warehouse.id)
+            def inventoryInstance = warehouseInstance?.inventory
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
+            sendProductCreatedNotification(productInstance)
+        }
 
         render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])
-	}
+    }
 
 
-	def show = {
-		//def productInstance = Product.get(params.id)
-		//if (!productInstance) {
-		//	flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-		//	redirect(controller: "inventoryItem", action: "browse")
-		//}
-		//else {
-		//	[productInstance: productInstance]
-		//}
-	}
+    def show = {}
 
 
-	def edit = {
+    def edit = {
 
-		def productInstance = Product.get(params.id)
-		def location = Location.get(session?.warehouse?.id);
-		if (!productInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-			redirect(controller: "inventory", action: "browse")
-		}
-		else {
-
-			def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
-			if (!inventoryLevelInstance) {
-				inventoryLevelInstance = new InventoryLevel();
-			}
-
+        def productInstance = Product.get(params.id)
+        def location = Location.get(session?.warehouse?.id)
+        if (!productInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
+            redirect(controller: "inventory", action: "browse")
+        } else {
+            def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
+            if (!inventoryLevelInstance) {
+                inventoryLevelInstance = new InventoryLevel()
+            }
 			[productInstance: productInstance, inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
-		}
-	}
+        }
+    }
 
 
     def productSuppliers = {
@@ -323,9 +240,8 @@ class ProductController {
         if (!productInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventory", action: "browse")
-        }
-        else {
-            render(template: "productSuppliers", model:[productInstance: productInstance])
+        } else {
+            render(template: "productSuppliers", model: [productInstance: productInstance])
         }
     }
 
@@ -334,18 +250,17 @@ class ProductController {
         if (!productInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventory", action: "browse")
-        }
-        else {
-            render(template: "productSubstitutions", model:[productInstance: productInstance])
+        } else {
+            render(template: "productSubstitutions", model: [productInstance: productInstance])
         }
     }
 
 
-	def update = {
-		log.info "Update called with params " + params
-		def productInstance = Product.get(params.id)
+    def update = {
+        log.info "Update called with params " + params
+        def productInstance = Product.get(params.id)
 
-		if (productInstance) {
+        if (productInstance) {
             if (params.version) {
                 def version = params.version.toLong()
                 if (productInstance.version > version) {
@@ -361,10 +276,12 @@ class ProductController {
                 updateTags(productInstance, params)
                 updateAttributes(productInstance, params)
 
-                log.info("Categories " + productInstance?.categories);
+                log.info("Categories " + productInstance?.categories)
 
                 // find the categories that are marked for deletion
-                def _toBeDeleted = productInstance.categories.findAll { (it?.deleted || (it == null)) }
+                def _toBeDeleted = productInstance.categories.findAll {
+                    (it?.deleted || (it == null))
+                }
 
                 log.info("toBeDeleted: " + _toBeDeleted)
 
@@ -377,7 +294,7 @@ class ProductController {
                 // when the session is closed.
                 if (productInstance.validate()) {
                     if (!productInstance.productCode) {
-                        productInstance.productCode = productService.generateProductIdentifier();
+                        productInstance.productCode = productService.generateProductIdentifier()
                     }
                 }
 
@@ -399,17 +316,15 @@ class ProductController {
                 render view: "edit", model: [productInstance:productInstance]
                 return
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventoryItem", action: "browse")
 
 
         }
-	}
+    }
 
     def updateTags(productInstance, params) {
-        //def productInstance = Product.get(params.id)
         // Process product tags
         try {
 
@@ -417,8 +332,7 @@ class ProductController {
             if (params.tagsToBeAdded) {
                 params.tagsToBeAdded.split(",").each { tagText ->
                     Tag tag = Tag.findByTag(tagText)
-                    if (!tag) tag = new Tag(tag:tagText)
-                    //productInstance.addToTags(tag)
+                    if (!tag) tag = new Tag(tag: tagText)
                     tagList << tag
                 }
             }
@@ -435,12 +349,11 @@ class ProductController {
         } catch (Exception e) {
             log.error("Error occurred: " + e.message)
         }
-        //redirect(action: "edit", id: productInstance?.id)
     }
 
 
-    def updateAttributes(Product productInstance, Map params)  {
-        Map existingAtts = new HashMap();
+    def updateAttributes(Product productInstance, Map params) {
+        Map existingAtts = new HashMap()
         productInstance.attributes.each() {
             existingAtts.put(it.attribute.id, it)
         }
@@ -453,28 +366,26 @@ class ProductController {
                 value = params["productAttributes." + it.id + ".otherValue"]
             }
 
-            log.info ("Process attribute " + it.name + " = " + value + ", required = ${it.required}, active = ${it.active}")
+            log.info("Process attribute " + it.name + " = " + value + ", required = ${it.required}, active = ${it.active}")
 
-			if (it.active && it.required && !value) {
+            if (it.active && it.required && !value) {
                 productInstance.errors.rejectValue("attributes", "product.attribute.required",
-                [] as Object[],
-                "Product attribute ${it.name} is required")
+                        [] as Object[],
+                        "Product attribute ${it.name} is required")
                 throw new ValidationException("Attribute required", productInstance.errors)
             }
 
             ProductAttribute existingAttribute = existingAtts.get(it.id)
             if (value) {
                 if (!existingAttribute) {
-                    existingAttribute = new ProductAttribute("attribute":it, value: value)
+                    existingAttribute = new ProductAttribute("attribute": it, value: value)
                     productInstance.addToAttributes(existingAttribute)
                     productInstance.save()
-                }
-                else {
-                    existingAttribute.value = value;
+                } else {
+                    existingAttribute.value = value
                     existingAttribute.save()
                 }
-            }
-            else {
+            } else {
                 if (existingAttribute?.attribute?.active) {
                     log.info("removing attribute ${existingAttribute.attribute.name}")
                     productInstance.removeFromAttributes(existingAttribute)
@@ -486,37 +397,35 @@ class ProductController {
     }
 
 
-	def delete = {
-		def productInstance = Product.get(params.id)
-		if (productInstance && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()) {
-			try {
-				// first we need to delete any inventory items associated with this product
-				def items = InventoryItem.findAllByProduct(productInstance)
-				items.each {
-                    it.delete(flush:true)
+    def delete = {
+        def productInstance = Product.get(params.id)
+        if (productInstance && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()) {
+            try {
+                // first we need to delete any inventory items associated with this product
+                def items = InventoryItem.findAllByProduct(productInstance)
+                items.each {
+                    it.delete(flush: true)
                 }
 
-				// now delete the actual product
-				productInstance.delete(flush: true)
+                // now delete the actual product
+                productInstance.delete(flush: true)
 
-				flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-				redirect(controller: "product", action: "list")
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
-				flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-				redirect(action: "edit", id: params.id)
-			}
-		}
-		else {
-			flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-			redirect(action: "edit", id: params.id)
-		}
-	}
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
+                redirect(controller: "product", action: "list")
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
+                redirect(action: "edit", id: params.id)
+            }
+        } else {
+            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
+            redirect(action: "edit", id: params.id)
+        }
+    }
 
 
     def deleteProducts = {
         println "Delete products: " + params
-        //def productIds = params.list('product.id')
         def productIds = request.getParameterValues("product.id")
 
         def products = productService.getProducts(productIds)
@@ -529,111 +438,102 @@ class ProductController {
     }
 
 
-	def removePackage = {
-		def packageInstance = ProductPackage.get(params.id)
-		def productInstance = packageInstance.product
-		log.info "" + packageInstance.product
-		productInstance.removeFromPackages(packageInstance)
-		packageInstance.delete()
-		productInstance.save();
-		flash.message = "Product package has been deleted"
-		redirect(action: "edit", id: productInstance.id)
-	}
+    def removePackage = {
+        def packageInstance = ProductPackage.get(params.id)
+        def productInstance = packageInstance.product
+        log.info "" + packageInstance.product
+        productInstance.removeFromPackages(packageInstance)
+        packageInstance.delete()
+        productInstance.save()
+        flash.message = "Product package has been deleted"
+        redirect(action: "edit", id: productInstance.id)
+    }
 
-	def savePackage = {
+    def savePackage = {
 
-		println "savePackage: " + params
-		def productInstance = Product.get(params.product.id)
+        println "savePackage: " + params
+        def productInstance = Product.get(params.product.id)
 
-		def packageInstance = ProductPackage.get(params.id)
-		if (!packageInstance) {
-			packageInstance = new ProductPackage(params)
-			productInstance.addToPackages(packageInstance)
-		}
-		else {
-			packageInstance.properties = params
-		}
+        def packageInstance = ProductPackage.get(params.id)
+        if (!packageInstance) {
+            packageInstance = new ProductPackage(params)
+            productInstance.addToPackages(packageInstance)
+        } else {
+            packageInstance.properties = params
+        }
 
-		if (!productInstance.hasErrors() && productInstance.save(flush: true) ) {
-			flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"
-			redirect(action: "edit", id: productInstance?.id)
-		}
-		else {
-			def location = Location.get(session.warehouse.id)
+        if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"
+            redirect(action: "edit", id: productInstance?.id)
+        } else {
+            def location = Location.get(session.warehouse.id)
 			def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
-			if (!inventoryLevelInstance) {
-				inventoryLevelInstance = new InventoryLevel();
-			}
+            if (!inventoryLevelInstance) {
+                inventoryLevelInstance = new InventoryLevel()
+            }
 
 			render(view: "edit", model: [productInstance: productInstance, inventoryLevelInstance: inventoryLevelInstance, packageInstance: packageInstance, rootCategory: productService.getRootCategory()])
-		}
-	}
+        }
+    }
 
 
-	/**
-	 *
-	 */
-	def importDependencies = {
-		/*
-		 if (session.dosageForms) {
-		 session.dosageForms.unique().each() {
-		 new DosageForm(code: it, name: it).save(flush:true)
-		 }
-		 session.dosageForms = null
-		 }*/
-
-		redirect(controller: "product", action: "importProducts")
-	}
+    /**
+     *
+     */
+    def importDependencies = {
+        redirect(controller: "product", action: "importProducts")
+    }
 
 
-	/**
-	 * @param userInstance
-	 * @return
-	 */
-	def sendProductCreatedNotification(Product productInstance) {
-		try {
-			def recipientList = userService.findUsersByRoleType(RoleType.ROLE_PRODUCT_NOTIFICATION).collect { it.email }
-			if (recipientList) {
-				def subject = "${warehouse.message(code:'email.productCreated.message',args:[productInstance?.name,productInstance?.createdBy?.name])}";
-				def body = "${g.render(template: '/email/productCreated', model:[productInstance:productInstance])}"
-				mailService.sendHtmlMail(subject, body.toString(), recipientList);
-			}
-		}
-		catch (Exception e) {
-			log.error("Error sending product notification email: " + e.message, e)
-		}
-	}
+    /**
+     * @param userInstance
+     * @return
+     */
+    def sendProductCreatedNotification(Product productInstance) {
+        try {
+            def recipientList = userService.findUsersByRoleType(RoleType.ROLE_PRODUCT_NOTIFICATION).collect {
+                it.email
+            }
+            if (recipientList) {
+                def subject = "${warehouse.message(code: 'email.productCreated.message', args: [productInstance?.name, productInstance?.createdBy?.name])}"
+                def body = "${g.render(template: '/email/productCreated', model: [productInstance: productInstance])}"
+                mailService.sendHtmlMail(subject, body.toString(), recipientList)
+            }
+        }
+        catch (Exception e) {
+            log.error("Error sending product notification email: " + e.message, e)
+        }
+    }
 
 
+    def search = {
+        log.info "search " + params
+        if (params.q) {
+            def products = productService.findProducts(URLEncoder.encode(params.q))
+            [products: products]
+        }
+    }
 
-	def search = {
-		log.info "search " + params
-		if (params.q) {
-			def products = productService.findProducts(URLEncoder.encode(params.q))
-			[ products : products ]
-		}
-	}
-
-	def barcode = {
-		BarcodeFormat format = BarcodeFormat.valueOf(params.format)
-		File file = File.createTempFile("barcode-", ".png")
-		barcodeService.renderImageToFile(file, params.data, (params.width?:125) as int, (params.height?:50) as int, format)
-		response.contentType = "image/png"
-		response.outputStream << file.bytes
-		file.delete()
-	}
+    def barcode = {
+        BarcodeFormat format = BarcodeFormat.valueOf(params.format)
+        File file = File.createTempFile("barcode-", ".png")
+        barcodeService.renderImageToFile(file, params.data, (params.width ?: 125) as int, (params.height ?: 50) as int, format)
+        response.contentType = "image/png"
+        response.outputStream << file.bytes
+        file.delete()
+    }
 
 
-	/**
-	 * Upload a document to a product.
-	 */
-	def upload = { DocumentCommand command ->
-		log.info "Uploading document: " + params
+    /**
+     * Upload a document to a product.
+     */
+    def upload = { DocumentCommand command ->
+        log.info "Uploading document: " + params
 
-		// HACK - for some reason the Product in document command is not getting bound
-		command.product = Product.get(params.product.id)
+        // HACK - for some reason the Product in document command is not getting bound
+        command.product = Product.get(params.product.id)
 
-		if (params.url) {
+        if (params.url) {
 
             Document documentInstance
             try {
@@ -647,24 +547,24 @@ class ProductController {
                 def contentType = new MimetypesFileTypeMap().getContentType(file)
 
                 documentInstance = new Document(
-                    size: file.size(),
-                    name: file.name,
-                    filename: file.name,
-                    fileContents: file.bytes,
-                    contentType: contentType)
+                        size: file.size(),
+                        name: file.name,
+                        filename: file.name,
+                        fileContents: file.bytes,
+                        contentType: contentType)
 
                 if (documentInstance?.validate() && !documentInstance?.hasErrors()) {
-                    log.info "Saving document " + documentInstance;
-                    command.product.addToDocuments(documentInstance).save(flush:true)
+                    log.info "Saving document " + documentInstance
+                    command.product.addToDocuments(documentInstance).save(flush: true)
                     flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
                 }
                 // If there are errors, we need to redisplay the document form
                 else {
-                    log.info "Document did not save " + documentInstance.errors;
+                    log.info "Document did not save " + documentInstance.errors
                     flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
                     redirect(controller: "product", action: "edit", id: command?.product?.id,
-                    model: [productInstance: command?.product, documentInstance : documentInstance])
-                    return;
+                            model: [productInstance: command?.product, documentInstance: documentInstance])
+                    return
                 }
 
             } catch (IOException e) {
@@ -674,152 +574,135 @@ class ProductController {
             }
 
 
-		}
-		else {
-			def file = command.fileContents;
-			// file must not be empty and must be less than 10MB
-			// FIXME The size limit needs to go somewhere
-			if (!file || file?.isEmpty()) {
-				flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
-			}
-			else if (file.size < 10*1024*1000) {
-				log.info "Creating new document ";
-				Document documentInstance = new Document(
-						size: file.size,
-						name: file.originalFilename,
-						filename: file.originalFilename,
-						fileContents: file.bytes,
-						contentType: file.contentType,
-						documentNumber: command.documentNumber,
-						documentType:  command.documentType)
+        } else {
+            def file = command.fileContents
+            // file must not be empty and must be less than 10MB
+            // FIXME The size limit needs to go somewhere
+            if (!file || file?.isEmpty()) {
+                flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
+            } else if (file.size < 10 * 1024 * 1000) {
+                log.info "Creating new document "
+                Document documentInstance = new Document(
+                        size: file.size,
+                        name: file.originalFilename,
+                        filename: file.originalFilename,
+                        fileContents: file.bytes,
+                        contentType: file.contentType,
+                        documentNumber: command.documentNumber,
+                        documentType: command.documentType)
 
-				if (!command?.product) {
-					log.info "Cannot add document " + documentInstance + "  because product does not exist";
-					flash.message = "${warehouse.message(code: 'document.productDoesNotExist.message')}"
-					redirect(controller: "product", action: "list")
-					return
-				}
-				else {
+                if (!command?.product) {
+                    log.info "Cannot add document " + documentInstance + "  because product does not exist"
+                    flash.message = "${warehouse.message(code: 'document.productDoesNotExist.message')}"
+                    redirect(controller: "product", action: "list")
+                    return
+                } else {
 
-					// Check to see if there are any errors
-					if (documentInstance.validate() && !documentInstance.hasErrors()) {
-						log.info "Saving document " + documentInstance;
-						command.product.addToDocuments(documentInstance).save(flush:true)
-						flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
-					}
-					// If there are errors, we need to redisplay the document form
-					else {
-						log.info "Document did not save " + documentInstance.errors;
-						flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
-						redirect(controller: "product", action: "edit", id: command?.product?.id,
-						model: [productInstance: command?.product, documentInstance : documentInstance])
-						return;
-					}
-				}
-			}
-			else {
-				log.info "Document is too large"
-				flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
-			}
-		}
+                    // Check to see if there are any errors
+                    if (documentInstance.validate() && !documentInstance.hasErrors()) {
+                        log.info "Saving document " + documentInstance
+                        command.product.addToDocuments(documentInstance).save(flush: true)
+                        flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
+                    }
+                    // If there are errors, we need to redisplay the document form
+                    else {
+                        log.info "Document did not save " + documentInstance.errors
+                        flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
+                        redirect(controller: "product", action: "edit", id: command?.product?.id,
+                                model: [productInstance: command?.product, documentInstance: documentInstance])
+                        return
+                    }
+                }
+            } else {
+                log.info "Document is too large"
+                flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
+            }
+        }
 
-		// This is, admittedly, a hack but I wanted to avoid having to add this code to each of
-		// these controllers.
-		log.info ("Redirecting to appropriate show details page " + command?.product?.id)
-		redirect(controller: 'product', action: 'edit', id: command?.product?.id)
-	}
+        // This is, admittedly, a hack but I wanted to avoid having to add this code to each of
+        // these controllers.
+        log.info("Redirecting to appropriate show details page " + command?.product?.id)
+        redirect(controller: 'product', action: 'edit', id: command?.product?.id)
+    }
 
 
-	def deleteDocument = {
-		def productInstance = Product.get(params.product.id)
-		if (!productInstance) {
-			flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.product.id])}"
-			redirect(action: "list")
-		}
-		else {
-			def documentInstance = Document.get(params?.id)
-			if (!documentInstance) {
-				flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
-				redirect(action: "edit", id: productInstance?.id)
-			}
-			else {
-				productInstance.removeFromDocuments(documentInstance);
-				documentInstance?.delete();
-				if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
-					flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), productInstance.id])}"
-					redirect(action: "edit", id: productInstance?.id)
-				}
-				else {
-					render(view: "edit", model: [productInstance: productInstance])
-				}
-			}
-		}
-	}
+    def deleteDocument = {
+        def productInstance = Product.get(params.product.id)
+        if (!productInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.product.id])}"
+            redirect(action: "list")
+        } else {
+            def documentInstance = Document.get(params?.id)
+            if (!documentInstance) {
+                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
+                redirect(action: "edit", id: productInstance?.id)
+            } else {
+                productInstance.removeFromDocuments(documentInstance)
+                documentInstance?.delete()
+                if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), productInstance.id])}"
+                    redirect(action: "edit", id: productInstance?.id)
+                } else {
+                    render(view: "edit", model: [productInstance: productInstance])
+                }
+            }
+        }
+    }
 
 
-	def upnDatabase = {
+    def upnDatabase = {
 
-		def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
-	//	def count=0, MAXSIZE=100000
-		def rows = []
-		try {
-			def line = ""
-			file.withReader { reader ->
-				while ((line = reader.readLine()) != null) {
-					//rows << line[0..19].trim()
-					rows << [
-						line: line,
-						upn: line[0..19].trim(),
-						supplier:  line[20..54].trim(),
-						division: line[55..89].trim(),
-						tradeName: line[90..124].trim(),
-						description: line[125..204].trim(),
-						uom: line[205..206].trim(),
-						qty: line[207..214].trim(),
-						partno: line[215..234].trim(),
-						saleable: line[235..235].trim(),
-						upnQualifierCode: line[236..237].trim(),
-						srcCode: line[238..239].trim(),
-						trackingRequired: line[240..240].trim(),
-						upnCreateDate: line[241..248].trim(),
-						upnEditDate: line[249..256].trim(),
-						statusCode: line[257..258].trim(),
-						actionCode: line[259..260].trim(),
-						reference: line[261..280].trim(),
-						referenceQualifierCode: line[281..282].trim()
-					]
-
-					//if (++count > MAXSIZE) throw new RuntimeException('File too large!')
-				}
-			}
+        def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
+        def rows = []
+        try {
+            def line = ""
+            file.withReader { reader ->
+                while ((line = reader.readLine()) != null) {
+                    rows << [
+                            line                  : line,
+                            upn                   : line[0..19].trim(),
+                            supplier              : line[20..54].trim(),
+                            division              : line[55..89].trim(),
+                            tradeName             : line[90..124].trim(),
+                            description           : line[125..204].trim(),
+                            uom                   : line[205..206].trim(),
+                            qty                   : line[207..214].trim(),
+                            partno                : line[215..234].trim(),
+                            saleable              : line[235..235].trim(),
+                            upnQualifierCode      : line[236..237].trim(),
+                            srcCode               : line[238..239].trim(),
+                            trackingRequired      : line[240..240].trim(),
+                            upnCreateDate         : line[241..248].trim(),
+                            upnEditDate           : line[249..256].trim(),
+                            statusCode            : line[257..258].trim(),
+                            actionCode            : line[259..260].trim(),
+                            reference             : line[261..280].trim(),
+                            referenceQualifierCode: line[281..282].trim()
+                    ]
+                }
+            }
 
 
-		} catch (RuntimeException e) {
-			log.error(e.message)
-			//render "error " + e.message + "<br/>" + rows
-		}
+        } catch (RuntimeException e) {
+            log.error(e.message)
+        }
 
-		[rows:rows];
-		//render rows;
-
-		//assert names[0].first == 'JOHN'
-		//assert names[1].age == 456
-	}
+        [rows: rows]
+    }
 
 
-	def renderImage = {
-		def documentInstance = Document.get(params.id);
-		if (documentInstance) {
-			response.outputStream << documentInstance.fileContents
-		}
-		else {
-			response.sendError(404)
-		}
-	}
+    def renderImage = {
+        def documentInstance = Document.get(params.id)
+        if (documentInstance) {
+            response.outputStream << documentInstance.fileContents
+        } else {
+            response.sendError(404)
+        }
+    }
 
     def downloadDocument = {
         log.info "viewImage: " + params
-        def documentInstance = Document.get(params.id);
+        def documentInstance = Document.get(params.id)
         if (documentInstance) {
             response.setHeader "Content-disposition", "attachment;filename=\"${documentInstance.filename}\""
             response.contentType = documentInstance.contentType
@@ -828,21 +711,16 @@ class ProductController {
         }
     }
 
-	/**
-	 * View document
-	 */
-	def viewImage = {
+    /**
+     * View document
+     */
+    def viewImage = {
         log.info "viewImage: " + params
-		def documentInstance = Document.get(params.id);
-		if (documentInstance) {
+        def documentInstance = Document.get(params.id)
+        if (documentInstance) {
             if (documentInstance.isImage()) {
-    			documentService.scaleImage(documentInstance, response.outputStream, '300px', '300px')
-            }
-            else {
-                // For Grails 2.3.x
-                //final Resource image = grailsResourceLocator.findResourceForURI('/images/icons/pdf.png')
-                //render file: image.inputStream, contentType: 'image/png'
-
+                documentService.scaleImage(documentInstance, response.outputStream, '300px', '300px')
+            } else {
                 // Strip out the most common mime type tree names
                 def documentType = documentInstance.contentType.minus("application/").minus("image/").minus("text/")
                 def servletContext = ServletContextHolder.servletContext
@@ -856,26 +734,19 @@ class ProductController {
 
 
             }
-		}
-		else {
-			//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
-			response.sendError(404)
-		}
-	}
+        } else {
+            response.sendError(404)
+        }
+    }
 
 
-	def viewThumbnail = {
+    def viewThumbnail = {
         log.info "viewThumbnail: " + params
-		def documentInstance = Document.get(params.id);
-		if (documentInstance) {
+        def documentInstance = Document.get(params.id)
+        if (documentInstance) {
             if (documentInstance.isImage()) {
                 documentService.scaleImage(documentInstance, response.outputStream, '100px', '100px')
-            }
-            else {
-                // For Grails 2.3.x
-                //final Resource image = grailsResourceLocator.findResourceForURI('/images/icons/pdf.png')
-                //render file: image.inputStream, contentType: 'image/png'
-
+            } else {
                 // Strip out the most common mime type tree names
                 def documentType = documentInstance.contentType.minus("application/").minus("image/").minus("text/")
                 def servletContext = ServletContextHolder.servletContext
@@ -888,181 +759,153 @@ class ProductController {
                 response.outputStream.flush()
 
             }
-
-			//byte[] bytes = documentInstance.fileContents
-			//resizeImage(bytes, response.outputStream, width, height)
-		}
-		else {
-			//"${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label'), params.id])}"
-			response.sendError(404)
-		}
-	}
+        } else {
+            response.sendError(404)
+        }
+    }
 
     /**
      * Export all products identified by the product.id parameter.
      *
      * @params product.id
      */
-	def exportProducts = {
-		println "export products: " + params
-		def productIds = params.list('product.id')
-		println "Product IDs: " + productIds
-		def products = productService.getProducts(productIds.toArray())
-		if (products) {
-			def date = new Date();
-			response.setHeader("Content-disposition",
-					"attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
-			response.contentType = "text/csv"
-			def csv = productService.exportProducts(products)
-			println "export products: " + csv
-			render csv
-		}
-		else {
-			//render(text: 'No products found', status: 404)
-			response.sendError(404)
-
-		}
-
-	}
+    def exportProducts = {
+        println "export products: " + params
+        def productIds = params.list('product.id')
+        println "Product IDs: " + productIds
+        def products = productService.getProducts(productIds.toArray())
+        if (products) {
+            def date = new Date()
+            response.setHeader("Content-disposition",
+                    "attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
+            response.contentType = "text/csv"
+            def csv = productService.exportProducts(products)
+            println "export products: " + csv
+            render csv
+        } else {
+            response.sendError(404)
+        }
+    }
 
     /**
      * Export all products as CSV
      */
-	def exportAsCsv = {
+    def exportAsCsv = {
 
         def products = Product.findAllByActive(true)
 
         if (products) {
-			response.setHeader("Content-disposition",
-					"attachment; filename=\"Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-			response.contentType = "text/csv"
-			render productService.exportProducts(products)
-		}
-		else {
-			render(text: 'No products found', status: 404)
-		}
-	}
+            response.setHeader("Content-disposition",
+                    "attachment; filename=\"Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+            response.contentType = "text/csv"
+            render productService.exportProducts(products)
+        } else {
+            render(text: 'No products found', status: 404)
+        }
+    }
 
     /**
      * Renders form to begin the import process
      */
-	def importAsCsv = {
-		// renders the initial form
-	}
+    def importAsCsv = {}
 
     /**
      * Upload CSV file
      */
-	def uploadCsv = { ImportDataCommand command ->
+    def uploadCsv = { ImportDataCommand command ->
 
-		log.info "uploadCsv " + params
+        log.info "uploadCsv " + params
 
-		def columns
-		def localFile
-		def uploadFile = command?.importFile
+        def columns
+        def localFile
+        def uploadFile = command?.importFile
 
-		def existingProductsMap = [:]
-		def tag = ""
+        def existingProductsMap = [:]
+        def tag = ""
 
-		if (request.method == "POST") {
+        if (request.method == "POST") {
 
-			// Step 1: Upload file
-			if (uploadFile && !uploadFile?.empty) {
+            // Step 1: Upload file
+            if (uploadFile && !uploadFile?.empty) {
 
-				def contentTypes = ['application/vnd.ms-excel','text/plain','text/csv','text/tsv']
-				println "Content type: " + uploadFile.contentType
-				println "Validate: " + contentTypes.contains(uploadFile.contentType)
+                def contentTypes = ['application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv']
+                println "Content type: " + uploadFile.contentType
+                println "Validate: " + contentTypes.contains(uploadFile.contentType)
 
-				try {
+                try {
 
                     // Upload file
-                    localFile = new File("uploads/" + uploadFile?.originalFilename);
-					localFile.mkdirs()
-					uploadFile?.transferTo(localFile);
-					session.localFile = localFile
+                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
+                    uploadFile?.transferTo(localFile)
+                    session.localFile = localFile
 
                     // Get CSV content
-					def csv = localFile.getText()
-					columns = productService.getColumns(csv)
-					println "CSV " + csv
-
-                    // Get all existing products
-					//def existingProducts = productService.getExistingProducts(csv)
-					//existingProducts.each { product ->
-					//	existingProductsMap[product.id] = product
-                    //    println "existing product " + product.id + " " + product.name
-					//}
+                    def csv = localFile.getText()
+                    columns = productService.getColumns(csv)
+                    println "CSV " + csv
 
                     // Create default tag based on base filename
                     tag = FilenameUtils.getBaseName(command?.importFile?.originalFilename)
 
-					command.products = productService.validateProducts(csv)
+                    command.products = productService.validateProducts(csv)
 
-					flash.message = "Uploaded file ${uploadFile?.originalFilename} to ${localFile.absolutePath}"
-
-                    //dataService.getFileProperties(uploadFile)
-                    //def localFile = dataService.saveFile(uploadFile)
-					//render localFile.getText()
-					//response.outputStream << localFile.newInputStream()
-				} catch (RuntimeException e) {
+                    flash.message = "Uploaded file ${uploadFile?.originalFilename} to ${localFile.absolutePath}"
+                } catch (RuntimeException e) {
                     log.error("An error occurred while uploading product import CSV " + e.message, e)
-					//flash.message = e.message
                     command.errors.reject(e.message)
-				}
+                }
                 catch (FileNotFoundException e) {
                     log.error("File not found exception occurred while uploading product import CSV " + e.message, e)
-                    command.errors.reject("File '${localFile.absolutePath}' could not be uploaded.  This is most likely due to a file permission error.  Make sure that the 'uploads' directory exists and has the proper read/write permissions.");
+                    command.errors.reject("File '${localFile.absolutePath}' could not be uploaded.  This is most likely due to a file permission error.  Make sure that the 'uploads' directory exists and has the proper read/write permissions.")
 
                 }
                 catch (Exception e) {
                     log.error("Exception occurred while uploading product import CSV " + e.message, e)
                     command.errors.reject("Unknown error: " + e.message)
 
-				}
-			}
-			else {
+                }
+            } else {
                 command.errors.reject("${warehouse.message(code: 'import.emptyFile.message', default: 'File is empty')}")
-			}
-		}
+            }
+        }
 
-		render(view: 'importAsCsv', model: [command:command, columns:columns, tag: tag])
-	}
+        render(view: 'importAsCsv', model: [command: command, columns: columns, tag: tag])
+    }
 
     /**
      * Perform import of CSV
      */
-	def importCsv = { ImportDataCommand command ->
+    def importCsv = { ImportDataCommand command ->
 
-		log.info "import " + params
+        log.info "import " + params
 
-		// Step 2: Import data from file
-		def tags = []
-		def columns = []
+        // Step 2: Import data from file
+        def tags = []
+        def columns = []
 
-		if (params.importNow && session.localFile) {
-			try {
-				def csv = session.localFile.getText()
+        if (params.importNow && session.localFile) {
+            try {
+                def csv = session.localFile.getText()
 
-				// Get columns
-				columns = productService.getColumns(csv)
+                // Get columns
+                columns = productService.getColumns(csv)
 
-				// Split tags
-				tags = params?.tagsToBeAdded?.split(",") as List
+                // Split tags
+                tags = params?.tagsToBeAdded?.split(",") as List
 
-				// Import products
-				command.products = productService.validateProducts(csv)
+                // Import products
+                command.products = productService.validateProducts(csv)
 
 
-				productService.importProducts(command.products, tags)
-				flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
-				redirect(controller: "product", action: "importAsCsv", params: [tag: tags[0]])
-			} catch (ValidationException e) {
-				command.errors = e.errors
-			}
+                productService.importProducts(command.products, tags)
+                flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
+                redirect(controller: "product", action: "importAsCsv", params: [tag: tags[0]])
+            } catch (ValidationException e) {
+                command.errors = e.errors
+            }
 
-		}
-		render(view: 'importAsCsv', model: [command:command, tags: tags, columns:columns, productsHaveBeenImported: true])
-
+        }
+        render(view: 'importAsCsv', model: [command: command, tags: tags, columns: columns, productsHaveBeenImported: true])
     }
 
 
@@ -1082,14 +925,14 @@ class ProductController {
             product.addToProductGroups(productGroup)
             product.save(failOnError: true)
         }
-        render(template:'productGroups', model:[product: product, productGroups:product.productGroups])
+        render(template: 'productGroups', model: [product: product, productGroups: product.productGroups])
     }
 
 
-	def addProductComponent = {
+    def addProductComponent = {
         Product assemblyProduct = productService.addProductComponent(params.assemblyProduct.id, params.componentProduct.id, params.quantity as BigDecimal, params.unitOfMeasure)
-		render(template:'productComponents', model:[productInstance: assemblyProduct])
-	}
+        render(template: 'productComponents', model: [productInstance: assemblyProduct])
+    }
 
     def deleteProductComponent = {
 
@@ -1100,7 +943,7 @@ class ProductController {
             productComponent.assemblyProduct.removeFromProductComponents(productComponent)
             productComponent.delete()
         }
-        render(template:'productComponents', model:[productInstance: productInstance])
+        render(template: 'productComponents', model: [productInstance: productInstance])
     }
 
     /**
@@ -1113,12 +956,11 @@ class ProductController {
         if (product) {
             def productGroup = ProductGroup.get(params.id)
             product.removeFromProductGroups(productGroup)
-            product.save(flush:true)
-        }
-        else {
+            product.save(flush: true)
+        } else {
             response.status = 404
         }
-        render(template:'productGroups', model:[product: product, productGroups:product?.productGroups])
+        render(template: 'productGroups', model: [product: product, productGroups: product?.productGroups])
     }
 
 
@@ -1137,12 +979,11 @@ class ProductController {
                 productGroup.removeFromProducts(productGroupProduct)
             }
             productGroup.delete(flush: true)
-            product.save(flush:true)
-        }
-        else {
+            product.save(flush: true)
+        } else {
             response.status = 404
         }
-        render(template:'productGroups', model:[product: product, productGroups:product?.productGroups])
+        render(template: 'productGroups', model: [product: product, productGroups: product?.productGroups])
     }
 
 
@@ -1155,10 +996,10 @@ class ProductController {
         println "addSynonymToProduct() " + params
         def product = Product.get(params.id)
         if (product) {
-            product.addToSynonyms(new Synonym(name : params.synonym, locale: RCU.getLocale(request)))
-            product.save(flush:true, failOnError: true)
+            product.addToSynonyms(new Synonym(name: params.synonym, locale: RCU.getLocale(request)))
+            product.save(flush: true, failOnError: true)
         }
-        render(template:'synonyms', model:[product: product, synonyms:product.synonyms])
+        render(template: 'synonyms', model: [product: product, synonyms: product.synonyms])
     }
 
     /**
@@ -1172,62 +1013,59 @@ class ProductController {
             def synonym = Synonym.get(params.id)
             product.removeFromSynonyms(synonym)
             synonym.delete()
-            product.save(flush:true)
-        }
-        else {
+            product.save(flush: true)
+        } else {
             response.status = 404
         }
-        render(template:'synonyms', model:[product: product, synonyms:product?.synonyms])
+        render(template: 'synonyms', model: [product: product, synonyms: product?.synonyms])
     }
 
 
     def renderCreatedEmail = {
         def productInstance = Product.get(params.id)
         def userInstance = User.get(session.user.id)
-        render(template:"/email/productCreated", model:[productInstance:productInstance, userInstance:userInstance])
+        render(template: "/email/productCreated", model: [productInstance: productInstance, userInstance: userInstance])
     }
 
-	def addToProductCatalog = { ProductCatalogCommand command ->
-		log.info("Add product ${command.product} to ${command.productCatalog}" + params)
-		def product = command.product
-		def productCatalog = command.productCatalog
+    def addToProductCatalog = { ProductCatalogCommand command ->
+        log.info("Add product ${command.product} to ${command.productCatalog}" + params)
+        def product = command.product
+        def productCatalog = command.productCatalog
         if (product && productCatalog) {
             if (!productCatalog.productCatalogItems.contains(product)) {
                 productCatalog.addToProductCatalogItems(new ProductCatalogItem(product: product))
                 productCatalog.save()
             }
         }
-		redirect(action: "productCatalogs", id: command.product.id)
-	}
+        redirect(action: "productCatalogs", id: command.product.id)
+    }
 
     def includesProduct = {
         def product = Product.get(params.id)
 
-        render ([products: ProductCatalog.includesProduct(product).listDistinct()] as JSON)
+        render([products: ProductCatalog.includesProduct(product).listDistinct()] as JSON)
     }
 
-	def removeFromProductCatalog = {
-        log.info ("params: " + params)
-		def product = Product.get(params.id)
+    def removeFromProductCatalog = {
+        log.info("params: " + params)
+        def product = Product.get(params.id)
         def productCatalog = ProductCatalog.get(params.productCatalog.id)
-		if (productCatalog && product) {
-            log.info ("product: " + product)
-            log.info ("productCatalog: " + productCatalog)
-            //productCatalog.removeProduct(product)
+        if (productCatalog && product) {
+            log.info("product: " + product)
+            log.info("productCatalog: " + productCatalog)
             def list = productCatalog.productCatalogItems.findAll { it.product = product }
             list.toArray().each { productCatalogItem ->
                 productCatalog.removeFromProductCatalogItems(productCatalogItem)
                 productCatalogItem.delete()
                 productCatalog.save()
             }
-
-		}
+        }
         redirect(action: "productCatalogs", id: product.id)
-	}
+    }
 
 
-	def productCatalogs = {
-		def product = Product.get(params.id)
+    def productCatalogs = {
+        def product = Product.get(params.id)
 
         def productCatalogs = ProductCatalogItem.createCriteria().list {
             projections {
@@ -1238,37 +1076,34 @@ class ProductController {
         }
 
         log.info "productCatalogs: " + productCatalogs
-		//def productCatalogs = ProductCatalog.list()
 
-		render template: "productCatalogs", model: [productCatalogs:productCatalogs, product: product]
-	}
+        render template: "productCatalogs", model: [productCatalogs: productCatalogs, product: product]
+    }
 
-	def removeFromProductAssociations = {
-		String productId
-		def productAssociation = ProductAssociation.get(params.id)
-		if (productAssociation) {
-			productId = productAssociation.product.id
-			productAssociation.delete()
-			redirect(action: "productSubstitutions", id: productId)
-		}
-		else {
-			response.status = 404
-		}
-	}
+    def removeFromProductAssociations = {
+        String productId
+        def productAssociation = ProductAssociation.get(params.id)
+        if (productAssociation) {
+            productId = productAssociation.product.id
+            productAssociation.delete()
+            redirect(action: "productSubstitutions", id: productId)
+        } else {
+            response.status = 404
+        }
+    }
 
 
+    def createProductSnapshot = {
 
-	def createProductSnapshot = {
+        Product product = Product.get(params.id)
+        Location location = Location.get(session.warehouse.id)
 
-		Product product = Product.get(params.id)
-		Location location = Location.get(session.warehouse.id)
+        inventoryService.createStockSnapshot(location, product)
 
-		inventoryService.createStockSnapshot(location, product)
+        flash.message = "Successfully created stock snapshot for product ${product.productCode} ${product?.name}"
 
-		flash.message = "Successfully created stock snapshot for product ${product.productCode} ${product?.name}"
-
-		redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
-	}
+        redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
+    }
 
 
 }

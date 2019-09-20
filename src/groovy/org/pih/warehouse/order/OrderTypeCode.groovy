@@ -11,7 +11,7 @@ enum OrderTypeCode {
     final Integer sortOrder
 
     OrderTypeCode(Integer sortOrder) {
-        this.sortOrder = sortOrder;
+        this.sortOrder = sortOrder
     }
 
     static list() {

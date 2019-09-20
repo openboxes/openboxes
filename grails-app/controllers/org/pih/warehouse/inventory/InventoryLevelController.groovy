@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.inventory
 
 import grails.orm.PagedResultList
@@ -51,8 +51,8 @@ class InventoryLevelController {
             String text = dataService.exportInventoryLevels(inventoryLevels)
             response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType:"text/csv", text: text)
-            return;
+            render(contentType: "text/csv", text: text)
+            return
         }
 
         [inventoryLevelInstanceList: inventoryLevels, inventoryLevelInstanceTotal: inventoryLevels?.totalCount]
@@ -65,13 +65,13 @@ class InventoryLevelController {
     }
 
     def save = {
+        def location = Location.get(params.location.id)
         def inventoryLevelInstance = new InventoryLevel(params)
+        inventoryLevelInstance.inventory = location.inventory
         if (inventoryLevelInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
-            //redirect(action: "list", id: inventoryLevelInstance.id)
-            redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id )
-        }
-        else {
+            redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id)
+        } else {
             render(view: "create", model: [inventoryLevelInstance: inventoryLevelInstance])
         }
     }
@@ -81,8 +81,7 @@ class InventoryLevelController {
         if (!inventoryLevelInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             [inventoryLevelInstance: inventoryLevelInstance]
         }
     }
@@ -94,13 +93,10 @@ class InventoryLevelController {
             def productInstance = Product.get(params.id)
             inventoryLevelInstance = InventoryLevel.findByProduct(productInstance)
         }
-        //def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (!inventoryLevelInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
-            //redirect(action: "list")
-			redirect(action: "create")
-        }
-        else {
+            redirect(action: "create")
+        } else {
             return [inventoryLevelInstance: inventoryLevelInstance]
         }
     }
@@ -110,7 +106,7 @@ class InventoryLevelController {
         if (inventoryLevelInstance) {
             if (params.version) {
                 def version = params.version.toLong()
-                if (inventoryLevelInstance.version > version) {                    
+                if (inventoryLevelInstance.version > version) {
                     inventoryLevelInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel')] as Object[], "Another user has updated this InventoryLevel while you were editing")
                     render(view: "edit", model: [inventoryLevelInstance: inventoryLevelInstance])
                     return
@@ -119,15 +115,19 @@ class InventoryLevelController {
             inventoryLevelInstance.properties = params
             if (!inventoryLevelInstance.hasErrors() && inventoryLevelInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
-                //redirect(action: "list", id: inventoryLevelInstance.id)
-                redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id )
 
-            }
-            else {
+                // FIXME Should do this in a filter
+                if (params.redirectUrl) {
+                    redirect(url: params.redirectUrl)
+                }
+                else {
+                    redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id)
+                }
+
+            } else {
                 render(view: "edit", model: [inventoryLevelInstance: inventoryLevelInstance])
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
             redirect(action: "list")
         }
@@ -147,91 +147,95 @@ class InventoryLevelController {
                 //redirect(action: "list", id: params.id)
             }
             redirect(controller: "product", action: "edit", id: productId)
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
             redirect(action: "list")
         }
     }
-	
-	
-	def markAsSupported = { 
-		log.info "Mark as supported " + params	
-		def productIds = params.list("product.id")
-		def location = Location.get(session.warehouse.id)
+
+    def dialog = {
+        def inventoryLevelInstance = InventoryLevel.get(params.id)
+        if (!inventoryLevelInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
+        }
+        render(template: "form", model: [inventoryLevelInstance: inventoryLevelInstance])
+    }
+
+    def markAsSupported = {
+        log.info "Mark as supported " + params
+        def productIds = params.list("product.id")
+        def location = Location.get(session.warehouse.id)
         if (productIds) {
             productIds.each {
                 def product = Product.get(it)
                 markAs(product, location.inventory, InventoryStatus.SUPPORTED)
             }
             redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
-            return;
+            return
         }
-		flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code:'products.label')])}"
-		redirect(controller: "inventory", action: "browse")
-	}
+        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'products.label')])}"
+        redirect(controller: "inventory", action: "browse")
+    }
 
-	def markAsNotSupported = {
-		log.info "Mark as not supported " + params
-		def productIds = params.list("product.id")
-		def location = Location.get(session.warehouse.id)
+    def markAsNotSupported = {
+        log.info "Mark as not supported " + params
+        def productIds = params.list("product.id")
+        def location = Location.get(session.warehouse.id)
         if (productIds) {
             productIds.each {
                 def product = Product.get(it)
                 markAs(product, location.inventory, InventoryStatus.NOT_SUPPORTED)
             }
             redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
-            return;
+            return
         }
-		flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code:'products.label')])}"
-		redirect(controller: "inventory", action: "browse")
-	}
+        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'products.label')])}"
+        redirect(controller: "inventory", action: "browse")
+    }
 
-	def markAsNonInventoried = {
-		log.info "Mark as non-inventoried " + params
-		def productIds = params.product.id
-		def location = Location.get(session.warehouse.id)
-		productIds.each {
-			def product = Product.get(it)
-			markAs(product, location.inventory, InventoryStatus.SUPPORTED_NON_INVENTORY)
-		}
-		flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code:'products.label')])}"
-		redirect(controller: "inventory", action: "browse")
-	}
+    def markAsNonInventoried = {
+        log.info "Mark as non-inventoried " + params
+        def productIds = params.product.id
+        def location = Location.get(session.warehouse.id)
+        productIds.each {
+            def product = Product.get(it)
+            markAs(product, location.inventory, InventoryStatus.SUPPORTED_NON_INVENTORY)
+        }
+        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'products.label')])}"
+        redirect(controller: "inventory", action: "browse")
+    }
 
-	
-	def markAs(Product product, Inventory inventory, InventoryStatus inventoryStatus) { 		
-		def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
-		// Add a new inventory level
-		if (!inventoryLevel) {
-			inventoryLevel = new InventoryLevel(product: product, status: inventoryStatus)
-			inventory.addToConfiguredProducts(inventoryLevel)
-			inventory.save()
-		}
-		// update existing inventory level
-		else {
-			inventoryLevel.status = inventoryStatus
-			inventoryLevel.save()
-		}
-	}
+
+    def markAs(Product product, Inventory inventory, InventoryStatus inventoryStatus) {
+        def inventoryLevel = InventoryLevel.findByProductAndInventory(product, inventory)
+        // Add a new inventory level
+        if (!inventoryLevel) {
+            inventoryLevel = new InventoryLevel(product: product, status: inventoryStatus)
+            inventory.addToConfiguredProducts(inventoryLevel)
+            inventory.save()
+        }
+        // update existing inventory level
+        else {
+            inventoryLevel.status = inventoryStatus
+            inventoryLevel.save()
+        }
+    }
 
     def export = {
-        def date = new Date();
+        def date = new Date()
         def dateFormatted = "${date.format('yyyyMMdd-hhmmss')}"
         def inventoryLevels = []
         def product = Product.get(params.id)
-        def location = Location.get(params?.location?.id?:session?.warehouse?.id)
+        def location = Location.get(params?.location?.id ?: session?.warehouse?.id)
         def filename = "Inventory Levels - ${dateFormatted}"
 
         if (product) {
             filename = "Inventory Levels - ${product?.name} - ${dateFormatted}"
             inventoryLevels = product.inventoryLevels
-        }
-        else if (location) {
+        } else if (location) {
             filename = "Inventory Levels - ${location?.name} - ${dateFormatted}"
             inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
-        }
-        else if (location) {
+        } else if (location) {
             filename = "Inventory Levels - ${dateFormatted}"
             inventoryLevels = InventoryLevel.findAll()
         }
@@ -241,10 +245,9 @@ class InventoryLevelController {
             String text = dataService.exportInventoryLevels(inventoryLevels)
             response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}.csv\"")
-            render(contentType:"text/csv", text: text)
-            return;
-        }
-        else {
+            render(contentType: "text/csv", text: text)
+            return
+        } else {
             render(text: 'No inventory levels found', status: 404)
         }
 

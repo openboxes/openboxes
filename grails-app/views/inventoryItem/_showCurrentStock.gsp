@@ -27,12 +27,16 @@
             </tr>
         </thead>
         <tbody>
-
+            <%-- FIXME The g:isSuperuser tag becomes expensive when executed within a for loop, so we should find a better way to implement it without this hack --%>
+            <g:isSuperuser>
+                <g:set var="isSuperuser" value="${true}"/>
+            </g:isSuperuser>
             <g:each var="entry" in="${commandInstance.quantityByBinLocation.sort { it?.inventoryItem?.expirationDate }}" status="status">
                 <g:set var="styleClass" value="${(status%2==0)?'even':'odd' }"/>
                 <tr class="prop ${styleClass}">
                     <td class="middle" style="text-align: left; width: 10%" nowrap="nowrap">
-                        <g:render template="actionsCurrentStock" model="[commandInstance:commandInstance,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantity]" />
+                        <g:render template="actionsCurrentStock"
+                                  model="[commandInstance:commandInstance,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantity,isSuperuser:isSuperuser]" />
                     </td>
                     <td>
                         <g:if test="${entry?.binLocation}">

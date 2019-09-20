@@ -101,8 +101,7 @@ class ShipmentItemTests extends GroovyTestCase {
 		assertEquals expectedValue, actualValue
 	}
 	
-	void test_sort_shouldSortProperly() { 
-		//def expectedValue = [shipmentItem6, shipmentItem1, shipmentItem5, shipmentItem2, shipmentItem3, shipmentItem4]
+	void test_sort_shouldSortProperly() {
 		def expectedValue = [shipmentItem5, shipmentItem1, shipmentItem4, shipmentItem6, shipmentItem3, shipmentItem2]
 		def actualValue = [shipmentItem1, shipmentItem2, shipmentItem3, shipmentItem4, shipmentItem5, shipmentItem6]
 		actualValue = actualValue.sort()

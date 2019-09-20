@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate } from 'react-localize-redux';
+import queryString from 'query-string';
 
 import CreateStockMovement from './CreateStockMovement';
 import AddItemsPage from './AddItemsPage';
@@ -14,6 +15,8 @@ import WizardSteps from '../form-elements/WizardSteps';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
+
+const request = queryString.parse(window.location.search).type === 'REQUEST';
 
 /** Main stock movement form's wizard component. */
 class StockMovements extends Component {
@@ -58,52 +61,76 @@ class StockMovements extends Component {
    * Returns array of form steps.
    * @public
    */
-  getStepList() {
-    return [this.props.translate('react.stockMovement.create.label', 'Create'),
-      this.props.translate('react.stockMovement.addItems.label', 'Add items'),
-      this.props.translate('react.stockMovement.edit.label', 'Edit'),
-      this.props.translate('react.stockMovement.pick.label', 'Pick'),
-      this.props.translate('react.stockMovement.pack.label', 'Pack'),
-      this.props.translate('react.stockMovement.send.label', 'Send')];
+  getStepList(status) {
+    let stepList = [];
+    if (request && (status === 'CREATED' || !status)) {
+      stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
+        this.props.translate('react.stockMovement.addItems.label', 'Add items')];
+    } else {
+      stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
+        this.props.translate('react.stockMovement.addItems.label', 'Add items'),
+        this.props.translate('react.stockMovement.edit.label', 'Edit'),
+        this.props.translate('react.stockMovement.pick.label', 'Pick'),
+        this.props.translate('react.stockMovement.pack.label', 'Pack'),
+        this.props.translate('react.stockMovement.send.label', 'Send')];
+    }
+    return stepList;
   }
 
   /**
    * Returns array of form's components.
    * @public
    */
-  getFormList() {
-    return [
-      <CreateStockMovement
-        initialValues={this.state.values}
-        onSubmit={this.nextPage}
-      />,
-      <AddItemsPage
-        initialValues={this.state.values}
-        previousPage={this.previousPage}
-        goToPage={this.goToPage}
-        onSubmit={this.nextPage}
-      />,
-      <EditPage
-        initialValues={this.state.values}
-        previousPage={this.previousPage}
-        onSubmit={this.nextPage}
-      />,
-      <PickPage
-        initialValues={this.state.values}
-        previousPage={this.previousPage}
-        onSubmit={this.nextPage}
-      />,
-      <PackingPage
-        initialValues={this.state.values}
-        previousPage={this.previousPage}
-        onSubmit={this.nextPage}
-      />,
-      <SendMovementPage
-        initialValues={this.state.values}
-        previousPage={this.previousPage}
-        setValues={this.setValues}
-      />,
-    ];
+  getFormList(status) {
+    let formList = [];
+    if (request && (status === 'CREATED' || !status)) {
+      formList = [
+        <CreateStockMovement
+          initialValues={this.state.values}
+          onSubmit={this.nextPage}
+        />,
+        <AddItemsPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          goToPage={this.goToPage}
+          onSubmit={this.nextPage}
+        />,
+      ];
+    } else {
+      formList = [
+        <CreateStockMovement
+          initialValues={this.state.values}
+          onSubmit={this.nextPage}
+        />,
+        <AddItemsPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          goToPage={this.goToPage}
+          onSubmit={this.nextPage}
+        />,
+        <EditPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          onSubmit={this.nextPage}
+        />,
+        <PickPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          onSubmit={this.nextPage}
+        />,
+        <PackingPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          onSubmit={this.nextPage}
+        />,
+        <SendMovementPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          setValues={this.setValues}
+        />,
+      ];
+    }
+    return formList;
   }
 
   setValues(values) {
@@ -231,11 +258,11 @@ class StockMovements extends Component {
   render() {
     const { page, values } = this.state;
 
-    const formList = this.getFormList();
-    const stepList = this.getStepList();
+    const formList = this.getFormList(values.statusCode);
+    const stepList = this.getStepList(values.statusCode);
 
     return (
-      <div>
+      <div className="content-wrap">
         <div>
           <WizardSteps steps={stepList} currentStep={page} />
         </div>
@@ -246,6 +273,9 @@ class StockMovements extends Component {
             }
             {values.trackingNumber &&
               <span>{`${values.movementNumber} - ${this.getShipmentName()}`}</span>
+            }
+            {page === 6 ?
+              <span className="shipment-status float-right"> {`${values.shipmentStatus ? values.shipmentStatus : 'PENDING'}`} </span> : null
             }
           </div>
           <div className="panelBody px-1">
@@ -277,7 +307,9 @@ StockMovements.propTypes = {
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
   /** Initial components' data */
-  initialValues: PropTypes.shape({}),
+  initialValues: PropTypes.shape({
+    shipmentStatus: PropTypes.string,
+  }),
   locale: PropTypes.string.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,

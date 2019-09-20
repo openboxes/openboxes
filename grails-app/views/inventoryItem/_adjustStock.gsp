@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.core.ReasonCode" %>
 <div class="dialog">
     <jqvalui:renderValidationScript for="org.pih.warehouse.inventory.AdjustStockCommand" form="adjustStockForm"/>
     <g:form name="adjustStockForm" controller="inventoryItem" action="adjustStock" autocomplete="off">
@@ -66,13 +67,17 @@
             <tr class="prop">
                 <td valign="top" class="name"><label><warehouse:message code="default.reasonCode.label" default="Reason Code"/></label></td>
                 <td valign="top" class="">
-                    <g:selectInventoryAdjustmentReasonCode name="reasonCode" value="${reasonCode}"  noSelection="['':'']"/>
+                    <g:select name="reasonCode"
+                              value="${params.reasonCode}"
+                              from="${org.pih.warehouse.core.ReasonCode.listInventoryAdjustmentReasonCodes()}"
+                              noSelection="['':'']"
+                              class="chzn-select-deselect"/>
                 </td>
             </tr>
             <tr class="prop">
                 <td valign="top" class="name"><label><warehouse:message code="default.comments.label" /></label></td>
                 <td valign="top" class="value">
-                    <g:textArea name="comment" rows="5" value="${params.comment }" class="text large"/>
+                    <g:textField name="comment" value="${params.comment }" class="text large"/>
                 </td>
             </tr>
             </tbody>

@@ -372,7 +372,7 @@
                 <g:if test="${!stockMovement?.origin?.isSupplier()}">
                     <li>
                         <a href="${request.contextPath}/stockMovement/requisition/${stockMovement?.id}">
-                            <warehouse:message code="requisition.label"/>
+                            <warehouse:message code="requestDetails.label"/>
                         </a>
                     </li>
                 </g:if>
@@ -401,7 +401,8 @@
         $(".tabs").tabs({
             cookie : {
                 expires : 1
-            }
+            },
+            selected: ${stockMovement?.shipment?.currentStatus >= ShipmentStatusCode.SHIPPED} ? 1 : 0
         });
     });
 </script>

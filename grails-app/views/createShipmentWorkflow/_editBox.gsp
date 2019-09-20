@@ -32,18 +32,6 @@
 		<div class="buttons">
 			<g:submitButton name="addItemToBox" value="${warehouse.message(code:'shipping.addItemToBox.label')}" class="button"></g:submitButton>
 		</div>
-
-
-		<!--
-			<g:if test="${addBoxToContainerId}">
-				<div class="buttons">
-				<g:submitButton name="addAnotherBox" value="Save Box and Add Another Box" class="button"></g:submitButton>
-				</div>
-			</g:if>
-			<div class="buttons">
-				<g:submitButton name="cloneBox" value="Clone Box" class="button"></g:submitButton> Quantity: <g:textField id="cloneQuantity" name="cloneQuantity" size="3" value="0"/>
-			</div>
-		-->
 	</g:form>
 </div>		
 		     

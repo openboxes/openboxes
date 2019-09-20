@@ -35,6 +35,7 @@ class GlobalSearch extends Component {
           cache={false}
           options={[]}
           showValueTooltip
+          noResultsText={`${this.state.inputValue.length >= 3 ? 'No results found' : ''}`}
           menuContainerStyle={{ maxHeight: '500px' }}
           menuStyle={{ maxHeight: '500px' }}
           filterOptions={options => options}

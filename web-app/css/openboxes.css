@@ -1428,13 +1428,6 @@ input.button {
     text-decoration: none;
     font-weight: normal;
 }
-.ui-widget-content a {
-    color: #666;
-}
-.ui-widget-content a:hover {
-    text-decoration: underline;
-}
-
 .nav {
     margin: 0px;
     margin-bottom: 1px;

@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.inventory
 
 import grails.orm.PagedResultList
@@ -21,7 +21,6 @@ import org.pih.warehouse.api.PackPage
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PickPage
 import org.pih.warehouse.api.PickPageItem
-import org.pih.warehouse.api.StockAdjustment
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SubstitutionItem
@@ -80,13 +79,16 @@ class StockMovementService {
 
         log.info "Update status ${id} " + status
         Requisition requisition = Requisition.get(id)
+        if (status == RequisitionStatus.CHECKING) {
+            Shipment shipment = requisition.shipment
+            shipment?.expectedShippingDate = new Date()
+        }
         if (!status in RequisitionStatus.list()) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
         } else if (status < requisition.status) {
             // Ignore backwards state transitions since it occurs normally when users go back and edit pages earlier in the workflow
             log.warn("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
-        }
-        else {
+        } else {
             requisition.status = status
             requisition.save(flush: true)
         }
@@ -205,8 +207,7 @@ class StockMovementService {
                         eq("origin", stockMovement.origin)
                     }
                 }
-            }
-            else {
+            } else {
                 if (stockMovement?.destination) {
                     eq("destination", stockMovement.destination)
                 }
@@ -226,12 +227,10 @@ class StockMovementService {
 
             if (params.sort && params.order) {
                 order(params.sort, params.order)
-            }
-            else {
+            } else {
                 order("dateCreated", "desc")
             }
         }
-
 
 
         def stockMovements = requisitions.collect { requisition ->
@@ -240,7 +239,6 @@ class StockMovementService {
 
         return new PagedResultList(stockMovements, requisitions.totalCount)
     }
-
 
 
     StockMovement getStockMovement(String id) {
@@ -257,32 +255,29 @@ class StockMovementService {
 
         def startTime = System.currentTimeMillis()
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-        log.info (">>>>>>>>>>>>>>> createFromRequisition: ${System.currentTimeMillis()-startTime} ms")
+        log.info(">>>>>>>>>>>>>>> createFromRequisition: ${System.currentTimeMillis() - startTime} ms")
 
         startTime = System.currentTimeMillis()
         stockMovement.documents = getDocuments(stockMovement)
-        log.info (">>>>>>>>>>>>>>> getDocuments: ${System.currentTimeMillis()-startTime} ms")
+        log.info(">>>>>>>>>>>>>>> getDocuments: ${System.currentTimeMillis() - startTime} ms")
 
         startTime = System.currentTimeMillis()
         if (stepNumber.equals("3")) {
             stockMovement.lineItems = null
             stockMovement.editPage = getEditPage(id)
-        }
-        else if (stepNumber.equals("4")) {
+        } else if (stepNumber.equals("4")) {
             stockMovement.lineItems = null
             stockMovement.pickPage = getPickPage(id)
-        }
-        else if (stepNumber.equals("5")) {
+        } else if (stepNumber.equals("5")) {
             stockMovement.lineItems = null
             stockMovement.packPage = getPackPage(id)
-        }
-        else if (stepNumber.equals("6")) {
+        } else if (stepNumber.equals("6")) {
             if (!stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                 stockMovement.lineItems = null
                 stockMovement.packPage = getPackPage(id)
             }
         }
-        log.info (">>>>>>>>>>>>>>> get stock movement for stepNumber ${stepNumber}: ${System.currentTimeMillis()-startTime} ms")
+        log.info(">>>>>>>>>>>>>>> get stock movement for stepNumber ${stepNumber}: ${System.currentTimeMillis() - startTime} ms")
 
         return stockMovement
     }
@@ -306,13 +301,24 @@ class StockMovementService {
 
     void clearPicklist(StockMovementItem stockMovementItem) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        clearPicklist(requisitionItem)
+    }
+
+    void clearPicklist(RequisitionItem requisitionItem) {
         if (requisitionItem.modificationItem) {
             requisitionItem = requisitionItem.modificationItem
         }
+
+        if (requisitionItem.pickReasonCode) {
+            requisitionItem.pickReasonCode = null
+        }
+
         Picklist picklist = requisitionItem?.requisition?.picklist
         log.info "Clear picklist"
         if (picklist) {
-            picklist.picklistItems.findAll { it.requisitionItem == requisitionItem }.toArray().each {
+            picklist.picklistItems.findAll {
+                it.requisitionItem == requisitionItem
+            }.toArray().each {
                 picklist.removeFromPicklistItems(it)
                 requisitionItem.removeFromPicklistItems(it)
                 it.delete()
@@ -332,8 +338,7 @@ class StockMovementService {
                     if (!stockMovementItem.requisitionItem?.modificationItem?.picklistItems) {
                         createMissingPicklistItems(stockMovementItem)
                     }
-                }
-                else {
+                } else {
                     createMissingPicklistItems(stockMovementItem)
                 }
             }
@@ -349,8 +354,7 @@ class StockMovementService {
             if (!stockMovementItem.requisitionItem?.modificationItem?.picklistItems) {
                 createMissingPicklistItems(stockMovementItem)
             }
-        }
-        else {
+        } else {
             createMissingPicklistItems(stockMovementItem)
         }
     }
@@ -382,11 +386,17 @@ class StockMovementService {
                 for (StockMovementItem subStockMovementItem : stockMovementItem.substitutionItems) {
                     createPicklist(subStockMovementItem)
                 }
-            }
-            else {
+            } else {
                 createPicklist(stockMovementItem)
             }
         }
+    }
+
+    void createPicklist(StockMovementItem stockMovementItem) {
+        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
+
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        createPicklist(requisitionItem)
     }
 
     /**
@@ -394,12 +404,7 @@ class StockMovementService {
      *
      * @param id
      */
-    void createPicklist(StockMovementItem stockMovementItem) {
-
-        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
-
-        // This is kind of a hack, but it's the only way I could figure out how to get the origin field
-        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+    void createPicklist(RequisitionItem requisitionItem) {
         Product product = requisitionItem.product
         Location location = requisitionItem?.requisition?.origin
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
@@ -413,9 +418,9 @@ class StockMovementService {
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
             if (suggestedItems) {
-                clearPicklist(stockMovementItem)
+                clearPicklist(requisitionItem)
                 for (SuggestedItem suggestedItem : suggestedItems) {
-                    createOrUpdatePicklistItem(stockMovementItem,
+                    createOrUpdatePicklistItem(requisitionItem,
                             null,
                             suggestedItem.inventoryItem,
                             suggestedItem.binLocation,
@@ -432,6 +437,13 @@ class StockMovementService {
                                     Integer quantity, String reasonCode, String comment) {
 
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantity, reasonCode, comment)
+    }
+
+    void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
+                                    InventoryItem inventoryItem, Location binLocation,
+                                    Integer quantity, String reasonCode, String comment) {
+
         Requisition requisition = requisitionItem.requisition
 
         Picklist picklist = Picklist.findByRequisition(requisition)
@@ -444,6 +456,11 @@ class StockMovementService {
         if (!picklistItem) {
             picklistItem = new PicklistItem()
             picklist.addToPicklistItems(picklistItem)
+        }
+
+        // Set pick reason code if it is different than the one that has already been added to the item
+        if (reasonCode && requisitionItem.pickReasonCode != reasonCode) {
+            requisitionItem.pickReasonCode = reasonCode
         }
 
         // Remove from picklist
@@ -463,7 +480,7 @@ class StockMovementService {
             picklistItem.quantity = quantity
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
-            picklistItem.sortOrder = stockMovementItem.sortOrder
+            picklistItem.sortOrder = requisitionItem.orderIndex
         }
         picklist.save(flush: true)
     }
@@ -509,7 +526,9 @@ class StockMovementService {
         // As long as quantity requested is less than the total available we can iterate through available items
         // and pick until quantity requested is 0. Otherwise, we don't suggest anything because the user must
         // choose anyway. This might be improved in the future.
-        Integer quantityAvailable = availableItems ? availableItems?.sum { it.quantityAvailable } : 0
+        Integer quantityAvailable = availableItems ? availableItems?.sum {
+            it.quantityAvailable
+        } : 0
         if (quantityRequested <= quantityAvailable) {
 
             for (AvailableItem availableItem : availableItems) {
@@ -584,14 +603,13 @@ class StockMovementService {
             substitutionItem.productName = item?.product?.name
             substitutionItem.productCode = item?.product?.productCode
             substitutionItem.quantitySelected = item?.quantity
+            substitutionItem.quantityConsumed = calculateMonthlyStockListQuantity(item.product, location)
             substitutionItem.availableItems = availableItems
             return substitutionItem
         }
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
-        //return inventoryService.getAvailableBinLocations(location, item.product)
-
         List availableBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, [product])
         List<AvailableItem> availableItems = availableBinLocations.collect {
             return new AvailableItem(
@@ -605,22 +623,11 @@ class StockMovementService {
     }
 
 
-    // These two methods do very different things
-//    List<SubstitutionItem> getSubstitutionItems(StockMovementItem stockMovementItem) {
-//        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
-//        List substitutionItems = requisitionItem?.substitutionItems?.collect { substitutionItem ->
-//            List availableItems = getAvailableItems()
-//            return SubstitutionItem.createFromRequisitionItem(requisitionItem)
-//        }
-//        return substitutionItems
-//    }
-
-
     EditPage getEditPage(String id) {
         EditPage editPage = new EditPage()
         def startTime = System.currentTimeMillis()
         StockMovement stockMovement = getStockMovement(id)
-        log.info("Get stock movement ${id}: ${System.currentTimeMillis()-startTime}")
+        log.info("Get stock movement ${id}: ${System.currentTimeMillis() - startTime}")
 
         Map monthlyStocklistQuantities = calculateMonthlyStockListQuantity(stockMovement.origin)
 
@@ -631,7 +638,7 @@ class StockMovementService {
             editPageItem.quantityConsumed = monthlyStocklistQuantities.get(stockMovementItem.product.id)
             editPage.editPageItems.addAll(editPageItem)
         }
-        log.info("Build edit pages for stock movement: ${System.currentTimeMillis()-startTime} ms")
+        log.info("Build edit pages for stock movement: ${System.currentTimeMillis() - startTime} ms")
         return editPage
     }
 
@@ -705,7 +712,9 @@ class StockMovementService {
         }
 
         Float monthlyStockListQuantity =
-                monthlyStockListQuantities.sum { it[1] ? Math.ceil(((Double) it[0]) / it[1] * 30) : 0 }
+                monthlyStockListQuantities.sum {
+                    it[1] ? Math.ceil(((Double) it[0]) / it[1] * 30) : 0
+                }
 
         return monthlyStockListQuantity
     }
@@ -739,7 +748,7 @@ class StockMovementService {
 
         // Rebuild list of maps as a map (productId: quantity]
         monthlyStockListQuantities =
-                monthlyStockListQuantities.inject([:]) {map, col ->
+                monthlyStockListQuantities.inject([:]) { map, col ->
                     map << [(col.productId): col.quantity]
                 }
 
@@ -754,7 +763,9 @@ class StockMovementService {
         List<Requisition> stocklists = requisitionService.getRequisitionTemplates(location)
         if (stocklists) {
             stocklists.each { stocklist ->
-                def stocklistItems = stocklist.requisitionItems.findAll { it?.product?.id == requisitionItem?.product?.id }
+                def stocklistItems = stocklist.requisitionItems.findAll {
+                    it?.product?.id == requisitionItem?.product?.id
+                }
                 if (stocklistItems) {
                     monthlyStockListQuantity += stocklistItems.sum {
                         it?.requisition?.replenishmentPeriod ? Math.ceil(((Double) it?.quantity) / it?.requisition?.replenishmentPeriod * 30) : 0
@@ -782,6 +793,7 @@ class StockMovementService {
         editPageItem.productCode = requisitionItem.product.productCode
         editPageItem.productName = requisitionItem.product.name
         editPageItem.quantityRequested = requisitionItem.quantity
+        editPageItem.quantityConsumed = calculateMonthlyStockListQuantity(stockMovementItem)
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
         editPageItem.substitutionItems = substitutionItems
@@ -796,6 +808,10 @@ class StockMovementService {
      */
     PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
 
+        if (!requisitionItem.picklistItems || (requisitionItem.picklistItems && requisitionItem.totalQuantityPicked() != requisitionItem.quantity &&
+                !requisitionItem.picklistItems.reasonCode)) {
+            createPicklist(requisitionItem)
+        }
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
@@ -826,7 +842,7 @@ class StockMovementService {
     PackPageItem buildPackPageItem(ShipmentItem shipmentItem) {
         String palletName = ""
         String boxName = ""
-        if(shipmentItem?.container?.parentContainer) {
+        if (shipmentItem?.container?.parentContainer) {
             palletName = shipmentItem?.container?.parentContainer?.name
             boxName = shipmentItem?.container?.name
         } else if (shipmentItem.container) {
@@ -894,7 +910,9 @@ class StockMovementService {
                 RequisitionItem requisitionItem
                 // Try to find a matching stock movement item
                 if (stockMovementItem.id) {
-                    requisitionItem = requisition.requisitionItems.find { it.id == stockMovementItem.id }
+                    requisitionItem = requisition.requisitionItems.find {
+                        it.id == stockMovementItem.id
+                    }
                     if (!requisitionItem) {
                         throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                     }
@@ -970,7 +988,9 @@ class StockMovementService {
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
-                RequisitionItem requisitionItem = requisition.requisitionItems.find { it.id == stockMovementItem.id }
+                RequisitionItem requisitionItem = requisition.requisitionItems.find {
+                    it.id == stockMovementItem.id
+                }
 
                 if (!requisitionItem) {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
@@ -1120,8 +1140,10 @@ class StockMovementService {
 
     void removeRequisitionItem(RequisitionItem requisitionItem) {
         Requisition requisition = requisitionItem.requisition
-        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
         requisitionItem.undoChanges()
+        requisitionItem.save(flush: true)
+
+        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
         requisition.removeFromRequisitionItems(requisitionItem)
         requisitionItem.delete()
     }
@@ -1302,7 +1324,7 @@ class StockMovementService {
 
         ShipmentItem shipmentItem = ShipmentItem.findByRequisitionItem(requisitionItem)
 
-        if(!shipmentItem) {
+        if (!shipmentItem) {
             shipmentItem = new ShipmentItem()
         }
 
@@ -1400,7 +1422,7 @@ class StockMovementService {
                 shipmentItem.product = picklistItem?.inventoryItem?.product
                 shipmentItem.quantity = picklistItem?.quantity
                 shipmentItem.requisitionItem = picklistItem.requisitionItem
-                shipmentItem.recipient = picklistItem?.requisitionItem?.recipient?:
+                shipmentItem.recipient = picklistItem?.requisitionItem?.recipient ?:
                         picklistItem?.requisitionItem?.parentRequisitionItem?.recipient
                 shipmentItem.inventoryItem = picklistItem?.inventoryItem
                 shipmentItem.binLocation = picklistItem?.binLocation
@@ -1456,8 +1478,7 @@ class StockMovementService {
                 splitItem.shipment.addToShipmentItems(splitItem)
                 splitItem.save(flush: true)
             }
-        }
-        else if (shipmentItem) {
+        } else if (shipmentItem) {
             shipmentItem.quantity = packPageItem?.quantityShipped
             shipmentItem.recipient = packPageItem?.recipient
             shipmentItem.container = createOrUpdateContainer(shipmentItem.shipment, packPageItem?.palletName, packPageItem?.boxName)
@@ -1472,7 +1493,7 @@ class StockMovementService {
         Requisition requisition = stockMovement.requisition
         def shipment = requisition.shipment
 
-       validateRequisition(requisition)
+        validateRequisition(requisition)
 
         if (!shipment) {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
@@ -1497,7 +1518,7 @@ class StockMovementService {
         } else if (requisitionItem.picklistItems) {
             // if there is picklist created check if quantity picked is equal to quantity requested if there was no reason code given(items canceled during pick or picked partially have reason code)
             if (requisitionItem.totalQuantityPicked() != requisitionItem.quantity && !requisitionItem.picklistItems.reasonCode) {
-                throw new ValidationException("Quantity picked does not match quantity requested for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name, requisitionItem.errors)
+                throw new ValidationException("Please change the pick qty for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name + " or enter reason code.", requisitionItem.errors)
             }
         }
     }
@@ -1531,14 +1552,14 @@ class StockMovementService {
                             hidden      : false
                     ],
                     [
-                        name        : g.message(code: "picklist.button.print.label"),
+                            name        : g.message(code: "picklist.button.print.label"),
                             documentType: DocumentGroupCode.PICKLIST.name(),
                             contentType : "text/html",
                             stepNumber  : 4,
                             uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true)
                     ],
                     [
-                        name        : g.message(code: "picklist.button.download.label"),
+                            name        : g.message(code: "picklist.button.download.label"),
                             documentType: DocumentGroupCode.PICKLIST.name(),
                             contentType : "application/pdf",
                             stepNumber  : 4,
@@ -1561,27 +1582,6 @@ class StockMovementService {
                     ]
             ])
         }
-//                [
-//                        name        : g.message(code: "shipping.printPickList.label"),
-//                        documentType: DocumentGroupCode.PICKLIST.name(),
-//                        contentType : "text/html",
-//                        stepNumber  : 5,
-//                        uri         : g.createLink(controller: 'report', action: "printPickListReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
-//                ],
-//                [
-//                        name        : g.message(code: "shipping.printShippingReport.label"),
-//                        documentType: DocumentGroupCode.PACKING_LIST.name(),
-//                        contentType : "text/html",
-//                        stepNumber  : 5,
-//                        uri         : g.createLink(controller: 'report', action: "printShippingReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
-//                ],
-//                [
-//                        name        : g.message(code: "shipping.printPaginatedPackingListReport.label"),
-//                        documentType: DocumentGroupCode.PACKING_LIST.name(),
-//                        contentType : "text/html",
-//                        stepNumber  : 5,
-//                        uri         : g.createLink(controller: 'report', action: "printPaginatedPackingListReport", params: ["shipment.id": stockMovement?.shipment?.id], absolute: true)
-//                ],
 
         if (stockMovement?.shipment) {
             documentList.addAll([

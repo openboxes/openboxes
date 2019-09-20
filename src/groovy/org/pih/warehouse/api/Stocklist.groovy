@@ -19,13 +19,13 @@ class Stocklist {
 
     Map toJson() {
         return [
-                "requisition.id": requisition?.id,
-                name: requisition?.name,
-                "destination.id": destination?.id,
+                "requisition.id"  : requisition?.id,
+                name              : requisition?.name,
+                "destination.id"  : destination?.id,
                 "destination.name": destination?.name,
-                "origin.id": origin?.id,
-                "origin.name": origin?.name,
-                "requestedBy.id": requestedBy?.id,
+                "origin.id"       : origin?.id,
+                "origin.name"     : origin?.name,
+                "requestedBy.id"  : requestedBy?.id,
                 "requestedBy.name": requestedBy?.name
         ]
     }

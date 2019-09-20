@@ -32,12 +32,6 @@
                                 </div>
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="reasonCode.label" default="Reason code"/></label>
-                                    <%--
-                                    <g:selectReasonCode multiple="true" name="cancelReasonCode" noSelection="['null':'']"
-                                                        value="${params.list('cancelReasonCode')}" class="chzn-select-deselect" />
-
-
-                                    --%>
                                     <div class="chzn-field">
                                         <g:select name="cancelReasonCode" from="${org.pih.warehouse.core.ReasonCode.values()}" noSelection="['null':'']"
                                                   class="chzn-select-deselect" keys="${org.pih.warehouse.core.ReasonCode.values()*.name()}"
@@ -59,11 +53,7 @@
                     <div class="button-bar">
                         <div class="button-group">
                             <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="['requisitionItem']"/></g:link>
-                            <%--
-                            <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="['requisitionItem']"/></g:link>
-                            --%>
                             <g:link class="button icon arrowdown" action="export" params="${params}"><warehouse:message code="default.export.label" args="['requisitionItem']"/></g:link>
-
                         </div>
                     </div>
                     <div class="list">
@@ -73,18 +63,10 @@
                                 ${title?:warehouse.message(code: "requisitionItem.list.label", default: "List requisition items")}
                                 (${requisitionItemInstanceList.totalCount})
                             </h2>
-                            <%--
-                            <h3>
-                                Showing ${(params.offset as int)+1} - ${(params.max as int) + (params.offset as int)} of ${requisitionItemInstanceList.totalCount}
-                            </h3>
-                            --%>
                             <table>
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <%--
-                                        <g:sortableColumn property="id" title="${warehouse.message(code: 'requisitionItem.id.label', default: 'Id')}" />
-                                        --%>
                                         <th><warehouse:message code="requisitionItem.requisition.label" default="Requisition" /></th>
                                         <th><warehouse:message code="requisitionItem.dateRequested.label" default="Date requested" /></th>
                                         <th><warehouse:message code="requisitionItem.product.label" default="Product" /></th>

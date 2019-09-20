@@ -17,7 +17,7 @@ enum RequisitionItemSortByCode {
 
 
     static list() {
-        [ DEFAULT, CATEGORY, SORT_INDEX]
+        [DEFAULT, CATEGORY, SORT_INDEX]
     }
 
 }

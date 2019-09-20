@@ -35,42 +35,6 @@
             <div class="dialog">
                 <div class="yui-ga">
 					<div class="yui-u first">
-%{--                        <div class="filters" >--}%
-%{--                            <g:form method="GET" controller="inventory" action="manage">--}%
-%{--                                <div class="box">--}%
-%{--                                    <h2><warehouse:message code="inventory.filterByProduct.label"/></h2>--}%
-%{--                                    <table>--}%
-%{--                                        <tr>--}%
-%{--                                            <td>--}%
-%{--                                                <label><g:message code="product.tag.label"/></label>--}%
-%{--                                                <g:selectTags name="tags" noSelection="['':'']"--}%
-%{--                                                              value="${command.tags}"--}%
-%{--                                                              data-placeholder="Select tags"--}%
-%{--                                                              class="chzn-select-deselect"/>--}%
-%{--                                            </td>--}%
-%{--                                        </tr>--}%
-%{--                                        <tr>--}%
-%{--                                            <td>--}%
-%{--                                                <label><g:message code="product.productCode.label"/></label>--}%
-%{--                                                <g:textField id="productCodes" name="productCodes"--}%
-%{--                                                             value="${command?.productCodes}" placeholder="Add products by product code"/>--}%
-%{--                                            </td>--}%
-%{--                                        </tr>--}%
-%{--                                        <tr>--}%
-%{--                                            <td>--}%
-%{--                                                <div class="buttons">--}%
-%{--                                                    <button type="submit" class="button icon search" name="searchPerformed" value="true">--}%
-%{--                                                        <warehouse:message code="default.search.label"/>--}%
-%{--                                                    </button>--}%
-%{--                                                </div>--}%
-%{--                                            </td>--}%
-%{--                                        </tr>--}%
-%{--                                    </table>--}%
-%{--                                </div>--}%
-
-
-%{--                            </g:form>--}%
-%{--                        </div>--}%
                     </div>
 					<div class="yui-u">
 

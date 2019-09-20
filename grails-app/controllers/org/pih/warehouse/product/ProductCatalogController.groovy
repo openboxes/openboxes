@@ -1,20 +1,22 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.product
 
-import org.apache.commons.io.FilenameUtils
+
+import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.importer.ImportDataCommand
 
 class ProductCatalogController {
 
-    def productService
+    UploadService uploadService
+    ProductService productService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -38,8 +40,7 @@ class ProductCatalogController {
         if (productCatalogInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), productCatalogInstance.id])}"
             redirect(action: "list", id: productCatalogInstance.id)
-        }
-        else {
+        } else {
             render(view: "create", model: [productCatalogInstance: productCatalogInstance])
         }
     }
@@ -49,8 +50,7 @@ class ProductCatalogController {
         if (!productCatalogInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             [productCatalogInstance: productCatalogInstance]
         }
     }
@@ -60,8 +60,7 @@ class ProductCatalogController {
         if (!productCatalogInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), params.id])}"
             redirect(action: "list")
-        }
-        else {
+        } else {
             return [productCatalogInstance: productCatalogInstance]
         }
     }
@@ -82,12 +81,10 @@ class ProductCatalogController {
             if (!productCatalogInstance.hasErrors() && productCatalogInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), productCatalogInstance.id])}"
                 redirect(action: "edit", id: productCatalogInstance.id)
-            }
-            else {
+            } else {
                 render(view: "edit", model: [productCatalogInstance: productCatalogInstance])
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), params.id])}"
             redirect(action: "list")
         }
@@ -105,8 +102,7 @@ class ProductCatalogController {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), params.id])}"
                 redirect(action: "list", id: params.id)
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), params.id])}"
             redirect(action: "list")
         }
@@ -115,7 +111,7 @@ class ProductCatalogController {
     def productCatalogItems = {
         def productCatalogInstance = ProductCatalog.get(params.id)
 
-        render (template: "productCatalogItems", model: [productCatalogInstance:productCatalogInstance])
+        render(template: "productCatalogItems", model: [productCatalogInstance: productCatalogInstance])
     }
 
     def addProductCatalogItem = { ProductCatalogCommand command ->
@@ -124,7 +120,7 @@ class ProductCatalogController {
         def product = command.product
         def productCatalog = command.productCatalog
         if (productCatalog && product) {
-            productCatalog.addToProductCatalogItems([product:product])
+            productCatalog.addToProductCatalogItems([product: product])
             productCatalog.save()
         }
         flash.message = "${warehouse.message(code: 'default.added.message', args: [warehouse.message(code: 'productCatalogItem.label', default: 'Product Catalog Item'), params.id])}"
@@ -144,20 +140,15 @@ class ProductCatalogController {
                 }
                 productCatalogItem.delete()
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productCatalogItem.label', default: 'Product Catalog Item'), params.id])}"
-                //redirect(action: "edit", id: productCatalog.id, fragment: "edit-product-catalog-items")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'productCatalogItem.label', default: 'Product Catalog Item'), params.id])}"
-                //redirect(action: "edit", id: params.id, fragment: "edit-product-catalog-items")
             }
-        }
-        else {
+        } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productCatalogItem.label', default: 'Product Catalog Item'), params.id])}"
-            //redirect(action: "list")
         }
         redirect(action: "productCatalogItems", id: productCatalogId)
     }
-
 
 
     def importProductCatalog = { ImportDataCommand command ->
@@ -173,16 +164,15 @@ class ProductCatalogController {
             // Step 1: Upload file
             if (uploadFile && !uploadFile?.empty) {
 
-                def contentTypes = ['application/vnd.ms-excel','text/plain','text/csv','text/tsv']
+                def contentTypes = ['application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv']
                 println "Content type: " + uploadFile.contentType
                 println "Validate: " + contentTypes.contains(uploadFile.contentType)
 
                 try {
 
                     // Upload file
-                    localFile = new File("uploads/" + uploadFile?.originalFilename);
-                    localFile.mkdirs()
-                    uploadFile?.transferTo(localFile);
+                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
+                    uploadFile?.transferTo(localFile)
 
                     // Get CSV content
                     def csv = localFile.getText()
@@ -193,7 +183,7 @@ class ProductCatalogController {
                     rows.each {
                         if (it.productCatalog && it.product) {
                             if (!it.productCatalog.contains(it.product)) {
-                                it.productCatalog.addToProductCatalogItems(new ProductCatalogItem(product:it.product))
+                                it.productCatalog.addToProductCatalogItems(new ProductCatalogItem(product: it.product))
                             }
                         }
                     }
@@ -204,8 +194,7 @@ class ProductCatalogController {
                     log.error("Exception occurred while uploading product import CSV " + e.message, e)
                     flash.message = "An error occurred while importing product catalog items: ${e.message}"
                 }
-            }
-            else {
+            } else {
                 log.warn("Cannot import product catalog items as file was empty")
                 flash.message = "An error occurred while importing product catalog items: ${warehouse.message(code: 'import.emptyFile.message', default: 'File is empty')}"
             }
@@ -217,7 +206,7 @@ class ProductCatalogController {
 
         def productCatalog = ProductCatalog.get(params.id)
         if (productCatalog) {
-            def date = new Date();
+            def date = new Date()
             response.setHeader("Content-disposition",
                     "attachment; filename=\"ProductCatalog-${date.format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
@@ -227,13 +216,8 @@ class ProductCatalogController {
             }
 
             render csv
-        }
-        else {
-            //render(text: 'No products found', status: 404)
+        } else {
             response.sendError(404)
-
         }
-
     }
-
 }

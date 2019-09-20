@@ -16,7 +16,6 @@
         $("#${id}-span").click(function() {
             return false;
         });
-        //$("#${id}-suggest").css('width', '300px');
 
         $("#${id}-suggest").autocomplete({
             delay: ${attrs.delay?:300},

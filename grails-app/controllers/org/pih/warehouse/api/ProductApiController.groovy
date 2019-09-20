@@ -1,16 +1,15 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/ 
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
@@ -30,7 +29,7 @@ class ProductApiController extends BaseDomainApiController {
         data.product = product
         data.demand = forecastingService.getDemand(location, product)
 
-        render ([data:data] as JSON)
+        render([data: data] as JSON)
     }
 
 
@@ -39,23 +38,23 @@ class ProductApiController extends BaseDomainApiController {
         def location = Location.get(session.warehouse.id)
         def data = forecastingService.getDemandSummary(location, product)
 
-        render ([data:data] as JSON)
+        render([data: data] as JSON)
 
     }
 
     def list = {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
-        if (params.name && params.name.size()<minLength) {
-            render([data:[]])
+        if (params.name && params.name.size() < minLength) {
+            render([data: []])
             return
         }
 
-        String [] terms = params?.name?.split(",| ")?.findAll { it }
+        String[] terms = params?.name?.split(",| ")?.findAll { it }
         def products = productService.searchProducts(terms, [])
         products = products.unique()
-		render ([data:products] as JSON)
-	}
+        render([data: products] as JSON)
+    }
 
     def availableItems = {
         def productIds = params.list("product.id") + params.list("id")
@@ -67,7 +66,7 @@ class ProductApiController extends BaseDomainApiController {
 
         def products = Product.findAllByIdInListAndActive(productIds, true)
         def availableItems = inventoryService.getAvailableBinLocations(location, products)
-        render ([data:availableItems] as JSON)
+        render([data: availableItems] as JSON)
     }
 
 
@@ -82,7 +81,7 @@ class ProductApiController extends BaseDomainApiController {
 
         def products = Product.findAllByIdInListAndActive(productIds, true)
         def availableBins = inventoryService.getAvailableBinLocations(location, products)
-        render ([data:availableBins] as JSON)
+        render([data: availableBins] as JSON)
     }
 
 
@@ -112,7 +111,9 @@ class ProductApiController extends BaseDomainApiController {
 
             productAssociations = productAssociations.collect { productAssociation ->
                 def availableProducts = inventoryService.getAvailableProducts(location, productAssociation.associatedProduct)
-                def expirationDate = availableProducts.findAll { it.expirationDate != null }.collect {
+                def expirationDate = availableProducts.findAll {
+                    it.expirationDate != null
+                }.collect {
                     it.expirationDate
                 }.min()
                 def availableQuantity = availableProducts.collect { it.quantity }.sum()
@@ -126,7 +127,9 @@ class ProductApiController extends BaseDomainApiController {
                         availableQuantity: availableQuantity
                 ]
             }
-            Date productExpirationDate = availableItems?.collect { it.inventoryItem.expirationDate }?.min()
+            Date productExpirationDate = availableItems?.collect {
+                it.inventoryItem.expirationDate
+            }?.min()
             Date otherExpirationDate = productAssociations?.collect { it.minExpirationDate }?.min()
             hasEarlierExpiringItems = productExpirationDate ? productExpirationDate.after(otherExpirationDate) : false
         }
@@ -150,14 +153,16 @@ class ProductApiController extends BaseDomainApiController {
     def withCatalogs = {
         Product product = Product.get(params.id)
 
-        render ([data: [
-                id: product.id,
-                name: product.name,
+        render([data: [
+                id         : product.id,
+                name       : product.name,
                 productCode: product.productCode,
-                catalogs: product.getProductCatalogs()?.collect { [
-                        id: it.id,
-                        name: it.name
-                ] }
+                catalogs   : product.getProductCatalogs()?.collect {
+                    [
+                            id  : it.id,
+                            name: it.name
+                    ]
+                }
         ]] as JSON)
     }
 

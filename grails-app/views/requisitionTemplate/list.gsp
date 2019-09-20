@@ -37,13 +37,11 @@
                             </div>
                             <div class="filter-list-item">
                                 <label>${g.message(code:'requisition.origin.label')}</label>
-                                <g:selectLocation name="origin.id" value="${params?.origin?.id}"
-                                                  noSelection="['':'']" class="chzn-select-deselect" />
+                                <g:selectLocation name="origin" value="${params.origin}" multiple="true" class="chzn-select-deselect" noSelection="['null':'']" data-placeholder=" "/>
                             </div>
                             <div class="filter-list-item">
                                 <label>${g.message(code:'requisition.destination.label')}</label>
-                                <g:selectLocation name="destination.id" value="${params?.destination?.id}"
-                                                  noSelection="['':'']" class="chzn-select-deselect" />
+                                <g:selectLocation name="destination" value="${params.destination}" multiple="true" class="chzn-select-deselect" noSelection="['null':'']" data-placeholder=" "/>
                             </div>
 
 
@@ -57,9 +55,16 @@
                                 <g:selectCommodityClass name="commodityClass" value="${params.commodityClass}"
                                                         noSelection="['':'']" class="chzn-select-deselect"/>
                             </div>
+                            <div class="checkbox">
+                                <g:checkBox name="includeUnpublished" value="${params.includeUnpublished}"/>
+                                <label><warehouse:message code="stocklist.includeUnpublished.label" default="Include unpublished stocklists"/></label>
+                            </div>
                             <div class="buttons">
                                 <button class="button"><g:message code="default.search.label"/></button>
-
+                                <button name="format" value="csv" class="button">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
+                                <warehouse:message code="stockList.export.label" default="Export stocklists"/>
+                                </button>
                             </div>
                         </g:form>
                     </div>

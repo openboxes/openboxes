@@ -24,14 +24,14 @@ enum ProductAssociationTypeCode {
 
     int sortOrder
 
-    ProductAssociationTypeCode(int sortOrder) { [this.sortOrder = sortOrder ] }
+    ProductAssociationTypeCode(int sortOrder) { [this.sortOrder = sortOrder] }
 
     static int compare(ProductAssociationTypeCode a, ProductAssociationTypeCode b) {
         return a.sortOrder <=> b.sortOrder
     }
 
     static list() {
-        [ ACCESSORY, COMPATIBLE, COMPLEMENT, COMPONENT, EQUIVALENT, INCOMPATIBLE, REPLACEMENT, SUBSTITUTE, UPGRADE, VARIANT ]
+        [ACCESSORY, COMPATIBLE, COMPLEMENT, COMPONENT, EQUIVALENT, INCOMPATIBLE, REPLACEMENT, SUBSTITUTE, UPGRADE, VARIANT]
     }
 
     String getName() { return name() }

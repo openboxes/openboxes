@@ -12,15 +12,7 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}"/>&nbsp;
 			<warehouse:message code="inventory.record.label"/>
 		</g:link>
-	</div>
-	<%-- 
-	<div class="action-menu-item">
-		<g:link controller="inventory" action="createTransaction" params="['product.id':product?.id]">
-			<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" style="vertical-align: middle"/>&nbsp;
-			<warehouse:message code="transaction.addNewTransaction.label"/>
-		</g:link>
-	</div>
-	--%>				
+	</div>				
 	<div class="action-menu-item">					
 		<g:link controller="product" action="edit" id="${product?.id }">
 			<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;

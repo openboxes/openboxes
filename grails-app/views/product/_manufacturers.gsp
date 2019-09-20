@@ -28,9 +28,6 @@
                         code="product.manufacturer.label" /></label></td>
                 <td
                         class="value ${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
-                    <%--
-                    <g:textField name="unitOfMeasure" value="${productInstance?.manufacturer}" size="60" class="medium text"/>
-                    --%>
                     <g:autoSuggestString id="manufacturer" name="manufacturer" size="50" class="text"
                                          jsonUrl="${request.contextPath}/json/autoSuggest"
                                          value="${productInstance?.manufacturer}"
@@ -44,12 +41,6 @@
                         code="product.manufacturerCode.label"/></label></td>
                 <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
                     <g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="50" class="text"/>
-                    <%--
-                    <g:autoSuggestString id="manufacturerCode" name="manufacturerCode" size="50" class="text"
-                        jsonUrl="${request.contextPath}/json/autoSuggest"
-                        value="${productInstance?.manufacturerCode}"
-                        placeholder=""/>
-                    --%>
                 </td>
             </tr>
             <tr class="prop">
@@ -57,12 +48,6 @@
                         code="product.manufacturerName.label"/></label></td>
                 <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerName', 'errors')}">
                     <g:textField name="manufacturerName" value="${productInstance?.manufacturerName}" size="50" class="text"/>
-                    <%--
-                    <g:autoSuggestString id="manufacturerName" name="manufacturerName" size="50" class="text"
-                        jsonUrl="${request.contextPath}/json/autoSuggest"
-                        value="${productInstance?.manufacturerName}"
-                        placeholder=""/>
-                    --%>
                 </td>
             </tr>
 
@@ -73,12 +58,6 @@
                 <td
                         class="value ${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
                     <g:textField name="modelNumber" value="${productInstance?.modelNumber}" size="50" class="text"/>
-                    <%--
-                    <g:autoSuggestString id="modelNumber" name="modelNumber" size="50" class="text"
-                        jsonUrl="${request.contextPath}/json/autoSuggest"
-                        value="${productInstance?.modelNumber}" promptOnMatch="true"
-                        placeholder="e.g. Usually only pertains to equipment "/>
-                    --%>
                 </td>
             </tr>
 
@@ -99,12 +78,6 @@
                         code="product.vendorCode.label"/></label></td>
                 <td class="value ${hasErrors(bean: productInstance, field: 'vendorCode', 'errors')}">
                     <g:textField name="vendorCode" value="${productInstance?.vendorCode}" size="50" class="text"/>
-                    <%--
-                    <g:autoSuggestString id="vendorCode" name="vendorCode" size="50" class="text"
-                        jsonUrl="${request.contextPath}/json/autoSuggest"
-                        value="${productInstance?.vendorCode}"
-                        placeholder=""/>
-                    --%>
                 </td>
             </tr>
             <tr class="prop">
@@ -112,13 +85,6 @@
                         code="product.vendorName.label"/></label></td>
                 <td class="value ${hasErrors(bean: productInstance, field: 'vendorName', 'errors')}">
                     <g:textField name="vendorName" value="${productInstance?.vendorName}" size="50" class="text"/>
-                    <%--
-                    <g:autoSuggestString id="vendorName" name="vendorName" size="50" class="text"
-                        jsonUrl="${request.contextPath}/json/autoSuggest"
-                        value="${productInstance?.vendorName}"
-                        placeholder=""/>
-                    --%>
-
                 </td>
             </tr>
             <tr class="prop">
