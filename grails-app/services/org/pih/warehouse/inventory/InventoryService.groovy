@@ -1895,15 +1895,14 @@ class InventoryService implements ApplicationContextAware {
             // Need to create a transaction if we want the inventory item to show up in the stock card
             def transaction = new Transaction()
             transaction.transactionDate = new Date()
-            transaction.transactionType = adjustedQuantity < 0 ?
-                    TransactionType.get(Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID) :
+            transaction.transactionType =
                     TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
             transaction.inventory = inventory
             transaction.comment = command.comment
 
             // Add transaction entry to transaction
             def transactionEntry = new TransactionEntry()
-            transactionEntry.quantity = (adjustedQuantity).abs()
+            transactionEntry.quantity = adjustedQuantity
             transactionEntry.inventoryItem = inventoryItem
             transactionEntry.binLocation = binLocation
 
