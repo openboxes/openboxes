@@ -16,7 +16,7 @@
                     ${productCatalogItem?.product?.productCode}
                 </td>
                 <td>
-                    <g:link controller="product" action="edit" id="${productCatalogItem?.product?.id}">
+                    <g:link controller="inventoryItem" action="showStockCard" id="${productCatalogItem?.product?.id}">
                         ${productCatalogItem.product.name}
                     </g:link>
                 </td>
