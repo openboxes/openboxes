@@ -24,10 +24,10 @@
                 <th><warehouse:message code="report.number.label"/></th>
                 <th class="center">${warehouse.message(code: 'product.productCode.label')}</th>
                 <th>${warehouse.message(code: 'product.label')}</th>
-                <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
+                <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
                 <th class="center" style="min-width: 150px;">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
-                <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
+                <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.suggestedPick.label')}</th>
                 <th class="center">${warehouse.message(code:'requisitionItem.confirmedPick.label')}</th>
                 <th class="center">${warehouse.message(code:'stockMovement.comments.label')}</th>
@@ -68,27 +68,23 @@
                     <%--<g:set var="numInventoryItem" value="${requisitionItem?.calculateNumInventoryItem() ?: 1}"/>--%>
                     <g:set var="numInventoryItem" value="${1}"/>
                 </g:else>
+                <g:set var="backgroundColor" value="${(i % 2) == 0 ? '#fff' : '#f7f7f7'}"/>
                 <g:set var="j" value="${0}"/>
                 <g:while test="${j < numInventoryItem}">
-                    <tr class="prop">
-                        <td class=" middle center">
-                            <g:if test="${j==0}">
+                    <tr class="prop" style="background-color: ${backgroundColor}">
+                        <g:if test="${j==0}">
+                            <td class="center" rowspan="${numInventoryItem}">
                                 ${i + 1}
-                            </g:if>
-                        </td>
-                        <td class="middle center">
-                            <g:if test="${j==0}">
+                            </td>
+                            <td class="center" rowspan="${numInventoryItem}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">${requisitionItem?.parentRequisitionItem?.product?.productCode}</div>
                                 </g:if>
                                 <div class="${requisitionItem?.status}">
                                     ${requisitionItem?.product?.productCode}
                                 </div>
-
-                            </g:if>
-                        </td>
-                        <td class="middle">
-                            <g:if test="${j==0}">
+                            </td>
+                            <td class="center" rowspan="${numInventoryItem}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
                                         ${StringEscapeUtils.escapeXml(requisitionItem?.parentRequisitionItem?.product?.name)}
@@ -97,15 +93,19 @@
                                 <div class="${requisitionItem?.status}">
                                     ${StringEscapeUtils.escapeXml(requisitionItem?.product?.name)}
                                 </div>
-                            </g:if>
-                        </td>
-                        <td class="center middle">
-                            <g:if test="${picklistItems}">
-                                <div class="binLocation">
-                                    ${picklistItems[j]?.binLocation?.name}
+                            </td>
+                            <td class="center" rowspan="${numInventoryItem}">
+                                <g:if test="${requisitionItem?.parentRequisitionItem?.isChanged()}">
+                                    <div class="canceled">
+                                        ${requisitionItem?.parentRequisitionItem?.quantity ?: 0}
+                                        ${requisitionItem?.parentRequisitionItem?.product?.unitOfMeasure ?: "EA"}
+                                    </div>
+                                </g:if>
+                                <div class="${requisitionItem?.status}">
+                                    ${requisitionItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                                 </div>
-                            </g:if>
-                        </td>
+                            </td>
+                        </g:if>
                         <td class="middle center">
                             <g:if test="${picklistItems}">
                                 <span class="lotNumber">${picklistItems[j]?.inventoryItem?.lotNumber}</span>
@@ -117,18 +117,10 @@
                             </g:if>
                         </td>
                         <td class="center middle">
-                            <g:if test="${j==0}">
-
-                                <g:if test="${requisitionItem?.parentRequisitionItem?.isChanged()}">
-                                    <div class="canceled">
-                                        ${requisitionItem?.parentRequisitionItem?.quantity ?: 0}
-                                        ${requisitionItem?.parentRequisitionItem?.product?.unitOfMeasure ?: "EA"}
-                                    </div>
-                                </g:if>
-                                <div class="${requisitionItem?.status}">
-                                    ${requisitionItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            <g:if test="${picklistItems}">
+                                <div class="binLocation">
+                                    ${picklistItems[j]?.binLocation?.name}
                                 </div>
-
                             </g:if>
                         </td>
                         <td class="middle center">
