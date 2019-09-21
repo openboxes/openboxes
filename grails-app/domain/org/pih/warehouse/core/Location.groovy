@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -19,6 +20,15 @@ import org.pih.warehouse.shipping.Shipment
  * A location can be a customer, warehouse, or supplier.
  */
 class Location implements Comparable<Location>, java.io.Serializable {
+
+    def publishPersistenceEvent = {
+        publishEvent(new InventorySnapshotEvent(this))
+    }
+
+    def afterInsert = publishPersistenceEvent
+    def afterUpdate = publishPersistenceEvent
+    def afterDelete = publishPersistenceEvent
+
 
     String id
     String name

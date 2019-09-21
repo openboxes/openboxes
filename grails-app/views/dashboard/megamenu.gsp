@@ -4,7 +4,7 @@
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
 <ul class="megamenu">
 
-    <g:if test="${megamenuConfig.dashboard.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.dashboard.enabled}">
         <li class="mm-item">
             <g:link controller="dashboard" action="index" class="mm-item-link">
                 <warehouse:message code="dashboard.label" />&nbsp;
@@ -12,7 +12,7 @@
         </li>
     </g:if>
 
-    <g:if test="${megamenuConfig.analytics.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.analytics.enabled}">
         <g:isUserAdmin>
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -45,7 +45,7 @@
         </g:isUserAdmin>
     </g:if>
 
-    <g:if test="${megamenuConfig.inventory.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.inventory.enabled}">
 
         <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
             <li class="mm-item">
@@ -53,61 +53,64 @@
                     <warehouse:message code="inventory.label" />
                 </a>
                 <div class="mm-item-content">
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="browse" params="[resetSearch:true]">
-                            <warehouse:message code="inventory.browse.label" />
-                        </g:link>
-                    </div>
-                    <g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
+                    <div class="mm-content-section">
+                        <h3><warehouse:message code="inventory.manage.label"/></h3>
+                        <g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
+                            <div class="mm-menu-item">
+                                <g:link controller="inventory" action="manage">
+                                    <warehouse:message code="inventory.manage.label" />
+                                </g:link>
+                            </div>
+                        </g:supports>
                         <div class="mm-menu-item">
-                            <g:link controller="inventory" action="manage">
-                                <warehouse:message code="inventory.manage.label" />
+                            <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory">
+                                <g:message code="default.import.label" args="[g.message(code:'inventory.label', default: 'Inventory')]"/>
                             </g:link>
                         </div>
-                    </g:supports>
-                    <hr/>
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="browse" class="browse" params="[resetSearch:true]">
-                            <warehouse:message code="inventory.browseByCategory.label"/>
-                        </g:link>
-                    </div>
-                    <div style="max-height: 400px; overflow: auto;">
-                        <g:if test='${quickCategories }'>
-                            <g:each var="category" in="${quickCategories}">
-                                <div class="mm-menu-item">
-                                    <g:link class="outline" controller="inventory" action="browse" params="[subcategoryId:category.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-                                        <format:category category="${category}"/> (${category?.products?.size() })
-                                    </g:link>
-                                </div>
-                                <g:if test="${category.categories}">
-                                    <g:each var="childCategory" in="${category.categories}">
+                        <h3><warehouse:message code="inventory.browse.label"/></h3>
+                        <div style="max-height: 400px; overflow: auto;">
+                            <div class="mm-menu-item">
+                                <g:link controller="inventory" action="browse" params="[resetSearch:true]">
+                                    <warehouse:message code="inventory.browse.label"/>
+                                </g:link>
+                            </div>
+                            <g:if test='${quickCategories }'>
+                                <g:each var="category" in="${quickCategories}">
+                                    <div class="mm-menu-item">
+                                        <g:link class="outline" controller="inventory" action="browse" params="[subcategoryId:category.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
+                                            <format:category category="${category}"/> (${category?.products?.size() })
+                                        </g:link>
+                                    </div>
+                                    <g:if test="${category.categories}">
+                                        <g:each var="childCategory" in="${category.categories}">
+                                            <div class="mm-menu-item">
+                                                <g:link controller="inventory" action="browse" params="[subcategoryId:childCategory.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
+                                                    <format:category category="${childCategory}"/> (${childCategory?.products?.size() })
+                                                </g:link>
+                                            </div>
+                                        </g:each>
+                                    </g:if>
+                                </g:each>
+                            </g:if>
+                            <g:elseif test='${categories }'>
+                                <g:each var="entry" in="${categories}">
+                                    <g:each var="category" in="${entry.value }">
                                         <div class="mm-menu-item">
-                                            <g:link controller="inventory" action="browse" params="[subcategoryId:childCategory.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-                                                <format:category category="${childCategory}"/> (${childCategory?.products?.size() })
+                                            <g:link controller="inventory" action="browse" params="[subcategoryId:category?.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
+                                                ${category } (${category.products.size() })
                                             </g:link>
                                         </div>
                                     </g:each>
-                                </g:if>
-                            </g:each>
-                        </g:if>
-                        <g:elseif test='${categories }'>
-                            <g:each var="entry" in="${categories}">
-                                <g:each var="category" in="${entry.value }">
-                                    <div class="mm-menu-item">
-                                        <g:link controller="inventory" action="browse" params="[subcategoryId:category?.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-                                            ${category } (${category.products.size() })
-                                        </g:link>
-                                    </div>
                                 </g:each>
-                            </g:each>
-                        </g:elseif>
+                            </g:elseif>
+                        </div>
                     </div>
                 </div>
             </li>
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.orders.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.orders.enabled}">
         <g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -115,9 +118,7 @@
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-base">
-
                         <div class="mm-content-section">
-
                             <h3><warehouse:message code="default.create.label" args="[warehouse.message(code: 'purchaseOrder.label')]" /></h3>
                             <div class="mm-menu-item">
                                 <g:link controller="purchaseOrderWorkflow" action="index" class="create">
@@ -137,11 +138,9 @@
                             <h3><warehouse:message code="order.listByType.label" default="List Orders by Type" /></h3>
                             <g:each var="orderTypeCode" in="${OrderTypeCode?.list()}">
                                 <div class="mm-menu-item">
-                                    <div class="indent">
-                                        <g:link controller="order" action="list" params="[orderTypeCode:orderTypeCode]" class="list">
-                                            <format:metadata obj="${orderTypeCode}"/>
-                                        </g:link>
-                                    </div>
+                                    <g:link controller="order" action="list" params="[orderTypeCode:orderTypeCode]" class="list">
+                                        <format:metadata obj="${orderTypeCode}"/>
+                                    </g:link>
                                 </div>
                             </g:each>
                         </div>
@@ -158,7 +157,6 @@
                     <warehouse:message code="requests.label"/>
                 </a>
                 <div class="mm-item-content">
-
                     <div class="mm-content-section">
                         <h3><warehouse:message code="default.create.label" args="[warehouse.message(code: 'requisitions.label')]" /></h3>
                         <div class="mm-menu-item">
@@ -176,7 +174,6 @@
                                 <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
                             </g:link>
                         </div>
-
                         <h3><warehouse:message code="default.list.label" args="[warehouse.message(code: 'requisitions.label')]" /></h3>
                         <div class="mm-menu-item">
                             <g:link controller="requisition" action="list" class="list">
@@ -208,63 +205,71 @@
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-section">
-                    <g:if test="${megamenuConfig.stockMovement.enabled}">
-
-                        <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
-
-                        <div class="mm-menu-item">
-                            <g:link controller="stockMovement" action="create" params="[direction:'INBOUND']">
-                                <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.inbound.label')]"/>
-                            </g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
-                                <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
-                            </g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="stockMovement" action="create" params="[type:'REQUEST']">
-                                <warehouse:message code="request.label"/>
-                            </g:link>
-                        </div>
-                        <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
-                        <div class="mm-menu-item">
-                            <g:link controller="putAway" action="index">
-                                <warehouse:message code="default.create.label" args="[g.message(code:'putAway.label')]"/>
-                            </g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="order" action="list" params="[orderTypeCode: 'TRANSFER_ORDER', status: 'PENDING']">
-                                <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
-                            </g:link>
-                        </div>
-                    </g:if>
-                    <g:if test="${megamenuConfig.receiving.enabled}">
-                        <h3><warehouse:message code="receiving.label" default="Receiving" /></h3>
-
-                        <div class="mm-menu-item">
-                            <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create">
-                                <warehouse:message code="shipping.createIncomingShipment.label"/>
-                            </g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="shipment" action="list" params="[type: 'incoming']" class="list">
-                                <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
-                            </g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
-                                <warehouse:message code="default.all.label"/> (${inboundShipmentsTotal})
-                            </g:link>
-                        </div>
-                        <g:each in="${inboundShipmentsCount}" var="statusRow">
+                        <g:if test="${megamenuConfig.stockMovement.enabled}">
+                            <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
                             <div class="mm-menu-item">
-                                <g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.status]" class="shipment-status-${statusRow.status }">
-                                    <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
+                                <g:link controller="stockMovement" action="create" params="[direction:'INBOUND']">
+                                    <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.inbound.label')]"/>
                                 </g:link>
                             </div>
-                        </g:each>
-                    </g:if>
+                            <div class="mm-menu-item">
+                                <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
+                                    <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
+                                </g:link>
+                            </div>
+                        </g:if>
+                        <g:if test="${megamenuConfig.stockRequest.enabled}">
+                            <h3><warehouse:message code="stockRequests.label" default="Stock Requests" /></h3>
+                            <div class="mm-menu-item">
+                                <g:link controller="stockMovement" action="create" params="[type:'REQUEST']">
+                                    <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockRequest.label', default: 'Stock Request')]"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="stockMovement" action="list" params="['requestedBy.id':session.user.id]">
+                                    <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockRequests.label', default: 'Stock Requests')]"/>
+                                </g:link>
+                            </div>
+                        </g:if>
+                        <g:if test="${megamenuConfig.putaways.enabled}">
+                            <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
+                            <div class="mm-menu-item">
+                                <g:link controller="putAway" action="index">
+                                    <warehouse:message code="default.create.label" args="[g.message(code:'putAway.label')]"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="order" action="list" params="[orderTypeCode: 'TRANSFER_ORDER', status: 'PENDING']">
+                                    <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
+                                </g:link>
+                            </div>
+                        </g:if>
+                        <g:if test="${megamenuConfig.receiving.enabled}">
+                            <h3><warehouse:message code="receiving.label" default="Receiving" /></h3>
+
+                            <div class="mm-menu-item">
+                                <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create">
+                                    <warehouse:message code="shipping.createIncomingShipment.label"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="shipment" action="list" params="[type: 'incoming']" class="list">
+                                    <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
+                                    <warehouse:message code="default.all.label"/> (${inboundShipmentsTotal})
+                                </g:link>
+                            </div>
+                            <g:each in="${inboundShipmentsCount}" var="statusRow">
+                                <div class="mm-menu-item">
+                                    <g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.status]" class="shipment-status-${statusRow.status }">
+                                        <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
+                                    </g:link>
+                                </div>
+                            </g:each>
+                        </g:if>
                     </div>
                 </div>
             </li>
@@ -328,7 +333,7 @@
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.reporting.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.reporting.enabled}">
         <li class="mm-item">
             <a href="javascript:void(0)" class="mm-item-link">
                 <warehouse:message code="report.label" />
@@ -339,7 +344,7 @@
                     <h3><warehouse:message code="report.inventoryReports.label" default="Inventory Reports" /></h3>
                     <div class="mm-menu-item">
                         <g:link controller="inventory" action="listInStock">
-                            <warehouse:message code="inventory.inStock.label"/></g:link>
+                            <warehouse:message code="report.inStockReport.label"/></g:link>
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="report" action="showBinLocationReport">
@@ -348,11 +353,11 @@
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="inventory" action="listExpiredStock" class="report-expired">
-                            <warehouse:message code="inventory.expiredStock.label"/></g:link>
+                            <warehouse:message code="report.expiredStockReport.label"/></g:link>
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="inventory" action="listExpiringStock" class="report-expiring">
-                            <warehouse:message code="inventory.expiringStock.label"/></g:link>
+                            <warehouse:message code="report.expiringStockReport.label"/></g:link>
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="report" action="showInventoryByLocationReport" class="">
@@ -422,7 +427,7 @@
     </g:if>
 
 
-    <g:if test="${megamenuConfig.products.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.products.enabled}">
         <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -520,7 +525,7 @@
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.requisitionTemplate.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.requisitionTemplate.enabled}">
         <li class="mm-item">
             <a href="javascript:void(0)" class="mm-item-link">
                 <warehouse:message code="requisitionTemplates.label" default="Stock Lists" />
@@ -542,7 +547,7 @@
         </li>
     </g:if>
 
-    <g:if test="${megamenuConfig.configuration.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.configuration.enabled}">
         <g:isUserAdmin>
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -718,7 +723,7 @@
         </g:isUserAdmin>
     </g:if>
 
-    <g:if test="${megamenuConfig.customLinks.enabled || isSuperuser}">
+    <g:if test="${megamenuConfig.customLinks.enabled}">
         <li class="mm-item">
             <a href="javascript:void(0)" class="mm-item-link">
                 <warehouse:message code="customLinks.label" default="Custom Links" />

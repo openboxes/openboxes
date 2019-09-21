@@ -64,6 +64,17 @@
                         </h2>
                         <table>
                             <tbody>
+                            <g:if test="${locationInstance?.id}">
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="name"><warehouse:message code="default.id.label"/></label>
+                                    </td>
+                                    <td valign="top"
+                                        class="value ${hasErrors(bean: locationInstance, field: 'id', 'errors')}">
+                                            ${locationInstance?.id}
+                                    </td>
+                                </tr>
+                            </g:if>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="name"><warehouse:message code="location.name.label"
@@ -273,7 +284,7 @@
                                     <g:set var="sameAsDefaults"
                                            value="${locationInstance?.locationType?.supportedActivities.equals(locationInstance?.supportedActivities)}"/>
                                     <g:set var="useDefault"
-                                           value="${locationInstance?.supportedActivities.empty || sameAsDefaults}"/>
+                                           value="${locationInstance?.supportedActivities?.isEmpty() || sameAsDefaults}"/>
 
                                     <g:if test="${useDefault}">
                                         <g:set var="supportedActivities"
@@ -322,7 +333,7 @@
                                             <g:set var="isDefault"
                                                    value="${locationInstance?.locationType?.supportedActivities?.contains(activity.toString())}"/>
                                             <g:set var="isSelected"
-                                                   value="${supportedActivities.contains(activity.toString())}"/>
+                                                   value="${supportedActivities?.contains(activity.toString())}"/>
                                             <option value="${activity}" ${isSelected ? 'selected' : ''}>
                                                 ${format.metadata(obj: activity)}
                                             </option>

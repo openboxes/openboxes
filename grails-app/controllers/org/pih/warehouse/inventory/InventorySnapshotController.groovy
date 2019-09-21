@@ -51,23 +51,16 @@ class InventorySnapshotController {
         }
     }
 
-    def trigger = {
-        Date date = new Date()
-        date.clearTime()
-        Product product = Product.get(params.productId)
-        Location location = Location.get(session.warehouse.id)
-        inventorySnapshotService.populateInventorySnapshots(date, location, product)
-        render([status: "OK"] as JSON)
-    }
-
-
     def triggerCalculateQuantityOnHandJob = {
-        println "triggerCalculateQuantityOnHandJob: " + params
-
-        def results = CalculateQuantityJob.triggerNow([productId: params.product.id, locationId: params.location.id, includeAllDates: true])
-
+        def results = CalculateQuantityJob.triggerNow(
+                [
+                        productId      : params.product.id,
+                        locationId     : params.location.id,
+                        includeAllDates: false,
+                        forceRefresh   : true
+                ]
+        )
         render([started: true, results: results] as JSON)
-
     }
 
     def refresh = {
@@ -115,8 +108,6 @@ class InventorySnapshotController {
 
             List data = inventorySnapshotService.findInventorySnapshotByDateAndLocation(date, location)
             render(["aaData": data, "iTotalRecords": data.size() ?: 0, "iTotalDisplayRecords": data.size() ?: 0, "sEcho": 1] as JSON)
-
-
         }
         catch (Exception e) {
             log.error("Exception occurred: " + e.message, e)

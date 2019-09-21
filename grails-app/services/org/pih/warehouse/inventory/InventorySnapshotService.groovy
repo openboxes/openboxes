@@ -15,7 +15,9 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.reporting.TransactionFact
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -29,16 +31,8 @@ class InventorySnapshotService {
     def inventoryService
     def persistenceInterceptor
 
-    def populateInventorySnapshots() {
-        def transactionDates = getTransactionDates()
-        for (Date date : transactionDates) {
-            populateInventorySnapshots(date)
-        }
-    }
-
     def populateInventorySnapshots(Date date) {
         def results
-
         def startTime = System.currentTimeMillis()
 
         // Compute bin locations from transaction entries for given location and date
@@ -86,6 +80,17 @@ class InventorySnapshotService {
         saveInventorySnapshots(date, location, binLocations)
     }
 
+    def populateInventorySnapshots(Location location, Product product) {
+        def transactionDates = getTransactionDates(location, product)
+        for (Date date : transactionDates) {
+            populateInventorySnapshots(date, location, product)
+        }
+    }
+
+    def populateInventorySnapshots(Date date, Location location, Product product) {
+        def binLocations = calculateBinLocations(location, product)
+        saveInventorySnapshots(date, location, binLocations)
+    }
 
     def calculateBinLocations(Location location, Date date) {
         def binLocations = inventoryService.getBinLocationDetails(location, date)
@@ -112,6 +117,11 @@ class InventorySnapshotService {
     def deleteInventorySnapshots(Location location) {
         Date date = getMostRecentInventorySnapshotDate() ?: new Date() + 1
         deleteInventorySnapshots(date, location)
+    }
+
+    def deleteInventorySnapshots(Location location, Product product) {
+        Date date = getMostRecentInventorySnapshotDate() ?: new Date() + 1
+        deleteInventorySnapshots(date, location, product)
     }
 
     def deleteInventorySnapshots(Date date, Location location) {
@@ -187,12 +197,11 @@ class InventorySnapshotService {
                     String binLocationName = entry?.binLocation?.name ?
                             "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
 
-                    // '${UUID.randomUUID().toString()}'
                     def insertStmt =
-                            "INSERT INTO inventory_snapshot (version, date, location_id, product_id, product_code, " +
+                            "INSERT INTO inventory_snapshot (id, version, date, location_id, product_id, product_code, " +
                                     "inventory_item_id, lot_number, expiration_date, bin_location_id, bin_location_name, " +
                                     "quantity_on_hand, date_created, last_updated) " +
-                                    "values (0, '${dateString}', '${location?.id}', " +
+                                    "values ('${UUID.randomUUID().toString()}', 0, '${dateString}', '${location?.id}', " +
                                     "'${productId}', '${productCode}', " +
                                     "${inventoryItemId}, ${lotNumber}, ${expirationDate}, " +
                                     "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) " +
@@ -210,12 +219,10 @@ class InventorySnapshotService {
     }
 
     def getTransactionDates() {
-        return Transaction.executeQuery("select distinct(date(transactionDate)) from Transaction order by transactionDate desc")
+        return Transaction.executeQuery("select distinct(date(transactionDate)) from Transaction order by date(transactionDate) desc")
     }
 
-
     def getTransactionDates(Location location, Product product) {
-
         String query = """
             select distinct(date(t.transactionDate)) 
             from TransactionEntry as te 
@@ -223,7 +230,7 @@ class InventorySnapshotService {
             join te.inventoryItem as ii
             where ii.product = :product
             and t.inventory = :inventory
-            order by t.transactionDate desc
+            order by date(t.transactionDate) desc
         """
         return TransactionEntry.executeQuery(query, [product: product, inventory: location.inventory])
     }
@@ -459,14 +466,14 @@ class InventorySnapshotService {
         return getQuantityOnHandByBinLocation(location, date)
     }
 
-
     List getQuantityOnHandByBinLocation(Location location, Date date) {
         def data = []
-        if (location && date) {
+
+        if (location) {
             def results = InventorySnapshot.executeQuery("""
 						select 
 						    iis.product, 
-						    ii,
+						    iis.inventoryItem,
 						    iis.binLocation,
 						    sum(iis.quantityOnHand)
 						from InventorySnapshot iis
@@ -474,9 +481,11 @@ class InventorySnapshotService {
 						left outer join iis.binLocation bl
 						where iis.location = :location
 						and iis.date = :date
-						group by iis.product, iis.location, iis.binLocation
+						group by iis.product, iis.inventoryItem, iis.binLocation
 						""", [location: location, date: date])
-            //data = results
+
+            def getStatus = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
+
             data = results.collect {
                 def product = it[0]
                 def inventoryItem = it[1]
@@ -484,6 +493,7 @@ class InventorySnapshotService {
                 def quantity = it[3]
 
                 [
+                        status       : getStatus(quantity),
                         product      : product,
                         inventoryItem: inventoryItem,
                         binLocation  : binLocation,
@@ -550,4 +560,226 @@ class InventorySnapshotService {
         }
     }
 
+
+    List getInventorySnapshots(Product product, Location location, Date date) {
+        log.info "Find inventory snapshots by product ${product} location ${location} and date ${date}"
+        return InventorySnapshot.createCriteria().list {
+            eq("product", product)
+            eq("location", location)
+            eq("date", date)
+            order("binLocation", "asc")
+        }
+    }
+
+    void updateInventorySnapshots(InventoryItem inventoryItem) {
+        def results = InventorySnapshot.executeUpdate(
+                "update InventorySnapshot a " +
+                        "set a.lotNumber=:lotNumber " +
+                        "where a.inventoryItem.id = :inventoryItemId " +
+                        "and a.lotNumber != :lotNumber",
+                [
+                        inventoryItemId: inventoryItem.id,
+                        lotNumber      : inventoryItem.lotNumber
+                ]
+        )
+        log.info "Updated ${results} inventory snapshots for inventory item ${inventoryItem}"
+    }
+
+    void updateInventorySnapshots(Location binLocation) {
+        def results = InventorySnapshot.executeUpdate(
+                "update InventorySnapshot a " +
+                        "set a.binLocationName = :binLocationName " +
+                        "where a.binLocation.id = :binLocationId " +
+                        "and a.binLocationName != :binLocationName",
+                [
+                        binLocationId  : binLocation.id,
+                        binLocationName: binLocation.name
+                ]
+        )
+        log.info "Updated ${results} inventory snapshots for bin location ${binLocation}"
+    }
+
+    void updateInventorySnapshots(Product product) {
+        def results = InventorySnapshot.executeUpdate(
+                "update InventorySnapshot a " +
+                        "set a.productCode = :productCode " +
+                        "where a.product.id = :productId " +
+                        "and a.productCode != :productCode",
+                [
+                        productId  : product.id,
+                        productCode: product.productCode
+                ]
+        )
+        log.info "Updated ${results} inventory snapshots for product ${product}"
+    }
+
+    def getTransactionReportData(Location location, Date startDate, Date endDate) {
+
+        def transactionCodes = [TransactionCode.DEBIT, TransactionCode.CREDIT].collect { it.toString() }
+        // Get all transactions between start and end dates for the given location
+        def transactions = TransactionFact.createCriteria().list {
+            projections {
+                productKey {
+                    groupProperty("productCode")
+                }
+                transactionTypeKey {
+                    groupProperty("transactionCode")
+                    groupProperty("transactionTypeName")
+                }
+                sum("quantity")
+            }
+            transactionTypeKey {
+                'in'("transactionCode", transactionCodes)
+            }
+            transactionDateKey {
+                between("date", startDate, endDate+1)
+            }
+            locationKey {
+                eq("locationId", location.id)
+            }
+        }
+
+        // Transform transaction facts
+        transactions = transactions.collect {
+            [
+                    productCode        : it[0],
+                    transactionCode    : it[1],
+                    transactionTypeName: it[2],
+                    quantity           : it[3]
+            ]
+        }
+        return transactions
+    }
+
+    def getTransactionReportDetails(Location location, List<Category> categories, Date startDate, Date endDate) {
+
+        def transactionData = getTransactionReportData(location, startDate, endDate)
+
+        def transactionTypeNames = transactionData.collect { it.transactionTypeName }.unique().sort()
+
+        // Get starting balance
+        def balanceOpeningMap = getQuantityOnHandByProduct(location, startDate)
+        if (balanceOpeningMap.isEmpty()) {
+            throw new IllegalStateException("No inventory snapshot for ${startDate}")
+        }
+
+        // Get ending balance
+        def balanceClosingMap = getQuantityOnHandByProduct(location, endDate)
+        if (balanceClosingMap.isEmpty()) {
+            throw new IllegalStateException("No inventory snapshot for ${endDate}")
+        }
+
+
+        // We need all products that have either an opening balance or closing balance
+        def products = new HashSet()
+        products.addAll(balanceOpeningMap.keySet())
+        products.addAll(balanceClosingMap.keySet())
+
+        def data = products.findAll { categories.contains(it.category) }.collect { Product product ->
+
+            // Get balances by product
+            def balanceOpening = balanceOpeningMap.get(product) ?: 0
+            def balanceClosing = balanceClosingMap.get(product) ?: 0
+
+            // Get quantity by transaction
+            def credits = transactionData.find {
+                it.productCode == product.productCode && it.transactionCode.equals("CREDIT")
+            }
+            def debits = transactionData.find {
+                it.productCode == product.productCode && it.transactionCode.equals("DEBIT")
+            }
+
+            def quantityInbound = credits?.quantity ?: 0
+            def quantityOutbound = debits?.quantity ?: 0
+
+            // Calculate discrepancy
+            def quantityAdjustments = balanceClosing -
+                    balanceOpening -
+                    quantityInbound +
+                    quantityOutbound
+
+            def row = [
+                    "Code"       : product.productCode,
+                    "Name"       : product.name,
+                    "Category"   : product.category.name,
+                    "Unit Cost"  : product.pricePerUnit ?: ''
+            ]
+            row.put("Opening", balanceOpening)
+            transactionTypeNames.each { transactionTypeName ->
+                def quantity =
+                        transactionData.find {
+                            it.productCode == product.productCode && it.transactionTypeName == transactionTypeName
+                        }?.quantity?:0
+                row[transactionTypeName] = quantity
+            }
+
+            row.put("Adjustments", quantityAdjustments)
+            row.put("Closing", balanceClosing)
+            return row;
+        }
+        data = data.sort { it."Code" }
+        return data
+    }
+
+    def getTransactionReportSummary(Location location, List<Category> categories, Date startDate, Date endDate) {
+
+        // Get starting balance
+        def balanceOpeningMap = getQuantityOnHandByProduct(location, startDate)
+        if (balanceOpeningMap.isEmpty()) {
+            throw new IllegalStateException("No inventory snapshot for ${startDate}")
+        }
+
+        // Get ending balance
+        def balanceClosingMap = getQuantityOnHandByProduct(location, endDate)
+        if (balanceClosingMap.isEmpty()) {
+            throw new IllegalStateException("No inventory snapshot for ${endDate}")
+        }
+
+        // We need all products that have either an opening balance or closing balance
+        def products = new HashSet()
+        products.addAll(balanceOpeningMap.keySet())
+        products.addAll(balanceClosingMap.keySet())
+
+        def transactionData = getTransactionReportData(location, startDate, endDate)
+
+        // FIXME Category filtering should happen in the query but we need to add a category dimension
+        // Flatten the data to make it easier to display
+        def data = products.findAll { categories.contains(it.category) }.collect { Product product ->
+
+            // Get balances by product
+            def balanceOpening = balanceOpeningMap.get(product) ?: 0
+            def balanceClosing = balanceClosingMap.get(product) ?: 0
+
+            // Get quantity by transaction
+            def credits = transactionData.findAll {
+                it.productCode == product.productCode && it.transactionCode.equals("CREDIT")
+            }
+            def debits = transactionData.findAll {
+                it.productCode == product.productCode && it.transactionCode.equals("DEBIT")
+            }
+
+            def quantityInbound = credits?.sum { it.quantity } ?: 0
+            def quantityOutbound = debits?.sum { it.quantity } ?: 0
+
+            // Calculate discrepancy
+            def quantityAdjustments = balanceClosing -
+                    balanceOpening -
+                    quantityInbound +
+                    quantityOutbound
+
+            // Transform data into inventory balance rows
+            [
+                    "Code"       : product.productCode,
+                    "Name"       : product.name,
+                    "Category"   : product.category.name,
+                    "Unit Cost"  : product.pricePerUnit ?: '',
+                    "Opening"    : balanceOpening,
+                    "Credits"    : quantityInbound,
+                    "Debits"     : quantityOutbound,
+                    "Adjustments": quantityAdjustments,
+                    "Closing"    : balanceClosing,
+            ]
+        }
+        return data
+    }
 }

@@ -3,13 +3,6 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet author="jmiranda (generated)" id="1564712113471-1" failOnError="false">
-        <sql>
-            DELETE FROM transaction_type
-            WHERE id = '10'
-            AND name like 'Adjustment - Debit%';
-        </sql>
-    </changeSet>
     <changeSet author="jmiranda (generated)" id="1564712113471-2">
         <sql>
             UPDATE transaction_type

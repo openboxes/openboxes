@@ -19,6 +19,7 @@ import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 import org.pih.warehouse.report.ProductReportCommand
+import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
 
@@ -30,11 +31,12 @@ class ReportController {
     def reportService
     def messageService
     def inventorySnapshotService
+    StdScheduler quartzScheduler
 
     def refreshTransactionFact = {
-        RefreshTransactionFactJob.triggerNow([:])
-        flash.message = "Refreshing transaction fact table in the background ..."
-        redirect(controller: "report", action: "showTransactionReport")
+        reportService.buildDimensions()
+        reportService.buildFacts()
+        render(success: true)
     }
 
     def buildFacts = {
@@ -219,7 +221,22 @@ class ReportController {
         command.location = Location.get(session.warehouse.id)
         command.rootCategory = productService.getRootCategory()
 
-        [command: command]
+        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob"))
+        def previousFireTime = triggers*.previousFireTime.max()
+        def nextFireTime = triggers*.nextFireTime.max()
+        def locationKey = LocationDimension.findByLocationId(command?.location?.id)
+        def model = [
+                command           : command,
+                locationKey       : locationKey,
+                transactionCount  : TransactionFact.countByLocationKey(locationKey),
+                productCount      : TransactionFact.countDistinctProducts(locationKey?.locationId).list(),
+                minTransactionDate: TransactionFact.minTransactionDate(locationKey?.locationId).list(),
+                maxTransactionDate: TransactionFact.maxTransactionDate(locationKey?.locationId).list(),
+                previousFireTime  : previousFireTime,
+                nextFireTime      : nextFireTime,
+        ]
+
+        return model
     }
 
     def showTransactionReportDialog = {

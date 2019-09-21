@@ -3,7 +3,7 @@
     <div>
         <g:hiddenField name="id" value="${inventoryLevelInstance?.id}" />
         <g:hiddenField name="version" value="${inventoryLevelInstance?.version}" />
-
+        <g:hiddenField name="redirectUrl" value="${params.redirectUrl}"/>
         <table>
             <tbody>
 

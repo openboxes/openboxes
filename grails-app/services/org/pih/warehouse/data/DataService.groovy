@@ -59,6 +59,7 @@ class DataService {
         sql.withTransaction {
             try {
                 statementList.each { String statement ->
+                    log.info "Executing statement " + statement
                     sql.execute(statement)
                 }
                 sql.commit()

@@ -23,9 +23,6 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
         def transactionDate = transaction?.transactionDate
         def locationId = transaction?.inventory?.warehouse?.id
         log.info "Refresh inventory snapshot date=$transactionDate, location=$locationId, transaction=$transactionId"
-        RefreshInventorySnapshotJob.triggerNow([startDate: transactionDate, location: locationId])
-        SendStockAlertsJob.triggerNow([transactionId: transactionId])
-        //def products = transaction?.transactionEntries?.collect { it.product }
-        //log.info "Check if products ${products} are below minimum"
+        RefreshInventorySnapshotJob.triggerNow([location: locationId, forceRefresh: event.deleted])
     }
 }

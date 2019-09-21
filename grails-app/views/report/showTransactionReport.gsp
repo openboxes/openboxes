@@ -46,19 +46,6 @@
 						<div class="parameters">
 
 							<div class="filter-list-item">
-								<label>
-									<warehouse:message code="report.location.label"/>
-								</label>
-								<g:selectLocation class="chzn-select-deselect filter"
-												  name="locationId"
-												  id="locationId"
-												  activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
-												  noSelection="['':'']"
-												  maxChars="75"
-												  groupBy="locationType"
-												  value="${command?.location?.id}"/>
-							</div>
-							<div class="filter-list-item">
 
 								<label>
 									<warehouse:message code="report.startDate.label"/>
@@ -84,7 +71,23 @@
 													value="${command?.endDate }"
 													format="MM/dd/yyyy"
 													autocomplete="off"/>
-
+								<label>
+									<g:checkBox id="refreshBalances" name="refreshBalances" value="${params?.refreshBalances}" checked="false"/>
+									<warehouse:message code="transactionReport.refreshBalances.label" default="Refresh balances (slow)"/>
+								</label>
+							</div>
+							<div class="filter-list-item">
+								<label>
+									<warehouse:message code="report.location.label"/>
+								</label>
+								<g:selectLocation class="chzn-select-deselect filter"
+												  id="locationId"
+												  name="location.id"
+												  activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
+												  noSelection="['':'']"
+												  maxChars="75"
+												  groupBy="locationType"
+												  value="${command?.location?.id}"/>
 							</div>
 							<div class="filter-list-item">
 								<label><warehouse:message code="category.label"/></label>
@@ -94,12 +97,13 @@
 													  data-placeholder="Select a category"
 													  name="category"
 													  noSelection="['':'']"
-													  value="${params?.category?.id}"
-									/>
+													  value="${params?.category?.id?:command?.rootCategory?.id}"/>
 								</p>
 								<p>
-									<g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="true"/>
-									<label>${warehouse.message(code:'search.includeCategoryChildren.label', default: 'Include all products in all subcategories.')}</label>
+									<label>
+										<g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="true"/>
+										${warehouse.message(code:'search.includeCategoryChildren.label', default: 'Include all products in all subcategories.')}
+									</label>
 								</p>
 							</div>
 						</div>
@@ -116,8 +120,10 @@
 							</button>
 						</div>
 					</div>
-
-
+					<div class="box">
+						<h2><warehouse:message code="report.metadata.label" default="Metadata"/></h2>
+						<g:render template="showTransactionReportMetadata"/>
+					</div>
 				</div>
 			</div>
 			<div class="yui-u">
@@ -131,12 +137,12 @@
                         <tr>
                             <th><warehouse:message code="product.productCode.label"/></th>
                             <th><warehouse:message code="product.label"/></th>
-                            <th><warehouse:message code="transactionReport.cycleCount.label" default="Cycle Count"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.openingBalance.label" default="Opening Balance"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.inbound.label" default="Inbound"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.outbound.label" default="Outbound"/></th>
+                            <th><warehouse:message code="category.label"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.openingBalance.label" default="Opening"/></th>
+                            <th class="center"><warehouse:message code="default.credits.label" default="Credits"/></th>
+                            <th class="center"><warehouse:message code="default.debits.label" default="Debits"/></th>
                             <th class="center"><warehouse:message code="transactionReport.adjustments.label" default="Adjustments"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing Balance"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing"/></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -145,28 +151,22 @@
                         <tr>
                             <th><warehouse:message code="product.productCode.label"/></th>
                             <th><warehouse:message code="product.label"/></th>
-                            <th><warehouse:message code="transactionReport.cycleCount.label" default="Cycle Count"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.openingBalance.label" default="Opening Balance"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.inbound.label" default="Inbound"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.outbound.label" default="Outbound"/></th>
+                            <th><warehouse:message code="category.label"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.openingBalance.label" default="Opening"/></th>
+                            <th class="center"><warehouse:message code="default.credits.label" default="Credits"/></th>
+                            <th class="center"><warehouse:message code="default.debits.label" default="Debits"/></th>
                             <th class="center"><warehouse:message code="transactionReport.adjustments.label" default="Adjustments"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing Balance"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing"/></th>
                         </tr>
                         </tfoot>
                     </table>
-					<div class="buttons right">
-						<a href="javascript:void(0);" class="btn-show-dialog button"
-						   data-title="${g.message(code:'default.show.label', args: [g.message(code: 'default.metadata.label')])}"
-						   data-url="${request.contextPath}/json/showTransactionReportMetadata">
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'application_key.png')}" />&nbsp;
-							<g:message code="default.show.label" args="[g.message(code: 'default.metadata.label')]"/>
-						</a>
-					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
+	<div class="loading">
+		Loading...
+	</div>
 <script>
 
     function handleAjaxError(xhr, status, error) {
@@ -202,21 +202,38 @@
 				data.push({ name: "startDate", value: $("#startDate").val() });
 				data.push({ name: "endDate", value: $("#endDate").val() });
 				data.push({ name: "category", value: $("#category").val() });
+				if($('#refreshBalances').is(':checked')) {
+					data.push({name: "refreshBalances", value: $("#refreshBalances").val()});
+				}
 				if($('#includeCategoryChildren').is(':checked')) {
 					data.push({ name: "includeCategoryChildren", value: $("#includeCategoryChildren").val() });
 				}
 			},
             "fnServerData": function ( sSource, aoData, fnCallback ) {
-                $.ajax({
-                    "dataType": 'json',
-                    "type": "POST",
-                    "url": sSource,
-                    "data": aoData,
-                    "success": fnCallback,
-                    "timeout": 30000,
-                    "error": handleAjaxError
-                })
-            },
+				$.ajax({
+					"dataType": 'json',
+					"type": "POST",
+					"url": sSource,
+					"data": aoData,
+					"success": fnCallback,
+					"timeout": 30000,
+					"error": function (xhr, status, error) {
+						var message = "An unexpected error has occurred on the server. Please contact your system administrator.";
+						if (xhr.responseText) {
+							// User probably refreshed page or clicked on a link, so this isn't really an error
+							if (xhr.readyState == 0 || xhr.status == 0) {
+								return;
+							}
+							var errorMessage = JSON.parse(xhr.responseText).errorMessage;
+							if (errorMessage) {
+								message += "\n\n" + errorMessage
+							}
+						}
+						alert(message);
+						destroyDataTable();
+					}
+				})
+			},
 			"oLanguage": {
 				"sZeroRecords": "No records found",
 				"sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
@@ -228,27 +245,27 @@
 			"aoColumns": [
 				{"mData": "Code"},
 				{"mData": "Name", "sWidth": "250px"},
-				{"mData": "Cycle Count"},
-				{"mData": "Opening Balance", "sType": 'numeric'},
-				{"mData": "Inbound", "sType": 'numeric'},
-				{"mData": "Outbound", "sType": 'numeric'},
-				{"mData": "Adjustments", "sType": 'numeric'},
-				{"mData": "Closing Balance", "sType": 'numeric'}
+				{"mData": "Category"},
+				{"mData": "Opening", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Credits", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Debits", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Adjustments", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Closing", "sType": 'numeric', "sClass": "right" }
 			],
 			"bUseRendered": false,
 			"dom": '<"top"i>rt<"bottom"flp><"clear">',
             "fnRowCallback": function (nRow, aData) {
-                $('td:eq(3)', nRow).html(Number(aData["Opening Balance"]).toLocaleString('en-US'));
-                $('td:eq(4)', nRow).html(Number(aData["Inbound"]).toLocaleString('en-US'));
-                $('td:eq(5)', nRow).html(Number(aData["Outbound"]).toLocaleString('en-US'));
+                $('td:eq(3)', nRow).html(Number(aData["Opening"]).toLocaleString('en-US'));
+                $('td:eq(4)', nRow).html(Number(aData["Credits"]).toLocaleString('en-US'));
+                $('td:eq(5)', nRow).html(Number(aData["Debits"]).toLocaleString('en-US'));
                 $('td:eq(6)', nRow).html(Number(aData["Adjustments"]).toLocaleString('en-US'));
-                $('td:eq(7)', nRow).html(Number(aData["Closing Balance"]).toLocaleString('en-US'));
+                $('td:eq(7)', nRow).html(Number(aData["Closing"]).toLocaleString('en-US'));
 
-                if (aData["Inbound"] > 0) {
+                if (aData["Credits"] > 0) {
                   $('td:eq(4)', nRow).addClass('credit')
                 }
 
-                if (aData["Outbound"] > 0) {
+                if (aData["Debits"] > 0) {
                   $('td:eq(5)', nRow).addClass('debit')
                 }
 
@@ -258,9 +275,8 @@
                   var normalized = 0 - Number(aData["Adjustments"]);
                   $('td:eq(6)', nRow).html(normalized.toLocaleString('en-US')).addClass('debit')
 			    }
-
-            return nRow;
-          }
+            	return nRow;
+	          }
 
 		};
 
@@ -270,6 +286,7 @@
 
 	$(document).ready(function() {
 
+		$(".loading").hide();
 		$('#transactionReport').dataTable({"bJQueryUI": true});
 
 		$(".submit-button").click(function(event){
@@ -307,7 +324,7 @@
 		$(".download-button").click(function(event) {
 			event.preventDefault();
 			var params = {
-				locationId: $("#locationId").val(),
+				"location.id": $("#locationId").val(),
 				startDate: $("#startDate").val(),
 				endDate: $("#endDate").val(),
 				category: $("#category").val(),
@@ -336,10 +353,41 @@
 				var url = "${request.contextPath}/report/showTransactionReportDialog?" + queryString;
 				openModalDialog("#dlgShowDialog", productCode + " " + productName, 800, null, url);
 			}
-		} );
+		});
 
+		$("#refreshTransactionFact").click(function(event) {
+			event.preventDefault();
+			var url = $(this).data("url");
+			var confirmationPrompt = $(this).data("confirmation-prompt");
+			var confirmed = confirm(confirmationPrompt);
+			if (confirmed) {
+				$.ajax({
+					url: url,
+					data: {},
+					cache: false,
+					timeout: ${grailsApplication.config.openboxes.ajaxRequest.timeout},
+					success: function (html) {
+						console.log(html);
+						alert("Data has been refreshed")
+					},
+					error: function (error) {
+						alert("An error occurred while refreshing the data");
+					},
+					beforeSend: function () {
+						$('.loading').livequery(function () {
+							$(this).show();
+						});
+					},
+					complete: function () {
+						$(".loading").hide();
+						window.location.reload();
+					}
+				});
+			}
+		});
 	});
 
 </script>
+
     </body>
 </html>

@@ -342,6 +342,13 @@
     $(document).ready(function() {
 
         $(".btn-show-dialog").live("click", function (event) {
+            event.preventDefault();
+
+            // Prevents dialog from opening if the link is supposed to be disabled
+            if ($(this).attr("disabled")) {
+              return false;
+            }
+
             var url = $(this).data("url");
             var title = $(this).data("title");
             var target = $(this).data("target") || "#dlgShowDialog";

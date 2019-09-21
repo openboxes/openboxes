@@ -25,7 +25,7 @@ class ForecastingService {
 
     def getDemand(Location origin, Product product) {
 
-        boolean forecastingEnabled = grailsApplication.config.openboxes.forecastingEnabled ?: false
+        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             def rows = getDemandDetails(origin, product)
             def startDate = rows.min { it.date_requested }?.date_requested
@@ -46,7 +46,7 @@ class ForecastingService {
 
     def getDemandDetails(Location origin, Product product) {
         List data = []
-        boolean forecastingEnabled = grailsApplication.config.openboxes.forecastingEnabled ?: false
+        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
                 select 
@@ -83,7 +83,7 @@ class ForecastingService {
     def getDemandSummary(Location origin, Product product) {
         List data = []
 
-        boolean forecastingEnabled = grailsApplication.config.openboxes.forecastingEnabled ?: false
+        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
                 select 

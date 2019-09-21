@@ -9,18 +9,29 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product
 import org.springframework.context.ApplicationEvent
 
-class TransactionEvent extends ApplicationEvent {
+class InventorySnapshotEvent extends ApplicationEvent {
 
-    Boolean deleted = false
+    Product product
+    Location binLocation
+    InventoryItem inventoryItem
 
-    TransactionEvent(Transaction source) {
+    InventorySnapshotEvent(InventoryItem source) {
         super(source)
+        this.inventoryItem = source
     }
 
-    TransactionEvent(Transaction source, Boolean deleted) {
+    InventorySnapshotEvent(Location source) {
         super(source)
-        this.deleted = deleted
+        this.binLocation = source
     }
+
+    InventorySnapshotEvent(Product source) {
+        super(source)
+        this.product = source
+    }
+
 }

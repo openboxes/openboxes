@@ -15,6 +15,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
+import org.springframework.context.ApplicationEvent
 
 class SynonymTests extends GrailsUnitTestCase {
 
@@ -34,6 +35,7 @@ class SynonymTests extends GrailsUnitTestCase {
         User.metaClass.static.withNewSession = {Closure c -> c.call() }
         Synonym.metaClass.static.withNewSession = {Closure c -> c.call() }
         Product.metaClass.static.withNewSession = {Closure c -> c.call() }
+        Product.metaClass.publishEvent = { ApplicationEvent event -> }
         //mockDomain(LocationType, [depot, supplier, ward])
         //mockDomain(Location, [location1, location2, location3, location4])
     }
