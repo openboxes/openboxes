@@ -48,14 +48,14 @@ grails:
         footer: ""
     mail:
         enabled: false
-        from: &from "info@openboxes.com"
-        prefix: &prefix "[OpenBoxes]"
-        host: &host "localhost"
-        port: &port "25"
+        from: "info@openboxes.com"
+        prefix: "[OpenBoxes]"
+        host: "localhost"
+        port: "25"
     
         # Authentication disabled by default
-        username: &username null
-        password: &password null
+        username: null
+        password: null
     
         # Disable debug mode by default
         debug: false
@@ -394,7 +394,7 @@ openboxes:
         supportedLocales: ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt']
         # Currency configuration
         defaultCurrencyCode: "USD"
-        defaultCurrencySymbol: "\$"
+        defaultCurrencySymbol: '\$'
     
     # Inventory snapshot configuration
     inventorySnapshot:
@@ -472,12 +472,12 @@ mail:
         enabled: false
         debug: false
         to: 'errors@openboxes.com'
-        server: *host
-        port: *port
-        from: *from
-        username: *username
-        password: *password
-        prefix: *prefix
+        server: "localhost"
+        port: "25"
+        from: "info@openboxes.com"
+        username: null
+        password: null
+        prefix: "[OpenBoxes]"
 
 uiperformance:
     enabled: false
