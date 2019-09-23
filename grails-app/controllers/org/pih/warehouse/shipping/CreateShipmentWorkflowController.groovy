@@ -12,8 +12,6 @@ package org.pih.warehouse.shipping
 import grails.validation.ValidationException
 import org.pih.warehouse.core.*
 import org.pih.warehouse.core.MailService
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
