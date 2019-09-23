@@ -12,8 +12,6 @@ package org.pih.warehouse.report
 import org.apache.commons.lang.StringEscapeUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.ConsumptionFact
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
