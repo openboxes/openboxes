@@ -19,7 +19,7 @@ import org.pih.warehouse.product.ProductService
 // import grails.converters.JSON
 // import groovy.xml.MarkupBuilder;
 
-// import org.pih.warehouse.core.ActivityCode
+// import ActivityCode
 import testutils.MockBindDataMixin
 
 @Mixin(MockBindDataMixin)
