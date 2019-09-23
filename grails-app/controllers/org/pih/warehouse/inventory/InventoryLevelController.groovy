@@ -12,8 +12,6 @@ package org.pih.warehouse.inventory
 import grails.orm.PagedResultList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 
 class InventoryLevelController {
 

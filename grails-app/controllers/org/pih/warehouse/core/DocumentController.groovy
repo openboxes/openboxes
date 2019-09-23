@@ -16,10 +16,6 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.order.Order
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.multipart.MultipartFile
 import util.FileUtil
 
