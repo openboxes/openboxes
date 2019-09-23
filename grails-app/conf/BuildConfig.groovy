@@ -9,6 +9,8 @@
  **/
 //grails.server.port.http = 8081
 
+// TODO OBGM-21: Move BuildConfig.groovy to build.gradle
+
 grails.project.class.dir = "target/classes"
 grails.project.docs.output.dir = "web-app/docs"
 grails.project.test.class.dir = "target/test-classes"
