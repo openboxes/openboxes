@@ -137,7 +137,7 @@ dataSource:
     driverClassName: com.mysql.jdbc.Driver
     username: 'root'
     password: 'root'
-    dialect: org.hibernate.dialect.MySQL5InnoDBDialectreadOnly
+    dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     logSql: false
     formatSql: false
     properties:
@@ -163,18 +163,18 @@ environments:
     development:
         dataSource:
             dbCreate: create-drop
-            url: jdbc:mysql://localhost:3306/openboxes_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
+            url: jdbc:mysql://localhost:3306/openboxes
     test:
         dataSource:
             dbCreate: update
-            url: jdbc:mysql://localhost:3306/openboxes_diff?autoReconnect=true&zeroDateTimeBehavior=convertToNull
+            url: jdbc:mysql://localhost:3306/openboxesf
     production:
         dataSource:
             dbCreate: none
-            url: jdbc:mysql://localhost:3306/openboxes?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
+            url: jdbc:mysql://localhost:3306/openboxes
     diff:
         dataSource:
-            url: jdbc:mysql://localhost:3306/openboxes_diff?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB
+            url: jdbc:mysql://localhost:3306/openboxes_diff
 
 ---
 openboxes:
@@ -224,19 +224,26 @@ openboxes:
         # Default value for news summary
         newsSummary:
             newsItems: []
-    
+
     # OpenBoxes identifier config
     identifier:
-        numeric: Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS
-        alphabetic: Constants.RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS
-        alphanumeric: Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS
-        transaction.format: Constants.DEFAULT_TRANSACTION_NUMBER_FORMAT
-        order.format: Constants.DEFAULT_ORDER_NUMBER_FORMAT
-        product.format: Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
-        productSupplier.format: Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
-        receipt.format: Constants.DEFAULT_RECEIPT_NUMBER_FORMAT
-        requisition.format: Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
-        shipment.format: Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
+        numeric: "0123456789"
+        alphabetic: "ABCDEFGHJKMNPQRSTUVXYZ"
+        alphanumeric: "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"
+        transaction:
+            format: "AAA-AAA-AAA"
+        order:
+            format: "NNNLLL"
+        product:
+            format: "LLNN"
+        productSupplier:
+            format: "LLNN"
+        receipt:
+            format: "NNNLLL"
+        requisition:
+            format: "NNNLLL"
+        shipment:
+            format: "NNNLLL"
     
     # OpenBoxes default line printer port
     linePrinterTerminal:
@@ -371,7 +378,13 @@ openboxes:
     # Examples: Stock out, Low stock, Expired, Damaged, Could not locate, Insufficient quantity reconditioned
     stockCard:
         consumption:
-            reasonCodes: [ReasonCode.STOCKOUT, ReasonCode.LOW_STOCK, ReasonCode.EXPIRED, ReasonCode.DAMAGED, ReasonCode.COULD_NOT_LOCATE, ReasonCode.INSUFFICIENT_QUANTITY_RECONDITIONED]
+            stouckout: &stockout 1
+            low_stock: &low_stock 2
+            expired: &expired 3
+            damaged: &damaged 4
+            could_not_locate: &could_not_locate 14
+            insufficient_quantity_reconditioned: &insufficient_quantity_reconditioned 19
+            reasonCodes: [*stockout, *low_stock, *expired, *damaged, *could_not_locate, *insufficient_quantity_reconditioned]
     
     # Localization configuration - default and supported locales
     locale:
@@ -448,7 +461,7 @@ openboxes:
         createReceivingLocation:
             enabled: true
         receivingLocation:
-            prefix: Constants.DEFAULT_RECEIVING_LOCATION_PREFIX
+            prefix: "R"
 
     # Indicates which activities are required for a location to allow logins
     chooseLocation:
