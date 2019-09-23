@@ -14,7 +14,7 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.requisition.RequisitionItem
 
-// import org.pih.warehouse.core.ActivityCode
+// import ActivityCode
 // import testutils.MockBindDataMixin
 
 class PicklistControllerTests extends ControllerUnitTestCase{
