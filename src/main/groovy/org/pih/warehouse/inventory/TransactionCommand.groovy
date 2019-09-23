@@ -13,8 +13,6 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionType
 
 @Validateable
 class TransactionCommand {
