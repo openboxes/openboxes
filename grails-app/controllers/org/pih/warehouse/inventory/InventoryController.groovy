@@ -253,9 +253,11 @@ class InventoryController {
     def search = { QuantityOnHandReportCommand command ->
         def quantityMapByDate = [:]
         def startTime = System.currentTimeMillis()
+        def startDate = new Date(command.startDate.getTime() + Calendar.getInstance().getTimeZone().getOffset(command.startDate.getTime()));
+        def endDate = new Date(command.endDate.getTime() + Calendar.getInstance().getTimeZone().getOffset(command.endDate.getTime()));
         println "search " + params
 
-        println "Locations: " + command?.locations?.toString() + ", Start date = " + command?.startDate + ", End Date = " + command?.endDate + ", Tag: " + command.tags
+        println "Locations: " + command?.locations?.toString() + ", Start date = " + startDate + ", End Date = " + endDate + ", Tag: " + command.tags
 
         if (command.validate()) {
 
@@ -264,12 +266,12 @@ class InventoryController {
             }
 
             if (command.startDate && command.endDate) {
-                command.dates = getDatesBetween(command.startDate, command.endDate, command.frequency)
+                command.dates = getDatesBetween(startDate, endDate, command.frequency)
                 println "dates : " + command?.dates
             } else if (command.startDate) {
-                command?.dates << command?.startDate
+                command?.dates << startDate
             } else if (command.endDate) {
-                command?.dates << command?.endDate
+                command?.dates << endDate
             }
 
             println "dates: " + command?.dates
