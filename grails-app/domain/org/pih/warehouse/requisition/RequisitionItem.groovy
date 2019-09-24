@@ -444,8 +444,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return true if the requisition is no longer in the reviewing stage and there are no changes
      */
     def isApproved() {
-        //return requisition?.status > RequisitionStatus.REVIEWING && !isChanged()
-        return quantityApproved > 0
+        return quantityApproved > 0 && !isChanged()
     }
 
     def isPending() {
