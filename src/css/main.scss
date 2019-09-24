@@ -120,6 +120,11 @@ body {
   min-height: calc(100vh - 110px - 3.5vh - 65px);
 }
 
+.putaway-wrap {
+  min-height: calc(100vh - 110px - 3.5vh - 65px);
+  margin: 10px 10px 40px 10px;
+}
+
 .language-selector {
   border-radius: 0.25rem;
   border: 2px solid lightgrey;
@@ -674,7 +679,7 @@ div.crossed-out .table-inner-row:before {
 }
 
 .main-container {
-  height: calc(100vh - 110px - 3.5vh - 65px); // 110 = header + menu + breadcrumbs; 3.5vh = footer; 65 = marginY
+  min-height: calc(100vh - 110px - 3.5vh - 65px); // 110 = header + menu + breadcrumbs; 3.5vh = footer; 65 = marginY
   margin: 10px 10px;
 }
 
