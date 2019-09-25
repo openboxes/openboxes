@@ -27,6 +27,7 @@
                 <ul>
                     <li><a href="#document-metadata-tab"><warehouse:message code="document.label"/></a></li>
                     <li><a href="#document-file-tab"><warehouse:message code="document.file.label" default="File"/></a></li>
+                    <li><a href="#document-render-tab"><warehouse:message code="default.button.render.label" default="Render"/></a></li>
                 </ul>
                 <div id="document-metadata-tab">
 
@@ -173,6 +174,34 @@
                                             </g:link>
 
 
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </g:form>
+                </div>
+                <div id="document-render-tab">
+                    <g:form method="post">
+                        <g:hiddenField name="id" value="${documentInstance?.id}" />
+                        <g:hiddenField name="version" value="${documentInstance?.version}" />
+                        <div class="box">
+                            <h2><warehouse:message code="default.render.label" args="[entityName]" default="Render {0}" /></h2>
+                            <table>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="fileContents"><warehouse:message code="shipment.label" /></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'fileContents', 'errors')}">
+                                        <g:selectShipment name="shipmentId" noSelection="['':'']" class="chzn-select-deselect"/>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top"></td>
+                                    <td valign="top">
+                                        <div class="buttons left">
+                                            <g:actionSubmit class="button" action="render" value="${warehouse.message(code: 'default.button.render.label', default: 'Render')}" />
                                         </div>
                                     </td>
                                 </tr>
