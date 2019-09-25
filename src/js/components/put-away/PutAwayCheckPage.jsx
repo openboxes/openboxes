@@ -306,7 +306,7 @@ class PutAwayCheckPage extends Component {
       };
 
     return (
-      <div className="main-container">
+      <div className="putaway-wrap">
         <h1><Translate id="react.putAway.putAway.label" defaultMessage="Putaway -" /> {this.state.putAway.putawayNumber}</h1>
         <div className="d-flex justify-content-between mb-2">
           <div>
