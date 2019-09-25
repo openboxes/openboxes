@@ -588,16 +588,12 @@ class DocumentService {
             Sheet sheet = workbook.createSheet()
             sheet.setColumnWidth((short) 0, (short) ((50 * 5) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) 1, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 2, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 3, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 4, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 5, (short) ((50 * 8) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) 2, (short) ((50 * 12) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) 3, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) 4, (short) ((50 * 4) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) 5, (short) ((50 * 3) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) 6, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 7, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 8, (short) ((50 * 2) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 9, (short) ((50 * 2) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 10, (short) ((50 * 5) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 11, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) 7, (short) ((50 * 5) / ((double) 1 / 20)))
 
             // Bold font
             Font boldFont = workbook.createFont()
@@ -753,14 +749,6 @@ class DocumentService {
                 actualShipmentDateCell.setCellValue("" + getMessageTagLib().message(code: 'default.notAvailable.label'))
             }
 
-            // EXPECTED ARRIVAL DATE
-            row = sheet.createRow((short) counter++)
-            row.createCell(0).setCellValue("" + getMessageTagLib().message(code: 'shipping.expectedDeliveryDate.label'))
-            row.getCell(0).setCellStyle(labelStyle)
-            Cell expectedArrivalDateCell = row.createCell(1)
-            expectedArrivalDateCell.setCellValue(shipmentInstance?.expectedDeliveryDate)
-            expectedArrivalDateCell.setCellStyle(dateStyle)
-
             // ACTUAL ARRIVAL DATE
             row = sheet.createRow((short) counter++)
             row.createCell(0).setCellValue("" + getMessageTagLib().message(code: 'shipping.actualDeliveryDate.label'))
@@ -793,17 +781,17 @@ class DocumentService {
             //first column (0-based)
             //last column (0-based)
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 4)) // Name
-            sheet.addMergedRegion(new CellRangeAddress(1, 1, 1, 4)) // Shipment type
-            sheet.addMergedRegion(new CellRangeAddress(2, 2, 1, 4)) // Empty
-            sheet.addMergedRegion(new CellRangeAddress(3, 3, 1, 4)) // Origin
-            sheet.addMergedRegion(new CellRangeAddress(4, 4, 1, 4)) // Destination
-            sheet.addMergedRegion(new CellRangeAddress(5, 5, 1, 4)) // Empty
-            sheet.addMergedRegion(new CellRangeAddress(6, 6, 1, 4)) // Expected shipping date
-            sheet.addMergedRegion(new CellRangeAddress(7, 7, 1, 4)) // Actual shipping date
-            sheet.addMergedRegion(new CellRangeAddress(8, 8, 1, 4)) // Expected arrival date
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 1, 4)) // Shipment number
+            sheet.addMergedRegion(new CellRangeAddress(2, 2, 1, 4)) // Shipment type
+            sheet.addMergedRegion(new CellRangeAddress(3, 3, 1, 4)) // Empty
+            sheet.addMergedRegion(new CellRangeAddress(4, 4, 1, 4)) // Origin
+            sheet.addMergedRegion(new CellRangeAddress(5, 5, 1, 4)) // Destination
+            sheet.addMergedRegion(new CellRangeAddress(6, 6, 1, 4)) // Empty
+            sheet.addMergedRegion(new CellRangeAddress(7, 7, 1, 4)) // Expected shipping date
+            sheet.addMergedRegion(new CellRangeAddress(8, 8, 1, 4)) //  Actual shipping date
             sheet.addMergedRegion(new CellRangeAddress(9, 9, 1, 4)) // Actual delivery date
-            sheet.addMergedRegion(new CellRangeAddress(10, 10, 1, 4))   // Empty
-            sheet.addMergedRegion(new CellRangeAddress(11, 12, 1, 4))   // Comments
+            sheet.addMergedRegion(new CellRangeAddress(10, 10, 1, 4)) // Empty
+            sheet.addMergedRegion(new CellRangeAddress(11, 12, 1, 4)) // Comments
 
 
             int CELL_INDEX = 0
@@ -813,16 +801,7 @@ class DocumentService {
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'container.label'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packingList.binLocation.label', default: 'Bin'))
-            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
-
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packingList.productCode.label', default: 'SKU'))
-            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
-
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packingList.manufacturerCode.label', default: 'Mfg#'))
-            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
-
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packingList.vendorCode.label', default: 'Vendor#'))
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packingList.productCode.label', default: 'Code'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'product.label'))
@@ -843,9 +822,6 @@ class DocumentService {
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'shipping.recipient.label'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle)
 
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'default.comments.label'))
-            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
-
             def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0
             shipmentInstance.shipmentItems.sort().each { itemInstance ->
 
@@ -865,20 +841,15 @@ class DocumentService {
                     finalRowIndex = row.getRowNum()
                 } else {
                     finalRowIndex = row.getRowNum()
+                    // Merge columns if container name is same as previous one but it's the last element in array
+                    if (itemInstance == shipmentInstance.shipmentItems.last()) {
+                        sheet.addMergedRegion(CellRangeAddress.valueOf("A${initialRowIndex + 1}:A${finalRowIndex + 1}"))
+                    }
                     row.createCell(CELL_INDEX).setCellValue("")
                     row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle)
                 }
 
-                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.getBinLocation(shipmentInstance?.destination?.id))
-                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
-
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.productCode)
-                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
-
-                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.manufacturerCode)
-                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
-
-                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.vendorCode)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name)
@@ -897,9 +868,6 @@ class DocumentService {
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.recipient?.name)
-                row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
-
-                row.createCell(CELL_INDEX).setCellValue("")
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
                 row.setHeightInPoints(30.0)
