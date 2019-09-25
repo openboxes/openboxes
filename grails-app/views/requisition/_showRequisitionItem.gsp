@@ -231,7 +231,7 @@
             </g:else>
         </td>
         <td class="middle center">
-            <g:set var="pickReasonCode" value="${requisitionItem?.pickReasonCode}"/>
+            <g:set var="pickReasonCode" value="${requisitionItem?.modificationItem?.pickReasonCode ?: requisitionItem?.substitutionItem?.pickReasonCode ?: requisitionItem?.pickReasonCode}"/>
             <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
                 <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}
 ${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}">
