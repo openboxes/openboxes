@@ -831,7 +831,9 @@ class StockMovementService {
         List packPageItems = []
         List<ShipmentItem> shipmentItems = ShipmentItem.findAllByRequisitionItem(picklistItem?.requisitionItem)
         if (shipmentItems) {
-            for (ShipmentItem shipmentItem : shipmentItems) {
+            shipmentItems.sort { a, b ->
+                a.sortOrder <=> b.sortOrder ?: b.id <=> a.id
+            }.each { shipmentItem ->
                 packPageItems << buildPackPageItem(shipmentItem)
             }
         }
@@ -1470,6 +1472,7 @@ class StockMovementService {
                 splitItem.expirationDate = shipmentItem.expirationDate
                 splitItem.binLocation = shipmentItem.binLocation
                 splitItem.inventoryItem = shipmentItem.inventoryItem
+                splitItem.sortOrder = shipmentItem.sortOrder
 
                 splitItem.quantity = splitLineItem?.quantityShipped
                 splitItem.recipient = splitLineItem?.recipient
