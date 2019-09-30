@@ -28,7 +28,6 @@ const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 const FIELDS = {
   packPageItems: {
     type: ArrayField,
-    virtualized: true,
     fields: {
       productCode: {
         type: LabelField,
