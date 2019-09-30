@@ -13,40 +13,7 @@ import org.pih.warehouse.shipping.Shipment
 
 class Doc4jController {
 
-    def fileService
     def documentService
-    def shipmentService
-
-    def downloadLetter = {
-        def shipmentInstance = Shipment.get(params.id)
-
-        if (!shipmentInstance) {
-            throw new Exception("Unable to locate shipment with ID ${params.id}")
-        }
-
-        def tempFile = fileService.generateLetterAsDocx(shipmentInstance)
-        def filename = "Certificate of Donation - " + shipmentInstance?.name?.trim() + ".docx"
-        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-        response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-        response.outputStream << tempFile.readBytes()
-    }
-
-    def downloadLetterAsPdf = {
-
-        def shipmentInstance = Shipment.get(params.id)
-
-        if (!shipmentInstance) {
-            throw new Exception("Unable to locate shipment with ID ${params.id}")
-        }
-
-        def filename = "Certificate of Donation - " + shipmentInstance?.name?.trim() + ".pdf"
-        fileService.generateLetterAsPdf(shipmentInstance, response.outputStream)
-
-        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-        response.setContentType("application/pdf")
-        return
-    }
-
 
     /**
      *

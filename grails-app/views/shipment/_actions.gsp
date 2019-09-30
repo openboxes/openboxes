@@ -120,14 +120,6 @@
                 <warehouse:message code="shipping.downloadPackingList.label"/> <span class="fade">(.xls)</span>
             </g:link>
         </div>
-
-        <div class="action-menu-item">
-            <g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id}">
-                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page_white_word.png')}" class="middle"/>&nbsp;
-                <warehouse:message code="shipping.downloadLetter.label"/> <span class="fade">(.docx)</span>
-            </g:link>
-        </div>
-
         <g:isUserManager>
             <g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id}">
                 <div class="action-menu-item">

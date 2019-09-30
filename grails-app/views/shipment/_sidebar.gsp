@@ -65,11 +65,6 @@
 				</g:link>		
 			</div>
 			<div class="action-menu-item">
-				<g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;
-					<warehouse:message code="shipping.downloadLetter.label"/> <span class="fade">(.docx)</span></g:link> 
-			</div>
-			<div class="action-menu-item">
 				<g:link controller="doc4j" action="downloadPackingList" id="${shipmentInstance?.id }">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" alt="View Packing List" style="vertical-align: middle"/>&nbsp;	
 					<warehouse:message code="shipping.downloadPackingList.label"/> <span class="fade">(.xls)</span></g:link> 
