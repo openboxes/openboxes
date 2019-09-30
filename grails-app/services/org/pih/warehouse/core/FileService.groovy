@@ -57,21 +57,6 @@ class FileService {
     def userService
     def grailsApplication
 
-    File findFile(String filePath) {
-        def file
-        def appContext = ApplicationHolder.application.parentContext
-        def archiveDirectory = filePath
-        if (ApplicationHolder.application.isWarDeployed()) {
-            //archiveDirectory = "${File.separator}WEB-INF${File.separator}grails-app${File.separator}conf${File.separator}${filePath}"
-            archiveDirectory = "classpath:$filePath"
-            file = appContext.getResource(archiveDirectory)?.getFile()
-        } else {
-            archiveDirectory = "grails-app${File.separator}conf${File.separator}${filePath}"
-            file = new File(archiveDirectory)
-        }
-        return file
-    }
-
     File createDirectory(String directoryPath) {
         File folder = new File(directoryPath)
         log.info("Attempting to create directory ${folder?.absolutePath}")
@@ -90,9 +75,7 @@ class FileService {
             log.info("- Directory ${folder?.absolutePath} already exists")
         }
         return folder
-
     }
-
 
     File renderShippingTemplate(org.pih.warehouse.core.Document documentTemplate, Shipment shipmentInstance) {
 
@@ -419,9 +402,7 @@ class FileService {
         return mappings
     }
 
-
     def addObjectProperties(Map dataMappings, String prefix, Object object, Class domainClass) {
-
         if (object) {
             new DefaultGrailsDomainClass(domainClass).persistentProperties.each { property ->
                 if (!property.isAssociation()) {
