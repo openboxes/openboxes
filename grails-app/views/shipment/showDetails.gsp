@@ -593,21 +593,6 @@
 
                                         </td>
                                     </tr>
-                                    <tr class="even">
-                                        <td>
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_word.png')}" class="middle"/>
-                                        </td>
-                                        <td>
-                                            <g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }">
-                                                <label><g:message code="shipping.certificateOfDonation" default="Certificate of Donation"/></label>
-                                            </g:link>
-                                        </td>
-                                        <td class="right">
-                                            <g:link controller="doc4j" action="downloadLetter" id="${shipmentInstance?.id }" class="button">
-                                                <warehouse:message code="default.button.download.label"/>
-                                            </g:link>
-                                        </td>
-                                    </tr>
                                     <g:each in="${shipmentInstance.documents + shipmentWorkflow.documentTemplates}" var="document" status="i">
                                         <tr id="document-${document.id}" class="${i%2==0?'odd':'even'}">
                                             <td class="middle">

@@ -27,12 +27,10 @@
                 <ul>
                     <li><a href="#document-metadata-tab"><warehouse:message code="document.label"/></a></li>
                     <li><a href="#document-file-tab"><warehouse:message code="document.file.label" default="File"/></a></li>
+                    <li><a href="${request.contextPath}/document/preview/${documentInstance?.id}"><warehouse:message code="default.button.preview.label" default="Preview"/></a></li>
                 </ul>
                 <div id="document-metadata-tab">
-
-
                     <g:form method="post" enctype="multipart/form-data">
-
                         <g:hiddenField name="id" value="${documentInstance?.id}" />
                         <g:hiddenField name="version" value="${documentInstance?.version}" />
                         <div class="box">
@@ -57,7 +55,6 @@
                                             <g:select class="chzn-select-deselect" name="documentType.id" from="${org.pih.warehouse.core.DocumentType.list()}" optionKey="id" value="${documentInstance?.documentType?.id}" noSelection="['null': '']" />
                                         </td>
                                     </tr>
-
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                           <label for="extension"><warehouse:message code="document.extension.label" default="Extension" /></label>
@@ -66,7 +63,6 @@
                                             <g:textField class="text" size="100" name="extension" cols="40" rows="5" value="${documentInstance?.extension}" />
                                         </td>
                                     </tr>
-
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                           <label for="contentType"><warehouse:message code="document.contentType.label" default="Content Type" /></label>
@@ -75,7 +71,6 @@
                                             <g:textField class="text" size="100" name="contentType" cols="40" rows="5" value="${documentInstance?.contentType}" />
                                         </td>
                                     </tr>
-
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                           <label for="fileUri"><warehouse:message code="document.fileUri.label" default="File Uri" /></label>
@@ -84,7 +79,6 @@
                                             <g:textField class="text" size="100" name="fileUri" value="${documentInstance?.fileUri}" />
                                         </td>
                                     </tr>
-
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                           <label for="documentNumber"><warehouse:message code="document.documentNumber.label" default="Document Number" /></label>
@@ -93,7 +87,6 @@
                                             <g:textField class="text" size="100" name="documentNumber" cols="40" rows="5" value="${documentInstance?.documentNumber}" />
                                         </td>
                                     </tr>
-
                                     <tr class="prop">
                                         <td valign="top"></td>
                                         <td valign="top">
@@ -116,9 +109,7 @@
                         <g:hiddenField name="version" value="${documentInstance?.version}" />
                         <div class="box">
                             <h2><warehouse:message code="default.upload.label" args="[entityName]" /></h2>
-
                             <table>
-
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="filename"><warehouse:message code="document.filename.label" default="Filename" /></label>
@@ -135,7 +126,6 @@
                                         <div id="image">${documentInstance?.isImage()}</div>
                                     </td>
                                 </tr>
-
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="size"><warehouse:message code="document.size.label" default="Size" /></label>
@@ -152,8 +142,6 @@
                                         <g:formatDate date="${documentInstance?.lastUpdated}"/>
                                     </td>
                                 </tr>
-
-
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="fileContents"><warehouse:message code="document.fileContents.label" default="File Contents" /></label>
@@ -167,12 +155,9 @@
                                     <td valign="top"></td>
                                     <td valign="top">
                                         <div class="buttons left">
-
                                             <g:link controller="document" action="download" class="button" id="${documentInstance?.id}">
                                                 <g:message code="document.download.label"/>
                                             </g:link>
-
-
                                         </div>
                                     </td>
                                 </tr>
