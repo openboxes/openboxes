@@ -315,30 +315,45 @@ class DocumentController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
             redirect(controller: "shipment", action: "showDetails", id: document.getShipment().getId())
         } else {
-            response.setHeader "Content-disposition", "attachment;filename=\"${documentInstance.filename}\""
+            if (!params.boolean("inline")) {
+                response.setHeader "Content-disposition", "attachment;filename=\"${documentInstance.filename}\""
+            }
             response.contentType = documentInstance.contentType
             response.outputStream << documentInstance.fileContents
             response.outputStream.flush()
         }
     }
 
+    def preview = {
+        def documentInstance = Document.get(params.id)
+        render(template: "preview", model: [documentInstance: documentInstance])
+    }
+
+
     def render = {
         def documentInstance = Document.get(params.id)
+        Shipment shipmentInstance = Shipment.get(params.shipmentId)
         if (!documentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
-            redirect(controller: "shipment", action: "showDetails", id: documentInstance.getShipment().getId())
+            redirect(controller: "shipment", action: "showDetails", id: shipmentInstance.id)
         } else {
             if (documentInstance?.documentType?.documentCode != DocumentCode.SHIPPING_TEMPLATE) {
                 throw new IllegalArgumentException("Document render action only supports documents with document code ${DocumentCode.SHIPPING_TEMPLATE}")
             }
-            Shipment shipmentInstance = Shipment.get(params.shipmentId)
+
             // FIXME Move this into the service layer and try to pass back a BAOS
-            File tempFile = fileService.renderShippingTemplate(documentInstance, shipmentInstance)
-            def filename = "${documentInstance.name}-${shipmentInstance?.name?.trim()}.docx"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-            response.outputStream << tempFile.readBytes()
-            response.outputStream.flush()
+            try {
+                File tempFile = fileService.renderShippingTemplate(documentInstance, shipmentInstance)
+                def filename = "${documentInstance.name}-${shipmentInstance?.name?.trim()}.docx"
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+                response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                response.outputStream << tempFile.readBytes()
+                response.outputStream.flush()
+            } catch(Exception e) {
+                log.error("Unable to render file due to error: " + e.message, e)
+                flash.message = "${e.message}"
+                redirect(action: "edit", id: params.id)
+            }
         }
     }
 

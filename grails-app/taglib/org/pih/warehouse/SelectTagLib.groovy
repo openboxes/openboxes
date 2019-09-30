@@ -220,7 +220,7 @@ class SelectTagLib {
             it?.name?.toLowerCase()
         }
         attrs.optionKey = 'id'
-        attrs.optionValue = { it.name + " (" + it.origin.name + " to " + it.destination.name + ")" }
+        attrs.optionValue = { it.shipmentNumber + " " + it.name + " - " + it.shipmentItemCount + " items" + " (" + it.origin.name + " to " + it.destination.name + ")" }
         out << g.select(attrs)
     }
 
