@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import org.apache.commons.lang.text.StrSubstitutor
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.docx4j.TextUtils
@@ -26,8 +27,10 @@ import org.docx4j.wml.Body
 import org.docx4j.wml.BooleanDefaultTrue
 import org.docx4j.wml.CTBorder
 import org.docx4j.wml.Document
+import org.docx4j.wml.HpsMeasure
 import org.docx4j.wml.P
 import org.docx4j.wml.R
+import org.docx4j.wml.RFonts
 import org.docx4j.wml.RPr
 import org.docx4j.wml.STBorder
 import org.docx4j.wml.Tbl
@@ -43,11 +46,14 @@ import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
 import org.pih.warehouse.FormatTagLib
 import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
+import javax.xml.bind.JAXBElement
 import javax.xml.bind.JAXBException
 import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
 class FileService {
@@ -95,7 +101,7 @@ class FileService {
 
     File renderShippingTemplate(org.pih.warehouse.core.Document documentTemplate, Shipment shipmentInstance) {
 
-        log.info "Document template: " + documentTemplate.fileContents
+        //log.info "Document template: " + documentTemplate.fileContents
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
 
@@ -111,32 +117,30 @@ class FileService {
 
         def dataMappings = getDataMappings(shipmentInstance)
 
+        StrSubstitutor strSubstitutor = new StrSubstitutor(dataMappings)
+        Object obj = XmlUtils.unmarshalString(strSubstitutor.replace(xml));
 
-        log.info("mappings: " + dataMappings)
-        log.debug("XML before: " + xml)
-        Object obj = XmlUtils.unmarshallFromTemplate(xml, dataMappings)
-        log.debug("XML after: " + xml)
-
-        //change  JaxbElement
         documentPart.setJaxbElement((Document) obj)
 
         // Create a new table for the Packing List
-        Tbl table = createPackingListTable(wordMLPackage, shipmentInstance)
-
+        Map packingList = getPackingList(shipmentInstance)
+        Tbl table = createTable(wordMLPackage, packingList.columns, packingList.data)
         insertTable(wordMLPackage, "{{PACKING_LIST}}", table)
 
-        // Get the data mappings
-        def dataMappingsTable = []
-        dataMappings.each { key, value ->
-            def rowMap = new HashMap()
-            rowMap.put("propertyName", key)
-            rowMap.put("propertyValue", value)
-            log.info("${key} = ${value}")
-            dataMappingsTable.add(rowMap)
+        Map commercialInvoice = getCommercialInvoice(shipmentInstance)
+        Tbl commercialInvoiceTable = createTable(wordMLPackage, commercialInvoice.columns, commercialInvoice.data)
+        insertTable(wordMLPackage, "{{COMMERCIAL_INVOICE}}", commercialInvoiceTable)
 
+
+        def dataMappingsTable = []
+        dataMappings.keySet().collect { key ->
+            dataMappingsTable.add(["propertyName": key, "propertyValue": dataMappings.get(key).toString()])
         }
-        Tbl debugTable = createTable(wordMLPackage, dataMappingsTable)
-        insertTable(wordMLPackage, "{{VARIABLES}}", debugTable)
+
+        Map columns = [propertyName: [label: "Property Name", ratio: 1.0],
+                       propertyValue: [label: "Property Value", ratio: 1.0]]
+        Tbl variablesTable = createTable(wordMLPackage, columns, dataMappingsTable)
+        insertTable(wordMLPackage, "{{VARIABLES}}", variablesTable)
 
         // FIXME Try to generate a BAOS
         File tempFile = File.createTempFile("${shipmentInstance?.name} - ${documentTemplate.name}", ".docx")
@@ -144,6 +148,76 @@ class FileService {
 
         return tempFile
 
+    }
+
+    Map getPackingList(Shipment shipment) {
+        def shipmentItems = shipment?.shipmentItems?.sort()
+        //shipment?.shipmentItems?.sort { it?.container?.sortOrder }
+        def data = shipmentItems.collect { ShipmentItem shipmentItem ->
+            def parentContainer = shipmentItem?.container?.parentContainer
+            def childContainer = shipmentItem?.container
+            return [
+                    parentContainer: parentContainer ? sanitizeValue(parentContainer?.name) : sanitizeValue(childContainer?.name),
+                    childContainer : parentContainer ? childContainer : null,
+                    productName    : shipmentItem.inventoryItem?.product?.name,
+                    lotNumber      : shipmentItem?.inventoryItem?.lotNumber ?: "",
+                    expirationDate : shipmentItem?.inventoryItem?.expirationDate?.format("dd-MMM-yyyy") ?: "",
+                    quantity       : "${shipmentItem?.quantity} ${shipmentItem?.inventoryItem?.product?.unitOfMeasure ?: ''}"
+            ]
+        }
+
+        log.info "data: ${data}"
+
+        def columns = [
+                parentContainer: [label: "Pallet", ratio: 1.0],
+                childContainer : [label: "Box", ratio: 1.0],
+                productName    : [label: "Product", ratio: 2.0],
+                lotNumber      : [label: "Lot", ratio: 0.5],
+                expirationDate : [label: "Exp", ratio: 0.75],
+                quantity       : [label: "Qty", ratio: 0.5]
+        ]
+
+        def hasNoContainers = data.every { !it.parentContainer && !it.childContainer }
+        if (hasNoContainers) {
+            columns.remove("parentContainer")
+            columns.remove("childContainer")
+        }
+        return [columns: columns, data: data]
+    }
+
+    Map getCommercialInvoice(Shipment shipment) {
+
+        NumberFormat numberFormat = NumberFormat.getNumberInstance()
+        numberFormat.maximumFractionDigits = 2
+
+        def data = shipment?.shipmentItems?.collect { ShipmentItem shipmentItem ->
+            BigDecimal quantity = shipmentItem?.quantity ?: 0
+            BigDecimal unitCost = shipmentItem?.inventoryItem?.product?.pricePerUnit ?: 0.0
+            BigDecimal totalCost = quantity * unitCost
+            return [
+                    productCode   : shipmentItem.inventoryItem?.product?.productCode,
+                    productName   : shipmentItem.inventoryItem?.product?.name,
+                    unitOfMeasure : shipmentItem.inventoryItem?.product?.unitOfMeasure,
+                    lotNumber     : shipmentItem?.inventoryItem?.lotNumber ?: "",
+                    expirationDate: shipmentItem?.inventoryItem?.expirationDate?.format("dd-MMM-yyyy") ?: "",
+                    quantity      : numberFormat.format(quantity),
+                    unitCost      : numberFormat.format(unitCost),
+                    totalCost     : numberFormat.format(totalCost)
+            ]
+        }
+
+        def columns = [
+                productCode   : [label: "Code", ratio: 0.75],
+                productName   : [label: "Description", ratio: 2.0],
+                unitOfMeasure : [label: "UoM", ratio: 0.75],
+                lotNumber     : [label: "Batch No", ratio: 1.0],
+                expirationDate: [label: "Exp Date", ratio: 1.25],
+                quantity      : [label: "Quantity", ratio: 0.75],
+                unitCost      : [label: "Unit Cost (USD)", ratio: 0.75],
+                totalCost     : [label: "Total Cost (USD)", ratio: 1.0],
+        ]
+
+        return [columns: columns, data: data]
     }
 
     /**
@@ -196,126 +270,89 @@ class FileService {
 
         def dataMappings = getDataMappings(shipmentInstance)
 
-
-        log.info("mappings: " + dataMappings)
-        log.debug("XML before: " + xml)
         Object obj = XmlUtils.unmarshallFromTemplate(xml, dataMappings)
-        log.debug("XML after: " + xml)
 
         //change  JaxbElement
         documentPart.setJaxbElement((Document) obj)
 
         // Create a new table for the Packing List
-        Tbl table = createPackingListTable(wordMLPackage, shipmentInstance)
+        Map packingList = getPackingList(shipmentInstance)
+        Tbl table = createTable(wordMLPackage, packingList.columns, packingList.data)
 
         // Add table to document
 
         insertTable(wordMLPackage, "{{PACKING_LIST}}", table)
 
         def dataMappingsTable = []
-        dataMappings.each { key, value ->
-            def rowMap = [:]
-            rowMap.put("propertyName", key)
-            rowMap.put("propertyValue", value)
-            dataMappingsTable.add(rowMap)
+        dataMappings.keySet().collect { key ->
+            dataMappingsTable.add(["propertyName": key, "propertyValue": dataMappings.get(key)])
         }
-        Tbl debugTable = createTable(wordMLPackage, dataMappingsTable)
-        insertTable(wordMLPackage, "{{VARIABLES}}", debugTable)
+
+        Map columns = [
+                propertyName: [label: "Property Name", ratio: 0.5],
+                propertyValue: [label: "Property Value", ratio: 1.5]
+        ]
+
+        Tbl variablesTable = createTable(wordMLPackage, columns, dataMappingsTable)
+        insertTable(wordMLPackage, "{{VARIABLES}}", variablesTable)
 
         return wordMLPackage
     }
 
-    Tbl createTable(WordprocessingMLPackage wordMLPackage, List<Map<String, Object>> data) {
-
-        String[] columns = data[0].keySet()
-        int cols = columns.length
-
-        int writableWidthTwips = wordMLPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips()
-        int cellWidthTwipsDefault = new Double(Math.floor((writableWidthTwips / cols))).intValue()
+    Tbl createTable(WordprocessingMLPackage wordMLPackage, Map columns, List data) {
 
         Tbl table = Context.getWmlObjectFactory().createTbl()
+        //addBorders(table)
+
+        Tr thead = Context.getWmlObjectFactory().createTr()
+        for(def key in columns.keySet()) {
+            addTc(thead, columns[key].label, "Book Antiqua", 10, true)
+        }
+
+        // Table header should be repeated on subsequent pages
+        TrPr trPr = Context.getWmlObjectFactory().createTrPr();
+        thead.setTrPr(trPr);
+        BooleanDefaultTrue defaultTrue = Context.getWmlObjectFactory().createBooleanDefaultTrue();
+        JAXBElement<BooleanDefaultTrue> defaultTrueElement = Context.getWmlObjectFactory().createCTTrPrBaseTblHeader(defaultTrue);
+        trPr.getCnfStyleOrDivIdOrGridBefore().add(defaultTrueElement);
+
+        // Add table header to table
+        table.getContent().add(thead)
+
+        int cols = columns.size()
+        int writableWidthTwips = wordMLPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips()
+        int cellWidthTwipsDefault = new Double(Math.floor((writableWidthTwips / cols))).intValue()
+        def cellWidth = { ratio -> (ratio * cellWidthTwipsDefault).intValue(); }
+
         TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid()
         table.setTblGrid(tblGrid)
+
+        log.info ("columns: " + columns)
+
         // Add required <w:gridCol w:w="4788"/>
-        for (int i = 1; i <= cols; i++) {
+        def headerColumnKeys = columns.keySet().toArray()
+        for (int i = 0; i < cols; i++) {
             TblGridCol gridCol = Context.getWmlObjectFactory().createTblGridCol()
-            int cellWidthTwips = cellWidthTwipsDefault
+            def headerColumnKey = headerColumnKeys[i]
+            def column = columns.get(headerColumnKey)
+            int cellWidthTwips = cellWidth(column.ratio)
             gridCol.setW(BigInteger.valueOf(cellWidthTwips))
             tblGrid.getGridCol().add(gridCol)
         }
 
-        // Add table headers
-        Tr thead = Context.getWmlObjectFactory().createTr()
-        columns.each { columnName ->
-            addTc(thead, columnName, true)
-        }
-        table.getContent().add(thead)
-
-        // Add table rows
-        for (Map row : data) {
+        // Iterate over data rows and add a cell for each column
+        for (def row : data) {
             Tr tr = Context.getWmlObjectFactory().createTr()
             table.getContent().add(tr)
-
-            // Add each table cell
-            row.each { columnName, value ->
-                addTc(tr, value, cellWidthTwipsDefault)
+            for (def key in columns.keySet()) {
+                addTc(tr, row[key], "Book Antiqua", 10, false)
             }
         }
-
-        log.debug "Table: " + XmlUtils.marshaltoString(table, true)
         return table
     }
 
-    Tbl createPackingListTable(WordprocessingMLPackage wordMLPackage, Shipment shipment) {
-        int cols = 5
-        int writableWidthTwips = wordMLPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips()
-        int cellWidthTwipsDefault = new Double(Math.floor((writableWidthTwips / cols))).intValue()
-
-        Map cellWidthTwipsRatio = [1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0]
-
-        Tbl table = Context.getWmlObjectFactory().createTbl()
-        addBorders(table)
-
-        TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid()
-        table.setTblGrid(tblGrid)
-
-        // Add required <w:gridCol w:w="4788"/>
-        for (int i = 1; i <= cols; i++) {
-            TblGridCol gridCol = Context.getWmlObjectFactory().createTblGridCol()
-            int cellWidthTwips = (cellWidthTwipsDefault * cellWidthTwipsRatio[i]).intValue()
-            gridCol.setW(BigInteger.valueOf(cellWidthTwips))
-            tblGrid.getGridCol().add(gridCol)
-        }
-
-        Tr thead = Context.getWmlObjectFactory().createTr()
-        addTc(thead, "Box", true)
-        addTc(thead, "Product", true)
-        addTc(thead, "Lot", true)
-        addTc(thead, "Exp", true)
-        addTc(thead, "Qty", true)
-        table.getContent().add(thead)
-
-        def previousContainer = null
-        def shipmentItems = shipment?.shipmentItems?.sort { it?.container?.sortOrder }
-
-        // Iterate over shipment items and add them to the table
-        for (ShipmentItem shipmentItem : shipmentItems) {
-            Tr tr = Context.getWmlObjectFactory().createTr()
-            table.getContent().add(tr)
-
-            if (shipmentItem?.container != previousContainer) {
-                addTc(tr, shipmentItem?.container?.name?.replaceAll("\n", "") ?: "None", cellWidthTwipsDefault)
-            } else {
-                addTc(tr, "", cellWidthTwipsDefault)
-            }
-            addTc(tr, shipmentItem.inventoryItem?.product?.name ?: "", cellWidthTwipsDefault)
-            addTc(tr, shipmentItem?.inventoryItem?.lotNumber ?: "", cellWidthTwipsDefault)
-            addTc(tr, shipmentItem?.inventoryItem?.expirationDate?.format("MM-dd-yyyy") ?: "", cellWidthTwipsDefault)
-            addTc(tr, "${shipmentItem?.quantity} ${shipmentItem?.inventoryItem?.product?.unitOfMeasure ?: ''}", cellWidthTwipsDefault)
-            previousContainer = shipmentItem?.container
-        }
-
-        return table
+    def sanitizeValue(String stringValue) {
+        return stringValue?.replaceAll("\n", "")
     }
 
     def addBorders(Tbl table) {
@@ -336,25 +373,44 @@ class FileService {
         table.getTblPr().setTblBorders(borders)
     }
 
-    def addTc(Tr tr, Object value, int cellWidthTwips) {
+    def addTc(Tr tr, Object value) {
         Tc tc = Context.getWmlObjectFactory().createTc()
         tr.getContent().add(tc)
 
         TcPr tcPr = Context.getWmlObjectFactory().createTcPr()
         tc.setTcPr(tcPr)
-        // <w:tcW w:w="4788" w:type="dxa"/>
-        TblWidth cellWidth = Context.getWmlObjectFactory().createTblWidth()
-        tcPr.setTcW(cellWidth)
-        cellWidth.setType("auto")
-        cellWidth.setW(BigInteger.valueOf(cellWidthTwips))
 
         // Cell content - an empty <w:p/>
-        value = value.toString().replace("\n", "")
         P paragraph = createParagraphOfText(value.toString(), false)
         tc.getContent().add(paragraph)
         return tc
     }
 
+
+    private RPr createRunProperties(final String fontName, final int fontSize, final boolean applyBold) {
+        final RPr rpr = Context.getWmlObjectFactory().createRPr();
+
+        if (fontName) {
+            final RFonts font = Context.getWmlObjectFactory().createRFonts();
+            font.setAscii(fontName);
+            font.setHAnsi(fontName);
+            rpr.setRFonts(font);
+        }
+
+        if (fontSize) {
+            final HpsMeasure size = Context.getWmlObjectFactory().createHpsMeasure();
+            size.setVal(BigInteger.valueOf(fontSize * 2));
+            rpr.setSz(size);
+        }
+
+        if (applyBold) {
+            final BooleanDefaultTrue isBold = Context.getWmlObjectFactory().createBooleanDefaultTrue();
+            isBold.setVal(applyBold);
+            rpr.setB(isBold);
+        }
+
+        return rpr;
+    }
 
     /**
      *
@@ -409,6 +465,13 @@ class FileService {
         String totalValue = decimalFormatter.format(shipmentInstance?.calculateTotalValue() ?: 0.0)
         mappings.put("STATUS", shipmentInstance?.getStatus())
         mappings.put("TOTAL_VALUE", totalValue)
+
+        ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
+        ReferenceNumber trackingNumber = shipmentInstance?.referenceNumbers?.find { ReferenceNumber rn ->
+            rn.referenceNumberType?.id == trackingNumberType?.id
+        }
+
+        mappings.put("TRACKING_NUMBER", trackingNumber?.identifier)
         mappings.put("DRIVER_NAME", shipmentInstance?.driverName)
         mappings.put("FREIGHT_FORWARDER", shipmentInstance?.shipmentMethod?.shipper?.name)
         mappings.put("ACTUAL_SHIPPING_DATE", shipmentInstance?.getActualShippingDate())
@@ -474,100 +537,28 @@ class FileService {
     /**
      *
      * @param wmlPackage
-     * @param shipmentInstance
-     * @param cols
-     * @param cellWidthTwips
-     * @return
-     */
-    Tbl createTable(WordprocessingMLPackage wmlPackage, Shipment shipmentInstance, int cols, int cellWidthTwips) {
-
-        int writableWidthTwips = wmlPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips()
-        log.info "writableWidthTwips: " + writableWidthTwips
-        cellWidthTwips = new Double(Math.floor((writableWidthTwips / cols))).intValue()
-        log.info "cellWidthTwips: " + cellWidthTwips
-
-        Tbl tbl = TblFactory.createTable(cols, cols, cellWidthTwips)
-
-        // w:tblPr
-        log.info("Namespace: " + Namespaces.W_NAMESPACE_DECLARATION)
-
-        TblPr tblPr = null
-        try {
-            String strTblPr =
-                    "<w:tblPr " + Namespaces.W_NAMESPACE_DECLARATION + "><w:tblStyle w:val=\"TableGrid\"/><w:tblW w:w=\"0\" w:type=\"auto\"/><w:tblLook w:val=\"04A0\"/></w:tblPr>"
-            tblPr = (TblPr) XmlUtils.unmarshalString(strTblPr)
-        } catch (JAXBException e) {
-            log.error("Exception occurred while creating the table prolog")
-        }
-        tbl.setTblPr(tblPr)
-
-        // <w:tblGrid><w:gridCol w:w="4788"/>
-        TblGrid tblGrid = Context.getWmlObjectFactory().createTblGrid()
-
-        tbl.setTblGrid(tblGrid)
-
-        // Add required <w:gridCol w:w="4788"/>
-
-        for (int i = 1; i <= cols; i++) {
-            TblGridCol gridCol = Context.getWmlObjectFactory().createTblGridCol()
-            gridCol.setW(BigInteger.valueOf(cellWidthTwips))
-            tblGrid.getGridCol().add(gridCol)
-        }
-
-        // Create a repeating header
-        Tr trHeader = Context.getWmlObjectFactory().createTr()
-        tbl.getContent().add(trHeader)
-        BooleanDefaultTrue bdt = Context.getWmlObjectFactory().createBooleanDefaultTrue()
-
-        TrPr trPr = Context.getWmlObjectFactory().createTrPr()
-        trHeader.setTrPr(trPr)
-
-        trPr.getCnfStyleOrDivIdOrGridBefore().add(Context.getWmlObjectFactory().createCTTrPrBaseTblHeader(bdt))
-        addTc(wmlPackage, trHeader, "Pallet/Box #", true)
-        addTc(wmlPackage, trHeader, "Item", true)
-        addTc(wmlPackage, trHeader, "Qty", true)
-
-        def previousContainer = null
-        def shipmentItems = shipmentInstance?.shipmentItems?.sort { it?.container?.sortOrder }
-        // Iterate over shipment items and add them to the table
-        shipmentItems?.each { itemInstance ->
-
-            log.info "previous: " + previousContainer + ", current: " + itemInstance?.container + ", same: " + (itemInstance?.container == previousContainer)
-            Tr tr = Context.getWmlObjectFactory().createTr()
-            tbl.getContent().add(tr)
-            if (itemInstance?.container != previousContainer) {
-                addTc(wmlPackage, tr, itemInstance?.container?.name, false)
-            } else {
-                addTc(wmlPackage, tr, "", false)
-            }
-            addTc(wmlPackage, tr, itemInstance?.product?.name, false)
-            addTc(wmlPackage, tr, String.valueOf(itemInstance?.quantity), false)
-            previousContainer = itemInstance?.container
-
-        }
-        return tbl
-    }
-
-    /**
-     *
-     * @param wmlPackage
      * @param tr
      * @param text
      * @param applyBold
      */
     void addTc(Tr tr, String text, boolean applyBold) {
+        addTc(tr, text, null, 0, applyBold)
+    }
+
+    void addTc(Tr tr, String text, String fontName, int fontSize, boolean applyBold) {
         Tc tc = Context.getWmlObjectFactory().createTc()
-        tc.getContent().add(createParagraphOfText(text, applyBold))
+        tc.getContent().add(createParagraphOfText(text, fontName, fontSize, applyBold))
         tr.getContent().add(tc)
     }
 
-    /**
-     *
-     * @param simpleText
-     * @param applyBold
-     * @return
-     */
+
     P createParagraphOfText(String simpleText, boolean applyBold) {
+        String defaultFontName = grailsApplication.config.openboxes.documentTemplate.defaultFontName?:null
+        Integer defaultFontSize = grailsApplication.config.openboxes.documentTemplate.defaultFontSize?:11
+        return createParagraphOfText(simpleText, defaultFontName, defaultFontSize, applyBold)
+    }
+
+    P createParagraphOfText(String simpleText, final String fontName, final int fontSize, boolean applyBold) {
         P para = Context.getWmlObjectFactory().createP()
         // Create the text element
         Text t = Context.getWmlObjectFactory().createText()
@@ -575,13 +566,9 @@ class FileService {
         // Create the run
         R run = Context.getWmlObjectFactory().createR()
         run.getContent().add(t)
-        // Set bold property
-        if (applyBold) {
-            RPr rpr = Context.getWmlObjectFactory().createRPr()
-            BooleanDefaultTrue bdt = Context.getWmlObjectFactory().createBooleanDefaultTrue()
-            rpr.setB(bdt)
-            run.setRPr(rpr)
-        }
+
+        RPr rPr = createRunProperties(fontName, fontSize, applyBold)
+        run.setRPr(rPr)
         para.getContent().add(run)
 
         return para
