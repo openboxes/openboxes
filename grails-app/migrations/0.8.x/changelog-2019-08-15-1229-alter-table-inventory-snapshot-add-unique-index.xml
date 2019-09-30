@@ -9,6 +9,7 @@
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1565890211110-1">
         <validCheckSum>62b8ef93f3591ba291ce9f907cc497</validCheckSum>
+        <validCheckSum>b04ed37539813ec408d68f62ac22e8e</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
