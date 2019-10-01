@@ -39,4 +39,5 @@ grails-app/views/partialReceiving/_create.gsp
 grails-app/views/common/_react.gsp
 docker/mysql
 docker/openboxes.war
+.gradle
 .~*#
