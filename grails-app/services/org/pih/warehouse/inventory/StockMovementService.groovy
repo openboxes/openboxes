@@ -1347,7 +1347,7 @@ class StockMovementService {
 
     Container createOrUpdateContainer(Shipment shipment, String palletName, String boxName) {
         if (boxName && !palletName) {
-            throw new IllegalArgumentException("A box must be contained within a pallet")
+            throw new IllegalArgumentException("Please enter Pack level 1 before Pack level 2. A box must be contained within a pallet")
         }
 
         Container pallet = (palletName) ? shipment.findOrCreatePallet(palletName) : null
