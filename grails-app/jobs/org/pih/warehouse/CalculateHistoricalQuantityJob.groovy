@@ -1,5 +1,6 @@
 package org.pih.warehouse
 
+import grails.util.Holders
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
@@ -23,7 +24,7 @@ class CalculateHistoricalQuantityJob {
             log.info "Executing calculate historical quantity job at ${new Date()} with context ${context}"
             if (!dates) {
                 // Filter down to the transaction dates within the last 18 months
-                def daysToProcess = CH.config.openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess
+                def daysToProcess = Holders.getConfig().getProperty("openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess")
                 def startDate = new Date() - daysToProcess
                 def transactionDates = inventorySnapshotService.getTransactionDates()
                 transactionDates = transactionDates.findAll { it >= startDate }
