@@ -8,14 +8,14 @@ import java.io.*;
 import java.net.URL;
 import java.util.Enumeration;
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import grails.util.Holders;
 
 class GrailsFileOpener implements FileOpener {
     
     def fileOpener;
 
     public GrailsFileOpener() {
-        if (ApplicationHolder.getApplication().isWarDeployed()) {
+        if (Holders.getGrailsApplication().isWarDeployed()) {
             fileOpener = new ClassLoaderFileOpener();
         } else {
             fileOpener = new DevFileOpener();
