@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.grails.plugins.excelimport.ExcelImportUtils
 import org.pih.warehouse.data.ProductSupplierDataService
 
@@ -75,7 +75,7 @@ class ProductSupplierExcelImporter extends AbstractExcelImporter {
     }
 
     def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("productSupplierDataService")
+        return Holders.getGrailsApplication().getMainContext().getBean("productSupplierDataService")
     }
 
 
