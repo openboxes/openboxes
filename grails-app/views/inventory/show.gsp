@@ -11,49 +11,63 @@
         <div class="yui-gf">
             <div class="yui-u first">
 
-                <div class="box" style="height:100%;">
+                <div class="box">
                     <h2 class="middle">
                         Baseline QoH Report
                     </h2>
                     <g:form controller="inventory" action="search">
                         <div class="filters">
 
-                            <div class="prop">
+                            <div class="filter-list-item">
+                                <h3><g:message code="report.parameters.label"/></h3>
+                            </div>
+                            <div class="filter-list-item">
                                 <label>${warehouse.message(code:'locations.label')}</label>
                                 <div>
                                     <g:selectLocation name="locations" multiple="true" class="chzn-select-deselect" value="${command?.locations?.id}" noSelection="['':'']" data-placeholder=" " />
 
                                 </div>
                             </div>
-                            <div class="prop">
-                                <label><warehouse:message code="tag.label"/></label>
-                                <div>
-                                    <g:selectTag name="tags" class="chzn-select-deselect" multiple="multiple" value="${command?.tags}" noSelection="['':'']"/>
-                                </div>
-                            </div>
-                            <div class="prop">
+                            <div class="filter-list-item">
                                 <label><warehouse:message code="reporting.startDate.label" default="Start date"/></label>
                                 <div>
                                     <g:jqueryDatePicker id="startDate" name="startDate" value="${command?.startDate}" format="MM/dd/yyyy" size="30" autocomplete="off"/>
                                 </div>
                             </div>
-                            <div class="prop">
+                            <div class="filter-list-item">
                                 <label><warehouse:message code="reporting.endDate.label" default="End date"/></label>
                                 <div>
                                     <g:jqueryDatePicker id="endDate" name="endDate" value="${command?.endDate}" format="MM/dd/yyyy" size="30" autocomplete="off"/>
                                 </div>
                             </div>
-                            <div class="prop">
+                            <div class="filter-list-item">
                                 <label><warehouse:message code="reporting.frequency.label" default="Frequency"/></label>
                                 <div>
                                     <g:select name="frequency" value="${command?.frequency}" from="['','Daily','Weekly','Monthly','Quarterly','Annually']" class="chzn-select-deselect" />
                                 </div>
                             </div>
-                            <div class="prop">
+%{--                            <div class="filter-list-item">--}%
+%{--                                <h3><g:message code="default.filters.label"/></h3>--}%
+%{--                            </div>--}%
+%{--                            <div class="filter-list-item">--}%
+%{--                                <label><warehouse:message code="tag.label"/></label>--}%
+%{--                                <div>--}%
+%{--                                    <g:selectTag name="tags" class="chzn-select-deselect" multiple="multiple" value="${command?.tags}" noSelection="['':'']"/>--}%
+%{--                                </div>--}%
+%{--                            </div>--}%
+                            <hr/>
+
+                            <div class="filter-list-item">
                                 <div class="center">
-                                    <button name="button" value="search" class="button icon search">View</button>
-                                    <button name="button" value="download" class="button icon log">Download</button>
-                                    <g:link controller="inventory" action="show" class="button icon reload">Reset</g:link>
+                                    <button name="button" value="search" class="button icon search">
+                                        <g:message code="report.runReport.label"/>
+                                    </button>
+                                    <button name="button" value="download" class="button icon log">
+                                        <g:message code="default.button.download.label"/>
+                                    </button>
+                                    <g:link controller="inventory" action="show" class="button icon reload">
+                                        <g:message code="default.button.reset.label"/>
+                                    </g:link>
                                 </div>
                             </div>
                         </div>
@@ -80,19 +94,15 @@
                             <tr>
                                 <th><warehouse:message code="product.productCode.label"/></th>
                                 <th><warehouse:message code="product.label"/></th>
-                                <th><warehouse:message code="product.genericProduct.label"/></th>
                                 <th><warehouse:message code="category.label"/></th>
-                                <th><warehouse:message code="product.uom.label"/></th>
-                                <th><warehouse:message code="product.manufacturer.label"/></th>
-                                <th class="border-right"><warehouse:message code="product.vendor.label"/></th>
+                                <th class="border-right"><warehouse:message code="product.uom.label"/></th>
                                 <g:each var="date" in="${command?.dates}">
-                                    <th class="center"><g:formatDate date="${date}" format="MMM dd"/></th>
+                                    <th class="center"><g:formatDate date="${date}" format="MMM dd" timeZone="${TimeZone.default}"/></th>
                                 </g:each>
                             </tr>
                         </thead>
                         <g:each var="product" in="${command?.products}" status="i">
-
-                            <tr class="${i%2?'even':'odd'} prop">
+                            <tr>
                                 <td>
                                     ${product?.productCode}
                                 </td>
@@ -102,23 +112,10 @@
                                     </g:link>
                                 </td>
                                 <td>
-                                    <g:link controller="productGroup" action="edit" id="${product?.genericProduct?.id}">
-                                        ${product?.genericProduct?.name?:""}
-                                    </g:link>
-                                </td>
-                                <td>
                                     ${product?.category?.name}
                                 </td>
-                                <td>
-                                    ${product?.unitOfMeasure}
-                                </td>
-                                <td>
-                                    ${product?.manufacturer}
-                                    <div class="fade">${product?.manufacturerCode}</div>
-                                </td>
                                 <td class="border-right">
-                                    ${product?.vendor}
-                                    <div class="fade">${product?.vendorCode}</div>
+                                    ${product?.unitOfMeasure}
                                 </td>
                                 <g:each var="date" in="${command.dates}">
                                     <td class="center">
@@ -136,8 +133,22 @@
                 </div>
             </div>
         </div>
+    </div>
 
-    </div>
-    </div>
+    <script>
+      $(document).ready(function(){
+        $(".dataTable").dataTable({
+          "bProcessing": true,
+          "iDisplayLength": 25,
+          "sServerMethod": "GET",
+          "bSearch": false,
+          "bScrollCollapse": true,
+          "bJQueryUI": true,
+          "bAutoWidth": true,
+          "sPaginationType": "full_numbers",
+        });
+      });
+    </script>
+
 </body>
 </html>
