@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.grails.plugins.excelimport.ExcelImportUtils
 import org.pih.warehouse.data.CategoryDataService
 
@@ -35,7 +35,7 @@ class CategoryExcelImporter extends AbstractExcelImporter {
 
     CategoryExcelImporter(String fileName) {
         super(fileName)
-        categoryDataService = ApplicationHolder.getApplication().getMainContext().getBean("categoryDataService")
+        categoryDataService = Holders.getGrailsApplication().getMainContext().getBean("categoryDataService")
     }
 
     List<Map> getData() {
