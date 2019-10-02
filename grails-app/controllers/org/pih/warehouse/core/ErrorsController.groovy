@@ -10,7 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.converters.JSON
-import org.pih.warehouse.util.RequestUtil
+import org.pih.warehouse.RequestUtil
 import org.springframework.validation.BeanPropertyBindingResult
 import util.ConfigHelper
 
