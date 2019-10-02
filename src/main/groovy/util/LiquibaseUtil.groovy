@@ -13,14 +13,14 @@ import liquibase.DatabaseChangeLogLock
 import liquibase.database.DatabaseFactory
 import liquibase.lock.LockHandler
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 
 class LiquibaseUtil {
 
     private static final log = LogFactory.getLog(this)
 
     static getDatabase() {
-        def ctx = ApplicationHolder.getApplication().getMainContext()
+        def ctx = Holders.getGrailsApplication().getMainContext()
         def dataSource = ctx.getBean("dataSource")
         def connection = dataSource.getConnection()
         def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
