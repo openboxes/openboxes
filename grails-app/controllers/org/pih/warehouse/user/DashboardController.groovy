@@ -13,22 +13,22 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
+import org.pih.warehouse.jobs.CalculateQuantityJob
+import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
+import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.jobs.CalculateQuantityJob
-import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 
 import java.text.SimpleDateFormat
@@ -107,8 +107,8 @@ class DashboardController {
 
     }
     def throwException = {
-        println "Configuration: " + ConfigurationHolder.config.grails
-        println "Configuration: " + ConfigurationHolder.config.grails.mail
+        println "Configuration: " + Holders.getConfig().getProperty("grails")
+        println "Configuration: " + Holders.getConfig().getProperty("grails.mail")
         try {
             throw new RuntimeException("error of some kind")
         } catch (RuntimeException e) {
@@ -131,7 +131,7 @@ class DashboardController {
 
         log.info "dashboard.index Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        def newsItems = ConfigurationHolder.config.openboxes.dashboard.newsSummary.newsItems
+        def newsItems = Holders.getConfig().getProperty("openboxes.dashboard.newsSummary.newsItems")
 
 
         [

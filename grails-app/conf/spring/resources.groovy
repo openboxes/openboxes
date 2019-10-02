@@ -9,7 +9,7 @@
  **/
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import grails.util.Holders
 
 beans = {
 
@@ -26,25 +26,25 @@ beans = {
     dataSource(ComboPooledDataSource) { bean ->
         bean.destroyMethod = 'close'
         //use grails' datasource configuration for connection user, password, driver and JDBC url
-        user = CH.config.dataSource.username
-        password = CH.config.dataSource.password
-        driverClass = CH.config.dataSource.driverClassName
-        jdbcUrl = CH.config.dataSource.url
+        user = Holders.getConfig().getProperty("dataSource.username")
+        password = Holders.getConfig().getProperty("dataSource.password")
+        driverClass = Holders.getConfig().getProperty("dataSource.driverClassName")
+        jdbcUrl = Holders.getConfig().getProperty("dataSource.url")
 
         //connection pool settings
 
         // If this is a number greater than 0, c3p0 will test all idle, pooled but unchecked-out connections, every
         // this number of seconds.
-        initialPoolSize = CH.config.dataSource.initialPoolSize
+        initialPoolSize = Holders.getConfig().getProperty("dataSource.initialPoolSize")
 
         // Minimum number of Connections a pool will maintain at any given time.
-        minPoolSize = CH.config.dataSource.minPoolSize
+        minPoolSize = Holders.getConfig().getProperty("dataSource.minPoolSize")
 
         // Maximum number of Connections a pool will maintain at any given time.
-        maxPoolSize = CH.config.dataSource.maxPoolSize
+        maxPoolSize = Holders.getConfig().getProperty("dataSource.maxPoolSize")
 
         // Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted.
-        acquireIncrement = CH.config.dataSource.acquireIncrement
+        acquireIncrement = Holders.getConfig().getProperty("dataSource.acquireIncrement")
 
         // The size of c3p0's global PreparedStatement cache. If both maxStatements and maxStatementsPerConnection are
         // zero, statement caching will not be enabled. If maxStatements is zero but maxStatementsPerConnection is a
@@ -55,7 +55,7 @@ beans = {
         // application, and multiply that number by maxPoolSize to arrive at an appropriate value. Though
         // maxStatements is the JDBC standard parameter for controlling statement caching, users may find c3p0's
         // alternative maxStatementsPerConnection more intuitive to use.
-        maxStatements = CH.config.dataSource.maxStatements
+        maxStatements = Holders.getConfig().getProperty("dataSource.maxStatements")
 
         // The number of PreparedStatements c3p0 will cache for a single pooled Connection. If both maxStatements and
         // maxStatementsPerConnection are zero, statement caching will not be enabled. If maxStatementsPerConnection is
@@ -65,7 +65,7 @@ beans = {
         // frequently in your application, plus two or three extra so infrequently statements don't force the more
         // common cached statements to be culled. Though maxStatements is the JDBC standard parameter for controlling
         // statement caching, users may find maxStatementsPerConnection more intuitive to use.
-        maxStatementsPerConnection = CH.config.dataSource.maxStatementsPerConnection
+        maxStatementsPerConnection = Holders.getConfig().getProperty("dataSource.maxStatementsPerConnection")
 
         // If set to a value greater than 0, the statement cache will track when Connections are in use, and only
         // destroy Statements when their parent Connections are not otherwise in use. Although closing of a Statement
@@ -76,20 +76,20 @@ beans = {
         // parameter should almost always be set to 1. Basically, if you need more than one Thread dedicated solely to
         // destroying cached Statements, you should set maxStatements and/or maxStatementsPerConnection so that you
         // don't churn through Statements so quickly.
-        statementCacheNumDeferredCloseThreads = CH.config.dataSource.statementCacheNumDeferredCloseThreads
+        statementCacheNumDeferredCloseThreads = Holders.getConfig().getProperty("dataSource.statementCacheNumDeferredCloseThreads")
 
         // If true, an operation will be performed asynchronously at every connection checkin to verify that the
         // connection is valid. Use in combination with idleConnectionTestPeriod for quite reliable, always
         // asynchronous Connection testing. Also, setting an automaticTestTable or preferredTestQuery will usually
         // speed up all connection tests.
-        testConnectionOnCheckin = CH.config.dataSource.testConnectionOnCheckin
+        testConnectionOnCheckin = Holders.getConfig().getProperty("dataSource.testConnectionOnCheckin")
 
         // If true, an operation will be performed at every connection checkout to verify that the connection is valid.
         // Be sure to set an efficient preferredTestQuery or automaticTestTable if you set this to true. Performing the
         // (expensive) default Connection test on every client checkout will harm client performance. Testing
         // Connections in checkout is the simplest and most reliable form of Connection testing, but for better
         // performance, consider verifying connections periodically using idleConnectionTestPeriod.
-        testConnectionOnCheckout = CH.config.dataSource.testConnectionOnCheckout
+        testConnectionOnCheckout = Holders.getConfig().getProperty("dataSource.testConnectionOnCheckout")
 
         // Defines the query that will be executed for all connection tests, if the default ConnectionTester (or some
         // other implementation of QueryConnectionTester, or better yet FullQueryConnectionTester) is being used.
@@ -99,28 +99,28 @@ beans = {
         // database query.) NOTE: The table against which your preferredTestQuery will be run must exist in the database
         // schema prior to your initialization of your DataSource. If your application defines its own schema, try
         // automaticTestTable instead.
-        preferredTestQuery = CH.config.dataSource.preferredTestQuery
+        preferredTestQuery = Holders.getConfig().getProperty("dataSource.preferredTestQuery")
 
         // Seconds a Connection can remain pooled but unused before being discarded. Zero means idle connections
         // never expire.
-        maxIdleTime = CH.config.dataSource.maxIdleTime
+        maxIdleTime = Holders.getConfig().getProperty("dataSource.maxIdleTime")
 
         // If this is a number greater than 0, c3p0 will test all idle, pooled but unchecked-out connections, every
         // this number of seconds.
-        idleConnectionTestPeriod = CH.config.dataSource.idleConnectionTestPeriod
+        idleConnectionTestPeriod = Holders.getConfig().getProperty("dataSource.idleConnectionTestPeriod")
 
         // Number of seconds that Connections in excess of minPoolSize should be permitted to remain idle in the pool
         // before being culled. Intended for applications that wish to aggressively minimize the number of open
         // Connections, shrinking the pool back towards minPoolSize if, following a spike, the load level diminishes
         // and Connections acquired are no longer needed. If maxIdleTime is set, maxIdleTimeExcessConnections should be
         // smaller if the parameter is to have any effect. Zero means no enforcement, excess Connections are not idled out.
-        maxIdleTimeExcessConnections = CH.config.dataSource.maxIdleTimeExcessConnections
+        maxIdleTimeExcessConnections = Holders.getConfig().getProperty("dataSource.maxIdleTimeExcessConnections")
 
         // Seconds, effectively a time to live. A Connection older than maxConnectionAge will be destroyed and purged
         // from the pool. This differs from maxIdleTime in that it refers to absolute age. Even a Connection which has
         // not been much idle will be purged from the pool if it exceeds maxConnectionAge. Zero means no maximum
         // absolute age is enforced.
-        maxConnectionAge = CH.config.dataSource.maxConnectionAge
+        maxConnectionAge = Holders.getConfig().getProperty("dataSource.maxConnectionAge")
 
         // unreturned connections - use with caution
         // Seconds. If set, if an application checks out but then fails to check-in [i.e. close()] a Connection within
@@ -132,7 +132,7 @@ beans = {
         // basically a bad idea, but it's a commonly requested feature. Fix your $%!@% applications so they don't leak
         // Connections! Use this temporarily in combination with debugUnreturnedConnectionStackTraces to figure out
         // where Connections are being checked-out that don't make it back into the pool!
-        unreturnedConnectionTimeout = CH.config.dataSource.unreturnedConnectionTimeout
+        unreturnedConnectionTimeout = Holders.getConfig().getProperty("dataSource.unreturnedConnectionTimeout")
 
         // If true, and if unreturnedConnectionTimeout is set to a positive value, then the pool will capture the stack
         // trace (via an Exception) of all Connection checkouts, and the stack traces will be printed when unreturned
@@ -140,17 +140,17 @@ beans = {
         // applications that occasionally fail to return Connections, leading to pool growth, and eventually exhaustion
         // (when the pool hits maxPoolSize with all Connections checked-out and lost). This parameter should only be
         // set while debugging, as capturing the stack trace will slow down every Connection check-out.
-        debugUnreturnedConnectionStackTraces = CH.config.dataSource.debugUnreturnedConnectionStackTraces
+        debugUnreturnedConnectionStackTraces = Holders.getConfig().getProperty("dataSource.debugUnreturnedConnectionStackTraces")
 
         // The number of milliseconds a client calling getConnection() will wait for a Connection to be checked-in or
         // acquired when the pool is exhausted. Zero means wait indefinitely. Setting any positive value will cause the
         // getConnection() call to time-out and break with an SQLException after the specified number of milliseconds.
-        checkoutTimeout = CH.config.dataSource.checkoutTimeout
+        checkoutTimeout = Holders.getConfig().getProperty("dataSource.checkoutTimeout")
 
         // c3p0 is very asynchronous. Slow JDBC operations are generally performed by helper threads that don't hold
         // contended locks. Spreading these operations over multiple threads can significantly improve performance by
         // allowing multiple operations to be performed simultaneously.
-        numHelperThreads = CH.config.dataSource.numHelperThreads
+        numHelperThreads = Holders.getConfig().getProperty("dataSource.numHelperThreads")
 
         // Seconds before c3p0's thread pool will try to interrupt an apparently hung task. Rarely useful. Many of
         // c3p0's functions are not performed by client threads, but asynchronously by an internal thread pool. c3p0's
@@ -170,7 +170,7 @@ beans = {
         // the time set. Zero (the default) means tasks are never interrupted, which is the best and safest policy
         // under most circumstances. If tasks are just slow, allocate more threads. If tasks are hanging forever,
         // try to figure out why, and maybe setting maxAdministrativeTaskTime can help in the meantime.
-        maxAdministrativeTaskTime = CH.config.dataSource.maxAdministrativeTaskTime
+        maxAdministrativeTaskTime = Holders.getConfig().getProperty("dataSource.maxAdministrativeTaskTime")
 
         // Must be one of caller, library, or none. Determines how the contextClassLoader (see java.lang.Thread) of
         // c3p0-spawned Threads is determined. If caller, c3p0-spawned Threads (helper threads, java.util.Timer
@@ -182,7 +182,7 @@ beans = {
         // client that hits them, it may be impossible to garbage collect a ClassLoader associated with that client
         // when it is undeployed in a running VM. Setting this to library can resolve these issues. [See "Configuring
         // To Avoid Memory Leaks On Hot Redeploy Of Client"]
-        contextClassLoaderSource = CH.config.dataSource.contextClassLoaderSource
+        contextClassLoaderSource = Holders.getConfig().getProperty("dataSource.contextClassLoaderSource")
 
         // If true, c3p0-spawned Threads will have the java.security.AccessControlContext associated with c3p0 library
         // classes. By default, c3p0-spawned Threads (helper threads, java.util.Timer threads) inherit their
@@ -192,7 +192,7 @@ beans = {
         // garbage collect a ClassLoader associated with that client when it is undeployed in a running VM. Also, it is
         // possible client Threads might lack sufficient permission to perform operations that c3p0 requires. Setting
         // this to true can resolve these issues. [See "Configuring To Avoid Memory Leaks On Hot Redeploy Of Client"]
-        privilegeSpawnedThreads = CH.config.dataSource.privilegeSpawnedThreads
+        privilegeSpawnedThreads = Holders.getConfig().getProperty("dataSource.privilegeSpawnedThreads")
 
 
     }
