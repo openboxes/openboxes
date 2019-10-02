@@ -10,7 +10,7 @@
 package org.pih.warehouse
 
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
