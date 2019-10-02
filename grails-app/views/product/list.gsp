@@ -28,13 +28,17 @@
                         </g:link>
 	                </g:isUserAdmin>
                     <g:link controller="product" action="exportAsCsv" class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'database_go.png')}" />&nbsp;
-                        <warehouse:message code="product.exportAsCsv.label"/>
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />&nbsp;
+                        <warehouse:message code="default.export.label" args="[g.message(code: 'products.label')]"/>
+                    </g:link>
+                    <g:link controller="product" action="exportAsCsv" class="button" params="[includeAttributes:true]">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />&nbsp;
+                        <warehouse:message code="default.export.label" args="[g.message(code: 'productAttributes.label')]"/>
                     </g:link>
                     <g:isUserAdmin>
                         <g:link controller="product" action="importAsCsv" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'database_refresh.png')}" />&nbsp;
-                            <warehouse:message code="product.importAsCsv.label"/>
+                            <warehouse:message code="default.import.label" args="[g.message(code: 'products.label')]"/>
                         </g:link>
                     </g:isUserAdmin>
                 </div>
