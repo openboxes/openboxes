@@ -10,7 +10,7 @@
 package org.pih.warehouse.jobs
 
 import groovyx.gpars.GParsPool
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -25,7 +25,7 @@ class SendStockAlertsJob {
 
     static triggers = {
         cron name: 'sendStockAlertsCronTrigger',
-                cronExpression: ConfigurationHolder.config.openboxes.jobs.sendStockAlertsJob.cronExpression
+                cronExpression: Holders.getConfig().getProperty("openboxes.jobs.sendStockAlertsJob.cronExpression")
     }
 
     def execute(JobExecutionContext context) {

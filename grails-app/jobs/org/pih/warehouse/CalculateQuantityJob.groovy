@@ -1,6 +1,6 @@
 package org.pih.warehouse
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import grails.util.Holders
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
@@ -18,12 +18,12 @@ class CalculateQuantityJob {
     // cron job needs to be triggered after the staging deployment
     static triggers = {
         cron name: 'calculateQuantityCronTrigger',
-                cronExpression: CH.config.openboxes.jobs.calculateQuantityJob.cronExpression
+                cronExpression: Holders.getConfig().getProperty("openboxes.jobs.calculateQuantityJob.cronExpression")
     }
 
     def execute(JobExecutionContext context) {
 
-        Boolean enabled = CH.config.openboxes.jobs.calculateQuantityJob.enabled
+        Boolean enabled = Holders.getConfig().getProperty("openboxes.jobs.calculateQuantityJob.enabled")
         if (!enabled) {
             return
         }

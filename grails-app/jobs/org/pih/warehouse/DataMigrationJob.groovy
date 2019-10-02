@@ -1,6 +1,6 @@
 package org.pih.warehouse
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as ConfigHolder
+import grails.util.Holders
 import org.quartz.DisallowConcurrentExecution
 import util.LiquibaseUtil
 
@@ -13,7 +13,7 @@ class DataMigrationJob {
 
     def execute(context) {
 
-        if (ConfigHolder.config.openboxes.jobs.dataMigrationJob.enabled ?: false) {
+        if (Holders.getConfig().getProperty("openboxes.jobs.dataMigrationJob.enabled") ?: false) {
 
             if (LiquibaseUtil.isRunningMigrations()) {
                 log.info "Postponing job execution until liquibase migrations are complete"
