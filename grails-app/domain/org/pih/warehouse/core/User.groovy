@@ -9,7 +9,7 @@
  * */
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import grails.util.Holders
 import util.StringUtil
 import grails.converters.JSON
 
@@ -119,7 +119,7 @@ class User extends Person {
 
 
     Map toJson() {
-        boolean anonymize = CH.config.openboxes.anonymize.enabled
+        boolean anonymize = Holders.getConfig().getProperty("openboxes.anonymize.enabled")
 
         return [
                 "id"       : id,

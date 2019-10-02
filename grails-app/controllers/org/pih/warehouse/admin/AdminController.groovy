@@ -11,7 +11,7 @@ package org.pih.warehouse.admin
 
 import grails.util.GrailsUtil
 import net.sf.ehcache.Cache
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.MailService
 import org.springframework.web.multipart.MultipartFile
 
@@ -24,7 +24,7 @@ class AdminController {
     def sessionFactory // inject Hibernate sessionFactory
     MailService mailService
     def grailsApplication
-    def config = ConfigurationHolder.config
+    def config = Holders.getConfig()
     def quartzScheduler
     def springcacheService
     def dataService
@@ -222,9 +222,9 @@ class AdminController {
                 systemProperties        : System.properties,
                 env                     : GrailsUtil.environment,
                 enabled                 : Boolean.valueOf(grailsApplication.config.grails.mail.enabled),
-                from                    : "${config.grails.mail.from}",
-                host                    : "${config.grails.mail.host}",
-                port                    : "${config.grails.mail.port}"
+                from                    : "${config.getProperty("grails.mail.from")}",
+                host                    : "${config.getProperty("grails.mail.host")}",
+                port                    : "${config.getProperty("grails.mail.port")}"
         ]
     }
 

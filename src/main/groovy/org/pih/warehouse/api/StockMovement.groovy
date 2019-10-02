@@ -2,7 +2,7 @@ package org.pih.warehouse.api
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -201,7 +201,7 @@ class StockMovement {
      */
     String generateName() {
         final String separator =
-                ConfigurationHolder.config.openboxes.generateName.separator ?: Constants.DEFAULT_NAME_SEPARATOR
+                Holders.getConfig().getProperty("openboxes.generateName.separator") ?: Constants.DEFAULT_NAME_SEPARATOR
 
         String originIdentifier = origin?.locationNumber ?: origin?.name
         String destinationIdentifier = destination?.locationNumber ?: destination?.name

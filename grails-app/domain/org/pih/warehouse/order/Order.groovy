@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.order
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.shipping.Shipment
@@ -179,7 +179,7 @@ class Order implements Serializable {
     }
 
     Boolean getIsApprovalRequired() {
-        BigDecimal minimumAmount = ConfigurationHolder.config.openboxes.purchasing.approval.minimumAmount
+        BigDecimal minimumAmount = Holders.getConfig().getProperty("openboxes.purchasing.approval.minimumAmount")
         return (origin?.supports([ActivityCode.APPROVE_ORDER]) ||
                 destination?.supports(ActivityCode.APPROVE_ORDER)) && total > minimumAmount
     }
@@ -315,7 +315,7 @@ class Order implements Serializable {
 
     String generateName() {
         final String separator =
-                ConfigurationHolder.config.openboxes.generateName.separator ?: Constants.DEFAULT_NAME_SEPARATOR
+                Holders.getConfig().getProperty("openboxes.generateName.separator") ?: Constants.DEFAULT_NAME_SEPARATOR
 
         String name = "${orderNumber}"
         if (dateCompleted) name += "${separator}${dateCompleted?.format("MMMMM d, yyyy")}"

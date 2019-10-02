@@ -1,6 +1,6 @@
 package org.pih.warehouse
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
@@ -13,7 +13,7 @@ class RefreshTransactionFactJob {
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {
         cron name: 'refreshTransactionFactCronTrigger',
-                cronExpression: ConfigurationHolder.config.openboxes.jobs.refreshTransactionFactJob.cronExpression
+                cronExpression: Holders.getConfig().getProperty("openboxes.jobs.refreshTransactionFactJob.cronExpression")
     }
 
     def execute(JobExecutionContext context) {
