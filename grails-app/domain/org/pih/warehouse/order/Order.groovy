@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.order
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.*
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
@@ -157,7 +157,7 @@ class Order implements Serializable {
 
     String generateName() {
         final String separator =
-                ConfigurationHolder.config.openboxes.generateName.separator ?: Constants.DEFAULT_NAME_SEPARATOR
+                Holders.getConfig().getProperty("openboxes.generateName.separator") ?: Constants.DEFAULT_NAME_SEPARATOR
 
         String name = "${orderNumber}"
         if (dateCompleted) name += "${separator}${dateCompleted?.format("MMMMM d, yyyy")}"
