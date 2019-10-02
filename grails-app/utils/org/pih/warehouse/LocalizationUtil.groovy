@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.util
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.inventory.Transaction
 
@@ -19,7 +19,7 @@ class LocalizationUtil {
     static final def localeDelimiter = ':'
 
     static LocalizationService getLocalizationService() {
-        return ApplicationHolder?.application?.mainContext?.getBean("localizationService")
+        return Holders.getGrailsApplication().getParentContext().getBean("localizationService")
     }
 
     static String getLocalizedString(Transaction transaction) {
