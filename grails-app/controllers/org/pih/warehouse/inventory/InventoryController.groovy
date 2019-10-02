@@ -19,13 +19,13 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.util.DateUtil
+import org.pih.warehouse.core.Location
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
