@@ -12,7 +12,7 @@ package org.pih.warehouse.inventory
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -145,7 +145,7 @@ class InventorySnapshotService {
 
     def saveInventorySnapshots(Date date, Location location, Product product, List binLocations, Boolean forceRefresh) {
         def startTime = System.currentTimeMillis()
-        def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
+        def batchSize = Holders.getConfig().getProperty("openboxes.inventorySnapshot.batchSize") ?: 1000
         Sql sql = new Sql(dataSource)
 
         try {

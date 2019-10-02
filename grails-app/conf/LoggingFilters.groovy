@@ -9,7 +9,7 @@
  **/
 
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import grails.util.Holders
 import org.slf4j.MDC
 
 class LoggingFilters {
@@ -19,7 +19,7 @@ class LoggingFilters {
                 try {
                     def sessionId = session?.id
                     def userId = session?.user?.username
-                    def serverUrl = CH.config.grails.serverURL
+                    def serverUrl = Holders.getConfig().getProperty("grails.serverURL")
                     MDC.put('sessionId', session?.id ?: "No session ID")
                     MDC.put('username', userId ?: "No user")
                     MDC.put('location', session?.warehouse?.name ?: "No location")
