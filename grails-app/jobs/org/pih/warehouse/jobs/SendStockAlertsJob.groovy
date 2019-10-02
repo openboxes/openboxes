@@ -8,8 +8,8 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package org.pih.warehouse.jobs
-
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import groovyx.gpars.GParsPool
+import grails.util.Holders
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -31,8 +31,8 @@ class SendStockAlertsJob {
 
     def execute(JobExecutionContext context) {
 
-        Boolean skipOnEmpty = Boolean.valueOf(ConfigurationHolder.config.openboxes.jobs.sendStockAlertsJob.skipOnEmpty)
-        Integer daysUntilExpiry = Integer.valueOf(ConfigurationHolder.config.openboxes.jobs.sendStockAlertsJob.daysUntilExpiry ?: 60)
+        Boolean skipOnEmpty = Boolean.valueOf(Holders.config.openboxes.jobs.sendStockAlertsJob.skipOnEmpty)
+        Integer daysUntilExpiry = Integer.valueOf(Holders.config.openboxes.jobs.sendStockAlertsJob.daysUntilExpiry ?: 60)
 
         if (JobUtils.shouldExecute(SendStockAlertsJob)) {
             def startTime = System.currentTimeMillis()
