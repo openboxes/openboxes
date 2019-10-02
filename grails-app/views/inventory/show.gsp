@@ -97,7 +97,7 @@
                                 <th><warehouse:message code="category.label"/></th>
                                 <th class="border-right"><warehouse:message code="product.uom.label"/></th>
                                 <g:each var="date" in="${command?.dates}">
-                                    <th class="center"><g:formatDate date="${date}" format="MMM dd" timeZone="${TimeZone.default}"/></th>
+                                    <th class="center"><g:formatDate date="${date}" format="MMM dd HH:mm z" timeZone="${TimeZone.default}"/></th>
                                 </g:each>
                             </tr>
                         </thead>
@@ -125,11 +125,6 @@
                             </tr>
                         </g:each>
                     </table>
-                    <g:unless test="${quantityMapByDate}">
-                        <div class="empty center">
-                            <warehouse:message code="default.noresults.label" default="No results"/>
-                        </div>
-                    </g:unless>
                 </div>
             </div>
         </div>
