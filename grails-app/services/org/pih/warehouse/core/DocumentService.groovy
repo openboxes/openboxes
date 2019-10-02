@@ -13,7 +13,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddress
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
@@ -101,9 +101,9 @@ class DocumentService {
      */
     File findFile(String filePath) {
         def file
-        def appContext = ApplicationHolder.application.parentContext
+        def appContext = Holders.getGrailsApplication().getParentContext()
         def archiveDirectory = filePath
-        if (ApplicationHolder.application.isWarDeployed()) {
+        if (Holders.getGrailsApplication().isWarDeployed()) {
             archiveDirectory = "classpath:$filePath"
             file = appContext.getResource(archiveDirectory)?.getFile()
         } else {

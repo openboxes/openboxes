@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.grails.plugins.excelimport.*
 import org.grails.plugins.excelimport.ExcelImportUtils
 
@@ -75,7 +75,7 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
     InventoryLevelExcelImporter(String fileName) {
         super(fileName)
-        dataService = ApplicationHolder.getApplication().getMainContext().getBean("dataService")
+        dataService = Holders.getGrailsApplication().getMainContext().getBean("dataService")
     }
 
 
