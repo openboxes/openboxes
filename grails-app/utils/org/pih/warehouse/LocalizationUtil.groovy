@@ -9,8 +9,7 @@
  **/
 package org.pih.warehouse.util
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.inventory.Transaction
 
@@ -20,7 +19,7 @@ class LocalizationUtil {
     static final def localeDelimiter = ':'
 
     static LocalizationService getLocalizationService() {
-        return ApplicationHolder?.application?.mainContext?.getBean("localizationService")
+        return Holders.getGrailsApplication().getParentContext().getBean("localizationService")
     }
 
     static Locale getCurrentLocale() {
@@ -28,7 +27,7 @@ class LocalizationUtil {
     }
 
     static List<Locale> getSupportedLocales() {
-        def supportedLocales = ConfigurationHolder.config.openboxes.locale.supportedLocales
+        def supportedLocales = Holders.config.openboxes.locale.supportedLocales
         return supportedLocales.collect { new Locale(it) }
     }
 

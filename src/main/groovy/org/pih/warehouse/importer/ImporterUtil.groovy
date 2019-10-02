@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.springframework.validation.Errors
 
 import java.text.DateFormat
@@ -21,7 +21,7 @@ class ImporterUtil {
     static DateFormat EXCEL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
 
     static getProductService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("productService")
+        return Holders.getGrailsApplication().getMainContext().getBean("productService")
     }
 
     /**
