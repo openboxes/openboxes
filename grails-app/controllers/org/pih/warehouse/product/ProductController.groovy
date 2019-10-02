@@ -776,10 +776,10 @@ class ProductController {
         def products = productService.getProducts(productIds.toArray())
         if (products) {
             def date = new Date()
+            def csv = productService.exportProducts(products)
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
-            def csv = productService.exportProducts(products)
             println "export products: " + csv
             render csv
         } else {
@@ -792,13 +792,14 @@ class ProductController {
      */
     def exportAsCsv = {
 
-        def products = Product.findAllByActive(true)
-
+        boolean includeAttributes = params.boolean("includeAttributes")
+        def products = Product.findAllByActive(true, [fetch:[attributes:"eager", tags:"eager"]])
         if (products) {
+            String csv = productService.exportProducts(products, includeAttributes)
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
-            render productService.exportProducts(products)
+            render csv
         } else {
             render(text: 'No products found', status: 404)
         }
