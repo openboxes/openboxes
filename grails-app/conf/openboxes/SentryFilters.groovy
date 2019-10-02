@@ -11,7 +11,7 @@ package openboxes
 
 
 import grails.util.Environment
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.User
 
 class SentryFilters {
@@ -23,7 +23,7 @@ class SentryFilters {
                 if (session.user) {
 
                     try {
-                        def serverUrl = ConfigurationHolder.config.grails.serverURL
+                        def serverUrl = Holders.getConfig().getProperty("grails.serverURL")
                         def user = User.get(session.user.id)
                         def userData = [
                                 id         : user.id, is_authenticated: true,
