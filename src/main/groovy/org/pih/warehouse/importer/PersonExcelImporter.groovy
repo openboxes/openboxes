@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.grails.plugins.excelimport.ExcelImportUtils
 
 class PersonExcelImporter extends AbstractExcelImporter {
@@ -38,7 +38,7 @@ class PersonExcelImporter extends AbstractExcelImporter {
     }
 
     def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("personDataService")
+        return Holders.getGrailsApplication().getMainContext().getBean("personDataService")
     }
 
     List<Map> getData() {
