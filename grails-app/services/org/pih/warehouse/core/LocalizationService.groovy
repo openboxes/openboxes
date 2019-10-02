@@ -12,7 +12,7 @@ package org.pih.warehouse.core
 import grails.util.Metadata
 import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 import org.springframework.core.io.ClassPathResource
 import org.springframework.web.context.request.RequestContextHolder
 
