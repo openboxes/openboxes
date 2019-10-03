@@ -37,7 +37,6 @@ import org.pih.warehouse.product.Product
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
-
 import java.sql.Timestamp
 import java.text.NumberFormat
 import java.text.ParseException
