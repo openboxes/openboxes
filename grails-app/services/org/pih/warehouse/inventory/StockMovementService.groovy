@@ -1480,7 +1480,7 @@ class StockMovementService {
 
 
     List<Map> getDocuments(StockMovement stockMovement) {
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         def documentList = []
 
         if (stockMovement?.requisition) {
