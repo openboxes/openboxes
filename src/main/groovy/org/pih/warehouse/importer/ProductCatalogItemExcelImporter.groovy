@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.importer
 
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductCatalogItem
@@ -18,6 +18,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
 
     def inventoryService
+    def excelImportService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -30,9 +31,9 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            productCatalogCode: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            productCode       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            productName       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
+            productCatalogCode: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productCode       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productName       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
     ]
 
 
@@ -42,7 +43,7 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
 
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {
