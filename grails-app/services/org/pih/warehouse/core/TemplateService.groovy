@@ -10,7 +10,7 @@
 package org.pih.warehouse.core
 
 import groovy.text.Template
-import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
+import org.grails.gsp.GroovyPagesTemplateEngine
 
 class TemplateService {
 
