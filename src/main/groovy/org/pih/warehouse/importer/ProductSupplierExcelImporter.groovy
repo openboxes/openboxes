@@ -10,11 +10,12 @@
 package org.pih.warehouse.importer
 
 import grails.util.Holders
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.data.ProductSupplierDataService
 
 class ProductSupplierExcelImporter extends AbstractExcelImporter {
 
+    def excelImportService
     ProductSupplierDataService productSupplierDataService
 
     static Map columnMap = [
@@ -47,28 +48,28 @@ class ProductSupplierExcelImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            active                                : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            id                                    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            code                                  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            name                                  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            productCode                           : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            productName                           : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            legacyProductCode                     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            supplierName                          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            supplierCode                          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            manufacturerName                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            manufacturerCode                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            minOrderQuantity                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            contractPricePrice                    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            contractPriceValidUntil               : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            ratingType                            : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            globalPreferenceTypeName              : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            globalPreferenceTypeValidityStartDate : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            globalPreferenceTypeValidityEndDate   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            globalPreferenceTypeComments          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            defaultProductPackageUomCode          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            defaultProductPackageQuantity         : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            defaultProductPackagePrice            : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
+            active                                : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            id                                    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            code                                  : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            name                                  : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productCode                           : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productName                           : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            legacyProductCode                     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            supplierName                          : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            supplierCode                          : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            manufacturerName                      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            manufacturerCode                      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            minOrderQuantity                      : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            contractPricePrice                    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            contractPriceValidUntil               : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            ratingType                            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            globalPreferenceTypeName              : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            globalPreferenceTypeValidityStartDate : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            globalPreferenceTypeValidityEndDate   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            globalPreferenceTypeComments          : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            defaultProductPackageUomCode          : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            defaultProductPackageQuantity         : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            defaultProductPackagePrice            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
     ]
 
 
@@ -82,7 +83,7 @@ class ProductSupplierExcelImporter extends AbstractExcelImporter {
 
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {
