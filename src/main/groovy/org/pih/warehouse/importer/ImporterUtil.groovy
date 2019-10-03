@@ -11,7 +11,7 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.springframework.validation.Errors
-
+import org.pih.warehouse.product.Category
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
