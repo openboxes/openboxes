@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.core
 
-import org.grails.plugins.csv.CSVWriter
+import grails.plugins.csv.CSVWriter
 import org.pih.warehouse.inventory.*
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.TransactionEntry
