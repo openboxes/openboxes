@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.user
 
-import grails.plugin.springcache.annotations.CacheFlush
 import grails.validation.ValidationException
 import org.pih.warehouse.core.*
 import org.pih.warehouse.core.Location
@@ -291,7 +290,7 @@ class UserController {
      * Updates the locale of the default user
      * Used by the locale selectors in the footer
      */
-    @CacheFlush(["megamenuCache"])
+    //@CacheFlush(["megamenuCache"])
     def updateAuthUserLocale = {
 
         log.info "update auth user locale " + params

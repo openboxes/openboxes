@@ -9,8 +9,8 @@
  **/
 package org.pih.warehouse.admin
 
+import grails.core.GrailsApplication
 import grails.util.GrailsUtil
-import net.sf.ehcache.Cache
 import grails.util.Holders
 import org.pih.warehouse.core.MailService
 import org.springframework.web.multipart.MultipartFile
@@ -23,10 +23,9 @@ class AdminController {
 
     def sessionFactory // inject Hibernate sessionFactory
     MailService mailService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def config = Holders.getConfig()
     def quartzScheduler
-    def springcacheService
     def dataService
 
     def index = {}
@@ -203,21 +202,21 @@ class AdminController {
 
         PrintService[] printServices = PrinterJob.lookupPrintServices()
 
-        def caches = new ArrayList()
-        def cacheNames = springcacheService.springcacheCacheManager.cacheNames
-
-        for (cacheName in cacheNames) {
-            Cache cache = springcacheService.springcacheCacheManager.getCache(cacheName)
-            if (cache instanceof Cache) {
-                caches.add(cache)
-            }
-        }
+//        def caches = new ArrayList()
+//        def cacheNames = springcacheService.springcacheCacheManager.cacheNames
+//
+//        for (cacheName in cacheNames) {
+//            Cache cache = springcacheService.springcacheCacheManager.getCache(cacheName)
+//            if (cache instanceof Cache) {
+//                caches.add(cache)
+//            }
+//        }
 
 
         [
                 quartzScheduler         : quartzScheduler,
                 printServices           : printServices,
-                caches                  : caches,
+                caches                  : null, //caches,
                 externalConfigProperties: externalConfigProperties,
                 systemProperties        : System.properties,
                 env                     : GrailsUtil.environment,
