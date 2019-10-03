@@ -392,7 +392,7 @@ class ReportController {
         }
     }
 
-    @CacheFlush(["binLocationReportCache", "binLocationSummaryCache"])
+    //@CacheFlush(["binLocationReportCache", "binLocationSummaryCache"])
     def clearBinLocationCache = {
         flash.message = "Cache have been flushed"
         redirect(action: "showBinLocationReport")
@@ -411,8 +411,6 @@ class ReportController {
             String label = messageService.getMessage(messageCode)
             [status: status, label: label]
         }
-
-
 
         try {
             if (params.downloadAction == "downloadStockReport") {

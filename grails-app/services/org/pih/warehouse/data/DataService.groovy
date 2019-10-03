@@ -11,8 +11,9 @@ package org.pih.warehouse.data
 
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.apache.poi.hssf.usermodel.*
+import org.apache.poi.ss.usermodel.*
+import grails.plugins.csv.CSVWriter
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ProductPrice
