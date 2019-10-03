@@ -9,8 +9,8 @@
  **/
 package org.pih.warehouse
 
+import grails.util.Holders
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.LocalizationUtil
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat
 class FormatTagLib {
 
     static namespace = "format"
-    def grailsApplication
 
     /**
      * Formats a Date
@@ -90,7 +89,7 @@ class FormatTagLib {
         if (attrs.product != null) {
             // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
             // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
-            Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+            Locale defaultLocale = new Locale(Holders.grailsApplication.config.openboxes.locale.defaultLocale)
             Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
             def value = ""
             value += LocalizationUtil.getLocalizedString(attrs.product.name.encodeAsHTML(), locale)
