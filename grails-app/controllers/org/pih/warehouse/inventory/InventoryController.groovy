@@ -11,7 +11,6 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.CacheFlush
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
@@ -1134,7 +1133,7 @@ class InventoryController {
      * TRANSFER_OUT, CONSUMED, DAMAGED, EXPIRED
      */
 
-    @CacheFlush("inventoryBrowserCache")
+    //@CacheFlush("inventoryBrowserCache")
     def saveDebitTransaction = { TransactionCommand command ->
         log.info("Saving debit transactions " + params)
         log.info("size: " + command?.transactionEntries?.size())
@@ -1220,7 +1219,7 @@ class InventoryController {
      *
      * TRANSFER_IN
      */
-    @CacheFlush("inventoryBrowserCache")
+    //@CacheFlush("inventoryBrowserCache")
     def saveCreditTransaction = { TransactionCommand command ->
 
         log.debug("Saving credit transaction: " + params)
