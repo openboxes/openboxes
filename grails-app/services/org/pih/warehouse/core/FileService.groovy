@@ -12,7 +12,7 @@ package org.pih.warehouse.core
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang.text.StrSubstitutor
 import grails.util.Holders
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.grails.core.DefaultGrailsDomainClass
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion

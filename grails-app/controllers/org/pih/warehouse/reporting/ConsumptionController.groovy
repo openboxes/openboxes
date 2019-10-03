@@ -14,7 +14,7 @@ import groovy.time.TimeCategory
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.grails.core.DefaultGrailsDomainClass
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
