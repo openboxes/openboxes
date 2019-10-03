@@ -15,6 +15,7 @@ import org.pih.warehouse.core.ActivityCode
 
 import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.BudgetCode
@@ -56,7 +57,7 @@ class OrderService {
     def productSupplierDataService
     def personDataService
     def stockMovementService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def getPurchaseOrders(Map params) {
         // Parse pagination parameters

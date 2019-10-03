@@ -10,7 +10,7 @@
 package org.pih.warehouse.requisition
 
 import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
+import grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 

@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.core.GrailsApplication
 
 class UploadService {
 
