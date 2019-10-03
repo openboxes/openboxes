@@ -9,13 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.inventory.InventoryItem
 
-@Validateable
-class AdjustStockCommand {
+class AdjustStockCommand implements Validateable {
 
     Integer newQuantity = 0
     Integer currentQuantity
