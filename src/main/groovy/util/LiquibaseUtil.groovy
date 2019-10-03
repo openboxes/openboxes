@@ -9,9 +9,9 @@
  **/
 package util
 
-import liquibase.DatabaseChangeLogLock
 import liquibase.database.DatabaseFactory
-import liquibase.lock.LockHandler
+import liquibase.lockservice.LockService
+import liquibase.lockservice.StandardLockService
 import org.apache.commons.logging.LogFactory
 import grails.util.Holders
 
@@ -29,14 +29,10 @@ class LiquibaseUtil {
 
     static synchronized isRunningMigrations() {
         boolean isRunning = false
-        def database
         try {
-            database = getDatabase()
-            LockHandler lockHandler = LockHandler.getInstance(database)
-            if (lockHandler) {
-                DatabaseChangeLogLock[] locks = lockHandler.listLocks()
-                isRunning = locks
-            }
+            LockService lockService = new StandardLockService()
+            lockService.database = getDatabase()
+            isRunning = lockService.hasChangeLogLock()
         } catch (Exception e) {
             e.printStackTrace()
         }
