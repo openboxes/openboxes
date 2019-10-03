@@ -1,6 +1,6 @@
 package org.pih.warehouse.putAway
 
-import grails.plugin.rendering.pdf.PdfRenderingService
+import grails.plugins.rendering.pdf.PdfRenderingService
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
