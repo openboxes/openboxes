@@ -9,8 +9,7 @@
  **/
 package org.pih.warehouse.order
 
-
-import org.grails.plugins.csv.CSVMapReader
+import grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Person
