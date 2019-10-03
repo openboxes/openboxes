@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.plugins.rendering.pdf.PdfRenderingService
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryLevel
@@ -24,6 +25,7 @@ class PutawayApiController {
     def identifierService
     def productAvailabilityService
     def putawayService
+    PdfRenderingService pdfRenderingService
 
     def list = {
         String locationId = params?.location?.id ?: session?.warehouse?.id
