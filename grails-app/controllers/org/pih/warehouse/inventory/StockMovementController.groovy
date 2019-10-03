@@ -11,7 +11,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import org.grails.plugins.csv.CSVWriter
+import grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.StockMovementType
