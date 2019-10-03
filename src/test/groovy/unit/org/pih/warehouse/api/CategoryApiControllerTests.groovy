@@ -11,7 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.test.ControllerUnitTestCase
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.codehaus.groovy.runtime.GroovyCategorySupport
 import org.pih.warehouse.product.Category
 
