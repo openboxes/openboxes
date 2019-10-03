@@ -388,7 +388,7 @@ class FileService {
         mappings.put("ACTUAL_DELIVERY_DATE", shipmentInstance?.getActualDeliveryDate())
 
         if (!hasRoleFinance) {
-            def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+            def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
             String accessDeniedMessage = "${g.message(code: 'access.accessDenied.label')}"
             mappings.put("TOTAL_VALUE", accessDeniedMessage)
             mappings.put("TOTALVALUE", accessDeniedMessage) // for backwards compatibility

@@ -10,7 +10,10 @@
 package org.pih.warehouse.core
 
 import fr.w3blog.zpl.utils.ZebraUtils
-import groovyx.net.http.HTTPBuilder
+import grails.core.GrailsApplication
+import groovy.text.Template
+//import groovyx.net.http.HTTPBuilder
+import org.grails.gsp.GroovyPagesTemplateEngine
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
@@ -23,7 +26,7 @@ import org.pih.warehouse.core.Constants
 class DocumentController {
 
     def fileService
-    def grailsApplication
+    GrailsApplication grailsApplication
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
 
 
@@ -470,8 +473,9 @@ class DocumentController {
         String body = renderTemplate(document, model)
         String contentType = "image/png"
 
-        def http = new HTTPBuilder("http://api.labelary.com/v1/printers/8dpmm/labels/2x1/0/".toString())
-        def html = http.post(body: body)
+        // FIXME Fix HTTPBuilder dependency
+        //def http = new HTTPBuilder("http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/".toString())
+        //def html = http.post(body: body)
 
         response.contentType = contentType
         response.outputStream << html
