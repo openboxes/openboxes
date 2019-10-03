@@ -13,6 +13,7 @@ import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.UnitOfMeasure
@@ -112,10 +113,10 @@ class DataService {
         row.each { key, value ->
             def expectedType = InventoryLevelExcelImporter.propertyMap.get(key).expectedType
             switch (expectedType) {
-                case ExcelImportUtils.PROPERTY_TYPE_INT:
+                case ExpectedPropertyType.IntType:
                     assert !value || value instanceof Number || value instanceof Boolean, "Value [${value}] for column [${key}] must be a Number or Boolean but was ${value?.class?.name} (" + row + ")."
                     break
-                case ExcelImportUtils.PROPERTY_TYPE_DATE:
+                case ExpectedPropertyType.DateType:
                     assert !value || value instanceof Date, "Value [${value}] for column [${key}] must be a Date but was ${value?.class?.name} (" + row + ")."
                     break
                 default:
