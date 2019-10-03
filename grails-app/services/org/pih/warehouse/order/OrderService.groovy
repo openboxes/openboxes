@@ -10,8 +10,8 @@
 package org.pih.warehouse.order
 
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.grails.plugins.csv.CSVMapReader
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
