@@ -10,8 +10,7 @@
 package org.pih.warehouse.user
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
+import grails.core.GrailsApplication
 import org.apache.commons.lang.StringEscapeUtils
 import grails.util.Holders
 import org.pih.warehouse.jobs.CalculateQuantityJob
@@ -34,7 +33,6 @@ import java.text.SimpleDateFormat
 
 class DashboardController {
 
-    def orderService
     def shipmentService
     def inventoryService
     def dashboardService
@@ -42,8 +40,8 @@ class DashboardController {
     def requisitionService
     def userService
     def sessionFactory
-    def grailsApplication
     def locationService
+    GrailsApplication grailsApplication
 
     def showCacheStatistics = {
         def statistics = sessionFactory.statistics
@@ -180,7 +178,7 @@ class DashboardController {
         render results as JSON
     }
 
-    @Cacheable("megamenuCache")
+    //@Cacheable("megamenuCache")
     def megamenu = {
 
         def user = User.get(session?.user?.id)
@@ -232,9 +230,9 @@ class DashboardController {
         ]
     }
 
-    @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
-            "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
-            "selectTagsCache", "selectCategoryCache", "selectCatalogsCache"])
+    //@CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
+    //        "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
+    //        "selectTagsCache", "selectCategoryCache", "selectCatalogsCache"])
     def flushCache = {
         flash.message = "All data caches have been flushed"
         CalculateQuantityJob.triggerNow([locationId: session.warehouse.id, forceRefresh: true])
@@ -245,7 +243,7 @@ class DashboardController {
         CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
     }
 
-    @CacheFlush(["megamenuCache"])
+    //@CacheFlush(["megamenuCache"])
     def flushMegamenu = {
         flash.message = "${g.message(code: 'dashboard.cacheFlush.message', args: [g.message(code: 'dashboard.megamenu.label')])}"
         redirect(action: "index")
