@@ -23,7 +23,7 @@ import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart
 import org.docx4j.openpackaging.parts.relationships.Namespaces
 import org.docx4j.wml.*
-import org.groovydev.SimpleImageBuilder
+//import org.groovydev.SimpleImageBuilder
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.requisition.RequisitionItem
@@ -75,16 +75,16 @@ class DocumentService {
             def extension = document.extension ?: document.filename.substring(document.filename.lastIndexOf(".") + 1)
             log.info "Scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
             fileInputStream = new FileInputStream(file)
-            def builder = new SimpleImageBuilder()
-            if (builder) {
-                def result = builder.image(stream: fileInputStream) {
-                    fit(width: width, height: height) {
-                        save(stream: outputStream, format: extension?.toLowerCase())
-                    }
-                }
-            } else {
-                log.warn("Unable to scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension)
-            }
+//            def builder = new SimpleImageBuilder()
+//            if (builder) {
+//                def result = builder.image(stream: fileInputStream) {
+//                    fit(width: width, height: height) {
+//                        save(stream: outputStream, format: extension?.toLowerCase())
+//                    }
+//                }
+//            } else {
+//                log.warn("Unable to scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension)
+//            }
 
         } catch (Exception e) {
             log.warn("Error scaling image " + document?.filename + ": " + e.message, e)
