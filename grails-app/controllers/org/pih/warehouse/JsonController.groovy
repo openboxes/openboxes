@@ -10,8 +10,7 @@
 package org.pih.warehouse
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
+import grails.plugin.cache.Cacheable
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringUtils
 import org.grails.web.json.JSONObject
@@ -285,7 +284,7 @@ class JsonController {
         render jsonResponse as JSON
     }
 
-    @Cacheable("inventoryBrowserCache")
+    //@Cacheable("inventoryBrowserCache")
     def getQuantityToReceive = {
         def product = Product.get(params?.product?.id)
         def location = Location.get(params?.location?.id)
@@ -293,7 +292,7 @@ class JsonController {
         render(quantityToReceive ?: "0")
     }
 
-    @Cacheable("inventoryBrowserCache")
+    //@Cacheable("inventoryBrowserCache")
     def getQuantityToShip = {
         def product = Product.get(params?.product?.id)
         def location = Location.get(params?.location?.id)
@@ -301,19 +300,21 @@ class JsonController {
         render(quantityToShip ?: "0")
     }
 
-    @Cacheable("inventoryBrowserCache")
+    //@Cacheable("inventoryBrowserCache")
     def getQuantityOnHand = {
         def product = Product.get(params?.product?.id)
         def location = Location.get(params?.location?.id)
         def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
         render(quantityOnHand ?: "0")
     }
-    @Cacheable("inventoryBrowserCache")
+
+    //@Cacheable("inventoryBrowserCache")
     def flushInventoryBrowserCache = {
         redirect(controller: "inventory", action: "browse")
     }
 
-    @Cacheable("dashboardCache")
+
+    //@Cacheable("dashboardCache")
     def getGenericProductSummary = {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session?.warehouse?.id)
@@ -330,21 +331,21 @@ class JsonController {
 
     }
 
-    @Cacheable("dashboardCache")
+    //@Cacheable("dashboardCache")
     def getDashboardAlerts = {
         def location = Location.get(session?.warehouse?.id)
         def dashboardAlerts = dashboardService.getDashboardAlerts(location)
         render dashboardAlerts as JSON
     }
 
-    @Cacheable("dashboardCache")
+    //@Cacheable("dashboardCache")
     def getDashboardExpiryAlerts = {
         def location = Location.get(session?.warehouse?.id)
         def map = dashboardService.getExpirationSummary(location)
         render map as JSON
     }
 
-    @Cacheable("dashboardCache")
+    //@Cacheable("dashboardCache")
     def getTotalStockValue = {
         def location = Location.get(session?.warehouse?.id)
         def result = dashboardService.getTotalStockValue(location)
@@ -365,7 +366,7 @@ class JsonController {
         render data as JSON
     }
 
-    @Cacheable("dashboardCache")
+    //@Cacheable("dashboardCache")
     def getStockValueByProduct = {
         def location = Location.get(session?.warehouse?.id)
         def result = dashboardService.getTotalStockValue(location)
@@ -387,7 +388,7 @@ class JsonController {
     }
 
 
-    @CacheFlush("dashboardTotalStockValueCache")
+    //@CacheFlush("dashboardTotalStockValueCache")
     def refreshTotalStockValue = {
         render([success: true] as JSON)
     }
@@ -1079,12 +1080,12 @@ class JsonController {
         render json as JSON
     }
 
-    @CacheFlush("quantityOnHandCache")
+    //@CacheFlush("quantityOnHandCache")
     def flushQuantityOnHandCache = {
         redirect(controller: "inventory", action: "analyze")
     }
 
-    @Cacheable("quantityOnHandCache")
+    //@Cacheable("quantityOnHandCache")
     def calculateQuantityOnHandByProduct = {
 
         log.info "Calculating quantity on hand by product ..." + params
@@ -1288,7 +1289,7 @@ class JsonController {
         render([data: data] as JSON)
     }
 
-    @Cacheable("dashboardCache")
+    //@Cacheable("dashboardCache")
     def getFastMovers = {
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         def date = new Date()
@@ -1322,7 +1323,7 @@ class JsonController {
         render "${CalculateHistoricalQuantityJob.enabled ? 'enabled' : 'disabled'}"
     }
 
-    @Cacheable("dashboardCache")
+    //@Cacheable("dashboardCache")
     def getBinLocationSummary = {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
@@ -1580,7 +1581,7 @@ class JsonController {
         render([count: count] as JSON)
     }
 
-    @Cacheable("dashboardCache")
+    //@Cacheable("dashboardCache")
     def getDashboardActivity = {
 
         List activityList = []
@@ -1727,6 +1728,7 @@ class JsonController {
         render([aaData: forecastingService.getDemandSummary(location, product)] as JSON)
     }
 
+    // @Cacheable("forecastCache")
     def getForecastingData = {
         Product product = Product.get(params.product.id)
         Location location = Location.get(params.location.id)
