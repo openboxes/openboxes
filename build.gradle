@@ -116,6 +116,7 @@ dependencies {
 
     // Required by MailService (should replace with grails mail plugin)
     compile "org.apache.commons:commons-email:1.2" // maybe 1.6-SNAPSHOT
+    compile "commons-beanutils:commons-beanutils:1.9.4"
     compile "commons-lang:commons-lang:2.6" // ok
     compile "org.jadira.usertype:usertype.jodatime:1.9" // maybe 2.1 (but the lates version is from 2012)
 
@@ -143,7 +144,6 @@ dependencies {
 //    compile "org.codehaus.groovy.modules.http-builder:http-builder:0.6" {
 //        excludes "xercesImpl", "groovy", "commons-lang", "commons-codec"
 //    }
-
     compile "org.apache.httpcomponents:httpclient:4.5.10"
 
     // Required by functionality (need to be upgraded or replaced)
