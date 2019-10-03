@@ -9,11 +9,12 @@
  **/
 package org.pih.warehouse.importer
 
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.ExpectedPropertyType
 
 class ProductPackageExcelImporter extends AbstractExcelImporter {
 
     def inventoryService
+    def excelImportService
 
     static Map cellMap = [sheet: 'Sheet1', startRow: 1, cellMap: []]
 
@@ -45,26 +46,26 @@ class ProductPackageExcelImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            status          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            productCode     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            productName     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            tags            : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            category        : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            manufacturer    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            manufacturerCode: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            vendor          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            vendorCode      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            binLocation     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            unitOfMeasure   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            package         : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            packageUom      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            packageSize     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            pricePerPackage : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            pricePerUnit    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            minQuantity     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            reorderQuantity : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            maxQuantity     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            currentQuantity : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null])
+            status          : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productCode     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productName     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            tags            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            category        : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            manufacturer    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            manufacturerCode: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            vendor          : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            vendorCode      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            binLocation     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            unitOfMeasure   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            package         : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            packageUom      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            packageSize     : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            pricePerPackage : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            pricePerUnit    : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            minQuantity     : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            reorderQuantity : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            maxQuantity     : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            currentQuantity : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null])
     ]
 
 
@@ -74,7 +75,7 @@ class ProductPackageExcelImporter extends AbstractExcelImporter {
 
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
 
