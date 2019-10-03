@@ -10,9 +10,11 @@
 package org.pih.warehouse.importer
 
 import grails.util.Holders
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.ExpectedPropertyType
 
 class PersonExcelImporter extends AbstractExcelImporter {
+
+    def excelImportService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -26,10 +28,10 @@ class PersonExcelImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            firstName  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            lastName   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            email      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            phoneNumber: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
+            firstName  : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            lastName   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            email      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            phoneNumber: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
     ]
 
 
@@ -42,7 +44,7 @@ class PersonExcelImporter extends AbstractExcelImporter {
     }
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
 
