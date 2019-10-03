@@ -1,13 +1,12 @@
 package org.pih.warehouse.api
 
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderStatus
 
-@Validateable
-class Putaway {
+class Putaway implements Validateable {
 
     String id
     Location origin
