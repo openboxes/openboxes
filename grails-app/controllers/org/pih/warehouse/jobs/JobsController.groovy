@@ -10,7 +10,6 @@
 package org.pih.warehouse.jobs
 
 
-import grails.plugin.quartz2.TriggerHelper
 import org.quartz.JobDetail
 import org.quartz.JobKey
 import org.quartz.Trigger
@@ -85,7 +84,7 @@ class JobsController {
         if (jobKey) {
             // cronExpression 0 0 22 * * ?
             try {
-                Trigger trigger = TriggerHelper.cronTrigger(jobKey, params.cronExpression, [:])
+                Trigger trigger //= TriggerHelper.cronTrigger(jobKey, params.cronExpression, [:])
                 def date = quartzScheduler.scheduleJob(trigger)
                 flash.message = "Job ${jobKey} scheduled " + date
             } catch (ParseException e) {
