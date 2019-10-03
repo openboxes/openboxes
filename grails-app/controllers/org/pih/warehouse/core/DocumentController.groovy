@@ -9,9 +9,10 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import groovy.text.Template
-import groovyx.net.http.HTTPBuilder
-import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
+//import groovyx.net.http.HTTPBuilder
+import org.grails.gsp.GroovyPagesTemplateEngine
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -22,7 +23,7 @@ import util.FileUtil
 class DocumentController {
 
     def fileService
-    def grailsApplication
+    GrailsApplication grailsApplication
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
 
 
@@ -451,8 +452,9 @@ class DocumentController {
         String body = renderTemplate(document, model)
         String contentType = "image/png"
 
-        def http = new HTTPBuilder("http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/".toString())
-        def html = http.post(body: body)
+        //def http = new HTTPBuilder("http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/".toString())
+        //def html = http.post(body: body)
+        def html
 
         response.contentType = contentType
         response.outputStream << html
