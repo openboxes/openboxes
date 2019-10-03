@@ -9,10 +9,14 @@
  **/
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.grails.plugins.excelimport.ExcelImportUtils
+import grails.util.Holders
+import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.ExcelImportService
+import org.grails.plugins.excelimport.ExpectedPropertyType
 
 class ProductPackageExcelImporter extends AbstractExcelImporter {
+
+    ExcelImportService excelImportService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -31,27 +35,28 @@ class ProductPackageExcelImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            id                 : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            productCode        : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            productSupplierCode: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            name               : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            description        : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            gtin               : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            uomCode            : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            quantity           : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            price              : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
+            id                 : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productCode        : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productSupplierCode: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            name               : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            description        : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            gtin               : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            uomCode            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            quantity           : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            price              : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
     ]
 
     ProductPackageExcelImporter(String fileName) {
         super(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
     }
 
     def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("productPackageDataService")
+        return Holders.grailsApplication.mainContext.getBean("productPackageDataService")
     }
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {
