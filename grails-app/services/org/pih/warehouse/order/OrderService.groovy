@@ -12,6 +12,7 @@ package org.pih.warehouse.order
 import grails.validation.ValidationException
 import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.BudgetCode
@@ -53,7 +54,7 @@ class OrderService {
     def productSupplierDataService
     def personDataService
     def stockMovementService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
         def orders = Order.createCriteria().list(params) {

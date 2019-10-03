@@ -11,12 +11,9 @@ package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem
+import grails.plugins.csv.CSVWriter
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
