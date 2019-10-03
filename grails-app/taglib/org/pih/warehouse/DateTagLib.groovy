@@ -10,8 +10,7 @@
 package org.pih.warehouse
 
 
-import com.ocpsoft.pretty.time.PrettyTime
-import grails.plugin.springcache.annotations.Cacheable
+import org.ocpsoft.prettytime.PrettyTime
 import groovy.time.TimeDuration
 import org.pih.warehouse.core.Constants
 

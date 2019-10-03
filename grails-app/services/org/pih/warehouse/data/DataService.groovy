@@ -13,19 +13,16 @@ import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.poi.hssf.usermodel.*
 import org.apache.poi.ss.usermodel.*
-import org.grails.plugins.csv.CSVWriter
+import grails.plugins.csv.CSVWriter
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
-import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.product.Product
 
 import java.text.SimpleDateFormat

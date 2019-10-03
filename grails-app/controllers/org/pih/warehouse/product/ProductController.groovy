@@ -13,10 +13,8 @@ import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.io.FilenameUtils
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import grails.web.context.ServletContextHolder
 import org.hibernate.Criteria
-import org.pih.warehouse.core.*
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
@@ -24,6 +22,7 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
