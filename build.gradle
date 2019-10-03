@@ -11,8 +11,9 @@
 buildscript {
     repositories {
         mavenLocal()
-        mavenCentral()
-        maven { url "https://repo.grails.org/grails/core" }
+        //mavenCentral()
+        maven { url "http://repo1.maven.org/maven2" }
+        //maven { url "https://repo.grails.org/grails/core" }
         maven { url "http://repo.grails.org/grails/plugins/" }
         maven { url "http://repo.grails.org/grails/plugins-releases/" }
         maven { url "http://repo.grails.org/grails/core/" }
@@ -44,8 +45,9 @@ apply plugin:"org.grails.grails-gsp"
 
 repositories {
     mavenLocal()
-    mavenCentral()
-    maven { url "https://repo.grails.org/grails/core" }
+    //mavenCentral()
+    //maven { url "https://repo.grails.org/grails/core" }
+    maven { url "http://repo1.maven.org/maven2" }
     maven { url "http://repo.grails.org/grails/plugins/" }
     maven { url "http://repo.grails.org/grails/plugins-releases/" }
     maven { url "http://repo.grails.org/grails/core/" }
@@ -97,6 +99,8 @@ dependencies {
 
     runtime "org.springframework:spring-test:3.0.5.RELEASE" // latest 5.1.x
 
+    compile 'org.grails.plugins:database-migration:3.1.0.RC1'
+
     // Required by database connection
     compile "mysql:mysql-connector-java:5.1.47" // latest (5) 5.1.48, latest (8) 8.0.17
 
@@ -122,8 +126,8 @@ dependencies {
     compile "fr.w3blog:zebra-zpl:0.0.3" // ??
 
     // Required for Geb support in Grails 1.3.9
-    testRuntime "org.spockframework:spock-grails-support:0.6-groovy-1.7" // ??
-    testRuntime "org.codehaus.geb:geb-spock:0.6.3" // ??
+    //testRuntime "org.spockframework:spock-grails-support:0.6-groovy-1.7" // ??
+    //testRuntime "org.codehaus.geb:geb-spock:0.6.3" // ??
         // exclude "spock"
 
     // Fake SMTP server
@@ -142,7 +146,7 @@ dependencies {
 
     // Required by functionality (need to be upgraded or replaced)
     compile "org.grails.plugins:rendering:2.0.3" // was 0.4.4
-    runtime "org.grails.plugins:excel-import:1.0.0" // was 0.3
+    compile "org.grails.plugins:excel-import:3.0.2" // was 0.3
         // excludes "poi-contrib", "poi-scratchpad"
     runtime "org.grails.plugins:external-config-reload:1.4.1" // was 1.4.0
         // exclude "spock-grails-support"
