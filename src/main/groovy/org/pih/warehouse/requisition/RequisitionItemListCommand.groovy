@@ -11,10 +11,9 @@ package org.pih.warehouse.requisition
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 
-@Validateable
-class RequisitionItemListCommand implements Serializable {
+class RequisitionItemListCommand implements Serializable, Validateable {
 
     // Not the actual order items, but rather all the line items on the receive order page.
     // This means that we might have more than one OrderItemCommand per OrderItem.
