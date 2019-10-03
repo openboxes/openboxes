@@ -10,6 +10,7 @@
 package org.pih.warehouse.user
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
@@ -38,7 +39,7 @@ class DashboardController {
     def productService
     def userService
     def sessionFactory
-    def grailsApplication
+    GrailsApplication grailsApplication
     def locationService
     def userAgentIdentService
 
@@ -149,7 +150,7 @@ class DashboardController {
         render results as JSON
     }
 
-    @Cacheable("megamenuCache")
+    //@Cacheable("megamenuCache")
     def megamenu = {
         [
                 isSuperuser           : userService.isSuperuser(session?.user),
@@ -159,9 +160,9 @@ class DashboardController {
         ]
     }
 
-    @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
-            "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
-            "selectTagsCache", "selectCategoryCache", "selectCatalogsCache", "forecastCache"])
+    //@CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
+    //        "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
+    //        "selectTagsCache", "selectCategoryCache", "selectCatalogsCache", "forecastCache"])
     def flushCache = {
         flash.message = "Data caches have been flushed and inventory snapshot job was triggered"
         RefreshProductAvailabilityJob.triggerNow([locationId: session.warehouse.id, forceRefresh: true])
