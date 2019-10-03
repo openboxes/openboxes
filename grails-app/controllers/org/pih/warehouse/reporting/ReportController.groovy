@@ -10,7 +10,6 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.CacheFlush
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
@@ -362,7 +361,7 @@ class ReportController {
         }
     }
 
-    @CacheFlush(["binLocationReportCache", "binLocationSummaryCache"])
+    //@CacheFlush(["binLocationReportCache", "binLocationSummaryCache"])
     def clearBinLocationCache = {
         flash.message = "Cache have been flushed"
         redirect(action: "showBinLocationReport")
@@ -381,8 +380,6 @@ class ReportController {
             String label = messageService.getMessage(messageCode)
             [status: status, label: label]
         }
-
-
 
         try {
             if (params.downloadAction == "downloadStockReport") {
