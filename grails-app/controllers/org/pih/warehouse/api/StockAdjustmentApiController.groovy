@@ -10,8 +10,8 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.codehaus.groovy.grails.web.json.JSONArray
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONArray
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.AdjustStockCommand
 import org.pih.warehouse.core.Location
