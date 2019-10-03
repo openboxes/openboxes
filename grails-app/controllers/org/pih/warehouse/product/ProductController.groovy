@@ -11,10 +11,10 @@ package org.pih.warehouse.product
 
 import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
+import grails.util.Holders
 import grails.validation.ValidationException
 import org.apache.commons.io.FilenameUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import grails.web.context.ServletContextHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
@@ -1213,7 +1213,7 @@ class ProductController {
     }
 
     def merge = {
-        Boolean enabled = ConfigurationHolder.config.openboxes.products.merge.enabled
+        Boolean enabled = Holders.config.openboxes.products.merge.enabled
         if (!enabled) {
             throw new IllegalArgumentException("Merge products feature is not enabled")
         }
