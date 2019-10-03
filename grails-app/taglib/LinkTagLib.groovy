@@ -1,4 +1,4 @@
-import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import util.ConfigHelper
 
 class LinkTagLib extends ApplicationTagLib {
@@ -25,7 +25,7 @@ class LinkTagLib extends ApplicationTagLib {
             }
         }
 
-        def applicationTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def applicationTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         applicationTagLib.link.call(attrs, body)
     }
 }
