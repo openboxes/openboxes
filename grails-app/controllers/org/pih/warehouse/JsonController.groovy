@@ -14,8 +14,9 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.sql.Sql
 import groovy.time.TimeCategory
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
 import org.pih.warehouse.core.Location
