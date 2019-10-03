@@ -19,7 +19,7 @@ class DateTagLib {
 
     static namespace = "g"
 
-    @Cacheable("copyrightYear")
+    //@Cacheable("copyrightYear")
     def copyrightYear = { attrs, body ->
         out << (new Date().format(org.pih.warehouse.core.Constants.DEFAULT_YEAR_FORMAT))
     }

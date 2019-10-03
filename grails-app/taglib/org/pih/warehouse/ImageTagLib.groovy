@@ -10,11 +10,12 @@
 package org.pih.warehouse
 
 import com.google.zxing.BarcodeFormat
+import grails.core.GrailsApplication
 import org.pih.warehouse.core.Location
 
 class ImageTagLib {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     // Cannot cache logo because it might change between locations
     def displayLogo = { attrs, body ->
