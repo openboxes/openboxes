@@ -15,9 +15,11 @@ import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.grails.plugins.csv.CSVWriter
+import org.hibernate.Criteria
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
 import org.pih.warehouse.core.Location
