@@ -10,8 +10,8 @@
 package org.pih.warehouse.core
 
 import grails.util.Metadata
+import grails.web.context.ServletContextHolder
 import org.apache.commons.io.IOUtils
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.pih.warehouse.LocalizationUtil
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
