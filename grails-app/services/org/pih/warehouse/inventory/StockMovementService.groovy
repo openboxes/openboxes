@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.core.GrailsApplication
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
@@ -47,7 +48,7 @@ class StockMovementService {
 
     boolean transactional = true
 
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def createStockMovement(StockMovement stockMovement) {
 

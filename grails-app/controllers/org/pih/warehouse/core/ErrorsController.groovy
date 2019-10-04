@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import org.pih.warehouse.RequestUtil
 import org.springframework.validation.BeanPropertyBindingResult
 import util.ConfigHelper
@@ -18,7 +19,7 @@ class ErrorsController {
 
     MailService mailService
     def userService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def handleException = {
         if (RequestUtil.isAjax(request)) {

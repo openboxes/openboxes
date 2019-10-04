@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.util.GrailsUtil
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
@@ -21,10 +22,9 @@ import org.pih.warehouse.product.Product
 
 class ApiController {
 
-    def dataSource
     def userService
     def localizationService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def login = {
         def username = request.JSON.username
@@ -58,7 +58,7 @@ class ApiController {
         render([status: 200, text: "Current language is ${locale}"])
     }
 
-    def getAppContext = {
+    def getUserSession = {
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
         boolean isSuperuser = userService.isSuperuser(session?.user)
