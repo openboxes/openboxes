@@ -425,58 +425,49 @@ class BootStrap {
         // Migrating existing data to the new data model is still a work in progress, but you can
         // use the previous versions changelogs.
         //
-        log.info("Running liquibase changelog(s) ...")
-        Liquibase liquibase = null
-        try {
+//        log.info("Running liquibase changelog(s) ...")
+//        Liquibase liquibase = null
+//        try {
+//
+//            def connection = dataSource.getConnection()
+//            if (connection == null) {
+//                throw new RuntimeException("Connection could not be created.")
+//            }
+//            def classLoader = getClass().classLoader
+//            def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
+//
+//            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+//            boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
+//            log.info("Liquibase running: " + isRunningMigrations)
+//            log.info("Setting default schema to " + connection.catalog)
+//            log.info("Product Version: " + database.databaseProductVersion)
+//            log.info("Database Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
+//            def ranChangeSets = database.getRanChangeSetList()
+//            database.setDefaultSchemaName(connection.catalog)
+//
+//            //If nothing has been created yet, let's create all new database objects with the install scripts
+//            if (!ranChangeSets) {
+//                liquibase = new Liquibase("install/install.xml", fileOpener, database)
+//                liquibase.update(null)
+//            }
+//
+//            // Run through the updates in the master changelog
+//            liquibase = new Liquibase("changelog.xml", fileOpener, database)
+//            liquibase.update(null)
+//        }
+//        finally {
+//            if (liquibase && liquibase.database) {
+//                liquibase.database.close()
+//            }
+//        }
+//        log.info("Finished running liquibase changelog(s)!")
 
-            def connection = dataSource.getConnection()
-            if (connection == null) {
-                throw new RuntimeException("Connection could not be created.")
-            }
-            def classLoader = getClass().classLoader
-            def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
-
-            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
-            boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
-            log.info("Liquibase running: " + isRunningMigrations)
-            log.info("Setting default schema to " + connection.catalog)
-            log.info("Product Version: " + database.databaseProductVersion)
-            log.info("Database Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
-            def ranChangeSets = database.getRanChangeSetList()
-            database.setDefaultSchemaName(connection.catalog)
-
-            //If nothing has been created yet, let's create all new database objects with the install scripts
-            if (!ranChangeSets) {
-                liquibase = new Liquibase("install/install.xml", fileOpener, database)
-                liquibase.update(null)
-            }
-
-            // Run through the updates in the master changelog
-            liquibase = new Liquibase("changelog.xml", fileOpener, database)
-            liquibase.update(null)
-        }
-        finally {
-            if (liquibase && liquibase.database) {
-                liquibase.database.close()
-            }
-        }
-        log.info("Finished running liquibase changelog(s)!")
-
-        def enableFixtures = Boolean.valueOf(grailsApplication.config.openboxes.fixtures.enabled ?: true)
-        log.info("Insert test fixtures?  " + enableFixtures)
-        if (enableFixtures) {
-            log.info("Inserting test fixtures ...")
-            insertTestFixture()
-        }
-
-        // Debug logging used to figure out what log4j properties are ruining it for the rest of us
-        getClass().getClassLoader().getResources("log4j.properties").each {
-            log.info "log4j.properties => " + it
-        }
-
-        getClass().getClassLoader().getResources("log4j.xml").each {
-            log.info "log4j.xml => " + it
-        }
+//        def enableFixtures = Boolean.valueOf(grailsApplication.config.openboxes.fixtures.enabled ?: true)
+//        log.info("Insert test fixtures?  " + enableFixtures)
+//        if (enableFixtures) {
+//            log.info("Inserting test fixtures ...")
+//            insertTestFixture()
+//        }
 
         // Create uploads directory if it doesn't already exist
         uploadService.findOrCreateUploadsDirectory()
