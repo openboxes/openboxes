@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.report
 
+import grails.core.GrailsApplication
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
@@ -37,7 +38,8 @@ class ReportService implements ApplicationContextAware {
     def dataService
     def inventoryService
     def dashboardService
-    def grailsApplication
+
+    GrailsApplication grailsApplication
     def userService
 
 

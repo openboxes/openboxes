@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import org.apache.commons.mail.ByteArrayDataSource
 import org.apache.commons.mail.EmailAttachment
 import org.apache.commons.mail.HtmlEmail
@@ -21,7 +22,7 @@ class MailService {
 
     boolean transactional = false
     def userService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def config = Holders.getConfig()
 
     String getDefaultFrom() {
