@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang.text.StrSubstitutor
 import grails.util.Holders
@@ -56,7 +57,7 @@ class FileService {
     boolean transactional = false
 
     def userService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     File createDirectory(String directoryPath) {
         File folder = new File(directoryPath)
@@ -364,7 +365,7 @@ class FileService {
         // Add all reference numbers
         shipmentInstance.referenceNumbers.each { ReferenceNumber referenceNumber ->
             log.info "Reference number ${referenceNumber?.referenceNumberType} = " + referenceNumber?.identifier
-            FormatTagLib formatTag = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+            FormatTagLib formatTag = grailsApplication.mainContext.getBean('FormatTagLib')
             String referenceNumberType = formatTag.metadata(obj: referenceNumber.referenceNumberType)
             referenceNumberType = referenceNumberType.toUpperCase().replaceAll(" ", "_")
             mappings.put(referenceNumberType, referenceNumber?.identifier)

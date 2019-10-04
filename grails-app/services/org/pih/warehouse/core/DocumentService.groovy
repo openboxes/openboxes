@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.*
@@ -36,7 +37,7 @@ import java.text.SimpleDateFormat
 
 class DocumentService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def userService
     boolean transactional = false
 

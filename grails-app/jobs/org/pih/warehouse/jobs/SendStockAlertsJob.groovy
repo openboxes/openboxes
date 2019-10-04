@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.jobs
 
+import grails.core.GrailsApplication
 import groovyx.gpars.GParsPool
 import grails.util.Holders
 import org.pih.warehouse.core.ActivityCode
@@ -19,7 +20,7 @@ import org.quartz.JobExecutionContext
 class SendStockAlertsJob {
 
     def concurrent = false
-    def grailsApplication
+    GrailsApplication grailsApplication
     def locationService
     def notificationService
 
