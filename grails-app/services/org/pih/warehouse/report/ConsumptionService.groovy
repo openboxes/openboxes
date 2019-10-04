@@ -14,6 +14,7 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.reporting.ConsumptionFact
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 import java.text.NumberFormat
