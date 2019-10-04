@@ -1,3 +1,4 @@
+package org.pih.warehouse
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
  * The use and distribution terms for this software are covered by the
@@ -10,6 +11,7 @@
 
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.util.Environment
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
@@ -62,7 +64,7 @@ import javax.sql.DataSource
 class BootStrap {
 
     def identifierService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def uploadService
     DataSource dataSource
 
