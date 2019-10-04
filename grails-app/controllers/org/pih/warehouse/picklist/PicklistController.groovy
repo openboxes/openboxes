@@ -17,7 +17,7 @@ import org.pih.warehouse.requisition.Requisition
 
 class PicklistController {
 
-    def scaffold = true
+    def scaffold = Picklist
 
     def picklistService
     def pdfRenderingService
