@@ -115,6 +115,7 @@ dependencies {
     compile "com.google.zxing:javase:2.0" // maybe 3.3.1
 
     // Required by MailService (should replace with grails mail plugin)
+    compile "commons-fileupload:commons-fileupload:1.4"
     compile "org.apache.commons:commons-email:1.2" // maybe 1.6-SNAPSHOT
     compile "commons-beanutils:commons-beanutils:1.9.4"
     compile "commons-lang:commons-lang:2.6" // ok
