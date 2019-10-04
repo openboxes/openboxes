@@ -163,19 +163,15 @@ environments:
     development:
         dataSource:
             dbCreate: create-drop
-            url: jdbc:mysql://localhost:3306/openboxes
+            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false
     test:
         dataSource:
             dbCreate: update
-            url: jdbc:mysql://localhost:3306/openboxesf
+            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false
     production:
         dataSource:
             dbCreate: none
-            url: jdbc:mysql://localhost:3306/openboxes
-    diff:
-        dataSource:
-            url: jdbc:mysql://localhost:3306/openboxes_diff
-
+            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false
 ---
 openboxes:
     # Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
