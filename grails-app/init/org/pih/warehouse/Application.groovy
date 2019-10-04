@@ -1,4 +1,4 @@
-package org
+package org.pih.warehouse
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
