@@ -22,6 +22,7 @@ import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.core.Location

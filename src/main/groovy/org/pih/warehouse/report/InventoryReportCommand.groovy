@@ -10,6 +10,7 @@
 package org.pih.warehouse.report
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 class InventoryReportCommand {
