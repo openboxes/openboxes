@@ -13,8 +13,7 @@ import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Container
 
-@Validateable
-class PutawayItem {
+class PutawayItem implements Validateable {
 
     String id
     Product product
