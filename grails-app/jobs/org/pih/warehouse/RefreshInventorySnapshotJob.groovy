@@ -1,6 +1,6 @@
 package org.pih.warehouse
 
-
+import grails.core.GrailsApplication
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Location
 import org.quartz.DisallowConcurrentExecution
@@ -9,7 +9,7 @@ import org.quartz.JobExecutionContext
 @DisallowConcurrentExecution
 class RefreshInventorySnapshotJob {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def inventorySnapshotService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener

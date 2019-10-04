@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.jobs
 
+import grails.core.GrailsApplication
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
@@ -20,6 +21,7 @@ import org.quartz.JobExecutionException
 class RefreshInventorySnapshotJob {
 
     def concurrent = false
+    GrailsApplication grailsApplication
     def inventorySnapshotService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
@@ -27,7 +29,7 @@ class RefreshInventorySnapshotJob {
 
     def execute(JobExecutionContext context) {
 
-        Boolean enabled = ConfigurationHolder.config.openboxes.jobs.refreshInventorySnapshotJob.enabled
+        Boolean enabled = grailsApplication.config.openboxes.jobs.refreshInventorySnapshotJob.enabled
         log.info("Refreshing inventory snapshots with data (enabled=${enabled}): " + context.mergedJobDataMap)
         if (enabled) {
 

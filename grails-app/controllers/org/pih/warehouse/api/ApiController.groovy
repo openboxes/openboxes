@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
+import grails.core.GrailsApplication
 import grails.util.GrailsUtil
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
@@ -27,8 +28,8 @@ class ApiController {
     def dataSource
     def userService
     def localizationService
+    GrailsApplication grailsApplication
     def megamenuService
-    def grailsApplication
     def messageSource
 
     def login = {

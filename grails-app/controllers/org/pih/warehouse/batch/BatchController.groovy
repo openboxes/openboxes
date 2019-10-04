@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.batch
 
-
+import grails.core.GrailsApplication
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CategoryExcelImporter
@@ -35,7 +35,7 @@ class BatchController {
     def dataService
     def documentService
     def inventoryService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def genericApiService
     def uploadService
 

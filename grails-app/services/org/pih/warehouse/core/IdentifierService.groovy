@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+import grails.core.GrailsApplication
 import org.apache.commons.lang.RandomStringUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.WordUtils
@@ -26,7 +27,7 @@ import org.pih.warehouse.receiving.Receipt
 class IdentifierService {
 
     boolean transactional = true
-    def grailsApplication
+    GrailsApplication grailsApplication
 
 
     /**

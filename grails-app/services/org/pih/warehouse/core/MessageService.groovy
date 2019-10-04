@@ -9,10 +9,12 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
+
 
 class MessageService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     String getMessage(String messageCode) {
         return getMessage(messageCode, null, messageCode, null)
