@@ -34,14 +34,10 @@ class DataService {
     def sessionFactory
     def userService
 
-    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
-
-
     private void cleanUpGorm() {
         def session = sessionFactory.currentSession
         session.flush()
         session.clear()
-        propertyInstanceMap.get().clear()
     }
 
     static transactional = true
