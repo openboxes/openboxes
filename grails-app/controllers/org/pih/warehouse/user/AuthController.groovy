@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.user
 
+import grails.core.GrailsApplication
 import grails.validation.ValidationException
 import org.pih.warehouse.auth.UserSignupEvent
 import org.pih.warehouse.core.MailService
@@ -19,7 +20,7 @@ class AuthController {
     MailService mailService
     def userService
     def authService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def recaptchaService
     def ravenClient
     def userAgentIdentService

@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.product
 
+import grails.core.GrailsApplication
 import grails.validation.ValidationException
 import groovy.xml.Namespace
 import org.hibernate.criterion.CriteriaSpecification
@@ -32,7 +33,7 @@ import org.pih.warehouse.product.ProductGroup
 class ProductService {
 
     def sessionFactory
-    def grailsApplication
+    GrailsApplication grailsApplication
     def identifierService
     def userService
     def dataService

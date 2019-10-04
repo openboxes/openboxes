@@ -9,12 +9,12 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import java.text.SimpleDateFormat
-
 
 class MessageService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     String getMessage(String messageCode) {
         return getMessage(messageCode, null, messageCode, null)

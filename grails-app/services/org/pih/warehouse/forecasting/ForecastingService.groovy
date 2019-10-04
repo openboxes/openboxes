@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.forecasting
 
+import grails.core.GrailsApplication
 import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.pih.warehouse.core.Location
@@ -28,7 +29,7 @@ class ForecastingService {
     boolean transactional = false
 
     def dataSource
-    def grailsApplication
+    GrailsApplication grailsApplication
     def productAvailabilityService
 
     def getDemand(Location origin, Location destination, Product product) {
