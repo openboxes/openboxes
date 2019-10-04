@@ -10,12 +10,13 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 
 class LocalizationApiController {
 
     def messageSource
     def localizationService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def list = {
         String languageCode = params.lang
