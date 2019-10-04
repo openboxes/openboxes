@@ -705,7 +705,7 @@ class InventoryController {
         if (params.format == "csv") {
             def filename = "Expired stock | " + location?.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForInventoryMap(expiredStockMap))
+            render(contentType: "text/csv", text: getCsvForInventoryMap(expiredStockMap, [:]))
             return
         }
 
@@ -730,17 +730,12 @@ class InventoryController {
         if (params.format == "csv") {
             def filename = "Expiring stock | " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForInventoryMap(expiringStockMap))
+            render(contentType: "text/csv", text: getCsvForInventoryMap(expiringStockMap, [:]))
             return
         }
 
         [inventoryItems  : inventoryItems, quantityMap: quantityMap, categories: categories,
          categorySelected: category, expirationStatus: expirationStatus]
-    }
-
-
-    def getCsvForInventoryMap(map) {
-        return getCsvForInventoryMap(map, [:])
     }
 
     def getCsvForInventoryMap(map, statusMap) {
