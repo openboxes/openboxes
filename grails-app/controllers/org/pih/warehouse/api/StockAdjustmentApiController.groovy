@@ -31,7 +31,7 @@ class StockAdjustmentApiController {
 
         def jsonObject = request.JSON
         List<StockAdjustment> stockAdjustments = new ArrayList<StockAdjustment>()
-        bindStockAdjustmentData(stockAdjustments, jsonObject)
+        bindStockAdjustments(stockAdjustments, jsonObject)
 
         // FIXME Forgot there was already a command object for this
         stockAdjustments.each { StockAdjustment stockAdjustment ->
@@ -48,17 +48,17 @@ class StockAdjustmentApiController {
     }
 
 
-    void bindStockAdjustmentData(List<StockAdjustment> stockAdjustments, JSONArray jsonArray) {
+    void bindStockAdjustments(List<StockAdjustment> stockAdjustments, JSONArray jsonArray) {
         jsonArray.each {
-            stockAdjustments << bindStockAdjustmentData(new StockAdjustment(), it)
+            stockAdjustments << bindStockAdjustment(new StockAdjustment(), it)
         }
     }
 
-    void bindStockAdjustmentData(List<StockAdjustment> stockAdjustments, JSONObject jsonObject) {
-        stockAdjustments << bindStockAdjustmentData(new StockAdjustment(), jsonObject)
-    }
+//    void bindStockAdjustmentData(List<StockAdjustment> stockAdjustments, JSONObject jsonObject) {
+//        stockAdjustments << bindStockAdjustmentData(new StockAdjustment(), jsonObject)
+//    }
 
-    StockAdjustment bindStockAdjustmentData(StockAdjustment stockAdjustment, JSONObject jsonObject) {
+    StockAdjustment bindStockAdjustment(StockAdjustment stockAdjustment, JSONObject jsonObject) {
         bindData(stockAdjustment, jsonObject)
 
         if (!stockAdjustment.inventoryItem) {
