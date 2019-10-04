@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -42,7 +43,7 @@ import org.docx4j.wml.Tc
 import org.docx4j.wml.Text
 import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
-import org.groovydev.SimpleImageBuilder
+//import org.groovydev.SimpleImageBuilder
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.order.Order
@@ -60,7 +61,7 @@ import java.text.SimpleDateFormat
 
 class DocumentService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def userService
     boolean transactional = false
 

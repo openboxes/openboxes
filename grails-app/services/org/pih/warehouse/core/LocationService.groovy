@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import grails.validation.ValidationException
 import org.apache.commons.collections.comparators.NullComparator
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -21,9 +22,9 @@ import util.ConfigHelper
 
 class LocationService {
 
-    def grailsApplication
-    def userService
-    def locationDataService
+    GrailsApplication grailsApplication
+    def dataService
+    def productTypeService
     boolean transactional = true
 
 

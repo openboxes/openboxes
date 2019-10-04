@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import grails.util.Metadata
 import grails.web.context.ServletContextHolder
 import org.apache.commons.io.IOUtils
@@ -25,7 +26,7 @@ class LocalizationService {
     static scope = "session"
 
     // inject the grails application so we can access the default locale
-    def grailsApplication
+    GrailsApplication grailsApplication
 
 
     String formatMetadata(Object object) {
