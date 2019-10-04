@@ -1,5 +1,6 @@
 package org.pih.warehouse
 
+import grails.core.GrailsApplication
 import grails.util.Holders
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
@@ -7,7 +8,7 @@ import org.quartz.JobExecutionContext
 @DisallowConcurrentExecution
 class RefreshTransactionFactJob {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def reportService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener

@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.user
 
-
+import grails.core.GrailsApplication
 import org.apache.commons.mail.EmailException
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Role
@@ -21,7 +21,7 @@ class AuthController {
     MailService mailService
     def userService
     def authService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
 
