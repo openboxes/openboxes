@@ -212,6 +212,7 @@ openboxes:
         # Column 3
         newsSummary:
             enabled: false
+            newsItems: []
         activitySummary:
             enabled: true
         valueSummary:
@@ -220,10 +221,6 @@ openboxes:
             enabled: true
         catalogsSummary:
             enabled: true
-        
-        # Default value for news summary
-        newsSummary:
-            newsItems: []
 
     # OpenBoxes identifier config
     identifier:
@@ -450,9 +447,6 @@ openboxes:
     # Disable feature during development
     shipping:
         splitPickItems.enabled: true
-
-    # Add item to shipment search
-    shipping:
         search:
         maxResults: 1000
 
