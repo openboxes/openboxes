@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
@@ -17,7 +18,7 @@ import org.pih.warehouse.auth.AuthService
 class UserService {
 
     def dataSource
-    def grailsApplication
+    GrailsApplication grailsApplication
     boolean transactional = true
 
     User getUser(String id) {
