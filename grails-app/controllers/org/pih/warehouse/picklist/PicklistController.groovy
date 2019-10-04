@@ -10,6 +10,7 @@
 package org.pih.warehouse.picklist
 
 import grails.converters.JSON
+import grails.plugins.rendering.pdf.PdfRenderingService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -21,7 +22,7 @@ class PicklistController {
     def scaffold = Picklist
 
     def picklistService
-    def pdfRenderingService
+    PdfRenderingService pdfRenderingService
 
     def save = {
         def jsonRequest = request.JSON
