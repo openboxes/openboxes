@@ -18,7 +18,7 @@ class OrganizationController {
 
     def identifierService
     def organizationService
-    def scaffold = true
+    def scaffold = Organization
 
     def search = {
         def organizationInstanceList = organizationService.getOrganizations(params)
