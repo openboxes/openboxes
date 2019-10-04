@@ -14,6 +14,7 @@ import org.pih.warehouse.inventory.*
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.requisition.RequisitionItem
 
 import java.text.SimpleDateFormat
