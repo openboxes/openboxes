@@ -1289,7 +1289,7 @@ class JsonController {
             date.clearTime()
         }
         def location = Location.get(params?.location?.id ?: session?.warehouse?.id)
-        def data = dashboardService.getFastMovers(location, date, params.max as int)
+        def data = dashboardService.getFastMovers(location, date, params.max)
 
         render([aaData: data?.results ?: []] as JSON)
     }
