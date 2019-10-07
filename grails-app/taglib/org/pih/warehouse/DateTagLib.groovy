@@ -24,7 +24,7 @@ class DateTagLib {
     }
 
     def formatDate = { attrs, body ->
-        def formatTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.FormatTagLib')
+        def formatTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.FormatTagLib')
 
         if (!attrs.format) {
             attrs.format = Constants.DEFAULT_DATE_TIME_FORMAT
