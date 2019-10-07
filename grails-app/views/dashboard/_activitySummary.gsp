@@ -87,10 +87,14 @@
             var errorMessage = "<p class='error'>An unexpected error has occurred on the server.  Please contact your system administrator.</p>";
 
             if (xhr.responseText) {
+              try {
                 var error = JSON.parse(xhr.responseText);
                 errorMessage = errorMessage += "<code>" + error.errorMessage + "</code>"
+              } catch (err) {
+                console.log(err);
+              }
             }
-            $("#fastMoversWidget").html(errorMessage);
+            $("#activity-summary").html(errorMessage);
         }
     }
 
