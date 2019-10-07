@@ -6,7 +6,7 @@
         <g:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}"><g:meta name="app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 		<g:message code="application.branchName.label"/>: <b><g:meta name="app.branchName"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
         <g:message code="application.buildNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
-		<g:message code="application.environment.label"/>: <b>${grails.util.GrailsUtil.environment}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
+		<g:message code="application.environment.label"/>: <b>${grails.util.Environment.current}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
 		<g:message code="application.buildDate.label"/>: <b><g:meta name="app.buildDate"/></b>&nbsp;&nbsp;
     </div>
     <div class="center" style="line-height: 2em;">
