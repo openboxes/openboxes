@@ -17,7 +17,7 @@ package org.pih.warehouse
 class UtilInterceptor {
 
     public UtilInterceptor() {
-        matchAll()
+        matchAll().except(uri: '/static/**')
     }
 
     boolean before() {
@@ -31,7 +31,7 @@ class UtilInterceptor {
     }
 
     void afterView() {
-
+        log.info "controller: ${controllerName} action: ${actionName} params: ${params}"
         if (actionName == "logout") {
             return
         }

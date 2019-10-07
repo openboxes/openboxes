@@ -12,13 +12,14 @@ package org.pih.warehouse
 
 import grails.util.Environment
 import grails.util.Holders
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
 class SentryInterceptor {
     def ravenClient
 
     public SentryInterceptor() {
-        matchAll()
+        matchAll().except(uri: '/static/**')
     }
 
     boolean before() {
@@ -27,21 +28,22 @@ class SentryInterceptor {
             try {
                 def serverUrl = Holders.grailsApplication.config.grails.serverURL
                 def user = User.get(session.user.id)
+                def warehouse = Location.get(session.warehouse.id)
                 def userData = [
                         id         : user.id, is_authenticated: true,
                         email      : user.email,
                         username   : user.username,
-                        location   : session.warehouse ? session.warehouse.name : "No location",
+                        location   : warehouse ? warehouse.name : "No location",
                         environment: Environment.current,
                         timezone   : user.timezone,
-                        locale     : session?.user?.locale?.toString() ?: "No locale",
+                        locale     : user?.locale?.toString() ?: "No locale",
                         sessionId  : session?.id,
                         server     : serverUrl ?: "No server URL"
 
                 ]
                 //ravenClient.setUserData(userData)
             } catch (Exception e) {
-                log.info("Unable to set the user data for sentry due to the following error " + e.message)
+                log.info("Unable to set the user data for ${request.requestURI} due to the following error: " + e.message)
             }
         } else {
             //ravenClient.setUserData([is_authenticated: false])
