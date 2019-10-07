@@ -13,7 +13,7 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import grails.core.GrailsApplication
-import grails.util.GrailsUtil
+import grails.util.Environment
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -127,7 +127,7 @@ class ApiController {
         def branchName = grailsApplication.metadata.'app.branchName'
         def grailsVersion = grailsApplication.metadata.'app.grails.version'
         def appVersion = grailsApplication.metadata.'app.version'
-        def environment = GrailsUtil.environment
+        def environment = Environment.current
         def ipAddress = request?.getRemoteAddr()
         def hostname = session.hostname ?: "Unknown"
         def timezone = session?.timezone?.ID

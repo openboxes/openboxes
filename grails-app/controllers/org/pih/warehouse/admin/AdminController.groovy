@@ -10,7 +10,7 @@
 package org.pih.warehouse.admin
 
 import grails.core.GrailsApplication
-import grails.util.GrailsUtil
+import grails.util.Environment
 import grails.util.Holders
 import org.pih.warehouse.core.MailService
 import org.springframework.web.multipart.MultipartFile
@@ -219,7 +219,7 @@ class AdminController {
                 caches                  : null, //caches,
                 externalConfigProperties: externalConfigProperties,
                 systemProperties        : System.properties,
-                env                     : GrailsUtil.environment,
+                env                     : Environment.current,
                 enabled                 : Boolean.valueOf(grailsApplication.config.grails.mail.enabled),
                 from                    : "${config.getProperty("grails.mail.from")}",
                 host                    : "${config.getProperty("grails.mail.host")}",
