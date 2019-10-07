@@ -96,8 +96,8 @@ class Transaction implements Comparable, Serializable {
 
     Inventory inventory
 
-    LocalTransfer outboundTransfer
-    LocalTransfer inboundTransfer
+    //LocalTransfer outboundTransfer
+    //LocalTransfer inboundTransfer
 
     // Transient property that allows each transaction to specify
     // whether it requires an inventory snapshot refresh (e.g. deletes, imports)
