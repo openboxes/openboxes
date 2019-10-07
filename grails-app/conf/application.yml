@@ -17,6 +17,10 @@ grails:
             # Disabled by default for performance reasons
             events: false
         failOnError: false
+    config:
+        locations:
+            - ~/.grails/openboxes.yml
+            - ~/.grails/openboxes.groovy
 
 info:
     app:
@@ -107,7 +111,7 @@ grails:
         default:
             codec: none
         enable:
-            jsessionid: true
+            jsessionid: false
         gsp:
             encoding: UTF-8
             htmlcodec: xml
@@ -162,7 +166,7 @@ dataSource:
 environments:
     development:
         dataSource:
-            dbCreate: create-drop
+            dbCreate: update
             url: jdbc:mysql://localhost:3306/openboxes?useSSL=false
     test:
         dataSource:
