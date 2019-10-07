@@ -16,6 +16,8 @@ class UrlMappings {
 
         "/snapshot/$action?"(controller: "inventorySnapshot")
 
+        "/favicon.ico" (uri: "/assets/images/favicon.ico")
+
         "/$controller/$action?/$id?" {
             constraints {
                 // apply constraints here
@@ -223,13 +225,13 @@ class UrlMappings {
 
         // Error handling
 
-//        "401"(controller: "errors", action: "handleUnauthorized")
-//        "404"(controller: "errors", action: "handleNotFound")
-//        "405"(controller: "errors", action: "handleMethodNotAllowed")
-//        "500"(controller: "errors", action: "handleException")
-//        "500"(controller: "errors", action: "handleNotFound", exception: ObjectNotFoundException)
-//        "500"(controller: "errors", action: "handleValidationErrors", exception: ValidationException)
-//        "500"(controller: "errors", action: "handleUnauthorized", exception: AuthenticationException)
+        "401"(controller: "errors", action: "handleUnauthorized")
+        "404"(controller: "errors", action: "handleNotFound")
+        "405"(controller: "errors", action: "handleMethodNotAllowed")
+        "500"(controller: "errors", action: "handleException")
+        "500"(controller: "errors", action: "handleNotFound", exception: ObjectNotFoundException)
+        "500"(controller: "errors", action: "handleValidationErrors", exception: ValidationException)
+        "500"(controller: "errors", action: "handleUnauthorized", exception: AuthenticationException)
         "/"(controller: "dashboard", action: "index")
     }
 
