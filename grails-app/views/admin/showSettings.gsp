@@ -62,7 +62,7 @@
                                     </label>
                                 </td>
                                 <td class="value">
-                                    ${grails.util.GrailsUtil.environment}
+                                    ${grails.util.Environment.current}
                                 </td>
                             </tr>
                             <tr class="prop">
