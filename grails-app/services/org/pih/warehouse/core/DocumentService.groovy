@@ -791,7 +791,12 @@ class DocumentService {
             sheet.addMergedRegion(new CellRangeAddress(8, 8, 1, 4)) //  Actual shipping date
             sheet.addMergedRegion(new CellRangeAddress(9, 9, 1, 4)) // Actual delivery date
             sheet.addMergedRegion(new CellRangeAddress(10, 10, 1, 4)) // Empty
-            sheet.addMergedRegion(new CellRangeAddress(11, 12, 1, 4)) // Comments
+            if (!shipmentInstance.referenceNumbers) {
+                sheet.addMergedRegion(new CellRangeAddress(11, 12, 1, 4)) // Comments
+            } else {
+                sheet.addMergedRegion(new CellRangeAddress(11, 11, 1, 4)) // Empty
+                sheet.addMergedRegion(new CellRangeAddress(12, 13, 1, 4)) // Comments
+            }
 
 
             int CELL_INDEX = 0
