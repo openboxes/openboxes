@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <!-- YUI -->
-    <yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/yui/2.9.0/reset-fonts-grids/reset-fonts-grids.css" type="text/css">
 
     <!-- Remix icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -38,14 +38,9 @@
     <g:javascript library="application"/>
 
     <!-- Include jQuery UI files -->
-    <g:javascript library="jquery" plugin="jquery" />
-    <jqui:resources />
-    <link href="${createLinkTo(dir:'js/jquery.ui/css/smoothness', file:'jquery-ui.css')}" type="text/css" rel="stylesheet" media="screen, projection" />
-
-
-    <!-- Include Jquery Validation and Jquery Validation UI plugins -->
-    <jqval:resources />
-    <jqvalui:resources />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.8.24/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.8.24/themes/smoothness/jquery-ui.min.css" type="text/css" media="all" />
 
     <link rel="stylesheet" href="${resource(dir:'css',file:'openboxes.css')}?v=${g.meta(name: 'app.version')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${resource(dir:'css',file:'loading.css')}" type="text/css" media="all" />
@@ -265,7 +260,7 @@
             var viewModel = new openboxes.localization.Localization(data);
             ko.applyBindings(viewModel);
 
-            // Delete localization event handler
+            // Delete localition event handler
             $("#delete-localization-btn").click(function() {
                 event.preventDefault();
                 console.log("delete localization");
@@ -419,9 +414,13 @@
                     if (xhr.status !== 200) {
                         $(this).text("");
                         $("<p></p>").addClass("error").text("Error: " + xhr.status + " " + xhr.statusText).appendTo($(this));
-                        var error = JSON.parse(response);
-                        var stack = $("<div></div>").addClass("stack empty").appendTo($(this));
-                        $("<code></code>").text(error.errorMessage).appendTo(stack)
+                        try {
+                            var error = JSON.parse(response);
+                            var stack = $("<div></div>").addClass("stack empty").appendTo($(this));
+                            $("<code></code>").text(error.errorMessage).appendTo(stack)
+                        } catch (err) {
+                            console.log(err);
+                        }
                     }
                 });
             }
