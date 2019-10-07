@@ -15,8 +15,7 @@ class AccessLogInterceptor {
     }
 
     boolean before() {
-        log.info("$controllerName.$actionName: [user:${session?.user?.username}, location:${session?.warehouse?.name}]")
-        log.debug("$controllerName.$actionName: ${params}")
+        log.info("${request.requestURI}: user:${session?.user?.username}, location:${session?.warehouse?.name}]")
         return true;
     }
 }
