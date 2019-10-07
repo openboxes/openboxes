@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
-import org.pih.warehouse.util.LocalizationUtil;
+import org.pih.warehouse.LocalizationUtil;
 
 
 class LocalizationUtilTest {
