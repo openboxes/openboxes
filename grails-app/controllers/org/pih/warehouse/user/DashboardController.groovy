@@ -28,6 +28,7 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.springframework.boot.info.GitProperties
 
 import java.text.SimpleDateFormat
 
@@ -42,6 +43,7 @@ class DashboardController {
     def sessionFactory
     def locationService
     GrailsApplication grailsApplication
+    GitProperties gitProperties
 
     def showCacheStatistics = {
         def statistics = sessionFactory.statistics
@@ -176,6 +178,10 @@ class DashboardController {
             }
         }
         render results as JSON
+    }
+
+    def footer = {
+        render(template: "/common/footer", model: [gitProperties:gitProperties, buildProperties: buildProperties, infoProperties: infoProperties])
     }
 
     //@Cacheable("megamenuCache")
