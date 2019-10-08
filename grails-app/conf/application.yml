@@ -148,7 +148,7 @@ dataSource:
     username: 'root'
     password: 'root'
     dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-    logSql: false
+    logSql: true
     formatSql: false
     properties:
         jmxEnabled: true
@@ -167,7 +167,7 @@ dataSource:
         testWhileIdle: true
         testOnReturn: false
         jdbcInterceptors: ConnectionState
-        defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+        defaultTransactionIsolation: java.sql.Connection.TRANSACTION_READ_COMMITTED
 
 environments:
     development:
