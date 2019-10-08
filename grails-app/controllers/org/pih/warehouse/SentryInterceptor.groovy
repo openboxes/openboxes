@@ -19,7 +19,7 @@ class SentryInterceptor {
     def ravenClient
 
     public SentryInterceptor() {
-        matchAll().except(uri: '/static/**')
+        matchAll().except(uri: '/static/**').except(uri: "/info")
     }
 
     boolean before() {
