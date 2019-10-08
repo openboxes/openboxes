@@ -128,7 +128,7 @@
 <!-- YUI "footer" block that includes footer information -->
     <g:if test="${session?.user && session?.warehouse}">
         <div id="ft" role="contentinfo">
-            <g:render template="/common/footer" />
+            <g:include controller="dashboard" action="footer"/>
         </div>
     </g:if>
 </div>
