@@ -27,6 +27,7 @@ info:
         name: '@info.app.name@'
         version: '@info.app.version@'
         grailsVersion: '@info.app.grailsVersion@'
+
 spring:
     main:
         banner-mode: "off"
@@ -36,9 +37,14 @@ spring:
 
 # Spring Actuator Endpoints are Disabled by Default
 endpoints:
-    enabled: false
+    enabled: true
     jmx:
         enabled: true
+
+management:
+    info:
+        git:
+            mode: full
 
 ---
 grails:
