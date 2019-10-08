@@ -63,11 +63,11 @@
 				<g:renderErrors bean="${flash.errors}" as="list" />
 			</div>
 		</g:hasErrors>
-		<g:render template="../product/summary" model="[productInstance:commandInstance?.product,
-                                                        inventoryInstance:commandInstance?.inventory,
-                                                        inventoryLevelInstance: commandInstance?.inventoryLevel,
-                                                        totalQuantity: commandInstance?.totalQuantity,
-                                                        totalQuantityAvailableToPromise: commandInstance?.totalQuantityAvailableToPromise]"/>
+		<g:render template="/product/summary" model="[productInstance:commandInstance?.product,
+													  inventoryInstance:commandInstance?.inventory,
+													  inventoryLevelInstance: commandInstance?.inventoryLevel,
+													  totalQuantity: commandInstance?.totalQuantity,
+													  totalQuantityAvailableToPromise: commandInstance?.totalQuantityAvailableToPromise]"/>
 		<div class="dialog">
             <div class="yui-gf">
                 <div class="yui-u first">
