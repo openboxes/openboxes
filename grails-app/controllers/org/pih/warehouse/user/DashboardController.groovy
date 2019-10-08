@@ -11,7 +11,6 @@ package org.pih.warehouse.user
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
-import grails.plugin.springcache.annotations.CacheFlush
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.ActivityCode
 import grails.util.Holders
@@ -30,6 +29,7 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.springframework.boot.info.GitProperties
 
 import java.text.SimpleDateFormat
 
@@ -39,8 +39,9 @@ class DashboardController {
     def dashboardService
     def userService
     def sessionFactory
-    GrailsApplication grailsApplication
     def locationService
+    GrailsApplication grailsApplication
+    GitProperties gitProperties
     def userAgentIdentService
     def megamenuService
 
@@ -152,6 +153,10 @@ class DashboardController {
             }
         }
         render results as JSON
+    }
+
+    def footer = {
+        render(template: "/common/footer", model: [gitProperties:gitProperties, buildProperties: buildProperties, infoProperties: infoProperties])
     }
 
     def megamenu = {
