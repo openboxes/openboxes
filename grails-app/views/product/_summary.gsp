@@ -64,7 +64,7 @@
     <table>
         <tr>
             <td width="1%">
-                <g:render template="../product/actions" model="[productInstance:productInstance]" />
+                <g:render template="/product/actions" model="[productInstance:productInstance]" />
             </td>
             <td>
                 <div class="button-container">
