@@ -26,7 +26,7 @@ class SecurityInterceptor {
     def authService
 
     public SecurityInterceptor() {
-        matchAll().except(action: "login").except(uri: '/static/**')
+        matchAll().except(uri: '/static/**').except(controller: "errors").except(uri: "/info")
     }
 
     void afterView() {
@@ -35,7 +35,7 @@ class SecurityInterceptor {
         AuthService.currentLocation.set(null)
     }
     boolean before() {
-        log.info "Security check " + params
+        log.info "Security check [" + request.requestURI + "]"
 
         // Set the current user (if there's on in the session)
         if (session.user) {
@@ -66,7 +66,7 @@ class SecurityInterceptor {
         // Not sure when this happens
         if (params.controller == null) {
             redirect(controller: 'auth', action: 'login')
-            return true
+            return false
         }
         // When a request does not require authentication, we return true
         // FIXME In order to start working on sync use cases, we need to authenticate
@@ -86,13 +86,13 @@ class SecurityInterceptor {
 
             // Prevent user from being redirected to invalid pages after re-authenticating
             if (!targetUri.contains("/dashboard/status") && !targetUri.contains("logout")) {
-                SecurityInterceptor.log.info "Request requires authentication, saving targetUri = " + targetUri
+                log.info "Request requires authentication, saving targetUri = " + targetUri
                 if (targetUri != "/") {
                     flash.message = "Your session has timed out."
                 }
                 session.targetUri = targetUri
             } else {
-                SecurityInterceptor.log.info "Not saving targetUri " + targetUri
+                log.info "Not saving targetUri " + targetUri
             }
 
             if (RequestUtil.isAjax(request)) {
@@ -121,7 +121,7 @@ class SecurityInterceptor {
                 controllersWithLocationNotRequired.contains(controllerName) || controllerName.endsWith("Api"))) {
 
             session.warehouseStillNotSelected = true
-            SecurityInterceptor.log.info "Request ${controllerName}:${actionName} requires location, redirecting to chooseLocation ..."
+            log.info "Request ${controllerName}:${actionName} requires location, redirecting to chooseLocation ..."
             redirect(controller: 'dashboard', action: 'chooseLocation')
             return false
         }

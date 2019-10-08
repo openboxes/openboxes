@@ -38,7 +38,7 @@ class RoleInterceptor {
     ]
 
     public RoleInterceptor() {
-        matchAll().except(action: "login").except(uri: '/static/**')
+        matchAll().except(uri: '/static/**').except(controller: "errors").except(uri: "/info")
     }
 
     boolean before() {

@@ -11,11 +11,11 @@ package org.pih.warehouse
 class AccessLogInterceptor {
 
     public AccessLogInterceptor() {
-        matchAll()
+        matchAll().except(uri: "/static/**")
     }
 
     boolean before() {
-        log.info("${request.requestURI}: user:${session?.user?.username}, location:${session?.warehouse?.name}]")
+        log.info("${request.requestURI}: user:${session?.user?.username}, location:${session?.warehouse?.name}] ${request.viewDuration}")
         return true;
     }
 }
