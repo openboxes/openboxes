@@ -65,7 +65,7 @@ class Document implements Serializable {
 
     static List findAllByDocumentCode(DocumentCode documentCode) {
         List<DocumentType> documentTypes = DocumentType.findAllByDocumentCode(documentCode)
-        return Document.findAllByDocumentTypeInList(documentTypes)
+        return documentTypes ? Document.findAllByDocumentTypeInList(documentTypes) : []
     }
 
 }
