@@ -87,4 +87,11 @@ class Document implements Serializable {
         ]
     }
 
+    static namedQueries = {
+        listAllByDocumentCode { DocumentCode documentCode ->
+            documentType {
+                eq("documentCode", documentCode)
+            }
+        }
+    }
 }
