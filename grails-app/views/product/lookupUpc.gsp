@@ -70,11 +70,11 @@
 		                                  <label for="categories"><warehouse:message code="categories.label" /></label>
 		                                </td>
 		                                <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
-		                                	<%-- <g:render template="../category/chooser"/>--%>
+		                                	<%-- <g:render template="/category/chooser"/>--%>
 		                                	 <div class="category">
 												<select name="category.id">
 													<option value="null"></option>
-													<g:render template="../category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
+													<g:render template="/category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
 												</select>	
 									       	</div>
 									       	<g:render template="categories" model="['productInstance':productInstance]" />

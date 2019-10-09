@@ -17,12 +17,12 @@
             </g:hasErrors>   
             
 			<div class="dialog">
-				<g:render template="../transaction/summary" model="[transactionInstance:transactionEntryInstance?.transaction]"/>            
+				<g:render template="/transaction/summary" model="[transactionInstance:transactionEntryInstance?.transaction]"/>
             
 			<div id="edit-transaction-entry">
 				<div class="yui-gf">
 					<div class="yui-u first">
-						<g:render template="../transaction/details" model="[transactionInstance:transactionEntryInstance?.transaction]"/>
+						<g:render template="/transaction/details" model="[transactionInstance:transactionEntryInstance?.transaction]"/>
 					</div>
 					<div class="yui-u">						
 						<g:form method="post" >
