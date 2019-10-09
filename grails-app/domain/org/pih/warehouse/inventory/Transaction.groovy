@@ -97,15 +97,8 @@ class Transaction implements Comparable, Serializable {
 
     Inventory inventory
 
-    //LocalTransfer outboundTransfer
-    //LocalTransfer inboundTransfer
-
     // Association mapping
     static hasMany = [transactionEntries: TransactionEntry]
-    static belongsTo = [LocalTransfer, Requisition, Shipment]
-
-    static mappedBy = [outboundTransfer: 'destinationTransaction',
-                       inboundTransfer : 'sourceTransaction']
 
     static mapping = {
         id generator: 'uuid'
@@ -143,8 +136,6 @@ class Transaction implements Comparable, Serializable {
         requisition(nullable: true)
         receipt(nullable: true)
         order(nullable: true)
-        outboundTransfer(nullable: true)
-        inboundTransfer(nullable: true)
         confirmed(nullable: true)
         confirmedBy(nullable: true)
         dateConfirmed(nullable: true)
@@ -178,7 +169,7 @@ class Transaction implements Comparable, Serializable {
 
 
     LocalTransfer getLocalTransfer() {
-        return inboundTransfer ?: outboundTransfer ?: null
+        return LocalTransfer.findByDestinationTransactionOrSourceTransaction(this, this)
     }
 
 
