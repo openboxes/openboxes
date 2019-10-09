@@ -33,7 +33,7 @@
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
 				<g:hiddenField name="shipment.id" value="${shipmentInstance?.id}"/>
 				
-					<g:render template="../shipment/summary" />	
+					<g:render template="/shipment/summary" />
 					<g:render template="flowHeader" model="['currentState':'Sending',stage: actionName]"/>
 					<g:set var="shipmentItemsWithRecipient" value="${shipmentInstance.allShipmentItems.findAll { it.recipient } }"/>
 					<g:set var="includeNotifications" value="${shipmentItemsWithRecipient || (!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier) || (!shipmentWorkflow?.isExcluded('recipient') && shipmentInstance?.recipient)}"/>

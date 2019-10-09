@@ -11,7 +11,7 @@
     <body>
         <div class="body">
 
-            <g:render template="../transaction/summary"/>
+            <g:render template="/transaction/summary"/>
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>						
@@ -24,10 +24,10 @@
 			<div class="dialog">
 				<div class="yui-gd">
 					<div class="yui-u first">
-						<g:render template="../transaction/details" model="[transactionInstance:transactionInstance]"/>
+						<g:render template="/transaction/details" model="[transactionInstance:transactionInstance]"/>
 					</div>
 					<div class="yui-u">									
-                        <g:render template="../transaction/entries" model="[transactionInstance:transactionInstance]"/>
+                        <g:render template="/transaction/entries" model="[transactionInstance:transactionInstance]"/>
 					</div>		
 				</div>
 			</div>

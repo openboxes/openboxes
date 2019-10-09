@@ -1,5 +1,5 @@
 <div class="dialog" >
-    <g:render template="../product/summary" model="[productInstance:product]"/>
+    <g:render template="/product/summary" model="[productInstance:product]"/>
 
     <div class="tabs">
         <ul>
