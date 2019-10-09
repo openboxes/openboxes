@@ -3493,8 +3493,8 @@ class InventoryService implements ApplicationContextAware {
         def transactions = Transaction.createCriteria().list {
             // eager fetch transaction and transaction type
             fetchMode("transactionType", org.hibernate.FetchMode.JOIN)
-            fetchMode("inboundTransfer", org.hibernate.FetchMode.JOIN)
-            fetchMode("outboundTransfer", org.hibernate.FetchMode.JOIN)
+            //fetchMode("inboundTransfer", org.hibernate.FetchMode.JOIN)
+            //fetchMode("outboundTransfer", org.hibernate.FetchMode.JOIN)
 
             eq("inventory", location.inventory)
             order("transactionDate", "asc")
