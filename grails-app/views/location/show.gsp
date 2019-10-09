@@ -81,7 +81,7 @@
 							<g:each var="transaction" in="${locationInstance?.transactions }" status="i">
 								<tr class="${i%2?'odd':'even' }">
 									<td>
-										<g:render template="../transaction/actions" model="[transactionInstance:transaction]"/>
+										<g:render template="/transaction/actions" model="[transactionInstance:transaction]"/>
 									</td>
 									<td>${transaction.id }</td>
 									<td>${transaction.transactionDate }</td>
@@ -107,7 +107,7 @@
 							<g:each var="shipment" in="${locationInstance?.shipments }" status="i">
 								<tr class="${i%2?'odd':'even' }">
 									<td>
-										<g:render template="../shipment/actions" model="[shipmentInstance:shipment]"/>
+										<g:render template="/shipment/actions" model="[shipmentInstance:shipment]"/>
 									</td>
 									<td>${shipment.id }</td>
 									<td>${shipment.shipmentType?.name }</td>

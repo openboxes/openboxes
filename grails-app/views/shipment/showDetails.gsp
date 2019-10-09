@@ -24,7 +24,7 @@
 
         <div class="buttons">
             <div class="button-container" style="text-align: left">
-                <g:render template="../shipment/actions" model="[shipmentInstance:shipmentInstance]" />
+                <g:render template="/shipment/actions" model="[shipmentInstance:shipmentInstance]" />
                 <g:render template="buttons"/>
             </div>
         </div>
