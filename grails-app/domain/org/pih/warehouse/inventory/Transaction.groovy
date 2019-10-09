@@ -198,7 +198,7 @@ class Transaction implements Comparable, Serializable {
     }
 
     LocalTransfer getLocalTransfer() {
-        return inboundTransfer ?: outboundTransfer ?: null
+        return LocalTransfer.findByDestinationTransactionOrSourceTransaction(this, this)
     }
 
     String getAssociatedLocation() {
