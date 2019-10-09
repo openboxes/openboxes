@@ -147,7 +147,7 @@
 										</td>
 										<td class="left" rowspan="${rowspan }">
 											<g:if test="${newContainer }">
-												<g:render template="../shipment/container" model="[container:checklistEntry?.shipmentItem?.container]"/>
+												<g:render template="/shipment/container" model="[container:checklistEntry?.shipmentItem?.container]"/>
 											</g:if>
 										</td>
 										<td>
