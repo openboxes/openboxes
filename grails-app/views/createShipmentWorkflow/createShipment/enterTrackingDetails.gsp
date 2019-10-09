@@ -27,7 +27,7 @@
 
 			<g:form action="createShipment" method="post">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}"/>
-				<g:render template="../shipment/summary" />
+				<g:render template="/shipment/summary" />
 				<g:render template="flowHeader" model="['currentState':'Tracking']"/>
 
 				<div class="dialog box">
