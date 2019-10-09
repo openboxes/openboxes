@@ -23,7 +23,7 @@
             	<div class="box">
             	    <h2><warehouse:message code="default.create.label" args="[entityName]" /></h2>
 
-                    <g:render template="../inventoryLevel/form" model="[productInstance:inventoryLevelInstance.product,inventoryLevelInstance:inventoryLevelInstance]"/>
+                    <g:render template="/inventoryLevel/form" model="[productInstance:inventoryLevelInstance.product,inventoryLevelInstance:inventoryLevelInstance]"/>
                 </div>
             </g:form>
         </div>

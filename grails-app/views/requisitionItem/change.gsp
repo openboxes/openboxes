@@ -27,12 +27,12 @@
                 
             <div class="dialog">
 
-                 <g:render template="../requisition/summary" model="[requisition:requisitionItemInstance?.requisition]"/>
+                 <g:render template="/requisition/summary" model="[requisition:requisitionItemInstance?.requisition]"/>
 
 
                 <div class="yui-gd">
                     <div class="yui-u first">
-                        <g:render template="../requisition/header" model="[requisition:requisitionItemInstance?.requisition]"/>
+                        <g:render template="/requisition/header" model="[requisition:requisitionItemInstance?.requisition]"/>
                     </div>
                     <div class="yui-u">
                         <div class="box">
