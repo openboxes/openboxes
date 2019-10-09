@@ -68,4 +68,13 @@ class Document implements Serializable {
         return documentTypes ? Document.findAllByDocumentTypeInList(documentTypes) : []
     }
 
+    static namedQueries = {
+        listAllByDocumentCode { DocumentCode documentCode ->
+            documentType {
+                eq("documentCode", documentCode)
+            }
+        }
+    }
+
+
 }
