@@ -5,7 +5,7 @@
             <tbody>
                 <tr>
                     <td class="top" width="1%">
-                        <g:render template="../requisition/actions" model="[requisition:requisition]" />
+                        <g:render template="/requisition/actions" model="[requisition:requisition]" />
                     </td>
                     <td class="center" width="1%">
                         <g:if test="${requisition?.requestNumber }">

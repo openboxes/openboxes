@@ -13,7 +13,7 @@
  	</g:if>
  	<g:else> 	
 		<select id="categoriesList[${i }].id" name="categoriesList[${i }].id" >	
-			<g:render template="../category/selectOptions" model="[category:rootCategory, selected:category, level: 0]"/>
+			<g:render template="/category/selectOptions" model="[category:rootCategory, selected:category, level: 0]"/>
 		</select>	   
 	</g:else>
 </div>

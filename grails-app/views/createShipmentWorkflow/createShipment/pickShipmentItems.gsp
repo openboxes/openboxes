@@ -23,7 +23,7 @@
                 <div class="message">${message}</div>
             </g:if>
 
-            <g:render template="../shipment/summary" />
+            <g:render template="/shipment/summary" />
             <g:render template="flowHeader" model="['currentState':'Picking']"/>
 
             <g:set var="shipmentItemsSorted" value="${shipmentInstance.sortShipmentItems()}"/>
