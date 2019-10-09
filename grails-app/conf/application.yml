@@ -46,6 +46,9 @@ management:
         git:
             mode: full
 
+server:
+    session:
+        timeout: 3600
 ---
 grails:
     #serverURL: "http://localhost:8080/${appName}"
