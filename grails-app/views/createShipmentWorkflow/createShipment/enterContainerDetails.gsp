@@ -56,7 +56,7 @@
     </g:elseif>
 
     <div>
-        <g:render template="../shipment/summary" />
+        <g:render template="/shipment/summary" />
         <g:render template="flowHeader" model="['currentState':'Packing']"/>
 
         <!-- figure out what dialog box, if any, we need to render -->

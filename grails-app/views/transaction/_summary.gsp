@@ -1,7 +1,7 @@
 <table class="summary">
 	<tr>
 		<td class="middle" style="width:1%">
-			<g:render template="../transaction/actions"/>
+			<g:render template="/transaction/actions"/>
 		</td>
 		<td class="middle">
 			<div class="title"> 

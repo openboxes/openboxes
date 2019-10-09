@@ -443,7 +443,7 @@
                             <g:render template="productPackages" model="[productInstance:productInstance]"/>
 						</div>
                         <div id="inventory-level-dialog" class="dialog hidden" title="Add a new stock level">
-                            <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new org.pih.warehouse.inventory.InventoryLevel()]"/>
+                            <g:render template="/inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new org.pih.warehouse.inventory.InventoryLevel()]"/>
                         </div>
                         <div id="uom-class-dialog" class="dialog hidden" title="Add a unit of measure class">
                             <g:render template="uomClassDialog" model="[productInstance:productInstance]"/>
@@ -461,7 +461,7 @@
 
         <g:each var="inventoryLevelInstance" in="${productInstance?.inventoryLevels}" status="i">
             <div id="inventory-level-${inventoryLevelInstance?.id}-dialog" class="dialog hidden" title="Edit inventory level">
-                <g:render template="../inventoryLevel/form" model="[inventoryLevelInstance:inventoryLevelInstance]"/>
+                <g:render template="/inventoryLevel/form" model="[inventoryLevelInstance:inventoryLevelInstance]"/>
             </div>
         </g:each>
         <g:each var="packageInstance" in="${productInstance.packages }">

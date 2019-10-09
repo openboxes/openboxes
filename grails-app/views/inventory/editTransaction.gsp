@@ -31,7 +31,7 @@
             </g:if>
 
 			<div class="dialog" >
-				<g:render template="../transaction/summary"/>
+				<g:render template="/transaction/summary"/>
 
 				<div class="yui-gf">
 					<div class="yui-u first">
