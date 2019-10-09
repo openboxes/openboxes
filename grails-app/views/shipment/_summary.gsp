@@ -15,7 +15,7 @@
 				<g:if test="${actionName != 'showDetails'}">
 					<td width="1%" class="middle">
 						<div>
-							<g:render template="../shipment/actions" />
+							<g:render template="/shipment/actions" />
 						</div>
 					</td>
 				</g:if>
