@@ -17,7 +17,7 @@
 		</option>
 	</g:else>
 	<g:each var="childCategory" in="${category.categories }">	
-		<g:render template="../category/selectOptions" model="${[category:childCategory,level:level,selected:selected,excludeSpaces:excludeSpaces]}"/>
+		<g:render template="/category/selectOptions" model="${[category:childCategory,level:level,selected:selected,excludeSpaces:excludeSpaces]}"/>
 	</g:each>
 </g:if>
 <g:else>
