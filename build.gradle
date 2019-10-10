@@ -183,6 +183,9 @@ dependencies {
     compile "org.grails.plugins:google-analytics:2.3.3" // was 1.0
 
     testCompile "org.grails.plugins:code-coverage:2.0.3-3" // was 1.2.5
+
+    compile("org.grails.plugins:sentry:11.7.24")
+
 }
 
 bootRun {
