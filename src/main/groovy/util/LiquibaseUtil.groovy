@@ -9,38 +9,35 @@
  **/
 package util
 
-import liquibase.database.DatabaseFactory
-import liquibase.lockservice.LockService
-import liquibase.lockservice.StandardLockService
-import org.apache.commons.logging.LogFactory
 import grails.util.Holders
+import liquibase.database.Database
+import liquibase.database.DatabaseFactory
+import liquibase.database.jvm.JdbcConnection
+import liquibase.lockservice.LockService
+import liquibase.lockservice.LockServiceFactory
+import org.apache.commons.logging.LogFactory
 
 class LiquibaseUtil {
 
     private static final log = LogFactory.getLog(this)
 
     static getDatabase() {
-        def ctx = Holders.getGrailsApplication().getMainContext()
+        def ctx = Holders.grailsApplication.mainContext
         def dataSource = ctx.getBean("dataSource")
-        def connection = dataSource.getConnection()
+        def connection = new JdbcConnection(dataSource.connection)
         def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
         return database
     }
 
     static synchronized isRunningMigrations() {
-        boolean isRunning = false
         try {
-            LockService lockService = new StandardLockService()
-            lockService.database = getDatabase()
-            isRunning = lockService.hasChangeLogLock()
+            Database database = getDatabase()
+            LockService lockService = LockServiceFactory.getInstance().getLockService(database)
+            boolean hasChangeLogLock = lockService.hasChangeLogLock()
+            return hasChangeLogLock
         } catch (Exception e) {
             e.printStackTrace()
         }
-        finally {
-            if (database) {
-                database.close()
-            }
-        }
-        return isRunning
+        return false
     }
 }
