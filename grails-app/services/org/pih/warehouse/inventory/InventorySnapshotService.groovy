@@ -9,14 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
-import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import grails.util.Holders
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
@@ -35,13 +33,8 @@ class InventorySnapshotService {
     def locationService
     def inventoryService
     def persistenceInterceptor
-    def grailsApplication
 
     def populateInventorySnapshots(Date date) {
-        populateInventorySnapshots(date, false)
-    }
-
-    def populateInventorySnapshots(Date date, Boolean enableOptimization) {
         def results
         def startTime = System.currentTimeMillis()
 
@@ -191,7 +184,7 @@ class InventorySnapshotService {
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
         def startTime = System.currentTimeMillis()
-        def batchSize = Holders.getConfig().getProperty("openboxes.inventorySnapshot.batchSize") ?: 1000
+        Integer batchSize = Holders.getConfig().getProperty("openboxes.inventorySnapshot.batchSize") ?: 1000
         Sql sql = new Sql(dataSource)
 
         try {
