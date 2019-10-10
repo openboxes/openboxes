@@ -40,6 +40,7 @@ class InventorySnapshotService {
     def locationService
     def productAvailabilityService
     def persistenceInterceptor
+    def grailsApplication
 
     def populateInventorySnapshots(Date date) {
         populateInventorySnapshots(date, false)
