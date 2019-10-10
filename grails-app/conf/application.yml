@@ -41,6 +41,11 @@ spring:
         template:
             check-template-location: false
 
+quartz:
+    pluginEnabled: true
+    jdbcStore: false
+    autoStartup: true
+
 # Spring Actuator Endpoints are Disabled by Default
 endpoints:
     enabled: true
@@ -157,7 +162,7 @@ dataSource:
     username: 'root'
     password: 'root'
     dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-    logSql: true
+    logSql: false
     formatSql: false
     properties:
         jmxEnabled: true
