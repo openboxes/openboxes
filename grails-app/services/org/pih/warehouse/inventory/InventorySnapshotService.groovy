@@ -224,6 +224,8 @@ class InventorySnapshotService {
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
+        } finally {
+            sql.close()
         }
     }
 
