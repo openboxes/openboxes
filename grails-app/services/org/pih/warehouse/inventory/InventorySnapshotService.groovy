@@ -199,6 +199,7 @@ class InventorySnapshotService {
 
             // Execute inventory snapshot insert/update in batches
             sql.withTransaction {
+                sql.executeUpdate("SET foreign_key_checks = 0")
                 sql.withBatch(batchSize, insertStmt) { ps ->
                     binLocations.eachWithIndex { entry, index ->
                         def row = [
@@ -217,6 +218,7 @@ class InventorySnapshotService {
                         ps.addBatch(row)
                     }
                 }
+                sql.executeUpdate("SET foreign_key_checks = 1")
             }
             log.info "Saved ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${System.currentTimeMillis() - startTime}ms"
 
