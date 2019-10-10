@@ -11,12 +11,13 @@ package org.pih.warehouse
 
 
 import grails.util.Environment
-import grails.util.Holders
+import io.sentry.SentryClient
+import io.sentry.event.UserBuilder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
 class SentryInterceptor {
-    def ravenClient
+    SentryClient sentryClient
 
     public SentryInterceptor() {
         matchAll().except(uri: '/static/**').except(uri: "/info")
@@ -24,29 +25,25 @@ class SentryInterceptor {
 
     boolean before() {
         if (session.user) {
-
             try {
-                def serverUrl = Holders.grailsApplication.config.grails.serverURL
                 def user = User.get(session.user.id)
                 def warehouse = Location.get(session.warehouse.id)
-                def userData = [
-                        id         : user.id, is_authenticated: true,
-                        email      : user.email,
-                        username   : user.username,
-                        location   : warehouse ? warehouse.name : "No location",
+                def data = [
+                        id         : user?.id,
+                        email      : user?.email,
+                        username   : user?.username,
+                        location   : warehouse?.name,
                         environment: Environment.current,
-                        timezone   : user.timezone,
-                        locale     : user?.locale?.toString() ?: "No locale",
-                        sessionId  : session?.id,
-                        server     : serverUrl ?: "No server URL"
-
+                        timezone   : user?.timezone,
+                        locale     : user?.locale?.toString(),
+                        sessionId  : session?.id
                 ]
-                //ravenClient.setUserData(userData)
+                def userBuilder = new UserBuilder().setData(data)
+                sentryClient.context.setUser(userBuilder.build())
+
             } catch (Exception e) {
                 log.info("Unable to set the user data for ${request.requestURI} due to the following error: " + e.message)
             }
-        } else {
-            //ravenClient.setUserData([is_authenticated: false])
         }
         return true
     }

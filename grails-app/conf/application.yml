@@ -21,6 +21,12 @@ grails:
         locations:
             - ~/.grails/openboxes.yml
             - ~/.grails/openboxes.groovy
+    plugin:
+        sentry:
+            active: false
+            dsn: https://{PUBLIC_KEY}@sentry.io/{PROJECT_ID}
+            logClassName: true
+            logHttpRequest: true
 
 info:
     app:
@@ -65,11 +71,11 @@ grails:
         prefix: "[OpenBoxes]"
         host: "localhost"
         port: "25"
-    
+
         # Authentication disabled by default
         username: null
         password: null
-    
+
         # Disable debug mode by default
         debug: false
     mime:
@@ -195,7 +201,7 @@ openboxes:
             widgets: ["binLocationSummary", "expiringSummary", "productSummary", "genericProductSummary",]
         column3:
             widgets: ["newsSummary", "activitySummary", "valueSummary", "tagSummary", "catalogsSummary"]
-        
+
         # Column 1
         requisitionItemSummary:
             enabled: true
@@ -207,7 +213,7 @@ openboxes:
             enabled: true
         indicatorSummary:
             enabled: false
-        
+
         # Column 2
         binLocationSummary:
             enabled: true
@@ -217,7 +223,7 @@ openboxes:
             enabled: false
         expiringSummary:
             enabled: true
-        
+
         # Column 3
         newsSummary:
             enabled: false
@@ -250,15 +256,15 @@ openboxes:
             format: "NNNLLL"
         shipment:
             format: "NNNLLL"
-    
+
     # OpenBoxes default line printer port
     linePrinterTerminal:
         port: "LPT1"
-    
+
     # OpenBoxes default uploads directory location
     uploads:
         location: "uploads"
-        
+
 
     # Fullstory integration
     fullstory:
@@ -314,13 +320,13 @@ openboxes:
     # Barcode scanner (disabled by default)
     scannerDetection:
         enabled: false
-    
-    
+
+
     # Default delay and min length for typeahead components
     typeahead:
         delay: 300
         minLength: 3
-    
+
     # Send stock alerts
     jobs:
         sendStockAlertsJob:
@@ -328,41 +334,41 @@ openboxes:
             skipOnEmpty: true
             daysUntilExpiry: 60
             cronExpression: "0 0 0 * * ?" # every day at midnight
-    
+
         # Refresh inventory snapshots
         refreshInventorySnapshotJob:
             enabled: true
-        
+
         # Refresh transaction fact table
         refreshTransactionFactJob:
             enabled: true
             cronExpression: "0 0 0 * * ?" # every day at midnight
-        
+
         # Assign identifier job
         assignIdentifierJob:
             enabled: true
             cronExpression: "0 * * * * ?" # every five minutes
-        
+
         # Calculate current quantity on hand
         calculateQuantityJob:
             enabled: true
             cronExpression: "0 */5 * * * ?" # every five minutes
-        
+
         # Calculate historical quantity on hand
         calculateHistoricalQuantityJob:
             enabled: false
             cronExpression: "0 0 0 * * ?" # every day at midnight
             daysToProcess: 540   // 18 months
-        
+
         # Data Cleaning Job
         dataCleaningJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"       # every five minutes
-        
+
         # Data Migration Job (enabled, but needs to be triggered manually)
         dataMigrationJob:
             enabled: true
-    
+
     # LDAP configuration
     ldap:
         enabled: false
@@ -372,14 +378,14 @@ openboxes:
             server:
                 host: "ldap.forumsys.com"
                 port: 389
-    
+
         # LDAP Search
         search:
             base: "dc=example,dc=com"
             filter: "(uid={0})"
             searchSubtree: true
             attributesToReturn: ['mail', 'givenName']
-    
+
     # Stock Card > Consumption > Reason codes
     # Examples: Stock out, Low stock, Expired, Damaged, Could not locate, Insufficient quantity reconditioned
     stockCard:
@@ -391,7 +397,7 @@ openboxes:
             could_not_locate: &could_not_locate 14
             insufficient_quantity_reconditioned: &insufficient_quantity_reconditioned 19
             reasonCodes: [*stockout, *low_stock, *expired, *damaged, *could_not_locate, *insufficient_quantity_reconditioned]
-    
+
     # Localization configuration - default and supported locales
     locale:
         custom:
@@ -401,11 +407,11 @@ openboxes:
         # Currency configuration
         defaultCurrencyCode: "USD"
         defaultCurrencySymbol: '\$'
-    
+
     # Inventory snapshot configuration
     inventorySnapshot:
         batchSize: 1500
-    
+
     # Global megamenu configuration
     megamenu:
         dashboard:
