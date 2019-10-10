@@ -11,6 +11,8 @@ grails:
     profile: web
     codegen:
         defaultPackage: org
+    dbconsole:
+        enabled: true
     gorm:
         reactor:
             # Whether to translate GORM events into Reactor events
