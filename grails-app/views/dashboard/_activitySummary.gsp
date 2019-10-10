@@ -51,7 +51,7 @@
             },
             "oLanguage": {
                 "sZeroRecords": "No records found",
-                "sProcessing": "Loading ... <img alt='spinner' src='${request.contextPath}/images/spinner.gif' />"
+                "sProcessing": "Loading ... <img alt='spinner' src=\"${createLinkTo(dir:'images/spinner.gif')}\" />"
             },
             "aLengthMenu": [
                 [5, 10, 25, 100, 1000, -1],
@@ -65,7 +65,7 @@
             ],
             "bUseRendered": false,
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                $('td:eq(0)', nRow).html('<img src="${request.contextPath}/images/icons/silk/' + aData["type"] + '.png" />');
+                $('td:eq(0)', nRow).html('<img src="${request.contextPath}/static/images/icons/silk/' + aData["type"] + '.png" />');
                 return nRow;
             }
 
