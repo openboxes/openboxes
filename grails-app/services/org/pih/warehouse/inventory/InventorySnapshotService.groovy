@@ -173,8 +173,8 @@ class InventorySnapshotService {
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
         def startTime = System.currentTimeMillis()
-        Integer batchSize = Holders.getConfig().getProperty("openboxes.inventorySnapshot.batchSize") ?: 1000
-        Sql sql = new Sql(dataSource)
+        Integer batchSize = Holders.config.getProperty("openboxes.inventorySnapshot.batchSize", Integer, 1000)
+        def sql = new Sql(dataSource)
 
         try {
             // Clear time in case caller did not
