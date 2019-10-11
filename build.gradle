@@ -185,7 +185,8 @@ dependencies {
 
     // new plugins
     compile("org.grails.plugins:sentry:11.7.24")
-    compile 'org.grails.plugins:quartz:2.0.13'
+    compile ('org.grails.plugins:quartz:2.0.13')
+    compile ('org.grails.plugins:ajax-tags:1.0.0')
 
 }
 
