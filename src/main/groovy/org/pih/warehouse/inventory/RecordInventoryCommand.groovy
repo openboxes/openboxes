@@ -9,13 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
-import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.Product
 
-class RecordInventoryCommand {
+class RecordInventoryCommand implements Validateable {
 
     Product product
     Inventory inventory
@@ -34,6 +33,7 @@ class RecordInventoryCommand {
         totalQuantity(nullable: true)
         transactionDate(nullable: false)
         comment(nullable: true)
+        recordInventoryRow(nullable: true)
         recordInventoryRows(validator: { val, obj, errors ->
             def errorsFound = false
             val.each { row ->
