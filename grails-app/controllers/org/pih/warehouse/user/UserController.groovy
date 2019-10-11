@@ -67,6 +67,11 @@ class UserController {
         if (session.impersonateUserId) {
             flash.message = "Already impersonstating user ${session.user.username}"
         } else {
+
+            if (!userInstance?.active) {
+                throw new IllegalStateException("Impersonating an inactive user is unconscionable and strictly prohibited")
+            }
+
             session.impersonateUserId = userInstance?.id
             session.activeUserId = session?.user?.id
         }
