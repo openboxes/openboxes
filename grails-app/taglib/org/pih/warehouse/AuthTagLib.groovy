@@ -62,16 +62,12 @@ class AuthTagLib {
 
     def userRole = { attrs, body ->
         Location location = Location.get(session.warehouse.id)
-        User.withTransaction {
-            out << User.get(attrs.user.id).getHighestRole(location)
-        }
+        out << User.get(attrs.user.id).getHighestRole(location)
     }
 
     def userPhoto = { attrs, body ->
-        User.withTransaction {
-            def user = User.get(attrs.user.id)
-            out << render(template: "/taglib/userPhoto", model: [userInstance: user])
-        }
+        def user = User.get(attrs.user.id)
+        out << render(template: "/taglib/userPhoto", model: [userInstance: user])
     }
 
 
