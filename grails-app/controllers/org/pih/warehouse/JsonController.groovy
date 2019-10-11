@@ -1653,6 +1653,19 @@ class JsonController {
         def demandDetails = forecastingService.getDemandDetails(location, product)
         render([aaData: demandDetails] as JSON)
     }
+
+    def getForecastingData = {
+        Product product = Product.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        def demand = forecastingService.getDemand(location, product)
+        def totalQuantity = inventoryService.getQuantityOnHand(location, product)
+        def onHandMonths = demand?.monthlyDemand ? totalQuantity / demand?.monthlyDemand : 0
+
+        def data = [
+                onHandMonths: onHandMonths,
+                monthlyDemand: demand?.monthlyDemand]
+        render data as JSON
+    }
 }
 
 

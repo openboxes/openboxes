@@ -72,9 +72,7 @@ class InventoryItemController {
             // now populate the rest of the commmand object
             inventoryService.getStockCardCommand(cmd, params)
 
-            def demand = forecastingService.getDemand(cmd.warehouse, cmd.product)
-
-            [commandInstance: cmd, demand: demand]
+            [commandInstance: cmd]
         } catch (ProductException e) {
             flash.message = e.message
             redirect(controller: "dashboard", action: "index")

@@ -62,13 +62,7 @@
                         <label><warehouse:message code="forecasting.onHandMonths.label"/></label>
                     </td>
                     <td class="value" id="onHandMonths">
-                        <g:if test="${totalQuantity && demand?.monthlyDemand}">
-                            <g:formatNumber number="${totalQuantity / demand?.monthlyDemand}" maxFractionDigits="1"/>
-                        </g:if>
-                        <g:else>
-                            0.0
-                        </g:else>
-                        <g:message code="default.months.label" default="months"/>
+                        <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -76,10 +70,7 @@
                         <label><warehouse:message code="forecasting.demand.label"/></label>
                     </td>
                     <td class="value" id="demand">
-                        <div>
-                            <g:formatNumber number="${demand?.monthlyDemand}" maxFractionDigits="1"/>
-                            <g:message code="default.perMonth.label" default="per month"/>
-                        </div>
+                        <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
                     </td>
                 </tr>
             </g:if>
@@ -424,6 +415,22 @@
 	function closeDialog(dialogId, imgId) {
 		$(dialogId).dialog('close');
 	}
+
+    $(window).load(function(){
+      var ajaxTimeout = ${grailsApplication.config.openboxes.ajaxRequest.timeout?:0}
+      $.ajax({
+        dataType: "json",
+        timeout: ajaxTimeout,
+        url: "${request.contextPath}/json/getForecastingData/${productInstance?.id}",
+        success: function (data) {
+          var onHandMonths = data.onHandMonths.toFixed(1);
+          var demand = data.monthlyDemand.toFixed(1);
+
+          $('#onHandMonths').html(onHandMonths + " months");
+          $('#demand').html(demand + " per month");
+        },
+      });
+    });
 </script>
 
 
