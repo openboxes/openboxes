@@ -35,6 +35,9 @@ class LiquibaseUtil {
         } catch (Exception e) {
             e.printStackTrace()
         }
+        finally {
+            database.close()
+        }
         return false
     }
 }
