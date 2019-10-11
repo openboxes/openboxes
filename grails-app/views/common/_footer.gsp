@@ -57,7 +57,7 @@
             <b>${session?.timezone?.ID}</b>
         </span>
         <g:if test="${session.warehouse && session.user && session._showTime}">
-            &nbsp;&nbsp; | &nbsp;&nbsp;
+        &nbsp;&nbsp; | &nbsp;&nbsp;
             <span>
                 <g:message code="default.dataLoad.label" default="Data load"/>:
                 <b>${(request?.actionDuration?:0)/1000}s</b>
@@ -65,7 +65,7 @@
             &nbsp;&nbsp; | &nbsp;&nbsp;
             <span>
                 <g:message code="default.pageLoad.label" default="Page load"/>:
-                <b>${(request?.viewDuration?:0)/1000}s</b>
+                <b>${(request?.pageLoadInMilliseconds?:0)/1000}s</b>
             </span>
         </g:if>
 	</div>

@@ -16,7 +16,7 @@ package org.pih.warehouse
  */
 class UtilInterceptor {
 
-    public UtilInterceptor() {
+    UtilInterceptor() {
         matchAll().except(uri: '/static/**')
     }
 
@@ -27,25 +27,8 @@ class UtilInterceptor {
 
     boolean after() {
         request._timeAfterRequest = System.currentTimeMillis()
+        request?.pageLoadInMilliseconds = request?._timeAfterRequest - request?._timeBeforeRequest
         return true
-    }
-
-    void afterView() {
-        log.info "controller: ${controllerName} action: ${actionName} params: ${params}"
-        if (actionName == "logout") {
-            return
-        }
-        if (params.showTime) {
-            session?._showTime = params.showTime == "on"
-        }
-        if (session._showTime) {
-            def actionDuration = request?._timeAfterRequest - request?._timeBeforeRequest
-            def viewDuration = System.currentTimeMillis() - request?._timeAfterRequest
-
-            request?.actionDuration = actionDuration
-            request?.viewDuration = viewDuration
-            log.info("Request duration for (${controllerName}/${actionName}): ${actionDuration}ms/${viewDuration}ms")
-        }
     }
 
 }
