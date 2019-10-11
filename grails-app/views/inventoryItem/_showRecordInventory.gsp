@@ -75,29 +75,29 @@
                                                 name="recordInventoryRows[${status}].binLocation.id"
                                                 value="${recordInventoryRow?.binLocation?.id}"/>
 
-										<g:if test="${recordInventoryRow?.binLocation}">
-											${recordInventoryRow?.binLocation?.name }
-										</g:if>
-										<g:else>
-											<g:if test="${!recordInventoryRow?.binLocation?.parentLocation?.hasBinLocationSupport()}">
-												<warehouse:message code="default.notSupported.label"/>
-											</g:if>
-											<g:else>
-												<warehouse:message code="default.label"/>
-											</g:else>
-										</g:else>
+					<g:if test="${recordInventoryRow?.binLocation}">
+						${recordInventoryRow?.binLocation?.name }
+					</g:if>
+					<g:else>
+						<g:if test="${!recordInventoryRow?.binLocation?.parentLocation?.hasBinLocationSupport()}">
+							<warehouse:message code="default.notSupported.label"/>
+						</g:if>
+						<g:else>
+							<warehouse:message code="default.label"/>
+						</g:else>
+					</g:else>
                                     </td>
                                     <td>
                                         <g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
                                         <g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
-										<g:if test="${recordInventoryRow?.lotNumber}">
-											<div class="lotNumber">
-												${recordInventoryRow?.lotNumber }
-											</div>
-										</g:if>
+					<g:if test="${recordInventoryRow?.lotNumber}">
+						<div class="lotNumber">
+							${recordInventoryRow?.lotNumber }
+						</div>
+					</g:if>
                                         <g:else>
-											<span class="fade"><warehouse:message code="default.label"/></span>
-										</g:else>
+						<span class="fade"><warehouse:message code="default.label"/></span>
+					</g:else>
                                     </td>
                                     <td>
 										<g:if test ="${!recordInventoryRow?.oldQuantity}">
