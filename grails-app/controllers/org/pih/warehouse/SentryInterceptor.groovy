@@ -24,7 +24,7 @@ class SentryInterceptor {
     }
 
     boolean before() {
-        if (session.user) {
+        if (session.user && sentryClient) {
             try {
                 def user = User.get(session.user.id)
                 def warehouse = Location.get(session.warehouse.id)
