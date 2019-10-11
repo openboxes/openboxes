@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import groovyx.gpars.GParsPool
@@ -39,6 +40,7 @@ import java.text.NumberFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
+@Transactional
 class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
@@ -1454,9 +1456,6 @@ class InventoryService implements ApplicationContextAware {
         log.debug "Saving record inventory command params: " + params
 
         try {
-            // Validation was done during bind, but let's do this just in case
-            def inventoryItems = getInventoryItemsByProductAndInventory(cmd.product, cmd.inventory)
-
             // Create a new transaction
             def transaction = new Transaction(cmd.properties)
             transaction.inventory = cmd.inventory
