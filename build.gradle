@@ -138,7 +138,7 @@ dependencies {
     testRuntime "dumbster:dumbster:1.6" // ??
 
     // Required for GPars
-    compile "org.codehaus.gpars:gpars:0.12" // latest 1.2.1
+    compile "org.codehaus.gpars:gpars:1.2.1" // latest 1.2.1
     compile "org.codehaus.jsr166-mirror:jsr166y:1.7.0" // ??
     compile "org.codehaus.jsr166-mirror:extra166y:1.7.0" // ??
 
