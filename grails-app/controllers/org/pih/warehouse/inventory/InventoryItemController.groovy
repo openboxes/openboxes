@@ -17,12 +17,17 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentItemException
+import util.ConfigHelper
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class InventoryItemController {
 
@@ -282,6 +287,10 @@ class InventoryItemController {
         cmd.warehouse = Location.get(session?.warehouse?.id)
 
         def reasonCodes = params.list("reasonCode")
+        if (reasonCodes.empty) {
+            reasonCodes = ConfigHelper.listValue(grailsApplication.config.openboxes.stockCard.consumption.reasonCodes)
+            reasonCodes = reasonCodes.collect { it.toString() }
+        }
 
         // now populate the rest of the commmand object
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
@@ -297,18 +306,27 @@ class InventoryItemController {
 
         // Get quantity issued by request
         def transactionEntries = requisitionService.getIssuedTransactionEntries(commandInstance?.warehouse, commandInstance?.product, cmd.startDate, cmd.endDate)
-        transactionEntries = transactionEntries.collect {
+        transactionEntries = transactionEntries.collect { TransactionEntry transactionEntry ->
+            // Retrieved through shipment since the transaction cannot be trusted to have a reliable link yet (see OBPIH-2447)
+            Requisition requisition = transactionEntry.transaction?.outgoingShipment?.requisition
             [
-                    requestNumber: it.transaction?.outgoingShipment?.requisition?.requestNumber,
-                    quantity     : it?.quantity,
+                    requestNumber : requisition?.requestNumber,
+                    dateRequested : requisition?.dateRequested,
+                    dateIssued    : transactionEntry?.transaction?.transactionDate,
+                    quantityIssued: transactionEntry?.quantity,
             ]
         }
 
+        DateFormat monthFormat = new SimpleDateFormat("MMM yyyy")
+        monthFormat.timeZone = TimeZone.default
+
         requisitionItems = requisitionItems.collect {
             def requestNumber = it?.requisition?.requestNumber
-            def quantityIssued = transactionEntries.findAll { te -> te.requestNumber == requestNumber }.collect {
-                it.quantity
-            }.sum()
+
+            def transactionEntriesByRequest = transactionEntries.findAll { te -> te.requestNumber == requestNumber }
+            def quantityIssued = transactionEntriesByRequest.collect { it.quantityIssued }.sum()
+            def dateIssued = transactionEntriesByRequest.collect { it.dateIssued }.min()
+
             def quantityApproved = it?.quantityApproved ?: 0
             def quantityPicked = it?.calculateQuantityPicked() ?: 0
             if (it.status in [RequisitionItemStatus.CHANGED, RequisitionItemStatus.SUBSTITUTED]) {
@@ -318,18 +336,20 @@ class InventoryItemController {
                 }.sum()
             }
             [
-                    monthRequested   : it?.requisition?.monthRequested,
                     status           : it?.status,
                     productCode      : it?.product?.productCode,
                     productName      : it?.product?.name,
                     origin           : it?.requisition?.origin?.name,
                     requisitionId    : it?.requisition?.id,
                     requestNumber    : it?.requisition?.requestNumber,
-                    reuestStatus     : it?.requisition?.status,
+                    requestStatus    : it?.requisition?.status,
                     destination      : it?.requisition?.destination?.name,
                     lotNumber        : it?.inventoryItem?.lotNumber,
                     expirationDate   : it?.inventoryItem?.expirationDate,
+                    dateIssued       : dateIssued,
+                    monthIssued      : dateIssued ? monthFormat.format(dateIssued) : null,
                     dateRequested    : it?.requisition?.dateRequested,
+                    monthRequested   : monthFormat.format(it?.requisition?.dateRequested),
                     quantityRequested: it?.quantity ?: 0,
                     quantityCanceled : it?.quantityCanceled ?: 0,
                     quantityApproved : quantityApproved,
@@ -341,8 +361,25 @@ class InventoryItemController {
             ]
         }
 
+        // Create list of months to display including all months between first and last requested date
+        def monthKeys = (firstDateRequested..lastDateRequested).collect {
+            monthFormat.format(it)
+        }.unique()
+
+        // Remove the current month
+        def currentMonthKey = monthFormat.format(new Date())
+        monthKeys.remove(currentMonthKey)
+
+        // By default, only display the last 6 months
+        if (!cmd.startDate && !cmd.endDate) {
+            monthKeys = monthKeys.subList(Math.max(monthKeys.size() - 6, 0), monthKeys.size());
+        }
         render(template: "showConsumption",
-                model: [commandInstance: commandInstance, requisitionItems: requisitionItems, numberOfDays: numberOfDays])
+                model: [commandInstance : commandInstance,
+                        requisitionItems: requisitionItems,
+                        reasonCodes     : reasonCodes,
+                        numberOfMonths  : monthKeys?.size() ?: 1,
+                        monthKeys       : monthKeys])
     }
 
     def showProductDemand = {
