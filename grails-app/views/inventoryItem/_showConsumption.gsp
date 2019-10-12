@@ -10,7 +10,7 @@
         Total and averages are for the last 6 months only, excluding the current month, as well as
         any month before the oldest request. To change the
         <span title="${monthKeys}">dates</span> and <span title="${reasonCodes}">reason codes</span>
-        considered in the totals. Also you can click on a row to view details for the month.
+        considered in the totals.
 
     </div>
     <div class="box">
@@ -53,7 +53,7 @@
 
                         <tr class="prop header ${i%2?'even':'odd'}" style="cursor: pointer">
                             <td>
-                                <label>${monthKey}</label>
+                                ${monthKey}
                             </td>
                             <td class="center middle">
                                 <g:formatNumber number="${monthlyQuantityRequested}" maxFractionDigits="0"/>
@@ -194,7 +194,7 @@
                         </tr>
                     </g:if>
                     <g:else>
-                        <tr class="prop fade ${i%2?'even':'odd'}" style="cursor: pointer">
+                        <tr class="prop ${i%2?'even':'odd'}" style="cursor: pointer">
                             <td>
                                 ${monthKey}
                             </td>
@@ -204,7 +204,7 @@
                             <td class="center middle">
                                 <g:formatNumber number="${0}" maxFractionDigits="0"/>
                             </td>
-                            <td class="center middle">
+                            <td class="center middle border-right">
                                 <g:formatNumber number="${0}" maxFractionDigits="0"/>
                             </td>
                             <td class="center middle">
@@ -289,13 +289,12 @@ $(function () {
                     <warehouse:message code="reasonCode.label" default="Reason Code"/>
                 </td>
                 <td class="value">
-                    <g:set var="defaultReasonCodes" value="${ConfigHelper.listValue(grailsApplication.config.openboxes.stockCard.consumption.reasonCodes)}"/>
 
                     <ul>
                         <li><g:checkBox id="reasonCode-ALL" name="reasonCode" value="ALL"/> <label for="reasonCode-ALL">All reason codes</label></li>
                         <g:each var="reasonCode" in="${org.pih.warehouse.core.ReasonCode.list()}">
                             <li>
-                                <g:checkBox id="reasonCode-${reasonCode}" name="reasonCode" value="${reasonCode}" checked="${defaultReasonCodes.contains(reasonCode)}"/>
+                                <g:checkBox id="reasonCode-${reasonCode}" name="reasonCode" value="${reasonCode}" checked="${reasonCodes.contains(reasonCode)}"/>
                                 <label for="reasonCode-${reasonCode}" title="${reasonCode}">
                                     <warehouse:message code="enum.ReasonCode.${reasonCode}"/>
                                 </label>

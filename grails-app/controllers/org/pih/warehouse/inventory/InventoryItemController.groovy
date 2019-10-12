@@ -300,10 +300,6 @@ class InventoryItemController {
         Date firstDateRequested = requisitionItems.collect { it.requisition.dateRequested }.min()
         Date lastDateRequested = requisitionItems.collect { it.requisition.dateRequested }.max()
 
-        // Calculate the days between first and last consumption transaction, ensuring that
-        def numberOfDays = (firstDateRequested && lastDateRequested) ? lastDateRequested - firstDateRequested : 1
-        numberOfDays = numberOfDays ?: 1
-
         // Get quantity issued by request
         def transactionEntries = requisitionService.getIssuedTransactionEntries(commandInstance?.warehouse, commandInstance?.product, cmd.startDate, cmd.endDate)
         transactionEntries = transactionEntries.collect { TransactionEntry transactionEntry ->

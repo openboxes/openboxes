@@ -570,7 +570,7 @@ class RequisitionService {
 
 
     List<RequisitionItem> getIssuedRequisitionItems(Location location, Product product, Date startDate, Date endDate, List<ReasonCode> cancelReasonCodes) {
-        println "Reason codes: " + cancelReasonCodes
+        log.info "Reason codes: " + cancelReasonCodes
 
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
