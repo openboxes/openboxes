@@ -2,11 +2,11 @@
 <head>
 	<meta name="layout" content="custom" />
 	<g:layoutHead />
-    <script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript" ></script>
-    <script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript" ></script>
-    <script src="${createLinkTo(dir:'js/', file:'inventory.js')}" type="text/javascript" ></script>
-    <script src="${createLinkTo(dir:'js/jquery.cycle', file:'jquery.cycle.lite.js')}" type="text/javascript" ></script>
-    <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/', file:'knockout_binding.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/', file:'inventory.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/jquery.cycle', file:'jquery.cycle.lite.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
 
 	<title><g:pageProperty name="page.title"/></title>
 

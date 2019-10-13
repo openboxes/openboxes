@@ -3,13 +3,13 @@
 <g:if test="${stockMovement?.id }">
     <span id="stockmovement-action-menu" class="action-menu">
         <button class="action-btn ">
-            <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_down.png')}" />
+            <img src="${resource(dir:'images/icons/silk',file:'bullet_arrow_down.png')}" />
         </button>
         <div class="actions" >
             <g:if test="${!request.request.requestURL.toString().contains('stockMovement/list')}">
                 <div class="action-menu-item">
                     <g:link controller="stockMovement" action="list">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" style="vertical-align: middle" />
+                        <img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" style="vertical-align: middle" />
                         &nbsp;${warehouse.message(code: 'stockMovement.list.label', args:[warehouse.message(code:'stockMovement.label')])}
                     </g:link>
                 </div>

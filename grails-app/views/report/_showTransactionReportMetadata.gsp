@@ -59,7 +59,7 @@
                        id="refreshTransactionFact" class="button"
                        data-url="${request.contextPath}/report/refreshTransactionFact"
                         data-confirmation-prompt="${warehouse.message(code: 'default.button.delay.confirm.message', default: 'Are you sure?')}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" />
+                        <img src="${resource(dir:'images/icons/silk',file:'reload.png')}" />
                         ${message(code:"default.button.refresh.label")} ${message(code:"default.data.label")}
                     </a>
                 </div>
