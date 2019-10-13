@@ -222,7 +222,7 @@
 
 
                                     <button class="dialog-trigger" data-id="#dialog-box-${requisition?.id}">
-                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
+                                        <img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" />
                                     </button>
 
                                 </td>
@@ -423,7 +423,7 @@
 
 
     <script type="text/javascript">
-			$(function() { 
+			$(function() {
 		    	$(".tabs").tabs(
 	    			{
 	    				cookie: {
@@ -446,7 +446,7 @@
 
 
             });
-        </script>        
-        
+        </script>
+
     </body>
 </html>

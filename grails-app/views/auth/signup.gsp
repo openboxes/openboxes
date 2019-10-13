@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<title><warehouse:message code="auth.signup.label"/></title>
-	<script src="${createLinkTo(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
 	<g:if test="${grailsApplication.config.openboxes.signup.recaptcha.enabled}">
 	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 	</g:if>
@@ -30,7 +30,7 @@
 					</g:hasErrors>
 					<div id="loginBox" class="box">
 						<h2>
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/> Signup for an account
+							<img src="${resource(dir:'images/icons/silk',file:'lock.png')}" class="middle"/> Signup for an account
 						</h2>
                         <table>
 							<tbody>
@@ -146,7 +146,7 @@
 													data-sitekey="${grailsApplication.config.openboxes.signup.recaptcha.v2.siteKey}"
 													data-callback="validateRecaptchaToken"
 													data-action="submit">
-												<img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" class="middle"/>
+												<img src="${resource(dir:'images/icons/silk',file:'accept.png')}" class="middle"/>
 												<warehouse:message code="auth.signup.label"/>
 											</button>
 										</g:if>

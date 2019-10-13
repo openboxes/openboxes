@@ -6,7 +6,7 @@
 
 		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
-		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>							
+		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
 		<table>
 			<tr class="prop">
 				<td class="name">
@@ -15,7 +15,7 @@
 				<td class="value">
 					<format:metadata obj="${command?.transactionInstance?.transactionType}"/>
 				</td>
-			</tr>	
+			</tr>
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.date.label"/></label>
@@ -23,7 +23,7 @@
 				<td class="value">
                     <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
 				</td>
-			</tr>	
+			</tr>
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.source.label"/></label>
@@ -31,10 +31,10 @@
 				<td class="value">
 					<span>
 						${command?.warehouseInstance?.name}
-					</span>								
+					</span>
 				</td>
-			</tr>	
-			
+			</tr>
+
 			<tr class="prop">
 				<td class="name">
 					<label><warehouse:message code="transaction.destination.label"/></label>
@@ -56,7 +56,7 @@
 						<g:textArea cols="120" rows="5" name="transactionInstance.comment" style="width:100%"
 							value="${command?.transactionInstance?.comment }"></g:textArea>
 
-					</span>								
+					</span>
 				</td>
 			</tr>
 			<tr class="prop">
@@ -139,7 +139,7 @@
 										</g:else>
 									</td>
 									<td class="center">
-										<img class="delete" src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}"/>
+										<img class="delete" src="${resource(dir:'images/icons/silk',file:'cross.png')}"/>
 									</td>
 								</tr>
 							</g:if>
@@ -177,15 +177,15 @@
 
 		/**
 		 * Delete a row from the table.
-		 */		
-		$("img.delete").livequery('click', function(event) { 
-			$(this).closest('tr').fadeTo(400, 0, function () { 
+		 */
+		$("img.delete").livequery('click', function(event) {
+			$(this).closest('tr').fadeTo(400, 0, function () {
 		        $(this).remove();
 				renameRowFields($("#outgoingTransfer"));
 				alternateRowColors("#outgoingTransfer");
 		    });
 		    return false;
-		});			
-				
+		});
+
 	});
 </script>

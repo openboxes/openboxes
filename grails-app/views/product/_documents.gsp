@@ -51,11 +51,11 @@
                     </td>
                     <td class="right">
                         <g:link controller="product" action="downloadDocument" id="${document?.id}" params="['product.id':productInstance?.id]" target="_blank" class="button">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="View" />
+                            <img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" alt="View" />
                             ${g.message(code: 'default.button.view.label')}
                         </g:link>
                         <g:link controller="product" action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" class="button">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete" />
+                            <img src="${resource(dir:'images/icons/silk',file:'delete.png')}" alt="Delete" />
                             ${g.message(code: 'default.button.delete.label')}
                         </g:link>
                     </td>
@@ -95,12 +95,12 @@
                         </td>
                         <td class="right">
                             <g:link url="${document.fileUri}" target="_blank" class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="View" />
+                                <img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" alt="View" />
                                 ${g.message(code: 'default.button.view.label')}
                             </g:link>
 
                             <g:link controller="product" action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete" />
+                                <img src="${resource(dir:'images/icons/silk',file:'delete.png')}" alt="Delete" />
                                 ${g.message(code: 'default.button.delete.label')}
                             </g:link>
                         </td>
@@ -151,7 +151,7 @@
                 </td>
                 <td>
                     <button type="submit" class="button">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Delete" />
+                        <img src="${resource(dir:'images/icons/silk',file:'add.png')}" alt="Delete" />
                         ${warehouse.message(code:'default.button.add.label')}
                     </button>
                 </td>

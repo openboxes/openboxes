@@ -1,11 +1,11 @@
 <script type="text/javascript">
     var childCount = ${productInstance?.categories.size()} + 0;
- 
+
 	function addCategory(){
       var clone = $("#category_clone").clone();
       var htmlId = 'categoriesList['+childCount+'].';
       var categoryInput = clone.find("input[id$=number]");
- 
+
       clone.find("input[id$=id]")
              .attr('id',htmlId + 'id')
              .attr('name',htmlId + 'id');
@@ -25,14 +25,14 @@
 	      .attr('id',htmlId + 'id')
 	      .attr('name',htmlId + 'id');
 
-            
+
       clone.attr('id', 'category'+childCount);
       $("#childList").append(clone);
       clone.show();
       categoryInput.focus();
       childCount++;
     }
- 
+
     //bind click event on delete buttons using jquery live
     $('.del-category').live('click', function() {
         //find the parent div
@@ -51,15 +51,15 @@
             prnt.hide();
         }
     });
- 
+
 </script>
- 
+
 <div id="childList">
     <g:each var="category" in="${productInstance.categories}" status="i">
         <g:render template='category' model="['category':category,'i':i,'hidden':false]"/>
     </g:each>
 </div>
 <div style="padding: 5px;">
-	<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
+	<img src="${resource(dir:'images/icons/silk',file:'add.png')}" />
 	<a href="#" onclick="addCategory();" class="middle"><warehouse:message code="product.addAnotherCategory.label"/></a>
 </div>

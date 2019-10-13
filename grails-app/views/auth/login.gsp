@@ -4,8 +4,8 @@
 	<meta name="layout" content="custom" />
 	<title><warehouse:message code="auth.title"/></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
-	<script src="${createLinkTo(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
-    <script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript" ></script>
+	<script src="${resource(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/', file:'requisition.js')}" type="text/javascript" ></script>
 	<style>
 		input, button { width: 100%; font-size: 2em; text-align: center; padding: 10px; }
 	</style>
@@ -31,7 +31,7 @@
 
 					<div id="loginBox" class="box">
                         <h2>
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk',file:'lock.png')}" class="middle"/>
                             <warehouse:message code="default.login.label" default="Login"/>
                         </h2>
 

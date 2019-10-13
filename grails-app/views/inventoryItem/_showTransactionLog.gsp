@@ -1,49 +1,49 @@
 <%@ page import="org.pih.warehouse.product.Product"%>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
-<div>							
+<div>
 	<div>
 		<g:form method="GET" action="showTransactionLog">
 			<g:hiddenField name="product.id" value="${commandInstance?.product?.id }"/>
 
 				<!--  Filter -->
-			
+
 				<table style="border: 1px solid lightgrey">
 					<tr class="odd">
 						<td>
 							<label><warehouse:message code="transactionLog.from.label"/></label>
 						</td>
 					</tr>
-					<tr class="even"> 
+					<tr class="even">
 						<td class="middle left">
-							<g:jqueryDatePicker 
-								id="startDate" 
-								name="startDate" 
-								value="${commandInstance?.startDate }" 
+							<g:jqueryDatePicker
+								id="startDate"
+								name="startDate"
+								value="${commandInstance?.startDate }"
 								format="MM/dd/yyyy"
 								size="8"
 								showTrigger="false" />
 							<warehouse:message code="transactionLog.to.label"/>
-							<g:jqueryDatePicker 
-								id="endDate" 
-								name="endDate" 
-								value="${commandInstance?.endDate }" 
+							<g:jqueryDatePicker
+								id="endDate"
+								name="endDate"
+								value="${commandInstance?.endDate }"
 								format="MM/dd/yyyy"
 								size="8"
 								showTrigger="false" />
-			
-							<g:select name="transactionType.id" 
+
+							<g:select name="transactionType.id"
 								from="${org.pih.warehouse.inventory.TransactionType.list()}"
-								optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${commandInstance?.transactionType?.id }" 
-								noSelection="['0': warehouse.message(code:'default.all.label')]" /> 
-						
+								optionKey="id" optionValue="${{format.metadata(obj:it)}}" value="${commandInstance?.transactionType?.id }"
+								noSelection="['0': warehouse.message(code:'default.all.label')]" />
+
 							<button  class="" name="filter">
-								<img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
+								<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png' )}" style="vertical-align:middle"/>
 								&nbsp;<warehouse:message code="default.button.filter.label"/>
 							</button>
 						</td>
 					</tr>
 					<tr>
-						<td style="padding: 0px;">					
+						<td style="padding: 0px;">
 							<g:set var="enableFilter" value="${!params.disableFilter}"/>
 							<table >
 								<thead>
@@ -65,13 +65,13 @@
 										</th>
 										<th style="text-align: center">
 											${warehouse.message(code: 'transaction.quantityChange.label')}
-										</th>										
+										</th>
 									</tr>
-			
+
 								</thead>
 								<!--  Transaction Log -->
-								<tbody>			
-									
+								<tbody>
+
 									<g:set var="transactionMap" value="${commandInstance?.getTransactionLogMap(enableFilter.toBoolean())}"/>
 									<g:if test="${!transactionMap }">
 										<tr>
@@ -83,11 +83,11 @@
 										</tr>
 									</g:if>
 									<g:else>
-										<g:set var="totalQuantityChange" value="${0 }"/>		
+										<g:set var="totalQuantityChange" value="${0 }"/>
 										<g:each var="transaction" in="${transactionMap?.keySet()?.sort {it.transactionDate}.reverse() }" status="status">
 											<tr class="transaction ${(status%2==0)?'even':'odd' } prop">
-												<td style="width: 10%;" nowrap="nowrap">	
-													<format:date obj="${transaction?.transactionDate}"/>																
+												<td style="width: 10%;" nowrap="nowrap">
+													<format:date obj="${transaction?.transactionDate}"/>
 												</td>
 												<td>
 													<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
@@ -129,9 +129,9 @@
 													<span class="${transaction?.transactionType?.transactionCode?.name()?.toLowerCase()}">
 														${quantityChange }
 													</span>
-												</td>												
+												</td>
 											</tr>
-										</g:each>															
+										</g:each>
 									</g:else>
 								</tbody>
 							</table>
@@ -151,4 +151,3 @@
 		</g:link>
 	</g:if>
 </div>
-	

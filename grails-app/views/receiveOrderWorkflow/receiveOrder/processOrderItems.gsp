@@ -11,8 +11,8 @@
 			<div class="message">
 				${flash.message}
 			</div>
-		</g:if>	
-	
+		</g:if>
+
 		<g:hasErrors bean="${orderCommand}">
 			<div class="errors">
 				<g:renderErrors bean="${orderCommand}" as="list" />
@@ -23,7 +23,7 @@
 				<g:renderErrors bean="${orderListCommand}" as="list" />
 			</div>
 		</g:hasErrors>
-				
+
 		<g:form action="receiveOrder" autocomplete="off">
 			<div class="dialog">
 				<g:render template="/order/summary" model="[orderInstance:order, currentState:'processOrderItems']"/>
@@ -39,20 +39,20 @@
 									<g:hiddenField name="recipient.id" value="${orderCommand?.recipient?.id }"/>
 									<g:hiddenField name="shippedOn" value="${formatDate(format:'MM/dd/yyyy', date: orderCommand?.shippedOn )}"/>
 									<g:hiddenField name="deliveredOn" value="${formatDate(format:'MM/dd/yyyy', date: orderCommand?.deliveredOn )}"/>
-								
+
 									<g:if test="${orderItems }">
 										<table id="orderItemsTable">
 											<thead>
 												<tr class="even">
 													<th class="center" align="center" colspan="6">
 														<h2>
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
+															<img src="${resource(dir:'images/icons/silk',file:'cart.png')}" alt="ordered" style="vertical-align: middle"/>
 															<warehouse:message code="order.itemsOrdered.label"/>
 														</h2>
 													</th>
 													<th class="center" align="center" colspan="5" style="border-left: 1px solid lightgrey;">
 														<h2>
-															<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
+															<img src="${resource(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
 															<warehouse:message code="order.itemsReceived.label"/>
 														</h2>
 													</th>
@@ -70,13 +70,13 @@
 													<th><warehouse:message code="default.expires.label"/></th>
 													<th></th>
 												</tr>
-											</thead>									
+											</thead>
 											<tbody>
-											
+
 												<g:set var="i" value="${0 }"/>
 												<g:each var="entrymap" in="${orderItems?.groupBy { it?.orderItem } }">
 													<g:each var="orderItem" in="${entrymap.value}">
-												
+
 														<tr class="${(orderItem?.primary)?"black-top":""} orderItem">
 															<td>
 																<g:hiddenField name="orderItems[${i }].orderItem.id" class="orderItemId" value="${orderItem?.orderItem?.id }"/>
@@ -140,18 +140,18 @@
 														<g:set var="i" value="${i+1 }"/>
 													</g:each>
 												</g:each>
-												
+
 											</tbody>
-													
+
 
 										</table>
 									</g:if>
 									<g:else>
 										<span class="fade"><warehouse:message code="default.noItems.label"/></span>
-									</g:else>									
+									</g:else>
 								</div>
 
-							</td>						
+							</td>
 						</tr>
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
@@ -168,7 +168,7 @@
 
 	function selectCombo(comboBoxElem, value) {
 		if (comboBoxElem != null) {
-			if (comboBoxElem.options) { 
+			if (comboBoxElem.options) {
 				for (var i = 0; i < comboBoxElem.options.length; i++) {
 		        	if (comboBoxElem.options[i].value == value &&
 		                comboBoxElem.options[i].value != "") { //empty string is for "noSelection handling as "" == 0 in js
@@ -208,15 +208,15 @@
 			$('tbody tr:odd', this).removeClass('odd').addClass('even');
 			$('tbody tr:even', this).removeClass('even').addClass('odd');
 			return this;
-		};				
+		};
 
 		$("#orderItemsTable").alternateRowColors();
-    	$(".updateable").change(function() { 
+    	$(".updateable").change(function() {
 			changed = true
 		});
 
-		
-		$(".checkable").click(function() { 
+
+		$(".checkable").click(function() {
 			if (changed) {
 				alert("Please reset or save your changes first.")
 				return false;
@@ -224,7 +224,7 @@
 		});
    	});
 	</script>
-	<script id="new-item-template" type="text/x-jquery-tmpl">						
+	<script id="new-item-template" type="text/x-jquery-tmpl">
 			<tr class="orderItem">
 				<td>
 					<a name="orderItems{{= Index }}"></a>
@@ -256,16 +256,16 @@
 				</td>
 				<td nowrap="true">
 					<g:datePicker name="orderItems[{{= Index }}].expirationDate" precision="day" default="none" value="" noSelection="['':'']"
-						years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}"/>					
-				</td>															
+						years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}"/>
+				</td>
 				<td>
 					<span class="buttons" style="padding: 0px;">
 						<button alt="Delete item" class="btnDel button icon trash">${warehouse.message(code:'default.deleteItem.label', default:'Delete item')}</button>
 					</span>
 				</td>
 			</tr>
-			
-	</script>    	  
+
+	</script>
 	<script language="javascript">
 		$(document).ready(function() {
 			$(".autocomplete").livequery(function() {
@@ -291,14 +291,14 @@
 						return false;
 					},
 					change: function(event, ui) {
-						if (!ui.item) { 
+						if (!ui.item) {
 							$(this).prev().val("null");
 							$(this).val("");
-						}						
+						}
 						return false;
 					},
-					select: function(event, ui) {						
-						if (ui.item) { 
+					select: function(event, ui) {
+						if (ui.item) {
 							$(this).val(ui.item.valueText);
 							$(this).prev().val(ui.item.value);
 						}
@@ -307,7 +307,7 @@
 				});
 			});
 		});
-	</script>	
-	  
+	</script>
+
 </body>
 </html>

@@ -4,9 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
 <script
-	src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}"
+	src="${resource(dir:'js/knockout/', file:'knockout-2.2.0.js')}"
 	type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'requisition.js')}"
+<script src="${resource(dir:'js/', file:'requisition.js')}"
 	type="text/javascript"></script>
 <g:set var="entityName"
 	value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />
@@ -36,7 +36,7 @@
 				controller="picklist">
 				<div class="dialog">
 					<ul id="accordion"
-						data-bind="foreach: requisition.requisitionItems">						
+						data-bind="foreach: requisition.requisitionItems">
 						<li>
 							<div class="accordion-header">
 								<div data-bind="text: $index()+1" class="row-index"></div>
@@ -103,10 +103,10 @@
 									</div>
 									<div data-bind="if: picklistItems().length == 0">
 										<div class="error">
-											<warehouse:message code="requisition.picklistItems.message" default="No picklist items available"></warehouse:message>	
+											<warehouse:message code="requisition.picklistItems.message" default="No picklist items available"></warehouse:message>
 										</div>
 									</div>
-									
+
 								</div>
 							</div>
 						</li>
@@ -156,12 +156,12 @@
 	</div>
 
 	<script type="text/javascript">
-	
+
     $(function(){
     	var viewModel;
         var data = ${data};
         var picklistFromServer = data.picklist;
-        var picklistFromLocal = openboxes.requisition.getPicklistFromLocal(data.requisition.id); 
+        var picklistFromLocal = openboxes.requisition.getPicklistFromLocal(data.requisition.id);
         var newerPicklist = openboxes.requisition.Picklist.getNewer(picklistFromServer, picklistFromLocal);
         viewModel = new openboxes.requisition.ProcessViewModel(data.requisition, newerPicklist, data.productInventoryItemsMap);
 
@@ -176,8 +176,8 @@
         $("#requisitionForm").validate({ submitHandler: viewModel.save });
 
         $("#accordion").accordion({
-          header: ".accordion-header", 
-          icons: false, 
+          header: ".accordion-header",
+          icons: false,
           active:false,
           collapsible: true,
           heightStyle: "content"
@@ -193,7 +193,7 @@
         });
 
         $(".quantity-picked input").keyup(function(){
-           this.value=this.value.replace(/[^\d]/,'');      
+           this.value=this.value.replace(/[^\d]/,'');
            $(this).trigger("change");//Safari and IE do not fire change event for us!
         });
 

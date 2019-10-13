@@ -12,7 +12,7 @@
 
 <body>
 	<div class="body">
-	
+
 
         <g:render template="summary" />
 
@@ -37,14 +37,14 @@
                 <g:render template="buttons"/>
 
                 <g:link controller="shipment" action="deleteReceipt" id="${receiptInstance?.id}" class="button">
-                    <img src="${createLinkTo(dir: 'images/icons/silk', file: 'reload.png')}"/>
+                    <img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}"/>
                     &nbsp;<g:message code="default.button.startOver.label" />
                 </g:link>
             </div>
         </div>
 
 		<div class="dialog">
-			
+
 			<g:form action="receiveShipment" method="POST">
 				<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 
@@ -56,7 +56,7 @@
 
                 <div class="box">
                     <h2>
-                        <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}"/>
+                        <img src="${resource(dir:'images/icons',file:'handtruck.png')}"/>
                         <warehouse:message code="receiving.label"/>
                     </h2>
 
@@ -184,12 +184,12 @@
                                                 </td>
                                                 <td class="middle center">
                                                     <a href="javascript:void(-1)" data-id="${receiptItem?.id}" data-index="${i}" class="btnCopyPutaway" title="${warehouse.message(code:'receipt.copyBinLocation.message')}">
-                                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page_copy.png')}" class="middle"/>
+                                                        <img src="${resource(dir: 'images/icons/silk', file: 'page_copy.png')}" class="middle"/>
                                                     </a>
                                                 </td>
                                                 <td class="middle center">
                                                     <a href="javascript:void(-1)" data-id="${receiptItem?.id}" class="btnShowPutaways" title="${warehouse.message(code:'default.button.zoom.label')}">
-                                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'zoom.png')}" class="middle"/>
+                                                        <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" class="middle"/>
                                                     </a>
                                                 </td>
 
@@ -200,13 +200,13 @@
                                                     <div class="button-group">
                                                         <g:if test="${innerStatus==0}">
                                                             <g:link controller="shipment" action="splitReceiptItem" id="${receiptItem?.id}" class="button">
-                                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_switch_bluegreen.png')}"/>
+                                                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch_bluegreen.png')}"/>
                                                                 <g:message code="default.button.split.label"/>
                                                             </g:link>
                                                         </g:if>
                                                         <g:else>
                                                             <g:link controller="shipment" action="deleteReceiptItem" id="${receiptItem?.id}" class="button">
-                                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png')}"/>
+                                                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
                                                                 <g:message code="default.button.delete.label"/>
                                                             </g:link>
                                                         </g:else>
@@ -225,15 +225,15 @@
                 <div class="buttons center">
                     <div class="button-container">
                         <button type="submit" name="saveButton" value="saveAndContinue" class="button">
-                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'disk.png')}"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'disk.png')}"/>
                             &nbsp;<g:message code="default.button.save.label" />
                         </button>
                         <button type="submit" name="saveButton" value="saveAndExit" class="button">
-                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_go.png')}"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'application_go.png')}"/>
                             &nbsp;<g:message code="default.button.saveAndExit.label" />
                         </button>
                         <button type="submit" name="saveButton" value="receiveShipment" class="button">
-                            <img src="${createLinkTo(dir: 'images/icons', file: 'handtruck.png')}"/>
+                            <img src="${resource(dir: 'images/icons', file: 'handtruck.png')}"/>
                             &nbsp;<g:message code="shipping.receiveShipment.label" />
                         </button>
                     </div>

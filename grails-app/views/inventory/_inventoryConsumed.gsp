@@ -81,13 +81,13 @@
 									<th><g:message code="default.quantityToDebit.label"/></th>
 									<th class="center middle">
 
-                                        <img data-id="all" class="plus action" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" title="${g.message(code: 'default.button.increment.label') }"/>
+                                        <img data-id="all" class="plus action" src="${resource(dir:'images/icons/silk',file:'add.png')}" title="${g.message(code: 'default.button.increment.label') }"/>
                                         &nbsp;
-                                        <img data-id="all" class="minus action" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" title="${g.message(code: 'default.button.decrement.label') }"/>
+                                        <img data-id="all" class="minus action" src="${resource(dir:'images/icons/silk',file:'delete.png')}" title="${g.message(code: 'default.button.decrement.label') }"/>
                                         &nbsp;
-                                        <img data-id="all" class="reset action" src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" title="${g.message(code: 'default.button.reset.label', default: 'Reset') }"/>
+                                        <img data-id="all" class="reset action" src="${resource(dir:'images/icons/silk',file:'reload.png')}" title="${g.message(code: 'default.button.reset.label', default: 'Reset') }"/>
                                         &nbsp;
-                                        <img data-id="all" class="max action" src="${createLinkTo(dir:'images/icons/silk',file:'asterisk_orange.png')}" title="${g.message(code: 'default.button.all.label', default: 'All') }"/>
+                                        <img data-id="all" class="max action" src="${resource(dir:'images/icons/silk',file:'asterisk_orange.png')}" title="${g.message(code: 'default.button.all.label', default: 'All') }"/>
 
                                     </th>
 								</tr>
@@ -145,13 +145,13 @@
 											</g:else>
                                         </td>
                                         <td class="center middle">
-                                            <img data-id="${status}" class="plus action" src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" title="${g.message(code: 'default.button.increment.label') }"/>
+                                            <img data-id="${status}" class="plus action" src="${resource(dir:'images/icons/silk',file:'add.png')}" title="${g.message(code: 'default.button.increment.label') }"/>
                                             &nbsp;
-                                            <img data-id="${status}" class="minus action" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" title="${g.message(code: 'default.button.decrement.label') }"/>
+                                            <img data-id="${status}" class="minus action" src="${resource(dir:'images/icons/silk',file:'delete.png')}" title="${g.message(code: 'default.button.decrement.label') }"/>
                                             &nbsp;
-                                            <img data-id="${status}" class="reset action" src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" title="${g.message(code: 'default.button.reset.label', default: 'Reset') }"/>
+                                            <img data-id="${status}" class="reset action" src="${resource(dir:'images/icons/silk',file:'reload.png')}" title="${g.message(code: 'default.button.reset.label', default: 'Reset') }"/>
                                             &nbsp;
-                                            <img data-id="${status}" class="max action" src="${createLinkTo(dir:'images/icons/silk',file:'asterisk_orange.png')}" title="${g.message(code: 'default.button.all.label', default: 'All') }"/>
+                                            <img data-id="${status}" class="max action" src="${resource(dir:'images/icons/silk',file:'asterisk_orange.png')}" title="${g.message(code: 'default.button.all.label', default: 'All') }"/>
 										</td>
 									</tr>
 

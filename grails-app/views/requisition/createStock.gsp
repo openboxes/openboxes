@@ -6,9 +6,9 @@
 <meta name="layout" content="custom" />
 <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />
 <title><warehouse:message code="${requisition?.id ? 'default.edit.label' : 'default.create.label'}" args="[entityName]" /></title>
-<script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/', file:'requisition.js')}" type="text/javascript"></script>
 </head>
 <body>
 
@@ -19,7 +19,7 @@
 		<div class="errors">
 			<g:renderErrors bean="${requisition}" as="list" />
 		</div>
-	</g:hasErrors>	
+	</g:hasErrors>
 
 	<g:render template="summary" model="[requisition:requisition]"/>
 
@@ -35,18 +35,18 @@
                     <g:if test="${requisition?.id }">
                         <div class="box">
                             <a class="toggle" href="javascript:void(0);">
-                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
+                                <img src="${resource(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
                             </a>
                             <h3 style="display: inline" class="toggle">${requisition?.requestNumber } ${requisition?.name }</h3>
                             <g:if test="${requisition?.id }">
                                 <g:if test="${!params.editHeader }">
                                     <g:link controller="requisition" action="editHeader" id="${requisition?.id }">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
                                     </g:link>
                                 </g:if>
                                 <g:else>
                                     <g:link controller="requisition" action="edit" id="${requisition?.id }">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
                                     </g:link>
                                 </g:else>
                             </g:if>
@@ -55,7 +55,7 @@
                     <g:else>
                         <h2>${warehouse.message(code: 'requisition.details.label', default: 'Requisition details') }</h2>
                     </g:else>
-						
+
                     <table id="requisition-template-table">
 
                         <tbody>
