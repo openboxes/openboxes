@@ -13,13 +13,13 @@
 
                         <g:if test="${!params.editCatalogs}">
                             <g:link controller="dashboard" action="index" params="[editCatalogs:true]">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle" />
+                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle" />
                                 <warehouse:message code="catalogs.editCatalogs.label" default="Edit catalogs"></warehouse:message>
                             </g:link>
                         </g:if>
                         <g:else>
                             <g:link controller="dashboard" action="index">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'control_end.png')}" style="vertical-align: middle" />
+                                <img src="${resource(dir:'images/icons/silk',file:'control_end.png')}" style="vertical-align: middle" />
                                 <warehouse:message code="tag.doneEditing.label" default="Done editing"></warehouse:message>
                             </g:link>
                         </g:else>
@@ -55,7 +55,7 @@
                                     </td>
                                     <td>
                                         <g:link controller="dashboard" action="hideCatalog" id="${catalog}" params="[editCatalogs:true]">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
+                                            <img src="${resource(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
                                     </td>
                                 </tr>
                             </g:each>
@@ -84,5 +84,5 @@
 		<div class="clear"></div>
 	</div>
 </div>
-<script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
 

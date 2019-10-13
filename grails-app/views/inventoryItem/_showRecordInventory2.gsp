@@ -18,7 +18,7 @@
 
 
                 <button class="addAnother" data-bind="click: addItem">
-                    <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png') }"/>
+                    <img src="${resource(dir:'images/icons/silk', file:'add.png') }"/>
                     <warehouse:message code="inventory.addInventoryItem.label"/>
                 </button>
             </div>
@@ -32,7 +32,7 @@
                     <th class="left"><warehouse:message code="default.actions.label"/></th>
                 </tr>
                 </thead>
-				<tbody data-bind="foreach: inventoryItems">                	
+				<tbody data-bind="foreach: inventoryItems">
 					<tr>
 						<td>
 							<input type="text" data-bind="value: lotNumber"/>
@@ -50,7 +50,7 @@
 						</td>
 						<td>
 							<button data-bind="click: $root.removeItem, enable: id() == undefined">
-								<img src="${createLinkTo(dir:'images/icons/silk', file:'cross.png') }"/>
+								<img src="${resource(dir:'images/icons/silk', file:'cross.png') }"/>
                     			<warehouse:message code="default.button.delete.label"/></button>
 						</td>
 					</tr>
@@ -62,7 +62,7 @@
         </div>
         <div class="center buttons">
             <button name="save" type="submit" class="positive" id="saveInventoryItem" data-bind="click: save">
-                <img src="${createLinkTo(dir:'images/icons/silk', file:'accept.png') }"/>&nbsp;
+                <img src="${resource(dir:'images/icons/silk', file:'accept.png') }"/>&nbsp;
                 <warehouse:message code="default.button.save.label"/>&nbsp;
             </button>
             &nbsp;

@@ -6,15 +6,15 @@
         <title><warehouse:message code="locations.label" /></title>
 
     </head>
-    <body>        
+    <body>
         <div class="body">
-        
+
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-           	
+
            	<div>
-				<div class="buttonBar">            	
+				<div class="buttonBar">
                     <g:link class="button" action="list">
                         <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                         <warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/>
@@ -97,20 +97,20 @@
                                             <td class="left middle">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
                                             <td class="left middle">
                                                 <g:if test="${locationInstance.active }">
-                                                    <img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
+                                                    <img class="middle" src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
                                                 </g:if>
                                                 <g:else>
-                                                    <img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
+                                                    <img class="middle" src="${resource(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
                                                 </g:else>
 
                                             </td>
                                             <g:each var="activity" in="${org.pih.warehouse.core.ActivityCode.list()}">
                                                 <td class="left middle">
                                                     <g:if test="${locationInstance?.supports(activity) }">
-                                                        <img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
+                                                        <img class="middle" src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
                                                     </g:if>
                                                     <g:else>
-                                                        <img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
+                                                        <img class="middle" src="${resource(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
                                                     </g:else>
 
                                                 </td>

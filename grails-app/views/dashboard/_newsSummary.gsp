@@ -1,6 +1,6 @@
 <div class="box">
     <h2>
-        <img src="${createLinkTo(dir:'images/icons/silk',file:'newspaper.png')}" />
+        <img src="${resource(dir:'images/icons/silk',file:'newspaper.png')}" />
         <warehouse:message code="dashboard.newSummary.label" args="[session.warehouse.name]"/>
     </h2>
 

@@ -218,7 +218,7 @@
 															</td>
 															<td class="center">
 																<g:link controller="transactionEntry" action="delete" id="${transactionEntry?.id }" onclick="return confirm('Are you sure?');">
-																	<img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png')}" />
+																	<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
 																</g:link>
 															</td>
 														</tr>

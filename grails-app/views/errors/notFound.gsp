@@ -34,7 +34,7 @@
 
 			</div>
 			<div>
-				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
+				<img src="${resource(dir:'images',file:'jgreenspan.jpg')}"/>
 			</div>
 		</div>
 	</div>
