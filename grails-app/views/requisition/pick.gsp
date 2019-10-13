@@ -3,8 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
-<script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/', file:'requisition.js')}" type="text/javascript"></script>
 <title><warehouse:message code="requisition.process.label" /></title>
 <style>
 	tr.selected-top { border-top: 5px solid #f3961c; border-right: 5px solid #f3961c; border-left: 5px solid #f3961c; }

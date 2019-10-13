@@ -4,19 +4,19 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'transaction.label', default: 'Transaction')}" />
-        
-        <title><warehouse:message code="transaction.dailyTransactions.label"/></title>    
-        <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'scrolltable.css')}" type="text/css" media="screen, projection" />
-    </head>    
+
+        <title><warehouse:message code="transaction.dailyTransactions.label"/></title>
+        <link rel="stylesheet" href="${resource(dir:'css',file:'scrolltable.css')}" type="text/css" media="screen, projection" />
+    </head>
 
 	<body>
        <div class="body">
-       
+
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
-			</g:if>			
-								
-			<fieldset>		
+			</g:if>
+
+			<fieldset>
 				<div class="box">
 					<h2><warehouse:message code="transaction.dailyTransactionsFor.label"/> ${session.warehouse.name}
                         <span class="fade">${formatDate(date: dateSelected, format: 'EEEEE, MMMMM dd yyyy') }</span></h2>
@@ -120,7 +120,7 @@
                 </div>
 			</fieldset>
 		</div>
-		
+
 	</body>
 
 </html>

@@ -82,14 +82,14 @@
 											<td>
 												<g:textField name="option" value="${option}" size="60" class="text medium"/>
 												<a href="#" class="button">
-													<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png') }" style="vertical-align: middle;"/>
+													<img src="${resource(dir: 'images/icons/silk', file: 'cross.png') }" style="vertical-align: middle;"/>
                                                     <g:message code="default.button.delete.label"/>
 												</a>
 											</td>
 										</tr>
 									</table>
                                     <a href="#" onClick="javascript:addOption('');" class="button">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png') }" style="vertical-align: middle;"/>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'add.png') }" style="vertical-align: middle;"/>
                                         <warehouse:message code="default.add.option" />
                                     </a>
 								</td>

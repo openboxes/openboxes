@@ -24,7 +24,7 @@
                     <tr class="${status%2?'odd':'even' } ${selected?'selected':''}">
                         <td>
                             <g:link controller="transactionEntry" action="edit" id="${transactionEntry?.id}">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle"/>
                             </g:link>
 
                         </td>

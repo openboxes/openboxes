@@ -28,7 +28,7 @@
                             <g:set var="statusMessage" value="${format.metadata(obj: status)}"/>
                             <tr class="${i%2?'odd':'even'}">
                                 <td class="center" style="width: 1%">
-                                    <img src="${createLinkTo(dir:'images/icons/requisitionStatus', file:'requisition_status_' + status?.name()?.toLowerCase() + '.png')}"/>
+                                    <img src="${resource(dir:'images/icons/requisitionStatus', file:'requisition_status_' + status?.name()?.toLowerCase() + '.png')}"/>
 
                                 </td>
                                 <td>
@@ -64,5 +64,5 @@
 
 			</g:else>
 		</div>
-	</div>	
+	</div>
 </div>
