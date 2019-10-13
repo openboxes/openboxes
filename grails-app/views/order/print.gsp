@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="print" />
     <title><warehouse:message code="order.print.label" default="Print order" /></title>
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
     <style>
         .report-details table, .report-details tr { page-break-inside: auto; page-break-after: auto; page-break-before: avoid; }
         table.order-items{ border-collapse:collapse; }

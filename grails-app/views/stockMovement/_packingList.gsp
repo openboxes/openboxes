@@ -8,7 +8,7 @@
 </style>
 <div id="packingList" class="box dialog">
     <h2>
-        <img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
+        <img src="${resource(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
         ${warehouse.message(code:'shipping.packingList.label')}
     </h2>
     <table>
@@ -179,7 +179,7 @@
                     <td class="left" >
                         <g:if test="${shipmentItem?.comments}">
                             <div title="${shipmentItem?.comments.join("\r\n")}">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" />
+                                <img src="${resource(dir:'images/icons/silk',file:'note.png')}" />
                             </div>
                         </g:if>
                         <g:else>

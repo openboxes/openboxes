@@ -1,9 +1,9 @@
-<g:if test="${requisition?.id }">		
+<g:if test="${requisition?.id }">
     <div class="buttons center">
         <g:if test="${!request.request.requestURL.toString().contains('requisition/list')}">
             <div class="button-group">
                 <g:link class="button" controller="requisition" action="list">
-                    <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="Back to requisitions" style="vertical-align: middle" />
+                    <img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="Back to requisitions" style="vertical-align: middle" />
                     &nbsp;${warehouse.message(code: 'requisition.back.label', default: 'Back')}
                 </g:link>
             </div>
@@ -11,15 +11,15 @@
 
         <div class="button-group">
             <g:link class="button ${'show'.equals(actionName)?'active':'' }" controller="requisition" action="show" id="${requisition?.id}">
-                <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
+                <img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" />
                 1.&nbsp;${warehouse.message(code: 'default.button.show.label', default: 'View')}
             </g:link>
             <g:link class="button ${('editHeader'.equals(actionName)||'edit'.equals(actionName))?'active':'' }" controller="requisition" action="edit" id="${requisition?.id}">
-                <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" />
                 2.&nbsp;${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}
             </g:link>
             <g:link class="button ${'change'.equals(actionName)?'active':''||'review'.equals(actionName)?'active':'' }" controller="requisition" action="review" id="${requisition?.id}">
-                <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" />
+                <img src="${resource(dir:'images/icons/silk',file:'accept.png')}" />
                 3.&nbsp;${warehouse.message(code: 'default.button.review.label', default: 'Review')}
             </g:link>
             <g:if test="${session?.warehouse?.id == requisition?.origin?.id }">

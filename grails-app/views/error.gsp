@@ -33,13 +33,13 @@
 
 
         <button class="open-dialog">
-            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'bug.png')}" style="vertical-align: middle" />&nbsp;
+            <img src="${resource(dir: 'images/icons/silk', file: 'bug.png')}" style="vertical-align: middle" />&nbsp;
             <warehouse:message code="default.reportAsBug.label"/>
             &nbsp;
         </button>
         &nbsp;
         <button class="go-back">
-            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'reload.png')}" style="vertical-align: middle" />&nbsp;
+            <img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" style="vertical-align: middle" />&nbsp;
         <warehouse:message code="default.ignoreError.label"/>
         &nbsp;
         </button>
@@ -83,7 +83,7 @@
                 <g:hiddenField name="exception.message" value="${exception?.message?.encodeAsHTML()}"/>
                 <g:hiddenField name="exception.class" value="${exception?.className}"/>
                 <g:hiddenField name="exception.date" value="${new Date() }"/>
-                <g:set var="absoluteTargetUri" value="${g.createLinkTo(url: targetUri, absolute: true) }"/>
+                <g:set var="absoluteTargetUri" value="${g.resource(url: targetUri, absolute: true) }"/>
                 <g:hiddenField name="absoluteTargetUri" value="${absoluteTargetUri}"/>
                 <g:set var="summary" value="${exception?.cause?.class?.name?:exception?.className}: ${exception?.cause?.message?.encodeAsHTML()}"/>
                 <table>

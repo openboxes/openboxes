@@ -1,4 +1,4 @@
-  
+
 <html>
     <head>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -47,7 +47,7 @@
                         <g:hiddenField name="currentShipmentItemId" value="${currentShipmentItemId}"/>
                         <div id="picklistItemsBox" class="dialog box">
                             <h2>
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}"/>
                                 <warehouse:message code="shipping.pickShipmentItems.label"/>
                             </h2>
 
@@ -143,7 +143,7 @@
 
                                                     <g:if test="${errors}">
                                                         <span title="${errors}">
-                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'exclamation.png')}" />
+                                                            <img src="${resource(dir:'images/icons/silk',file:'exclamation.png')}" />
                                                         </span>
                                                     </g:if>
                                                 </td>
@@ -182,24 +182,24 @@
 
                                                     <g:isSuperuser>
                                                         <button name="_eventId_clearPicklist" class="button">
-                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_remove.png')}" />&nbsp;
+                                                            <img src="${resource(dir:'images/icons/silk',file:'basket_remove.png')}" />&nbsp;
                                                             <warehouse:message code="shipping.clearPicklist.label" default="Clear picklist"/>
                                                         </button>
                                                     </g:isSuperuser>
 
                                                     <button name="_eventId_validatePicklist" class="button">
-                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" />&nbsp;
+                                                        <img src="${resource(dir:'images/icons/silk',file:'error.png')}" />&nbsp;
                                                         <warehouse:message code="shipping.validatePicklist.label" default="Validate picklist"/>
                                                     </button>
 
                                                     <div class="button-group">
                                                         <a href="#" class="previous-picklist-item button">
-                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'resultset_previous.png')}" alt="Previous Item"/>&nbsp;
+                                                            <img src="${resource(dir:'images/icons/silk',file:'resultset_previous.png')}" alt="Previous Item"/>&nbsp;
                                                         <g:message code="default.button.back.label" default="Back"/>
                                                         </a>
                                                         <a href="#" class="next-picklist-item button">
                                                             <g:message code="default.button.next.label" default="Next"/>
-                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'resultset_next.png')}" alt="Next Item"/>&nbsp;
+                                                            <img src="${resource(dir:'images/icons/silk',file:'resultset_next.png')}" alt="Next Item"/>&nbsp;
                                                         </a>
                                                     </div>
                                                 </div>
@@ -231,7 +231,7 @@
                     <div id="pickShipmentItemBox" style="position: absolute; width: 30%;">
                         <div class="box">
                             <h2>
-                                <img src="${createLinkTo(dir:'images/icons',file:'draggable.png')}"
+                                <img src="${resource(dir:'images/icons',file:'draggable.png')}"
                                      title="${g.message(code:'picklist.picked.label')}">
                                 <g:message code="shipping.editPicklistItem.label" default="Edit Picklist Item"/>
                             </h2>
@@ -239,7 +239,7 @@
                             <div class="empty fade center">
                                 <g:message code="shipping.pickShipmentItems.message" default="Select an item from the picklist"/>
                                 <button class="button next-picklist-item">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'next_blue.png')}" alt="Next Item"/>&nbsp;
+                                    <img src="${resource(dir:'images/icons/silk',file:'next_blue.png')}" alt="Next Item"/>&nbsp;
                                     <g:message code="default.button.next.label" default="Next"/>
                                 </button>
                             </div>
@@ -435,6 +435,6 @@
 
             });
 		</script>
-		
+
 	</body>
 </html>

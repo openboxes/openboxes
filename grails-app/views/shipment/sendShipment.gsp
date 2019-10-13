@@ -13,7 +13,7 @@
 
 <body>
 	<div class="body">
-	
+
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -23,12 +23,12 @@
 			<div class="errors">
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
-		</g:hasErrors>	
+		</g:hasErrors>
 		<g:hasErrors bean="${transactionInstance}">
 			<div class="errors">
 				<g:renderErrors bean="${transactionInstance}" as="list" />
 			</div>
-		</g:hasErrors>	
+		</g:hasErrors>
 
 		<div class="dialog">
 			<fieldset>
@@ -38,7 +38,7 @@
 					<g:hiddenField name="id" value="${shipmentInstance?.id}" />
 					<table>
 						<tbody>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label>
@@ -51,51 +51,51 @@
 										<g:jqueryDatePicker name="actualShippingDate"
 									value="${shipmentInstance?.expectedShippingDate}" format="MM/dd/yyyy"/>
 								</td>
-							</tr>											
+							</tr>
 							<tr class="prop">
 	                            <td valign="top" class="name">
 	                            	<label>
 	                            		<warehouse:message code="shipping.note.label"/>
 	                            	</label>
-	                            </td>                            
+	                            </td>
 	                            <td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'comment', 'errors')}">
                                     <g:textArea name="comment" cols="100" rows="5"/>
                                 </td>
-	                        </tr>  	        
-						
-					
+	                        </tr>
+
+
 							<tr class="prop">
-								
+
 								<td valign="top" class="name"><label><warehouse:message code="shipping.overview.label"/></label></td>
 								<td valign="top" class="value">
 									<p>
-										<warehouse:message code="shipping.sendShipment.message" 
+										<warehouse:message code="shipping.sendShipment.message"
 											args="[shipmentInstance?.origin?.name,shipmentInstance?.destination?.name]"/>
 									</p>
 									<ul class="prop">
 										<li>
-											<img src="${createLinkTo(dir:'images/icons/silk',file: 'lorry_go.png')}" style="vertical-align: middle"/>
+											<img src="${resource(dir:'images/icons/silk',file: 'lorry_go.png')}" style="vertical-align: middle"/>
 											&nbsp;
-											<warehouse:message code="shipping.shipmentWillBeMarkedAsShipped.message" 
+											<warehouse:message code="shipping.shipmentWillBeMarkedAsShipped.message"
 											args="[shipmentInstance?.name]"/>
 										</li>
 										<g:if test="${shipmentInstance?.origin.isWarehouse()}">
 											<li>
-												<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+												<img src="${resource(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
 												&nbsp;
 												<warehouse:message code="shipping.itemsInShipmentWillBeDebited.message" args="[shipmentInstance?.shipmentItems?.size(),shipmentInstance?.origin?.name]"/>
 											</li>
 										</g:if>
 										<li>
-											<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
+											<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 											&nbsp;
 											<warehouse:message code="shipping.notificationEmailsWillBeSentOut.message"/>
 										</li>
 									</ul>
-								</td>								
+								</td>
 							</tr>
-							
-							
+
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label>
@@ -107,26 +107,26 @@
 										<format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.CREATED}"/>
 									</span>
 									&nbsp;
-									<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+									<img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
 									&nbsp;
 									<span class="fade">
 										<format:metadata obj="${shipmentInstance?.status?.code}"/>
 									</span>
 									&nbsp;
-									<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+									<img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
 									&nbsp;
 									<span>
 										<b><format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED}"/></b>
 									</span>
 									&nbsp;
-									<img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+									<img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
 									&nbsp;
 									<span class="fade">
 										<format:metadata obj="${org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED}"/>
 									</span>
 								</td>
 							</tr>
-												
+
 							<g:if test="${shipmentInstance?.origin.isWarehouse()}">
 								<tr class="prop">
 									<td valign="top" class="name">
@@ -135,7 +135,7 @@
 										</label>
 									</td>
 									<td valign="top" class="value">
-										<warehouse:message code="shipping.willBeDebited.message" args="[shipmentInstance?.origin?.name]"/>											
+										<warehouse:message code="shipping.willBeDebited.message" args="[shipmentInstance?.origin?.name]"/>
 										<g:if test="${shipmentInstance.shipmentItems.sort()}">
 											<table style="display: inline" id="debitShipmentItems">
 												<tr>
@@ -147,7 +147,7 @@
 												<g:each var="item" in="${shipmentInstance?.shipmentItems }" status="status">
 													<tr class="${status % 2 ? 'even' : 'odd' }">
 														<td>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
+															<img src="${resource(dir:'images/icons/silk',file: 'delete.png')}" style="vertical-align: middle"/>
 														</td>
 														<td>
 															${item?.container?.name }
@@ -160,7 +160,7 @@
 														</td>
 													</tr>
 												</g:each>
-											</table>	
+											</table>
 										</g:if>
 										<g:else>
 											<warehouse:message code="shipping.noItemsToShip.message"/>
@@ -168,23 +168,23 @@
 									</td>
 								</tr>
 							</g:if>
-					
+
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="shipping.notifications.label"/></label></td>
-								<td valign="top" class="value">								
+								<td valign="top" class="value">
 									<warehouse:message code="shipping.notifications.message"/>
-									<table style="display: inline" id="notifyRecipients">	
+									<table style="display: inline" id="notifyRecipients">
 										<tr>
 											<th></th>
 											<th><warehouse:message code="default.role.label"/></th>
 											<th><warehouse:message code="shipping.recipient.label"/></th>
 										</tr>
-										
+
 										<g:if test="${!shipmentWorkflow?.isExcluded('carrier') && shipmentInstance?.carrier}">
 											<tr class="prop odd">
 												<td style="valign:center">
 													<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.carrier?.id}"/>
-													<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+													<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 												</td>
 												<td>
 													<warehouse:message code="shipping.traveler.label"/>
@@ -195,18 +195,18 @@
 												</td>
 											</tr>
 										</g:if>
-										
+
 										<g:if test="${!shipmentWorkflow?.isExcluded('recipient') && shipmentInstance?.recipient}">
 											<tr class="prop even">
 												<td>
 													<input type="checkbox" checked="true" name="emailRecipientId" value="${shipmentInstance?.recipient?.id}"/>
-													<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+													<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 												</td>
 												<td>
 													<warehouse:message code="shipping.recipient.label"/>
 												</td>
 												<td>
-													${shipmentInstance?.recipient?.name }  &nbsp; 
+													${shipmentInstance?.recipient?.name }  &nbsp;
 													<span class="fade">${shipmentInstance?.recipient?.email}</span>
 												</td>
 											</tr>
@@ -218,30 +218,30 @@
 													<tr class="prop odd">
 														<td>
 															<input type="checkbox" checked="true" name="emailRecipientId" value="${recipient?.id}"/>
-															<img src="${createLinkTo(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/> 
+															<img src="${resource(dir:'images/icons/silk',file: 'email.png')}" style="vertical-align: middle"/>
 														</td>
 														<td>
 															<warehouse:message code="shipping.recipient.label"/>
 														</td>
-														<td>							
+														<td>
 															${recipient?.name } &nbsp;
-															<span class="fade">${recipient?.email}</span>				
+															<span class="fade">${recipient?.email}</span>
 														</td>
 													</tr>
-												</g:if>						
+												</g:if>
 											</g:each>
 										</g:if>
 									</table>
-								</td>							
+								</td>
 							</tr>
-				
-									
+
+
 							<tr class="prop">
 								<td valign="top" class="name"></td>
 								<td valign="top" class="value">
-									
+
 									<button type="submit" class="positive"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+										src="${resource(dir:'images/icons/silk',file:'accept.png')}"
 										alt="save" /> <warehouse:message code="shipping.sendShipment.label"/></button>
 									&nbsp;
 									<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}" class="negative">
@@ -255,7 +255,7 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		$(function() { 		
+		$(function() {
 			$('#debit').click(function() {
 			    $("#debitShipmentItems").toggle(this.checked);
 			});

@@ -7,9 +7,9 @@
 <meta name="layout" content="custom" />
 <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}" />
 <title><warehouse:message code="${requisition?.id ? 'default.edit.label' : 'default.create.label'}" args="[entityName]" /></title>
-<script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'requisition.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/', file:'requisition.js')}" type="text/javascript"></script>
 </head>
 <body>
 
@@ -26,8 +26,8 @@
 	</g:if>
 
 	<g:render template="summary" model="[requisition:requisition]"/>
-	
-	
+
+
 	<div class="yui-ga">
 		<div class="yui-u first">
 
@@ -35,26 +35,26 @@
 				<g:if test="${requisition?.id }">
 					<div class="box">
 						<a class="toggle" href="javascript:void(0);">
-							<img src="${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
+							<img src="${resource(dir: 'images/icons/silk', file: 'section_collapsed.png')}" style="vertical-align: bottom;"/>
 						</a>
-						<h3 style="display: inline" class="toggle">${requisition?.requestNumber } ${requisition?.name }</h3>				
+						<h3 style="display: inline" class="toggle">${requisition?.requestNumber } ${requisition?.name }</h3>
 						<g:if test="${requisition?.id }">
 							<g:if test="${!params.editHeader }">
 								<g:link controller="requisition" action="editHeader" id="${requisition?.id }">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
+									<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: bottom;"/>
 								</g:link>
 							</g:if>
 							<g:else>
 								<g:link controller="requisition" action="edit" id="${requisition?.id }">
-									<img src="${createLinkTo(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
-								</g:link>									
+									<img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}" style="vertical-align: bottom;"/>
+								</g:link>
 							</g:else>
 						</g:if>
 					</div>
-					
+
 				</g:if>
 				<div id="requisition-header-details" class="dialog ui-validation expandable box" style="${(!requisition?.id||params.editHeader)?'':'display: none;'}">
-					<%-- 
+					<%--
 					<div id="requisition-header">
 						<div class="title" data-bind="html: requisition.name"></div>
 						<div class="time-stamp fade"
@@ -63,13 +63,13 @@
 					</div>
 					--%>
 					asfasas
-					
+
 					<div class="yui-g">
 						<div class="yui-u first">
-						
+
 							<table id="requisition-header-details-table" class="header-summary-table">
-								
-								<tbody>							
+
+								<tbody>
 									<tr class="prop">
 										<td class="name">
 											<label for="origin.id">
@@ -80,10 +80,10 @@
 											<g:if test="${params?.editHeader || !requisition?.id }">
 												<g:select name="origin.id"
 													from="${locations}" id="depot"
-													data-bind="value: requisition.originId" 
+													data-bind="value: requisition.originId"
 													optionKey="id" optionValue="name" class='required' value=""
 													noSelection="['null':'']" />
-											</g:if>	
+											</g:if>
 											<g:else>
 												${requisition?.origin?.name }
 											</g:else>
@@ -122,26 +122,26 @@
 											</g:else>
 										</td>
 									</tr>
-																
-									
+
+
 								</tbody>
 							</table>
-												
-						
+
+
 						</div>
-					
+
 						<div class="yui-u">
-						
-						
+
+
 							<table class="">
 								<tbody>
 									<tr class="prop">
 										<td class="name">
-											<label for="destination.id"> 
+											<label for="destination.id">
 												<warehouse:message code="requisition.destination.label" />
 											</label>
 										</td>
-										<td class="value">	
+										<td class="value">
 											${session?.warehouse?.name }
 										</td>
 									</tr>
@@ -153,8 +153,8 @@
 										<td class="value">
 											${requisition?.createdBy?.name?:session?.user?.name }
 										</td>
-										
-										
+
+
 									</tr>
 									<tr class="prop">
 										<td class="name"><label><warehouse:message code="requisition.requestedDeliveryDate.label" /></label></td>
@@ -170,17 +170,17 @@
 												${requisition?.requestedDeliveryDate }
 											</g:else>
 										</td>
-									</tr>		
+									</tr>
 									<%--
-									<tr class="prop">							
+									<tr class="prop">
 										<td class="name">
-											<label for="description"> 
+											<label for="description">
 												<warehouse:message code="default.description.label" />
 											</label>
 										</td>
-									
-										<td class="value">	
-										
+
+										<td class="value">
+
 											<g:if test="${params?.editHeader || !requisition?.id }">
 												<g:textArea name="description" cols="80" rows="5"
 													placeholder="${warehouse.message(code:'requisition.description.label')}"
@@ -188,19 +188,19 @@
 											</g:if>
 											<g:else>
 												${requisition?.description?:warehouse.message(code:'default.none.label') }
-												
+
 											</g:else>
 										</td>
-									</tr>	
+									</tr>
 									 --%>
-															
+
 								</tbody>
-							</table>							
+							</table>
 						</div>
 					</div>
-					
-									
-					
+
+
+
 				</div>
 				<g:if test="${requisition?.id && !params.editHeader}">
 					<div>
@@ -243,50 +243,50 @@
 										data-bind="value: recipient, uniqueName: true" /></td>
 									<td class="center middle">
 										<a href='#' class="button"
-											data-bind='click: $root.requisition.removeItem' tabindex="-1"> 
+											data-bind='click: $root.requisition.removeItem' tabindex="-1">
 												${warehouse.message(code:'default.button.delete.label')}
 										</a>
 									</td>
-									
+
 								</tr>
 							</tbody>
 						</table>
-					
+
 					</div>
 				</g:if>
-				
-					
+
+
 				<div class="buttons">
-				
+
 					<g:if test="${requisition?.id && params.editHeader}">
-						<button class="button" name="saveAndContinue">${warehouse.message(code:'default.button.saveAndContinue.label', default: 'Save & Continue') }</button>									
-						
+						<button class="button" name="saveAndContinue">${warehouse.message(code:'default.button.saveAndContinue.label', default: 'Save & Continue') }</button>
+
 						&nbsp;
 						<g:link controller="requisition" action="edit" id="${requisition?.id }">
 							<warehouse:message code="default.button.cancel.label"/>
 						</g:link>
-						
-					</g:if>				
+
+					</g:if>
 					<g:else>
 						<div class="left">
 							<g:if test="${requisition?.id && !params.editHeader}">
 								<button class="button"
-									id="addRequisitionItemRow" name="addRequisitionItemRow" 
+									id="addRequisitionItemRow" name="addRequisitionItemRow"
 									data-bind='click: requisition.addItem'>
 										${warehouse.message(code:'requisition.addNewItem.label')}</button>
 							</g:if>
 						</div>
-					
+
 						<div class="right">
 							<g:link controller="requisition" action="${requisition?.id ? 'show': 'list'}" id="${requisition?.id }" class="button">
-								<warehouse:message code="default.button.back.label"/>	
+								<warehouse:message code="default.button.back.label"/>
 							</g:link>
 							<input type="hidden" data-bind="value: requisition.id" />
 							<button id="save-requisition" class="button">
 								${warehouse.message(code: 'default.button.next.label')}</button>
 						</div>
 					</g:else>
-				</div>					
+				</div>
 			</g:form>
 		</div>
 	</div>
@@ -366,19 +366,19 @@
         });
 
         $("input.quantity").keyup(function(){
-           this.value=this.value.replace(/[^\d]/,'');      
+           this.value=this.value.replace(/[^\d]/,'');
            $(this).trigger("change");//Safari and IE do not fire change event for us!
         });
 
   		$("#addRequisitionItemRow").click(function(event){
   			$('#requisition-items tbody tr:last').find('.search-product').focus();
-  	  	}); 
+  	  	});
 
-		$(".toggle").click(function() {  
-			// hides children divs if shown, shows if hidden 
+		$(".toggle").click(function() {
+			// hides children divs if shown, shows if hidden
 			$("#requisition-header-details").toggle();
-		}); 
-  		
+		});
+
     });
 </script>
 </body>

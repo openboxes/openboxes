@@ -1,6 +1,6 @@
 <div id="receipt" class="dialog box">
     <h2>
-        <img src="${createLinkTo(dir:'images/icons',file:'handtruck.png')}" />
+        <img src="${resource(dir:'images/icons',file:'handtruck.png')}" />
         <label><warehouse:message code="shipping.receipt.label"/></label>
     </h2>
     <table>

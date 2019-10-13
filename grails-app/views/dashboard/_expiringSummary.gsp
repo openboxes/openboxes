@@ -7,7 +7,7 @@
     			<tbody>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/', file: 'accept.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/', file: 'accept.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listExpiringStock" params="[status:'greaterThan365Days']">
@@ -15,12 +15,12 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="greaterThan365Days"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="greaterThan365Days"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                         </td>
                     </tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/', file: 'error.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/', file: 'error.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listExpiringStock" params="[status:'within365Days']">
@@ -28,12 +28,12 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="within365Days"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="within365Days"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                         </td>
                     </tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'error.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk', file: 'error.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listExpiringStock" params="[status:'within180Days']">
@@ -41,13 +41,13 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="within180Days"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="within180Days"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                         </td>
                     </tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listExpiringStock" params="[status:'within90Days']">
@@ -55,14 +55,14 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="within90Days"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="within90Days"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                         </td>
                     </tr>
 
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listExpiringStock" params="[status:'within30Days']">
@@ -71,13 +71,13 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="within30Days"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="within30Days"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                         </td>
                     </tr>
 
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listExpiredStock" params="[status:'expired']">
@@ -86,7 +86,7 @@
                         </td>
                         <td class="right">
                             <div id="expired">
-                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                             </div>
                         </td>
                     </tr>
@@ -96,7 +96,7 @@
                 <tfoot>
                 <tr>
                     <th class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/sum.png')}" class="middle"
+                        <img src="${resource(dir:'images/icons/silk/sum.png')}" class="middle"
                              title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
                     </th>
                     <th>
@@ -105,7 +105,7 @@
                         </g:link>
                     </th>
                     <th class="right">
-                        <div id="totalExpiring"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="totalExpiring"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                     </th>
                 </tr>
                 </tfoot>
@@ -142,7 +142,7 @@
                     errorMessage += ":\n" + errorJson.errorMessage;
                 }
 
-                var errorHtml = "<img src='${createLinkTo(dir:'images/icons/silk/exclamation.png')}' title='" + errorMessage +"'/>";
+                var errorHtml = "<img src='${resource(dir:'images/icons/silk/exclamation.png')}' title='" + errorMessage +"'/>";
                 $('#expired').html(errorHtml);
                 $('#within30Days').html(errorHtml);
                 $('#within60Days').html(errorHtml);
