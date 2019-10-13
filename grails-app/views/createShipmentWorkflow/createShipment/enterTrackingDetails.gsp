@@ -46,7 +46,7 @@
 											valueName="${shipmentInstance?.carrier?.name}"/>
 
 										<g:link action="createShipment" event="addPerson" params="[target:'carrier']">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
+											<img src="${resource(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
 										</g:link>
 
 									</td>
@@ -58,7 +58,7 @@
 										code="shipper.label" /></label>
 
 										<g:link action="createShipment" event="addShipper" params="[target:'shipper']">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
+											<img src="${resource(dir:'images/icons/silk',file:'lorry_add.png')}" alt="Add a shipper" class="middle"/>
 										</g:link>
 									</td>
 									<td valign="top" class="value">
@@ -88,7 +88,7 @@
 											valueName="${shipmentInstance?.recipient?.name}"/>
 
 										<g:link action="createShipment" event="addPerson" params="[target:'recipient']">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
+											<img src="${resource(dir:'images/icons/silk',file:'user_add.png')}" alt="Add a person" class="middle"/>
 										</g:link>
 									</td>
 								</tr>

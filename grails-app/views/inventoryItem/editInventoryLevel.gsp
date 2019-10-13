@@ -4,7 +4,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'inventory.level.label', default: 'Inventory Level')}" />
         <title><warehouse:message code="default.edit.label" args="[entityName]" /> &rsaquo; <span style="color: grey">
-			<format:product product="${productInstance}"/></span>        
+			<format:product product="${productInstance}"/></span>
         </title>
     </head>
     <body>
@@ -22,10 +22,10 @@
 					<g:hiddenField name="id" value="${inventoryLevelInstance?.id}"/>
 					<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
 					<g:hiddenField name="product.id" value="${productInstance?.id}"/>
-					<fieldset>				
-					
+					<fieldset>
+
 						<table>
-							<tbody>			
+							<tbody>
 								<tr>
 									<td style="width: 50px; vertical-align: middle;">
 										<div class="fade" style="font-size: 0.9em;">
@@ -34,18 +34,18 @@
 													<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
 												</button>
 												<div class="actions">
-													<g:render template="showStockCardMenuItems" model="[product: productInstance, inventory: inventoryInstance]"/>																				
+													<g:render template="showStockCardMenuItems" model="[product: productInstance, inventory: inventoryInstance]"/>
 												</div>
-											</span>				
-										</div>			
+											</span>
+										</div>
 									</td>
 									<td style="vertical-align: middle;">
 										<h1><format:product product="${productInstance}"/></h1>
 									</td>
 								</tr>
 							</tbody>
-						</table>					
-						
+						</table>
+
 						<table>
 							<tr class="prop">
 								<td class="name"><label><warehouse:message code="inventory.label"/></label></td>
@@ -62,33 +62,33 @@
 							<tr class="prop">
 								<td class="name"><label><warehouse:message code="inventoryLevel.status.label"/></label></td>
 								<td class="value">
-						           	<g:select name="status" 
+						           	<g:select name="status"
 		           					   from="${org.pih.warehouse.inventory.InventoryStatus.list()}"
-		           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance.status}" 
-		           					   noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;	
-								
-								
+		           					   optionValue="${{format.metadata(obj:it)}}" value="${inventoryLevelInstance.status}"
+		           					   noSelection="['':warehouse.message(code:'inventoryLevel.chooseStatus.label')]" />&nbsp;&nbsp;
+
+
 
 								</td>
 							</tr>
 							<tr class="prop">
 								<td></td>
 								<td>
-								
+
 									<button type="submit" class="positive"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}"
+										src="${resource(dir:'images/icons/silk',file:'tick.png')}"
 										alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 									</button>
 									&nbsp;
-									<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
-										${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
-									</g:link>  
-								
+									<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">
+										${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+									</g:link>
+
 								</td>
 							</tr>
-						</table>			
+						</table>
 					</fieldset>
-				</g:form>			
+				</g:form>
 			</div>
         </div>
     </body>

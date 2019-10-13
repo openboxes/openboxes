@@ -79,11 +79,11 @@
                                        data-position="top"
                                        data-title="${g.message(code:'productSupplier.label')}"
                                        data-url="${request.contextPath}/productSupplier/dialog?id=${productSupplier?.id}&product.id=${productInstance?.id}">
-                                        <img src="${createLinkTo(dir:'images/icons/silk', file:'pencil.png')}" />
+                                        <img src="${resource(dir:'images/icons/silk', file:'pencil.png')}" />
                                         <g:message code="default.button.edit.label"/>
                                     </a>
                                     <g:link controller="productSupplier" action="delete" id="${productSupplier?.id}" params="[dialog:true]" class="button">
-                                        <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />
+                                        <img src="${resource(dir:'images/icons/silk', file:'delete.png')}" />
                                         <g:message code="default.button.delete.label"/>
                                     </g:link>
                                 </div>

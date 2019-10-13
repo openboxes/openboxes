@@ -12,12 +12,12 @@
         <div class="body">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
-            </g:if>						
+            </g:if>
             <g:hasErrors bean="${command}">
 	            <div class="errors">
 	                <g:renderErrors bean="${command}" as="list" />
 	            </div>
-            </g:hasErrors>    
+            </g:hasErrors>
             <g:hasErrors bean="${command?.transactionInstance}">
 	            <div class="errors">
 	                <g:renderErrors bean="${command?.transactionInstance}" as="list" />
@@ -26,12 +26,12 @@
 
 			<div class="buttons" style="text-align: left">
 				<g:link controller="dashboard" action="index" class="button">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" alt="${warehouse.message(code: 'dashboard.label') }" />
+					<img src="${resource(dir:'images/icons/silk',file:'house.png')}" alt="${warehouse.message(code: 'dashboard.label') }" />
 					&nbsp;<warehouse:message code="dashboard.label"/>
 				</g:link>
 
 				<g:link controller="inventory" action="browse" class="button">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'application_form_magnify.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" />
+					<img src="${resource(dir:'images/icons/silk',file:'application_form_magnify.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" />
 					&nbsp;<warehouse:message code="inventory.browse.label"/>
 				</g:link>
 			</div>

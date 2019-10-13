@@ -5,12 +5,12 @@
 		<g:if test="${inventoryItem?.product?.images }">
 			<div class="nailthumb-container">
 				<g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
-				<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />		
+				<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
 			</div>
 		</g:if>
 		<g:else>
 			<div class="nailthumb-container">
-				<img src="${resource(dir: 'images', file: 'default-product.png')}" style="display:none" />		
+				<img src="${resource(dir: 'images', file: 'default-product.png')}" style="display:none" />
 			</div>
 		</g:else>
 	</td>
@@ -29,15 +29,15 @@
 								<g:if test="${inventoryItem?.product?.images }">
 									<div class="nailthumb-container-100">
 										<g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
-										<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />		
+										<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
 									</div>
 								</g:if>
 								<g:else>
 									<div class="nailthumb-container-100">
-										<img src="${resource(dir: 'images', file: 'default-product.png')}" style="display:none" />		
+										<img src="${resource(dir: 'images', file: 'default-product.png')}" style="display:none" />
 									</div>
-								</g:else>				
-							
+								</g:else>
+
 							</td>
 							<td>
 								<table>
@@ -47,7 +47,7 @@
 												<span class="fade">#${inventoryItem?.product?.productCode}</span>
 												${inventoryItem?.product?.name}
 											</div>
-										
+
 										</td>
 									</tr>
 									<g:if test="${inventoryItem?.product?.productGroups }">
@@ -56,21 +56,21 @@
 												<span style="text-transform:uppercase;" class="fade">
 													<format:category category="${inventoryItem?.product?.category }"/> &rsaquo;
 													${inventoryItem?.product?.productGroups?.sort()?.first()?.name}
-												</span>										
+												</span>
 											</td>
-										</tr>									
-									</g:if>				
+										</tr>
+									</g:if>
 									<tr>
 										<td>
 											<p>${inventoryItem?.product?.description }</p>
 										</td>
-									</tr>					
+									</tr>
 								</table>
 							</td>
 						</tr>
 						<tr>
 							<td>
-							
+
 							</td>
 							<td >
 								<div class="button-group">
@@ -96,16 +96,16 @@
 		</div>
 	</td>
 	<td class="top center">
-		<g:checkBox id="${inventoryItem?.product?.id }" name="product.id" 
-			class="checkbox" style="top:0em;" checked="${false }" 
+		<g:checkBox id="${inventoryItem?.product?.id }" name="product.id"
+			class="checkbox" style="top:0em;" checked="${false }"
 				value="${inventoryItem?.product?.id }" />
 	</td>
 	<td class="checkable top">
-		<span class="fade">${inventoryItem?.product?.productCode }</span>	
+		<span class="fade">${inventoryItem?.product?.productCode }</span>
 	</td>
-	<td class="checkable top">			
+	<td class="checkable top">
 		<g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-			<span title="${inventoryItem?.product?.description }" class="popover-trigger" data-id="${inventoryItem?.product?.id }">				
+			<span title="${inventoryItem?.product?.description }" class="popover-trigger" data-id="${inventoryItem?.product?.id }">
 				<g:if test="${inventoryItem?.product?.name?.trim()}">
 					${inventoryItem?.product?.name}
 				</g:if>
@@ -113,54 +113,54 @@
 					<warehouse:message code="product.untitled.label"/>
 				</g:else>
 			</span>
-		</g:link>	
+		</g:link>
 	</td>
 	<td class="checkable top left">
 		<span class="fade">${inventoryItem?.product?.manufacturer }</span>
 	</td>
 	<td class="checkable top left">
-		<span class="fade">${inventoryItem?.product?.brandName}</span>	
+		<span class="fade">${inventoryItem?.product?.brandName}</span>
 	</td>
 	<td class="checkable top left">
 		<span class="fade">${inventoryItem?.product?.manufacturerCode }</span>
 	</td>
 	<td class="checkable top center" style="width: 7%; border-left: 1px solid lightgrey;">
-	
+
 		<g:if test="${!showQuantity }">
-			
+
 		</g:if>
 		<g:elseif test="${inventoryItem?.supported && showQuantity }">
-			<div data-product-id="${inventoryItem?.product?.id }" class="quantityToReceive"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+			<div data-product-id="${inventoryItem?.product?.id }" class="quantityToReceive"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 		</g:elseif>
 		<g:else>
-			<span class="fade"><warehouse:message code="default.na.label"/></span>																
+			<span class="fade"><warehouse:message code="default.na.label"/></span>
 		</g:else>
 	</td>
 	<td class="checkable top center" style="width: 7%; border-right: 1px solid lightgrey;">
 		<g:if test="${!showQuantity }">
-			
+
 		</g:if>
 		<g:elseif test="${inventoryItem?.supported && showQuantity}">
-			<div data-product-id="${inventoryItem?.product?.id }" class="quantityToShip"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+			<div data-product-id="${inventoryItem?.product?.id }" class="quantityToShip"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 		</g:elseif>
 		<g:else>
-			<span class="fade"><warehouse:message code="default.na.label"/></span>																
+			<span class="fade"><warehouse:message code="default.na.label"/></span>
 		</g:else>
 	</td>
 	<td class="checkable top center" style="width: 7%;">
-	
+
 		<g:if test="${!showQuantity }">
 			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
 				<warehouse:message code="default.clickToView.label"/>
 			</g:link>
 		</g:if>
-		<g:elseif test="${inventoryItem?.supported && showQuantity}">																
+		<g:elseif test="${inventoryItem?.supported && showQuantity}">
 			<g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-				<div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+				<div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 			</g:link>
 		</g:elseif>
 		<g:else>
-			<span class="fade"><warehouse:message code="default.na.label"/></span>																
+			<span class="fade"><warehouse:message code="default.na.label"/></span>
 		</g:else>
 	</td>
 </tr>

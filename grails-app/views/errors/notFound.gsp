@@ -35,7 +35,7 @@
 				<warehouse:message code="errors.resourceNotFound.message" default="Sorry, that resource could not be found."/>
 			</div>
 			<div class="left">
-			<img src="${createLinkTo(dir:'images',file:'jgreenspan.png')}"/>
+			<img src="${resource(dir:'images',file:'jgreenspan.png')}"/>
 
 			</div>
 		</div>
