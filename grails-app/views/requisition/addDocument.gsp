@@ -19,15 +19,15 @@
 				<g:renderErrors bean="${requestInstance}" as="list" />
 			</div>
 		</g:hasErrors>
-			
+
 
 		<fieldset>
 			<g:render template="summary" />
 			<div>
-				<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
+				<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->
 				<g:uploadForm controller="document" action="${documentInstance?.id ? 'saveDocument' : 'uploadDocument'}">
 					<g:hiddenField name="requestId" value="${requestInstance?.id}" />
-					<g:hiddenField name="documentId" value="${documentInstance?.id}" />					
+					<g:hiddenField name="documentId" value="${documentInstance?.id}" />
 					<table>
 						<tbody>
 							<tr class="prop">
@@ -83,10 +83,10 @@
 									<div class="buttons left">
 										<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
 										<button type="submit" class="positive">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}
+											<img src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}
 										</button>
 										<g:link controller="requisition" action="show" id="${requestInstance?.id}" class="negative">
-											<img src="${createLinkTo(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> <warehouse:message
+											<img src="${resource(dir:'images/icons/silk',file:'cancel.png')}" alt="Cancel" /> <warehouse:message
 												code="default.button.cancel.label" /> </g:link>
 									</div>
 								</td>

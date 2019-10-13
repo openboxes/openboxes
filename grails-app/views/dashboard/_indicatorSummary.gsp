@@ -8,13 +8,13 @@
                     <g:each in="${org.pih.warehouse.reporting.Indicator.list()}" var="indicator" status="status">
                         <tr class="${status%2?'odd':'even'}">
                             <td class="center" style="width: 1%">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file: 'sum.png')}" class="middle"/>
+                                <img src="${resource(dir:'images/icons/silk', file: 'sum.png')}" class="middle"/>
                             </td>
                             <td>
                                 ${indicator.description}
                             </td>
                             <td class="right">
-                                <div id="${indicator.id}"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                                <div id="${indicator.id}"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                             </td>
                         </tr>
                         <script type="text/javascript">

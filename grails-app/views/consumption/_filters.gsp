@@ -162,12 +162,12 @@
             <div class="filter-list-item">
                 <div class="buttons">
                     <button class="button">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'cog_go.png')}" />
+                        <img src="${resource(dir:'images/icons/silk',file:'cog_go.png')}" />
                         <warehouse:message code="report.runReport.label" default="Run Report"/>
                     </button>
 
                     <g:link controller="consumption" action="show" class="button">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_refresh.png')}" />
+                        <img src="${resource(dir:'images/icons/silk',file: 'arrow_refresh.png')}" />
                         ${warehouse.message(code:'default.button.reset.label', default: 'Reset')}
                     </g:link>
                 </div>

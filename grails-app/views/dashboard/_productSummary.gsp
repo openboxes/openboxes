@@ -7,7 +7,7 @@
     			<tbody>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
+                        <img src="${resource(dir:'images/icons/silk/exclamation.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listQuantityOnHandZero" target="_blank">
@@ -15,13 +15,13 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="onHandQuantityZeroCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="onHandQuantityZeroCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                     </td>
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
+                        <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listLowStock" target="_blank">
@@ -29,12 +29,12 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="lowStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="lowStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
+                        <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warnings.label",default:"Warning")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listReorderStock" target="_blank">
@@ -42,12 +42,12 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="reorderStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="reorderStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
+                        <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle" title='${warehouse.message(code:"inventory.warning.label",default:"Warning")}'/>
 
                     </td>
                     <td>
@@ -56,12 +56,12 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="overStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="overStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
+                        <img src="${resource(dir:'images/icons/silk/accept.png')}" class="middle" title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
                     </td>
                     <td>
                         <g:link controller="inventory" action="listInStock" target="_blank">
@@ -69,7 +69,7 @@
                         </g:link>
                     </td>
                     <td class="right">
-                        <div id="inStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="inStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                     </td>
                 </tr>
@@ -79,7 +79,7 @@
                 <tfoot>
                 <tr>
                     <th class="center" style="width: 1%">
-                        <img src="${createLinkTo(dir:'images/icons/silk/sum.png')}" class="middle"
+                        <img src="${resource(dir:'images/icons/silk/sum.png')}" class="middle"
                              title='${warehouse.message(code:"inventory.information.label",default:"information")}'/>
                     </th>
                     <th>
@@ -88,7 +88,7 @@
                         </g:link>
                     </th>
                     <th class="right">
-                        <div id="totalStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                        <div id="totalStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                     </th>
                 </tr>
                 </tfoot>
@@ -135,7 +135,7 @@
                     errorMessage += ":\n" + errorJson.errorMessage;
                 }
 
-                var errorHtml = "<img src='${createLinkTo(dir:'images/icons/silk/exclamation.png')}' title='" + errorMessage +"'/>";
+                var errorHtml = "<img src='${resource(dir:'images/icons/silk/exclamation.png')}' title='" + errorMessage +"'/>";
                 $('#reorderStockCount').html(errorHtml);
                 $('#lowStockCount').html(errorHtml);
                 $('#inStockCount').html(errorHtml);

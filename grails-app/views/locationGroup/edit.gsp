@@ -8,12 +8,12 @@
         <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle"><warehouse:message code="default.edit.label" args="[entityName]" /></content>
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
-		<script src="${createLinkTo(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
+		<link rel="stylesheet" href="${resource(dir:'js/jquery',file:'jquery.colorpicker.css')}" type="text/css" media="screen, projection" />
+		<script src="${resource(dir:'js/jquery/', file:'jquery.colorpicker.js')}" type="text/javascript" ></script>
     </head>
     <body>
         <div class="body">
-        
+
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
@@ -22,7 +22,7 @@
 	                <g:renderErrors bean="${locationGroupInstance}" as="list" />
 	            </div>
             </g:hasErrors>
-                        
+
 			<g:render template="summary"/>
 
             <div class="button-bar">
@@ -107,9 +107,9 @@
                         </tbody>
                         <tfoot>
                             <tr class="prop">
-                            
+
                             	<td valign="top">
-                            	
+
                             	</td>
                             	<td valign="top">
 									<div class="buttons left">
@@ -119,17 +119,17 @@
 
                                         &nbsp;
 										<g:link action="list">
-											${warehouse.message(code: 'default.button.cancel.label')}						
-										</g:link>			
+											${warehouse.message(code: 'default.button.cancel.label')}
+										</g:link>
 									</div>
 								</td>
 							</tr>
-                            
+
                         </tfoot>
                     </table>
                 </div>
-	                
-               
+
+
             </g:form>
         </div>
 	    <script type="text/javascript">
@@ -137,7 +137,7 @@
 	        function selectCombo(comboBoxElem, value) {
 		        alert(comboBoxElem + " " + value)
 				if (comboBoxElem != null) {
-					if (comboBoxElem.options) { 
+					if (comboBoxElem.options) {
 						for (var i = 0; i < comboBoxElem.options.length; i++) {
 				        	if (comboBoxElem.options[i].value == value &&
 				                comboBoxElem.options[i].value != "") { //empty string is for "noSelection handling as "" == 0 in js
@@ -148,6 +148,6 @@
 					}
 				}
 			}
-	    </script>        
+	    </script>
     </body>
 </html>
