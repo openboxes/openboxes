@@ -3,13 +3,13 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        
-        <title><warehouse:message code="inventory.expiringStock.label"/></title>    
-    </head>    
+
+        <title><warehouse:message code="inventory.expiringStock.label"/></title>
+    </head>
 
 	<body>
 		<div class="body">
-       		
+
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
@@ -20,12 +20,12 @@
             <div class="buttons" style="text-align: left">
 
                 <g:link controller="dashboard" action="index" class="button">
-                    <img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" alt="${warehouse.message(code: 'dashboard.label') }" />
+                    <img src="${resource(dir:'images/icons/silk',file:'house.png')}" alt="${warehouse.message(code: 'dashboard.label') }" />
                     &nbsp;<warehouse:message code="dashboard.label"/>
                 </g:link>
 
                 <g:link controller="inventory" action="browse" class="button">
-                    <img src="${createLinkTo(dir:'images/icons/silk',file:'application_form_magnify.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" />
+                    <img src="${resource(dir:'images/icons/silk',file:'application_form_magnify.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" />
                     &nbsp;<warehouse:message code="inventory.browse.label"/>
                 </g:link>
 
@@ -36,17 +36,17 @@
                         <div class="button-group">
 
                             <a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createExpired")}">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'hourglass.png')}"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'hourglass.png')}"/>
                                 &nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
                             </a>
 
                             <a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createConsumed")}">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'package_white.png')}"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'package_white.png')}"/>
                                 &nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
                             </a>
 
                             <a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createOutboundTransfer")}">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'package_go.png')}"/>
                                 &nbsp;<warehouse:message code="inventory.outgoingTransfer.label"/>
                             </a>
 
@@ -54,7 +54,7 @@
 
                         <g:link params="[format:'csv',threshold:params.threshold,category:params.category]" controller="${controllerName}" action="${actionName}"
                                 class="button">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+                            <img src="${resource(dir:'images/icons/silk',file:'page_excel.png')}" />
                             &nbsp;<g:message code="default.button.download.label"/></g:link>
 
                     </div>
@@ -93,7 +93,7 @@
                                                     warehouse.message(code:'inventory.listGreaterThan365Days.label',
                                                             args: [365], default: 'Expires after {0} days')]"
 									optionKey="key" optionValue="value" value="${expirationStatus}"
-									noSelection="['': warehouse.message(code:'default.all.label')]" />   
+									noSelection="['': warehouse.message(code:'default.all.label')]" />
 				           	</div>
 
 				           	<div class="filter-list-item right">
@@ -104,10 +104,10 @@
                             </div>
 							<div class="clear"></div>
 						</div>
-		            </g:form>  
+		            </g:form>
 		   		</div>
 		   		<div class="yui-u">
-		   		
+
 					<div class="box">
                         <h2>
                             <warehouse:message code="inventoryItems.expiring.label" default="Expiring inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
@@ -188,11 +188,11 @@
                             </form>
                         </div>
 
-					</div>		   		
+					</div>
 		   		</div>
-		   	</div>   
-             
-			
+		   	</div>
+
+
 		</div>
 		<script>
 			$(document).ready(function() {
@@ -209,11 +209,11 @@
 						return false;
 					}
 				);
-				
+
 				$("#toggleCheckbox").click(function(event) {
                     var checked = ($(this).attr("checked") == 'checked');
                     $(".checkbox").attr("checked", checked);
-				});	
+				});
 
                 $(".button-action").click(function(event) {
                     var numChecked = $("input.checkbox:checked").length;
@@ -230,8 +230,8 @@
             });
 
 
-		</script>	
-		
+		</script>
+
 	</body>
 
 </html>

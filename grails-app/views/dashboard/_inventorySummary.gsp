@@ -6,7 +6,7 @@
                 <tbody>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/time.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/time.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listTotalStock">
@@ -14,14 +14,14 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="totalStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="totalStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                         </td>
                     </tr>
 
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/accept.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/accept.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listInStock">
@@ -29,13 +29,13 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="inStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="inStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                         </td>
                     </tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/', file: 'bricks.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/', file: 'bricks.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listReconditionedStock">
@@ -43,7 +43,7 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="reconditionedStockCount"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="reconditionedStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
 
                         </td>
                     </tr>

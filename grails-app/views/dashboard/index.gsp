@@ -95,7 +95,7 @@
 	    	</div>
 		</div>
 
-        <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+        <script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
         <script type="text/javascript">
 
             $(window).load(function(){
