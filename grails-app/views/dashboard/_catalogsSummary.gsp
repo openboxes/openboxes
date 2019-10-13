@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.product.ProductCatalogItem" %>
 
 <div class="box">
 
@@ -71,9 +72,10 @@
                 <g:if test="${catalogs}">
                     <div class="tagcloud">
                         <g:each in="${catalogs }" var="catalog">
-                            <g:if test="${catalog?.productCatalogItems?.size() > 1}">
-                                <g:link controller="inventory" action="browse" params="['catalogs':catalog.id]" rel="${catalog?.productCatalogItems?.size() }">
-                                    ${catalog.name?:"Empty catalog" } (${catalog?.productCatalogItems?.size() })</g:link>
+                            <g:set var="productCatalogItemCount" value="${org.pih.warehouse.product.ProductCatalogItem.countByProductCatalog(catalog)}"/>
+                            <g:if test="${productCatalogItemCount > 1}">
+                                <g:link controller="inventory" action="browse" params="['catalogs':catalog.id]" rel="${productCatalogItemCount }">
+                                    ${catalog.name?:"Empty catalog" } (${productCatalogItemCount })</g:link>
                             </g:if>
                         </g:each>
                     </div>
