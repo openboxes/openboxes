@@ -13,7 +13,7 @@
             </g:if>
             <div class="list dialog">
 
-				<div class="buttonBar">            	
+				<div class="buttonBar">
 	            	<span class="linkButton">
 	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'persons.label').toLowerCase()]"/></g:link>
 	            	</span>
@@ -21,7 +21,7 @@
 	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'person.label').toLowerCase()]"/></g:link>
 	            	</span>
             	</div>
-            
+
 	            <div class="box">
                     <h2><g:message code="default.list.label" args="[g.message(code:'persons.label')]"/></h2>
 					<g:form action="list" method="get">
@@ -29,7 +29,7 @@
                             <label><warehouse:message code="default.search.label"/></label>
                             <g:textField name="q" size="45" value="${params.q }" class="text"/>
                             <button type="submit" class="button"><img
-                                src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
+                                src="${resource(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
                                 alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
                             </button>
                         </div>

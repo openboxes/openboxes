@@ -4,14 +4,14 @@
 	<meta name="layout" content="custom" />
 	<title><warehouse:message code="errors.methodNotAllowed.label" default="Method Not Allowed Denied"/></title>
 	<content tag="pageTitle"><warehouse:message code="errors.methodNotAllowed.label" default="Method Not Allowed"/></content>
-	
-	
+
+
 </head>
 
 <body>
 	<div class="body">
-	
-	
+
+
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -28,7 +28,7 @@
 				<warehouse:message code="errors.methodNotAllowed.message" default="Apologies, but you are not allowed to do *that* on that page."/>
 			</div>
 			<div style="padding-left: 45px;">
-				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
+				<img src="${resource(dir:'images',file:'jgreenspan.jpg')}"/>
 			</div>
 		</div>
 	</div>

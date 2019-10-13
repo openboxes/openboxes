@@ -1,7 +1,7 @@
 <html>
   <head>
 	  <title>General Error</title>
-	  <meta name="layout" content="custom" />	  
+	  <meta name="layout" content="custom" />
 	  <style type="text/css">
 	  		.message {
 	  			border: 1px solid black;
@@ -21,25 +21,25 @@
 	  			margin:3px;
 	  			font-family:courier;
 	  		}
-	  		.dialog { 
+	  		.dialog {
 	  			display: none;
 	  		}
 	  </style>
   </head>
 
   <body>
-  
+
   	<div class="" style="padding: 10px;">
 
 
         <button class="open-dialog">
-            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'bug.png')}" style="vertical-align: middle" />&nbsp;
+            <img src="${resource(dir: 'images/icons/silk', file: 'bug.png')}" style="vertical-align: middle" />&nbsp;
             <warehouse:message code="default.reportAsBug.label"/>
             &nbsp;
         </button>
         &nbsp;
         <button class="go-back">
-            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'reload.png')}" style="vertical-align: middle" />&nbsp;
+            <img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" style="vertical-align: middle" />&nbsp;
         <warehouse:message code="default.ignoreError.label"/>
         &nbsp;
         </button>
@@ -83,7 +83,7 @@
                 <g:hiddenField name="exception.message" value="${exception?.message?.encodeAsHTML()}"/>
                 <g:hiddenField name="exception.class" value="${exception?.className}"/>
                 <g:hiddenField name="exception.date" value="${new Date() }"/>
-                <g:set var="absoluteTargetUri" value="${g.createLinkTo(url: targetUri, absolute: true) }"/>
+                <g:set var="absoluteTargetUri" value="${g.resource(url: targetUri, absolute: true) }"/>
                 <g:hiddenField name="absoluteTargetUri" value="${absoluteTargetUri}"/>
                 <g:set var="summary" value="${exception?.cause?.class?.name?:exception?.className}: ${exception?.cause?.message?.encodeAsHTML()}"/>
                 <table>
@@ -165,7 +165,7 @@
         </g:else>
 
 	</div>
-	
+
 	<script>
         function checkFormSubmission() {
             var comments = $("#comments").val();
@@ -176,24 +176,24 @@
             }
             return true;
         }
-		$(".go-back").click(function() { 
+		$(".go-back").click(function() {
 			parent.history.back();
 	        return false;
 		});
 		$(".open-dialog").click(function() {
-			$("#error-dialog").dialog({ 
-				autoOpen: true, 
-				modal: true, 
+			$("#error-dialog").dialog({
+				autoOpen: true,
+				modal: true,
 				width: '1000px'
 			});
 
 			$("#comments").focus();
 
-			
+
 		});
 		$(".close-dialog").click(function(event) {
-			event.preventDefault(); 
-			$("#error-dialog").dialog("close"); 
+			event.preventDefault();
+			$("#error-dialog").dialog("close");
 		});
 
 	</script>

@@ -106,13 +106,13 @@
                     <td class="middle">
                         <div class="button-group">
                             <img data-id="${status}" class="add"
-                                 src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"
+                                 src="${resource(dir:'images/icons/silk',file:'add.png')}"
                                  alt="${g.message(code: 'default.button.increment.label') }"/>
                             <img data-id="${status}" class="minus"
-                                 src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}"
+                                 src="${resource(dir:'images/icons/silk',file:'delete.png')}"
                                  alt="${g.message(code: 'default.button.decrement.label') }"/>
                             <img data-id="${status}" class="reset"
-                                 src="${createLinkTo(dir:'images/icons/silk',file:'arrow_undo.png')}"
+                                 src="${resource(dir:'images/icons/silk',file:'arrow_undo.png')}"
                                  alt="${g.message(code: 'default.button.reset.label') }"/>
                         </div>
                     </td>
@@ -157,9 +157,9 @@
 
 		/**
 		 * Delete a row from the table.
-		 */		
+		 */
 		$(".delete").livequery('click', function(event) {
-			$(this).closest('tr').fadeTo(400, 0, function () { 
+			$(this).closest('tr').fadeTo(400, 0, function () {
 		        $(this).remove();
 				renameRowFields($("#adjustStockTable"));
 				alternateRowColors("#adjustStockTable");

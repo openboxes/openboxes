@@ -8,8 +8,8 @@
         <title><warehouse:message code="inventory.browse.label" default="Browse inventory"/></title>
     </head>
     <body>
-    
-    	
+
+
         <div class="body">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -65,10 +65,10 @@
                             <div id="tabs-1" style="padding: 0px;">
 					            <form id="inventoryBrowserForm" method="POST">
 					                <table id="inventoryBrowserTable" border="0">
-										<thead> 
+										<thead>
 				           					<tr>
 				           						<th>
-				           						
+
 				           						</th>
 				           						<th class="center middle">
                                                    <g:render template="./actions" model="[]"/>
@@ -254,7 +254,7 @@
                                                                    </g:if>
                                                                    <g:elseif test="${inventoryItem?.supported && showQuantity }">
                                                                    <%-- <g:formatNumber number="${inventoryItem?.quantityToReceive?:0}"/>--%>
-                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToReceive"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToReceive"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                                                                    </g:elseif>
                                                                    <g:else>
                                                                        <span class="fade"><warehouse:message code="default.na.label"/></span>
@@ -266,7 +266,7 @@
                                                                    </g:if>
                                                                    <g:elseif test="${inventoryItem?.supported && showQuantity}">
                                                                    <%-- <g:formatNumber number="${inventoryItem?.quantityToShip?:0}"/>--%>
-                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToShip"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToShip"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                                                                    </g:elseif>
                                                                    <g:else>
                                                                        <span class="fade"><warehouse:message code="default.na.label"/></span>
@@ -282,7 +282,7 @@
                                                                    <g:elseif test="${inventoryItem?.supported && showQuantity}">
                                                                        <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
                                                                        <%-- <g:formatNumber number="${inventoryItem?.quantityOnHand?:0}"/>--%>
-                                                                           <div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
+                                                                           <div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
                                                                        </g:link>
                                                                    </g:elseif>
                                                                    <g:else>
@@ -310,7 +310,7 @@
                                         </tbody>
 									</table>
 
-								</form>		
+								</form>
 							</div>
                             <div class="paginateButtons">
 
@@ -333,11 +333,11 @@
 						</div>
 
 					</div>
-				</div>    	
+				</div>
 			</div>
 		</div>
-        <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
-        <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
+        <script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+        <script src="${resource(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
 		<script>
 			$(document).ready(function() {
 				$(".checkable a").click(function(event) {
@@ -353,7 +353,7 @@
 						return false;
 					}
 				);
-				
+
 				$("#toggleCheckbox").click(function(event) {
                     var checked = ($(this).attr("checked") == 'checked');
 		            $(".checkbox").attr("checked", checked);
@@ -362,16 +362,16 @@
 		    	$(".isRelated").hide();
 		    	$(".expandable").click(function(event) {
 			    	var isVisible = $(".productGroup-"+event.target.id).is(":visible");
-			    	if (isVisible) { 
+			    	if (isVisible) {
 				    	$("#productGroup-"+event.target.id).removeClass("showRelated");
 				    	$("#productGroup-"+event.target.id).addClass("hideRelated");
 				    }
-			    	else { 
+			    	else {
 				    	$("#productGroup-"+event.target.id).addClass("showRelated");
 				    	$("#productGroup-"+event.target.id).removeClass("hideRelated");
 			    	}
 		    		$(".productGroup-"+event.target.id).toggle();
-					
+
 		    	});
 
 		    	$('.nailthumb-container').nailthumb({ width : 20, height : 20 });
@@ -392,24 +392,24 @@
 		    	function refreshQuantity() {
 			    	$.each($(".quantityOnHand"), function(index, value) {
 						var productId = $(this).attr("data-product-id");
-						$(this).load('${request.contextPath}/json/getQuantityOnHand?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
+						$(this).load('${request.contextPath}/json/getQuantityOnHand?product.id='+productId+'&location.id=${session.warehouse.id}');
 			    	});
 
 			    	$.each($(".quantityToShip"), function(index, value) {
 						var productId = $(this).attr("data-product-id");
-						$(this).load('${request.contextPath}/json/getQuantityToShip?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
+						$(this).load('${request.contextPath}/json/getQuantityToShip?product.id='+productId+'&location.id=${session.warehouse.id}');
 			    	});
 
 			    	$.each($(".quantityToReceive"), function(index, value) {
 						var productId = $(this).attr("data-product-id");
-						$(this).load('${request.contextPath}/json/getQuantityToReceive?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
-			    	});			    	
+						$(this).load('${request.contextPath}/json/getQuantityToReceive?product.id='+productId+'&location.id=${session.warehouse.id}');
+			    	});
 		    	}
 				<g:if test="${showQuantity}">
 					refreshQuantity();
 				</g:if>
-			    
-			});	
+
+			});
 		</script>
     </body>
 </html>
