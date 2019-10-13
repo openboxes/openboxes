@@ -127,22 +127,23 @@ class DashboardController {
         def currentUser = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
         def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
+        def outgoingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentOutgoingShipments)
         def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
-
-        log.info "dashboard.index Response time: " + (System.currentTimeMillis() - startTime) + " ms"
-
+        def incomingShipmentsByStatus = shipmentService.getShipmentsByStatus(recentIncomingShipments)
+        def rootCategory = productService.getRootCategory()
         def newsItems = Holders.getConfig().getProperty("openboxes.dashboard.newsSummary.newsItems")
-
+        def catalogs = productService?.getAllCatalogs()
+        def tags = productService?.getPopularTags(50)
+        def requisitionStatistics = requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine ? currentUser : null, null, [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED] as List)
 
         [
                 newsItems                : newsItems,
-                rootCategory             : productService.getRootCategory(),
-                requisitionStatistics    : requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine ? currentUser : null, null, [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED] as List),
-                requisitions             : [],
-                outgoingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentOutgoingShipments),
-                incomingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentIncomingShipments),
-                tags                     : productService?.getPopularTags(50),
-                catalogs                 : productService?.getAllCatalogs()
+                rootCategory             : rootCategory,
+                requisitionStatistics    : requisitionStatistics,
+                outgoingShipmentsByStatus: outgoingShipmentsByStatus,
+                incomingShipmentsByStatus: incomingShipmentsByStatus,
+                tags                     : tags,
+                catalogs                 : catalogs
         ]
     }
 
