@@ -307,12 +307,12 @@
             // hides children divs if shown, shows if hidden
             $details = $("#requisition-header").slideUp();
             var icon = $("#toggle-icon");
-            icon.attr('src', "${createLinkTo(dir: 'images/icons/silk', file: 'section_expanded.png')}");
+            icon.attr('src', "${resource(dir: 'images/icons/silk', file: 'section_expanded.png')}");
             console.log(icon);
         }, function() {
             $details = $("#requisition-header").slideDown();
             var icon = $("#toggle-icon");
-            icon.attr('src', "${createLinkTo(dir: 'images/icons/silk', file: 'section_collapsed.png')}");
+            icon.attr('src', "${resource(dir: 'images/icons/silk', file: 'section_collapsed.png')}");
             console.log(icon);
         });
     });

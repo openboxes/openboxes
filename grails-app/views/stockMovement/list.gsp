@@ -55,7 +55,7 @@
             <div class="button-container">
                 <g:if test="${params.direction as org.pih.warehouse.api.StockMovementDirection == StockMovementDirection.INBOUND}">
                     <g:link controller="stockMovement" action="exportItems" class="button">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+                        <img src="${resource(dir:'images/icons/silk',file:'page_excel.png')}" />
                         ${warehouse.message(code: 'stockMovements.exportIncomingItems.label', default: 'Export all incoming items')}
                     </g:link>
                 </g:if>

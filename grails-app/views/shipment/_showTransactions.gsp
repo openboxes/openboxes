@@ -8,7 +8,7 @@
 
 <div id="transactions" class="box">
     <h2>
-        <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_switch_bluegreen.png')}" style="vertical-align: middle"/>
+        <img src="${resource(dir:'images/icons/silk',file:'arrow_switch_bluegreen.png')}" style="vertical-align: middle"/>
         <label><warehouse:message code="shipping.transactions.label"/></label>
     </h2>
     <g:if test="${shipmentInstance?.outgoingTransactions || shipmentInstance?.incomingTransactions }">

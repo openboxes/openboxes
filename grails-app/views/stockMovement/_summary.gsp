@@ -6,11 +6,11 @@
         <tr>
             <td class="middle" width="1%">
                 <g:if test="${shipmentInstance?.shipmentType }">
-                    <img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
+                    <img src="${resource(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
                          alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />
                 </g:if>
                 <g:else>
-                    <img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentTypeDefault.png')}"
+                    <img src="${resource(dir:'images/icons/shipmentType',file: 'ShipmentTypeDefault.png')}"
                          alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />
                 </g:else>
             </td>
