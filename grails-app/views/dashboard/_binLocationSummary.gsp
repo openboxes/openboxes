@@ -1,7 +1,7 @@
 <div class="box">
     <h2>
         <warehouse:message code="dashboard.binLocationSummary.label" />
-        <img id="binLocationSummary-spinner" class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+        <img id="binLocationSummary-spinner" class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
     </h2>
     <div id="binLocationSummaryWidget" class="widget-content" style="padding:0; margin:0">
         <table id="binLocationSummaryTable" class="zebra">
@@ -29,9 +29,9 @@
                     var row = data[index];
 
                     if (row.status == "inStock")
-                        row.imgSrc = "${createLinkTo(dir:'images/icons/silk/accept.png')}";
+                        row.imgSrc = "${resource(dir:'images/icons/silk/accept.png')}";
                     else if (row.status == "outOfStock")
-                        row.imgSrc = "${createLinkTo(dir:'images/icons/silk/exclamation.png')}";
+                        row.imgSrc = "${resource(dir:'images/icons/silk/exclamation.png')}";
 
                     row.reportUrl = "${request.contextPath}/report/showBinLocationReport?location.id=${session.warehouse.id}&status=" + row.status;
 
@@ -40,7 +40,7 @@
 
                 // Add totals row to footer
                 var totalCount = data.reduce(function(sum, row) { return sum + row.count; }, 0);
-                var imgSrc = "${createLinkTo(dir:'images/icons/silk/asterisk.png')}";
+                var imgSrc = "${resource(dir:'images/icons/silk/asterisk.png')}";
                 var reportUrl = "${request.contextPath}/report/showBinLocationReport?location.id=${session.warehouse.id}";
                 var tableFooter = $('#binLocationSummaryTable tfoot');
                 appendFooterRow({imgSrc: imgSrc, label: 'Total', count: totalCount, reportUrl: reportUrl});

@@ -4,19 +4,19 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'product.label', default: 'Product')}" />
-        
+
         <g:if test="${productInstance?.id}">
 	        <title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 		</g:if>
 		<g:else>
-	        <title><warehouse:message code="product.add.label" /></title>	
+	        <title><warehouse:message code="product.add.label" /></title>
 			<content tag="label1"><warehouse:message code="inventory.label"/></content>
 		</g:else>
 
-	
 
-    </head>    
-    <body>        
+
+    </head>
+    <body>
         <div class="body">
 
             <g:if test="${flash.message}">
@@ -28,7 +28,7 @@
 	            </div>
             </g:hasErrors>
 
-			<div class="buttonBar">            	
+			<div class="buttonBar">
             	<span class="linkButton">
             		<g:link class="list" action="list">
             			<warehouse:message code="default.list.label" args="[warehouse.message(code:'products.label').toLowerCase()]"/>
@@ -47,16 +47,16 @@
 					<ul>
 						<li><a href="#tabs-1"><warehouse:message code="product.details.label"/></a></li>
 						<li><a href="#tabs-2"><warehouse:message code="product.documents.label"/></a></li>
-					</ul>		
-					<div id="tabs-1" style="padding: 0px;">	
-						<g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>			
+					</ul>
+					<div id="tabs-1" style="padding: 0px;">
+						<g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
 			            <g:form action="${formAction}" method="post">
-							<g:hiddenField name="action" value="save"/>                					
+							<g:hiddenField name="action" value="save"/>
 			                <g:hiddenField name="id" value="${productInstance?.id}" />
 			                <g:hiddenField name="version" value="${productInstance?.version}" />
 			            	<g:hiddenField name="categoryId" value="${params?.category?.id }"/><!--  So we know which category to show on browse page after submit -->
 				                <table>
-			                      <tbody>                
+			                      <tbody>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="name"><warehouse:message
 											code="default.description.label" /></label></td>
@@ -75,12 +75,12 @@
 												<select name="category.id">
 													<option value="null"></option>
 													<g:render template="/category/selectOptions" model="[category:rootCategory, selected:productInstance?.category, level: 0]"/>
-												</select>	
+												</select>
 									       	</div>
 									       	<g:render template="categories" model="['productInstance':productInstance]" />
 									   </td>
-									</tr>					
-									
+									</tr>
+
 									<tr class="prop">
 										<td valign="top" class="name"><label for="name"><warehouse:message
 											code="default.unitOfMeasure.label" /></label></td>
@@ -88,7 +88,7 @@
 											class="${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
 										<g:textField name="unitOfMeasure" value="${productInstance?.unitOfMeasure}" size="15" />
 										</td>
-									</tr>								
+									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="manufacturer"><warehouse:message
 											code="product.manufacturer.label" /></label></td>
@@ -96,7 +96,7 @@
 											class="${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
 										<g:textField name="manufacturer" value="${productInstance?.manufacturer}" size="40" />
 										</td>
-									</tr>								
+									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="name"><warehouse:message
 											code="product.manufacturerCode.label"/></label></td>
@@ -104,7 +104,7 @@
 											class="${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
 										<g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="15" />
 										</td>
-									</tr>								
+									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="upc"><warehouse:message
 											code="product.upc.label" /></label></td>
@@ -112,7 +112,7 @@
 											class="${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
 										<g:textField name="upc" value="${productInstance?.upc}" size="15" />
 										</td>
-									</tr>								
+									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="ndc"><warehouse:message
 											code="product.ndc.label" /></label></td>
@@ -120,7 +120,7 @@
 											class="${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
 										<g:textField name="ndc" value="${productInstance?.ndc}" size="15" />
 										</td>
-									</tr>								
+									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="coldChain"><warehouse:message
 											code="product.coldChain.label" /></label></td>
@@ -129,7 +129,7 @@
 										<g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
 										</td>
 									</tr>
-									 
+
 									<g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
 										<tr class="prop">
 											<td valign="top" class="name">
@@ -161,7 +161,7 @@
 											</td>
 										</tr>
 									</g:each>
-									
+
 									<script type="text/javascript">
 										$(document).ready(function() {
 											$(".attributeValueSelector").change(function(event) {
@@ -174,34 +174,34 @@
 											});
 										});
 									</script>
-												
+
 									<tr class="prop">
 										<td valign="top" class="">
 										</td>
 										<td>
 											<button type="submit" class="positive"><img
-												src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+												src="${resource(dir:'images/icons/silk',file:'accept.png')}"
 												alt="Save" /> ${warehouse.message(code: 'default.button.save.label', default: 'Save')}
 											</button>
 											&nbsp;
 											<!-- we only can delete products that 1) exist, and 2) dont have associated transaction entries or shipment items -->
 											<g:if test="${productInstance.id && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()}">
-											<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"> 
-									                <button type="button" class="negative"><img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
+											<g:link action="delete" id="${productInstance.id}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+									                <button type="button" class="negative"><img src="${resource(dir:'images/icons/silk',file:'decline.png')}" alt="Delete" /> ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}</button></g:link>
 											</g:if>
 											&nbsp;
-											<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">			
-												${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}			
-											</g:link>  
+											<g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="negative">
+												${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+											</g:link>
 										</td>
 									</tr>
-						
+
 								</tbody>
 							</table>
 					</g:form>
 				</div>
-				<div id="tabs-2" style="padding: 0px;">					
-					<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->					
+				<div id="tabs-2" style="padding: 0px;">
+					<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->
 					<g:uploadForm controller="product" action="upload">
 						<g:hiddenField name="product.id" value="${productInstance?.id}" />
 						<g:hiddenField name="document.id" value="${documentInstance?.id}" />
@@ -211,7 +211,7 @@
 											code="documents.label" /></label></td>
 								<td valign="top"
 									class="value">
-									
+
 									<table>
 										<thead>
 											<tr>
@@ -230,16 +230,16 @@
 												<tr>
 													<td>
 														<g:link action="deleteDocument" id="${document?.id}" params="['product.id':productInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-															<img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
-														</g:link>												
+															<img src="${resource(dir:'images/icons',file:'trash.png')}" alt="Delete" />
+														</g:link>
 													</td>
 													<td>
 														${document.contentType }
-													</td>	
+													</td>
 													<td>
 														${document.filename }
-													</td>	
-												</tr>						
+													</td>
+												</tr>
 											</g:each>
 											<g:unless test="${productInstance?.documents }">
 												<tr>
@@ -248,13 +248,13 @@
 													</td>
 												</tr>
 											</g:unless>
-										</tbody>									
+										</tbody>
 									</table>
-									
-									
+
+
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message
 									code="document.selectFile.label" /></label>
@@ -264,15 +264,15 @@
 									&nbsp;
 									<!-- show upload or save depending on whether we are adding a new doc or modifying a previous one -->
 									<button type="submit" class="positive"><img
-										src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+										src="${resource(dir:'images/icons/silk',file:'accept.png')}"
 													alt="save" />${documentInstance?.id ? warehouse.message(code:'default.button.save.label') : warehouse.message(code:'default.button.upload.label')}</button>
 								</td>
-							</tr>						
+							</tr>
 						</table>
 					</g:uploadForm>
 				</div>
 			</div>
-						
+
 
 
 
@@ -290,7 +290,7 @@
     					expires: 1
     				}
     			}
-			); 
+			);
 	    });
        </script>
 </body>
