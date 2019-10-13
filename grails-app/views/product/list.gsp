@@ -118,12 +118,12 @@
 
                                 <div class="filter-list-item center middle">
                                     <button type="submit" class="button">
-                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'find.png')}" />&nbsp;
+                                        <img src="${resource(dir:'images/icons/silk',file:'find.png')}" />&nbsp;
                                         ${warehouse.message(code: 'default.button.search.label')}
                                     </button>
 
                                     <button type="submit" name="format" value="csv" class="button">
-                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}"/>&nbsp;
+                                        <img src="${resource(dir:'images/icons/silk',file:'page_excel.png')}"/>&nbsp;
                                         ${warehouse.message(code: 'default.button.downloadFiltered.label', default: 'Download results')}
                                     </button>
                                 </div>

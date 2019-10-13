@@ -36,13 +36,13 @@
                 <tr class="prop ${i%2?'even':'odd'}">
                     <td class="center middle">
                         <g:if test="${inventoryLevelInstance?.status in org.pih.warehouse.inventory.InventoryStatus.listEnabled()}">
-                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'accept.png')}" title="${inventoryLevelInstance?.status}" />
+                            <img src="${resource(dir:'images/icons/silk', file: 'accept.png')}" title="${inventoryLevelInstance?.status}" />
                         </g:if>
                         <g:elseif test="${inventoryLevelInstance?.status in org.pih.warehouse.inventory.InventoryStatus.listDisabled()}">
-                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'delete.png')}" title="${inventoryLevelInstance?.status}" />
+                            <img src="${resource(dir:'images/icons/silk', file: 'delete.png')}" title="${inventoryLevelInstance?.status}" />
                         </g:elseif>
                         <g:else>
-                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'error.png')}" title="${inventoryLevelInstance?.status}"/>
+                            <img src="${resource(dir:'images/icons/silk', file: 'error.png')}" title="${inventoryLevelInstance?.status}"/>
                         </g:else>
                     </td>
                     <td class="middle">
@@ -90,7 +90,7 @@
                         <a href="javascript:void(0);" class="button btn-show-dialog"  data-width="900" data-height="500"
                            data-title="${warehouse.message(code:'inventoryLevel.edit.label', default: 'Edit stock level')}"
                            data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevelInstance?.id}">
-                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                            <img src="${resource(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
                             ${warehouse.message(code:'default.button.edit.label')}</a>
                     </td>
                 </tr>
@@ -109,14 +109,16 @@
             <tr class="prop">
                 <td colspan="14" class="center">
 
-                    <a href="javascript:void(0);" class="button btn-show-dialog"
-                       data-title="${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}" data-width="900" data-height="500"
-                       data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevelInstance?.id}?productId=${productInstance?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
+                    <a href="javascript:void(0);" class="open-dialog create button" dialog-id="inventory-level-dialog">
+                        <img src="${resource(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
                         ${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}</a>
 
                     <g:link class="button" controller="inventoryLevel" action="export" id="${productInstance?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'page_excel.png')}"/>&nbsp;
+                        <img src="${resource(dir:'images/icons/silk', file: 'page_excel.png')}"/>&nbsp;
+                    <a href="javascript:void(0);" class="button btn-show-dialog"
+                       data-title="${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}" data-width="900" data-height="500"
+                       data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevelInstance?.id}?productId=${productInstance?.id}">
+                        <img src="${resource(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
                         ${warehouse.message(code:'inventoryLevel.export.label', default: 'Export stock levels')}
                     </g:link>
 

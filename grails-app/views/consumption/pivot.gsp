@@ -4,7 +4,7 @@
     <meta name="layout" content="custom" />
 
     <title><g:message code="inventory.consumption.label"/></title>
-    <link rel="stylesheet" href="${createLinkTo(dir:'js/pivottable/',file:'pivot.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'js/pivottable/',file:'pivot.css')}" type="text/css" media="all" />
 
 </head>
 

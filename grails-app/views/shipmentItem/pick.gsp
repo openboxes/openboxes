@@ -6,14 +6,14 @@
     <div class="button-bar">
         <div class="left middle">
             <a href="#" class="previous-picklist-item button">
-                <img src="${createLinkTo(dir:'images/icons/silk',file:'resultset_previous.png')}" alt="Previous Item"/>&nbsp;
+                <img src="${resource(dir:'images/icons/silk',file:'resultset_previous.png')}" alt="Previous Item"/>&nbsp;
                 <g:message code="default.button.back.label" default="Back"/>
             </a>
         </div>
         <div class="right middle">
             <a href="#" class="next-picklist-item button">
                 <g:message code="default.button.next.label" default="Next"/>
-                <img src="${createLinkTo(dir:'images/icons/silk',file:'resultset_next.png')}" alt="Next Item"/>&nbsp;
+                <img src="${resource(dir:'images/icons/silk',file:'resultset_next.png')}" alt="Next Item"/>&nbsp;
             </a>
         </div>
         <div class="center middle">
@@ -48,17 +48,17 @@
                         <g:set var="availableInBin" value="${totalQtyByBin >= shipmentItem?.quantity}"/>
                         <g:set var="availableInProduct" value="${totalQtyByProduct >= shipmentItem?.quantity}"/>
                         <g:if test="${availableInBin}">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+                            <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"
                                  title="${g.message(code:'picklist.picked.label')}">
                             ${g.message(code:'picklist.picked.message', default: 'Item has been picked')}
                         </g:if>
                         <g:elseif test="${availableInProduct}">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}"
+                            <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"
                                  title="${g.message(code:'picklist.notPicked.label', default: 'Not Picked')}">
                             ${g.message(code:'picklist.notAvailable.message', default: 'Item has not been picked')}
                         </g:elseif>
                         <g:else>
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}"
+                            <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"
                                  title="${g.message(code:'picklist.notAvailable.label', default: 'Not Available')}">
                             ${g.message(code:'picklist.notAvailable.message', default: 'Insufficient quantity available for item')}
                         </g:else>
@@ -119,11 +119,11 @@
                                                 </td>
                                                 <td>
                                                     <g:if test="${sufficientQuantity}">
-                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+                                                        <img src="${resource(dir:'images/icons/silk',file:'accept.png')}"
                                                             title="${g.message(code:'default.quantitySufficient.label', default: 'Quantity Sufficient')}"/>
                                                     </g:if>
                                                     <g:else>
-                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}"
+                                                        <img src="${resource(dir:'images/icons/silk',file:'decline.png')}"
                                                              title="${g.message(code:'default.quantitySufficient.label', default: 'Quantity Insufficient')}"/>
                                                     </g:else>
                                                 </td>
@@ -176,20 +176,20 @@
                         <div class="buttons">
 
                             <button name="_eventId_pickShipmentItem" class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" alt="Pick Item Item"/>&nbsp;
+                                <img src="${resource(dir:'images/icons/silk',file:'accept.png')}" alt="Pick Item Item"/>&nbsp;
                                 <g:message code="shipping.button.pick.label"/>
                             </button>
 
                             <g:link controller="createShipmentWorkflow" action="createShipment" event="splitShipmentItem2" class="button"
                                     id="${shipmentInstance?.id}" params="[execution:params.execution, 'shipmentItem.id': shipmentItem?.id]">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_divide.png')}" alt="Split Item"/>&nbsp;
+                                <img src="${resource(dir:'images/icons/silk',file:'arrow_divide.png')}" alt="Split Item"/>&nbsp;
                                 <warehouse:message code="shipping.button.split.label"/>
                             </g:link>
 
                             <g:link controller="createShipmentWorkflow" action="createShipment" event="deleteShipmentItem" class="button"
                                     id="${shipmentInstance?.id}" params="[execution:params.execution, 'shipmentItem.id': shipmentItem?.id]"
                                     onclick="return confirm('Are you sure you want to delete this item? NOTE: If this is a split item, quantity will not be returned to the original item.')">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'decline.png')}" alt="Delete Item"/>&nbsp;
+                                <img src="${resource(dir:'images/icons/silk',file:'decline.png')}" alt="Delete Item"/>&nbsp;
                                 <g:message code="shipping.button.delete.label"/>
                             </g:link>
                         </div>

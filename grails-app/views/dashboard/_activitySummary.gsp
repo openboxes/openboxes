@@ -51,7 +51,7 @@
             },
             "oLanguage": {
                 "sZeroRecords": "No records found",
-                "sProcessing": "Loading ... <img alt='spinner' src=\"${createLinkTo(dir:'images/spinner.gif')}\" />"
+                "sProcessing": "Loading ... <img alt='spinner' src=\"${resource(dir:'images/spinner.gif')}\" />"
             },
             "aLengthMenu": [
                 [5, 10, 25, 100, 1000, -1],
