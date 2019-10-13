@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.product.ProductCatalogItem" %>
 
 <div class="box">
 
