@@ -12,7 +12,7 @@
 				<td class="value">
                     <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
                 </td>
-			</tr>	
+			</tr>
 			<tr class="prop">
                 <td class="name">
                     <label><warehouse:message code="transaction.comment.label"/></label>
@@ -24,7 +24,7 @@
 
 					</div>
 				</td>
-			</tr>				
+			</tr>
 			<tr class="prop">
 				<td style="padding: 0px;" colspan="2">
 					<div>
@@ -41,7 +41,7 @@
 								</tr>
 							</thead>
 							<tbody>
-							
+
 								<g:set var="status" value="${0 }"/>
 								<g:unless test="${command?.productInventoryItems}">
 									<tr>
@@ -53,11 +53,11 @@
 								<g:each var="product" in="${command?.productInventoryItems?.keySet() }">
 									<%-- Hidden field used to keep track of the products that were selected --%>
 									<g:hiddenField name="product.id" value="${product?.id }"/>
-									
+
 									<%-- Display one row for every inventory item --%>
 									<g:each var="inventoryItem" in="${command?.productInventoryItems[product]?.sort { it.expirationDate } }">
 										<g:set var="onHandQuantity" value="${command?.quantityMap[inventoryItem] ?: 0}"/>
-										<g:if test="${onHandQuantity > 0}">										
+										<g:if test="${onHandQuantity > 0}">
 											<tr>
 												<td>
                                                     ${product?.productCode}
@@ -87,11 +87,11 @@
 													</g:else>
 												</td>
                                                 <td>
-													<img class="delete middle" src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>	
+													<img class="delete middle" src="${resource(dir:'images/icons/silk',file:'delete.png')}" alt="${warehouse.message(code: 'delete.label') }"/>
 												</td>
 											</tr>
-											<g:set var="status" value="${status+1 }"/>		
-										</g:if>								
+											<g:set var="status" value="${status+1 }"/>
+										</g:if>
 									</g:each>
 									<g:unless test="${command?.productInventoryItems[product] }">
 										<tr>
@@ -99,13 +99,13 @@
 												<format:product product="product"/>
 											</td>
 											<td>
-												
+
 											</td>
                                             <td>
 
                                             </td>
 											<td>
-											
+
 											</td>
 											<td>
 												0
@@ -115,13 +115,13 @@
 											</td>
 										</tr>
 									</g:unless>
-									
+
 								</g:each>
 							</tbody>
 						</table>
-					</div>	
+					</div>
 				</td>
-			</tr>		
+			</tr>
 			<tr class="prop">
 				<td colspan="7">
 					<div class="center">
@@ -135,7 +135,7 @@
 					</div>
 				</td>
 			</tr>
-		</table>				
+		</table>
 	</g:form>
 </div>
 
@@ -143,18 +143,18 @@
 <script>
 	$(document).ready(function() {
 		alternateRowColors("#inventoryTable");
-		
+
 		/**
 		 * Delete a row from the table.
-		 */		
-		$("img.delete").livequery('click', function(event) { 
-			$(this).closest('tr').fadeTo(400, 0, function () { 
+		 */
+		$("img.delete").livequery('click', function(event) {
+			$(this).closest('tr').fadeTo(400, 0, function () {
 		        $(this).remove();
 				alternateRowColors("#inventoryTable");
 				renameRowFields($("#inventoryTable"));
 		    });
 		    return false;
-		});			
+		});
 	});
 </script>
 

@@ -5,7 +5,7 @@
 	<g:set var="entityName" value="${warehouse.message(code: 'errors.dataAccess.label', default: 'Data Access Error')}" />
 	<title><warehouse:message code="errors.dataAccess.label" default="Data Access Error"/></title>
 	<content tag="title"><warehouse:message code="dataAccess.label" default="Page Not Found"/></content>
-    <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
 </head>
 <body>
 	<div class="body">
@@ -26,7 +26,7 @@
 				<warehouse:message code="errors.dataAccess.message" default="Apologies, but you just tried to do something unspeakable to the database."/>
 			</div>
 			<div style="padding-left: 45px;" class="nailthumb-container">
-				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
+				<img src="${resource(dir:'images',file:'jgreenspan.jpg')}"/>
 			</div>
 		</div>
 
@@ -57,8 +57,8 @@
         </g:if>
 	</div>
 	<script>
-		$(function() { 		
+		$(function() {
 			$('.nailthumb-container img').nailthumb({width : 100, height : 100});
 		});
-	</script>	
+	</script>
 </body>

@@ -101,7 +101,7 @@
                                             </g:if>
                                             <p>
                                                 <g:if test="${isSubstitution}">
-                                                    <img src="${createLinkTo(dir:'images/icons',file:'indent.gif')}" />
+                                                    <img src="${resource(dir:'images/icons',file:'indent.gif')}" />
                                                 </g:if>
                                                 ${picklistItem?.inventoryItem?.product?.productCode}
                                                 ${picklistItem?.inventoryItem?.product?.name }

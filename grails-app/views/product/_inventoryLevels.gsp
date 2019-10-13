@@ -42,13 +42,13 @@
                                 <div class="action-menu-item">
 
                                     <a href="javascript:void(0);" class="open-dialog create" dialog-id="inventory-level-${inventoryLevelInstance?.id}-dialog">
-                                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                                        <img src="${resource(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
                                         ${warehouse.message(code:'default.button.edit.label')}</a>
 
                                 </div>
                                 <div class="action-menu-item">
                                     <g:link controller="inventoryLevel" action="delete" class="" id="${inventoryLevelInstance?.id}">
-                                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+                                        <img src="${resource(dir:'images/icons/silk', file: 'delete.png')}"/>&nbsp;
                                         ${warehouse.message(code:'default.button.delete.label')}</g:link>
                                 </div>
                             </div>
@@ -110,11 +110,11 @@
                 <td colspan="12" class="center">
 
                     <a href="javascript:void(0);" class="open-dialog create button" dialog-id="inventory-level-dialog">
-                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
+                        <img src="${resource(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
                         ${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}</a>
 
                     <g:link class="button" controller="inventoryLevel" action="export" id="${productInstance?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'page_excel.png')}"/>&nbsp;
+                        <img src="${resource(dir:'images/icons/silk', file: 'page_excel.png')}"/>&nbsp;
                         ${warehouse.message(code:'inventoryLevel.export.label', default: 'Export stock levels')}
                     </g:link>
 

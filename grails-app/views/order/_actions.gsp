@@ -8,7 +8,7 @@
 			<g:if test="${!request.request.requestURL.toString().contains('order/list')}">
 				<div class="action-menu-item">
 					<g:link controller="order" action="list">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
+						<img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
 						&nbsp;${warehouse.message(code: 'order.list.label')}
 					</g:link>
 				</div>
@@ -19,7 +19,7 @@
 
 			<div class="action-menu-item">
 				<g:link controller="order" action="show" id="${orderInstance?.id}">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" alt="Edit" style="vertical-align: middle" />
+					<img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" alt="Edit" style="vertical-align: middle" />
 					&nbsp;${warehouse.message(code: 'order.viewDetails.label')}
 				</g:link>
 			</div>
@@ -38,13 +38,13 @@
 			<g:if test="${orderInstance?.isPending() && orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
 				<div class="action-menu-item">
 					<g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle" />
+						<img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle" />
 						&nbsp;${warehouse.message(code: 'order.editDetails.label')}
 					</g:link>
 				</div>
 				<div class="action-menu-item">
 					<g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" params="['skipTo': 'items']">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: middle" />
+						<img src="${resource(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: middle" />
 						&nbsp;${warehouse.message(code: 'order.editItems.label')}
 					</g:link>
 				</div>
@@ -57,7 +57,7 @@
 			</g:if>
 			<div class="action-menu-item">
 				<g:link target="_blank" controller="order" action="print" id="${orderInstance?.id}">
-					<img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
+					<img src="${resource(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
 					<warehouse:message code="order.print.label" default="Print order"/>
 				</g:link>
 			</div>

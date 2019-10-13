@@ -2,9 +2,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        
+
         <title><g:message code="inventory.consumption.label"/></title>
-        <link rel="stylesheet" href="${createLinkTo(dir:'js/pivottable/',file:'pivot.css')}" type="text/css" media="all" />
+        <link rel="stylesheet" href="${resource(dir:'js/pivottable/',file:'pivot.css')}" type="text/css" media="all" />
     </head>
 
 	<body>
@@ -119,7 +119,7 @@
             </div>
 
 		</div>
-    %{--<script src="${createLinkTo(dir:'js/pivottable', file:'pivot.js')}" type="text/javascript" ></script>--}%
+    %{--<script src="${resource(dir:'js/pivottable', file:'pivot.js')}" type="text/javascript" ></script>--}%
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/1.6.3/pivot.min.js" type="text/javascript" ></script>
 
 

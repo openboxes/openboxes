@@ -3,13 +3,13 @@
 <g:if test="${requisition?.id }">
 	<span id="requisition-action-menu" class="action-menu">
 		<button class="action-btn ">
-            <img src="${createLinkTo(dir:'images/icons/silk',file:'cog.png')}" />
+            <img src="${resource(dir:'images/icons/silk',file:'cog.png')}" />
 		</button>
 			<div class="actions" >
 				<g:if test="${!request.request.requestURL.toString().contains('requisition/list')}">
 					<div class="action-menu-item">
 						<g:link controller="requisition" action="list">
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
+							<img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View requests" style="vertical-align: middle" />
 							&nbsp;${warehouse.message(code: 'requisition.view.label', default: 'View requisitions')}
 						</g:link>
 					</div>
@@ -19,43 +19,43 @@
 				</g:if>
 				<div class="action-menu-item">
 					<g:link controller="requisition" action="show" id="${requisition?.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />
+						<img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" />
 						&nbsp;${warehouse.message(code: 'requisition.show.label', default: 'Preview requisition')}
 					</g:link>
 				</div>
 				<div class="action-menu-item">
 					<g:link controller="requisition" action="editHeader" id="${requisition?.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" />
+						<img src="${resource(dir:'images/icons/silk',file:'page_edit.png')}" />
 						&nbsp;${warehouse.message(code: 'requisition.editHeader.label', default: 'Edit requisition')}
 					</g:link>
 				</div>
                 <div class="action-menu-item">
                     <g:link controller="requisition" action="edit" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />
+                        <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" />
                         &nbsp;${warehouse.message(code: 'requisition.edit.label', default: 'Edit requisition items')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="requisition" action="review" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'zoom_in.png')}" />
+                        <img src="${resource(dir:'images/icons/silk',file:'zoom_in.png')}" />
                         &nbsp;${warehouse.message(code: 'requisition.review.label', default: 'Review requisition')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="requisition" action="pick" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_add.png')}" />
+                        <img src="${resource(dir:'images/icons/silk',file:'basket_add.png')}" />
                         &nbsp;${warehouse.message(code: 'requisition.pick.label', default: 'Pick requisition items')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="requisition" action="confirm" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_edit.png')}" />
+                        <img src="${resource(dir:'images/icons/silk',file:'basket_edit.png')}" />
                         &nbsp;${warehouse.message(code: 'requisition.confirm.label', default: 'Confirm requisition')}
                     </g:link>
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="requisition" action="issue" id="${requisition?.id}">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'basket_go.png')}" />
+                        <img src="${resource(dir:'images/icons/silk',file:'basket_go.png')}" />
                         &nbsp;${warehouse.message(code: 'requisition.issue.label', default: 'Issue requisition')}
                     </g:link>
                 </div>
