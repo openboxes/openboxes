@@ -113,7 +113,7 @@
 
 
 							<h2>
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
+								<img src="${resource(dir:'images/icons/silk',file:'lorry.png')}" alt="received" style="vertical-align: middle"/>
 								<warehouse:message code="order.itemsReceived.label"/>
 
 							</h2>

@@ -4,11 +4,11 @@
 <html>
 <head>
 %{--    <meta name="layout" content="print"/>--}%
-%{--    <link rel="stylesheet" href="${createLinkTo(dir: 'css', file: 'print.css')}" type="text/css"--}%
+%{--    <link rel="stylesheet" href="${resource(dir: 'css', file: 'print.css')}" type="text/css"--}%
 %{--          media="print, screen, projection"/>--}%
     <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}"/>
     <title><warehouse:message code="default.show.label" args="[entityName]"/></title>
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
 
     <style>
 

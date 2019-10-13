@@ -5,12 +5,12 @@
 <meta name="layout" content="custom" />
 <title><warehouse:message code="order.enterShipmentDetails.label"/></title>
 <style>
-	
+
 </style>
 </head>
 <body>
 	<div class="nav">
-		<span class="linkButton"><a href="${createLinkTo(dir:'')}"><warehouse:message code="default.home.label"/></a>
+		<span class="linkButton"><a href="${resource(dir:'')}"><warehouse:message code="default.home.label"/></a>
 		</span>
 	</div>
 	<div class="body">
@@ -26,7 +26,7 @@
 		</g:hasErrors>
 		<g:form action="receiveOrder" method="post">
 			<g:hiddenField name="order.id" value="${orderCommand?.order?.id }"/>
-			<g:hiddenField name="dateOrdered" value="${orderCommand?.dateOrdered }"/>			
+			<g:hiddenField name="dateOrdered" value="${orderCommand?.dateOrdered }"/>
 			<div class="dialog">
 
 			<g:render template="/order/summary" model="[orderInstance:order, currentState:'enterShipmentDetails']"/>
@@ -95,42 +95,42 @@
 								<td valign='top' class='name'>
 									<label for='shippedOn'><warehouse:message code="shipping.shippedOn.label"/>:</label>
 								</td>
-								<td valign='top'class='value'>									
-									<g:jqueryDatePicker 
-										id="shippedOn" 
-										name="shippedOn" 
+								<td valign='top'class='value'>
+									<g:jqueryDatePicker
+										id="shippedOn"
+										name="shippedOn"
 										class="updateable large text"
 										size="30"
-										value="${orderCommand?.shippedOn }" 
+										value="${orderCommand?.shippedOn }"
 										format="MM/dd/yyyy"
 										showTrigger="false" />
 								</td>
-							</tr>								
+							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'>
 									<label for='deliveredOn'><warehouse:message code="shipping.deliveredOn.label"/>:</label>
 								</td>
 								<td valign='top'class='value'>
-									<g:jqueryDatePicker 
-										id="deliveredOn" 
-										name="deliveredOn" 
+									<g:jqueryDatePicker
+										id="deliveredOn"
+										name="deliveredOn"
 										class="updateable"
 										size="30"
-										value="${orderCommand?.deliveredOn }" 
+										value="${orderCommand?.deliveredOn }"
 										format="MM/dd/yyyy"
 										showTrigger="false" />
 								</td>
-							</tr>									
-	
+							</tr>
+
 						</tbody>
 					</table>
 					<div class="buttons" style="border-top: 1px solid lightgrey;">
-						<span class="formButton"> 
+						<span class="formButton">
 							<g:submitButton class="button" name="next" value="${warehouse.message(code:'default.button.next.label')}"></g:submitButton>
 						</span>
 					</div>
-					
-					
+
+
 				</div>
 			</g:form>
 		</div>

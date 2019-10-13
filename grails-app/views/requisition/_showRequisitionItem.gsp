@@ -237,7 +237,7 @@
             <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
                 <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}
 ${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}">
-                    <img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" />
+                    <img src="${resource(dir:'images/icons/silk',file:'note.png')}" />
                 </div>
             </g:if>
             <g:else>

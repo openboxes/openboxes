@@ -40,7 +40,7 @@
                                 <g:if test="${!document.hidden}">
                                     <div class="action-menu-item">
                                         <g:link url="${document.uri}" target="_blank">
-                                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
                                             ${document.name}
                                         </g:link>
                                     </div>

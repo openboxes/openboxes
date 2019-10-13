@@ -10,27 +10,27 @@
         .required { color: red}
 	</style>
 
-		
+
 
 </head>
 <body>
 	<div class="body">
-		<g:form controller="auth" action="handleSignup" method="POST">		  
+		<g:form controller="auth" action="handleSignup" method="POST">
 		    <div class="dialog">
 				<div id="signupForm">
 					<g:if test="${flash.message}">
 					    <div class="message">${flash.message}</div>
-					</g:if>		
-			
+					</g:if>
+
 					<g:hasErrors bean="${userInstance}">
 					   <div class="errors">
 					       <g:renderErrors bean="${userInstance}" as="list" />
 					   </div>
-					</g:hasErrors>		
-								
+					</g:hasErrors>
+
 					<div id="loginBox" class="box">
 						<h2>
-							<img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/> Signup for an account
+							<img src="${resource(dir:'images/icons/silk',file:'lock.png')}" class="middle"/> Signup for an account
 						</h2>
                         <table>
 							<tbody>
@@ -43,7 +43,7 @@
 					                    <g:textField name="firstName" value="${userInstance?.firstName}" class="text" size="40"/>
 					                </td>
 					            </tr>
-	
+
 					            <tr class="prop">
 					                <td class="name middle right">
                                         <span class="required">*</span>
@@ -63,7 +63,7 @@
 										<g:textField name="email" value="${userInstance?.email}" class="text" size="40"/>
 									</td>
 								</tr>
-	
+
 					            <tr class="prop">
 					                <td class="name middle right">
                                         <span class="required">*</span>
@@ -73,7 +73,7 @@
 					                    <g:passwordField name="password" value="${userInstance?.password}" class="text" size="40"/>
 					                </td>
 					            </tr>
-						    
+
 					            <tr class="prop">
 					                <td class="name middle right">
                                         <span class="required">*</span>
@@ -159,16 +159,16 @@
                                         </div>
 
 									</td>
-								
+
 								</tr>
 							</tbody>
-						</table>						
+						</table>
 					</div>
-					
-				</div>			
+
+				</div>
 			</div>
-		</g:form>		
+		</g:form>
 	</div>
 </body>
 </html>
-       
+

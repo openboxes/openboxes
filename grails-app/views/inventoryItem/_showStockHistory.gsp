@@ -186,7 +186,7 @@
             <warehouse:message code="inventory.stockHistory.label"/>
             <div class="print-history">
                 <g:link controller="inventoryItem" action="showStockHistory" params="[print:true]" id="${commandInstance.product.id}" class="button">
-                    <img src="${createLinkTo(dir:'images/icons',file:'pdf.png')}" />
+                    <img src="${resource(dir:'images/icons',file:'pdf.png')}" />
                     ${warehouse.message(code: 'inventory.exportPdf.label', default: 'Export to PDF')}
                 </g:link>
             </div>
@@ -280,16 +280,16 @@
                             <td  class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
                                     </g:if>
                                     <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}" />
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'add.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}" />
                                     </g:elseif>
                                     <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.INVENTORY}">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'calculator_edit.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}" />
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'calculator_edit.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}" />
                                     </g:elseif>
                                     <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY}">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'calculator.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'calculator.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
                                     </g:elseif>
                                 </g:if>
                             </td>

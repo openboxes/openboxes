@@ -19,34 +19,34 @@
                     <thead>
                     <tr class="prop odd">
                         <td colspan="3">
-                            <label class="fade lastUpdated"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></label>
+                            <label class="fade lastUpdated"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></label>
                         </td>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${createLinkTo(dir:'images/icons/silk/money.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/money.png')}" class="middle"/>
                         </td>
                         <td>
                             <warehouse:message code="inventory.totalStockValue.label" default="Total value of inventory"/>
                         </td>
                         <td class="right">
                             <div id="totalStockValue">
-                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <img src="${createLinkTo(dir:'images/icons/silk/chart_pie.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk/chart_pie.png')}" class="middle"/>
                         </td>
                         <td>
                             Products with pricing data
                         </td>
                         <td class="right">
                             <span id="progressSummary">
-                                <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                             </span>
                             (<small id="progressPercentage">0%</small>)
                         </td>

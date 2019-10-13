@@ -8,7 +8,7 @@
 </head>
 <body>
 	<div class="nav">
-		<span class="linkButton"><a href="${createLinkTo(dir:'')}"><warehouse:message code="default.home.label"/></a></span>
+		<span class="linkButton"><a href="${resource(dir:'')}"><warehouse:message code="default.home.label"/></a></span>
 	</div>
 	<div class="body">
 		<g:if test="${flash.message}">

@@ -1,7 +1,7 @@
 <ul class="breadcrumb">
     <li>
         <g:link controller="dashboard" action="index">
-            <img src="${createLinkTo(dir:'images/icons/silk',file:'house.png')}" class="home"/>
+            <img src="${resource(dir:'images/icons/silk',file:'house.png')}" class="home"/>
         </g:link>
     </li>
     <g:if test="${session?.user && session?.warehouse}">

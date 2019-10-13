@@ -129,12 +129,12 @@
 						</div>
 						<div class="buttons">
 							<button class="submit-button button">
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'play_blue.png')}" />
+								<img src="${resource(dir:'images/icons/silk',file:'play_blue.png')}" />
 								<g:set var="reportLabel" value="${g.message(code:'default.report.label', default: 'Report')}"/>
 								${g.message(code: 'default.run.label', args: [reportLabel])}
 							</button>
 							<button class="download-button button">
-								<img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+								<img src="${resource(dir:'images/icons/silk',file:'page_excel.png')}" />
 								<g:set var="dataLabel" value="${g.message(code:'default.data.label', default: 'Data')}"/>
 								${g.message(code: 'default.download.label', args: [dataLabel])}
 							</button>
@@ -176,7 +176,7 @@
                             <th class="center"><warehouse:message code="default.credits.label" default="Credits"/></th>
                             <th class="center"><warehouse:message code="default.debits.label" default="Debits"/></th>
                             <th class="center"><warehouse:message code="transactionReport.adjustments.label" default="Adjustments"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing"/></th>
+                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing Balance"/></th>
                         </tr>
                         </tfoot>
                     </table>

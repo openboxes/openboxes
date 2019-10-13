@@ -9,15 +9,15 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/yui/2.9.0/reset-fonts-grids/reset-fonts-grids.css" type="text/css">
 
     <!-- Include Favicon -->
-    <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}?v2" type="image/x-icon" />
+    <link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 
     <!-- Include Main CSS -->
-    <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
-    <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
-    <link rel="stylesheet" href="${createLinkTo(dir:'js/chosen',file:'chosen.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'js/chosen',file:'chosen.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" type="text/css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.min.css" type="text/css">
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footable.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'footable.css')}" type="text/css" media="all" />
 
     <!-- Include javascript files -->
     <g:javascript library="application"/>
@@ -32,7 +32,7 @@
 
     <!-- jquery validation messages -->
     <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
-        <script src="${createLinkTo(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
+        <script src="${resource(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
     </g:if>
 
     <!-- Grails Layout : write head element for page-->
@@ -138,29 +138,29 @@
     </div>
 </div>
 <!-- Include other plugins -->
-<script src="${createLinkTo(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.cookie/', file:'jquery.cookie.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.tmpl/', file:'jquery.tmpl.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.tmplPlus/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.livequery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
-<script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.ui/js/', file:'jquery.ui.autocomplete.selectFirst.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.cookies/', file:'jquery.cookies.2.2.0.min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.cookie/', file:'jquery.cookie.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.tmpl/', file:'jquery.tmpl.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.tmplPlus/', file:'jquery.tmplPlus.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.livequery/', file:'jquery.livequery.min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.livesearch/', file:'jquery.livesearch.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.hoverIntent/', file:'jquery.hoverIntent.minified.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/knockout/', file:'knockout-2.2.0.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/', file:'knockout_binding.js')}" type="text/javascript"></script>
+<script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
 <g:if test="${System.getenv().get('headless') != 'false'}" env="test">
     <!--headless driver throw error when using watermark-->
 </g:if>
 <g:else>
-    <script src="${createLinkTo(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/jquery.watermark/', file:'jquery.watermark.min.js')}" type="text/javascript" ></script>
 </g:else>
-<script src="${createLinkTo(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
-<script src="${createLinkTo(dir:'js/footable/', file:'footable.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/', file:'global.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/jquery.megaMenu/', file:'jquery.megamenu.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/footable/', file:'footable.js')}" type="text/javascript" ></script>
 <script src="//cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.js" type="text/javascript"></script>
@@ -554,7 +554,7 @@
 </script>
 
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.scannerDetection.enabled)}">
-    <script src="${createLinkTo(dir:'js/jquery.scannerdetection', file:'jquery.scannerdetection.js')}" type="text/javascript" ></script>
+    <script src="${resource(dir:'js/jquery.scannerdetection', file:'jquery.scannerdetection.js')}" type="text/javascript" ></script>
     <script>
         $(document).ready(function() {
           var scanner = $(document).scannerDetection({ ignoreIfFocusOn: ':input' });

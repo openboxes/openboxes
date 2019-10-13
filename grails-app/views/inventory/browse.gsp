@@ -95,7 +95,7 @@
 															<g:if test="${searchResult?.product?.images }">
 															   <div class="nailthumb-container">
 																   <g:set var="image" value="${searchResult?.product?.images?.sort()?.first()}"/>
-																   <img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
+																   <img src="${resource(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
 															   </div>
 														   </g:if>
 														   <g:else>
@@ -146,8 +146,6 @@
 													</td>
 												</tr>
                                             </g:unless>
-
-
                                         </tbody>
 									</table>
 
@@ -172,8 +170,8 @@
 				</div>
 			</div>
 		</div>
-        <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
-        <script src="${createLinkTo(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
+        <script src="${resource(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
+        <script src="${resource(dir:'js/jquery.tagcloud', file:'jquery.tagcloud.js')}" type="text/javascript" ></script>
 		<script>
 			$(document).ready(function() {
 				$(".checkable a").click(function(event) {

@@ -28,7 +28,7 @@
 				<warehouse:message code="errors.methodNotAllowed.message" default="Apologies, but you are not allowed to do *that* on that page."/>
 			</div>
 			<div style="padding-left: 45px;">
-				<img src="${createLinkTo(dir:'images',file:'jgreenspan.png')}"/>
+				<img src="${resource(dir:'images',file:'jgreenspan.png')}"/>
 			</div>
 		</div>
 	</div>

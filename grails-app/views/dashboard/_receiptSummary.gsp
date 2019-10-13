@@ -10,20 +10,20 @@
 				<div style="text-align: left; padding: 10px;" class="fade">
 					(<warehouse:message code="shipping.noRecent.label"/>)
 				</div>
-				
-			</g:if>	    		
-			<g:else>	
-			
+
+			</g:if>
+			<g:else>
+
   				<g:set var="pending" value="${ShipmentStatusCode.PENDING}"/>
   				<g:set var="shipped" value="${ShipmentStatusCode.SHIPPED}"/>
   				<g:set var="received" value="${ShipmentStatusCode.RECEIVED}"/>
-  				
-				<g:set var="shipmentsPending" value="${incomingShipmentsByStatus[pending] }"/>			
-				<g:set var="shipmentsEnroute" value="${incomingShipmentsByStatus[shipped] }"/>			
-  				<g:set var="shipmentsReceived" value="${incomingShipmentsByStatus[received] }"/>
-				<g:set var="incomingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsEnroute.objectList.size + shipmentsReceived.objectList.size }"/>	
 
-					
+				<g:set var="shipmentsPending" value="${incomingShipmentsByStatus[pending] }"/>
+				<g:set var="shipmentsEnroute" value="${incomingShipmentsByStatus[shipped] }"/>
+  				<g:set var="shipmentsReceived" value="${incomingShipmentsByStatus[received] }"/>
+				<g:set var="incomingShipmentsTotal" value="${shipmentsPending.objectList.size + shipmentsEnroute.objectList.size + shipmentsReceived.objectList.size }"/>
+
+
 	    		<table class="zebra">
 	    			<thead>
                         <tr class="prop odd">
@@ -38,11 +38,11 @@
 	    			<tbody>
 						<tr>
 							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>						
+								<img src="${resource(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>
 							</td>
 							<td>
 								<g:link controller="shipment" action="list" params="['type':'incoming','status':pending]">
-									${warehouse.message(code: 'dashboard.incoming.pending.label', args: [session.warehouse.name]) }							
+									${warehouse.message(code: 'dashboard.incoming.pending.label', args: [session.warehouse.name]) }
 								</g:link>
 							</td>
 							<td class="right">
@@ -50,14 +50,14 @@
 									${shipmentsPending.objectList.size}
 								</g:link>
 							</td>
-						</tr>				
+						</tr>
 						<tr>
 							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_go.png')}" class="middle"/>						
+								<img src="${resource(dir:'images/icons/silk/lorry_go.png')}" class="middle"/>
 							</td>
 							<td>
 								<g:link controller="shipment" action="list" params="['type':'incoming','status':shipped]">
-									${warehouse.message(code: 'dashboard.incoming.shipped.label', args: [session.warehouse.name]) }							
+									${warehouse.message(code: 'dashboard.incoming.shipped.label', args: [session.warehouse.name]) }
 								</g:link>
 							</td>
 							<td class="right">
@@ -65,12 +65,12 @@
 									${shipmentsEnroute.objectList.size}
 								</g:link>
 							</td>
-						</tr>				
+						</tr>
 						<tr>
 							<td class="center" style="width: 1%">
-								<img src="${createLinkTo(dir:'images/icons/silk/lorry_stop.png')}" class="middle"/>						
+								<img src="${resource(dir:'images/icons/silk/lorry_stop.png')}" class="middle"/>
 							</td>
-						
+
 							<td>
 								<g:link controller="shipment" action="list" params="['type':'incoming','status':received]">
 									${warehouse.message(code: 'dashboard.incoming.received.label', args: [session.warehouse.name]) }
@@ -81,7 +81,7 @@
 									${shipmentsReceived.objectList.size}
 								</g:link>
 							</td>
-						</tr>							
+						</tr>
 			    	</tbody>
 			    	<tfoot>
 						<tr class="odd">
@@ -93,10 +93,10 @@
 							</th>
 						</tr>
 			    	</tfoot>
-			    	
+
 		    	</table>
 
 			</g:else>
 		</div>
-	</div>	
+	</div>
 </div>

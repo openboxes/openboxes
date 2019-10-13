@@ -9,9 +9,9 @@
     <!-- Specify content to overload like global navigation links, page titles, etc. -->
     <content tag="pageTitle"><warehouse:message code="default.edit.label"
                                                 args="[entityName]"/></content>
-    <link rel="stylesheet" href="${createLinkTo(dir: 'js/jquery', file: 'jquery.colorpicker.css')}"
+    <link rel="stylesheet" href="${resource(dir: 'js/jquery', file: 'jquery.colorpicker.css')}"
           type="text/css" media="screen, projection"/>
-    <script src="${createLinkTo(dir: 'js/jquery/', file: 'jquery.colorpicker.js')}"
+    <script src="${resource(dir: 'js/jquery/', file: 'jquery.colorpicker.js')}"
             type="text/javascript"></script>
 </head>
 
@@ -58,7 +58,7 @@
                 <div id="location-details-tab">
                     <div class="box">
                         <h2>
-                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'application_view_detail.png')}"
+                            <img src="${resource(dir: 'images/icons/silk', file: 'application_view_detail.png')}"
                                  class="middle"/>
                             <warehouse:message code="location.details.label" default="Details"/>
                         </h2>
@@ -247,7 +247,7 @@
                 <div id="location-status-tab">
                     <div class="box">
                         <h2>
-                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'flag_red.png')}"
+                            <img src="${resource(dir: 'images/icons/silk', file: 'flag_red.png')}"
                                  class="middle"/>
                             <warehouse:message code="default.status.label" default="Status"/>
                         </h2>
@@ -373,7 +373,7 @@
                         <g:hiddenField name="address.id" value="${locationInstance?.address?.id}"/>
                         <div class="box">
                             <h2>
-                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'map.png')}"
+                                <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"
                                      class="middle"/>
                                 <warehouse:message code="address.label" default="Address"/>
                             </h2>

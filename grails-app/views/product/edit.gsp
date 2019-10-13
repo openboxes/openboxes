@@ -12,8 +12,8 @@
 	        <title><warehouse:message code="product.add.label" /></title>
 			<content tag="label1"><warehouse:message code="inventory.label"/></content>
 		</g:else>
-		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
-		<script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
+		<link rel="stylesheet" href="${resource(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
+		<script src="${resource(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
         <style>
         #category_id_chosen {
             width: 100% !important;

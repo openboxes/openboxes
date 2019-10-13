@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${warehouse.message(code: 'shipment.label', default: 'Shipment')}" />
-	<title><warehouse:message code="default.delete.label" args="[entityName]" /></title>        
+	<title><warehouse:message code="default.delete.label" args="[entityName]" /></title>
 </head>
 
 <body>
@@ -38,7 +38,7 @@
 
 					<div id="details" class="box">
                         <h2>
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Details" style="vertical-align: middle"/>
+                            <img src="${resource(dir:'images/icons/silk',file:'delete.png')}" alt="Details" style="vertical-align: middle"/>
                             <label><warehouse:message code="default.delete.label" args="[entityName]" /></label>
                         </h2>
 
@@ -77,7 +77,7 @@
 											<td class="value left">
 												<div>
 													<button type="submit" class="positive"><img
-													src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}"
+													src="${resource(dir:'images/icons/silk',file:'accept.png')}"
 													 /> <warehouse:message code="default.button.delete.label"/></button>
 
 													&nbsp;
