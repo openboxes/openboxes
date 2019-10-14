@@ -27,8 +27,7 @@ import org.pih.warehouse.importer.ProductSupplierExcelImporter
 import org.pih.warehouse.importer.TagExcelImporter
 import org.pih.warehouse.importer.UserExcelImporter
 import org.pih.warehouse.importer.UserLocationExcelImporter
-import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
-
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest
 
 class BatchController {
 
@@ -98,25 +97,19 @@ class BatchController {
     }
 
 
-    def importData = { ImportDataCommand command ->
-
-        log.info params
-        log.info command.location
-        log.info session
+    def importData(ImportDataCommand command) {
 
         if ("POST".equals(request.getMethod())) {
             File localFile = null
-            if (request instanceof DefaultMultipartHttpServletRequest) {
+            if (request instanceof StandardMultipartHttpServletRequest) {
                 def uploadFile = request.getFile('xlsFile')
                 if (!uploadFile?.empty) {
                     try {
                         localFile = uploadService.createLocalFile(uploadFile.originalFilename)
                         uploadFile.transferTo(localFile)
                         session.localFile = localFile
-                        //flash.message = "File uploaded successfully"
 
                     } catch (Exception e) {
-                        //throw new RuntimeException(e);
                         flash.message = "Unable to upload file due to exception: " + e.message
                         return
                     }
@@ -137,7 +130,7 @@ class BatchController {
                 command.location = Location.get(session.warehouse.id)
                 try {
                     // Need to choose the right importer
-                    switch (command.type) {
+                    switch (command.importType) {
                         case "category":
                             dataImporter = new CategoryExcelImporter(command?.filename)
                             break
@@ -181,7 +174,7 @@ class BatchController {
                             dataImporter = new UserLocationExcelImporter(command?.filename)
                             break
                         default:
-                            command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default: 'Please choose a valid import type')}")
+                            command.errors.reject("importType", "${warehouse.message(code: 'import.invalidType.message', default: 'Please choose a valid import type')}")
                     }
                 }
                 catch (OfficeXmlFileException e) {
@@ -209,7 +202,7 @@ class BatchController {
                     command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet?:'Sheet1', localFile.getAbsolutePath()])}")
                 }
 
-                if (command.type == 'inventory' && !command.date) {
+                if (command.importType == 'inventory' && !command.date) {
                     command.errors.reject("date", "${warehouse.message(code: 'import.inventoryImportMustHaveDate.message', default: "Inventory import must specify the date of the stock count")}")
                 }
 

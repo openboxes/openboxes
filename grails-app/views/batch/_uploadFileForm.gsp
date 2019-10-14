@@ -17,7 +17,7 @@
                 <td class="value">
                     <div>
                         <label>
-                            <g:radio name="type" value="category" checked="${params.type=='category'}"/>
+                            <g:radio name="importType" value="category" checked="${params.importType=='category'}"/>
                             <warehouse:message code="import.category.label" default="Category"/>
                         </label>
                         <g:link controller="batch" action="downloadExcel" params="[type:'Category']">
@@ -26,7 +26,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="inventory" checked="${params.type=='inventory'}"/>
+                            <g:radio name="importType" value="inventory" checked="${params.importType=='inventory'}"/>
                             <warehouse:message code="import.inventory.label" default="Inventory"/>
                         </label>
                         <g:link controller="inventory" action="downloadTemplate">
@@ -35,7 +35,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="inventoryLevel" checked="${params.type=='inventoryLevel'}"/>
+                            <g:radio name="importType" value="inventoryLevel" checked="${params.importType=='inventoryLevel'}"/>
                             <warehouse:message code="import.inventoryLevel.label" default="Inventory levels"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'inventoryLevels.xls']">
@@ -44,7 +44,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="location" checked="${params.type=='location'}"/>
+                            <g:radio name="importType" value="location" checked="${params.importType=='location'}"/>
                             <warehouse:message code="locations.label" default="Locations"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'locations.xls']">
@@ -53,7 +53,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="person" checked="${params.type=='person'}"/>
+                            <g:radio name="importType" value="person" checked="${params.importType=='person'}"/>
                             <warehouse:message code="persons.label" default="People"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'persons.xls']">
@@ -62,7 +62,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="productAttribute" checked="${params.type=='productAttribute'}"/>
+                            <g:radio name="importType" value="productAttribute" checked="${params.type=='productAttribute'}"/>
                             ${g.message(code:'productAttribute.label')}
                         </label>
                         <g:link controller="batch" action="downloadExcel" params="[type:'ProductAttribute']">
@@ -80,7 +80,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="productCatalogItem" checked="${params.type=='productCatalogItem'}"/>
+                            <g:radio name="importType" value="productCatalogItem" checked="${params.importType=='productCatalogItem'}"/>
                             ${g.message(code:'productCatalogItem.label')}
                         </label>
                         <g:link controller="batch" action="downloadExcel" params="[type:'ProductCatalogItem']">
@@ -89,7 +89,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="productSupplier" checked="${params.type=='productSupplier'}"/>
+                            <g:radio name="importType" value="productSupplier" checked="${params.importType=='productSupplier'}"/>
                             ${g.message(code:'productSuppliers.label')}
                         </label>
                         <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplier']">
@@ -98,7 +98,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="productPackage" checked="${params.type=='productPackage'}"/>
+                            <g:radio name="importType" value="productPackage" checked="${params.importType=='productPackage'}"/>
                             ${g.message(code:'productPackages.label')}
                         </label>
                         <g:link controller="batch" action="downloadExcel" params="[type:'ProductPackage']">
@@ -107,7 +107,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="tag" checked="${params.type=='tag'}"/>
+                            <g:radio name="importType" value="tag" checked="${params.importType=='tag'}"/>
                             <warehouse:message code="import.tag.label" default="Tag"/>
                         </label>
                         <g:link controller="batch" action="downloadExcel" params="[type:'Tag']">
@@ -116,7 +116,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="user" checked="${params.type=='user'}"/>
+                            <g:radio name="importType" value="user" checked="${params.importType=='user'}"/>
                             <warehouse:message code="users.label" default="Users"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'users.xls']">
@@ -125,7 +125,7 @@
                     </div>
                     <div>
                         <label>
-                            <g:radio name="type" value="userLocation" checked="${params.type=='userLocation'}"/>
+                            <g:radio name="importType" value="userLocation" checked="${params.importType=='userLocation'}"/>
                             <warehouse:message code="userLocations.label" default="User Locations"/>
                         </label>
                         <g:link controller="batch" action="downloadTemplate" params="[template:'userLocations.xls']">
