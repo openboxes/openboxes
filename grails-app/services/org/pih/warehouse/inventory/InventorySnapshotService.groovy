@@ -204,6 +204,7 @@ class InventorySnapshotService {
                         def row = [
                                 id             : UUID.randomUUID().toString(),
                                 dateString     : dateString,
+                                locationId     : StringEscapeUtils.escapeSql(location?.id),
                                 productId      : StringEscapeUtils.escapeSql(entry?.product?.id),
                                 productCode    : StringEscapeUtils.escapeSql(entry?.product?.productCode),
                                 lotNumber      : StringEscapeUtils.escapeSql(entry?.inventoryItem?.lotNumber ?: "DEFAULT"),
