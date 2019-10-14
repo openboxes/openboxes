@@ -56,7 +56,7 @@ class ProductPackageExcelImporter extends AbstractExcelImporter {
     }
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {

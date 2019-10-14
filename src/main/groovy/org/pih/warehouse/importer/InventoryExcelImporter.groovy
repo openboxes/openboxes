@@ -10,6 +10,7 @@
 package org.pih.warehouse.importer
 
 import grails.util.Holders
+import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
@@ -49,12 +50,13 @@ class InventoryExcelImporter extends AbstractExcelImporter {
 
     InventoryExcelImporter(String fileName) {
         super(fileName)
-        inventoryService = Holders.getGrailsApplication().getMainContext().getBean("inventoryService")
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        inventoryService = Holders.grailsApplication.mainContext.getBean("inventoryService")
     }
 
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
 
