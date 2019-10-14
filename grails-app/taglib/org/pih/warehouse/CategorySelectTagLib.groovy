@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import org.apache.commons.lang.StringUtils
+import org.pih.warehouse.product.Category
 
 class CategorySelectTagLib {
 
