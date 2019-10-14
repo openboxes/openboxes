@@ -10,6 +10,7 @@
 package org.pih.warehouse.importer
 
 import grails.util.Holders
+import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
@@ -36,14 +37,15 @@ class UserLocationExcelImporter extends AbstractExcelImporter {
 
     UserLocationExcelImporter(String fileName) {
         super(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
     }
 
     def getDataService() {
-        return Holders.getGrailsApplication().getMainContext().getBean("userLocationDataService")
+        return Holders.grailsApplication.mainContext.getBean("userLocationDataService")
     }
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, null, propertyMap)
     }
 
 

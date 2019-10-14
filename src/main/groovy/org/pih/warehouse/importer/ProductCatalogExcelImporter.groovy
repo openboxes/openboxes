@@ -9,13 +9,14 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.util.Holders
+import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.product.ProductCatalog
 import org.springframework.validation.BeanPropertyBindingResult
 
 class ProductCatalogExcelImporter extends AbstractExcelImporter {
 
-    def inventoryService
     def excelImportService
 
     static Map columnMap = [
@@ -40,11 +41,12 @@ class ProductCatalogExcelImporter extends AbstractExcelImporter {
 
     ProductCatalogExcelImporter(String fileName) {
         super(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
     }
 
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
 

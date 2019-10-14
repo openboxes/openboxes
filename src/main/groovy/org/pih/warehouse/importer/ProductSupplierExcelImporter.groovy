@@ -10,13 +10,13 @@
 package org.pih.warehouse.importer
 
 import grails.util.Holders
+import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.data.ProductSupplierDataService
 
 class ProductSupplierExcelImporter extends AbstractExcelImporter {
 
     def excelImportService
-    ProductSupplierDataService productSupplierDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -73,15 +73,16 @@ class ProductSupplierExcelImporter extends AbstractExcelImporter {
 
     ProductSupplierExcelImporter(String fileName) {
         super(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
     }
 
     def getDataService() {
-        return Holders.getGrailsApplication().getMainContext().getBean("productSupplierDataService")
+        return Holders.grailsApplication.mainContext.getBean("productSupplierDataService")
     }
 
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {

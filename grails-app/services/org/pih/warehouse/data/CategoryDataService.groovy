@@ -9,10 +9,12 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.importer.ImportDataCommand
 import org.springframework.validation.BeanPropertyBindingResult
 
+@Transactional
 class CategoryDataService {
 
     Boolean validateData(ImportDataCommand command) {
@@ -50,7 +52,6 @@ class CategoryDataService {
         if (!category) {
             category = new Category()
         }
-        category.id = params.id
         category.name = params.name
         if (params.parentCategoryId) {
             category.parentCategory = Category.get(params.parentCategoryId)
