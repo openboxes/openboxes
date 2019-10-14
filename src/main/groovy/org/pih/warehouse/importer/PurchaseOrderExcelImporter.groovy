@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.util.Holders
+import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
 /**
@@ -36,7 +38,6 @@ import org.grails.plugins.excelimport.ExpectedPropertyType
  */
 class PurchaseOrderExcelImporter extends AbstractExcelImporter {
 
-    def productService
     def excelImportService
 
     static Map cellMap = [
@@ -94,11 +95,12 @@ class PurchaseOrderExcelImporter extends AbstractExcelImporter {
 
     PurchaseOrderExcelImporter(String fileName) {
         super(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
     }
 
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {
