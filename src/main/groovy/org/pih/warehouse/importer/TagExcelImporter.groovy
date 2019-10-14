@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.gorm.transactions.Transactional
+import grails.util.Holders
+import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.Tag
 import org.springframework.validation.BeanPropertyBindingResult
@@ -33,10 +36,11 @@ class TagExcelImporter extends AbstractExcelImporter {
 
     TagExcelImporter(String fileName) {
         super(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
     }
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {
@@ -50,6 +54,7 @@ class TagExcelImporter extends AbstractExcelImporter {
         }
     }
 
+    @Transactional
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Tag tag = createOrUpdateTag(params)
