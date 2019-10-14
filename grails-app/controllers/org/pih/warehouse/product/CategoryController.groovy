@@ -23,7 +23,6 @@ class CategoryController {
 
     def tree = {
         long startTime = System.currentTimeMillis()
-        log.info params
         def categoryInstance = Category.get(params.id)
 
         println "Category tree: " + (System.currentTimeMillis() - startTime) + " ms"
@@ -33,11 +32,8 @@ class CategoryController {
 
 
     def move = {
-        log.info params
         def parent = Category.get(params.newParent)
         def child = Category.get(params.child)
-        log.info parent
-        log.info child
         child.parentCategory = parent
         if (!child.hasErrors() && child.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.success.message')}"
@@ -47,8 +43,6 @@ class CategoryController {
 
     @CacheFlush("selectCategoryCache")
     def saveCategory = {
-        log.info params
-
         def categoryInstance = Category.get(params.id)
         if (!categoryInstance) {
             categoryInstance = new Category(params)
@@ -65,7 +59,7 @@ class CategoryController {
     }
 
     def deleteCategory = {
-        log.info params
+
         def categoryInstance = Category.get(params.id)
 
         if (categoryInstance) {
