@@ -373,7 +373,7 @@ class StockMovementController {
     }
 
     def addDocument = {
-        log.info params
+
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         Shipment shipmentInstance = stockMovement.shipment

@@ -294,7 +294,6 @@ class UserController {
     def updateAuthUserLocale = {
 
         log.info "update auth user locale " + params
-        log.info params.locale == 'debug'
         if (params.locale == 'debug') {
             session.useDebugLocale = true
         } else {
