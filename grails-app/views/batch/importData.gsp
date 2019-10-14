@@ -31,7 +31,7 @@
 
                 <g:form controller="batch" action="importData" method="POST">
                     <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
-                    <input name="type" type="hidden" value="${params.type }"/>
+                    <input name="importType" type="hidden" value="${params.importType }"/>
 
                     <div class="box">
                         <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.properties.label', default:'properties')]"/></h2>
