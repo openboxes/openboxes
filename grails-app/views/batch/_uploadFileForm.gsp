@@ -335,7 +335,7 @@
                 <td class="name"></td>
                 <td class="value">
                     <button type="submit" class="button">
-                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
+                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
                         ${warehouse.message(code: 'default.button.upload.label', default: 'Upload')}</button>
                 </td>
             </tr>
