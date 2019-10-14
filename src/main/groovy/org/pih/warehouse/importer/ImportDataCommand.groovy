@@ -9,12 +9,15 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
+import org.springframework.web.multipart.MultipartFile
 
-class ImportDataCommand {
+class ImportDataCommand implements Validateable {
     def filename
     def importFile
-    def type
+    MultipartFile xlsFile
+    String importType
     Location location
     Date date
     def columnMap
@@ -30,7 +33,8 @@ class ImportDataCommand {
         date(nullable: true)
         filename(nullable: true)
         importFile(nullable: true)
-        type(nullable: false)
+        xlsFile(nullable:true)
+        importType(nullable: false)
         location(nullable: false)
         columnMap(nullable: true)
         data(nullable: true)
