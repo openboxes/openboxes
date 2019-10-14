@@ -129,7 +129,6 @@ class ShipmentController {
     }
 
     def update = {
-        log.info params
 
         def shipmentInstance = Shipment.get(params.id)
         if (shipmentInstance) {
@@ -252,7 +251,7 @@ class ShipmentController {
     }
 
     def editDetails = {
-        log.info params
+
         def shipmentInstance = Shipment.get(params.id)
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -728,8 +727,6 @@ class ShipmentController {
 
     def editContainer = {
 
-        log.info params
-
         def shipmentInstance = Shipment.get(params.shipmentId)
         def containerInstance = Container.get(params.containerId)
         if (containerInstance) {
@@ -802,7 +799,7 @@ class ShipmentController {
 
 
     def addDocument = {
-        log.info params
+
         def shipmentInstance = Shipment.get(params.id)
         def documentInstance = Document.get(params?.document?.id)
         if (!documentInstance) {
