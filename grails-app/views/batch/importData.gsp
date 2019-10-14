@@ -10,12 +10,12 @@
     </head>
 	<body>
 		<div class="body">
-	
+
 			<g:if test="${flash.message}">
 				<div class="message">
 					${flash.message}
 				</div>
-			</g:if> 
+			</g:if>
 			<g:hasErrors bean="${commandInstance}">
 				<div class="errors">
                     <g:renderErrors bean="${commandInstance}" as="list" />
@@ -26,7 +26,7 @@
 
                 <g:form controller="batch" action="importData" method="POST">
                     <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
-                    <input name="type" type="hidden" value="${params.type }"/>
+                    <input name="importType" type="hidden" value="${params.importType }"/>
 
                     <div class="box">
                         <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.properties.label', default:'properties')]"/></h2>
@@ -44,7 +44,7 @@
                                     <label><warehouse:message code="default.type.label"/></label>
                                 </td>
                                 <td class="value">
-                                    ${commandInstance?.type}
+                                    ${commandInstance?.importType}
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -55,14 +55,16 @@
                                     ${commandInstance?.filename}
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message code="default.date.label"/></label>
-                                </td>
-                                <td class="value">
-                                    <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
-                                </td>
-                            </tr>
+                            <g:if test="${commandInstance?.date}">
+                                <tr class="prop">
+                                    <td class="name">
+                                        <label><warehouse:message code="default.date.label"/></label>
+                                    </td>
+                                    <td class="value">
+                                        <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
+                                    </td>
+                                </tr>
+                            </g:if>
                         </table>
                     </div>
 
@@ -140,7 +142,7 @@
                     "sScrollY": 300,
                     "bScrollCollapse": true,
                     "bScrollInfinite": true,
-                    "iDisplayLength": 15,
+                    "iDisplayLength": 25,
                     "bSearch": false
                 });
             });
