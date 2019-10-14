@@ -44,8 +44,12 @@
 
                         <div class="buttons">
 
-                            <button name="button" value="run" class="button"><g:message code="default.button.run.label"/></button>
-                            <button name="button" value="download" class="button"><g:message code="default.button.download.label"/></button>
+                            <button name="button" value="run" class="button">
+                                <g:message code="report.runReport.label"/>
+                            </button>
+                            <button name="button" value="download" class="button">
+                                <g:message code="default.button.download.label"/>
+                            </button>
                         </div>
                     </div>
                 </g:form>
@@ -78,7 +82,7 @@
                                 <th class="center"><g:message code="inventoryItem.expirationDate.label"/></th>
                                 <th class="center"><g:message code="default.quantity.label"/></th>
                                 <th class="center"><g:message code="default.uom.label"/></th>
-                                <th class="center"><g:message code="productSupplier.unitCost.label"/></th>
+                                <th class="center"><g:message code="product.unitCost.label"/></th>
                                 <th class="center"><g:message code="product.totalValue.label"/></th>
                             </tr>
                         </thead>
@@ -88,17 +92,19 @@
         </div>
     </div>
 </div>
+<div class="loading">Loading...</div>
 <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>
 <script>
     $(document).ready(function() {
-
         $('#binLocationReportTable').dataTable( {
-            "bProcessing": true,
+            "bProcessing": false,
             "sServerMethod": "GET",
             "iDisplayLength": 25,
             "bSearch": false,
             "bScrollCollapse": true,
+            "bScrollInfinite": true,
             "bJQueryUI": true,
+            "sScrollY": 500,
             "bAutoWidth": true,
             "sPaginationType": "full_numbers",
             "sAjaxSource": "${request.contextPath}/json/getBinLocationReport",
@@ -117,12 +123,18 @@
                     "data": aoData,
                     "success": fnCallback,
                     "timeout": 120000,   // optional if you want to handle timeouts (which you should)
-                    "error": handleAjaxError // this sets up jQuery to give me errors
+                    "error": handleAjaxError, // this sets up jQuery to give me errors
+                    beforeSend : function(){
+                        $(".loading").show();
+                    },
+                    complete: function(){
+                       $(".loading").hide();
+                    },
                 } );
             },
             "oLanguage": {
-                "sZeroRecords": "No records found",
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
+                //"sZeroRecords": "No records found",
+                "sProcessing": "Loading <img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
             },
             "aLengthMenu": [
                 [5, 15, 25, 100, 1000, -1],
