@@ -22,7 +22,6 @@ class OrderWorkflowController {
                 def productList = []
                 if (params.searchTerms) {
                     def categoryList = Category.findByNameLike("%" + params.searchTerms + "%")
-                    log.info params.searchTerms
                     if (categoryList) {
                         productList = Product.findByNameLikeOrCategory("%" + params.searchTerms + "%", categoryList)
                     } else {
