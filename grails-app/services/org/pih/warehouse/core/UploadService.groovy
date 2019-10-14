@@ -21,7 +21,7 @@ class UploadService {
     File createLocalFile(String filename) {
         log.info "Create local file ${filename}"
         def uploadsDirectory = findOrCreateUploadsDirectory()
-        return new File(uploadsDirectory, filename)
+        return new File(uploadsDirectory.absolutePath, filename)
     }
 
     File findOrCreateUploadsDirectory() {
