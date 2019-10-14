@@ -19,7 +19,7 @@ class Doc4jController {
      *
      */
     def downloadPackingList = {
-        log.info params
+
         def shipmentInstance = Shipment.get(params.id)
 
         if (!shipmentInstance) {
@@ -39,7 +39,7 @@ class Doc4jController {
     }
 
     def downloadCertificateOfDonation = {
-        log.info params
+
         def shipmentInstance = Shipment.get(params.id)
 
         if (!shipmentInstance) {

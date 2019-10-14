@@ -243,13 +243,11 @@ class AdminController {
 
 
     def downloadWar = {
-        log.info params
         log.info("Updating war file " + params)
         redirect(action: "showSettings")
     }
 
     def cancelUpdateWar = {
-        log.info params
         if (session.future) {
             session.future.cancel(true)
             new File(LOCAL_TEMP_WEBARCHIVE_PATH).delete()
@@ -258,7 +256,6 @@ class AdminController {
     }
 
     def deployWar = { UpgradeCommand ->
-        log.info params
         def source = session.command.localWebArchive
 
         def backup = new File(session.command.localWebArchive.absolutePath + ".backup")
