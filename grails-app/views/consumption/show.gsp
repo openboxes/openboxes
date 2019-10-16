@@ -77,20 +77,20 @@
                                             <div class="debit">${row.transferOutQuantity}</div>
                                         </td>
                                         <td class="center">
-                                            <g:formatNumber number="${row.monthlyQuantity}" format="###,###.#" maxFractionDigits="1"/>
+                                            <g:formatNumber number="${row.monthlyQuantity}" maxFractionDigits="0"/>
                                         </td>
                                         <td class="center">
-                                            <g:formatNumber number="${row.weeklyQuantity}" format="###,###.#" maxFractionDigits="1"/>
+                                            <g:formatNumber number="${row.weeklyQuantity}" maxFractionDigits="0"/>
                                         </td>
                                         <td class="center">
-                                            <g:formatNumber number="${row.dailyQuantity}" format="###,###.#" maxFractionDigits="1"/>
+                                            <g:formatNumber number="${row.dailyQuantity}" maxFractionDigits="0"/>
                                         </td>
 
                                         <td class="center">
-                                            <g:formatNumber number="${row.onHandQuantity}" format="###,###.#" maxFractionDigits="1"/>
+                                            <g:formatNumber number="${row.onHandQuantity}" maxFractionDigits="0"/>
                                         </td>
                                         <td class="center">
-                                            <g:formatNumber number="${row.numberOfMonthsRemaining}" format="###,###.#" maxFractionDigits="1"/>
+                                            <g:formatNumber number="${row.numberOfMonthsRemaining}" maxFractionDigits="0"/>
                                         </td>
                                     </tr>
                                 </g:each>

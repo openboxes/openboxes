@@ -62,7 +62,7 @@
                         <label>
                             <warehouse:message code="consumption.categories.label" default="Categories"/>
                         </label>
-                        <g:selectCategory name="selectedCategories" multiple="true" value="${command?.selectedCategories?.id}" class="chzn-select"/>
+                        <g:selectCategory name="selectedCategories" multiple="true" value="${command?.selectedCategories?.id}" class="chzn-select-deselect"/>
                     </div>
                     <div class="filter-list-item">
                         <label>
@@ -97,7 +97,13 @@
                     </g:elseif>
 
                 </div>
-
+                <div class="filter-list-item">
+                        <label><warehouse:message code="consumption.transactionTypes.label" default="Transaction Types"/></label>
+                        <g:selectTransactionType name="selectedTransactionTypes" from="${command?.transactionTypes}"
+                                                 transactionCode="${org.pih.warehouse.inventory.TransactionCode.DEBIT}"
+                                                 multiple="true" class="chzn-select-deselect"
+                                                 value="${command?.selectedTransactionTypes?.id}"/>
+                    </div>
             </div>
             <h2><warehouse:message code="consumption.renderOptions.label" default="Render Options"/></h2>
             <div class="options">
