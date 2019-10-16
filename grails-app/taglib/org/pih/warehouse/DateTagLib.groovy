@@ -27,15 +27,12 @@ class DateTagLib {
     def formatDate = { attrs, body ->
         def formatTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.FormatTagLib')
 
-        def today = new Date()
         if (!attrs.format) {
             attrs.format = Constants.DEFAULT_DATE_TIME_FORMAT
         }
-        if (session.timezone) {
+        if (!attrs.timeZone && session.timezone) {
             attrs.timeZone = session.timezone
         }
-
-
         out << formatTagLib.formatDate.call(attrs)
     }
 

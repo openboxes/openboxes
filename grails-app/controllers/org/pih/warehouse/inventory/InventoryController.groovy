@@ -253,36 +253,28 @@ class InventoryController {
     def search = { QuantityOnHandReportCommand command ->
         def quantityMapByDate = [:]
         def startTime = System.currentTimeMillis()
-        println "search " + params
-
-        println "Locations: " + command?.locations?.toString() + ", Start date = " + command?.startDate + ", End Date = " + command?.endDate + ", Tag: " + command.tags
-
+        def startDate = command.startDate
+        def endDate = command.endDate
         if (command.validate()) {
-
             if (!command?.locations) {
                 command.locations = [Location.get(session?.warehouse?.id)]
             }
-
             if (command.startDate && command.endDate) {
-                command.dates = getDatesBetween(command.startDate, command.endDate, command.frequency)
-                println "dates : " + command?.dates
+                command.dates = getDatesBetween(startDate, endDate, command.frequency)
             } else if (command.startDate) {
-                command?.dates << command?.startDate
+                command?.dates << startDate
             } else if (command.endDate) {
-                command?.dates << command?.endDate
+                command?.dates << endDate
             }
-
-            println "dates: " + command?.dates
 
             command.locations.each { location ->
                 for (date in command?.dates) {
                     println "Get quantity map " + date + " location = " + location
-                    def quantityMap = [:]
                     def revisedDate = date
                     use(TimeCategory) {
                         revisedDate = revisedDate.plus(1.day)
                     }
-                    quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, revisedDate, command.tags)
+                    def quantityMap = inventorySnapshotService.getQuantityOnHandByProduct(location, revisedDate)
                     def existingQuantityMap = quantityMapByDate[date]
                     if (existingQuantityMap) {
                         quantityMapByDate[date] = mergeQuantityMap(existingQuantityMap, quantityMap)
@@ -295,11 +287,7 @@ class InventoryController {
             }
 
 
-            def keys = quantityMapByDate[command.dates[0]]?.keySet()?.sort()
-            println "keys: " + keys
-            keys.each { product ->
-                command.products << product
-            }
+            command.products = quantityMapByDate[command.dates[0]]?.keySet()?.sort()
         }
 
         if (params.button == 'download') {
