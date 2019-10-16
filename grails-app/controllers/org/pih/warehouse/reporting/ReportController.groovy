@@ -78,6 +78,8 @@ class ReportController {
             csv += g.message(code: 'inventoryItem.expirationDate.label') + ","
             csv += g.message(code: 'location.binLocation.label') + ","
             csv += g.message(code: 'default.quantity.label') + ","
+            csv += g.message(code: 'product.unitCost.label') + ","
+            csv += g.message(code: 'product.totalValue.label')
             csv += "\n"
         }
         return csv
@@ -97,6 +99,8 @@ class ReportController {
             csv += StringEscapeUtils.escapeCsv(expirationDate) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.binLocation?.name ?: defaultBinLocation) + ","
             csv += binLocation.quantity + ","
+            csv += binLocation.unitCost + ","
+            csv += binLocation.totalValue
             csv += "\n"
         }
         return csv
@@ -110,12 +114,16 @@ class ReportController {
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         def products = binLocations.collect { it.product.productCode }.unique()
         binLocations = binLocations.collect {
-            [productCode   : it.product.productCode,
-             productName   : it.product.name,
-             lotNumber     : it.inventoryItem.lotNumber,
-             expirationDate: it.inventoryItem.expirationDate,
-             binLocation   : it?.binLocation?.name ?: "Default Bin",
-             quantity      : it.quantity]
+            [
+                    productCode   : it.product.productCode,
+                    productName   : it.product.name,
+                    lotNumber     : it.inventoryItem.lotNumber,
+                    expirationDate: it.inventoryItem.expirationDate,
+                    binLocation   : it?.binLocation?.name ?: "Default Bin",
+                    quantity      : formatNumber(number: it.quantity),
+                    unitCost      : formatNumber(number: it.unitCost),
+                    totalValue     : formatNumber(number: it.totalValue)
+            ]
         }
 
         long elapsedTime = System.currentTimeMillis() - startTime

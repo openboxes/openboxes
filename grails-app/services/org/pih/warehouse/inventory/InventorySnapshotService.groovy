@@ -487,17 +487,22 @@ class InventorySnapshotService {
             def getStatus = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
 
             data = results.collect {
-                def product = it[0]
-                def inventoryItem = it[1]
-                def binLocation = it[2]
-                def quantity = it[3]
+                Product product = it[0]
+                InventoryItem inventoryItem = it[1]
+                Location binLocation = it[2]
+                BigDecimal quantity = it[3]?:0.0
+                BigDecimal unitCost = product.pricePerUnit?:0.0
+                BigDecimal totalValue = quantity * unitCost
 
                 [
                         status       : getStatus(quantity),
                         product      : product,
                         inventoryItem: inventoryItem,
                         binLocation  : binLocation,
-                        quantity     : quantity
+                        quantity     : quantity,
+                        unitCost     : unitCost,
+                        totalValue   : totalValue
+
                 ]
             }
         }
