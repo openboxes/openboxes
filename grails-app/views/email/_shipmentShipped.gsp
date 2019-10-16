@@ -115,7 +115,29 @@
                             </td>
                             <td class="value">
                                 ${userInstance?.name }
-                                <a href="mailto:${userInstance?.email }">${userInstance?.email }</a>
+                                <a href="mailto:${userInstance?.email}">${userInstance?.email}</a>
+                            </td>
+                        </tr>
+                    </g:if>
+                    <g:if test="${shipmentInstance?.createdBy}">
+                        <tr class="prop">
+                            <td class="name">
+                                <label>${warehouse.message(code: 'default.createdBy.label') }</label>
+                            </td>
+                            <td class="value">
+                                ${shipmentInstance?.createdBy?.name }
+                                <a href="mailto:${shipmentInstance?.createdBy?.email}">${shipmentInstance?.createdBy?.email}</a>
+                            </td>
+                        </tr>
+                    </g:if>
+                    <g:if test="${shipmentInstance?.updatedBy}">
+                        <tr class="prop">
+                            <td class="name">
+                                <label>${warehouse.message(code: 'default.updatedBy.label') }</label>
+                            </td>
+                            <td class="value">
+                                ${shipmentInstance?.createdBy?.name }
+                                <a href="mailto:${shipmentInstance?.updatedBy?.email}">${shipmentInstance?.updatedBy?.email}</a>
                             </td>
                         </tr>
                     </g:if>
@@ -156,6 +178,20 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
+                        <td>
+                            <g:formatDate date="${shipmentInstance?.dateCreated}" format="MMM d, yyyy"/>
+                        </td>
+                        <td>
+                            <g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mma"/>
+                        </td>
+                        <td>
+                            <warehouse:message code="default.created.label"/>
+                        </td>
+                        <td>
+                            ${shipmentInstance?.origin?.name}
+                        </td>
+                    </tr>
                     <g:set var="i" value="${0 }"/>
                     <g:each in="${shipmentInstance.events}" var="event">
                         <tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
@@ -174,20 +210,6 @@
                             </td>
                         </tr>
                     </g:each>
-                    <tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
-                        <td>
-                            <g:formatDate date="${shipmentInstance?.dateCreated}" format="MMM d, yyyy"/>
-                        </td>
-                        <td>
-                            <g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mma"/>
-                        </td>
-                        <td>
-                            <warehouse:message code="default.created.label"/>
-                        </td>
-                        <td>
-                            ${shipmentInstance?.origin?.name}
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </div>

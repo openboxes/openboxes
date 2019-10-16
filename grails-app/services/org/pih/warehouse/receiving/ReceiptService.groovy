@@ -24,6 +24,8 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 
 class ReceiptService {
 
@@ -284,6 +286,8 @@ class ReceiptService {
         Shipment shipment = partialReceipt.shipment
         if (shipment) {
             createInboundTransaction(partialReceipt)
+
+            grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipment, ShipmentStatusCode.RECEIVED))
         }
     }
 

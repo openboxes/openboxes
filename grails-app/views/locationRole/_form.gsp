@@ -32,7 +32,7 @@
                             name="location.id"
                             noSelection="['':'']"
                             activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
-                            value="${locationRoleInstance?.location?.id}"/>
+                            value="${locationRoleInstance?.location?.id?:session.warehouse.id}"/>
                 </td>
             </tr>
             <tr class="prop">
