@@ -277,28 +277,25 @@
                                                             </g:each>
                                                             <g:unless test="${userInstance.locationRoles}">
                                                                 <tr>
-                                                                    <td colspan="5" class="empty fade center">
+                                                                    <td colspan="5" class="fade center">
                                                                         <g:message code="default.results.message"
-                                                                                   args="[userInstance?.locationRoles?.size()?:0, g.message(code:'user.locationRoles.label')]"/>
+                                                                                   args="[userInstance?.locationRoles?.size()?:'no', g.message(code:'user.locationRoles.label').toLowerCase()]"/>
                                                                     </td>
                                                                 </tr>
                                                             </g:unless>
-                                                        </tbody>
-                                                        <tfoot>
-                                                            <tr>
-                                                                <td colspan="5" class="buttons">
+                                                            <tr class="prop">
+                                                                <td colspan="5" class="buttons right">
                                                                     <a href="javascript:void(0);"
                                                                        class="button btn-show-dialog"
                                                                        data-title="${g.message(code:'default.add.label', args: [g.message(code: 'user.locationRoles.label')])}"
                                                                        data-url="${request.contextPath}/user/createLocationRoles?user.id=${userInstance?.id}">
+                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"/>&nbsp;
                                                                         <g:message code="default.add.label" args="[g.message(code: 'user.locationRoles.label')]"/>
                                                                     </a>
                                                                 </td>
                                                             </tr>
                                                         </tfoot>
                                                     </table>
-
-
                                                 </td>
                                             </tr>
                                         </g:isUserAdmin>
@@ -339,6 +336,5 @@
         $(".tabs").tabs({cookie: { expires: 1 } });
      });
 </script>
-    
 </body>
 </html>

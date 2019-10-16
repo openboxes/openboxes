@@ -15,6 +15,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.FetchMode
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
@@ -51,6 +52,7 @@ class ShipmentService {
     def inventoryService
     def identifierService
     def documentService
+    GrailsApplication grailsApplication
 
     /**
      * Returns the shipment referenced by the passed id parameter;
@@ -1056,6 +1058,9 @@ class ShipmentService {
         else {
             throw new ValidationException("Failed to send shipment", shipmentInstance?.errors)
         }
+
+        grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipmentInstance, ShipmentStatusCode.SHIPPED))
+
     }
 
 

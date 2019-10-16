@@ -6,14 +6,16 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.report
 
 import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 
@@ -21,7 +23,7 @@ class NotificationService {
 
     def dataService
     def userService
-    def mailService
+    MailService mailService
 
     boolean transactional = false
 
@@ -86,17 +88,7 @@ class NotificationService {
             return
         }
 
-        // FIXME Need to fix this when we migrate to grails 3
-        // Hack to ensure that the GSP template engine has access to a request.
-        def webRequest = RequestContextHolder.getRequestAttributes()
-        if(!webRequest) {
-            def servletContext = ServletContextHolder.getServletContext()
-            def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-            grails.util.GrailsWebUtil.bindMockWebRequest(applicationContext)
-        }
-
-        def renderTagLib = new RenderTagLib()
-        String body = renderTagLib.render(template: template, model: model)
+        String body = renderTemplate(template, model)
 
         // Send email with attachment (if csv exists)
         if (csv) {
@@ -107,6 +99,49 @@ class NotificationService {
         }
 
     }
+
+
+    def sendShipmentCreatedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
+        def users = userService.findUsersByRoleTypes(location, roleTypes)
+        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been created"
+        String template = "/email/shipmentCreated"
+        sendShipmentNotifications(shipmentInstance, users, template, subject)
+    }
+
+    def sendShipmentIssuedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
+        def users = userService.findUsersByRoleTypes(location, roleTypes)
+        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been shipped"
+        String template = "/email/shipmentShipped"
+        sendShipmentNotifications(shipmentInstance, users, template, subject)
+    }
+
+    def sendShipmentReceiptNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
+        List<User> users = userService.findUsersByRoleTypes(location, roleTypes)
+        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been received"
+        String template = "/email/shipmentReceived"
+        sendShipmentNotifications(shipmentInstance, users, template, subject)
+    }
+
+    def sendShipmentNotifications(Shipment shipmentInstance, List<User> users, String template, String subject) {
+        String body = renderTemplate(template, [shipmentInstance: shipmentInstance])
+        List emails = users.collect { it.email }
+        if (!emails.empty) {
+            mailService.sendHtmlMail(subject, body, emails)
+        }
+    }
+
+    def renderTemplate(String template, Map model) {
+        // FIXME Need to fix this when we migrate to grails 3
+        // Hack to ensure that the GSP template engine has access to a request.
+        def webRequest = RequestContextHolder.getRequestAttributes()
+        if(!webRequest) {
+            def servletContext = ServletContextHolder.getServletContext()
+            def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
+            grails.util.GrailsWebUtil.bindMockWebRequest(applicationContext)
+        }
+        return new RenderTagLib().render(template: template, model: model)
+    }
+
 
 
 }
