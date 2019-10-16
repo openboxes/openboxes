@@ -178,20 +178,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
-                        <td>
-                            <g:formatDate date="${shipmentInstance?.dateCreated}" format="MMM d, yyyy"/>
-                        </td>
-                        <td>
-                            <g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mma"/>
-                        </td>
-                        <td>
-                            <warehouse:message code="default.created.label"/>
-                        </td>
-                        <td>
-                            ${shipmentInstance?.origin?.name}
-                        </td>
-                    </tr>
                     <g:set var="i" value="${0 }"/>
                     <g:each in="${shipmentInstance.events}" var="event">
                         <tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
@@ -210,6 +196,20 @@
                             </td>
                         </tr>
                     </g:each>
+                    <tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
+                        <td>
+                            <g:formatDate date="${shipmentInstance?.dateCreated}" format="MMM d, yyyy"/>
+                        </td>
+                        <td>
+                            <g:formatDate date="${shipmentInstance?.dateCreated}" format="hh:mma"/>
+                        </td>
+                        <td>
+                            <warehouse:message code="default.created.label"/>
+                        </td>
+                        <td>
+                            ${shipmentInstance?.origin?.name}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
