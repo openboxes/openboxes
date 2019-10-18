@@ -196,7 +196,7 @@ class SubstitutionsModal extends Component {
     const originalItem = _.find(values.substitutions, sub => sub.originalItem)
       || this.state.attr.lineItem;
 
-    const url = `/openboxes/api/stockMovementItems/${originalItem.requisitionItemId}/substituteItem`;
+    const url = `/api/stockMovementItems/${originalItem.requisitionItemId}/substituteItem`;
     const payload = {
       newQuantity: originalItem.quantitySelected && originalItem.quantitySelected !== '0' ? originalItem.quantityRequested - subQty : '',
       quantityRevised: originalItem.quantitySelected,

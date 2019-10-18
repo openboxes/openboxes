@@ -346,7 +346,7 @@ class EditItemsPage extends Component {
       values: updatedValues,
     });
 
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/reviseItems`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/reviseItems`;
     const payload = {
       lineItems: _.map(itemsToRevise, item => ({
         id: item.requisitionItemId,
@@ -436,7 +436,7 @@ class EditItemsPage extends Component {
    * @public
    */
   transitionToNextStep() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = {
       status: 'PICKING',
       createPicklist: this.state.statusCode === 'VERIFYING' ? 'true' : 'false',
@@ -450,7 +450,7 @@ class EditItemsPage extends Component {
    * @public
    */
   fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=3`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=3`;
 
     return apiClient.get(url)
       .then(resp => resp)
@@ -570,7 +570,7 @@ class EditItemsPage extends Component {
    */
   revertItem(values, itemId) {
     this.props.showSpinner();
-    const revertItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/revertItem`;
+    const revertItemsUrl = `/api/stockMovementItems/${itemId}/revertItem`;
 
     return apiClient.post(revertItemsUrl)
       .then((response) => {

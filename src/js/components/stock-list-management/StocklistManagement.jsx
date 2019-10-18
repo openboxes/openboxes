@@ -79,7 +79,7 @@ class StocklistManagement extends Component {
 
   fetchUsers() {
     this.props.showSpinner();
-    const url = '/openboxes/api/generic/person';
+    const url = '/api/generic/person';
 
     apiClient.get(url)
       .then((response) => {
@@ -93,7 +93,7 @@ class StocklistManagement extends Component {
 
   fetchData() {
     this.props.showSpinner();
-    const url = `/openboxes/api/stocklistItems?product.id=${this.props.match.params.productId || ''}`;
+    const url = `/api/stocklistItems?product.id=${this.props.match.params.productId || ''}`;
 
     apiClient.get(url)
       .then((response) => {
@@ -104,7 +104,7 @@ class StocklistManagement extends Component {
 
   fetchAvailableStocklists() {
     this.props.showSpinner();
-    const url = '/openboxes/api/stocklistItems/availableStocklists';
+    const url = '/api/stocklistItems/availableStocklists';
 
     apiClient.get(url)
       .then((response) => {
@@ -119,7 +119,7 @@ class StocklistManagement extends Component {
 
   fetchProductInfo() {
     this.props.showSpinner();
-    const url = `/openboxes/api/products/${this.props.match.params.productId}/withCatalogs`;
+    const url = `/api/products/${this.props.match.params.productId}/withCatalogs`;
 
     apiClient.get(url)
       .then((response) => {
@@ -176,10 +176,10 @@ class StocklistManagement extends Component {
   }
 
   saveItem(index, item) {
-    let url = `/openboxes/api/stocklistItems?product.id=${this.props.match.params.productId || ''}`;
+    let url = `/api/stocklistItems?product.id=${this.props.match.params.productId || ''}`;
 
     if (!item.new) {
-      url = `/openboxes/api/stocklistItems/${item.requisitionItem.id}`;
+      url = `/api/stocklistItems/${item.requisitionItem.id}`;
     }
 
     apiClient.post(url, flattenRequest(item))
@@ -202,7 +202,7 @@ class StocklistManagement extends Component {
       this.removeItem(index);
     } else {
       this.props.showSpinner();
-      const url = `/openboxes/api/stocklistItems/${item.requisitionItem.id}`;
+      const url = `/api/stocklistItems/${item.requisitionItem.id}`;
 
       apiClient.delete(url)
         .then(() => {
