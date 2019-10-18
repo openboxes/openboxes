@@ -89,7 +89,7 @@ export function hideUserActions() {
 }
 
 export function fetchReasonCodes() {
-  const url = '/openboxes/api/reasonCodes';
+  const url = '/api/reasonCodes';
   return (dispatch) => {
     apiClient.get(url).then((res) => {
       dispatch({
@@ -101,7 +101,7 @@ export function fetchReasonCodes() {
 }
 
 export function fetchCurrencies() {
-  const url = '/openboxes/api/unitOfMeasure/currencies';
+  const url = '/api/unitOfMeasure/currencies';
   return (dispatch) => {
     apiClient.get(url).then((res) => {
       dispatch({
@@ -113,7 +113,7 @@ export function fetchCurrencies() {
 }
 
 export function fetchUsers() {
-  const url = '/openboxes/api/persons';
+  const url = '/api/persons';
   return (dispatch) => {
     apiClient.get(url, { params: { status: true } }).then((res) => {
       dispatch({
@@ -125,7 +125,7 @@ export function fetchUsers() {
 }
 
 export async function fetchSessionInfo() {
-  const url = '/openboxes/api/getAppContext';
+  const url = '/api/getAppContext';
   const res = await apiClient.get(url);
 
   return (dispatch) => {
@@ -137,7 +137,7 @@ export async function fetchSessionInfo() {
 }
 
 export function fetchMenuConfig() {
-  const url = '/openboxes/api/getMenuConfig';
+  const url = '/api/getMenuConfig';
   return (dispatch) => {
     apiClient.get(url).then((res) => {
       dispatch({
@@ -150,7 +150,7 @@ export function fetchMenuConfig() {
 
 export function changeCurrentLocation(location) {
   return (dispatch) => {
-    const url = `/openboxes/api/chooseLocation/${location.id}`;
+    const url = `/api/chooseLocation/${location.id}`;
 
     return apiClient.put(url).then(() => {
       dispatch({
@@ -163,7 +163,7 @@ export function changeCurrentLocation(location) {
 
 export function fetchTranslations(lang, prefix) {
   return (dispatch) => {
-    const url = `/openboxes/api/localizations?lang=${lang ||
+    const url = `/api/localizations?lang=${lang ||
       ''}&prefix=react.${prefix || ''}`;
 
     apiClient.get(url).then((response) => {
@@ -181,7 +181,7 @@ export function fetchTranslations(lang, prefix) {
 
 export function changeCurrentLocale(locale) {
   return (dispatch) => {
-    const url = `/openboxes/api/chooseLocale/${locale}`;
+    const url = `/api/chooseLocale/${locale}`;
 
     apiClient.put(url).then(() => {
       dispatch({
@@ -397,7 +397,7 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
 
 export function fetchConfigAndData(locationId, config = 'personal', userId, id, filterSelected) {
   return (dispatch) => {
-    apiClient.get(`/openboxes/api/dashboard/${id}/config`).then((res) => {
+    apiClient.get(`/api/dashboard/${id}/config`).then((res) => {
       dispatch({
         type: FETCH_CONFIG_AND_SET_ACTIVE,
         payload: {
@@ -412,7 +412,7 @@ export function fetchConfigAndData(locationId, config = 'personal', userId, id, 
 
 export function fetchConfig(id) {
   return (dispatch) => {
-    apiClient.get(`/openboxes/api/dashboard/${id}/config`).then((res) => {
+    apiClient.get(`/api/dashboard/${id}/config`).then((res) => {
       dispatch({
         type: FETCH_CONFIG,
         payload: {
@@ -425,7 +425,7 @@ export function fetchConfig(id) {
 
 export function fetchPurchaseOrderStatuses() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/orderSummaryStatus').then((res) => {
+    apiClient.get('/api/orderSummaryStatus').then((res) => {
       dispatch({
         type: FETCH_PURCHASE_ORDER_STATUSES,
         payload: res.data.data,
@@ -444,7 +444,7 @@ export const fetchPaymentTerms = () => async (dispatch) => {
 
 export function fetchSuppliers(active = false) {
   return (dispatch) => {
-    apiClient.get(`/openboxes/api/organizations?roleType=ROLE_SUPPLIER&active=${active}`)
+    apiClient.get(`/api/organizations?roleType=ROLE_SUPPLIER&active=${active}`)
       .then((res) => {
         if (res.data.data) {
           const suppliers = res.data.data.map(obj => (
@@ -471,7 +471,7 @@ export function fetchSuppliers(active = false) {
 
 export function fetchBuyers(active = false) {
   return (dispatch) => {
-    apiClient.get(`/openboxes/api/organizations?roleType=ROLE_BUYER&active=${active}`)
+    apiClient.get(`/api/organizations?roleType=ROLE_BUYER&active=${active}`)
       .then((res) => {
         if (res.data.data) {
           const buyers = res.data.data.map(obj => (
@@ -498,7 +498,7 @@ export function fetchBuyers(active = false) {
 
 export function fetchInvoiceStatuses() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/invoiceStatuses').then((res) => {
+    apiClient.get('/api/invoiceStatuses').then((res) => {
       dispatch({
         type: FETCH_INVOICE_STATUSES,
         payload: res.data.data,
@@ -509,7 +509,7 @@ export function fetchInvoiceStatuses() {
 
 export function fetchInvoiceTypeCodes() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/invoiceTypeCodes').then((res) => {
+    apiClient.get('/api/invoiceTypeCodes').then((res) => {
       dispatch({
         type: FETCH_INVOICE_TYPE_CODES,
         payload: res.data.data,
@@ -520,7 +520,7 @@ export function fetchInvoiceTypeCodes() {
 
 export function fetchShipmentStatusCodes() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/stockMovements/shipmentStatusCodes')
+    apiClient.get('/api/stockMovements/shipmentStatusCodes')
       .then((res) => {
         dispatch({
           type: FETCH_SHIPMENT_STATUS_CODES,
@@ -533,7 +533,7 @@ export function fetchShipmentStatusCodes() {
 
 export function fetchRequisitionStatusCodes() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/stockMovements/requisitionsStatusCodes')
+    apiClient.get('/api/stockMovements/requisitionsStatusCodes')
       .then((res) => {
         dispatch({
           type: FETCH_REQUISITION_STATUS_CODES,
@@ -545,7 +545,7 @@ export function fetchRequisitionStatusCodes() {
 
 export function fetchStockTransferStatuses() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/stockTransfers/statusOptions').then((res) => {
+    apiClient.get('/api/stockTransfers/statusOptions').then((res) => {
       dispatch({
         type: FETCH_STOCK_TRANSFER_STATUSES,
         payload: res.data.data,

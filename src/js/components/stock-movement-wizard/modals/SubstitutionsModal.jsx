@@ -190,7 +190,7 @@ class SubstitutionsModal extends Component {
       || this.state.attr.lineItem;
     const substitutionReasonCode = _.get(values, 'reasonCode.value');
 
-    const url = `/openboxes/api/stockMovementItems/${originalItem.requisitionItemId}/substituteItem`;
+    const url = `/api/stockMovementItems/${originalItem.requisitionItemId}/substituteItem`;
     const payload = {
       substitutionItems: _.map(substitutions, (sub, key) => ({
         'newProduct.id': sub.product.id,

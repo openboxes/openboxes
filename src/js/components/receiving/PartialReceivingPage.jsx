@@ -592,7 +592,7 @@ class PartialReceivingPage extends Component {
     this.props.showSpinner();
     const { values } = this.state;
     const { shipmentId } = values;
-    const url = `/openboxes/api/partialReceiving/exportCsv/${shipmentId}`;
+    const url = `/api/partialReceiving/exportCsv/${shipmentId}`;
     /** We have to omit product.displayNames, due to an error
      *  while binding bindData(partialReceiptItem, shipmentItemMap)
      *  it expects product.displayNames to have a setter, as we pass
@@ -629,7 +629,7 @@ class PartialReceivingPage extends Component {
       },
     };
 
-    const url = `/openboxes/api/partialReceiving/importCsv/${this.state.values.shipmentId}`;
+    const url = `/api/partialReceiving/importCsv/${this.state.values.shipmentId}`;
 
     return apiClient.post(url, formData, config)
       .then(() => {
