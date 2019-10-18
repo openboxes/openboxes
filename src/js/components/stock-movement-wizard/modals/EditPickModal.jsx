@@ -162,7 +162,7 @@ class EditPickModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}/updatePicklist`;
+    const url = `/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}/updatePicklist`;
     const payload = {
       picklistItems: _.map(values.availableItems, avItem => ({
         id: avItem.id || '',

@@ -9,7 +9,7 @@ import UserActionMenu from '../user/UserActionMenu';
 
 class Header extends Component {
   logoutImpersonatedUser() {
-    const url = '/openboxes/api/logout';
+    const url = '/api/logout';
 
     this.apiClient.post(url)
       .then(() => {

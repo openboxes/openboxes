@@ -353,7 +353,7 @@ class EditItemsPage extends Component {
   }
 
   fetchItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=3`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=3`;
     apiClient.get(url)
       .then((response) => {
         this.setEditPageItems(response, null);
@@ -368,7 +368,7 @@ class EditItemsPage extends Component {
    * @public
    */
   fetchEditPageItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=3`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=3`;
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
@@ -398,7 +398,7 @@ class EditItemsPage extends Component {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=3`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=3`;
     apiClient.get(url)
       .then((response) => {
         this.setEditPageItems(response, stopIndex);
@@ -452,7 +452,7 @@ class EditItemsPage extends Component {
       values: updatedValues,
     });
 
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/reviseItems`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/reviseItems`;
     const payload = {
       lineItems: _.map(itemsToRevise, item => ({
         id: item.requisitionItemId,
@@ -553,7 +553,7 @@ class EditItemsPage extends Component {
    * @public
    */
   transitionToNextStep() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = {
       status: 'PICKING',
       createPicklist: this.state.statusCode === 'REQUESTED' ? 'true' : 'false',
@@ -567,7 +567,7 @@ class EditItemsPage extends Component {
    * @public
    */
   fetchEditPageData() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}`;
 
     return apiClient.get(url)
       .then(resp => resp)
@@ -638,7 +638,7 @@ class EditItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`; },
+            onClick: () => { window.location = `/stockMovement/show/${formValues.stockMovementId}`; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -649,7 +649,7 @@ class EditItemsPage extends Component {
     } else {
       this.reviseRequisitionItems(formValues)
         .then(() => {
-          window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+          window.location = `/stockMovement/show/${formValues.stockMovementId}`;
         });
     }
   }
@@ -661,7 +661,7 @@ class EditItemsPage extends Component {
    */
   revertItem(values, itemId) {
     this.props.showSpinner();
-    const revertItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/revertItem`;
+    const revertItemsUrl = `/api/stockMovementItems/${itemId}/revertItem`;
 
     return apiClient.post(revertItemsUrl)
       .then((response) => {
@@ -752,7 +752,7 @@ class EditItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => {
-                  window.location = '/openboxes/stockMovement/list?direction=OUTBOUND';
+                  window.location = '/stockMovement/list?direction=OUTBOUND';
                 }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
