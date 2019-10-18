@@ -157,7 +157,7 @@ class AdjustInventoryModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stockAdjustments?location.id=${this.props.locationId}`;
+    const url = `/api/stockAdjustments?location.id=${this.props.locationId}`;
     const items = _.filter(values.adjustInventory, item => !_.isNil(item.quantityAdjusted) && item.quantityAdjusted !== '');
     const payload = _.map(items, (item) => {
       if (!item['inventoryItem.id']) {

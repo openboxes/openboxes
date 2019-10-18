@@ -117,7 +117,7 @@ class EmailModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stocklists/sendMail/${this.props.stocklistId}?includePdf=${this.state.formValues.includePdf}?includeXls=${this.state.formValues.includeXls}`;
+    const url = `/api/stocklists/sendMail/${this.props.stocklistId}?includePdf=${this.state.formValues.includePdf}?includeXls=${this.state.formValues.includeXls}`;
     const payload = {
       ...values,
       recipients: _.map(_.filter(values.recipients, val => val.email), val => val.email),

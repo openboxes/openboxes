@@ -276,7 +276,7 @@ class CreateStockMovement extends Component {
    */
   fetchStockLists(origin, destination, clearStocklist) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stocklists?origin.id=${origin.id}&destination.id=${destination.id}`;
+    const url = `/api/stocklists?origin.id=${origin.id}&destination.id=${destination.id}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -308,9 +308,9 @@ class CreateStockMovement extends Component {
 
       let stockMovementUrl = '';
       if (values.stockMovementId) {
-        stockMovementUrl = `/openboxes/api/stockMovements/${values.stockMovementId}/updateRequisition`;
+        stockMovementUrl = `/api/stockMovements/${values.stockMovementId}/updateRequisition`;
       } else {
-        stockMovementUrl = '/openboxes/api/stockMovements';
+        stockMovementUrl = '/api/stockMovements';
       }
 
       const payload = {

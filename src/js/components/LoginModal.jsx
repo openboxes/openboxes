@@ -20,7 +20,7 @@ class LoginForm extends Component {
   }
 
   onLogin() {
-    const url = '/openboxes/api/login';
+    const url = '/api/login';
     const payload = {
       username: this.state.username,
       password: this.state.password,
@@ -37,7 +37,7 @@ class LoginForm extends Component {
   }
 
   setUserLocation() {
-    const url = `/openboxes/api/chooseLocation/${this.props.currentLocationId}`;
+    const url = `/api/chooseLocation/${this.props.currentLocationId}`;
 
     return apiClient.put(url);
   }

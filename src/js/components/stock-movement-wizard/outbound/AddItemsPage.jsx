@@ -574,7 +574,7 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=2`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=2`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -593,7 +593,7 @@ class AddItemsPage extends Component {
   fetchAddItemsPageData() {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}`;
     apiClient.get(url)
       .then((resp) => {
         const { hasManageInventory } = resp.data.data;
@@ -615,7 +615,7 @@ class AddItemsPage extends Component {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
     apiClient.get(url)
       .then((response) => {
         this.setLineItems(response, startIndex);
@@ -690,7 +690,7 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItems(lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -711,7 +711,7 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -770,7 +770,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+          window.location = `/stockMovement/show/${formValues.stockMovementId}`;
         });
     } else {
       confirmAlert({
@@ -782,7 +782,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`; },
+            onClick: () => { window.location = `/stockMovement/show/${formValues.stockMovementId}`; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -837,7 +837,7 @@ class AddItemsPage extends Component {
    * @public
    */
   removeItem(itemId) {
-    const removeItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/removeItem`;
+    const removeItemsUrl = `/api/stockMovementItems/${itemId}/removeItem`;
     const payload = { stockMovementId: this.state.values.stockMovementId };
 
     return apiClient.delete(removeItemsUrl, { data: payload })
@@ -852,7 +852,7 @@ class AddItemsPage extends Component {
    * @public
    */
   removeAll() {
-    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
+    const removeItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
 
     return apiClient.delete(removeItemsUrl)
       .then(() => {
@@ -878,7 +878,7 @@ class AddItemsPage extends Component {
    * @public
    */
   transitionToNextStep() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'REQUESTED' };
 
     if (this.state.values.statusCode === 'CREATED') {
@@ -912,7 +912,7 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
 
     const { movementNumber, stockMovementId } = formValues;
-    const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
+    const url = `/stockMovement/exportCsv/${stockMovementId}`;
     this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
@@ -942,7 +942,7 @@ class AddItemsPage extends Component {
       },
     };
 
-    const url = `/openboxes/stockMovement/importCsv/${stockMovementId}`;
+    const url = `/stockMovement/importCsv/${stockMovementId}`;
 
     return apiClient.post(url, formData, config)
       .then(() => {
@@ -1061,7 +1061,7 @@ class AddItemsPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => { window.location = '/openboxes/stockMovement/list?direction=OUTBOUND'; }}
+                onClick={() => { window.location = '/stockMovement/list?direction=OUTBOUND'; }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.exit.label" defaultMessage="Exit" /></span>

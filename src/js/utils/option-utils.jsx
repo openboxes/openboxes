@@ -5,7 +5,7 @@ import apiClient from './apiClient';
 export const debounceUsersFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/persons?name=${searchTerm}`)
+      apiClient.get(`/api/persons?name=${searchTerm}`)
         .then(result => callback(
           null,
           {
@@ -32,7 +32,7 @@ export const debounceLocationsFetch = (waitTime, minSearchLength, activityCodes)
     if (searchTerm && searchTerm.length >= minSearchLength) {
       const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
       const { direction } = queryString.parse(window.location.search);
-      apiClient.get(`/openboxes/api/locations?name=${searchTerm}${direction ? `&direction=${direction}` : ''}${activityCodesParams}`)
+      apiClient.get(`/api/locations?name=${searchTerm}${direction ? `&direction=${direction}` : ''}${activityCodesParams}`)
         .then(result => callback(
           null,
           {
@@ -84,7 +84,7 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
 export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`)
+      apiClient.get(`/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`)
         .then(result => callback(
           null,
           {

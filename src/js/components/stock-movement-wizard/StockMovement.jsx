@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate } from 'react-localize-redux';
+import queryString from 'query-string';
 
 import CreateStockMovement from './outbound/CreateStockMovement';
 import AddItemsPage from './outbound/AddItemsPage';
@@ -189,7 +190,8 @@ class StockMovements extends Component {
   fetchInitialValues() {
     if (this.props.match.params.stockMovementId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/stockMovements/${this.props.match.params.stockMovementId}`;
+      const url = `/api/stockMovements/${this.props.match.params.stockMovementId}`;
+
       apiClient.get(url)
         .then((response) => {
           const resp = response.data.data;

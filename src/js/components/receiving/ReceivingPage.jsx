@@ -81,7 +81,7 @@ class ReceivingPage extends Component {
    */
   fetchPartialReceiptCandidates() {
     this.props.showSpinner();
-    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=${this.state.currentPage}`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=${this.state.currentPage}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -102,7 +102,7 @@ class ReceivingPage extends Component {
    * @public
    */
   fetchBins() {
-    const url = `/openboxes/api/internalLocations/receiving?location.id=${this.state.locationId}&shipmentNumber=${this.state.shipmentNumber}`;
+    const url = `/api/internalLocations/receiving?location.id=${this.state.locationId}&shipmentNumber=${this.state.shipmentNumber}`;
 
     return apiClient.get(url)
       .then((response) => {
