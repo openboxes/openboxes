@@ -631,7 +631,7 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=2`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=2`;
 
     return apiClient.get(url)
       .then(resp => resp)
@@ -722,7 +722,7 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItems(lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -743,7 +743,7 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -869,7 +869,7 @@ class AddItemsPage extends Component {
    * @public
    */
   removeItem(itemId) {
-    const removeItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/removeItem`;
+    const removeItemsUrl = `/api/stockMovementItems/${itemId}/removeItem`;
 
     return apiClient.delete(removeItemsUrl)
       .catch(() => {
@@ -883,7 +883,7 @@ class AddItemsPage extends Component {
    * @public
    */
   removeAll() {
-    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
+    const removeItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
 
     return apiClient.delete(removeItemsUrl)
       .catch(() => {
@@ -900,7 +900,7 @@ class AddItemsPage extends Component {
    * @public
    */
   transitionToNextStep(status) {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status };
     const { movementNumber } = this.state.values;
 
