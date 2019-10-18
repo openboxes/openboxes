@@ -326,7 +326,7 @@ class SendMovementPage extends Component {
    * @public
    */
   fetchShipmentTypes() {
-    const url = '/openboxes/api/generic/shipmentType';
+    const url = '/api/generic/shipmentType';
 
     return apiClient.get(url)
       .then((response) => {
@@ -401,7 +401,7 @@ class SendMovementPage extends Component {
    * @public
    */
   fetchStockMovementData() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=6`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=6`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -483,7 +483,7 @@ class SendMovementPage extends Component {
    * @public
    */
   saveShipment(payload) {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateShipment`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/updateShipment`;
 
     return apiClient.post(url, payload);
   }
@@ -493,7 +493,7 @@ class SendMovementPage extends Component {
    * @public
    */
   stateTransitionToSent() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'DISPATCHED' };
 
     return apiClient.post(url, payload);
@@ -632,7 +632,7 @@ class SendMovementPage extends Component {
    */
   rollbackStockMovement(values) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { rollback: true };
 
     const isOrigin = this.props.currentLocationId === values.origin.id;
