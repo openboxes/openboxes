@@ -362,7 +362,7 @@ class PutAwaySecondPage extends Component {
    */
   fetchBins() {
     this.props.showSpinner();
-    const url = `/openboxes/api/internalLocations?location.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
+    const url = `/api/internalLocations?location.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
 
     const mapBins = bins => (_.chain(bins)
       .orderBy(['name'], ['asc']).value()
@@ -445,7 +445,7 @@ class PutAwaySecondPage extends Component {
 
   deleteItem(itemIndex) {
     this.props.showSpinner();
-    const url = `/openboxes/api/putawayItems/${_.get(this.state.putAway.putawayItems, `[${itemIndex}].id`)}`;
+    const url = `/api/putawayItems/${_.get(this.state.putAway.putawayItems, `[${itemIndex}].id`)}`;
 
     apiClient.delete(url)
       .then(() => {
@@ -535,7 +535,7 @@ class PutAwaySecondPage extends Component {
   }
 
   fetchItems(sortBy) {
-    const url = `/openboxes/api/putaways/${this.state.putAway.id}?sortBy=${sortBy}`;
+    const url = `/api/putaways/${this.state.putAway.id}?sortBy=${sortBy}`;
     return apiClient.get(url)
       .then((response) => {
         const putawayItems = _.map(

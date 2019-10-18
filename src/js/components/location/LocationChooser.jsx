@@ -61,7 +61,7 @@ class LocationChooser extends Component {
   }
 
   fetchLocations() {
-    const url = '/openboxes/api/locations?locationTypeCode=DEPOT&activityCodes=MANAGE_INVENTORY&applyUserFilter=true&locationChooser=true';
+    const url = '/api/locations?locationTypeCode=DEPOT&activityCodes=MANAGE_INVENTORY&applyUserFilter=true&locationChooser=true';
 
     return apiClient.get(url)
       .then((response) => {

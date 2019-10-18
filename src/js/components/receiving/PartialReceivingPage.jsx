@@ -615,7 +615,7 @@ class PartialReceivingPage extends Component {
     this.props.showSpinner();
 
     const { shipmentId } = this.state.values;
-    const url = `/openboxes/api/partialReceiving/exportCsv/${shipmentId}`;
+    const url = `/api/partialReceiving/exportCsv/${shipmentId}`;
 
     apiClient.post(url, flattenRequest(this.state.values))
       .then((response) => {
@@ -637,7 +637,7 @@ class PartialReceivingPage extends Component {
       },
     };
 
-    const url = `/openboxes/api/partialReceiving/importCsv/${this.state.values.shipmentId}`;
+    const url = `/api/partialReceiving/importCsv/${this.state.values.shipmentId}`;
 
     return apiClient.post(url, formData, config)
       .then(() => {

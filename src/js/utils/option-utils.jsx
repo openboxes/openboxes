@@ -7,7 +7,7 @@ import apiClient from 'utils/apiClient';
 export const debounceUsersFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get('/openboxes/api/persons', { params: { name: searchTerm, status: true } })
+      apiClient.get('/api/persons', { params: { name: searchTerm, status: true } })
         .then(result => callback(_.map(result.data.data, obj => (
           {
             ...obj,
@@ -35,7 +35,7 @@ export const debounceLocationsFetch = (
       const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
       const { direction } = queryString.parse(window.location.search);
       const directionParam = fetchAll ? null : direction;
-      apiClient.get(`/openboxes/api/locations?name=${searchTerm}${directionParam ? `&direction=${directionParam}` : ''}${activityCodesParams}${isReturnOrder ? '&isReturnOrder=true' : ''}`)
+      apiClient.get(`/api/locations?name=${searchTerm}${directionParam ? `&direction=${directionParam}` : ''}${activityCodesParams}${isReturnOrder ? '&isReturnOrder=true' : ''}`)
         .then(result => callback(_.map(result.data.data, (obj) => {
           const locationType = withTypeDescription ? ` [${obj.locationType.description}]` : '';
           const label = `${obj.name}${locationType}`;
@@ -73,7 +73,7 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
 export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`)
+      apiClient.get(`/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`)
         .then(result => callback(_.map(result.data.data, obj => (
           {
             value: obj.id,
@@ -95,7 +95,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
 export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&availableItems=true`)
+      apiClient.get(`/api/products?name=${searchTerm}&productCode=${searchTerm}&availableItems=true`)
         .then(result => callback(_.map(result.data.data, obj => (
           {
             id: obj.id,
@@ -118,7 +118,7 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
 export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, destination) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/combinedShipmentItems/getProductsInOrders?name=${searchTerm}&vendor=${vendor}&destination=${destination}`)
+      apiClient.get(`/api/combinedShipmentItems/getProductsInOrders?name=${searchTerm}&vendor=${vendor}&destination=${destination}`)
         .then(result => callback(_.map(result.data.data, obj => (
           {
             value: obj.id,
@@ -139,7 +139,7 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
 export const debounceOrganizationsFetch = (waitTime, minSearchLength, roleTypes = ['ROLE_SUPPLIER']) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/organizations?q=${searchTerm}${roleTypes ? roleTypes.map(roleType => `&roleType=${roleType}`).join('') : ''}`)
+      apiClient.get(`/api/organizations?q=${searchTerm}${roleTypes ? roleTypes.map(roleType => `&roleType=${roleType}`).join('') : ''}`)
         .then(result => callback(_.map(result.data.data, obj => (
           {
             value: obj.id,
@@ -157,7 +157,7 @@ export const debounceOrganizationsFetch = (waitTime, minSearchLength, roleTypes 
 export const debounceLocationGroupsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/locationGroups?q=${searchTerm}`)
+      apiClient.get(`/api/locationGroups?q=${searchTerm}`)
         .then(result => callback(_.map(result.data.data, obj => (
           {
             id: obj.id,
