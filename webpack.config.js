@@ -2,10 +2,10 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, 'src');
 const SRC = path.resolve(ROOT, 'js');
-const DEST = path.resolve(__dirname, 'web-app');
+const DEST = path.resolve(__dirname, 'grails-app/assets');
 const ASSETS = path.resolve(ROOT, 'assets');
-const JS_DEST = path.resolve(__dirname, 'web-app/js');
-const CSS_DEST = path.resolve(__dirname, 'web-app/css');
+const JS_DEST = path.resolve(__dirname, 'grails-app/assets/javascripts');
+const CSS_DEST = path.resolve(__dirname, 'grails-app/assets/stylesheets');
 const GRAILS_VIEWS = path.resolve(__dirname, 'grails-app/views');
 const COMMON_VIEW = path.resolve(GRAILS_VIEWS, 'common');
 const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
@@ -21,8 +21,8 @@ module.exports = {
   },
   output: {
     path: DEST,
-    filename: 'js/bundle.[hash].js',
-    chunkFilename: 'js/bundle.[hash].[name].js',
+    filename: 'javascripts/bundle.[hash].js',
+    chunkFilename: 'javascripts/bundle.[hash].[name].js',
     publicPath: '/openboxes/',
   },
   stats: {
@@ -30,8 +30,8 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'css/bundle.[hash].css',
-      chunkFilename: 'css/bundle.[hash].[name].css',
+      filename: 'stylesheets/bundle.[hash].css',
+      chunkFilename: 'stylesheets/bundle.[hash].[name].css',
     }),
     new OptimizeCSSAssetsPlugin({}),
     new CleanWebpackPlugin([`${JS_DEST}/bundle.**`, `${CSS_DEST}/bundle.**`]),
@@ -40,8 +40,8 @@ module.exports = {
       template: `${ASSETS}/grails-template.html`,
       inject: false,
       templateParameters: compilation => ({
-        jsSource: `\${createLinkTo(dir:'/js', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${createLinkTo(dir:'css/', file:'bundle.${compilation.hash}.css')}`,
+        jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
+        cssSource: `\${resource(dir:'grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
         receivingIfStatement: '',
       }),
     }),
@@ -50,8 +50,8 @@ module.exports = {
       template: `${ASSETS}/grails-template.html`,
       inject: false,
       templateParameters: compilation => ({
-        jsSource: `\${createLinkTo(dir:'/js', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${createLinkTo(dir:'css/', file:'bundle.${compilation.hash}.css')}`,
+        jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
+        cssSource: `\${resource(dir:'grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
         receivingIfStatement:
           // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
