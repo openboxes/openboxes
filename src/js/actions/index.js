@@ -33,7 +33,7 @@ export function hideSpinner() {
 }
 
 export function fetchReasonCodes() {
-  const url = '/openboxes/api/reasonCodes';
+  const url = '/api/reasonCodes';
   const request = apiClient.get(url);
 
   return {
@@ -43,7 +43,7 @@ export function fetchReasonCodes() {
 }
 
 export function fetchUsers() {
-  const url = '/openboxes/api/generic/person';
+  const url = '/api/generic/person';
   const request = apiClient.get(url);
 
   return {
@@ -53,7 +53,7 @@ export function fetchUsers() {
 }
 
 export function fetchSessionInfo() {
-  const url = '/openboxes/api/getAppContext';
+  const url = '/api/getSession';
   const request = apiClient.get(url);
 
   return {
@@ -64,43 +64,46 @@ export function fetchSessionInfo() {
 
 export function changeCurrentLocation(location) {
   return (dispatch) => {
-    const url = `/openboxes/api/chooseLocation/${location.id}`;
+    const url = `/api/chooseLocation/${location.id}`;
 
-    apiClient.put(url).then(() => {
-      dispatch({
-        type: CHANGE_CURRENT_LOCATION,
-        payload: location,
+    apiClient.put(url)
+      .then(() => {
+        dispatch({
+          type: CHANGE_CURRENT_LOCATION,
+          payload: location,
+        });
       });
-    });
   };
 }
 
 export function fetchTranslations(lang, prefix) {
   return (dispatch) => {
-    const url = `/openboxes/api/localizations?lang=${lang ||
-      ''}&prefix=react.${prefix || ''}`;
+    const url = `/api/localizations?lang=${lang || ''}&prefix=react.${prefix || ''}`;
 
-    apiClient.get(url).then((response) => {
-      const { messages, currentLocale } = parseResponse(response.data);
+    apiClient.get(url)
+      .then((response) => {
+        const { messages, currentLocale } = parseResponse(response.data);
 
-      dispatch(addTranslationForLanguage(messages, currentLocale));
+        dispatch(addTranslationForLanguage(messages, currentLocale));
 
-      dispatch({
-        type: TRANSLATIONS_FETCHED,
-        payload: prefix,
+        dispatch({
+          type: TRANSLATIONS_FETCHED,
+          payload: prefix,
+        });
       });
-    });
   };
 }
 
 export function changeCurrentLocale(locale) {
   return (dispatch) => {
-    const url = `/openboxes/api/chooseLocale/${locale}`;
+    const url = `/api/chooseLocale/${locale}`;
 
-    apiClient.put(url).then(() => {
-      dispatch({
-        type: CHANGE_CURRENT_LOCALE,
-        payload: locale,
+    apiClient.put(url)
+      .then(() => {
+        dispatch({
+          type: CHANGE_CURRENT_LOCALE,
+          payload: locale,
+        });
       });
     });
   };
@@ -120,7 +123,7 @@ function fetchIndicator(
   const archived = 0;
   const id = indicatorId || Math.random();
 
-  const url = `/openboxes/apitablero/${indicatorMethod}?${params}`;
+  const url = `/apitablero/${indicatorMethod}?${params}`;
 
   dispatch({
     type: FETCH_INDICATORS,
@@ -172,14 +175,14 @@ export function reloadIndicator(method, type, title, link, id, params) {
 
 export function fetchIndicators() {
   return (dispatch) => {
-    fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary', '/openboxes/inventory/listExpiringStock');
+    fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary', '/inventory/listExpiringStock');
     fetchIndicator(dispatch, 'getFillRate', 'bar', 'Fill Rate');
     fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
     fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Stock Movements Sent by Month');
     fetchIndicator(dispatch, 'getReceivedStockMovements', 'bar', 'Incoming Stock Movements by Month');
-    fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/openboxes/stockMovement/list?receiptStatusCode=PENDING');
+    fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/stockMovement/list?receiptStatusCode=PENDING');
     fetchIndicator(dispatch, 'getDiscrepancy', 'table', 'Items received with a discrepancy');
-    fetchIndicator(dispatch, 'getIncomingStock', 'numbers', 'Incoming Stock Movements by Status', '/openboxes/stockMovement/list?direction=INBOUND');
+    fetchIndicator(dispatch, 'getIncomingStock', 'numbers', 'Incoming Stock Movements by Status', '/stockMovement/list?direction=INBOUND');
   };
 }
 
@@ -210,7 +213,7 @@ export function reorderIndicators({ oldIndex, newIndex }, e) {
 }
 
 export function fetchNumbersData() {
-  const url = '/openboxes/apitablero/getNumberData';
+  const url = '/apitablero/getNumberData';
 
   return (dispatch) => {
     apiClient.get(url).then((res) => {
