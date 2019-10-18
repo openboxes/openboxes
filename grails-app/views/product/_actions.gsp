@@ -19,7 +19,7 @@
 			</g:link>
 		</div>
 		<div class="action-menu-item">
-			<g:link controller="product" action="edit" id="${productInstance?.id }"> 
+			<g:link controller="product" action="edit" id="${productInstance?.id }">
 				<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
 				<warehouse:message code="product.edit.label"/>
 			</g:link>
@@ -68,8 +68,8 @@
 		</g:supports>
 		<div class="action-menu-item">
 			<g:link controller="inventory" action="createTransaction" params="['product.id':productInstance?.id]">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'package_down.png')}"/>&nbsp;
-				<g:message code="default.create.label" args="[g.message(code: 'default.debit.label')]"/>
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'package_delete.png')}"/>&nbsp;
+				<g:message code="default.create.label" args="[g.message(code: 'default.debit.label').toLowerCase()]"/>
 			</g:link>
 		</div>
 		<div class="action-menu-item">
@@ -141,18 +141,18 @@
 </span>
 
 <script>
-	$(document).ready(function() {		
+	$(document).ready(function() {
 
-		$(".dialog-form").dialog({ autoOpen: false, modal: true, width: '800px', top: 10});	
+		$(".dialog-form").dialog({ autoOpen: false, modal: true, width: '800px', top: 10});
 
-		$(".open-dialog").click(function() { 
+		$(".open-dialog").click(function() {
 			var id = $(this).attr("id");
 			$("#dialog-" + id).dialog('open');
 		});
-		$(".close-dialog").click(function() { 
+		$(".close-dialog").click(function() {
 			var id = $(this).attr("id");
 			$("#dialog-" + id).dialog('close');
 		});
-		
+
 	});
 </script>
