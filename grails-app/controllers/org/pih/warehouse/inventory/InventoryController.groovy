@@ -17,6 +17,7 @@ import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -1023,21 +1024,37 @@ class InventoryController {
     }
 
     def createInboundTransfer = {
+        Location location = Location.get(session.warehouse.id)
+        if (!location.supports(ActivityCode.RECEIVE_STOCK)) {
+            throw new UnsupportedOperationException("Location ${location.name} does not support receipt transactions")
+        }
         params.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params: params)
     }
 
     def createOutboundTransfer = {
+        Location location = Location.get(session.warehouse.id)
+        if (!location.supports(ActivityCode.SEND_STOCK)) {
+            throw new UnsupportedOperationException("Location ${location.name} does not support transfer transactions")
+        }
         params.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params: params)
     }
 
     def createAdjustment = {
+        Location location = Location.get(session.warehouse.id)
+        if (!location.supports(ActivityCode.ADJUST_INVENTORY)) {
+            throw new UnsupportedOperationException("Location ${location.name} does not support adjustment transactions")
+        }
         params.transactionType = TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params: params)
     }
 
     def createConsumed = {
+        Location location = Location.get(session.warehouse.id)
+        if (!location.supports(ActivityCode.CONSUME_STOCK)) {
+            throw new UnsupportedOperationException("Location ${location.name} does not support consumption transactions")
+        }
         params.transactionType = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params: params)
     }
