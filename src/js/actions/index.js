@@ -53,7 +53,7 @@ export function fetchUsers() {
 }
 
 export function fetchSessionInfo() {
-  const url = '/api/getSession';
+  const url = '/api/getUserSession';
   const request = apiClient.get(url);
 
   return {
