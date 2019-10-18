@@ -340,7 +340,7 @@ class PickPage extends Component {
    * @public
    */
   fetchPickPageData() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
 
     return apiClient.get(url)
       .then((resp) => {
@@ -360,7 +360,7 @@ class PickPage extends Component {
   }
 
   fetchPickPageItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
     apiClient.get(url)
       .then((response) => {
         this.setPickPageItems(response, null);
@@ -368,7 +368,7 @@ class PickPage extends Component {
   }
 
   fetchItemsAfterImport() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
@@ -390,7 +390,7 @@ class PickPage extends Component {
       this.setState({
         isFirstPageLoaded: true,
       });
-      const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=4`;
+      const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=4`;
       apiClient.get(url)
         .then((response) => {
           this.setPickPageItems(response, startIndex);
@@ -403,7 +403,7 @@ class PickPage extends Component {
   }
 
   fetchAdjustedItems(adjustedProductCode) {
-    apiClient.post(`/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateAdjustedItems?adjustedProduct=${adjustedProductCode}`)
+    apiClient.post(`/api/stockMovements/${this.state.values.stockMovementId}/updateAdjustedItems?adjustedProduct=${adjustedProductCode}`)
       .then((resp) => {
         const { pickPageItems } = resp.data.data.pickPage;
 
@@ -424,7 +424,7 @@ class PickPage extends Component {
    * @public
    */
   transitionToNextStep() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'PICKED' };
 
     if (this.state.values.statusCode !== 'PICKED' && this.state.values.statusCode !== 'PACKED') {
@@ -434,7 +434,7 @@ class PickPage extends Component {
   }
 
   validatePicklist() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
     return apiClient.get(url);
   }
 
@@ -517,8 +517,8 @@ class PickPage extends Component {
   revertUserPick(itemId) {
     this.props.showSpinner();
 
-    const createPicklistUrl = `/openboxes/api/stockMovementItems/${itemId}/createPicklist`;
-    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}?stepNumber=4`;
+    const createPicklistUrl = `/api/stockMovementItems/${itemId}/createPicklist`;
+    const itemsUrl = `/api/stockMovementItems/${itemId}?stepNumber=4`;
 
     apiClient.post(createPicklistUrl)
       .then(() => {
@@ -562,7 +562,7 @@ class PickPage extends Component {
     this.props.showSpinner();
 
     const { movementNumber, stockMovementId } = formValues;
-    const url = `/openboxes/api/stockMovements/exportPickListItems/${stockMovementId}`;
+    const url = `/api/stockMovements/exportPickListItems/${stockMovementId}`;
 
     apiClient.get(url, { responseType: 'blob' })
       .then((response) => {
@@ -585,7 +585,7 @@ class PickPage extends Component {
       },
     };
 
-    const url = `/openboxes/api/stockMovements/importPickListItems/${stockMovementId}`;
+    const url = `/api/stockMovements/importPickListItems/${stockMovementId}`;
 
     return apiClient.post(url, formData, config)
       .then(() => {
@@ -598,7 +598,7 @@ class PickPage extends Component {
   }
 
   recreatePicklist() {
-    const url = `/openboxes/api/stockMovements/createPickList/${this.state.values.stockMovementId}`;
+    const url = `/api/stockMovements/createPickList/${this.state.values.stockMovementId}`;
     this.props.showSpinner();
 
     apiClient.get(url)
@@ -703,7 +703,7 @@ class PickPage extends Component {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
+                  onClick={() => { window.location = `/stockMovement/show/${values.stockMovementId}`; }}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
@@ -720,7 +720,7 @@ class PickPage extends Component {
                 :
               <button
                 type="button"
-                onClick={() => { window.location = '/openboxes/stockMovement/list?direction=OUTBOUND'; }}
+                onClick={() => { window.location = '/stockMovement/list?type=REQUEST'; }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>

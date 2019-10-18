@@ -255,7 +255,7 @@ class PackingPage extends Component {
    * @public
    */
   fetchAllData() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=5`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=5`;
 
     apiClient.get(url)
       .then((resp) => {
@@ -298,7 +298,7 @@ class PackingPage extends Component {
    * @public
    */
   fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=5`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=5`;
 
     return apiClient.get(url)
       .then(resp => resp)
@@ -350,7 +350,7 @@ class PackingPage extends Component {
    * @public
    */
   transitionToNextStep() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const status = 'CHECKING';
     const payload = { status };
 
@@ -410,7 +410,7 @@ class PackingPage extends Component {
    * @public
    */
   savePackingData(packPageItems) {
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateShipmentItems`;
+    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateShipmentItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       stepNumber: '5',
@@ -488,7 +488,7 @@ class PackingPage extends Component {
                 <button
                   type="button"
                   disabled={invalid}
-                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; })}
+                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/stockMovement/show/${values.stockMovementId}`; })}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
@@ -498,7 +498,7 @@ class PackingPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => { window.location = '/openboxes/stockMovement/list?direction=OUTBOUND'; }}
+                onClick={() => { window.location = '/stockMovement/list?direction=OUTBOUND'; }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
