@@ -250,7 +250,7 @@ class PackingPage extends Component {
    * @public
    */
   transitionToNextStep() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const status = 'CHECKING';
     const payload = { status };
 
@@ -265,7 +265,7 @@ class PackingPage extends Component {
    * @public
    */
   fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=5`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=5`;
 
     return apiClient.get(url)
       .then(resp => resp)
@@ -297,7 +297,7 @@ class PackingPage extends Component {
    * @public
    */
   savePackingData(packPageItems) {
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateShipmentItems`;
+    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateShipmentItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       stepNumber: '5',
