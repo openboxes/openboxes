@@ -10,9 +10,9 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
-import grails.util.Metadata
 import grails.web.context.ServletContextHolder
 import org.apache.commons.io.IOUtils
+import org.grails.core.io.ResourceLocator
 import org.pih.warehouse.LocalizationUtil
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
@@ -27,7 +27,7 @@ class LocalizationService {
 
     // inject the grails application so we can access the default locale
     GrailsApplication grailsApplication
-
+    ResourceLocator grailsResourceLocator
 
     String formatMetadata(Object object) {
         def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
@@ -74,28 +74,18 @@ class LocalizationService {
      * @return
      */
     Properties getMessagesProperties(Locale locale) {
-        Properties messagesProperties
+        Properties messagesProperties = new Properties()
         def messagesPropertiesFilename = (locale && locale.language != "en" && locale.language != 'null') ? "messages_${locale.language}.properties" : "messages.properties"
 
-        // Get properties from classpath
-        if (!Metadata.getCurrent().isWarDeployed()) {
-            String messagesPropertiesUrl = "grails-app/i18n/" + messagesPropertiesFilename
-            messagesProperties = getMessagesPropertiesFromClasspath(messagesPropertiesUrl)
-        }
-        // Get properties from exploded WAR file
-        else {
-            String messagesPropertiesUrl = "/WEB-INF/grails-app/i18n/" + messagesPropertiesFilename
-            messagesProperties = getMessagesPropertiesFromResource(messagesPropertiesUrl)
-        }
-        return messagesProperties.sort()
-    }
+        def resource = grailsResourceLocator.findResourceForURI('classpath:' + messagesPropertiesFilename)
+        messagesProperties.load(resource.inputStream)
 
+        return messagesProperties
     Properties getMessagesPropertiesWithPrefix(String prefix, Locale locale) {
         return getMessagesProperties(locale).findAll {
             it.key.startsWith(prefix)
         }
     }
-
 
     /**
      * Get messages properties while running app using deployed WAR.
@@ -130,5 +120,4 @@ class LocalizationService {
         }
         return properties
     }
-
 }
