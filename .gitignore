@@ -37,6 +37,9 @@ npm-debug.log
 /web-app/js/fonts/*
 grails-app/views/partialReceiving/_create.gsp
 grails-app/views/common/_react.gsp
+grails-app/assets/javascripts/bundle*
+grails-app/assets/stylesheets/bundle*
+grails-app/assets/fonts/*
 docker/mysql
 docker/openboxes.war
 .gradle
