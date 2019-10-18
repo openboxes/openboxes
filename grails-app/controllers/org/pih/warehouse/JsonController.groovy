@@ -1358,7 +1358,7 @@ class JsonController {
     def getTransactionReport = { TransactionReportCommand command ->
 
         Date startDate = command.startDate
-        Date endDate = command.endDate
+        Date endDate = command.endDate + 1
         Location location = command.location ?: Location.get(session.warehouse.id)
 
         Category category = command.category
@@ -1389,15 +1389,15 @@ class JsonController {
         }
 
         if (command.refreshBalances) {
-            log.info "Refreshing inventory snapshot for ${command.startDate} and location ${location}"
-            inventorySnapshotService.populateInventorySnapshots(command.startDate, command.location)
-            log.info "Refreshing inventory snapshot for ${command.endDate} and location ${location}"
-            inventorySnapshotService.populateInventorySnapshots(command.endDate, command.location)
+            log.info "Refreshing inventory snapshot for ${startDate} and location ${location}"
+            inventorySnapshotService.populateInventorySnapshots(startDate, command.location)
+            log.info "Refreshing inventory snapshot for ${endDate} and location ${location}"
+            inventorySnapshotService.populateInventorySnapshots(endDate, command.location)
         }
 
         def data = (params.format == "text/csv") ?
-                inventorySnapshotService.getTransactionReportDetails(location, categories, command.startDate, command.endDate) :
-                inventorySnapshotService.getTransactionReportSummary(location, categories, command.startDate, command.endDate)
+                inventorySnapshotService.getTransactionReportDetails(location, categories, startDate, endDate) :
+                inventorySnapshotService.getTransactionReportSummary(location, categories, startDate, endDate)
 
         if (params.format == "text/csv") {
             String csv = dataService.generateCsv(data)
@@ -1413,7 +1413,7 @@ class JsonController {
         Location location = Location.get(locationId)
         Product product = Product.findByProductCode(params.productCode)
         Date startDate = command.startDate
-        Date endDate = command.endDate
+        Date endDate = command.endDate + 1
 
         def balanceOpeningBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate, [product])
         def balanceClosingBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate, [product])
