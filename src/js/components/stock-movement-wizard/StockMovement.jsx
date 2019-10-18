@@ -164,7 +164,7 @@ class StockMovements extends Component {
   fetchInitialValues() {
     if (this.props.match.params.stockMovementId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/stockMovements/${this.props.match.params.stockMovementId}`;
+      const url = `/api/stockMovements/${this.props.match.params.stockMovementId}`;
 
       apiClient.get(url)
         .then((response) => {

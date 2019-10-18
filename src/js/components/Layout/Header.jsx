@@ -11,7 +11,7 @@ const { dashboard } = translations.navbar;
 
 /** Logs out impersonated user and redirects to dashboard */
 function logoutImpersonatedUser() {
-  const url = '/openboxes/api/logout';
+  const url = '/api/logout';
 
   apiClient.post(url)
     .then(() => {
