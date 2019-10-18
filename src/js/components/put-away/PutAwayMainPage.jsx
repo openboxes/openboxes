@@ -81,7 +81,7 @@ class PutAwayMainPage extends Component {
     if (this.props.match.params.putAwayId) {
       this.props.showSpinner();
 
-      const url = `/openboxes/api/putaways/${this.props.match.params.putAwayId}`;
+      const url = `/api/putaways/${this.props.match.params.putAwayId}`;
 
       apiClient.get(url)
         .then((response) => {
@@ -105,7 +105,7 @@ class PutAwayMainPage extends Component {
    */
   savePutAways(putAwayToSave, callback) {
     this.props.showSpinner();
-    const url = `/openboxes/api/putaways?location.id=${this.props.location.id}`;
+    const url = `/api/putaways?location.id=${this.props.location.id}`;
 
     return apiClient.post(url, flattenRequest(putAwayToSave))
       .then((response) => {

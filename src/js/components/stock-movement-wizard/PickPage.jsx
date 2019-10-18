@@ -248,7 +248,7 @@ class PickPage extends Component {
    * @public
    */
   fetchPickPageData() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
 
     return apiClient.get(url)
       .then((resp) => {
@@ -273,7 +273,7 @@ class PickPage extends Component {
   }
 
   fetchAdjustedItems(adjustedProductCode) {
-    apiClient.post(`/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateAdjustedItems?adjustedProduct=${adjustedProductCode}`)
+    apiClient.post(`/api/stockMovements/${this.state.values.stockMovementId}/updateAdjustedItems?adjustedProduct=${adjustedProductCode}`)
       .then((resp) => {
         const { pickPageItems } = resp.data.data.pickPage;
 
@@ -294,7 +294,7 @@ class PickPage extends Component {
    * @public
    */
   fetchBins() {
-    const url = `/openboxes/api/internalLocations?location.id=${this.state.values.origin.id}`;
+    const url = `/api/internalLocations?location.id=${this.state.values.origin.id}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -311,7 +311,7 @@ class PickPage extends Component {
    * @public
    */
   transitionToNextStep() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: this.props.hasPackingSupport ? 'PICKED' : 'CHECKING' };
 
     return apiClient.post(url, payload);
@@ -358,7 +358,7 @@ class PickPage extends Component {
   revertUserPick(itemId) {
     this.props.showSpinner();
 
-    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}/createPicklist`;
+    const itemsUrl = `/api/stockMovementItems/${itemId}/createPicklist`;
 
     apiClient.post(itemsUrl)
       .then((resp) => {
@@ -398,7 +398,7 @@ class PickPage extends Component {
     this.props.showSpinner();
 
     const { movementNumber, stockMovementId } = formValues;
-    const url = `/openboxes/api/stockMovements/exportPickListItems/${stockMovementId}`;
+    const url = `/api/stockMovements/exportPickListItems/${stockMovementId}`;
 
     apiClient.get(url, { responseType: 'blob' })
       .then((response) => {
@@ -421,7 +421,7 @@ class PickPage extends Component {
       },
     };
 
-    const url = `/openboxes/api/stockMovements/importPickListItems/${stockMovementId}`;
+    const url = `/api/stockMovements/importPickListItems/${stockMovementId}`;
 
     return apiClient.post(url, formData, config)
       .then(() => {

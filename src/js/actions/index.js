@@ -28,7 +28,7 @@ export function hideSpinner() {
 }
 
 export function fetchReasonCodes() {
-  const url = '/openboxes/api/reasonCodes';
+  const url = '/api/reasonCodes';
   const request = apiClient.get(url);
 
   return {
@@ -38,7 +38,7 @@ export function fetchReasonCodes() {
 }
 
 export function fetchUsers() {
-  const url = '/openboxes/api/generic/person';
+  const url = '/api/generic/person';
   const request = apiClient.get(url);
 
   return {
@@ -48,7 +48,7 @@ export function fetchUsers() {
 }
 
 export function fetchSessionInfo() {
-  const url = '/openboxes/api/getAppContext';
+  const url = '/api/getSession';
   const request = apiClient.get(url);
 
   return {
@@ -59,7 +59,7 @@ export function fetchSessionInfo() {
 
 export function changeCurrentLocation(location) {
   return (dispatch) => {
-    const url = `/openboxes/api/chooseLocation/${location.id}`;
+    const url = `/api/chooseLocation/${location.id}`;
 
     apiClient.put(url)
       .then(() => {
@@ -73,7 +73,7 @@ export function changeCurrentLocation(location) {
 
 export function fetchTranslations(lang, prefix) {
   return (dispatch) => {
-    const url = `/openboxes/api/localizations?lang=${lang || ''}&prefix=react.${prefix || ''}`;
+    const url = `/api/localizations?lang=${lang || ''}&prefix=react.${prefix || ''}`;
 
     apiClient.get(url)
       .then((response) => {
@@ -91,7 +91,7 @@ export function fetchTranslations(lang, prefix) {
 
 export function changeCurrentLocale(locale) {
   return (dispatch) => {
-    const url = `/openboxes/api/chooseLocale/${locale}`;
+    const url = `/api/chooseLocale/${locale}`;
 
     apiClient.put(url)
       .then(() => {
