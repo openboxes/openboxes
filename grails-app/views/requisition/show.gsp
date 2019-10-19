@@ -12,7 +12,7 @@
 	            <div class="message">${flash.message}</div>
             </g:if>
             <div class="dialog">
-            
+
                 <g:render template="summary" model="[requisition:requisition]"/>
 
                 <div class="yui-gf">
@@ -51,23 +51,28 @@
                                             <g:render template="showRequisitionItem" model="[i:i,requisitionItem:requisitionItem]"/>
                                         </g:each>
                                     </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="9">
+                                                <div class="buttons center">
+                                                    <g:link controller="requisition" action="list" class="button icon arrowleft">
+                                                        <warehouse:message code="default.button.back.label"/>
+                                                    </g:link>
+
+                                                    <g:link controller="requisition" action="edit" id="${requisition.id }" class="button icon arrowright">
+                                                        <warehouse:message code="default.button.next.label"/>
+                                                    </g:link>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
-                        </div>
-                        <div class="clear"></div>
-                        <div class="button-container center">
-                            <g:link controller="requisition" action="list" class="button icon arrowleft">
-                                <warehouse:message code="default.button.back.label"/>
-                            </g:link>
-
-                            <g:link controller="requisition" action="edit" id="${requisition.id }" class="button icon arrowright">
-                                <warehouse:message code="default.button.next.label"/>
-                            </g:link>
                         </div>
                     </div>
                 </div>
 			</div>
 		</div>
-         
+
     </body>
 </html>
