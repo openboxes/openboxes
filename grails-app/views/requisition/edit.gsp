@@ -91,7 +91,7 @@
                             <tfoot>
                                 <tr>
                                     <td colspan="5">
-                                        <div class="left">
+                                        <div class="right">
                                             <g:if test="${requisition?.id}">
                                                 <button class="button"
                                                         id="addRequisitionItemRow" name="addRequisitionItemRow"
@@ -100,6 +100,19 @@
 
                                             </g:if>
                                         </div>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="5">
+										<div class="buttons center">
+											<input type="hidden" data-bind="value: requisition.id" />
+
+											<g:link controller="requisition" action="${requisition?.id ? 'show': 'list'}" id="${requisition?.id }" class="button icon arrowleft">
+												<warehouse:message code="default.button.back.label"/>
+											</g:link>
+											<button id="save-requisition" class="button icon arrowright">
+												${warehouse.message(code: 'default.button.next.label')}</button>
+										</div>
 
                                     </td>
                                 </tr>
@@ -107,15 +120,6 @@
                         </table>
                     </div>
                 </g:if>
-				<div class="button-container center">
-                    <input type="hidden" data-bind="value: requisition.id" />
-
-                    <g:link controller="requisition" action="${requisition?.id ? 'show': 'list'}" id="${requisition?.id }" class="button icon arrowleft">
-                        <warehouse:message code="default.button.back.label"/>
-                    </g:link>
-                    <button id="save-requisition" class="button icon arrowright">
-                        ${warehouse.message(code: 'default.button.next.label')}</button>
-				</div>
 			</g:form>
 		</div>
 	</div>

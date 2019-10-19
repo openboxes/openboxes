@@ -557,16 +557,12 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def calculateNumInventoryItem(Inventory inventory) {
-        long startTime = System.currentTimeMillis()
         def numInventoryItem = InventoryItem.findAllByProduct(product).size()
-        //log.debug "calculateNumInventoryItem: " + (System.currentTimeMillis() - startTime) + " ms"
         return numInventoryItem
     }
 
     def retrievePicklistItems() {
-        long startTime = System.currentTimeMillis()
         def picklistItems = PicklistItem.findAllByRequisitionItem(this)
-        println "retrievePicklistItems: " + (System.currentTimeMillis() - startTime) + " ms"
         return picklistItems
     }
 
