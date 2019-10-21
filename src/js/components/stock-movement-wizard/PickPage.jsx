@@ -232,7 +232,7 @@ class PickPage extends Component {
         }
       });
 
-      return { ...pickPageItem, picklistItems: _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['binLocation.name', 'initial']) };
+      return { ...pickPageItem, picklistItems: _.concat(initialPicks, _.sortBy(pickPageItem.picklistItems, ['binLocation.name', 'initial'])) };
     }
 
     return pickPageItem;
