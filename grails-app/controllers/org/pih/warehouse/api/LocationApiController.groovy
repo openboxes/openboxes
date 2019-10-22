@@ -11,13 +11,13 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Location
+import grails.core.GrailsApplication
 
 class LocationApiController extends BaseDomainApiController {
 
     def locationService
     def userService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def list = {
 

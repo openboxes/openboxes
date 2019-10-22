@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.springframework.context.ApplicationListener
 
 class InventorySnapshotEventService implements ApplicationListener<InventorySnapshotEvent> {
