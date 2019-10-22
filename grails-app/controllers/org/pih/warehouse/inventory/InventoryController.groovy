@@ -23,7 +23,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.util.DateUtil
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Location
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile

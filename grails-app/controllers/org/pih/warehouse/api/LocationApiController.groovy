@@ -22,15 +22,16 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.ProductAvailability
+import grails.core.GrailsApplication
 import org.springframework.web.multipart.MultipartFile
 
 class LocationApiController extends BaseDomainApiController {
 
     def locationService
     def userService
+    GrailsApplication grailsApplication
     def identifierService
     def inventoryService
-    def grailsApplication
     def documentService
 
     def read = {
