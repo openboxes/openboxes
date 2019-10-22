@@ -15,13 +15,14 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductAvailability
+import grails.core.GrailsApplication
 
 class ProductApiController extends BaseDomainApiController {
 
     def productService
     def inventoryService
     def forecastingService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def productAvailabilityService
 
     def demand = {
