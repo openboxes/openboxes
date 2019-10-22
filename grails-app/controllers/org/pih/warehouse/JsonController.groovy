@@ -25,7 +25,7 @@ import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
+import org.pih.warehouse.CalculateHistoricalQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
@@ -41,7 +41,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 
@@ -1258,6 +1258,7 @@ class JsonController {
                     quantityOnHand: it.quantityOnHand
             ]
         }
+    }
 
     def getQuantityOnHandByMonth = {
         Location location = Location.get(params.location.id)
