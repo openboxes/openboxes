@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -27,7 +28,7 @@ class ProductApiController extends BaseDomainApiController {
     def productService
     def inventoryService
     def forecastingService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def productAvailabilityService
 
     def list = {

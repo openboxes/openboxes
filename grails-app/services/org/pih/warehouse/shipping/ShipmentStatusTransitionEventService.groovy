@@ -11,6 +11,7 @@ package org.pih.warehouse.shipping
 
 import org.pih.warehouse.core.RoleType
 import org.springframework.context.ApplicationListener
+import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 
 class ShipmentStatusTransitionEventService implements ApplicationListener<ShipmentStatusTransitionEvent> {
 

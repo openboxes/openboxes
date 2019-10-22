@@ -15,8 +15,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.core.GrailsApplication
 import org.hibernate.FetchMode
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.auth.AuthService
@@ -47,6 +46,7 @@ import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
+import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 
 import javax.mail.internet.InternetAddress
 import java.math.RoundingMode
