@@ -14,12 +14,13 @@ import org.hibernate.Criteria
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.ProductAvailability
+import grails.core.GrailsApplication
 
 class LocationApiController extends BaseDomainApiController {
 
     def locationService
     def userService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def list = {
 
