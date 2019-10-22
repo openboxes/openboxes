@@ -4,7 +4,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import grails.util.Holders
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -29,8 +29,7 @@ import org.pih.warehouse.auth.AuthService
 import util.ConfigHelper
 
 
-@Validateable
-class StockMovement {
+class StockMovement implements Validateable{
 
     String id
     String name

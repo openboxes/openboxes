@@ -10,7 +10,6 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.Product
 
 /**
  * Represents an instance of a product, referenced by lot number
