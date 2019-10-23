@@ -57,7 +57,7 @@ export const debounceLocationsFetch = (waitTime, minSearchLength) =>
 export const debounceGlobalSearch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/json/globalSearch?term=${searchTerm}`)
+      apiClient.get(`/json/globalSearch?term=${searchTerm}`)
         .then(result => callback(
           null,
           {
