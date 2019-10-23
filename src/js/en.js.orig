@@ -72,13 +72,31 @@ const en = {
       activity: ['PLACE_ORDER', 'FULFILL_ORDER'],
       subsections: {
         purchaseOrdersWorkflow: {
+<<<<<<< 8097715b4a4622efe8802adcdc4fb7fd476ba929
           label: 'Create Purchase Order',
-          link: '/purchaseOrderWorkflow/index',
+          link: '/openboxes/purchaseOrderWorkflow/index',
         },
         orders: {
           label: 'List Purchase Orders',
+          link: '/openboxes/order/list?orderTypeCode=PURCHASE_ORDER',
+        },
+=======
+          label: 'Create order',
+          link: '/purchaseOrderWorkflow/index',
+        },
+        orders: {
+          label: 'Order',
           link: '/order/list?orderTypeCode=PURCHASE_ORDER',
         },
+        completed: {
+          label: 'Completed',
+          link: '/order/list?status=COMPLETED',
+        },
+        placed: {
+          label: 'Placed',
+          link: '/order/list?status=PLACED',
+        },
+>>>>>>> OBGM-28: Remove /opneboxes/ path from react menu
       },
     },
     requisitions: {

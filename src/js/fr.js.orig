@@ -1,7 +1,7 @@
-const en = {
+const fr = {
   navbar: {
     dashboard: {
-      label: 'Dashboard',
+      label: 'Tableau de bord',
       link: '/dashboard/index',
     },
     analytics: {
@@ -10,7 +10,7 @@ const en = {
       adminOnly: true,
       subsections: {
         inventoryBrowser: {
-          label: 'Browse Inventory',
+          label: 'Parcourir l\'inventaire',
           link: '/inventoryBrowser/index',
         },
         snapshot: {
@@ -20,16 +20,16 @@ const en = {
       },
     },
     inventory: {
-      label: 'Inventory',
+      label: 'Inventaire',
       link: '#',
       activity: ['MANAGE_INVENTORY'],
       subsections: {
         browse: {
-          label: 'Browse Inventory',
+          label: 'Parcourir l\'inventaire',
           link: '/inventory/browse?resetSearch=true',
         },
         manage: {
-          label: 'Manage Inventory',
+          label: 'Gérer l\'inventaire',
           link: '/inventory/manage',
         },
         browseByCategory: {
@@ -67,22 +67,40 @@ const en = {
       },
     },
     orders: {
-      label: 'Orders',
+      label: 'Commandes',
       link: '#',
       activity: ['PLACE_ORDER', 'FULFILL_ORDER'],
       subsections: {
         purchaseOrdersWorkflow: {
-          label: 'Create Purchase Order',
+<<<<<<< 8097715b4a4622efe8802adcdc4fb7fd476ba929
+          label: 'Créer Purchase Order',
+          link: '/openboxes/purchaseOrderWorkflow/index',
+        },
+        orders: {
+          label: 'List Purchase Order',
+          link: '/openboxes/order/list?orderTypeCode=PURCHASE_ORDER',
+        },
+=======
+          label: 'Créer',
           link: '/purchaseOrderWorkflow/index',
         },
         orders: {
-          label: 'List Purchase Orders',
+          label: 'Order',
           link: '/order/list?orderTypeCode=PURCHASE_ORDER',
         },
+        completed: {
+          label: 'Completed',
+          link: '/order/list?status=COMPLETED',
+        },
+        placed: {
+          label: 'Placed',
+          link: '/order/list?status=PLACED',
+        },
+>>>>>>> OBGM-28: Remove /opneboxes/ path from react menu
       },
     },
     requisitions: {
-      label: 'Requisitions',
+      label: 'Demandes',
       link: '#',
       activity: ['PLACE_REQUEST', 'FULFILL_REQUEST'],
       subsections: {
@@ -103,7 +121,7 @@ const en = {
           link: '/requisition/list',
         },
         requisitionsAll: {
-          label: 'All',
+          label: 'Tout',
           link: '/requisition/list',
         },
         requisitionsCreated: {
@@ -127,32 +145,32 @@ const en = {
       subsections: {
         create: {
           configName: 'stockMovement',
-          label: 'Create Inbound Stock Movement',
+          label: 'Créer Inbound Stock Movement',
           link: '/stockMovement/create?direction=INBOUND',
         },
         list: {
           configName: 'stockMovement',
-          label: 'List Inbound Stock Movements',
+          label: 'Liste de Inbound Stock Movements',
           link: '/stockMovement/list?direction=INBOUND',
         },
         request: {
           configName: 'stockMovement',
-          label: 'Request Stock',
+          label: 'Demande de stock',
           link: '/stockMovement/create?type=REQUEST',
         },
         createPutAway: {
           configName: 'stockMovement',
-          label: 'Create Putaway',
+          label: 'Créer Put Away',
           link: '/putAway/index',
         },
         listPutAways: {
           configName: 'stockMovement',
-          label: 'List Putaways',
+          label: 'Liste de Put Aways',
           link: '/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING',
         },
         createShipment: {
           configName: 'receiving',
-          label: 'Create Inbound Shipment',
+          label: 'Créer Inbound Shipment',
           link: '/createShipmentWorkflow/createShipment?type=INCOMING',
         },
         listShipments: {
@@ -162,12 +180,12 @@ const en = {
         },
         all: {
           configName: 'receiving',
-          label: 'All',
+          label: 'Tout',
           link: '/shipment/list?type=incoming',
         },
         receiving: {
           configName: 'receiving',
-          label: 'Receiving',
+          label: 'En cours',
           link: '/shipment/list?type=incoming&status=PARTIALLY_RECEIVED',
         },
         pending: {
@@ -194,17 +212,17 @@ const en = {
       subsections: {
         create: {
           configName: 'stockMovement',
-          label: 'Create Outbound Stock Movement',
+          label: 'Créer Outbound Stock Movement',
           link: '/stockMovement/create?direction=OUTBOUND',
         },
         list: {
           configName: 'stockMovement',
-          label: 'List Outbound Stock Movements',
+          label: 'Liste de Outbound Stock Movements',
           link: '/stockMovement/list?direction=OUTBOUND',
         },
         createShipment: {
           configName: 'shipping',
-          label: 'Create Outbound Shipment',
+          label: 'Créer Outbound Shipment',
           link: '/createShipmentWorkflow/createShipment?type=OUTGOING',
         },
         listShipments: {
@@ -214,12 +232,12 @@ const en = {
         },
         all: {
           configName: 'shipping',
-          label: 'All',
+          label: 'Tout',
           link: '/shipment/list?type=outgoing',
         },
         pending: {
           configName: 'shipping',
-          label: 'Pending',
+          label: 'En cours',
           link: '/shipment/list?status=PENDING',
         },
         received: {
@@ -305,12 +323,12 @@ const en = {
       },
     },
     products: {
-      label: 'Products',
+      label: 'Produits',
       link: '#',
       activity: ['MANAGE_INVENTORY'],
       subsections: {
         product: {
-          label: 'Products',
+          label: 'Produits',
           link: '/product/list',
         },
         productGroup: {
@@ -358,7 +376,7 @@ const en = {
           link: '/inventoryLevel/list',
         },
         productCreate: {
-          label: 'Create new product',
+          label: 'Créer new product',
           link: '/product/create',
           adminOnly: true,
         },
@@ -384,11 +402,11 @@ const en = {
       link: '#',
       subsections: {
         listStockLists: {
-          label: 'List stock lists',
+          label: 'Liste de stock lists',
           link: '/requisitionTemplate/list',
         },
         createStockList: {
-          label: 'Create stock list',
+          label: 'Créer stock list',
           link: '/requisitionTemplate/create',
         },
       },
@@ -500,4 +518,4 @@ const en = {
   },
 };
 
-export default en;
+export default fr;
