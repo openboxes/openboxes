@@ -12,8 +12,8 @@ const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FileManagerPlugin = require('filemanager-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -22,19 +22,32 @@ module.exports = {
   output: {
     path: DEST,
     filename: 'javascripts/bundle.[hash].js',
-    chunkFilename: 'javascripts/bundle.[hash].[name].js',
-    publicPath: '/openboxes/',
+    chunkFilename: 'bundle.[hash].[name].js',
+    publicPath: '/assets/',
   },
   stats: {
     colors: true,
   },
   plugins: [
+    new FileManagerPlugin({
+      onStart: {
+        delete: [`${JS_DEST}/bundle.**`, `${CSS_DEST}/bundle.**`]
+      },
+      onEnd: {
+        copy: [
+          { source: `${DEST}/bundle.*.js`, destination: JS_DEST },
+          { source: `${DEST}/bundle.*.css`, destination: CSS_DEST }
+        ],
+        delete: [
+          `${DEST}/bundle.**`
+        ]
+      }
+    }),
     new MiniCssExtractPlugin({
       filename: 'stylesheets/bundle.[hash].css',
-      chunkFilename: 'stylesheets/bundle.[hash].[name].css',
+      chunkFilename: 'bundle.[hash].[name].css',
     }),
     new OptimizeCSSAssetsPlugin({}),
-    new CleanWebpackPlugin([`${JS_DEST}/bundle.**`, `${CSS_DEST}/bundle.**`]),
     new HtmlWebpackPlugin({
       filename: `${COMMON_VIEW}/_react.gsp`,
       template: `${ASSETS}/grails-template.html`,
