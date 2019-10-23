@@ -35,7 +35,7 @@ class Header extends Component {
 
     apiClient.post(url)
       .then(() => {
-        window.location = '/openboxes/dashboard/index';
+      window.location = '/dashboard/index';
       });
   }
 

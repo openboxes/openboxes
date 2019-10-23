@@ -80,7 +80,7 @@ class PutAwayCheckPage extends Component {
   componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = '/openboxes/order/list?orderType=PUTAWAY_ORDER&status=PENDING'; },
+      () => { window.location = '/order/list?orderType=PUTAWAY_ORDER&status=PENDING'; },
     );
 
     const location = this.state.location.id ? this.state.location : nextProps.location;
@@ -257,13 +257,13 @@ class PutAwayCheckPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'), { timeout: 3000 });
-        window.location = `/openboxes/order/show/${this.props.initialValues.putAway.id}`;
+        window.location = `/order/show/${this.props.initialValues.putAway.id}`;
       })
       .catch(() => this.props.hideSpinner());
   }
 
   goToFirstPage() {
-    this.props.history.push('/openboxes/putAway/create');
+    this.props.history.push('/putAway/create');
     this.props.goToPage(1, null);
   }
 
