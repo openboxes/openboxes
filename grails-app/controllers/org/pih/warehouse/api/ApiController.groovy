@@ -75,8 +75,8 @@ class ApiController {
             return
         }
 
-        Map menuConfig = grailsApplication.config.openboxes.megamenu;
-        Map menuSectionsUrlParts = grailsApplication.config.openboxes.menuSectionsUrlParts;
+        Map menuConfig = grailsApplication.config.getProperty("openboxes.megamenu")
+        Map menuSectionsUrlParts = grailsApplication.config.getProperty("openboxes.menuSectionsUrlParts")
         User user = User.get(session?.user?.id)
 
         if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
@@ -150,11 +150,11 @@ class ApiController {
         boolean isUserManager = userService.getEffectiveRoles(user).any { managerRoles.contains(it.roleType) }
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         boolean isImpersonated = session.impersonateUserId ? true : false
-        def buildNumber = grailsApplication.metadata.'app.revisionNumber'
-        def buildDate = grailsApplication.metadata.'app.buildDate'
-        def branchName = grailsApplication.metadata.'app.branchName'
-        def grailsVersion = grailsApplication.metadata.'app.grails.version'
-        def appVersion = grailsApplication.metadata.'app.version'
+        def buildNumber = grailsApplication.metadata.getProperty('app.revisionNumber')?:''
+        def buildDate = grailsApplication.metadata.getProperty('app.buildDate')?:''
+        def branchName = grailsApplication.metadata.getProperty('app.branchName')?:''
+        def grailsVersion = grailsApplication.metadata.getProperty('app.grails.version')?:''
+        def appVersion = grailsApplication.metadata.getProperty('app.version')?:''
         def environment = Environment.current
         def ipAddress = request?.getRemoteAddr()
         def hostname = session.hostname ?: "Unknown"
@@ -192,7 +192,7 @@ class ApiController {
                 appVersion           : appVersion,
                 branchName           : branchName,
                 buildNumber          : buildNumber,
-                environment          : environment,
+                environment          : environment.name,
                 buildDate            : buildDate,
                 ipAddress            : ipAddress,
                 hostname             : hostname,
