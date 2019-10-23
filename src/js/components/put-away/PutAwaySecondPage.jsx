@@ -55,7 +55,7 @@ class PutAwaySecondPage extends Component {
   componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = '/openboxes/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING'; },
+      () => { window.location = '/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING'; },
     );
 
     const location = this.state.location.id ? this.state.location : nextProps.location;
@@ -352,7 +352,7 @@ class PutAwaySecondPage extends Component {
    */
   generatePutAwayList() {
     this.props.showSpinner();
-    const url = '/openboxes/putAway/generatePdf/ff80818164ae89800164affcfe6e0001';
+    const url = '/putAway/generatePdf/ff80818164ae89800164affcfe6e0001';
     const { putawayNumber } = this.props.putAway;
 
     return apiClient.post(url, flattenRequest(this.props.putAway), { responseType: 'blob' })

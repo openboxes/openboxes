@@ -506,7 +506,7 @@ class PickPage extends Component {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
+                  onClick={() => { window.location = `/stockMovement/show/${values.stockMovementId}`; }}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
@@ -523,7 +523,7 @@ class PickPage extends Component {
               :
               <button
                 type="button"
-                onClick={() => { window.location = '/openboxes/stockMovement/list?type=REQUEST'; }}
+                onClick={() => { window.location = '/stockMovement/list?type=REQUEST'; }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
