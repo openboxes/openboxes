@@ -60,12 +60,9 @@
                             <td class="center middle" rowspan="${numInventoryItem}">
                                 <g:if test="${j==0}">
                                     <g:if test="${requisitionItem.parentRequisitionItem?.isChanged()}">
-                                        <div class="canceled">
+                                        <div>
                                             ${requisitionItem?.parentRequisitionItem?.quantity ?: 0}
                                             ${requisitionItem?.parentRequisitionItem?.product?.unitOfMeasure ?: "EA"}
-                                        </div>
-                                        <div>
-                                            ${requisitionItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                                         </div>
                                     </g:if>
                                     <g:else>
