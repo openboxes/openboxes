@@ -39,7 +39,12 @@ module.exports = {
           { source: `${DEST}/bundle.*.css`, destination: CSS_DEST }
         ],
         delete: [
-          `${DEST}/bundle.**`
+          `${DEST}/bundle.**`,
+          `${DEST}/*.eot`,
+          `${DEST}/*.svg`,
+          `${DEST}/*.woff2`,
+          `${DEST}/*.ttf`,
+          `${DEST}/*.woff`
         ]
       }
     }),
@@ -93,19 +98,19 @@ module.exports = {
       },
       {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'file-loader?name=./fonts/[hash].[ext]',
+        loader: 'file-loader?name=./[hash].[ext]',
       },
       {
         test: /\.(woff|woff2)$/,
-        loader: 'url-loader?prefix=font/&limit=5000&name=./fonts/[hash].[ext]',
+        loader: 'url-loader?prefix=font/&limit=5000&name=./[hash].[ext]',
       },
       {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url-loader?limit=10000&mimetype=application/octet-stream&name=./fonts/[hash].[ext]',
+        loader: 'url-loader?limit=10000&mimetype=application/octet-stream&name=./[hash].[ext]',
       },
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url-loader?limit=10000&mimetype=image/svg+xml&name=./fonts/[hash].[ext]',
+        loader: 'url-loader?limit=10000&mimetype=image/svg+xml&name=./[hash].[ext]',
       },
     ],
   },
