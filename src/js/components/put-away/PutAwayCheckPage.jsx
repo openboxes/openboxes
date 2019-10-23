@@ -78,7 +78,7 @@ class PutAwayCheckPage extends Component {
   componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = '/openboxes/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING'; },
+      () => { window.location = '/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING'; },
     );
 
     const location = this.state.location.id ? this.state.location : nextProps.location;

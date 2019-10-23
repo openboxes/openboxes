@@ -233,7 +233,7 @@ class PutAwayPage extends Component {
           _.forEach(this.state.putawayItems, (item, index) => { expanded[index] = true; });
         }
 
-        this.props.history.push(`/openboxes/putAway/create/${putAway.id}`);
+        this.props.history.push(`/putAway/create/${putAway.id}`);
         if (putAway.putawayNumber && putAway.id) {
           const {
             actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,

@@ -329,7 +329,7 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(`/openboxes/stockMovement/createRequest/${resp.id}`);
+            this.props.history.push(`/stockMovement/createRequest/${resp.id}`);
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,

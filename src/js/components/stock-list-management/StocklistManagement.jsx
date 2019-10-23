@@ -236,7 +236,7 @@ class StocklistManagement extends Component {
             <div className="align-self-center">
               <button
                 className="btn btn-outline-primary btn-xs"
-                onClick={() => { window.location = `/openboxes/inventoryItem/showStockCard/${this.state.productInfo.id}`; }}
+                onClick={() => { window.location = `/inventoryItem/showStockCard/${this.state.productInfo.id}`; }}
               ><Translate id="react.stockListManagement.returnStockCard.label" defaultMessage="Return to stock card" />
               </button>
             </div>
@@ -317,7 +317,7 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <a href={`/openboxes/requisitionTemplate/show/${original.stocklistId}`}>
+                  <a href={`/requisitionTemplate/show/${original.stocklistId}`}>
                     <Tooltip
                       title={original.name}
                       theme="transparent"
@@ -538,13 +538,13 @@ class StocklistManagement extends Component {
                     <a
                       className="btn btn-outline-secondary btn-xs mr-1"
                       disabled={original.edit || original.new}
-                      href={`/openboxes/stocklist/renderPdf/${original.stocklistId}`}
+                      href={`/stocklist/renderPdf/${original.stocklistId}`}
                     ><Translate id="react.default.button.printPdf.label" defaultMessage="Print PDF" />
                     </a>
                     <a
                       className="btn btn-outline-secondary btn-xs mr-1"
                       disabled={original.edit || original.new}
-                      href={`/openboxes/stocklist/generateCsv/${original.stocklistId}`}
+                      href={`/stocklist/generateCsv/${original.stocklistId}`}
                     ><Translate id="react.default.button.printXls.label" defaultMessage="Print XLS" />
                     </a>
                     {original.manager ?
