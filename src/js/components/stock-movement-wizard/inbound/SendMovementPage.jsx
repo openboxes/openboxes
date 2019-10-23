@@ -453,7 +453,7 @@ class SendMovementPage extends Component {
    * @public
    */
   sendFile(file) {
-    const url = `/openboxes/stockMovement/uploadDocument/${this.state.values.stockMovementId}`;
+    const url = `/stockMovement/uploadDocument/${this.state.values.stockMovementId}`;
 
     const data = new FormData();
     data.append('fileContents', file);
@@ -559,7 +559,7 @@ class SendMovementPage extends Component {
           this.stateTransitionToSent()
             .then(() => {
               // redirect to requisition list
-              window.location = `/openboxes/stockMovement/show/${this.state.values.stockMovementId}`;
+              window.location = `/stockMovement/show/${this.state.values.stockMovementId}`;
             })
             .catch(() => this.props.hideSpinner());
         })
@@ -604,7 +604,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`;
+          window.location = `/stockMovement/show/${values.stockMovementId}`;
         });
     } else {
       confirmAlert({
@@ -616,7 +616,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; },
+            onClick: () => { window.location = `/stockMovement/show/${values.stockMovementId}`; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
