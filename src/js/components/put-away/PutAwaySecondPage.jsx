@@ -69,7 +69,7 @@ class PutAwaySecondPage extends Component {
   componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = '/openboxes/order/list?orderType=PUTAWAY_ORDER&status=PENDING'; },
+      () => { window.location = '/order/list?orderType=PUTAWAY_ORDER&status=PENDING'; },
     );
 
     const location = this.state.location.id ? this.state.location : nextProps.location;
@@ -299,7 +299,7 @@ class PutAwaySecondPage extends Component {
     if (this.props.match.params.putAwayId) {
       this.props.showSpinner();
 
-      const url = `/openboxes/api/putaways/${this.props.match.params.putAwayId}`;
+      const url = `/api/putaways/${this.props.match.params.putAwayId}`;
 
       apiClient.get(url)
         .then((response) => {
@@ -398,7 +398,7 @@ class PutAwaySecondPage extends Component {
    */
   savePutAways(putAwayToSave, callback) {
     this.props.showSpinner();
-    const url = `/openboxes/api/putaways?location.id=${this.state.location.id}`;
+    const url = `/api/putaways?location.id=${this.state.location.id}`;
 
     return apiClient.post(url, flattenRequest(putAwayToSave))
       .then((response) => {
@@ -496,7 +496,7 @@ class PutAwaySecondPage extends Component {
    */
   generatePutAwayList() {
     this.props.showSpinner();
-    const url = '/openboxes/putAway/generatePdf';
+    const url = '/putAway/generatePdf';
     const { putawayNumber } = this.state.putAway;
 
     return apiClient.post(url, flattenRequest(this.state.putAway), { responseType: 'blob' })

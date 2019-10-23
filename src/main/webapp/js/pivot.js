@@ -89,7 +89,7 @@ var app = angular.module('pivotApp',['googlechart']).controller("mainController"
     $scope.init = function() {
         $scope.$emit('LOAD');
 
-        $http.jsonp('/openboxes/inventory/calculateQuantityOnHandByProduct?callback=JSON_CALLBACK').success(function(data) {
+        $http.jsonp('/inventory/calculateQuantityOnHandByProduct?callback=JSON_CALLBACK').success(function(data) {
             console.log(data);
             $scope.results = data.items;
             $scope.elapsedTime = data.elapsedTime;
