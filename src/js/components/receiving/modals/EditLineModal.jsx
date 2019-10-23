@@ -184,7 +184,13 @@ class EditLineModal extends Component {
           binLocation: this.state.attr.fieldValue.binLocation,
           product: this.state.attr.fieldValue.product,
         }}
-      />
+      >
+        <div>
+          <div className="font-weight-bold mb-3">
+            <Translate id="react.partialReceiving.originalQtyShipped.label" defaultMessage="Original quantity shipped" />: {this.state.attr.fieldValue.quantityShipped}
+          </div>
+        </div>
+      </ModalWrapper>
     );
   }
 }
