@@ -128,7 +128,7 @@ class ReceivingPage extends Component {
         }, () => {
           this.setState({ completed: true });
           const { requisition, shipmentId } = formValues;
-          window.location = `/openboxes/stockMovement/show/${requisition || shipmentId}`;
+          window.location = `/stockMovement/show/${requisition || shipmentId}`;
         });
       }
     }
@@ -180,7 +180,7 @@ class ReceivingPage extends Component {
           }, () => {
             this.setState({ completed: true });
             const { requisition, shipmentId } = formValues;
-            window.location = `/openboxes/stockMovement/show/${requisition || shipmentId}`;
+            window.location = `/stockMovement/show/${requisition || shipmentId}`;
           }),
         },
         {
@@ -248,7 +248,7 @@ class ReceivingPage extends Component {
     this.saveValues(formValues)
       .then(() => {
         const { requisition, shipmentId } = formValues;
-        window.location = `/openboxes/stockMovement/show/${requisition || shipmentId}`;
+        window.location = `/stockMovement/show/${requisition || shipmentId}`;
       })
       .catch(() => this.props.hideSpinner());
   }
