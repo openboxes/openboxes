@@ -66,7 +66,7 @@ class ApiController {
     }
 
     def getMenuConfig = {
-        Map menuConfig = grailsApplication.config.openboxes.megamenu
+        Map menuConfig = grailsApplication.config.getProperty("openboxes.megamenu")
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
         List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
@@ -122,11 +122,11 @@ class ApiController {
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         boolean isImpersonated = session.impersonateUserId ? true : false
-        def buildNumber = grailsApplication.metadata.'app.revisionNumber'
-        def buildDate = grailsApplication.metadata.'app.buildDate'
-        def branchName = grailsApplication.metadata.'app.branchName'
-        def grailsVersion = grailsApplication.metadata.'app.grails.version'
-        def appVersion = grailsApplication.metadata.'app.version'
+        def buildNumber = grailsApplication.metadata.getProperty('app.revisionNumber')?:''
+        def buildDate = grailsApplication.metadata.getProperty('app.buildDate')?:''
+        def branchName = grailsApplication.metadata.getProperty('app.branchName')?:''
+        def grailsVersion = grailsApplication.metadata.getProperty('app.grails.version')?:''
+        def appVersion = grailsApplication.metadata.getProperty('app.version')?:''
         def environment = Environment.current
         def ipAddress = request?.getRemoteAddr()
         def hostname = session.hostname ?: "Unknown"
@@ -156,7 +156,7 @@ class ApiController {
                         appVersion           : appVersion,
                         branchName           : branchName,
                         buildNumber          : buildNumber,
-                        environment          : environment,
+                        environment        : environment.name,
                         buildDate            : buildDate,
                         ipAddress            : ipAddress,
                         hostname             : hostname,
