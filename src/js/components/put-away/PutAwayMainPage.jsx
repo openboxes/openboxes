@@ -145,7 +145,7 @@ class PutAwayMainPage extends Component {
    * @public
    */
   firstPage() {
-    this.props.history.push('/openboxes/putAway/create');
+    this.props.history.push('/putAway/create');
     this.setState({ page: 0, props: null });
   }
 

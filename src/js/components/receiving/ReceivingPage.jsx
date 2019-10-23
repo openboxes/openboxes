@@ -128,7 +128,7 @@ class ReceivingPage extends Component {
         }, () => {
           this.setState({ completed: true });
           const { requisition } = formValues;
-          window.location = `/openboxes/stockMovement/show/${requisition}`;
+          window.location = `/stockMovement/show/${requisition}`;
         });
       }
     }
@@ -180,7 +180,7 @@ class ReceivingPage extends Component {
           }, () => {
             this.setState({ completed: true });
             const { requisition } = formValues;
-            window.location = `/openboxes/stockMovement/show/${requisition}`;
+            window.location = `/stockMovement/show/${requisition}`;
           }),
         },
         {
@@ -248,7 +248,7 @@ class ReceivingPage extends Component {
     this.saveValues(formValues)
       .then(() => {
         const { requisition } = formValues;
-        window.location = `/openboxes/stockMovement/show/${requisition}`;
+        window.location = `/stockMovement/show/${requisition}`;
       })
       .catch(() => this.props.hideSpinner());
   }
