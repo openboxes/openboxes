@@ -250,25 +250,7 @@ class StockMovementController {
 
     def exportCsv = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
-        // We need to create at least one row to ensure an empty template
-        if (stockMovement?.lineItems?.empty) {
-            stockMovement?.lineItems.add(new StockMovementItem())
-        }
-
-        def lineItems = stockMovement.lineItems.collect {
-            [
-                    requisitionItemId            : it?.id ?: "",
-                    "productCode (required)"     : it?.product?.productCode ?: "",
-                    productName                  : it?.product?.name ?: "",
-                    palletName                   : it?.palletName ?: "",
-                    boxName                      : it?.boxName ?: "",
-                    lotNumber                    : it?.lotNumber ?: "",
-                    "expirationDate (MM/dd/yyyy)": it?.expirationDate ? it?.expirationDate?.format("MM/dd/yyyy") : "",
-                    "quantity (required)"        : it?.quantityRequested ?: "",
-                    recipientId                  : it?.recipient?.id ?: ""
-            ]
-        }
+        List lineItems = stockMovementService.buildStockMovementItemList(stockMovement)
         String csv = dataService.generateCsv(lineItems)
         response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
