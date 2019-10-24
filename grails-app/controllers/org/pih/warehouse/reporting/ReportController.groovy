@@ -12,6 +12,8 @@ package org.pih.warehouse.reporting
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import org.apache.commons.lang.StringEscapeUtils
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.RefreshTransactionFactJob
@@ -25,12 +27,14 @@ import util.ReportUtil
 
 class ReportController {
 
+    def dataService
     def documentService
     def inventoryService
     def productService
     def reportService
     def messageService
     def inventorySnapshotService
+    def stockMovementService
     StdScheduler quartzScheduler
 
     def refreshTransactionFact = {
@@ -375,8 +379,11 @@ class ReportController {
             [status: status, label: label]
         }
 
+
+
         try {
-            if (params.button == "download") {
+            if (params.downloadAction == "downloadStockReport") {
+
                 def binLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
 
                 // Filter on status
@@ -390,8 +397,24 @@ class ReportController {
                 render(contentType: "text/csv", text: csv)
                 return
             }
+            else if (params.downloadAction == "downloadStockMovement") {
 
-
+                StockMovement stockMovement = new StockMovement()
+                def entries = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+                entries = entries.findAll { entry -> entry.quantity > 0 }
+                entries = entries.groupBy { it.product }
+                entries.each { k, v ->
+                    def quantity = v.sum { it.quantity }
+                    stockMovement.lineItems.add(
+                            new StockMovementItem(product: k,
+                                    quantityRequested: quantity))
+                }
+                List lineItems = stockMovementService.buildStockMovementItemList(stockMovement)
+                String csv = dataService.generateCsv(lineItems)
+                response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-CurrentStock.csv\"")
+                render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+                return;
+            }
         } catch (Exception e) {
             log.error("Unable to generate bin location report due to error: " + e.message, e)
             flash.message = e.message
