@@ -146,12 +146,17 @@ class StockMovementController {
     }
 
     def rollback = {
-        try {
-            stockMovementService.rollbackStockMovement(params.id)
-            flash.message = "Successfully rolled back stock movement with ID ${params.id}"
-        } catch (Exception e) {
-            log.warn("Unable to rollback stock movement with ID ${params.id}: " + e.message)
-            flash.message = "Unable to rollback stock movement with ID ${params.id}: " + e.message
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        if (stockMovement?.requisition?.origin?.id != session.warehouse.id) {
+            flash.error = "You are not able to rollback shipment from a location other than origin."
+        } else {
+            try {
+                stockMovementService.rollbackStockMovement(params.id)
+                flash.message = "Successfully rolled back stock movement with ID ${params.id}"
+            } catch (Exception e) {
+                log.warn("Unable to rollback stock movement with ID ${params.id}: " + e.message)
+                flash.message = "Unable to rollback stock movement with ID ${params.id}: " + e.message
+            }
         }
 
         redirect(action: "show", id: params.id)
@@ -160,7 +165,12 @@ class StockMovementController {
 
     def removeStockMovement = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
+        if (stockMovement?.requisition?.origin?.id != session.warehouse.id) {
+            flash.error = "You are not able to delete stock movement from a location other than origin."
+            if (params.show) {
+                return redirect(action: "show", id: params.id)
+            }
+        } else if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
             try {
                 Requisition requisition = stockMovement?.requisition
                 if (requisition) {
@@ -180,7 +190,9 @@ class StockMovementController {
                 log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
                 flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
             }
-        } else flash.message = "You cannot delete this shipment"
+        } else {
+            flash.message = "You cannot delete this shipment"
+        }
 
         redirect(action: "list")
     }
