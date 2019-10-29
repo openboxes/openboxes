@@ -625,8 +625,8 @@ class SendMovementPage extends Component {
                 <table className="table table-striped text-center border my-2 table-xs">
                   <thead>
                     <tr>
-                      <th><Translate id="react.stockMovement.pallet.label" defaultMessage="Pallet" /> </th>
-                      <th><Translate id="react.stockMovement.box.label" defaultMessage="Box" /> </th>
+                      <th><Translate id="react.stockMovement.packLevel1.label" defaultMessage="Pack level 1" /> </th>
+                      <th><Translate id="react.stockMovement.packLevel2.label" defaultMessage="Pack level 2" /> </th>
                       <th><Translate id="react.stockMovement.code.label" defaultMessage="Code" /> </th>
                       <th><Translate id="react.stockMovement.productName.label" defaultMessage="Product name" /> </th>
                       <th><Translate id="react.stockMovement.lot.label" defaultMessage="Lot" /> </th>

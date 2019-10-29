@@ -154,8 +154,8 @@ class FileService {
                                       {it?.productName}]))
 
         def columns = [
-                parentContainer: [label: "Pallet", ratio: 0.75],
-                childContainer : [label: "Box", ratio: 0.75],
+                parentContainer: [label: "Pack level 1", ratio: 0.75],
+                childContainer : [label: "Pack level 2", ratio: 0.75],
                 productName    : [label: "Product", ratio: 2.0],
                 lotNumber      : [label: "Lot", ratio: 0.75],
                 expirationDate : [label: "Exp", ratio: 0.75],
