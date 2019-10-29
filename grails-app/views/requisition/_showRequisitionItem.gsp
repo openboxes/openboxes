@@ -179,26 +179,28 @@
         </g:else>
 
     </td>
-    <td class="middle center">
-        <g:if test="${requisitionItem?.isSubstituted()}">
-            <div>
-                ${requisitionItem?.substitutionItem?.calculateQuantityRemaining()?:0}
-            </div>
-        </g:if>
-        <g:elseif test="${requisitionItem?.isCanceled()}">
-            <div class="canceled">
+    <g:if test="${!requestTab}">
+        <td class="middle center">
+            <g:if test="${requisitionItem?.isSubstituted()}">
+                <div>
+                    ${requisitionItem?.substitutionItem?.calculateQuantityRemaining()?:0}
+                </div>
+            </g:if>
+            <g:elseif test="${requisitionItem?.isCanceled()}">
+                <div class="canceled">
+                    ${requisitionItem?.calculateQuantityRemaining()?:0}
+                </div>
+            </g:elseif>
+            <g:elseif test="${requisitionItem?.isChanged()}">
+                <div>
+                    ${requisitionItem?.modificationItem?.calculateQuantityRemaining()?:0}
+                </div>
+            </g:elseif>
+            <g:else>
                 ${requisitionItem?.calculateQuantityRemaining()?:0}
-            </div>
-        </g:elseif>
-        <g:elseif test="${requisitionItem?.isChanged()}">
-            <div>
-                ${requisitionItem?.modificationItem?.calculateQuantityRemaining()?:0}
-            </div>
-        </g:elseif>
-        <g:else>
-            ${requisitionItem?.calculateQuantityRemaining()?:0}
-        </g:else>
-    </td>
+            </g:else>
+        </td>
+    </g:if>
     <g:if test="${requestTab}">
         <td class="middle center">
             <g:if test="${requisitionItem?.isCanceled()}">
