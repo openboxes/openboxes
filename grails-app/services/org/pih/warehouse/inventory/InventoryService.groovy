@@ -36,6 +36,7 @@ import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
 
 import java.sql.Timestamp
+import java.text.NumberFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
@@ -2856,6 +2857,7 @@ class InventoryService implements ApplicationContextAware {
      */
     String exportBaselineQoH(products, quantityMapByDate) {
         def csvrows = []
+        NumberFormat numberFormat = NumberFormat.getNumberInstance()
         products.each { product ->
             def csvrow = [
                     'Product code'     : product.productCode ?: '',
@@ -2871,7 +2873,7 @@ class InventoryService implements ApplicationContextAware {
 
             if (quantityMapByDate) {
                 quantityMapByDate.each { key, value ->
-                    csvrow[key.format("dd-MMM-yyyy")] = quantityMapByDate[key][product]
+                    csvrow[key.format("dd-MMM-yyyy")] = quantityMapByDate[key][product] ? numberFormat.format(quantityMapByDate[key][product]) : ""
                 }
             }
 
