@@ -88,11 +88,20 @@ class IdentifierService {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.product.format)
     }
 
+    def generateProductSupplierIdentifier() {
+        return generateProductSupplierIdentifier(null)
+    }
+
     /**
      * @return
      */
-    def generateProductSupplierIdentifier() {
-        return generateIdentifier(grailsApplication.config.openboxes.identifier.product.format)
+    def generateProductSupplierIdentifier(String prefix) {
+        String identifier = generateIdentifier(grailsApplication.config.openboxes.identifier.productSupplier.format)
+        Boolean prefixEnabled = grailsApplication.config.openboxes.identifier.productSupplier.prefix.enabled
+        if (prefixEnabled && prefix) {
+            identifier = "${prefix}${Constants.DEFAULT_NAME_SEPARATOR}${identifier}"
+        }
+        return identifier
     }
 
 

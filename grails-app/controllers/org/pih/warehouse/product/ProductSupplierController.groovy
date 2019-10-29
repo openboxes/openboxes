@@ -14,7 +14,7 @@ class ProductSupplierController {
     def dataService
     def identifierService
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [save: "POST", update: "POST", delete: ["GET", "POST"]]
 
     def index = {
         redirect(action: "list", params: params)
@@ -35,7 +35,8 @@ class ProductSupplierController {
         def productSupplierInstance = new ProductSupplier(params)
 
         if (!productSupplierInstance.code) {
-            productSupplierInstance.code = identifierService.generateProductSupplierIdentifier()
+            String prefix = productSupplierInstance?.product?.productCode
+            productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
         }
         if (productSupplierInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
@@ -85,7 +86,8 @@ class ProductSupplierController {
             productSupplierInstance.properties = params
 
             if (!productSupplierInstance.code) {
-                productSupplierInstance.code = identifierService.generateProductSupplierIdentifier()
+                String prefix = productSupplierInstance?.product?.productCode
+                productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
             }
 
             if (!productSupplierInstance.hasErrors() && productSupplierInstance.save(flush: true)) {
@@ -144,7 +146,8 @@ class ProductSupplierController {
     }
 
     def export = {
-        def productSuppliers = ProductSupplier.list()
+        def productSuppliers = params.list("productSupplier.id") ?
+                ProductSupplier.findAllByIdInList(params.list("productSupplier.id")) : ProductSupplier.list()
         def data = productSuppliers ? dataService.transformObjects(productSuppliers, ProductSupplier.PROPERTIES) : [[:]]
         response.setHeader("Content-disposition",
                 "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")

@@ -92,6 +92,7 @@ class Constants {
 
     // Default character separator for generated names
     static final String DEFAULT_NAME_SEPARATOR = "-"
+    static final String DEFAULT_IDENTIFIER_SEPARATOR = "-"
 
     // Default character used to separate columns and newlines in exports
     static final String DEFAULT_COLUMN_SEPARATOR = ","
@@ -105,6 +106,7 @@ class Constants {
     // Default random number formats
     static final String DEFAULT_ORDER_NUMBER_FORMAT = "NNNLLL"
     static final String DEFAULT_PRODUCT_NUMBER_FORMAT = "LLNN"
+    static final String DEFAULT_PRODUCT_SUPPLIER_NUMBER_FORMAT = "NNNN"
     static final String DEFAULT_REQUISITION_NUMBER_FORMAT = "NNNLLL"
     static final String DEFAULT_SHIPMENT_NUMBER_FORMAT = "NNNLLL"
     static final String DEFAULT_RECEIPT_NUMBER_FORMAT = "NNNLLL"

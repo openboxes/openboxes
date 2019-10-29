@@ -367,13 +367,15 @@ openboxes.dashboard.catalogsSummary.enabled = true
 openboxes.dashboard.newsSummary.newsItems = []
 
 // OpenBoxes identifier config
+openboxes.identifier.separator = Constants.DEFAULT_IDENTIFIER_SEPARATOR
 openboxes.identifier.numeric = Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS
 openboxes.identifier.alphabetic = Constants.RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS
 openboxes.identifier.alphanumeric = Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS
 openboxes.identifier.transaction.format = Constants.DEFAULT_TRANSACTION_NUMBER_FORMAT
 openboxes.identifier.order.format = Constants.DEFAULT_ORDER_NUMBER_FORMAT
 openboxes.identifier.product.format = Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
-openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
+openboxes.identifier.productSupplier.prefix.enabled = true
+openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_SUPPLIER_NUMBER_FORMAT
 openboxes.identifier.receipt.format = Constants.DEFAULT_RECEIPT_NUMBER_FORMAT
 openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
 openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
