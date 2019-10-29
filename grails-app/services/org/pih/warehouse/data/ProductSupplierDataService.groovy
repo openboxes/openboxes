@@ -17,6 +17,8 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 class ProductSupplierDataService {
 
+    def identifierService
+
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
@@ -76,12 +78,16 @@ class ProductSupplierDataService {
         } else {
             productSupplier.properties = params
         }
-
         productSupplier.name = params["productName"]
         productSupplier.productCode = params["legacyProductCode"]
         productSupplier.product = Product.findByProductCode(params["productCode"])
         productSupplier.supplier = Organization.get(params["supplierId"])
         productSupplier.manufacturer = Organization.get(params["manufacturerId"])
+
+        if (!productSupplier.code) {
+            String prefix = productSupplierInstance?.product?.productCode
+            productSupplier.code = identifierService.generateProductSupplierIdentifier(prefix)
+        }
         return productSupplier
     }
 }
