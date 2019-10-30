@@ -270,12 +270,12 @@ $(function () {
                     <warehouse:message code="reasonCode.label" default="Reason Code"/>
                 </td>
                 <td class="value">
-
+                    <g:set var="defaultReasonCodes" value="${ConfigHelper.listValue(grailsApplication.config.openboxes.stockCard.consumption.reasonCodes)}"/>
                     <ul>
-                        <li><g:checkBox id="reasonCode-ALL" name="reasonCode" value="ALL"/> <label for="reasonCode-ALL">All reason codes</label></li>
+                        <li><g:checkBox id="reasonCode-ALL" name="reasonCode" value="ALL" checked="${false}"/> <label for="reasonCode-ALL">All reason codes</label></li>
                         <g:each var="reasonCode" in="${org.pih.warehouse.core.ReasonCode.list()}">
                             <li>
-                                <g:checkBox id="reasonCode-${reasonCode}" name="reasonCode" value="${reasonCode}" checked="${reasonCodes.contains(reasonCode)}"/>
+                                <g:checkBox id="reasonCode-${reasonCode}" name="reasonCode" value="${reasonCode}" checked="${defaultReasonCodes.contains(reasonCode)}"/>
                                 <label for="reasonCode-${reasonCode}" title="${reasonCode}">
                                     <warehouse:message code="enum.ReasonCode.${reasonCode}"/>
                                 </label>
