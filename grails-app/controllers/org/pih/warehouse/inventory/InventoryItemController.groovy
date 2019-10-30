@@ -242,6 +242,7 @@ class InventoryItemController {
         Product product = Product.get(params.id)
         Location location = Location.get(session?.warehouse?.id)
         StockMovementType stockMovementType = params.type as StockMovementType
+        def itemsMap, requisitionItems, shipmentItems = []
 
         if (!stockMovementType) {
             throw new IllegalArgumentException("Stock movement type is required")
@@ -250,35 +251,33 @@ class InventoryItemController {
         Location origin = stockMovementType == StockMovementType.INBOUND ? null : location
         Location destination = stockMovementType == StockMovementType.OUTBOUND ? null : location
 
-        def requisitionItems =
-                requisitionService.getPendingRequisitionItems(origin, destination, product)
-        def requisitionMap = requisitionItems.groupBy { it.requisition }
+        if (origin) {
+            requisitionItems = requisitionService.getPendingRequisitionItems(origin, product)
+            itemsMap = requisitionItems.groupBy { it.requisition }
+        } else if (destination) {
+            shipmentItems = shipmentService.getPendingInboundShipmentItems(destination, product)
+            itemsMap = shipmentItems.groupBy { it.shipment }
+        }
 
-        log.info "requisitionmap: " + requisitionMap
-        if (requisitionMap) {
-            requisitionMap.keySet().each {
-                def quantityRequested = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.quantity }
-                def quantityRequired = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() }
-                def quantityPicked = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() }
-                def quantityRemaining = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRemaining() }
-                def quantityReceived = requisitionMap[it].sum() { RequisitionItem requisitionItem ->
-                    ShipmentItem.findAllByRequisitionItem(requisitionItem).sum {
-                        it.quantityReceived() ?: 0
-                    } ?: 0
-                }
+        log.info "itemsMap: " + itemsMap
+        if (itemsMap) {
+            itemsMap.keySet().each {
+                def quantityRequested = !shipmentItems ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.quantity } : itemsMap[it].sum() { ShipmentItem shipmentItem -> shipmentItem.quantity }
+                def quantityRequired = !shipmentItems ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() } : 0
+                def quantityPicked = !shipmentItems ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() } : 0
+                def quantityReceived = shipmentItems ? itemsMap[it].sum() { ShipmentItem shipmentItem -> shipmentItem.quantityReceived() } : 0
 
                 def quantityMap = [
                         quantityRequested: quantityRequested,
                         quantityRequired : quantityRequired,
                         quantityPicked   : quantityPicked,
-                        quantityRemaining: quantityRemaining,
                         quantityReceived : quantityReceived
                 ]
-                requisitionMap.put(it, quantityMap)
+                itemsMap.put(it, quantityMap)
             }
         }
 
-        render(template: "showPendingStock", model: [product: product, requisitionMap: requisitionMap])
+        render(template: "showPendingStock", model: [product: product, itemsMap: itemsMap])
     }
 
     def showConsumption = { StockCardCommand cmd ->
