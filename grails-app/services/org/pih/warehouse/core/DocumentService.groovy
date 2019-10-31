@@ -306,7 +306,7 @@ class DocumentService {
         trHeader.setTrPr(trPr)
 
         trPr.getCnfStyleOrDivIdOrGridBefore().add(Context.getWmlObjectFactory().createCTTrPrBaseTblHeader(bdt))
-        addTc(wmlPackage, trHeader, "Pallet/Box #", true)
+        addTc(wmlPackage, trHeader, "Pack level 1/2 #", true)
         addTc(wmlPackage, trHeader, "Item", true)
         addTc(wmlPackage, trHeader, "Qty", true)
 
@@ -492,10 +492,10 @@ class DocumentService {
 
         // ITEM TABLE HEADER
         Row row = sheet.createRow((short) counter++)
-        row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'container.pallet.label', default: 'Pallet'))
+        row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packLevel1.label', default: 'Pack level 1'))
         row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
-        row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'container.box.label', default: 'Box'))
+        row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packLevel2.label', default: 'Pack level 2'))
         row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
         row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'product.productCode.label', default: 'SKU'))
