@@ -36,6 +36,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 
@@ -312,6 +313,23 @@ class ShipmentService {
             shipmentItemList.each {
                 shipmentItems << it
             }
+        }
+
+        return shipmentItems
+    }
+
+    List<ShipmentItem> getPendingInboundShipmentItems(Location destination, Product product) {
+        def shipmentItems = ShipmentItem.createCriteria().list() {
+            shipment {
+                eq("destination", destination)
+                not {
+                    'in'("currentStatus", [ShipmentStatusCode.RECEIVED])
+                }
+                requisition {
+                    'in'("status", [RequisitionStatus.ISSUED])
+                }
+            }
+            eq("product", product)
         }
 
         return shipmentItems
