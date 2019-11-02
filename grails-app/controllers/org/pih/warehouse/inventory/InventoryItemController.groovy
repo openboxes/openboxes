@@ -192,7 +192,12 @@ class InventoryItemController {
                 // Normalize quantity (inventory transactions were all converted to CREDIT so some may have negative quantity)
                 def quantity = (transactionEntry.quantity > 0) ? transactionEntry.quantity : -transactionEntry.quantity
 
+                String transactionYear = (transaction.transactionDate.year + 1900).toString()
+                String transactionMonth = (transaction.transactionDate.month).toString()
+
                 stockHistoryList << [
+                        transactionYear  : transactionYear,
+                        transactionMonth : transactionMonth,
                         transactionDate  : transaction.transactionDate,
                         transactionCode  : transaction?.transactionType?.transactionCode,
                         transaction      : transaction,
@@ -223,8 +228,14 @@ class InventoryItemController {
             render(template: "printStockHistory", model: [commandInstance: commandInstance, stockHistoryList: stockHistoryList,
                                                           totalBalance   : totalBalance, totalCount: totalCount, totalCredit: totalCredit, totalDebit: totalDebit])
         } else {
-            render(template: "showStockHistory", model: [commandInstance: commandInstance, stockHistoryList: stockHistoryList,
-                                                         totalBalance   : totalBalance, totalCount: totalCount, totalCredit: totalCredit, totalDebit: totalDebit])
+            stockHistoryList = stockHistoryList.groupBy({ it.transactionYear })
+            def groupedStockHistoryList = [:]
+            stockHistoryList.each { year, history ->
+                history = history.groupBy { it.transactionMonth }
+                groupedStockHistoryList.get(year, [:]) << history
+            }
+            render(template: "showStockHistory", model: [commandInstance: commandInstance, stockHistoryList: groupedStockHistoryList,
+                                                          totalBalance   : totalBalance, totalCount: totalCount, totalCredit: totalCredit, totalDebit: totalDebit])
         }
     }
 

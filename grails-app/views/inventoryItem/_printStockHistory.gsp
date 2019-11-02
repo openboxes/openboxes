@@ -74,7 +74,7 @@
     </div>
 
     <div class="content">
-            <g:render template="showStockHistory" model="[commandInstance:commandInstance, stockHistoryList: stockHistoryList,
+            <g:render template="showStockHistoryPrintable" model="[commandInstance:commandInstance, stockHistoryList: stockHistoryList,
                                                            totalBalance:totalBalance, totalCount:totalCount, totalCredit:totalCredit, totalDebit:totalDebit]"/>
     </div>
 
