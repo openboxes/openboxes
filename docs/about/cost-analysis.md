@@ -5,4 +5,4 @@ costs you would need to cover whether you decide to go with an on-premise or clo
 
 If you'd like your own cost analysis please contact us at <support@openboxes.com>. 
 
-<iframe src="/about/sample-cost-analysis.pdf" width="700" height="1000"/>
+<iframe src="../about/sample-cost-analysis.pdf" width="700" height="1000"/>
