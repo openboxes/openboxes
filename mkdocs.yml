@@ -1,5 +1,5 @@
 site_name: OpenBoxes
-site_description: 
+site_description:
 site_author: Justin Miranda
 repo_url: https://github.com/openboxes/openboxes
 theme: readthedocs
@@ -16,8 +16,12 @@ nav:
   - Home: index.md
   - About:
     - Features: https://openboxes.com/features/
+    - Architecture: about/architecture.md
     - Benefits: about/benefits.md
     - Considerations: about/considerations.md
+    - Cost Analysis: about/cost-analysis.md
+    - Pricing: https://openboxes.com/pricing/
+    - Road Map: https://openboxes.com/roadmap/
     - Release Notes: about/release-notes.md
   - Installation:
     - Overview: installation/index.md
@@ -31,10 +35,12 @@ nav:
       - Apache: installation/ubuntu1804/apache.md
       - Configuration: installation/ubuntu1804/configuration.md
       - Deployment: installation/ubuntu1804/deployment.md
-      - Upgrading: installation/ubuntu1804/upgrading.md
       - Troubleshooting: installation/ubuntu1804/troubleshooting.md
-    - Ubuntu 16.04: installation/ubuntu1604.md
+    - Ubuntu 16.04:
+      - Instructions: installation/ubuntu1604.md
+      - Notes: installation/ubuntu1604-notes.md
     - Ubuntu 14.04: installation/ubuntu1404.md
+    - Docker: installation/docker.md
     - Mac OS: installation/macos.md
     - Windows: installation/windows.md
     - Upgrading: upgrading/index.md
@@ -51,10 +57,12 @@ nav:
     - Overview: user-guide/index.md
   - Developers:
     - Introduction: developer-guide/index.md
+    - Release Process: developer-guide/release-process.md
     - Getting Started: developer-guide/getting-started.md
     - Contributing: developer-guide/contributing.md
     - Syncing a Fork: developer-guide/syncing-a-fork.md
     - Tagging a Release: developer-guide/tagging.md
+    - Troubleshooting: developer-guide/troubleshooting.md
   - REST API Guide:
     - Overview: api-guide/index.md
     - Getting Started: api-guide/getting-started.md
