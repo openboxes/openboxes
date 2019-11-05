@@ -17,7 +17,12 @@
                         </g:else>
                     </th>
                     <th class="center">
-                        ${warehouse.message(code: 'requisition.status.label')}
+                        <g:if test="${params.type=='OUTBOUND'}">
+                            ${warehouse.message(code: 'requisition.status.label')}
+                        </g:if>
+                        <g:else>
+                            ${warehouse.message(code: 'shipping.shipmentStatus.label')}
+                        </g:else>
                     </th>
                     <th class="center">
                         ${warehouse.message(code: 'default.code.label')}
@@ -74,23 +79,15 @@
                             </g:else>
                         </td>
                         <td class="center">
-                            <g:if test="${params.type=='OUTBOUND'}">
-                                ${item?.status}
-                            </g:if>
-                            <g:else>
-                                ${item?.currentStatus}
-                            </g:else>
+                            ${params.type=='OUTBOUND' ? item?.status : item?.currentStatus}
                         </td>
                         <td class="center">
-                            <g:if test="${params.type=='OUTBOUND'}">
-                                ${item?.requestNumber}
-                            </g:if>
-                            <g:else>
-                                ${item?.shipmentNumber}
-                            </g:else>
+                            <g:link controller="stockMovement" action="show" id="${params.type=='OUTBOUND' ? item?.id : item?.requisition.id }">
+                                ${params.type=='OUTBOUND' ? item?.requestNumber : item?.shipmentNumber }
+                            </g:link>
                         </td>
                         <td>
-                            <g:link controller="requisition" action="show" id="${item?.id }">
+                            <g:link controller="stockMovement" action="show" id="${params.type=='OUTBOUND' ? item?.id : item?.requisition.id }">
                                 ${item?.name }
                             </g:link>
                         </td>
