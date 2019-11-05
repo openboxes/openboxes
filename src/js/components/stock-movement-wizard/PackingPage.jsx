@@ -365,6 +365,7 @@ class PackingPage extends Component {
                 </button>
                 <button
                   type="button"
+                  disabled={invalid}
                   onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; })}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >
