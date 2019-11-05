@@ -81,7 +81,7 @@ const FIELDS = {
       'container.name': {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
-        label: 'react.partialReceiving.box.label',
+        label: 'react.partialReceiving.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '1',
         attributes: {
