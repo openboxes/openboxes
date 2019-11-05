@@ -387,10 +387,16 @@ class PackingPage extends Component {
                 debouncedUsersFetch: this.debouncedUsersFetch,
               }))}
               <div>
-                <button type="button" className="btn btn-outline-primary btn-form btn-xs" disabled={showOnly} onClick={() => this.savePackingData(values.packPageItems).then(() => this.props.previousPage(values))}>
+                <button
+                  type="button"
+                  className="btn btn-outline-primary btn-form btn-xs"
+                  disabled={showOnly || invalid}
+                  onClick={() => this.savePackingData(values.packPageItems)
+                    .then(() => this.props.previousPage(values))}
+                >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly}>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly || invalid}>
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
