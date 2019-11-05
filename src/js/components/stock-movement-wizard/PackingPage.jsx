@@ -138,6 +138,18 @@ const FIELDS = {
   },
 };
 
+function validate(values) {
+  const errors = {};
+  errors.packPageItems = [];
+
+  _.forEach(values.packPageItems, (item, key) => {
+    if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
+      errors.packPageItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
+    }
+  });
+  return errors;
+}
+
 /**
  * The fifth step of stock movement(for movements from a depot) where user can see the
  * packing information.
@@ -327,6 +339,7 @@ class PackingPage extends Component {
         onSubmit={values => this.nextPage(values)}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
+        validate={validate}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             { !showOnly ?
