@@ -8,6 +8,8 @@ import Router from './components/Router';
 
 import en from './en';
 import fr from './fr';
+import es from './es';
+import ar from './ar';
 import { fetchTranslations, fetchSessionInfo } from './actions';
 
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
@@ -34,11 +36,11 @@ class MainRouter extends React.Component {
 
     this.props.addTranslationForLanguage(en, 'en');
     this.props.addTranslationForLanguage(fr, 'fr');
-    this.props.addTranslationForLanguage(en, 'es');
+    this.props.addTranslationForLanguage(es, 'es');
     this.props.addTranslationForLanguage(en, 'pt');
     this.props.addTranslationForLanguage(en, 'it');
     this.props.addTranslationForLanguage(en, 'de');
-    this.props.addTranslationForLanguage(en, 'ar');
+    this.props.addTranslationForLanguage(ar, 'ar');
   }
 
   componentDidMount() {
