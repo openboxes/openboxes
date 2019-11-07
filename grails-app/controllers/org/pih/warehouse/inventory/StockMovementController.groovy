@@ -14,6 +14,7 @@ import grails.converters.JSON
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
@@ -147,7 +148,7 @@ class StockMovementController {
 
     def rollback = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (stockMovement?.requisition?.origin?.id != session.warehouse.id) {
+        if (stockMovement?.requisition?.origin?.id != session.warehouse.id && stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
             flash.error = "You are not able to rollback shipment from a location other than origin."
         } else {
             try {
@@ -165,7 +166,7 @@ class StockMovementController {
 
     def removeStockMovement = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (stockMovement?.requisition?.origin?.id != session.warehouse.id) {
+        if (stockMovement?.requisition?.origin?.id != session.warehouse.id && stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
             flash.error = "You are not able to delete stock movement from a location other than origin."
             if (params.show) {
                 redirect(action: "show", id: params.id)
