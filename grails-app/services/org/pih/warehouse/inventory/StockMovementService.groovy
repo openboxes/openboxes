@@ -578,13 +578,6 @@ class StockMovementService {
         }
     }
 
-    StockMovement getShipmentBasedStockMovement(Shipment shipment) {
-        StockMovement stockMovement = StockMovement.createFromShipment(shipment)
-        stockMovement.documents = getDocuments(stockMovement)
-        return stockMovement
-    }
-
-    StockMovement getRequisitionBasedStockMovement(Requisition requisition, String stepNumber) {
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
         stockMovement.documents = getDocuments(stockMovement)
         return stockMovement
