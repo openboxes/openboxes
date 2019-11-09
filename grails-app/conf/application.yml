@@ -146,6 +146,9 @@ grails:
                 preprocess: true
         javascript:
             library: jquery
+    databinding:
+        dateFormats:
+            - 'MM/dd/yyyy'
 endpoints:
     jmx:
         unique-names: true
