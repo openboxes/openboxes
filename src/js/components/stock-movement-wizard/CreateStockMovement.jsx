@@ -260,7 +260,7 @@ class CreateStockMovement extends Component {
           { value: { id: stocklist.id, name: stocklist.name }, label: stocklist.name }
         ));
 
-        const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));
+        const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist'));
 
         if (stocklistChanged && clearStocklist) {
           clearStocklist();
@@ -293,10 +293,10 @@ class CreateStockMovement extends Component {
         name: '',
         description: values.description,
         dateRequested: values.dateRequested,
-        'origin.id': values.origin.id,
-        'destination.id': values.destination.id,
-        'requestedBy.id': values.requestedBy.id,
-        'stocklist.id': _.get(values.stocklist, 'id') || '',
+        origin: values.origin.id,
+        destination: values.destination.id,
+        requestedBy: values.requestedBy.id,
+        stocklist: _.get(values.stocklist, 'id') || '',
       };
 
       apiClient.post(stockMovementUrl, payload)
