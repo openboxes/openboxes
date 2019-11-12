@@ -173,7 +173,7 @@ class StockMovementController {
         boolean isDestination = stockMovement?.requisition?.destination?.id == session.warehouse.id
         boolean canManageInventory = stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)
         if (!((canManageInventory && isOrigin) || (!canManageInventory && isDestination))) {
-            flash.error = "You are not able to delete stock movement from a your location."
+            flash.error = "You are not able to delete stock movement from your location."
             if (params.show) {
                 return redirect(action: "show", id: params.id)
             }
