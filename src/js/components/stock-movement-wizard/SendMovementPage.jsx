@@ -490,18 +490,21 @@ class SendMovementPage extends Component {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { rollback: true };
 
-    if (this.props.currentLocationId !== values.origin.id) {
-      this.props.hideSpinner();
-      Alert.error(this.props.translate(
-        'react.stockMovement.alert.rollbackShipment.label',
-        'You are not able to rollback shipment from a location other than origin.',
-      ));
-    } else {
+    const isOrigin = this.props.currentLocationId === values.origin.id;
+    const isDestination = this.props.currentLocationId === values.destination.id;
+
+    if ((values.hasManageInventory && isOrigin) || (!values.hasManageInventory && isDestination)) {
       apiClient.post(url, payload)
         .then(() => {
           this.props.hideSpinner();
           window.location.reload();
         });
+    } else {
+      this.props.hideSpinner();
+      Alert.error(this.props.translate(
+        'react.stockMovement.alert.rollbackShipment.label',
+        'You are not able to rollback shipment from your location.',
+      ));
     }
   }
 
