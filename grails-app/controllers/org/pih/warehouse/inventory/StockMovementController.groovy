@@ -148,9 +148,10 @@ class StockMovementController {
 
     def rollback = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (stockMovement?.requisition?.origin?.id != session.warehouse.id && stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
-            flash.error = "You are not able to rollback shipment from a location other than origin."
-        } else {
+        boolean isOrigin = stockMovement?.requisition?.origin?.id == session.warehouse.id
+        boolean isDestination = stockMovement?.requisition?.destination?.id == session.warehouse.id
+        boolean canManageInventory = stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)
+        if ((canManageInventory && isOrigin) || (!canManageInventory && isDestination)) {
             try {
                 stockMovementService.rollbackStockMovement(params.id)
                 flash.message = "Successfully rolled back stock movement with ID ${params.id}"
@@ -158,6 +159,8 @@ class StockMovementController {
                 log.warn("Unable to rollback stock movement with ID ${params.id}: " + e.message)
                 flash.message = "Unable to rollback stock movement with ID ${params.id}: " + e.message
             }
+        } else {
+            flash.error = "You are not able to rollback shipment from your location."
         }
 
         redirect(action: "show", id: params.id)
@@ -166,8 +169,11 @@ class StockMovementController {
 
     def removeStockMovement = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (stockMovement?.requisition?.origin?.id != session.warehouse.id && stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
-            flash.error = "You are not able to delete stock movement from a location other than origin."
+        boolean isOrigin = stockMovement?.requisition?.origin?.id == session.warehouse.id
+        boolean isDestination = stockMovement?.requisition?.destination?.id == session.warehouse.id
+        boolean canManageInventory = stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)
+        if (!((canManageInventory && isOrigin) || (!canManageInventory && isDestination))) {
+            flash.error = "You are not able to delete stock movement from a your location."
             if (params.show) {
                 return redirect(action: "show", id: params.id)
             }
