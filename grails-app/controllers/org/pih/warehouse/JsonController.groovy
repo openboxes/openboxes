@@ -30,6 +30,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.reporting.Indicator
@@ -1362,6 +1363,27 @@ class JsonController {
         Location location = command.location ?: Location.get(session.warehouse.id)
 
         Category category = command.category
+        List<Tag> tagList = []
+        List<ProductCatalog> catalogList = []
+
+        if (params.tags) {
+            params.tags.split(",").each { tagId ->
+                Tag tag = Tag.findById(tagId)
+                if (tag) {
+                    tagList << tag
+                }
+            }
+        }
+
+        if (params.catalogs) {
+            params.catalogs.split(",").each { catalogId ->
+                ProductCatalog catalog = ProductCatalog.findById(catalogId)
+                if (catalog) {
+                    catalogList << catalog
+                }
+            }
+        }
+
         if (!category) {
             category = productService.getRootCategory()
         }
@@ -1396,8 +1418,8 @@ class JsonController {
         }
 
         def data = (params.format == "text/csv") ?
-                inventorySnapshotService.getTransactionReportDetails(location, categories, startDate, endDate) :
-                inventorySnapshotService.getTransactionReportSummary(location, categories, startDate, endDate)
+                inventorySnapshotService.getTransactionReportDetails(location, categories, tagList, catalogList, startDate, endDate) :
+                inventorySnapshotService.getTransactionReportSummary(location, categories, tagList, catalogList, startDate, endDate)
 
         if (params.format == "text/csv") {
             String csv = dataService.generateCsv(data)

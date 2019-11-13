@@ -253,6 +253,8 @@ class ConsumptionController {
                         'Product code'      : row.product.productCode ?: '',
                         'Product'           : row.product.name,
                         'Category'          : row.product?.category?.name,
+                        'Formulary'         : row.product?.productCatalogsToString(),
+                        'Tag'               : row.product?.tagsToString(),
                         'UoM'               : row.product.unitOfMeasure ?: '',
                         'Qty transfer out'  : g.formatNumber(number: row.transferOutQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Count transfer out': g.formatNumber(number: row.transferOutTransactions.size(), format: '###.#', maxFractionDigits: 1) ?: '',

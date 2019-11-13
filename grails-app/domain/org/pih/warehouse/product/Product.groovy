@@ -482,6 +482,18 @@ class Product implements Comparable, Serializable {
         return tagsToString()?.contains(tag)
     }
 
+    Boolean hasOneOfTags(List<Tag> tagsInput) {
+        return tagsInput.find { tag ->
+           tags?.contains(tag)
+        }
+    }
+
+    Boolean hasOneOfCatalogs(List<ProductCatalog> catalogs) {
+        return catalogs.find { catalog ->
+            productCatalogs?.contains(catalog)
+        }
+    }
+
     /**
      * Converts product catalog association to string.
      *
