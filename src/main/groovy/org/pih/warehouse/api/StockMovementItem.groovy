@@ -105,6 +105,7 @@ class StockMovementItem {
         palletName(nullable: true)
         boxName(nullable: true)
         sortOrder(nullable: true)
+        substitutionItems(nullable: true)
     }
 
     String toString() {
