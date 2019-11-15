@@ -88,6 +88,15 @@ class StockMovement implements Validateable{
         driverName(nullable: true)
         comments(nullable: true)
         totalValue(nullable: true)
+        currentStatus nullable: true
+        editPage(nullable: true)
+        order(nullable: true)
+        pickPage(nullable: true)
+        requisition(nullable: true)
+        createdBy(nullable: true)
+        status(nullable: true)
+        packPage(nullable: true)
+        identifier(nullable: true)
     }
 
 
