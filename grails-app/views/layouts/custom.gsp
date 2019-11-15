@@ -345,7 +345,9 @@
             event.preventDefault();
 
             // Prevents dialog from opening if the link is supposed to be disabled
-            if ($(this).attr("disabled")) {
+            var disabled = $(this).data("disabled");
+            if (disabled) {
+              alert("Access denied");
               return false;
             }
 
