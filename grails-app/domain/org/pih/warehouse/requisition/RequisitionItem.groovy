@@ -146,6 +146,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         parentRequisitionItem(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
+        substitutionItem(nullable: true)
+        modificationItem(nullable: true)
     }
 
     static RequisitionItem createFromStockMovementItem(StockMovementItem stockMovementItem) {
