@@ -24,7 +24,7 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.util.DateUtil
+import org.pih.warehouse.DateUtil
 
 class RequisitionService {
 
