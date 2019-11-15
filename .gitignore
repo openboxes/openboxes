@@ -39,7 +39,11 @@ grails-app/views/partialReceiving/_create.gsp
 grails-app/views/common/_react.gsp
 grails-app/assets/javascripts/bundle*
 grails-app/assets/stylesheets/bundle*
-grails-app/assets/fonts/*
+grails-app/assets/images/*.eot
+grails-app/assets/images/*.svg
+grails-app/assets/images/*.woff
+grails-app/assets/images/*.woff2
+grails-app/assets/images/*.ttf
 docker/mysql
 docker/openboxes.war
 .gradle
