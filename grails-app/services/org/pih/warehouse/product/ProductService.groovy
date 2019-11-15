@@ -1104,17 +1104,17 @@ class ProductService {
                         ilike("ndc", "%" + term + "%")
                         ilike("unitOfMeasure", "%" + term + "%")
 
-                        productSuppliers {
-                            or {
-                                ilike("name", "%" + term + "%")
-                                ilike("code", "%" + term + "%")
-                                ilike("productCode", "%" + term + "%")
-                                ilike("manufacturerCode", "%" + term + "%")
-                                ilike("manufacturerName", "%" + term + "%")
-                                ilike("supplierCode", "%" + term + "%")
-                                ilike("supplierName", "%" + term + "%")
-                            }
-                        }
+//                        productSuppliers {
+//                            or {
+//                                ilike("name", "%" + term + "%")
+//                                ilike("code", "%" + term + "%")
+//                                ilike("productCode", "%" + term + "%")
+//                                ilike("manufacturerCode", "%" + term + "%")
+//                                ilike("manufacturerName", "%" + term + "%")
+//                                ilike("supplierCode", "%" + term + "%")
+//                                ilike("supplierName", "%" + term + "%")
+//                            }
+//                        }
 
                         inventoryItems {
                             ilike("lotNumber", "%" + term + "%")
