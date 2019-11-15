@@ -6,6 +6,7 @@ const DEST = path.resolve(__dirname, 'grails-app/assets');
 const ASSETS = path.resolve(ROOT, 'assets');
 const JS_DEST = path.resolve(__dirname, 'grails-app/assets/javascripts');
 const CSS_DEST = path.resolve(__dirname, 'grails-app/assets/stylesheets');
+const IMAGES_DEST = path.resolve(__dirname, 'grails-app/assets/images');
 const GRAILS_VIEWS = path.resolve(__dirname, 'grails-app/views');
 const COMMON_VIEW = path.resolve(GRAILS_VIEWS, 'common');
 const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
@@ -36,7 +37,12 @@ module.exports = {
       onEnd: {
         copy: [
           { source: `${DEST}/bundle.*.js`, destination: JS_DEST },
-          { source: `${DEST}/bundle.*.css`, destination: CSS_DEST }
+          { source: `${DEST}/bundle.*.css`, destination: CSS_DEST },
+          { source: `${DEST}/*.eot`, destination: IMAGES_DEST },
+          { source: `${DEST}/*.svg`, destination: IMAGES_DEST },
+          { source: `${DEST}/*.woff2`, destination: IMAGES_DEST },
+          { source: `${DEST}/*.ttf`, destination: IMAGES_DEST },
+          { source: `${DEST}/*.woff`, destination: IMAGES_DEST }
         ],
         delete: [
           `${DEST}/bundle.**`,
@@ -59,7 +65,7 @@ module.exports = {
       inject: false,
       templateParameters: compilation => ({
         jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${resource(dir:'grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
+        cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
         receivingIfStatement: '',
       }),
     }),
@@ -69,7 +75,7 @@ module.exports = {
       inject: false,
       templateParameters: compilation => ({
         jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${resource(dir:'grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
+        cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
         receivingIfStatement:
           // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
