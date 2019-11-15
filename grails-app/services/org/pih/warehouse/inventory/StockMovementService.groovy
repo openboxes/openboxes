@@ -52,7 +52,7 @@ class StockMovementService {
 
     def createStockMovement(StockMovement stockMovement) {
 
-        if (!stockMovement.validate(['dateRequested', 'description', 'destination', 'name', 'origin', 'requestedBy', 'stocklist'])) {
+        if (!stockMovement.validate()) {
             throw new ValidationException("Invalid stock movement", stockMovement.errors)
         }
         Requisition requisition = createRequisition(stockMovement)
