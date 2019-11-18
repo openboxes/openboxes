@@ -1657,15 +1657,15 @@ class StockMovementService {
 
         def lineItems = stockMovement.lineItems.collect {
             [
-                    requisitionItemId            : it?.id ?: "",
-                    "productCode (required)"     : it?.product?.productCode ?: "",
-                    productName                  : it?.product?.name ?: "",
-                    palletName                   : it?.palletName ?: "",
-                    boxName                      : it?.boxName ?: "",
-                    lotNumber                    : it?.lotNumber ?: "",
-                    "expirationDate (MM/dd/yyyy)": it?.expirationDate ? it?.expirationDate?.format("MM/dd/yyyy") : "",
-                    "quantity (required)"        : it?.quantityRequested ?: "",
-                    recipientId                  : it?.recipient?.id ?: ""
+                "Requisition item id"            : it?.id ?: "",
+                "Product code (required)"     : it?.product?.productCode ?: "",
+                "Product name"                  : it?.product?.name ?: "",
+                "Pack level 1"                   : it?.palletName ?: "",
+                "Pack level 2"                      : it?.boxName ?: "",
+                "Lot number"                    : it?.lotNumber ?: "",
+                "Expiration date (MM/dd/yyyy)": it?.expirationDate ? it?.expirationDate?.format("MM/dd/yyyy") : "",
+                "Quantity (required)"        : it?.quantityRequested ?: "",
+                "Recipient id"                  : it?.recipient?.id ?: ""
             ]
         }
         return lineItems
