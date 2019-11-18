@@ -1384,7 +1384,7 @@ class JsonController {
             throw new IllegalArgumentException("Start date must occur before end date")
         }
 
-        if (endDate.after(new Date())) {
+        if (endDate.after(new Date()+1)) {
             throw new IllegalArgumentException("End date must occur on or before today")
         }
 
