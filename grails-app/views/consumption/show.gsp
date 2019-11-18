@@ -37,6 +37,10 @@
                                     <th><warehouse:message code="product.productCode.label"/></th>
                                     <th><warehouse:message code="product.label"/></th>
                                     <th class="center"><warehouse:message code="consumption.issued.label" default="Issued"/></th>
+                                    <th class="center"><warehouse:message code="consumption.expired.label" default="Expired"/></th>
+                                    <th class="center"><warehouse:message code="consumption.damaged.label" default="Damaged"/></th>
+                                    <th class="center"><warehouse:message code="consumption.other.label" default="Other"/></th>
+                                    <th class="center"><warehouse:message code="consumption.total.label" default="Total"/></th>
                                     <th class="center"><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
                                     <th class="center"><warehouse:message code="consumption.weekly.label" default="Weekly"/></th>
                                     <th class="center"><warehouse:message code="consumption.daily.label" default="Daily"/></th>
@@ -75,6 +79,18 @@
                                         </td>
                                         <td class="center">
                                             <div class="debit">${row.transferOutQuantity}</div>
+                                        </td>
+                                        <td class="center">
+                                            <div class="debit">${row.expiredQuantity}</div>
+                                        </td>
+                                        <td class="center">
+                                            <div class="debit">${row.damagedQuantity}</div>
+                                        </td>
+                                        <td class="center">
+                                            <div class="debit">${row.otherQuantity}</div>
+                                        </td>
+                                        <td class="center">
+                                            ${row.transferBalance}
                                         </td>
                                         <td class="center">
                                             <g:formatNumber number="${row.monthlyQuantity}" maxFractionDigits="0"/>

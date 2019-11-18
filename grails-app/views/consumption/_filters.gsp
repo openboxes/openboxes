@@ -100,7 +100,7 @@
                 <div class="filter-list-item">
                         <label><warehouse:message code="consumption.transactionTypes.label" default="Transaction Types"/></label>
                         <g:selectTransactionType name="selectedTransactionTypes" from="${command?.transactionTypes}"
-                                                 transactionCode="${org.pih.warehouse.inventory.TransactionCode.DEBIT}"
+
                                                  multiple="true" class="chzn-select-deselect"
                                                  value="${command?.selectedTransactionTypes?.id}"/>
                     </div>
@@ -163,11 +163,11 @@
                     <div class="buttons">
                         <button class="button">
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'cog_go.png')}" />
-                            <warehouse:message code="default.button.run.label" default="Run"/>
+                            <warehouse:message code="report.runReport.label" default="Run Report"/>
                         </button>
 
                         <g:link controller="consumption" action="show" class="button">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_undo.png')}" />
+                            <img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_refresh.png')}" />
                             ${warehouse.message(code:'default.button.reset.label', default: 'Reset')}
                         </g:link>
                     </div>
