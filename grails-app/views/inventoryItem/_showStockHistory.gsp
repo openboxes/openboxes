@@ -94,7 +94,7 @@
           });
         });
 
-        $('.monthRow').on('click', function() {
+        $('.monthRow:not(.dataRow)').on('click', function() {
           $(this).children().toggleClass("active");
           var dataRows = getDataRows($(this));
           $.each(dataRows, function() {
