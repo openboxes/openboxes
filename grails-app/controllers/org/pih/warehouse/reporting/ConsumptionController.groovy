@@ -52,7 +52,13 @@ class ConsumptionController {
             command.selectedTags = []
             command.selectedLocations = []
             command.selectedCategories = []
-            command.selectedTransactionTypes = []
+            //command.selectedTransactionTypes = []
+
+            String[] defaultTransactionTypeIds = [Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID, Constants.CONSUMPTION_TRANSACTION_TYPE_ID]
+            command.defaultTransactionTypes = defaultTransactionTypeIds.collect {
+                TransactionType.get(it)
+            }
+
             if (params.format == "csv") {
                 params.remove("format")
                 flash.message = "Unable to download CSV as parameters have changed. Please try download again."
@@ -414,6 +420,7 @@ class ShowConsumptionCommand {
     List<Location> toLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
     List<TransactionType> transactionTypes = []
     List<TransactionType> selectedTransactionTypes = []
+    List<TransactionType> defaultTransactionTypes = []
     List<String> selectedDates = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class))
     List<Location> selectedLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
     List<Category> selectedCategories = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class))
