@@ -25,8 +25,8 @@ class AdjustStockCommand {
     String comment
 
     static constraints = {
-        currentQuantity(nullable: false, min: 0)
-        newQuantity(nullable: false, min: 0)
+        currentQuantity(nullable: false)
+        newQuantity(nullable: false)
         inventoryItem(nullable: false)
         location(nullable: false)
         binLocation(nullable: true)
