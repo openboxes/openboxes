@@ -9,7 +9,7 @@
 
 ### System Requirements
 * Internet connection (recommended)
-* 2GB RAM (minimum), 4GB RAM (recommended)
+* 4GB RAM (minimum), 8GB RAM (recommended)
 * 25GB disk storage (minimum)
 
 ### Software Requirements

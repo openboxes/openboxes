@@ -37,7 +37,7 @@
             </tr>
             <tr class="prop">
                 <td class="name">
-                    <label><warehouse:message code="transaction.destination.label"/> <br/><span class="fade">(optional)</span></label>
+                    <label class="fade"><warehouse:message code="transaction.destination.label"/></label>
                 </td>
                 <td class="value">
                     <g:selectTransactionDestination name="destination.id" noSelection="['':'']" class="chzn-select-deselect"/>
@@ -53,7 +53,7 @@
             </tr>
             <tr class="prop">
                 <td class="name">
-                    <label><warehouse:message code="transaction.comment.label"/></label>
+                    <label class="fade"><warehouse:message code="transaction.comment.label"/></label>
                 </td>
                 <td class="value">
                     <span class="value">
@@ -159,9 +159,9 @@
 							</tbody>
 
 						</table>
-					</div>	
+					</div>
 				</td>
-			</tr>		
+			</tr>
 			<tr class="prop">
 				<td></td>
 				<td>
@@ -176,7 +176,7 @@
 					</div>
 				</td>
 			</tr>
-		</table>				
+		</table>
 	</g:form>
 </div>
 
@@ -240,15 +240,15 @@
 
 		/**
 		 * Delete a row from the table.
-		 */		
+		 */
 		$(".delete").click(function(event) {
-			$(this).closest('tr').fadeTo(400, 0, function () { 
+			$(this).closest('tr').fadeTo(400, 0, function () {
 		        $(this).remove();
 		        renameRowFields($("#inventoryConsumedTable"));
-		        alternateRowColors("#inventoryConsumedTable");				
+		        alternateRowColors("#inventoryConsumedTable");
 		    });
 		    return false;
-		});			
+		});
 	});
 
     function reloadQuantity(id) {

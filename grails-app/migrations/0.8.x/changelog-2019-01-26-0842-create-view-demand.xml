@@ -20,31 +20,31 @@
                 quantity_approved,
                 quantity_change_approved,
                 quantity_substitution_approved,
-                IF(quantity_approved = 0,
+                IF(quantity_approved != quantity_requested,
                     quantity_canceled,
                     quantity_approved) AS quantity_demand,
                 cancel_reason_code
             FROM
                 (SELECT
                     request_status,
-                        request_number,
-                        date_requested,
-                        origin_id,
-                        origin_name,
-                        destination_id,
-                        destination_name,
-                        product_id,
-                        product_code,
-                        product_name,
-                        quantity_requested,
-                        quantity_canceled,
-                        IFNULL(quantity_change_approved, IFNULL(quantity_substitution_approved, quantity_approved)) AS quantity_approved,
-                        quantity_change_approved,
-                        quantity_substitution_approved,
-                        cancel_reason_code
+                    request_number,
+                    date_requested,
+                    origin_id,
+                    origin_name,
+                    destination_id,
+                    destination_name,
+                    product_id,
+                    product_code,
+                    product_name,
+                    quantity_requested,
+                    quantity_canceled,
+                    IFNULL(quantity_change_approved, IFNULL(quantity_substitution_approved, quantity_approved)) AS quantity_approved,
+                    quantity_change_approved,
+                    quantity_substitution_approved,
+                    cancel_reason_code
                 FROM
                     (SELECT
-                    requisition.status AS request_status,
+                        requisition.status AS request_status,
                         requisition.request_number,
                         requisition.date_requested AS date_requested,
                         origin.id AS origin_id,
@@ -58,8 +58,10 @@
                         cancel_reason_code,
                         cancel_comments,
                         quantity AS quantity_requested,
-                        IF(requisition_item.cancel_reason_code IN ('SUBSTITUTION' , 'STOCKOUT', 'LOW_STOCK', 'EXPIRED', 'COULD_NOT_LOCATE'), quantity_canceled, 0) AS quantity_canceled,
-                        IF(quantity_canceled IS NOT NULL, 0, quantity) AS quantity_approved,
+                        IF(requisition_item.cancel_reason_code IN ('SUBSTITUTION' , 'STOCKOUT', 'LOW_STOCK', 'EXPIRED', 'COULD_NOT_LOCATE'), quantity_canceled, 0)
+                            AS quantity_canceled,
+                        IF(quantity_canceled IS NOT NULL, 0, quantity)
+                            AS quantity_approved,
                         (SELECT
                                 SUM(quantity_approved)
                             FROM

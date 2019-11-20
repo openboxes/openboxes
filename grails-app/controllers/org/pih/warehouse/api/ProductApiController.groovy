@@ -20,6 +20,7 @@ class ProductApiController extends BaseDomainApiController {
     def productService
     def inventoryService
     def forecastingService
+    def grailsApplication
 
     def demand = {
         def product = Product.get(params.id)

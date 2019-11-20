@@ -12,6 +12,7 @@ package org.pih.warehouse
 import grails.plugin.springcache.annotations.Cacheable
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.Person
@@ -220,7 +221,7 @@ class SelectTagLib {
             it?.name?.toLowerCase()
         }
         attrs.optionKey = 'id'
-        attrs.optionValue = { it.name + " (" + it.origin.name + " to " + it.destination.name + ")" }
+        attrs.optionValue = { it.shipmentNumber + " " + it.name + " - " + it.shipmentItemCount + " items" + " (" + it.origin.name + " to " + it.destination.name + ")" }
         out << g.select(attrs)
     }
 
@@ -347,12 +348,29 @@ class SelectTagLib {
     }
 
     def selectTransactionType = { attrs, body ->
-        if (attrs.transactionCode) {
-            attrs.from = TransactionType.findAllByTransactionCode(attrs.transactionCode)
-        } else {
-            attrs.from = TransactionType.list()
 
+        List transactionTypes = (attrs.transactionCode) ?
+                TransactionType.findAllByTransactionCode(attrs.transactionCode) : TransactionType.list()
+
+        // FIXME Once we tie the activity code to the transaction type I think this will be more elegant
+        Location location = Location.get(session.warehouse.id)
+        def disabledTransactionTypes = []
+        if (!location.supports(ActivityCode.CONSUME_STOCK)) {
+            disabledTransactionTypes.add(Constants.CONSUMPTION_TRANSACTION_TYPE_ID)
         }
+        if (!location.supports(ActivityCode.ADJUST_INVENTORY)) {
+            disabledTransactionTypes.add(Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID)
+            disabledTransactionTypes.add(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
+        }
+        if (!location.supports(ActivityCode.SEND_STOCK)) {
+            disabledTransactionTypes.add(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+        }
+        if (!disabledTransactionTypes.empty) {
+            disabledTransactionTypes = transactionTypes.findAll { it.id in disabledTransactionTypes }
+            transactionTypes.removeAll(disabledTransactionTypes)
+        }
+
+        attrs.from = transactionTypes
         attrs.optionKey = 'id'
         attrs.optionValue = { format.metadata(obj: it?.name) }
         out << g.select(attrs)

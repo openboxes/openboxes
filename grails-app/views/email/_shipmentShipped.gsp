@@ -115,7 +115,29 @@
                             </td>
                             <td class="value">
                                 ${userInstance?.name }
-                                <a href="mailto:${userInstance?.email }">${userInstance?.email }</a>
+                                <a href="mailto:${userInstance?.email}">${userInstance?.email}</a>
+                            </td>
+                        </tr>
+                    </g:if>
+                    <g:if test="${shipmentInstance?.createdBy}">
+                        <tr class="prop">
+                            <td class="name">
+                                <label>${warehouse.message(code: 'default.createdBy.label') }</label>
+                            </td>
+                            <td class="value">
+                                ${shipmentInstance?.createdBy?.name }
+                                <a href="mailto:${shipmentInstance?.createdBy?.email}">${shipmentInstance?.createdBy?.email}</a>
+                            </td>
+                        </tr>
+                    </g:if>
+                    <g:if test="${shipmentInstance?.updatedBy}">
+                        <tr class="prop">
+                            <td class="name">
+                                <label>${warehouse.message(code: 'default.updatedBy.label') }</label>
+                            </td>
+                            <td class="value">
+                                ${shipmentInstance?.createdBy?.name }
+                                <a href="mailto:${shipmentInstance?.updatedBy?.email}">${shipmentInstance?.updatedBy?.email}</a>
                             </td>
                         </tr>
                     </g:if>

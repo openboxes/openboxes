@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'request.label', default: 'Requisition')}" />
-        <title><warehouse:message code="default.fulfill.label" default="Fulfill {0}" args="[entityName]" /></title>       
+        <title><warehouse:message code="default.fulfill.label" default="Fulfill {0}" args="[entityName]" /></title>
     </head>
     <body>
         <div class="body">
@@ -15,9 +15,9 @@
 				<div class="errors">
 					<g:renderErrors bean="${requisition}" as="list" />
 				</div>
-			</g:hasErrors>            
-			
-            
+			</g:hasErrors>
+
+
 			<g:render template="summary" model="[requisition:requisition]"/>
 
             <g:if test="${requisition.status == RequisitionStatus.ISSUED || requisition.status == RequisitionStatus.CANCELED}">
@@ -80,6 +80,7 @@
                                 <tr class="odd">
                                     <th></th>
                                     <th><warehouse:message code="product.label"/></th>
+                                    <th><warehouse:message code="location.binLocation.label"/></th>
                                     <th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
                                     <th><warehouse:message code="default.quantity.label"/></th>
                                     <th><warehouse:message code="product.unitOfMeasure.label"/></th>
@@ -94,6 +95,9 @@
                                         <td>
                                             ${picklistItem?.inventoryItem?.product?.productCode }
                                             ${picklistItem?.inventoryItem?.product }
+                                        </td>
+                                        <td>
+                                            ${picklistItem?.binLocation?.name }
                                         </td>
                                         <td>
                                             ${picklistItem?.inventoryItem?.lotNumber }
@@ -113,34 +117,32 @@
                                                 <warehouse:message code="picklistItems.empty.label" default="Picklist is empty"/>
                                             </div>
                                         </td>
-
                                     </tr>
-
                                 </g:unless>
                                 </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="buttons center">
+                                            <g:link controller="requisition" action="confirm" id="${requisition.id }" class="button">
+                                                <warehouse:message code="default.button.back.label"/>
+                                            </g:link>
+                                            <g:if test="${requisition.status == RequisitionStatus.ISSUED || requisition.status == RequisitionStatus.CANCELED}">
+
+                                            </g:if>
+                                            <g:else>
+                                                <g:submitButton name="finish" value="Finish" class="button">
+                                                    <warehouse:message code="default.button.finish.label"/>
+                                                </g:submitButton>
+                                            </g:else>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tfoot>
                             </table>
                         </div>
-
-
-                        <div class="buttons center">
-                            <g:link controller="requisition" action="confirm" id="${requisition.id }" class="button">
-                                <warehouse:message code="default.button.back.label"/>
-                            </g:link>
-                            <g:if test="${requisition.status == RequisitionStatus.ISSUED || requisition.status == RequisitionStatus.CANCELED}">
-
-                            </g:if>
-                            <g:else>
-                                <g:submitButton name="finish" value="Finish" class="button">
-                                    <warehouse:message code="default.button.finish.label"/>
-                                </g:submitButton>
-                            </g:else>
-                        </div>
-
                     </g:form>
-
-					               
 				</div>
-
             </div>
         </div>
     </body>

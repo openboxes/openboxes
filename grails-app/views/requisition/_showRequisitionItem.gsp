@@ -31,17 +31,17 @@
     <td class="middle">
         <div class="tag ${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick() ? 'tag-danger' :
                 requisitionItem.isSubstituted() || requisitionItem.isReduced() ? 'tag-warning' : 'tag-alert'}">
-            <g:if test="${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick()}">
-                <g:message code="enum.RequisitionItemStatus.CANCELED"/>
+            <g:if test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
+                <format:metadata obj="${requisitionItem?.requisition?.status}"/>
             </g:if>
+            <g:elseif test="${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick()}">
+                <g:message code="enum.RequisitionItemStatus.CANCELED"/>
+            </g:elseif>
             <g:elseif test="${requisitionItem.isReduced()}">
                 <g:message code="enum.RequisitionItemStatus.REDUCED"/>
             </g:elseif>
             <g:elseif test="${requisitionItem.isIncreased()}">
                 <g:message code="enum.RequisitionItemStatus.INCREASED"/>
-            </g:elseif>
-            <g:elseif test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
-                <format:metadata obj="${requisitionItem?.requisition?.status}"/>
             </g:elseif>
             <g:else>
                 <format:metadata obj="${requisitionItem?.status}"/>
@@ -179,26 +179,28 @@
         </g:else>
 
     </td>
-    <td class="middle center">
-        <g:if test="${requisitionItem?.isSubstituted()}">
-            <div>
-                ${requisitionItem?.substitutionItem?.calculateQuantityRemaining()?:0}
-            </div>
-        </g:if>
-        <g:elseif test="${requisitionItem?.isCanceled()}">
-            <div class="canceled">
+    <g:if test="${!requestTab}">
+        <td class="middle center">
+            <g:if test="${requisitionItem?.isSubstituted()}">
+                <div>
+                    ${requisitionItem?.substitutionItem?.calculateQuantityRemaining()?:0}
+                </div>
+            </g:if>
+            <g:elseif test="${requisitionItem?.isCanceled()}">
+                <div class="canceled">
+                    ${requisitionItem?.calculateQuantityRemaining()?:0}
+                </div>
+            </g:elseif>
+            <g:elseif test="${requisitionItem?.isChanged()}">
+                <div>
+                    ${requisitionItem?.modificationItem?.calculateQuantityRemaining()?:0}
+                </div>
+            </g:elseif>
+            <g:else>
                 ${requisitionItem?.calculateQuantityRemaining()?:0}
-            </div>
-        </g:elseif>
-        <g:elseif test="${requisitionItem?.isChanged()}">
-            <div>
-                ${requisitionItem?.modificationItem?.calculateQuantityRemaining()?:0}
-            </div>
-        </g:elseif>
-        <g:else>
-            ${requisitionItem?.calculateQuantityRemaining()?:0}
-        </g:else>
-    </td>
+            </g:else>
+        </td>
+    </g:if>
     <g:if test="${requestTab}">
         <td class="middle center">
             <g:if test="${requisitionItem?.isCanceled()}">
@@ -231,7 +233,7 @@
             </g:else>
         </td>
         <td class="middle center">
-            <g:set var="pickReasonCode" value="${requisitionItem?.pickReasonCode}"/>
+            <g:set var="pickReasonCode" value="${requisitionItem?.modificationItem?.pickReasonCode ?: requisitionItem?.substitutionItem?.pickReasonCode ?: requisitionItem?.pickReasonCode}"/>
             <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
                 <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}
 ${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}">

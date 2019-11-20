@@ -1907,12 +1907,6 @@ div#dashboard li {
     background-color: #eee;
 }
 
-.header td {
-    background-color: #eee;
-    border-top: 3px solid lightgrey;
-    font-weight: bold;
-    color: #666
-}
 
 .indent {
     text-indent: 15px;

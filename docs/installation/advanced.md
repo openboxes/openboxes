@@ -1,4 +1,3 @@
-# Advanced
 Now that you have OpenBoxes running on Tomcat you might have noticed that you need to access
 the server using an IP address over port 8080. That doesn't seem great. On top of that the 
 connection is not secure ()

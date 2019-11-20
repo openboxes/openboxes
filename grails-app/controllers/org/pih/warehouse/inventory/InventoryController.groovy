@@ -17,6 +17,7 @@ import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -253,36 +254,28 @@ class InventoryController {
     def search = { QuantityOnHandReportCommand command ->
         def quantityMapByDate = [:]
         def startTime = System.currentTimeMillis()
-        println "search " + params
-
-        println "Locations: " + command?.locations?.toString() + ", Start date = " + command?.startDate + ", End Date = " + command?.endDate + ", Tag: " + command.tags
-
+        def startDate = command.startDate
+        def endDate = command.endDate
         if (command.validate()) {
-
             if (!command?.locations) {
                 command.locations = [Location.get(session?.warehouse?.id)]
             }
-
             if (command.startDate && command.endDate) {
-                command.dates = getDatesBetween(command.startDate, command.endDate, command.frequency)
-                println "dates : " + command?.dates
+                command.dates = getDatesBetween(startDate, endDate, command.frequency)
             } else if (command.startDate) {
-                command?.dates << command?.startDate
+                command?.dates << startDate
             } else if (command.endDate) {
-                command?.dates << command?.endDate
+                command?.dates << endDate
             }
-
-            println "dates: " + command?.dates
 
             command.locations.each { location ->
                 for (date in command?.dates) {
                     println "Get quantity map " + date + " location = " + location
-                    def quantityMap = [:]
                     def revisedDate = date
                     use(TimeCategory) {
                         revisedDate = revisedDate.plus(1.day)
                     }
-                    quantityMap = inventoryService.getQuantityOnHandAsOfDate(location, revisedDate, command.tags)
+                    def quantityMap = inventorySnapshotService.getQuantityOnHandByProduct(location, revisedDate)
                     def existingQuantityMap = quantityMapByDate[date]
                     if (existingQuantityMap) {
                         quantityMapByDate[date] = mergeQuantityMap(existingQuantityMap, quantityMap)
@@ -295,11 +288,7 @@ class InventoryController {
             }
 
 
-            def keys = quantityMapByDate[command.dates[0]]?.keySet()?.sort()
-            println "keys: " + keys
-            keys.each { product ->
-                command.products << product
-            }
+            command.products = quantityMapByDate[command.dates[0]]?.keySet()?.sort()
         }
 
         if (params.button == 'download') {
@@ -1035,21 +1024,37 @@ class InventoryController {
     }
 
     def createInboundTransfer = {
+        Location location = Location.get(session.warehouse.id)
+        if (!location.supports(ActivityCode.RECEIVE_STOCK)) {
+            throw new UnsupportedOperationException("Location ${location.name} does not support receipt transactions")
+        }
         params.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params: params)
     }
 
     def createOutboundTransfer = {
+        Location location = Location.get(session.warehouse.id)
+        if (!location.supports(ActivityCode.SEND_STOCK)) {
+            throw new UnsupportedOperationException("Location ${location.name} does not support transfer transactions")
+        }
         params.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params: params)
     }
 
     def createAdjustment = {
+        Location location = Location.get(session.warehouse.id)
+        if (!location.supports(ActivityCode.ADJUST_INVENTORY)) {
+            throw new UnsupportedOperationException("Location ${location.name} does not support adjustment transactions")
+        }
         params.transactionType = TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params: params)
     }
 
     def createConsumed = {
+        Location location = Location.get(session.warehouse.id)
+        if (!location.supports(ActivityCode.CONSUME_STOCK)) {
+            throw new UnsupportedOperationException("Location ${location.name} does not support consumption transactions")
+        }
         params.transactionType = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID)
         forward(action: "createTransaction", params: params)
     }

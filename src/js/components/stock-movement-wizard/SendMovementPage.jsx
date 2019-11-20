@@ -485,16 +485,27 @@ class SendMovementPage extends Component {
    * Rollback stock movement if it has been shipped
    * @public
    */
-  rollbackStockMovement() {
+  rollbackStockMovement(values) {
     this.props.showSpinner();
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { rollback: true };
 
-    return apiClient.post(url, payload)
-      .then(() => {
-        this.props.hideSpinner();
-        window.location.reload();
-      });
+    const isOrigin = this.props.currentLocationId === values.origin.id;
+    const isDestination = this.props.currentLocationId === values.destination.id;
+
+    if ((values.hasManageInventory && isOrigin) || (!values.hasManageInventory && isDestination)) {
+      apiClient.post(url, payload)
+        .then(() => {
+          this.props.hideSpinner();
+          window.location.reload();
+        });
+    } else {
+      this.props.hideSpinner();
+      Alert.error(this.props.translate(
+        'react.stockMovement.alert.rollbackShipment.label',
+        'You are not able to rollback shipment from your location.',
+      ));
+    }
   }
 
   render() {
@@ -529,6 +540,7 @@ class SendMovementPage extends Component {
                       buttonTitle={document.name}
                       {...document}
                       key={idx}
+                      onClick={() => this.saveValues(values)}
                     />);
                   })}
                   <div className="dropzone btn btn-outline-secondary">
@@ -614,7 +626,7 @@ class SendMovementPage extends Component {
                 {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
                   <button
                     type="submit"
-                    onClick={() => { this.rollbackStockMovement(); }}
+                    onClick={() => { this.rollbackStockMovement(values); }}
                     className="btn btn-outline-success float-right btn-xs"
                     disabled={invalid || !(values.statusCode === 'ISSUED') || showOnly}
                   >
@@ -624,8 +636,8 @@ class SendMovementPage extends Component {
                 <table className="table table-striped text-center border my-2 table-xs">
                   <thead>
                     <tr>
-                      <th><Translate id="react.stockMovement.pallet.label" defaultMessage="Pallet" /> </th>
-                      <th><Translate id="react.stockMovement.box.label" defaultMessage="Box" /> </th>
+                      <th><Translate id="react.stockMovement.packLevel1.label" defaultMessage="Pack level 1" /> </th>
+                      <th><Translate id="react.stockMovement.packLevel2.label" defaultMessage="Pack level 2" /> </th>
                       <th><Translate id="react.stockMovement.code.label" defaultMessage="Code" /> </th>
                       <th><Translate id="react.stockMovement.productName.label" defaultMessage="Product name" /> </th>
                       <th><Translate id="react.stockMovement.lot.label" defaultMessage="Lot" /> </th>
@@ -687,7 +699,7 @@ class SendMovementPage extends Component {
                 {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
                   <button
                     type="submit"
-                    onClick={() => { this.rollbackStockMovement(); }}
+                    onClick={() => { this.rollbackStockMovement(values); }}
                     className="btn btn-outline-success float-right  btn-xs"
                     disabled={invalid || !(values.statusCode === 'ISSUED') || showOnly}
                   >

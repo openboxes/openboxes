@@ -271,13 +271,10 @@ class DashboardService {
         def csvWriter = new CSVWriter(sw, {
             "Product Code" { it.productCode }
             "Name" { it.name }
-            "Bin Location" { it.binLocation }
             "ABC" { it.abcClass }
             "Most Recent Stock Count" { it.latestInventoryDate }
             "QoH" { it.quantityOnHand }
             "Unit of Measure" { it.unitOfMeasure }
-            "Date Created" { it.dateCreated }
-            "Date Updated" { it.lastUpdated }
         })
 
         products.each { product ->
@@ -287,11 +284,8 @@ class DashboardService {
                     name               : product.name,
                     unitOfMeasure      : product.unitOfMeasure ?: "",
                     abcClass           : inventoryLevelMap[product]?.abcClass ?: "",
-                    binLocation        : inventoryLevelMap[product]?.binLocation ?: "",
                     latestInventoryDate: latestInventoryDate ? "${formatDate.format(latestInventoryDate)}" : "",
-                    quantityOnHand     : quantityMap[product] ?: "",
-                    dateCreated        : product.dateCreated ? "${formatDate.format(product.dateCreated)}" : "",
-                    lastUpdated        : product.lastUpdated ? "${formatDate.format(product.lastUpdated)}" : "",
+                    quantityOnHand     : quantityMap[product] ?: ""
             ]
             csvWriter << row
         }

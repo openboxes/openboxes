@@ -26,7 +26,7 @@
 
             <div class="box">
                 <h2 class="middle"><g:message code="default.filters.label"/></h2>
-                <g:form controller="report" action="showBinLocationReport" method="GET">
+                <g:form name="showBinLocationReportForm" controller="report" action="showBinLocationReport" method="GET">
                     <div class="filters">
                         <div class="prop">
                             <div class="filter-list-item">
@@ -41,11 +41,32 @@
                                     noSelection="['':g.message(code:'default.all.label')]" data-placeholder=" " />
                             </div>
                         </div>
-
                         <div class="buttons">
-
-                            <button name="button" value="run" class="button"><g:message code="default.button.run.label"/></button>
-                            <button name="button" value="download" class="button"><g:message code="default.button.download.label"/></button>
+                            <button name="button" value="run" class="button">
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />&nbsp;
+                                <g:message code="report.runReport.label"/>
+                            </button>
+                            <span class="action-menu" style="margin-left: 15px">
+                                <button class="action-btn button">
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" />&nbsp;
+                                    ${warehouse.message(code: 'default.button.download.label')}
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                                </button>
+                                <div class="actions">
+                                    <div class="action-menu-item">
+                                        <a href="#" class="download-btn" data-download-action="downloadStockReport">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
+                                            <g:message code="default.download.label" args="[g.message(code: 'default.report.label', default: 'Report')]"/>
+                                        </a>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <a href="#" class="download-btn" data-download-action="downloadStockMovement">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
+                                            <g:message code="default.download.label" args="[g.message(code: 'stockMovement.label')]"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </span>
                         </div>
                     </div>
                 </g:form>
@@ -78,7 +99,7 @@
                                 <th class="center"><g:message code="inventoryItem.expirationDate.label"/></th>
                                 <th class="center"><g:message code="default.quantity.label"/></th>
                                 <th class="center"><g:message code="default.uom.label"/></th>
-                                <th class="center"><g:message code="productSupplier.unitCost.label"/></th>
+                                <th class="center"><g:message code="product.unitCost.label"/></th>
                                 <th class="center"><g:message code="product.totalValue.label"/></th>
                             </tr>
                         </thead>
@@ -88,17 +109,37 @@
         </div>
     </div>
 </div>
+<div class="loading">Loading...</div>
 <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>
 <script>
     $(document).ready(function() {
 
+        $(".download-btn").click(function(event){
+          console.log(event);
+          console.log($(this));
+            event.preventDefault();
+            $(".loading").show();
+            try {
+                var action = $(this).data("download-action");
+                var formField = $("<input>").attr({id: "downloadActionInput", "type": "hidden", name: "downloadAction", value: action});
+                console.log($("form[name='showBinLocationReportForm']"));
+                $("form[name='showBinLocationReportForm']").append(formField).submit();
+                $("#downloadActionInput").remove();
+
+            } finally {
+                $(".loading").hide();
+            }
+        });
+
         $('#binLocationReportTable').dataTable( {
-            "bProcessing": true,
+            "bProcessing": false,
             "sServerMethod": "GET",
             "iDisplayLength": 25,
             "bSearch": false,
             "bScrollCollapse": true,
+            "bScrollInfinite": true,
             "bJQueryUI": true,
+            "sScrollY": 500,
             "bAutoWidth": true,
             "sPaginationType": "full_numbers",
             "sAjaxSource": "${request.contextPath}/json/getBinLocationReport",
@@ -109,7 +150,6 @@
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 console.log("fnServerData", aoData);
-                aoData.push( { "name": "test1", "value": "value1" } );
                 $.ajax( {
                     "dataType": 'json',
                     "type": "GET",
@@ -117,12 +157,18 @@
                     "data": aoData,
                     "success": fnCallback,
                     "timeout": 120000,   // optional if you want to handle timeouts (which you should)
-                    "error": handleAjaxError // this sets up jQuery to give me errors
+                    "error": handleAjaxError, // this sets up jQuery to give me errors
+                    beforeSend : function(){
+                        $(".loading").show();
+                    },
+                    complete: function(){
+                       $(".loading").hide();
+                    },
                 } );
             },
             "oLanguage": {
-                "sZeroRecords": "No records found",
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
+                //"sZeroRecords": "No records found",
+                "sProcessing": "Loading <img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
             },
             "aLengthMenu": [
                 [5, 15, 25, 100, 1000, -1],

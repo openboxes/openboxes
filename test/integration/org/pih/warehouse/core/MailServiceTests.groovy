@@ -6,15 +6,21 @@ import com.dumbster.smtp.SimpleSmtpServer
 class MailServiceTests extends GroovyTestCase{
   
 	def mailService
-	
+	def grailsApplication
+
+	protected void setUp() {
+		super.setUp()
+
+		// Reset mail server settings
+		grailsApplication.config.grails.mail.host = "localhost"
+		grailsApplication.config.grails.mail.port = 2525
+	}
+
 	@Test
 	void sendHtmlMail_shouldHandleAccentedCharactersCorrectly() { 
 		def server = SimpleSmtpServer.start(2525)
-		
-		def subject = "The Véhicule shipment 'Soduim Chloride 0,9% for Boucan Carre' has been shipped on January 23 2013."
-		def body = "The Véhicule shipment 'Soduim Chloride 0,9% for Boucan Carre' has been shipped on January 23 2013."
 
-		mailService.sendHtmlMail("[Html]" + subject, body, "justin@openboxes.com", 2525, true)
+		mailService.sendHtmlMail("subject", "body", "anybody@anywhere.com")
 
 		server.stop()
 		

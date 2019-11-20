@@ -30,9 +30,9 @@ class FieldArrayComponent extends Component {
   render() {
     const { fieldsConfig, properties, fields } = this.props;
     const AddButton = fieldsConfig.addButton;
-    const { maxTableHeight = 'calc(100vh - 400px)', virtualize } = fieldsConfig;
+    const { maxTableHeight = 'calc(100vh - 400px)', virtualized } = fieldsConfig;
     const addRow = (row = {}) => fields.push(row);
-    const TableBodyComponent = virtualize ? TableBodyVirtualized : TableBody;
+    const TableBodyComponent = virtualized ? TableBodyVirtualized : TableBody;
 
     return (
       <div className="d-flex flex-column">
@@ -68,7 +68,7 @@ class FieldArrayComponent extends Component {
         </div>
         <div
           className="text-center border mb-1 flex-grow-1"
-          style={{ overflowY: virtualize ? 'hidden' : 'scroll', maxHeight: virtualize ? '450px' : maxTableHeight }}
+          style={{ overflowY: virtualized ? 'hidden' : 'scroll', maxHeight: virtualized ? '450px' : maxTableHeight }}
         >
           <TableBodyComponent
             fields={fields}

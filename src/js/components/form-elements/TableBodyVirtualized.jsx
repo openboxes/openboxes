@@ -40,7 +40,7 @@ class TableBodyVirtualized extends Component {
     key, index, style,
   }) {
     const {
-      fieldsConfig, properties, fields,
+      fieldsConfig, properties, fields, tableRef = () => {},
       addRow = (row = {}) => fields.push(row),
     } = this.props;
     const field = `${fields.name}[${index}]`;
@@ -56,6 +56,7 @@ class TableBodyVirtualized extends Component {
           fieldsConfig={fieldsConfig}
           removeRow={() => fields.remove(index)}
           rowValues={fields.value[index]}
+          rowRef={(el, fieldName) => tableRef(el, fieldName, index)}
         />
       </div>
     );
@@ -69,7 +70,7 @@ class TableBodyVirtualized extends Component {
         <AutoSizer disableHeight>
           {({ width }) => (
             <List
-              height={450}
+              height={445}
               overscanRowCount={3}
               rowCount={fields.length || 0}
               rowHeight={this.getRowHeight}
@@ -96,8 +97,10 @@ TableBodyVirtualized.propTypes = {
   ]).isRequired,
   properties: PropTypes.shape({}).isRequired,
   addRow: PropTypes.func,
+  tableRef: PropTypes.func,
 };
 
 TableBodyVirtualized.defaultProps = {
   addRow: undefined,
+  tableRef: undefined,
 };

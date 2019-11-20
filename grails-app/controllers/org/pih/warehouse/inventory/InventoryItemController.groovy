@@ -17,12 +17,17 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentItemException
+import util.ConfigHelper
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class InventoryItemController {
 
@@ -72,9 +77,7 @@ class InventoryItemController {
             // now populate the rest of the commmand object
             inventoryService.getStockCardCommand(cmd, params)
 
-            def demand = forecastingService.getDemand(cmd.warehouse, cmd.product)
-
-            [commandInstance: cmd, demand: demand]
+            [commandInstance: cmd]
         } catch (ProductException e) {
             flash.message = e.message
             redirect(controller: "dashboard", action: "index")
@@ -189,7 +192,12 @@ class InventoryItemController {
                 // Normalize quantity (inventory transactions were all converted to CREDIT so some may have negative quantity)
                 def quantity = (transactionEntry.quantity > 0) ? transactionEntry.quantity : -transactionEntry.quantity
 
+                String transactionYear = (transaction.transactionDate.year + 1900).toString()
+                String transactionMonth = (transaction.transactionDate.month).toString()
+
                 stockHistoryList << [
+                        transactionYear  : transactionYear,
+                        transactionMonth : transactionMonth,
                         transactionDate  : transaction.transactionDate,
                         transactionCode  : transaction?.transactionType?.transactionCode,
                         transaction      : transaction,
@@ -220,8 +228,14 @@ class InventoryItemController {
             render(template: "printStockHistory", model: [commandInstance: commandInstance, stockHistoryList: stockHistoryList,
                                                           totalBalance   : totalBalance, totalCount: totalCount, totalCredit: totalCredit, totalDebit: totalDebit])
         } else {
-            render(template: "showStockHistory", model: [commandInstance: commandInstance, stockHistoryList: stockHistoryList,
-                                                         totalBalance   : totalBalance, totalCount: totalCount, totalCredit: totalCredit, totalDebit: totalDebit])
+            stockHistoryList = stockHistoryList.groupBy({ it.transactionYear })
+            def groupedStockHistoryList = [:]
+            stockHistoryList.each { year, history ->
+                history = history.groupBy { it.transactionMonth }
+                groupedStockHistoryList.get(year, [:]) << history
+            }
+            render(template: "showStockHistory", model: [commandInstance: commandInstance, stockHistoryList: groupedStockHistoryList,
+                                                          totalBalance   : totalBalance, totalCount: totalCount, totalCredit: totalCredit, totalDebit: totalDebit])
         }
     }
 
@@ -239,6 +253,7 @@ class InventoryItemController {
         Product product = Product.get(params.id)
         Location location = Location.get(session?.warehouse?.id)
         StockMovementType stockMovementType = params.type as StockMovementType
+        def itemsMap, requisitionItems, shipmentItems = []
 
         if (!stockMovementType) {
             throw new IllegalArgumentException("Stock movement type is required")
@@ -247,35 +262,33 @@ class InventoryItemController {
         Location origin = stockMovementType == StockMovementType.INBOUND ? null : location
         Location destination = stockMovementType == StockMovementType.OUTBOUND ? null : location
 
-        def requisitionItems =
-                requisitionService.getPendingRequisitionItems(origin, destination, product)
-        def requisitionMap = requisitionItems.groupBy { it.requisition }
+        if (origin) {
+            requisitionItems = requisitionService.getPendingRequisitionItems(origin, product)
+            itemsMap = requisitionItems.groupBy { it.requisition }
+        } else if (destination) {
+            shipmentItems = shipmentService.getPendingInboundShipmentItems(destination, product)
+            itemsMap = shipmentItems.groupBy { it.shipment }
+        }
 
-        log.info "requisitionmap: " + requisitionMap
-        if (requisitionMap) {
-            requisitionMap.keySet().each {
-                def quantityRequested = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.quantity }
-                def quantityRequired = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() }
-                def quantityPicked = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() }
-                def quantityRemaining = requisitionMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRemaining() }
-                def quantityReceived = requisitionMap[it].sum() { RequisitionItem requisitionItem ->
-                    ShipmentItem.findAllByRequisitionItem(requisitionItem).sum {
-                        it.quantityReceived() ?: 0
-                    } ?: 0
-                }
+        log.info "itemsMap: " + itemsMap
+        if (itemsMap) {
+            itemsMap.keySet().each {
+                def quantityRequested = !shipmentItems ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.quantity } : itemsMap[it].sum() { ShipmentItem shipmentItem -> shipmentItem.quantity }
+                def quantityRequired = !shipmentItems ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() } : 0
+                def quantityPicked = !shipmentItems ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() } : 0
+                def quantityReceived = shipmentItems ? itemsMap[it].sum() { ShipmentItem shipmentItem -> shipmentItem.quantityReceived() } : 0
 
                 def quantityMap = [
                         quantityRequested: quantityRequested,
                         quantityRequired : quantityRequired,
                         quantityPicked   : quantityPicked,
-                        quantityRemaining: quantityRemaining,
                         quantityReceived : quantityReceived
                 ]
-                requisitionMap.put(it, quantityMap)
+                itemsMap.put(it, quantityMap)
             }
         }
 
-        render(template: "showPendingStock", model: [product: product, requisitionMap: requisitionMap])
+        render(template: "showPendingStock", model: [product: product, itemsMap: itemsMap])
     }
 
     def showConsumption = { StockCardCommand cmd ->
@@ -284,6 +297,10 @@ class InventoryItemController {
         cmd.warehouse = Location.get(session?.warehouse?.id)
 
         def reasonCodes = params.list("reasonCode")
+        if (reasonCodes.empty) {
+            reasonCodes = ConfigHelper.listValue(grailsApplication.config.openboxes.stockCard.consumption.reasonCodes)
+            reasonCodes = reasonCodes.collect { it.toString() }
+        }
 
         // now populate the rest of the commmand object
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
@@ -293,24 +310,29 @@ class InventoryItemController {
         Date firstDateRequested = requisitionItems.collect { it.requisition.dateRequested }.min()
         Date lastDateRequested = requisitionItems.collect { it.requisition.dateRequested }.max()
 
-        // Calculate the days between first and last consumption transaction, ensuring that
-        def numberOfDays = (firstDateRequested && lastDateRequested) ? lastDateRequested - firstDateRequested : 1
-        numberOfDays = numberOfDays ?: 1
-
         // Get quantity issued by request
         def transactionEntries = requisitionService.getIssuedTransactionEntries(commandInstance?.warehouse, commandInstance?.product, cmd.startDate, cmd.endDate)
-        transactionEntries = transactionEntries.collect {
+        transactionEntries = transactionEntries.collect { TransactionEntry transactionEntry ->
+            // Retrieved through shipment since the transaction cannot be trusted to have a reliable link yet (see OBPIH-2447)
+            Requisition requisition = transactionEntry.transaction?.outgoingShipment?.requisition
             [
-                    requestNumber: it.transaction?.outgoingShipment?.requisition?.requestNumber,
-                    quantity     : it?.quantity,
+                    requestNumber : requisition?.requestNumber,
+                    dateRequested : requisition?.dateRequested,
+                    dateIssued    : transactionEntry?.transaction?.transactionDate,
+                    quantityIssued: transactionEntry?.quantity,
             ]
         }
 
+        DateFormat monthFormat = new SimpleDateFormat("MMM yyyy")
+        monthFormat.timeZone = TimeZone.default
+
         requisitionItems = requisitionItems.collect {
             def requestNumber = it?.requisition?.requestNumber
-            def quantityIssued = transactionEntries.findAll { te -> te.requestNumber == requestNumber }.collect {
-                it.quantity
-            }.sum()
+
+            def transactionEntriesByRequest = transactionEntries.findAll { te -> te.requestNumber == requestNumber }
+            def quantityIssued = transactionEntriesByRequest.collect { it.quantityIssued }.sum()
+            def dateIssued = transactionEntriesByRequest.collect { it.dateIssued }.min()
+
             def quantityApproved = it?.quantityApproved ?: 0
             def quantityPicked = it?.calculateQuantityPicked() ?: 0
             if (it.status in [RequisitionItemStatus.CHANGED, RequisitionItemStatus.SUBSTITUTED]) {
@@ -320,18 +342,20 @@ class InventoryItemController {
                 }.sum()
             }
             [
-                    monthRequested   : it?.requisition?.monthRequested,
                     status           : it?.status,
                     productCode      : it?.product?.productCode,
                     productName      : it?.product?.name,
                     origin           : it?.requisition?.origin?.name,
                     requisitionId    : it?.requisition?.id,
                     requestNumber    : it?.requisition?.requestNumber,
-                    reuestStatus     : it?.requisition?.status,
+                    requestStatus    : it?.requisition?.status,
                     destination      : it?.requisition?.destination?.name,
                     lotNumber        : it?.inventoryItem?.lotNumber,
                     expirationDate   : it?.inventoryItem?.expirationDate,
+                    dateIssued       : dateIssued,
+                    monthIssued      : dateIssued ? monthFormat.format(dateIssued) : null,
                     dateRequested    : it?.requisition?.dateRequested,
+                    monthRequested   : monthFormat.format(it?.requisition?.dateRequested),
                     quantityRequested: it?.quantity ?: 0,
                     quantityCanceled : it?.quantityCanceled ?: 0,
                     quantityApproved : quantityApproved,
@@ -343,8 +367,25 @@ class InventoryItemController {
             ]
         }
 
+        // Create list of months to display including all months between first and last requested date
+        def monthKeys = (firstDateRequested..lastDateRequested).collect {
+            monthFormat.format(it)
+        }.unique()
+
+        // Remove the current month
+        def currentMonthKey = monthFormat.format(new Date())
+        monthKeys.remove(currentMonthKey)
+
+        // By default, only display the last 6 months
+        if (!cmd.startDate && !cmd.endDate) {
+            monthKeys = monthKeys.subList(Math.max(monthKeys.size() - 6, 0), monthKeys.size());
+        }
         render(template: "showConsumption",
-                model: [commandInstance: commandInstance, requisitionItems: requisitionItems, numberOfDays: numberOfDays])
+                model: [commandInstance : commandInstance,
+                        requisitionItems: requisitionItems,
+                        reasonCodes     : reasonCodes,
+                        numberOfMonths  : monthKeys?.size() ?: 1,
+                        monthKeys       : monthKeys])
     }
 
     def showProductDemand = {
@@ -383,9 +424,8 @@ class InventoryItemController {
         // now populate the rest of the commmand object
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
 
-        def demand = forecastingService.getDemand(cmd.warehouse, cmd.product)
 
-        [commandInstance: commandInstance, demand: demand]
+        [commandInstance: commandInstance]
     }
 
     /**
@@ -438,8 +478,6 @@ class InventoryItemController {
         // Compute the total quantity for the given product
         commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 
-        def demand = forecastingService.getDemand(locationInstance, productInstance)
-
         // FIXME Use this method instead of getQuantityByProductMap
         // NEED to add tests before we introduce this change
         //commandInstance.totalQuantity = inventoryService.getQuantityOnHand(locationInstance, productInstance)
@@ -452,7 +490,7 @@ class InventoryItemController {
         String jsonString = [product: productInstance.toJson(), inventoryItems: result] as JSON
         log.info "record inventory " + jsonString
 
-        [commandInstance: commandInstance, demand: demand, product: jsonString]
+        [commandInstance: commandInstance, product: jsonString]
     }
 
     def saveRecordInventory = { RecordInventoryCommand commandInstance ->
@@ -477,14 +515,12 @@ class InventoryItemController {
 
         commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 
-        def demand = forecastingService.getDemand(warehouseInstance, productInstance)
-
         log.info "commandInstance.recordInventoryRows: "
         commandInstance?.recordInventoryRows.each {
             log.info "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
         }
 
-        render(view: "showRecordInventory", model: [commandInstance: commandInstance, demand: demand])
+        render(view: "showRecordInventory", model: [commandInstance: commandInstance])
     }
 
     def showTransactions = {

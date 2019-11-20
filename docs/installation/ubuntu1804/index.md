@@ -2,7 +2,7 @@
 # System Requirements
 * Internet connection (recommended)
 * Processors: 2 Cores (minimum), 4-8 Cores (recommended)
-* Memory: 2GB RAM (minimum), 4GB
+* Memory: 4GB RAM (minimum), 8GB (recommended)
 * Local Disk Storage: 25-50GB (minimum)
 
 # Software Requirements

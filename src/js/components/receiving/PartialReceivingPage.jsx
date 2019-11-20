@@ -182,8 +182,8 @@ const FIELDS = {
       'parentContainer.name': {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
-        label: 'react.partialReceiving.pallet.label',
-        defaultMessage: 'Pallet',
+        label: 'react.partialReceiving.packLevel1.label',
+        defaultMessage: 'Pack level 1',
         flexWidth: '0.8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
@@ -193,8 +193,8 @@ const FIELDS = {
       'container.name': {
         fieldKey: '',
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
-        label: 'react.partialReceiving.box.label',
-        defaultMessage: 'Box',
+        label: 'react.partialReceiving.packLevel2.label',
+        defaultMessage: 'Pack level 2',
         flexWidth: '0.8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),

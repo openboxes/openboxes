@@ -3,6 +3,7 @@ package org.pih.warehouse.api
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -29,6 +30,7 @@ enum StockMovementType {
     }
 }
 
+@Validateable
 class StockMovement {
 
     String id

@@ -49,7 +49,7 @@
         </g:link>
     </g:if>
     <g:isSuperuser>
-        <g:if test="${userInstance}">
+        <g:if test="${userInstance && userInstance?.active}">
             <g:link class="button" action="impersonate" controller="user" id="${userInstance?.id}" target="_blank">
                 <img src="${createLinkTo(dir:'images/icons/silk',file:'arrow_switch.png')}"/>
                 <g:message code="user.impersonate.label" args="[g.message(code: 'user.label')]" />

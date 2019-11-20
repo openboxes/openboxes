@@ -34,44 +34,41 @@
                     <g:hiddenField name="redirectAction" value="confirm"/>
                     <g:hiddenField name="id" value="${requisition?.id}"/>
                     <table>
-                        <tr>
-                            <td class="left middle">
+                        <tr class="prop">
+                            <td class="name">
                                 <label>
                                     ${warehouse.message(code:'requisition.checkedBy.label', default: 'Checked by')}
                                 </label>
                             </td>
-                            <td class="middle">
+                            <td class="value">
                                 <g:selectPerson id="checkedBy" name="checkedBy" value="${requisition?.checkedBy?.id}"
                                                 noSelection="['null':'']" size="40" class="chzn-select-deselect"/>
                             </td>
-                            <td class="left middle">
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
                                 <label>
                                     ${warehouse.message(code:'requisition.dateChecked.label', default: 'Date checked')}
                                 </label>
                             </td>
-                            <td class="middle">
+                            <td class="value">
                                 <g:datePicker name="dateChecked" value="${requisition?.dateChecked}"/>
-                            </td>
-                            <td>
                                 <button class="button icon approve">
                                     ${warehouse.message(code:'default.button.save.label')}
                                 </button>
                             </td>
                         </tr>
-
                     </table>
                 </g:form>
-
                 <hr/>
-
-
                 <table border="0" class="zebra">
                     <thead>
                         <tr>
                             <th></th>
                             <th>Status</th>
                             <th>Product</th>
-                            <th>Lot number</th>
+                            <th>Bin Location</th>
+                            <th>Lot Number</th>
                             <th class="right">Requested</th>
                             <th class="right">Picked</th>
                             <th class="right">Canceled</th>
@@ -81,7 +78,6 @@
                         </tr>
                     </thead>
                     <tbody>
-
                         <g:set var="status" value="${1}"/>
                         <g:each var="requisitionItem" in="${requisition.requisitionItems }">
                             <g:set var="quantityPicked" value="${requisitionItem?.calculateQuantityPicked() }"/>
@@ -110,6 +106,10 @@
                                                 ${picklistItem?.inventoryItem?.product?.productCode}
                                                 ${picklistItem?.inventoryItem?.product?.name }
                                             </p>
+                                        </td>
+                                        <td>
+                                            ${picklistItem?.binLocation?.name}
+
                                         </td>
                                         <td>
                                             <span class="lotNumber">
@@ -178,24 +178,28 @@
                             </g:else>
                         </g:each>
                     </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="11">
+                            <div class="buttons center">
+                                <g:link controller="requisition" action="pick" id="${requisition.id }" class="button icon arrowleft">
+                                    <warehouse:message code="default.button.back.label"/>
+                                </g:link>
+                                <g:link controller="requisition" action="transfer" id="${requisition.id }" class="button icon arrowright">
+                                    <warehouse:message code="default.button.next.label"/>
+                                </g:link>
+                            </div>
+
+                        </td>
+                    </tr>
+                    </tfoot>
                 </table>
             </div>
-			<div class="clear"></div>	
-			
-			<div class="buttons center">
-                <g:link controller="requisition" action="pick" id="${requisition.id }" class="button icon arrowleft">
-                    <warehouse:message code="default.button.back.label"/>
-                </g:link>
-                <g:link controller="requisition" action="transfer" id="${requisition.id }" class="button icon arrowright">
-                    <warehouse:message code="default.button.next.label"/>
-                </g:link>
-			</div>
-					
 		</div>
     </div>
-	
-	
-	
+
+
+
 </div>
 </body>
 </html>

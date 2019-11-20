@@ -28,7 +28,6 @@ const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 const FIELDS = {
   packPageItems: {
     type: ArrayField,
-    virtualized: true,
     fields: {
       productCode: {
         type: LabelField,
@@ -99,8 +98,8 @@ const FIELDS = {
       },
       palletName: {
         type: TextField,
-        label: 'react.stockMovement.pallet.label',
-        defaultMessage: 'Pallet',
+        label: 'react.stockMovement.packLevel1.label',
+        defaultMessage: 'Pack level 1',
         flexWidth: '0.8',
         attributes: {
           disabled: showOnly,
@@ -108,8 +107,8 @@ const FIELDS = {
       },
       boxName: {
         type: TextField,
-        label: 'react.stockMovement.box.label',
-        defaultMessage: 'Box',
+        label: 'react.stockMovement.packLevel2.label',
+        defaultMessage: 'Pack level 2',
         flexWidth: '0.8',
         attributes: {
           disabled: showOnly,
@@ -138,6 +137,18 @@ const FIELDS = {
     },
   },
 };
+
+function validate(values) {
+  const errors = {};
+  errors.packPageItems = [];
+
+  _.forEach(values.packPageItems, (item, key) => {
+    if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
+      errors.packPageItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
+    }
+  });
+  return errors;
+}
 
 /**
  * The fifth step of stock movement(for movements from a depot) where user can see the
@@ -328,6 +339,7 @@ class PackingPage extends Component {
         onSubmit={values => this.nextPage(values)}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
+        validate={validate}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             { !showOnly ?
@@ -353,6 +365,7 @@ class PackingPage extends Component {
                 </button>
                 <button
                   type="button"
+                  disabled={invalid}
                   onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; })}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >
@@ -375,10 +388,16 @@ class PackingPage extends Component {
                 debouncedUsersFetch: this.debouncedUsersFetch,
               }))}
               <div>
-                <button type="button" className="btn btn-outline-primary btn-form btn-xs" disabled={showOnly} onClick={() => this.savePackingData(values.packPageItems).then(() => this.props.previousPage(values))}>
+                <button
+                  type="button"
+                  className="btn btn-outline-primary btn-form btn-xs"
+                  disabled={showOnly || invalid}
+                  onClick={() => this.savePackingData(values.packPageItems)
+                    .then(() => this.props.previousPage(values))}
+                >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly}>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly || invalid}>
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

@@ -62,7 +62,7 @@
                         <label>
                             <warehouse:message code="consumption.categories.label" default="Categories"/>
                         </label>
-                        <g:selectCategory name="selectedCategories" multiple="true" value="${command?.selectedCategories?.id}" class="chzn-select"/>
+                        <g:selectCategory name="selectedCategories" multiple="true" value="${command?.selectedCategories?.id}" class="chzn-select-deselect"/>
                     </div>
                     <div class="filter-list-item">
                         <label>
@@ -97,7 +97,12 @@
                     </g:elseif>
 
                 </div>
-
+                <div class="filter-list-item">
+                        <label><warehouse:message code="consumption.transactionTypes.label" default="Transaction Types"/></label>
+                        <g:selectTransactionType name="selectedTransactionTypes" from="${command?.transactionTypes}"
+                                                 multiple="true" class="chzn-select-deselect"
+                                                 value="${command?.selectedTransactionTypes?.id?:command?.defaultTransactionTypes?.id}"/>
+                    </div>
             </div>
             <h2><warehouse:message code="consumption.renderOptions.label" default="Render Options"/></h2>
             <div class="options">
@@ -153,18 +158,18 @@
                         </label>
                     </div>
                 </div>
-                <div class="filter-list-item">
-                    <div class="buttons">
-                        <button class="button">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'cog_go.png')}" />
-                            <warehouse:message code="default.button.run.label" default="Run"/>
-                        </button>
+            </div>
+            <div class="filter-list-item">
+                <div class="buttons">
+                    <button class="button">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'cog_go.png')}" />
+                        <warehouse:message code="report.runReport.label" default="Run Report"/>
+                    </button>
 
-                        <g:link controller="consumption" action="show" class="button">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_undo.png')}" />
-                            ${warehouse.message(code:'default.button.reset.label', default: 'Reset')}
-                        </g:link>
-                    </div>
+                    <g:link controller="consumption" action="show" class="button">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file: 'arrow_refresh.png')}" />
+                        ${warehouse.message(code:'default.button.reset.label', default: 'Reset')}
+                    </g:link>
                 </div>
             </div>
         </div>

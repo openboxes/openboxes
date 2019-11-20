@@ -15,6 +15,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.FetchMode
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
@@ -35,6 +36,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 
@@ -51,6 +53,7 @@ class ShipmentService {
     def inventoryService
     def identifierService
     def documentService
+    GrailsApplication grailsApplication
 
     /**
      * Returns the shipment referenced by the passed id parameter;
@@ -310,6 +313,23 @@ class ShipmentService {
             shipmentItemList.each {
                 shipmentItems << it
             }
+        }
+
+        return shipmentItems
+    }
+
+    List<ShipmentItem> getPendingInboundShipmentItems(Location destination, Product product) {
+        def shipmentItems = ShipmentItem.createCriteria().list() {
+            shipment {
+                eq("destination", destination)
+                not {
+                    'in'("currentStatus", [ShipmentStatusCode.RECEIVED])
+                }
+                requisition {
+                    'in'("status", [RequisitionStatus.ISSUED])
+                }
+            }
+            eq("product", product)
         }
 
         return shipmentItems
@@ -1056,6 +1076,9 @@ class ShipmentService {
         else {
             throw new ValidationException("Failed to send shipment", shipmentInstance?.errors)
         }
+
+        grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipmentInstance, ShipmentStatusCode.SHIPPED))
+
     }
 
 

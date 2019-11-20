@@ -48,7 +48,6 @@ const DELETE_BUTTON_FIELD = {
 const NO_STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
-    virtualized: true,
     arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder, showOnly }) => (
@@ -214,7 +213,6 @@ const STOCKLIST_FIELDS = {
 const VENDOR_FIELDS = {
   lineItems: {
     type: ArrayField,
-    virtualized: true,
     arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
@@ -230,8 +228,8 @@ const VENDOR_FIELDS = {
     fields: {
       palletName: {
         type: TextField,
-        label: 'react.stockMovement.pallet.label',
-        defaultMessage: 'Pallet',
+        label: 'react.stockMovement.packLevel1.label',
+        defaultMessage: 'Pack level 1',
         flexWidth: '1',
         getDynamicAttr: ({ rowIndex, rowCount }) => ({
           autoFocus: rowIndex === rowCount - 1,
@@ -239,8 +237,8 @@ const VENDOR_FIELDS = {
       },
       boxName: {
         type: TextField,
-        label: 'react.stockMovement.box.label',
-        defaultMessage: 'Box',
+        label: 'react.stockMovement.packLevel2.label',
+        defaultMessage: 'Pack level 2',
         flexWidth: '1',
       },
       product: {
@@ -555,7 +553,7 @@ class AddItemsPage extends Component {
         },
         {
           label: this.props.translate('react.default.submit.label', 'Submit'),
-          onClick: () => onConfirm,
+          onClick: onConfirm,
         },
       ],
     });
@@ -1087,7 +1085,7 @@ class AddItemsPage extends Component {
               <div>
                 <button
                   type="submit"
-                  disabled={showOnly}
+                  disabled={showOnly || invalid}
                   onClick={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
@@ -1105,7 +1103,8 @@ class AddItemsPage extends Component {
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item)) || showOnly}
+                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))
+                    || showOnly || invalid}
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

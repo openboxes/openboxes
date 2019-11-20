@@ -21,6 +21,7 @@
 				</g:if>
 				<g:set var="count" value="${0 }"/>
 				<%-- FIXME The g:isSuperuser tag becomes expensive when executed within a for loop, so we should find a better way to implement it without this hack --%>
+				<g:set var="isSuperuser" value="${false}"/>
 				<g:isSuperuser>
 					<g:set var="isSuperuser" value="${true}"/>
 				</g:isSuperuser>
@@ -33,7 +34,7 @@
 								</button>
 								<div class="actions left">
 									<div class="action-menu-item">
-										<g:link class="btn-show-dialog" disabled="${!isSuperuser}"
+										<g:link class="btn-show-dialog" data-disabled="${!isSuperuser}"
 										   data-title="${g.message(code:'inventory.editItem.label')}"
 										   data-url="${request.contextPath}/inventoryItem/showDialog?id=${inventoryItem?.id}&template=editItemDialog">
 											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
@@ -41,7 +42,7 @@
 										</g:link>
 									</div>
 									<div class="action-menu-item">
-										<g:link controller="inventoryItem" action="delete" id="${inventoryItem?.id}" disabled="${!isSuperuser}">
+										<g:link controller="inventoryItem" action="delete" id="${inventoryItem?.id}" data-disabled="${!isSuperuser}">
 											<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
 											<g:message code="default.delete.label" args="[g.message(code:'inventoryItem.label')]"/>
 										</g:link>

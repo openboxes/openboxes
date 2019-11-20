@@ -29,7 +29,6 @@ const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 const FIELDS = {
   pickPageItems: {
     type: ArrayField,
-    virtualized: true,
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'picklistItems',
     getDynamicRowAttr: ({ rowValues, subfield }) => {
@@ -233,7 +232,7 @@ class PickPage extends Component {
         }
       });
 
-      return { ...pickPageItem, picklistItems: _.sortBy(_.concat(pickPageItem.picklistItems, initialPicks), ['binLocation.name', 'initial']) };
+      return { ...pickPageItem, picklistItems: _.concat(initialPicks, _.sortBy(pickPageItem.picklistItems, ['binLocation.name', 'initial'])) };
     }
 
     return pickPageItem;

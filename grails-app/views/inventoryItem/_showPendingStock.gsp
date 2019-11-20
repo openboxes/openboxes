@@ -9,10 +9,20 @@
             <thead>
                 <tr class="odd">
                     <th>
-                        ${warehouse.message(code: 'requisition.date.label')}
+                        <g:if test="${params.type=='OUTBOUND'}">
+                            ${warehouse.message(code: 'requisition.date.label')}
+                        </g:if>
+                        <g:else>
+                            ${warehouse.message(code: 'shipping.dateShipped.label')}
+                        </g:else>
                     </th>
                     <th class="center">
-                        ${warehouse.message(code: 'requisition.status.label')}
+                        <g:if test="${params.type=='OUTBOUND'}">
+                            ${warehouse.message(code: 'requisition.status.label')}
+                        </g:if>
+                        <g:else>
+                            ${warehouse.message(code: 'shipping.shipmentStatus.label')}
+                        </g:else>
                     </th>
                     <th class="center">
                         ${warehouse.message(code: 'default.code.label')}
@@ -27,7 +37,12 @@
                         ${warehouse.message(code: 'requisition.destination.label')}
                     </th>
                     <th>
-                        ${warehouse.message(code: 'requisition.quantityRequested.label')}
+                        <g:if test="${params.type=='OUTBOUND'}">
+                            ${warehouse.message(code: 'requisition.quantityRequested.label')}
+                        </g:if>
+                        <g:else>
+                            ${warehouse.message(code: 'shipping.shipped.label')}
+                        </g:else>
                     </th>
                     <g:if test="${params.type=='OUTBOUND'}">
                         <th>
@@ -46,32 +61,41 @@
 
             </thead>
             <tbody>
-                <g:each var="entry" in="${requisitionMap}" status="status">
-                    <g:set var="requisition" value="${entry.key }"/>
+                <g:each var="entry" in="${itemsMap}" status="status">
+                    <g:set var="item" value="${entry.key }"/>
 
 
                     <tr class="${(status%2==0)?'even':'odd' } prop">
                         <td style="width: 10%;" nowrap="nowrap">
-                            <g:if test="${requisition?.dateRequested }">
-                                <g:formatDate date="${requisition.dateRequested }" format="dd/MMM/yyyy"/>
+                            <g:if test="${params.type=='OUTBOUND'}">
+                                <g:if test="${item?.dateRequested }">
+                                    <g:formatDate date="${item.dateRequested }" format="dd/MMM/yyyy"/>
+                                </g:if>
                             </g:if>
+                            <g:else>
+                                <g:if test="${item?.expectedShippingDate }">
+                                    <g:formatDate date="${item.expectedShippingDate }" format="dd/MMM/yyyy"/>
+                                </g:if>
+                            </g:else>
                         </td>
                         <td class="center">
-                            ${requisition.status }
+                            ${params.type=='OUTBOUND' ? item?.status : item?.currentStatus}
                         </td>
                         <td class="center">
-                            ${requisition?.requestNumber}
-                        </td>
-                        <td>
-                            <g:link controller="requisition" action="show" id="${requisition?.id }">
-                                ${requisition?.name }
+                            <g:link controller="stockMovement" action="show" id="${params.type=='OUTBOUND' ? item?.id : item?.requisition.id }">
+                                ${params.type=='OUTBOUND' ? item?.requestNumber : item?.shipmentNumber }
                             </g:link>
                         </td>
                         <td>
-                            ${requisition?.origin?.name }
+                            <g:link controller="stockMovement" action="show" id="${params.type=='OUTBOUND' ? item?.id : item?.requisition.id }">
+                                ${item?.name }
+                            </g:link>
                         </td>
                         <td>
-                            ${requisition?.destination?.name }
+                            ${item?.origin?.name }
+                        </td>
+                        <td>
+                            ${item?.destination?.name }
                         </td>
                         <td>
                             ${entry.value["quantityRequested"]} ${product?.unitOfMeasure}
@@ -91,7 +115,7 @@
                         </g:if>
                     </tr>
                 </g:each>
-                <g:if test="${!requisitionMap}">
+                <g:if test="${!itemsMap}">
                     <tr>
                         <g:set var="colspan" value="${params.type=='INBOUND'?8:9}"/>
                         <td colspan="${colspan}" class="even center">
@@ -108,19 +132,19 @@
 
                 </td>
                 <td>
-                    ${requisitionMap.values()["quantityRequested"].sum()} ${product?.unitOfMeasure}
+                    ${itemsMap.values()["quantityRequested"].sum()} ${product?.unitOfMeasure}
                 </td>
                 <g:if test="${params.type=='OUTBOUND'}">
                 <td>
-                    ${requisitionMap.values()["quantityRequired"].sum()} ${product?.unitOfMeasure}
+                    ${itemsMap.values()["quantityRequired"].sum()} ${product?.unitOfMeasure}
                 </td>
                 <td>
-                    ${requisitionMap.values()["quantityPicked"].sum()} ${product?.unitOfMeasure}
+                    ${itemsMap.values()["quantityPicked"].sum()} ${product?.unitOfMeasure}
                 </td>
                 </g:if>
                 <g:if test="${params.type=='INBOUND'}">
                 <td>
-                    ${requisitionMap.values()["quantityReceived"].sum()} ${product?.unitOfMeasure}
+                    ${itemsMap.values()["quantityReceived"].sum()} ${product?.unitOfMeasure}
                 </td>
                 </g:if>
             </tr>

@@ -26,8 +26,16 @@ enum RoleType {
     ROLE_FEEDBACK_NOTIFICATION('Feedback Notifications', 100),
     ROLE_PRODUCT_NOTIFICATION('Product Notifications', 100),
     ROLE_ORDER_NOTIFICATION('Order Notifications', 100),
-    ROLE_SHIPMENT_NOTIFICATION('Shipment Notifications', 100),
     ROLE_USER_NOTIFICATION('User Notifications', 100),
+
+    // Notification roles for shipments and receipts
+    ROLE_SHIPMENT_NOTIFICATION('All Shipment Notifications', 100),
+    ROLE_SHIPMENT_INBOUND_CREATED_NOTIFICATION('Shipment Inbound Created Notifications', 100),
+    ROLE_SHIPMENT_OUTBOUND_CREATED_NOTIFICATION('Shipment Outbound Created Notifications', 100),
+    ROLE_SHIPMENT_INBOUND_SHIPPED_NOTIFICATION('Shipment Inbound Shipped Notifications', 100),
+    ROLE_SHIPMENT_OUTBOUND_SHIPPED_NOTIFICATION('Shipment Outbound Shipped Notifications', 100),
+    ROLE_SHIPMENT_INBOUND_RECEIVED_NOTIFICATION('Shipment Inbound Received Notifications', 100),
+    ROLE_SHIPMENT_OUTBOUND_RECEIVED_NOTIFICATION('Shipment Outbound Received Notifications', 100),
 
     // Notification roles for stock alerts
     ROLE_ITEM_ALL_NOTIFICATION('All Stock Notifications', 100),

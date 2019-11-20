@@ -83,7 +83,7 @@ class StockMovementService {
             Shipment shipment = requisition.shipment
             shipment?.expectedShippingDate = new Date()
         }
-        if (!status in RequisitionStatus.list()) {
+        if (!(status in RequisitionStatus.list())) {
             throw new IllegalStateException("Transition from ${requisition.status.name()} to ${status.name()} is not allowed")
         } else if (status < requisition.status) {
             // Ignore backwards state transitions since it occurs normally when users go back and edit pages earlier in the workflow
@@ -163,11 +163,11 @@ class StockMovementService {
     }
 
     def getStockMovements(Integer maxResults, Integer offset) {
-        return getStockMovements(null, [:], maxResults, offset)
+        return getStockMovements(new StockMovement(), [:], maxResults, offset)
     }
 
     def getStockMovements(Map params, Integer maxResults, Integer offset) {
-        return getStockMovements(null, params, maxResults, offset)
+        return getStockMovements(new StockMovement(), params, maxResults, offset)
     }
 
     def getStockMovements(StockMovement stockMovement, Map params, Integer maxResults, Integer offset) {
@@ -831,7 +831,9 @@ class StockMovementService {
         List packPageItems = []
         List<ShipmentItem> shipmentItems = ShipmentItem.findAllByRequisitionItem(picklistItem?.requisitionItem)
         if (shipmentItems) {
-            for (ShipmentItem shipmentItem : shipmentItems) {
+            shipmentItems.sort { a, b ->
+                a.sortOrder <=> b.sortOrder ?: b.id <=> a.id
+            }.each { shipmentItem ->
                 packPageItems << buildPackPageItem(shipmentItem)
             }
         }
@@ -1345,7 +1347,7 @@ class StockMovementService {
 
     Container createOrUpdateContainer(Shipment shipment, String palletName, String boxName) {
         if (boxName && !palletName) {
-            throw IllegalArgumentException("A box must be contained within a pallet")
+            throw new IllegalArgumentException("Please enter Pack level 1 before Pack level 2. A box must be contained within a pallet")
         }
 
         Container pallet = (palletName) ? shipment.findOrCreatePallet(palletName) : null
@@ -1470,6 +1472,7 @@ class StockMovementService {
                 splitItem.expirationDate = shipmentItem.expirationDate
                 splitItem.binLocation = shipmentItem.binLocation
                 splitItem.inventoryItem = shipmentItem.inventoryItem
+                splitItem.sortOrder = shipmentItem.sortOrder
 
                 splitItem.quantity = splitLineItem?.quantityShipped
                 splitItem.recipient = splitLineItem?.recipient
@@ -1644,6 +1647,28 @@ class StockMovementService {
         }
 
         return documentList
+    }
+
+    List buildStockMovementItemList(StockMovement stockMovement) {
+        // We need to create at least one row to ensure an empty template
+        if (stockMovement?.lineItems?.empty) {
+            stockMovement?.lineItems.add(new StockMovementItem())
+        }
+
+        def lineItems = stockMovement.lineItems.collect {
+            [
+                "Requisition item id"            : it?.id ?: "",
+                "Product code (required)"     : it?.product?.productCode ?: "",
+                "Product name"                  : it?.product?.name ?: "",
+                "Pack level 1"                   : it?.palletName ?: "",
+                "Pack level 2"                      : it?.boxName ?: "",
+                "Lot number"                    : it?.lotNumber ?: "",
+                "Expiration date (MM/dd/yyyy)": it?.expirationDate ? it?.expirationDate?.format("MM/dd/yyyy") : "",
+                "Quantity (required)"        : it?.quantityRequested ?: "",
+                "Recipient id"                  : it?.recipient?.id ?: ""
+            ]
+        }
+        return lineItems
     }
 }
 

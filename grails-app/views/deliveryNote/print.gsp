@@ -46,7 +46,6 @@
     .small {font-size: xx-small;}
     .large { font-size: larger; }
     .line{border-bottom: 1px solid black}
-    .CANCELED { text-decoration: line-through; }
     .page-start {
         -fs-page-sequence: start;
         page-break-before: avoid;
@@ -119,6 +118,9 @@
     @media print {
         .print-button { display:none; }
         .print-header { display:none; }
+    }
+    .canceled {
+        text-decoration: line-through;
     }
     </style>
 

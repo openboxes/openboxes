@@ -14,6 +14,7 @@ import grails.validation.ValidationException
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.hibernate.HibernateException
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -304,9 +305,7 @@ class RequisitionController {
 
                 requisition.save(flush: true)
             }
-
-
-            def currentInventory = Location.get(session.warehouse.id).inventory
+            def location = Location.get(session.warehouse.id)
             def picklist = Picklist.findByRequisition(requisition)
 
             if (!picklist) {
@@ -318,25 +317,18 @@ class RequisitionController {
             }
 
             def productInventoryItemsMap = [:]
-            def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect {
-                it.product
-            }, currentInventory)
-            productInventoryItems.keySet().each { product ->
-                productInventoryItemsMap[product.id] = productInventoryItems[product]//.collect{it.toJson()}
+            List<Product> products = requisition.requisitionItems?.collect { it.product }
+            products.each { product ->
+                productInventoryItemsMap[product.id] = inventoryService.getAvailableBinLocations(location, product)
             }
-
-            def location = Location.get(session.warehouse.id)
-            def inventoryLevelMap = [:]
-            productInventoryItems.keySet().each { product ->
-                inventoryLevelMap[product] = product.getInventoryLevel(location.id)
-            }
-
 
             def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
-
-            [requisition            : requisition, productInventoryItemsMap: productInventoryItemsMap,
-             picklist               : picklist, inventoryLevelMap: inventoryLevelMap,
-             selectedRequisitionItem: requisitionItem]
+            [
+                    requisition             : requisition,
+                    productInventoryItemsMap: productInventoryItemsMap,
+                    picklist                : picklist,
+                    selectedRequisitionItem : requisitionItem
+            ]
 
         } else {
             response.sendError(404)
@@ -354,6 +346,19 @@ class RequisitionController {
         def requisition = Requisition.get(params?.id)
         requisitionService.clearPicklist(requisition)
         redirect(action: "pick", id: requisition?.id)
+    }
+
+    def showPicklistDialog = {
+        def location = Location.get(session.warehouse.id)
+        def requisitionItem = RequisitionItem.get(params.id)
+
+        List<AvailableItem> availableItems = inventoryService.getAvailableBinLocations(location, requisitionItem?.product)
+
+        log.info "availableItems: ${availableItems}"
+
+        render(template: "picklistItems", model: [location       : location,
+                                                  requisitionItem: requisitionItem,
+                                                  availableItems : availableItems])
     }
 
     def pickNextItem = {
@@ -538,9 +543,6 @@ class RequisitionController {
 
 
     def addToPicklistItems = { AddToPicklistItemsCommand command ->
-        println "Add to picklist items " + params
-        def requisition = Requisition.get(params.id)
-        println "Requisition " + command?.requisition
         def picklist = Picklist.findByRequisition(command.requisition)
         if (!picklist) {
             picklist = new Picklist()
@@ -556,7 +558,6 @@ class RequisitionController {
                     existingPicklistItem.quantity = picklistItem.quantity
                     existingPicklistItem.save(flush: true)
                 } else {
-                    println "Adding new item to picklist " + picklistItem?.id + " inventoryItem.id=" + picklistItem?.inventoryItem?.id + " qty=" + picklistItem?.quantity
                     picklist.addToPicklistItems(picklistItem)
                     picklist.save(flush: true)
                 }

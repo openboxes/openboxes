@@ -14,6 +14,7 @@ import grails.converters.JSON
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
@@ -146,12 +147,20 @@ class StockMovementController {
     }
 
     def rollback = {
-        try {
-            stockMovementService.rollbackStockMovement(params.id)
-            flash.message = "Successfully rolled back stock movement with ID ${params.id}"
-        } catch (Exception e) {
-            log.warn("Unable to rollback stock movement with ID ${params.id}: " + e.message)
-            flash.message = "Unable to rollback stock movement with ID ${params.id}: " + e.message
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        boolean isOrigin = stockMovement?.requisition?.origin?.id == session.warehouse.id
+        boolean isDestination = stockMovement?.requisition?.destination?.id == session.warehouse.id
+        boolean canManageInventory = stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)
+        if ((canManageInventory && isOrigin) || (!canManageInventory && isDestination)) {
+            try {
+                stockMovementService.rollbackStockMovement(params.id)
+                flash.message = "Successfully rolled back stock movement with ID ${params.id}"
+            } catch (Exception e) {
+                log.warn("Unable to rollback stock movement with ID ${params.id}: " + e.message)
+                flash.message = "Unable to rollback stock movement with ID ${params.id}: " + e.message
+            }
+        } else {
+            flash.error = "You are not able to rollback shipment from your location."
         }
 
         redirect(action: "show", id: params.id)
@@ -160,7 +169,16 @@ class StockMovementController {
 
     def removeStockMovement = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
+        boolean isOrigin = stockMovement?.requisition?.origin?.id == session.warehouse.id
+        boolean isDestination = stockMovement?.requisition?.destination?.id == session.warehouse.id
+        boolean canManageInventory = stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)
+        if (!((canManageInventory && isOrigin) || (!canManageInventory && isDestination))) {
+            flash.error = "You are not able to delete stock movement from your location."
+            if (params.show) {
+                redirect(action: "show", id: params.id)
+                return
+            }
+        } else if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
             try {
                 Requisition requisition = stockMovement?.requisition
                 if (requisition) {
@@ -180,7 +198,9 @@ class StockMovementController {
                 log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
                 flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
             }
-        } else flash.message = "You cannot delete this shipment"
+        } else {
+            flash.message = "You cannot delete this shipment"
+        }
 
         redirect(action: "list")
     }
@@ -250,25 +270,7 @@ class StockMovementController {
 
     def exportCsv = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
-        // We need to create at least one row to ensure an empty template
-        if (stockMovement?.lineItems?.empty) {
-            stockMovement?.lineItems.add(new StockMovementItem())
-        }
-
-        def lineItems = stockMovement.lineItems.collect {
-            [
-                    requisitionItemId            : it?.id ?: "",
-                    "productCode (required)"     : it?.product?.productCode ?: "",
-                    productName                  : it?.product?.name ?: "",
-                    palletName                   : it?.palletName ?: "",
-                    boxName                      : it?.boxName ?: "",
-                    lotNumber                    : it?.lotNumber ?: "",
-                    "expirationDate (MM/dd/yyyy)": it?.expirationDate ? it?.expirationDate?.format("MM/dd/yyyy") : "",
-                    "quantity (required)"        : it?.quantityRequested ?: "",
-                    recipientId                  : it?.recipient?.id ?: ""
-            ]
-        }
+        List lineItems = stockMovementService.buildStockMovementItemList(stockMovement)
         String csv = dataService.generateCsv(lineItems)
         response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")

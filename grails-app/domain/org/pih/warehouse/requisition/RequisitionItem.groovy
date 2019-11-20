@@ -406,7 +406,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def isCanceledDuringPick() {
-        return requisition.status >= RequisitionStatus.PICKED && (modificationItem ? modificationItem.calculateQuantityPicked() == 0 : calculateQuantityPicked() == 0)
+         return requisition.status >= RequisitionStatus.PICKED && (modificationItem ? modificationItem.calculateQuantityPicked() == 0 : calculateQuantityPicked() == 0)
     }
 
     /**
@@ -444,8 +444,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return true if the requisition is no longer in the reviewing stage and there are no changes
      */
     def isApproved() {
-        //return requisition?.status > RequisitionStatus.REVIEWING && !isChanged()
-        return quantityApproved > 0
+        return quantityApproved > 0 && !isChanged() && !isCanceled()
     }
 
     def isPending() {
@@ -558,16 +557,12 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def calculateNumInventoryItem(Inventory inventory) {
-        long startTime = System.currentTimeMillis()
         def numInventoryItem = InventoryItem.findAllByProduct(product).size()
-        //log.debug "calculateNumInventoryItem: " + (System.currentTimeMillis() - startTime) + " ms"
         return numInventoryItem
     }
 
     def retrievePicklistItems() {
-        long startTime = System.currentTimeMillis()
         def picklistItems = PicklistItem.findAllByRequisitionItem(this)
-        println "retrievePicklistItems: " + (System.currentTimeMillis() - startTime) + " ms"
         return picklistItems
     }
 
