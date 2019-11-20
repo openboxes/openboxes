@@ -72,12 +72,10 @@ Bamboo should automatically trigger a build for OBNAVSTAGE, but if that doesn't 
 few minutes just go to the build plan page and trigger it manually.
 <http://bamboo.pih-emr.org:8085/browse/OPENBOXES-SDONS>
 
-
 ### Testing Release
 Once the latest release branch has been deployed to OBNAVSTAGE we can start the QA pass. During 
 this process we might add a few Bug tickets, but there should be no new features. Developers 
 should either create branches off of release/0.8.9 or commit directly to the release branch.
-
 
 ### Finalize Release
 Finalizing the release involves making the following changes to JIRA and Github.
@@ -88,14 +86,43 @@ release.
 1. Close any tickets that have been completed
 1. Move remaining tickets to the next sprint
 1. Remove or change the fixVersion of any open tickets (0.8.9 -> 0.8.10) 
-1. Go to Agile board > Active Sprints and close the current sprint (i.e. Sprint 30) using the 
-current date as the End Date.
-1. Jira > Agile Board > Complete Sprint
-1. Jira > Kanban Board > Release 
-1. Go to Versions page and merge 0.8.9 and 0.8.9-kanban1
-1. Github > Create new release with release notes (use WAR from Bamboo)
-1. Publish Release Notes to openboxes.com
+1. Go to Agile board > Active Sprints 
+1. Close the current sprint using the current date as the End Date.
+1. Go to Agile Board > Complete Sprint
+1. Go to Kanban Board > Release 
+1. Go to Versions page 
+1. Merge 0.8.9-kanban1 into 0.8.9
 1. Git > Merge release/0.8.9 into master
+
+        git checkout master
+        git merge release/0.8.9
+        git push
+        
 1. Git > Tag release/0.8.9 (http://docs.openboxes.com/en/latest/developer-guide/tagging/)
-1. Bamboo > Change openboxes-release back to master 
+
+        git tag -a v0.8.9 -m 'Release 0.8.9' <commit-sha>
+        git push --tags
+
+1. Git > Merge master into develop
+
+        git checkout develop
+        git merge master
+        # fix conflicts
+        git push
+        
+1. Git > Bump version
+
+        # bump version number in application.properties
+        git add application.properties
+        git commit -m "bumped app version to 0.8.10-SNAPSHOT"
+        git push
+
 1. Git > Delete release/0.8.9 branch
+
+        git branch -d release/0.8.9
+
+1. Github > Create new release with release notes 
+1. Bamboo > Download latest WAR from Daily Stable Build (master)
+1. GitHub > Upload WAR to release 
+1. Publish Release Notes to openboxes.com
+1. Bamboo > Change openboxes-release back to master 
