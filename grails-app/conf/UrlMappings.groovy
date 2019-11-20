@@ -16,7 +16,7 @@ class UrlMappings {
 
         "/snapshot/$action?"(controller: "inventorySnapshot")
 
-        "/$controller/$action?/$id?" {
+        "/$controller/$action?/$id**?" {
             constraints {
                 // apply constraints here
             }

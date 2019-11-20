@@ -424,9 +424,8 @@ class InventoryItemController {
         // now populate the rest of the commmand object
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
 
-        def demand = forecastingService.getDemand(cmd.warehouse, cmd.product)
 
-        [commandInstance: commandInstance, demand: demand]
+        [commandInstance: commandInstance]
     }
 
     /**
@@ -479,8 +478,6 @@ class InventoryItemController {
         // Compute the total quantity for the given product
         commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 
-        def demand = forecastingService.getDemand(locationInstance, productInstance)
-
         // FIXME Use this method instead of getQuantityByProductMap
         // NEED to add tests before we introduce this change
         //commandInstance.totalQuantity = inventoryService.getQuantityOnHand(locationInstance, productInstance)
@@ -493,7 +490,7 @@ class InventoryItemController {
         String jsonString = [product: productInstance.toJson(), inventoryItems: result] as JSON
         log.info "record inventory " + jsonString
 
-        [commandInstance: commandInstance, demand: demand, product: jsonString]
+        [commandInstance: commandInstance, product: jsonString]
     }
 
     def saveRecordInventory = { RecordInventoryCommand commandInstance ->
@@ -518,14 +515,12 @@ class InventoryItemController {
 
         commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
 
-        def demand = forecastingService.getDemand(warehouseInstance, productInstance)
-
         log.info "commandInstance.recordInventoryRows: "
         commandInstance?.recordInventoryRows.each {
             log.info "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
         }
 
-        render(view: "showRecordInventory", model: [commandInstance: commandInstance, demand: demand])
+        render(view: "showRecordInventory", model: [commandInstance: commandInstance])
     }
 
     def showTransactions = {

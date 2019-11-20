@@ -1,17 +1,16 @@
 <%@ page import="util.ConfigHelper" %>
 <div id="consumption">
-    <div class="message">
+    <div class="message information">
         <div class="right">
             <a href="javascript:void(-1);" id="consumption-config-btn" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'cog_edit.png')}" />&nbsp;
                 <warehouse:message code="default.configure.label" default="Configure"/>
             </a>
         </div>
-        Total and averages are for the last 6 months only, excluding the current month, as well as
-        any month before the oldest request. To change the
+        Totals and monthly averages are for the last 6 months only (excluding the current month and
+        any month before the oldest request). Click the Configure button to change the
         <span title="${monthKeys}">dates</span> and <span title="${reasonCodes}">reason codes</span>
         considered in the totals.
-
     </div>
     <div class="box">
         <h2>
@@ -55,17 +54,17 @@
                                 <g:formatNumber number="${monthlyQuantityRequested}" maxFractionDigits="0"/>
                             </td>
                             <td class="center middle">
-                                <div class="${monthlyQuantityPicked < monthlyQuantityApproved ? 'discrepancy': ''}" title="Picked should not be less than Approved">
                                     <g:formatNumber number="${monthlyQuantityApproved}" maxFractionDigits="0"/>
-                                </div>
                             </td>
                             <td class="center middle">
-                                <div class="${monthlyQuantityIssued < monthlyQuantityPicked ? 'discrepancy': ''}" title="Issued should not be less than Picked">
+                                <div class="${monthlyQuantityPicked < monthlyQuantityApproved ? 'discrepancy': ''}" title="Picked should not be less than Approved">
                                     <g:formatNumber number="${monthlyQuantityPicked}" maxFractionDigits="0"/>
                                 </div>
                             </td>
                             <td class="center middle">
-                                <g:formatNumber number="${monthlyQuantityIssued}" maxFractionDigits="0"/>
+                                <div class="${monthlyQuantityIssued < monthlyQuantityPicked ? 'discrepancy': ''}" title="Issued should not be less than Picked">
+                                    <g:formatNumber number="${monthlyQuantityIssued}" maxFractionDigits="0"/>
+                                </div>
                             </td>
                         </tr>
                         <tr class="prop data fade">
@@ -81,14 +80,12 @@
                                             <th><warehouse:message code="requisitionItem.status.label"/></th>
                                             <th><warehouse:message code="requisitionItem.cancelReasonCode.label"/></th>
                                             <th class="center middle"><warehouse:message code="requisitionItem.quantityRequested.label"/></th>
-                                            <th class="center middle"><warehouse:message code="requisitionItem.quantityRequired.label"/></th>
                                             <th class="center middle"><warehouse:message code="requisitionItem.quantityApproved.label"/></th>
                                             <th class="center middle"><warehouse:message code="requisitionItem.quantityPicked.label"/></th>
                                             <th class="center middle"><warehouse:message code="requisitionItem.quantityIssued.label" default="Issued"/></th>
                                         </tr>
                                         <g:set var="innerQuantityRequested" value="${0}"/>
                                         <g:set var="innerQuantityApproved" value="${0}"/>
-                                        <g:set var="innerQuantityRequired" value="${0}"/>
                                         <g:set var="innerQuantityPicked" value="${0}"/>
                                         <g:set var="innerQuantityIssued" value="${0}"/>
                                         <g:each var="requisitionItem" in="${entry.value.sort { it?.dateRequested }}" status="j">
@@ -96,10 +93,8 @@
                                             <g:set var="quantityApproved" value="${requisitionItem?.quantityApproved?:0}"/>
                                             <g:set var="quantityPicked" value="${requisitionItem?.quantityPicked?:0}"/>
                                             <g:set var="quantityIssued" value="${requisitionItem?.quantityIssued?:0}"/>
-                                            <g:set var="quantityRequired" value="${requisitionItem?.quantityRequired?:0}"/>
                                             <g:set var="innerQuantityRequested" value="${innerQuantityRequested + quantityRequested}"/>
                                             <g:set var="innerQuantityApproved" value="${innerQuantityApproved + quantityApproved}"/>
-                                            <g:set var="innerQuantityRequired" value="${innerQuantityRequired + quantityRequired}"/>
                                             <g:set var="innerQuantityPicked" value="${innerQuantityPicked + quantityPicked}"/>
                                             <g:set var="innerQuantityIssued" value="${innerQuantityIssued + quantityIssued}"/>
 
@@ -132,20 +127,17 @@
                                                     <g:formatNumber number="${quantityRequested}" maxFractionDigits="0"/>
                                                 </td>
                                                 <td class="center middle">
-                                                    <g:formatNumber number="${quantityRequired}" maxFractionDigits="0"/>
+                                                        <g:formatNumber number="${quantityApproved}" maxFractionDigits="0"/>
                                                 </td>
                                                 <td class="center middle">
                                                     <div class="${quantityPicked < quantityApproved ? 'discrepancy': ''}" title="Picked should not be less than approved">
-                                                        <g:formatNumber number="${quantityApproved}" maxFractionDigits="0"/>
-                                                    </div>
-                                                </td>
-                                                <td class="center middle">
-                                                    <div class="${quantityIssued < quantityPicked ? 'discrepancy': ''}" title="Issued should not be less than picked">
                                                         <g:formatNumber number="${quantityPicked}" maxFractionDigits="0"/>
                                                     </div>
                                                 </td>
                                                 <td class="center middle">
-                                                    <g:formatNumber number="${quantityIssued}" maxFractionDigits="0"/>
+                                                    <div class="${quantityIssued < quantityPicked ? 'discrepancy': ''}" title="Issued should not be less than picked">
+                                                        <g:formatNumber number="${quantityIssued}" maxFractionDigits="0"/>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </g:each>
@@ -156,9 +148,6 @@
                                                 </th>
                                                 <th class="center">
                                                     <g:formatNumber number="${innerQuantityRequested}" maxFractionDigits="0"/>
-                                                </th>
-                                                <th class="center">
-                                                    <g:formatNumber number="${innerQuantityRequired}" maxFractionDigits="0"/>
                                                 </th>
                                                 <th class="center">
                                                     <g:formatNumber number="${innerQuantityApproved}" maxFractionDigits="0"/>
@@ -180,9 +169,6 @@
                         <tr class="prop ${i%2?'even':'odd'}" style="cursor: pointer">
                             <td>
                                 ${monthKey}
-                            </td>
-                            <td class="center middle">
-                                <g:formatNumber number="${0}" maxFractionDigits="0"/>
                             </td>
                             <td class="center middle">
                                 <g:formatNumber number="${0}" maxFractionDigits="0"/>
