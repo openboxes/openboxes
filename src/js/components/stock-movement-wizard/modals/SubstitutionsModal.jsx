@@ -19,10 +19,10 @@ const FIELDS = {
     defaultMessage: 'Reason for not fulfilling full qty',
     attributes: {
       required: true,
+      className: 'mb-2',
     },
     getDynamicAttr: props => ({
       options: props.reasonCodes,
-      hidden: !props.originalItem,
     }),
   },
   substitutions: {
