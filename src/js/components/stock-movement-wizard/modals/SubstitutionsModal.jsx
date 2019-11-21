@@ -200,12 +200,11 @@ class SubstitutionsModal extends Component {
     const payload = {
       newQuantity: originalItem.quantitySelected && originalItem.quantitySelected !== '0' ? originalItem.quantityRequested - subQty : '',
       quantityRevised: originalItem.quantitySelected,
-      reasonCode: values.reasonCode,
       sortOrder: originalItem.sortOrder,
       substitutionItems: _.map(substitutions, sub => ({
         'newProduct.id': sub.productId,
         newQuantity: sub.quantitySelected,
-        reasonCode: 'SUBSTITUTION',
+        reasonCode: `SUBSTITUTION${values.reasonCode ? ` (${values.reasonCode})` : ''}`,
         sortOrder: originalItem.sortOrder,
       })),
     };
