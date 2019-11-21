@@ -36,6 +36,7 @@ const BTN_CLASS_MAPPER = {
 const FIELDS = {
   editPageItems: {
     type: ArrayField,
+    arrowsNavigation: true,
     rowComponent: TableRowWithSubfields,
     getDynamicRowAttr: ({ rowValues, subfield }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
