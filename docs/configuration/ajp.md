@@ -20,12 +20,10 @@
 
         sudo a2enmod jk
 
-
 1. Configure mod_jk workers.properties */etc/libapache2-mod-jk/workers.properties*
 
-        workers.tomcat_home=/opt/tomcat/apache-tomcat-7.0.94
-        workers.java_home=/usr/lib/jvm/java-7-openjdk-amd64
-
+        workers.tomcat_home=/opt/tomcat
+        workers.java_home=/usr/lib/jvm/zulu-7-amd64/jre
 
 ## To delegate requests from Apache to Tomcat
 

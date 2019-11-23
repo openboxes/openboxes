@@ -1,6 +1,27 @@
+## Using a version of Tomcat compiled with Java 8 (or only have Java 8 installed)
+```
+2018-10-31 12:44:45,463 [localhost-startStop-1] INFO  xml.XmlBeanDefinitionReader  - Loading XML bean definitions from ServletContext resource [/WEB-INF/applicationContext.xml]
+2018-10-31 12:44:46,299 [localhost-startStop-1] ERROR context.ContextLoader  - Context initialization failed
+org.springframework.beans.factory.access.BootstrapException: Error executing bootstraps; nested exception is java.lang.NoSuchMethodError: java.util.concurrent.ConcurrentHashMap.keySet()Ljava/util/concurrent/ConcurrentHashMap$KeySetView;
+  at org.codehaus.groovy.grails.web.context.GrailsContextLoader.createWebApplicationContext(GrailsContextLoader.java:87)
+  at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:197)
+  at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:47)
+  at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:5068)
+  at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5584)
+  at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:147)
+  at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:899)
+  at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:875)
+  at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:652)
+  at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:1091)
+  at org.apache.catalina.startup.HostConfig$DeployWar.run(HostConfig.java:1980)
+  at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:471)
+  at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+  at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+  at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+  at java.lang.Thread.run(Thread.java:745)
+```
 
-
-
+Please see the instructions for installing Java and Tomcat.
 
 ## Unable to load specified config location 
 You can ignore these errors because these files are only used to override the default `openboxes-config.properties`.

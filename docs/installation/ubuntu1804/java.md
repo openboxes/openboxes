@@ -48,7 +48,7 @@ This is probably the easiest solution, but also the least secure. Your friends w
 ## Option 1: Zulu Linux
 We're going to go with Option 1 since it appears the be the most straightforward approach at this point in time.
 
-1. Go to https://www.azul.com/
+1. Go to <https://www.azul.com/>
 1. Click on Downloads > Zulu Community
 1. Locate the Zulu Community Linux Repositories section
 1. Click the Apt-get link
@@ -83,7 +83,6 @@ Press <enter> to keep the current choice[*], or type selection number:
 ```
 If there's only one you'll see a message like this:
 ```
-[sudo] password for jmiranda: 
 There is only one alternative in link group java (providing /usr/bin/java): /usr/lib/jvm/zulu-7-amd64/jre/bin/java
 Nothing to configure.
 ```
