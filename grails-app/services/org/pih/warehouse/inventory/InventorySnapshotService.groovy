@@ -15,8 +15,10 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.reporting.TransactionFact
 
 import java.text.DateFormat
@@ -656,7 +658,7 @@ class InventorySnapshotService {
         return transactions
     }
 
-    def getTransactionReportDetails(Location location, List<Category> categories, Date startDate, Date endDate) {
+    def getTransactionReportDetails(Location location, List<Category> categories, List<Tag> tags, List<ProductCatalog> catalogs, Date startDate, Date endDate) {
 
         def transactionData = getTransactionReportData(location, startDate, endDate)
 
@@ -680,7 +682,8 @@ class InventorySnapshotService {
         products.addAll(balanceOpeningMap.keySet())
         products.addAll(balanceClosingMap.keySet())
 
-        def data = products.findAll { categories.contains(it.category) }.collect { Product product ->
+        def data = products.findAll { (categories.contains(it.category) && ((tags && it.hasOneOfTags(tags)) || (catalogs && it.hasOneOfCatalogs(catalogs)))) ||
+                (!tags && !catalogs && categories.contains(it.category)) }.collect { Product product ->
 
             // Get balances by product
             def balanceOpening = balanceOpeningMap.get(product) ?: 0
@@ -707,6 +710,7 @@ class InventorySnapshotService {
                     "Code"       : product.productCode,
                     "Name"       : product.name,
                     "Category"   : product.category.name,
+                    "Tag"        : product.tagsToString(),
                     "Unit Cost"  : product.pricePerUnit ?: ''
             ]
             row.put("Opening", balanceOpening)
@@ -726,7 +730,7 @@ class InventorySnapshotService {
         return data
     }
 
-    def getTransactionReportSummary(Location location, List<Category> categories, Date startDate, Date endDate) {
+    def getTransactionReportSummary(Location location, List<Category> categories, List<Tag> tags, List<ProductCatalog> catalogs, Date startDate, Date endDate) {
 
         // Get starting balance
         def balanceOpeningMap = getQuantityOnHandByProduct(location, startDate)
@@ -749,13 +753,14 @@ class InventorySnapshotService {
 
         // FIXME Category filtering should happen in the query but we need to add a category dimension
         // Flatten the data to make it easier to display
-        def data = products.findAll { categories.contains(it.category) }.collect { Product product ->
+        def data = products.findAll { (categories.contains(it.category) && ((tags && it.hasOneOfTags(tags)) || (catalogs && it.hasOneOfCatalogs(catalogs)))) ||
+                (!tags && !catalogs && categories.contains(it.category)) }.collect { Product product ->
 
             // Get balances by product
             def balanceOpening = balanceOpeningMap.get(product) ?: 0
             def balanceClosing = balanceClosingMap.get(product) ?: 0
 
-            // Get quantity by transaction
+            // Get quantity by transactionf
             def credits = transactionData.findAll {
                 it.productCode == product.productCode && it.transactionCode.equals("CREDIT")
             }

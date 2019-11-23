@@ -259,6 +259,8 @@ class ConsumptionController {
                         'Product code'      : row.product.productCode ?: '',
                         'Product'           : row.product.name,
                         'Category'          : row.product?.category?.name,
+                        'Formulary'         : row.product?.productCatalogsToString(),
+                        'Tag'               : row.product?.tagsToString(),
                         'UoM'               : row.product.unitOfMeasure ?: '',
                         'Qty issued'  : g.formatNumber(number: row.transferOutQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Qty expired': g.formatNumber(number: row.expiredQuantity, format: '###.#', maxFractionDigits: 1)?:'',
