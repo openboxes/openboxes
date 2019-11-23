@@ -144,6 +144,72 @@
                                                     placeholder="Detailed text description (optional)" />
                                             </td>
                                         </tr>
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label><warehouse:message code="product.handlingRequirements.label" default="Handling requirements"></warehouse:message></label>
+                                            </td>
+                                            <td class="value ${hasErrors(bean: productInstance, field: 'coldChain', 'errors')} ${hasErrors(bean: productInstance, field: 'controlledSubstance', 'errors')} ${hasErrors(bean: productInstance, field: 'hazardousMaterial', 'errors')}">
+                                                <table>
+                                                    <tr>
+                                                        <td>
+                                                            <g:checkBox name="coldChain" value="${productInstance?.coldChain}" />
+                                                            <label for="coldChain"><warehouse:message
+                                                                code="product.coldChain.label" />
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <g:checkBox name="controlledSubstance" value="${productInstance?.controlledSubstance}" />
+                                                            <label for="controlledSubstance"><warehouse:message
+                                                                code="product.controlledSubstance.label" />
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <g:checkBox name="hazardousMaterial" value="${productInstance?.hazardousMaterial}" />
+                                                            <label for="hazardousMaterial"><warehouse:message
+                                                                code="product.hazardousMaterial.label" />
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <g:checkBox name="reconditioned" value="${productInstance?.reconditioned}" />
+                                                            <label for="reconditioned"><warehouse:message
+                                                                    code="product.reconditioned.label" default="Reconditioned"/>
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label><warehouse:message code="product.inventoryControl.label" default="Inventory control"></warehouse:message></label>
+                                            </td>
+                                            <td class="value ${hasErrors(bean: productInstance, field: 'lotControl', 'errors')}">
+                                                <table>
+                                                    <tr>
+                                                        <td>
+                                                            <g:checkBox name="serialized" value="${productInstance?.serialized}" />
+                                                            <label for="serialized"><warehouse:message
+                                                                code="product.serialized.label" /></label>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <g:checkBox name="lotControl" value="${productInstance?.lotControl}" />
+                                                            <label for="lotControl"><warehouse:message
+                                                                code="product.lotControl.label" /></label>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+                                        </tr>
+
                                         <g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
 
                                             <g:if test="${attribute.active}">
@@ -304,10 +370,9 @@
 
                                                     <span class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</span>
                                                 </g:hasRoleFinance>
-
-
                                             </td>
                                         </tr>
+
                                     </tbody>
                                     <tfoot>
                                         <tr>
