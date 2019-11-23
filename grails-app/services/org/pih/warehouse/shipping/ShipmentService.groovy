@@ -332,7 +332,7 @@ class ShipmentService {
             eq("product", product)
         }
 
-        return shipmentItems
+        return shipmentItems.findAll { !it.isFullyReceived() }
     }
 
     /**
