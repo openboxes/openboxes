@@ -15,7 +15,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
-import grails.core.GrailsApplication
 import org.hibernate.FetchMode
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
@@ -45,6 +44,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 import org.springframework.validation.ObjectError
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
+import grails.util.Holders
 
 import javax.mail.internet.InternetAddress
 import java.math.RoundingMode
@@ -60,7 +60,6 @@ class ShipmentService {
     def identifierService
     def documentService
     def personDataService
-    GrailsApplication grailsApplication
 
     /**
      * Returns the shipment referenced by the passed id parameter;
@@ -1127,7 +1126,7 @@ class ShipmentService {
             throw new ValidationException("Failed to send shipment", shipmentInstance?.errors)
         }
 
-        grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipmentInstance, ShipmentStatusCode.SHIPPED))
+        Holders.grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipmentInstance, ShipmentStatusCode.SHIPPED))
 
     }
 

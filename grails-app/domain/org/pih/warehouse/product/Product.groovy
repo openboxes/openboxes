@@ -29,6 +29,7 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
+import grails.util.Holders
 
 
 /**
@@ -66,7 +67,7 @@ class Product implements Comparable, Serializable {
     }
 
     def publishPersistenceEvent = {
-        publishEvent(new InventorySnapshotEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
     }
 
     def afterInsert = publishPersistenceEvent
