@@ -18,6 +18,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import grails.util.Holders
 
 /**
  * A location can be a customer, warehouse, or supplier.
@@ -25,8 +26,8 @@ import org.pih.warehouse.shipping.Shipment
 class Location implements Comparable<Location>, java.io.Serializable {
 
     def publishPersistenceEvent = {
-        publishEvent(new InventorySnapshotEvent(this))
-        publishEvent(new RefreshProductAvailabilityEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this))
     }
 
     def afterInsert = publishPersistenceEvent
