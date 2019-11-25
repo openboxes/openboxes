@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.product.Product
+import grails.util.Holders
 
 /**
  * Represents an instance of a product, referenced by lot number
@@ -27,7 +28,7 @@ import org.pih.warehouse.product.Product
 class InventoryItem implements Serializable {
 
     def publishPersistenceEvent = {
-        publishEvent(new InventorySnapshotEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
     }
 
     def afterInsert = publishPersistenceEvent
