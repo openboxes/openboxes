@@ -17,6 +17,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import grails.util.Holders
 
 /**
  *  Represents a unit of work completed within a single warehouse.  A
@@ -51,11 +52,11 @@ class Transaction implements Comparable, Serializable {
     }
 
     def publishSaveEvent = {
-        publishEvent(new RefreshProductAvailabilityEvent(this, forceRefresh))
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this, forceRefresh))
     }
 
     def publishDeleteEvent = {
-        publishEvent(new RefreshProductAvailabilityEvent(this, true))
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this, true))
     }
 
     // ID won't be available until after the record is inserted

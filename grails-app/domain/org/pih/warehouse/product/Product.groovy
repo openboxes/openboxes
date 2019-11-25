@@ -29,6 +29,8 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
+import grails.util.Holders
+
 /**
  * An product is an instance of a generic.  For instance,
  * the product might be Ibuprofen, but the product is Advil 200mg
@@ -64,7 +66,7 @@ class Product implements Comparable, Serializable {
     }
 
     def publishPersistenceEvent = {
-        publishEvent(new InventorySnapshotEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
     }
 
     def afterInsert = publishPersistenceEvent
