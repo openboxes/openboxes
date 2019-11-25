@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.product
 
+import grails.util.Holders
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
@@ -67,7 +68,7 @@ class Product implements Comparable, Serializable {
     }
 
     def publishPersistenceEvent = {
-        publishEvent(new InventorySnapshotEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
     }
 
     def afterInsert = publishPersistenceEvent
