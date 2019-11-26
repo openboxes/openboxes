@@ -72,12 +72,14 @@
 				<g:message code="default.create.label" args="[g.message(code: 'default.debit.label').toLowerCase()]"/>
 			</g:link>
 		</div>
-		<div class="action-menu-item">
-			<g:link controller="inventory" action="createConsumed" params="['product.id':productInstance?.id]">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'package_stop.png')}"/>&nbsp;
-				<warehouse:message code="inventory.inventoryConsumed.label" />
-			</g:link>
-		</div>
+		<g:supports activityCode="${org.pih.warehouse.core.ActivityCode.CONSUME_STOCK}">
+			<div class="action-menu-item">
+				<g:link controller="inventory" action="createConsumed" params="['product.id':productInstance?.id]">
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'package_stop.png')}"/>&nbsp;
+					<warehouse:message code="inventory.inventoryConsumed.label" />
+				</g:link>
+			</div>
+		</g:supports>
 		<div class="action-menu-item">
 			<g:link controller="inventory" action="createExpired" params="['product.id':productInstance?.id]">
 				<img src="${createLinkTo(dir:'images/icons/silk',file:'hourglass.png')}"/>&nbsp;
