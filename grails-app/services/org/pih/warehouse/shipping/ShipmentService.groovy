@@ -1359,6 +1359,7 @@ class ShipmentService {
         creditTransaction.inventory = shipment?.destination?.inventory
         creditTransaction.transactionDate = shipment.receipt.actualDeliveryDate
         creditTransaction.receipt = shipment?.receipt
+        creditTransaction.requisition = shipment?.requisition
 
         shipment?.receipt?.receiptItems.each {
             def inventoryItem =
@@ -1417,6 +1418,7 @@ class ShipmentService {
             debitTransaction.destination = shipmentInstance?.destination
             debitTransaction.inventory = shipmentInstance?.origin?.inventory
             debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
+            debitTransaction.requisition = shipmentInstance.requisition
 
             shipmentInstance.shipmentItems.each {
                 def inventoryItem =

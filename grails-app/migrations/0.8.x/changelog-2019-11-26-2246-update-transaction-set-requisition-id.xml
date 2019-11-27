@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda (generated)" id="1574830064357-1">
+    <sql>
+      update transaction
+      left join shipment outbound on outbound.id = transaction.outgoing_shipment_id
+      left join requisition outbound_requisition on outbound_requisition.id = outbound.requisition_id
+      set transaction.requisition_id = outbound_requisition.id
+      where outgoing_shipment_id is not null
+      and transaction.requisition_id is null;
+    </sql>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1574830064357-2">
+    <sql>
+      update transaction
+      left join shipment inbound on inbound.id = transaction.incoming_shipment_id
+      left join requisition inbound_requisition on inbound_requisition.id = inbound.requisition_id
+      set transaction.requisition_id = inbound_requisition.id
+      where incoming_shipment_id is not null
+      and transaction.requisition_id is null;
+    </sql>
+  </changeSet>
+</databaseChangeLog>

@@ -59,8 +59,10 @@ class DataService {
         sql.withTransaction {
             try {
                 statementList.each { String statement ->
+                    def startTime = System.currentTimeMillis()
                     log.info "Executing statement " + statement
                     sql.execute(statement)
+                    log.info "Executed statement in " +  (System.currentTimeMillis() - startTime) + " ms"
                 }
                 sql.commit()
             } catch (Exception e) {
