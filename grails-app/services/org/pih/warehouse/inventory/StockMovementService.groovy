@@ -64,7 +64,7 @@ class StockMovementService {
         log.info "Update status ${id} " + status
         Requisition requisition = Requisition.get(id)
         if (status == RequisitionStatus.CHECKING) {
-            Shipment shipment = requisition.shipment
+            Shipment shipment = requisition.shipment ? requisition.shipment : new Shipment()
             shipment.expectedShippingDate = new Date()
         }
         if (!(status in RequisitionStatus.list())) {
