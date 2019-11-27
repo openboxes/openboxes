@@ -166,6 +166,11 @@ class UrlMappings {
 
         // Stocklist Item API
 
+        "/api/stocklistItems/$id"(parseRequest: true) {
+            controller = "stocklistItemApi"
+            action = [GET:"read", PUT:"update", DELETE:"remove", POST:"save"]
+        }
+
         "/api/stocklistItems/availableStocklists"(parseRequest: true) {
             controller = "stocklistItemApi"
             action = [GET: "availableStocklists"]

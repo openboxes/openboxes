@@ -22,14 +22,17 @@ class RoleFilters {
             'location'     : ['edit'],
             'shipper'      : ['create'],
             'locationGroup': ['create'],
-            'locationType' : ['create']
+            'locationType' : ['create'],
+            '*'            : ['remove']
     ]
 
     def static superuserControllers = []
     def static superuserActions = [
             '*'               : ['delete'],
             'console'         : ['index', 'execute'],
-            'inventory'       : ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
+            'inventory'       : ['createInboundTransfer', 'createOutboundTransfer',
+                                 'createConsumed', 'editTransaction', 'deleteTransaction',
+                                 'saveTransaction'],
             'inventoryItem'   : ['adjustStock', 'transferStock'],
             'productCatalog'  : ['create', 'importProductCatalog'],
             'transactionEntry': ['edit', 'delete', 'save', 'update'],
@@ -39,6 +42,8 @@ class RoleFilters {
     def filters = {
         readonlyCheck(controller: '*', action: '*') {
             before = {
+
+                log.info "Admin action: " + actionName + " Controller " + controllerName
 
                 // Anonymous
                 if (SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName) || actionName == "chooseLocation" ||
@@ -51,6 +56,8 @@ class RoleFilters {
                 def missManager = needManager(controllerName, actionName) && !userService.isUserManager(session.user)
                 def missAdmin = needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
                 def missSuperuser = needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
+
+                log.info "${missBrowser}:${missManager}:${missAdmin}:${missSuperuser}"
 
                 if (missBrowser || missManager || missAdmin || missSuperuser) {
                     log.info("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
