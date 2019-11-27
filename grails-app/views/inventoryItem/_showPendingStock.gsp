@@ -56,6 +56,9 @@
                         <th>
                             ${warehouse.message(code: 'requisition.quantityReceived.label')}
                         </th>
+                        <th>
+                            ${warehouse.message(code: 'requisition.quantityRemaining.label')}
+                        </th>
                     </g:if>
                 </tr>
 
@@ -112,6 +115,9 @@
                             <td>
                                 ${entry.value["quantityReceived"]} ${product?.unitOfMeasure}
                             </td>
+                            <td>
+                                ${entry.value["quantityRemaining"]} ${product?.unitOfMeasure}
+                            </td>
                         </g:if>
                     </tr>
                 </g:each>
@@ -145,6 +151,9 @@
                 <g:if test="${params.type=='INBOUND'}">
                 <td>
                     ${itemsMap.values()["quantityReceived"].sum()} ${product?.unitOfMeasure}
+                </td>
+                <td>
+                    ${itemsMap.values()["quantityRemaining"].sum()} ${product?.unitOfMeasure}
                 </td>
                 </g:if>
             </tr>

@@ -277,12 +277,14 @@ class InventoryItemController {
                 def quantityRequired = !shipmentItems ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() } : 0
                 def quantityPicked = !shipmentItems ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() } : 0
                 def quantityReceived = shipmentItems ? itemsMap[it].sum() { ShipmentItem shipmentItem -> shipmentItem.quantityReceived() } : 0
+                def quantityRemaining = shipmentItems ? itemsMap[it].sum() { ShipmentItem shipmentItem -> shipmentItem.quantityRemaining } : 0
 
                 def quantityMap = [
                         quantityRequested: quantityRequested,
                         quantityRequired : quantityRequired,
                         quantityPicked   : quantityPicked,
-                        quantityReceived : quantityReceived
+                        quantityReceived : quantityReceived,
+                        quantityRemaining: quantityRemaining
                 ]
                 itemsMap.put(it, quantityMap)
             }
