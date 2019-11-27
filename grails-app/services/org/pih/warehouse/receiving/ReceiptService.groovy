@@ -312,6 +312,7 @@ class ReceiptService {
         Transaction creditTransaction = new Transaction()
         creditTransaction.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
         creditTransaction.incomingShipment = shipment
+        creditTransaction.requisition = shipment?.requisition
         creditTransaction.receipt = receipt
         creditTransaction.source = shipment?.origin
         creditTransaction.destination = null
