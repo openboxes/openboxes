@@ -357,7 +357,7 @@
 			if($('#includeCategoryChildren').is(':checked')) {
 				params.includeCategoryChildren = $("#includeCategoryChildren").val();
 			}
-			var queryString = $.param(params);
+			var queryString = $.param(params, true);
 			window.location.href = '${request.contextPath}/json/getTransactionReport?' + queryString;
 		});
 
