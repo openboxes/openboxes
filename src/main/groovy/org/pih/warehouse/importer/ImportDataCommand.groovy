@@ -15,8 +15,7 @@ import org.springframework.web.multipart.MultipartFile
 
 class ImportDataCommand implements Validateable {
     def filename
-    def importFile
-    MultipartFile xlsFile
+    MultipartFile importFile
     String importType
     Location location
     Date date
@@ -33,7 +32,6 @@ class ImportDataCommand implements Validateable {
         date(nullable: true)
         filename(nullable: true)
         importFile(nullable: true)
-        xlsFile(nullable:true)
         importType(nullable: false)
         location(nullable: false)
         columnMap(nullable: true)
