@@ -1043,6 +1043,10 @@ class ProductService {
         // Iterate over each line and either update an existing product or create a new product
         csv.toCsvReader(['skipLines': 1]).eachLine { tokens ->
 
+            if (tokens.length != 4) {
+                throw new IllegalArgumentException("Expected columns: Catalog Code, Category, Product Code, Product Name")
+            }
+
             def productCatalogCode = tokens[0]
             def productCatalog = ProductCatalog.findByCode(productCatalogCode)
 
