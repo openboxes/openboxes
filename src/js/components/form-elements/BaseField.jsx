@@ -101,9 +101,16 @@ class BaseField extends Component {
         }
         return false;
       };
+      const copyDown = attr.copyDown ? attr.copyDown : () => {
+        if (otherProps.rowIndex < otherProps.rowCount - 1) {
+          otherProps.copyDown(otherProps.rowIndex + 1, focusThis);
+          return true;
+        }
+        return false;
+      };
 
       attr = {
-        ...attr, arrowLeft, arrowRight, arrowUp, arrowDown,
+        ...attr, arrowLeft, arrowRight, arrowUp, arrowDown, copyDown,
       };
     }
 
