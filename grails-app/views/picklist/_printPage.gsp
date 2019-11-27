@@ -30,7 +30,7 @@
                 <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.suggestedPick.label')}</th>
                 <th class="center">${warehouse.message(code:'requisitionItem.confirmedPick.label')}</th>
-                <th class="center">${warehouse.message(code:'stockMovement.comments.label')}</th>
+                <th class="center" style="min-width: 100px">${warehouse.message(code:'stockMovement.comments.label')}</th>
             </tr>
         </thead>
         <tbody>
@@ -133,39 +133,7 @@
                             <!-- Checked by -->
                         </td>
                         <td class="middle">
-                            <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
-                                <g:if test="${requisitionItem.parentRequisitionItem?.isSubstituted()}">
-                                    ${warehouse.message(code:'requisitionItem.substituted.label')}
-                                </g:if>
-                                <g:elseif test="${requisitionItem.parentRequisitionItem?.isChanged()}">
-                                    ${warehouse.message(code:'requisitionItem.modified.label')}
-                                </g:elseif>
-                                <i>
-                                    ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}
-                                </i>
-                                <g:if test="${requisitionItem?.parentRequisitionItem?.cancelComments}">
-                                    <blockquote>
-                                        ${requisitionItem?.parentRequisitionItem?.cancelComments}
-                                    </blockquote>
-                                </g:if>
-                            </g:if>
-                            <g:if test="${requisitionItem?.cancelReasonCode}">
-                                <g:if test="${requisitionItem?.isCanceled()}">
-                                    ${warehouse.message(code:'requisitionItem.canceled.label')}
-                                </g:if>
-                                <i>
-                                    ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode)}
-                                </i>
-                                <g:if test="${requisitionItem?.cancelComments}">
-                                    <blockquote>
-                                        ${requisitionItem?.cancelComments}
-                                    </blockquote>
-                                </g:if>
-                            </g:if>
-                            <g:if test="${picklistItems}">
-                                <i>${picklistItems[j]?.reasonCode}</i>
-                            </g:if>
-
+                            <!-- Comments -->
                         </td>
                         <% j++ %>
                     </tr>
