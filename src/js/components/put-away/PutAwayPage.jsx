@@ -10,7 +10,7 @@ import 'react-table/react-table.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
 import Select from '../../utils/Select';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
+import apiClient, { parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import Translate from '../../utils/Translate';
@@ -160,7 +160,7 @@ class PutAwayPage extends Component {
    */
   fetchPutAwayCandidates(locationId) {
     this.props.showSpinner();
-    const url = `/api/putaways?location.id=${locationId}`;
+    const url = `/api/putaways?location=${locationId}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -193,18 +193,18 @@ class PutAwayPage extends Component {
    */
   createPutAway() {
     this.props.showSpinner();
-    const url = `/api/putaways?location.id=${this.props.locationId}`;
+    const url = `/api/putaways?location=${this.props.locationId}`;
     const items = _.filter(this.state.putawayItems, item =>
       _.includes([...this.state.selection], item._id));
     const payload = {
       putawayNumber: '',
-      'putawayAssignee.id': '',
+      putawayAssignee: '',
       putawayStatus: 'PENDING',
       putawayDate: '',
       putawayItems: _.map(items, item => ({ ...item, putawayStatus: 'PENDING' })),
     };
 
-    return apiClient.post(url, flattenRequest(payload))
+    return apiClient.post(url, payload)
       .then((response) => {
         const putAway = parseResponse(response.data.data);
 
