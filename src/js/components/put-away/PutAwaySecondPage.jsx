@@ -13,7 +13,7 @@ import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import SplitLineModal from 'components/put-away/SplitLineModal';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import showLocationChangedAlert from 'utils/location-change-alert';
@@ -507,7 +507,7 @@ class PutAwaySecondPage extends Component {
     const url = '/putAway/generatePdf';
     const { putawayNumber } = this.state.putAway;
 
-    return apiClient.post(url, flattenRequest(this.state.putAway), { responseType: 'blob' })
+    return apiClient.post(url, this.state.putAway, { responseType: 'blob' })
       .then((response) => {
         fileDownload(response.data, `PutawayReport${putawayNumber ? `-${putawayNumber}` : ''}.pdf`, 'application/pdf');
         this.fetchItems(this.state.sortBy);
