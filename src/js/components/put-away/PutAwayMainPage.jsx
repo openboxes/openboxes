@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom';
 import PutAwayPage from './PutAwayPage';
 import PutAwaySecondPage from './PutAwaySecondPage';
 import PutAwayCheckPage from './PutAwayCheckPage';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
+import apiClient, { parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
 
 /** Main put-away form's component. */
@@ -105,9 +105,9 @@ class PutAwayMainPage extends Component {
    */
   savePutAways(putAwayToSave, callback) {
     this.props.showSpinner();
-    const url = `/api/putaways?location.id=${this.props.location.id}`;
+    const url = `/api/putaways?location=${this.props.location.id}`;
 
-    return apiClient.post(url, flattenRequest(putAwayToSave))
+    return apiClient.post(url, putAwayToSave)
       .then((response) => {
         const putAway = parseResponse(response.data.data);
 
