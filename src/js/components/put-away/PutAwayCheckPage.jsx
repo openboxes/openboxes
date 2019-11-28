@@ -11,7 +11,7 @@ import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
-import apiClient, { flattenRequest } from '../../utils/apiClient';
+import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import showLocationChangedAlert from '../../utils/location-change-alert';
@@ -226,7 +226,7 @@ class PutAwayCheckPage extends Component {
 
   save() {
     this.props.showSpinner();
-    const url = `/api/putaways?location.id=${this.state.location.id}`;
+    const url = `/api/putaways?location=${this.state.location.id}`;
     const payload = {
       ...this.props.initialValues.putAway,
       putawayStatus: 'COMPLETED',
@@ -239,7 +239,8 @@ class PutAwayCheckPage extends Component {
         })),
       })),
     };
-    return apiClient.post(url, flattenRequest(payload))
+
+    return apiClient.post(url, payload)
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'), { timeout: 3000 });

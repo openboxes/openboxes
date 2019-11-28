@@ -14,7 +14,7 @@ import 'react-table/react-table.css';
 import customTreeTableHOC from '../../utils/CustomTreeTable';
 import Select from '../../utils/Select';
 import SplitLineModal from './SplitLineModal';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
+import apiClient, { parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import Filter from '../../utils/Filter';
 import showLocationChangedAlert from '../../utils/location-change-alert';
@@ -346,7 +346,7 @@ class PutAwaySecondPage extends Component {
    */
   fetchBins() {
     this.props.showSpinner();
-    const url = `/api/internalLocations?location.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
+    const url = `/api/internalLocations?location=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -475,10 +475,10 @@ class PutAwaySecondPage extends Component {
    */
   generatePutAwayList() {
     this.props.showSpinner();
-    const url = '/openboxes/putAway/generatePdf/ff80818164ae89800164affcfe6e0001';
+    const url = '/putAway/generatePdf/ff80818164ae89800164affcfe6e0001';
     const { putawayNumber } = this.state.putAway;
 
-    return apiClient.post(url, flattenRequest(this.state.putAway), { responseType: 'blob' })
+    return apiClient.post(url, this.state.putAway, { responseType: 'blob' })
       .then((response) => {
         fileDownload(response.data, `PutawayReport${putawayNumber ? `-${putawayNumber}` : ''}.pdf`, 'application/pdf');
         this.fetchItems(this.state.sortBy);
