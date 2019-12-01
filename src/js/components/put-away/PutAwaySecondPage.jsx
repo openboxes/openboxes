@@ -346,7 +346,7 @@ class PutAwaySecondPage extends Component {
    */
   fetchBins() {
     this.props.showSpinner();
-    const url = `/api/internalLocations?location=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
+    const url = `/api/internalLocations?location.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
 
     return apiClient.get(url)
       .then((response) => {
