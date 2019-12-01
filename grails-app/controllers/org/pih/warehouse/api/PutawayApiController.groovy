@@ -28,7 +28,7 @@ class PutawayApiController {
     PdfRenderingService pdfRenderingService
 
     def list = {
-        String locationId = params?.location ?: session?.warehouse?.id
+        String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
         if (!location) {
             throw new IllegalArgumentException("Must provide location.id as request parameter")
