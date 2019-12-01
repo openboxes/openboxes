@@ -31,7 +31,18 @@ class ImportDataCommand implements Validateable {
     static constraints = {
         date(nullable: true)
         filename(nullable: true)
-        importFile(nullable: true)
+        importFile(nullable: true, validator: { val, obj ->
+            if ( val == null ) {
+                return false
+            }
+            if ( val.isEmpty() ) {
+                return false
+            }
+
+            return ['application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv'].any { fileType ->
+                val.part.fileItem.contentType == fileType
+            }
+        })
         importType(nullable: false)
         location(nullable: false)
         columnMap(nullable: true)

@@ -6,7 +6,7 @@
                     <label><warehouse:message code="inventory.uploadAFileToImport.label"/></label>
                 </td>
                 <td class="value">
-                    <input name="xlsFile" type="file" />
+                    <input name="importFile" type="file" />
                 </td>
             </tr>
 

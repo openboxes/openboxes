@@ -828,11 +828,6 @@ class ProductController {
 
             // Step 1: Upload file
             if (uploadFile && !uploadFile?.empty) {
-
-                def contentTypes = ['application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv']
-                println "Content type: " + uploadFile.contentType
-                println "Validate: " + contentTypes.contains(uploadFile.contentType)
-
                 try {
 
                     // Upload file

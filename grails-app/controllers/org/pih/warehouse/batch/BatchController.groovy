@@ -27,7 +27,7 @@ import org.pih.warehouse.importer.ProductSupplierExcelImporter
 import org.pih.warehouse.importer.TagExcelImporter
 import org.pih.warehouse.importer.UserExcelImporter
 import org.pih.warehouse.importer.UserLocationExcelImporter
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest
+import org.springframework.web.multipart.MultipartFile
 
 class BatchController {
 
@@ -100,9 +100,9 @@ class BatchController {
     def importData(ImportDataCommand command) {
 
         if ("POST".equals(request.getMethod())) {
-            File localFile = null
+            MultipartFile localFile = null
             if (request instanceof StandardMultipartHttpServletRequest) {
-                def uploadFile = request.getFile('xlsFile')
+                def uploadFile = request.getFile('importFile')
                 if (!uploadFile?.empty) {
                     try {
                         localFile = uploadService.createLocalFile(uploadFile.originalFilename)
