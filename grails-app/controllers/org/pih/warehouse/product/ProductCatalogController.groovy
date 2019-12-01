@@ -11,14 +11,12 @@ package org.pih.warehouse.product
 
 
 import org.pih.warehouse.core.UploadService
-import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.ImportDataCommand
 
 class ProductCatalogController {
 
     UploadService uploadService
     ProductService productService
-    DataService dataService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -155,17 +153,16 @@ class ProductCatalogController {
 
     def importProductCatalog = { ImportDataCommand command ->
 
+        log.info "uploadCsv " + params
+
+        def columns
+        def localFile
+        def uploadFile = command?.importFile
+
         if (request.method == "POST") {
 
             // Step 1: Upload file
-            def uploadFile = command?.importFile
             if (uploadFile && !uploadFile?.empty) {
-
-                // FIXME Validation belongs in command object
-                def contentTypes = ['application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv']
-                log.info "Content type: " + uploadFile.contentType
-                log.info "Validate: " + contentTypes.contains(uploadFile.contentType)
-
                 try {
 
                     // Upload file
@@ -189,7 +186,6 @@ class ProductCatalogController {
 
                 } catch (Exception e) {
                     log.error("Exception occurred while uploading product import CSV " + e.message, e)
-                    //flash.message = "${e.message}"
                     command.errors.rejectValue("importFile", e.message)
                 }
             } else {
