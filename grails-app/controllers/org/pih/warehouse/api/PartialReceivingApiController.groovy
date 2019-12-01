@@ -101,13 +101,6 @@ class PartialReceivingApiController {
             PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, "1")
 
             def importFile = command.importFile
-            if (importFile.isEmpty()) {
-                throw new IllegalArgumentException("File cannot be empty")
-            }
-
-            if (importFile.part.fileItem.contentType != "text/csv") {
-                throw new IllegalArgumentException("File must be in CSV format")
-            }
 
             String csv = new String(importFile.bytes)
             def settings = [separatorChar: ',', skipLines: 1]
