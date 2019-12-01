@@ -105,7 +105,7 @@ class PutAwayMainPage extends Component {
    */
   savePutAways(putAwayToSave, callback) {
     this.props.showSpinner();
-    const url = `/api/putaways?location=${this.props.location.id}`;
+    const url = `/api/putaways?location.id=${this.props.location.id}`;
 
     return apiClient.post(url, putAwayToSave)
       .then((response) => {
