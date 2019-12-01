@@ -218,7 +218,7 @@ class PutAwayCheckPage extends Component {
 
   save() {
     this.props.showSpinner();
-    const url = `/api/putaways?location=${this.state.location.id}`;
+    const url = `/api/putaways?location.id=${this.state.location.id}`;
     const payload = {
       ...this.props.putAway,
       putawayStatus: 'COMPLETED',
