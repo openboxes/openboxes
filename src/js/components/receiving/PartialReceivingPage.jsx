@@ -205,12 +205,17 @@ const FIELDS = {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.code.label',
         defaultMessage: 'Code',
+        headerAlign: 'left',
         flexWidth: '0.8',
+        attributes: {
+          className: 'text-left ml-1',
+        },
       },
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
-        label: 'react.partialReceiving.name.label',
-        defaultMessage: 'Name',
+        label: 'react.partialReceiving.product.label',
+        defaultMessage: 'Product',
+        headerAlign: 'left',
         flexWidth: '3.3',
         attributes: {
           className: 'text-left ml-1',
