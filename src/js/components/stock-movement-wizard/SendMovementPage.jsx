@@ -639,7 +639,7 @@ class SendMovementPage extends Component {
                       <th><Translate id="react.stockMovement.packLevel1.label" defaultMessage="Pack level 1" /> </th>
                       <th><Translate id="react.stockMovement.packLevel2.label" defaultMessage="Pack level 2" /> </th>
                       <th><Translate id="react.stockMovement.code.label" defaultMessage="Code" /> </th>
-                      <th><Translate id="react.stockMovement.productName.label" defaultMessage="Product name" /> </th>
+                      <th className="text-left"><span className="ml-4"><Translate id="react.stockMovement.product.label" defaultMessage="Product" /></span></th>
                       <th><Translate id="react.stockMovement.lot.label" defaultMessage="Lot" /> </th>
                       <th><Translate id="react.stockMovement.expiry.label" defaultMessage="Expiry" /> </th>
                       <th style={{ width: '150px' }}><Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" /> </th>

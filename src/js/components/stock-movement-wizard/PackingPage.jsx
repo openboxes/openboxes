@@ -33,14 +33,19 @@ const FIELDS = {
       productCode: {
         type: LabelField,
         flexWidth: '0.7',
+        headerAlign: 'left',
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          className: 'text-left ml-1',
+        },
       },
       productName: {
         type: LabelField,
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product Name',
         flexWidth: '3',
+        headerAlign: 'left',
         attributes: {
           className: 'text-left ml-1',
         },
