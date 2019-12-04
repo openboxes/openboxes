@@ -26,6 +26,7 @@ class OrderItem implements Serializable {
     Product product
     InventoryItem inventoryItem
     Integer quantity
+    Integer quantityFulfilled
     BigDecimal unitPrice
     String currencyCode
 
@@ -67,6 +68,7 @@ class OrderItem implements Serializable {
         destinationBinLocation(nullable: true)
         recipient(nullable: true)
         currencyCode(nullable: true)
+        quantityFulfilled(nullable: true)
     }
 
 
@@ -74,29 +76,17 @@ class OrderItem implements Serializable {
         return (product) ? "Product" : (category) ? "Category" : "Unclassified"
     }
 
-    Integer quantityFulfilled() {
-        def quantity = 0
-        try {
-            def shipmentItems = shipmentItems()
-            quantity = shipmentItems?.sum { it?.quantity }
-        }
-        catch (Exception e) {
-            log.error "Error calculating quantity fulfilled: " + e.message
-        }
-        return quantity ?: 0
-    }
-
     Integer quantityRemaining() {
-        return quantity - quantityFulfilled()
+        return quantityFulfilled ? quantity - quantityFulfilled : quantity
     }
 
 
     Boolean isPartiallyFulfilled() {
-        return quantityFulfilled() > 0 && quantityFulfilled() < quantity
+        return quantityFulfilled ? quantityFulfilled > 0 && quantityFulfilled < quantity : false
     }
 
     Boolean isCompletelyFulfilled() {
-        return quantityFulfilled() >= quantity
+        return quantityFulfilled ? quantityFulfilled >= quantity : false
     }
 
     Boolean isPending() {

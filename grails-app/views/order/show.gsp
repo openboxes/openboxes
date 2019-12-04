@@ -173,7 +173,7 @@
                                                     </td>
                                                     <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
                                                         <td class="order-item-fullfilled">
-                                                            ${orderItem?.quantityFulfilled()}
+                                                            ${orderItem?.quantityFulfilled?:0}
                                                             ${orderItem?.product?.unitOfMeasure?:"EA"}
                                                         </td>
                                                         <td class="">

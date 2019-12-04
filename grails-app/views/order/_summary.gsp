@@ -30,7 +30,7 @@
 	</g:if>
 	<g:else>
 		<table>
-			<tbody>			
+			<tbody>
 				<tr>
 					<td>
 						<div class="title">
@@ -41,7 +41,7 @@
                                 <warehouse:message code="order.untitled.label"/>
                             </g:else>
 						</div>
-					</td>										
+					</td>
 					<td width="1%" class="right">
                         <div class="tag tag-alert">
                             <warehouse:message code="default.new.label"/>
@@ -115,19 +115,10 @@
                             ${warehouse.message(code: 'order.wizard.placeOrder.label')}</g:link>
 
                     </g:else>
-                    <g:if test="${!orderInstance?.isReceived() && orderInstance?.isPlaced() || orderInstance?.isPartiallyReceived()}">
-                        <g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}" class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                            ${warehouse.message(code: 'order.wizard.receiveOrder.label')}
-                        </g:link>
-                    </g:if>
-                    <g:else>
-                        <g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}" class="button" onClick="alert('You cannot perform this action at this time.'); return false;">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                            ${warehouse.message(code: 'order.wizard.receiveOrder.label')}
-                        </g:link>
-                    </g:else>
-
+                    <g:link controller="order" action="shipOrder" id="${orderInstance?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
+                        <warehouse:message code="order.shipOrder.label" default="Ship Order"/>
+                    </g:link>
                 </div>
                 <div class="button-group">
                     <g:link controller="order" action="print" id="${orderInstance?.id}" class="button" target="_blank">
