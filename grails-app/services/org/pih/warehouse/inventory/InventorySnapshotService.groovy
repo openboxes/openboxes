@@ -710,6 +710,7 @@ class InventorySnapshotService {
                     "Code"       : product.productCode,
                     "Name"       : product.name,
                     "Category"   : product.category.name,
+                    "Formulary"  : product.productCatalogsToString(),
                     "Tag"        : product.tagsToString(),
                     "Unit Cost"  : product.pricePerUnit ?: ''
             ]
