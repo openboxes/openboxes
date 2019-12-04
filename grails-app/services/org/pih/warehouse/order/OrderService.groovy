@@ -472,6 +472,13 @@ class OrderService {
         return true
     }
 
+    def updateOrderItem(OrderItem orderItem, Integer quantity) {
+        if (!orderItem.quantityFulfilled) {
+            orderItem.quantityFulfilled = quantity
+        } else {
+            orderItem.quantityFulfilled += quantity
+        }
+    }
 
     List<OrderItem> getPendingInboundOrderItems(Location destination, Product product) {
         def orderItems = OrderItem.createCriteria().list() {

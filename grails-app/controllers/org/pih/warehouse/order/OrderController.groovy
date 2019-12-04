@@ -10,6 +10,7 @@
 package org.pih.warehouse.order
 
 import org.apache.commons.lang.StringEscapeUtils
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile
 
 class OrderController {
     def orderService
+    def stockMovementService
     def reportService
 
     static allowedMethods = [save: "POST", update: "POST"]
@@ -70,6 +72,12 @@ class OrderController {
 
     def create = {
         redirect(controller: 'purchaseOrderWorkflow', action: 'index')
+    }
+
+    def shipOrder = {
+        def orderInstance = Order.get(params.id)
+        StockMovement stockMovement = stockMovementService.createFromOrder(orderInstance);
+        redirect(controller: 'stockMovement', action: "create", params: [id: stockMovement.id])
     }
 
     def save = {

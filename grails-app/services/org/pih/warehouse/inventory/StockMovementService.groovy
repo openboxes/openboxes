@@ -32,6 +32,8 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -61,6 +63,7 @@ class StockMovementService {
     def locationService
     def inventoryService
     def inventorySnapshotService
+    def orderService
 
     boolean transactional = true
 
@@ -71,6 +74,13 @@ class StockMovementService {
         if (!stockMovement.validate()) {
             throw new ValidationException("Invalid stock movement", stockMovement.errors)
         }
+        Requisition requisition = createRequisition(stockMovement)
+        return StockMovement.createFromRequisition(requisition)
+    }
+
+    def createFromOrder(Order order) {
+        StockMovement stockMovement = StockMovement.createFormOrder(order)
+
         Requisition requisition = createRequisition(stockMovement)
         return StockMovement.createFromRequisition(requisition)
     }
@@ -876,6 +886,12 @@ class StockMovementService {
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName()
+        requisition.requisitionItems = []
+
+        stockMovement.lineItems.each { stockMovementItem ->
+            RequisitionItem requisitionItem = RequisitionItem.createFromStockMovementItem(stockMovementItem, requisition)
+            requisition.requisitionItems.add(requisitionItem)
+        }
 
         addStockListItemsToRequisition(stockMovement, requisition)
         if (requisition.hasErrors() || !requisition.save(flush: true)) {
@@ -967,6 +983,7 @@ class StockMovementService {
                     requisitionItem.lotNumber = stockMovementItem.lotNumber
                     requisitionItem.expirationDate = stockMovementItem.expirationDate
                     requisitionItem.orderIndex = stockMovementItem.sortOrder
+                    requisitionItem.orderItem = stockMovementItem.orderItem
                     requisition.addToRequisitionItems(requisitionItem)
                 }
             }
@@ -1486,6 +1503,12 @@ class StockMovementService {
         }
 
         shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
+        requisition.requisitionItems.each { requisitionItem ->
+            if (requisitionItem.orderItem) {
+                OrderItem orderItem = OrderItem.get(requisitionItem.orderItem.id)
+                orderService.updateOrderItem(orderItem, requisitionItem.quantity)
+            }
+        }
     }
 
     void validateRequisition(Requisition requisition) {
@@ -1519,6 +1542,12 @@ class StockMovementService {
         if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
             shipmentService.rollbackLastEvent(shipment)
             requisitionService.rollbackRequisition(requisition)
+            requisition.requisitionItems.each { requisitionItem ->
+                if (requisitionItem.orderItem) {
+                    OrderItem orderItem = OrderItem.get(requisitionItem.orderItem.id)
+                    orderService.updateOrderItem(orderItem, -requisitionItem.quantity)
+                }
+            }
         }
     }
 
