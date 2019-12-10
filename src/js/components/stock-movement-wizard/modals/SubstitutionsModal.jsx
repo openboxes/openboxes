@@ -201,6 +201,7 @@ class SubstitutionsModal extends Component {
       newQuantity: originalItem.quantitySelected && originalItem.quantitySelected !== '0' ? originalItem.quantityRequested - subQty : '',
       quantityRevised: originalItem.quantitySelected,
       sortOrder: originalItem.sortOrder,
+      reasonCode: values.reasonCode,
       substitutionItems: _.map(substitutions, sub => ({
         'newProduct.id': sub.productId,
         newQuantity: sub.quantitySelected,
