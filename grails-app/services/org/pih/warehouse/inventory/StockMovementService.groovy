@@ -1045,10 +1045,10 @@ class StockMovementService {
         //this is for split line during substitution (if substituted item has available quantity it shows up in the substitutions list)
         if (stockMovementItem.newQuantity) {
             Integer changedQuantity = requisitionItem.quantity - stockMovementItem.newQuantity?.intValueExact()
-            requisitionItem.quantity = changedQuantity > 0 ? changedQuantity : 0
+            requisitionItem.quantity = changedQuantity > 0 && changedQuantity < requisitionItem.quantity ? changedQuantity : requisitionItem.quantity
 
             RequisitionItem newItem = new RequisitionItem()
-            newItem.quantity = stockMovementItem.newQuantity?.intValueExact() > 0 ? stockMovementItem.newQuantity?.intValueExact() : 0
+            newItem.quantity = stockMovementItem.quantityRevised
             newItem.quantityApproved = newItem.quantity
             newItem.orderIndex = stockMovementItem.sortOrder
             newItem.product = requisitionItem.product
