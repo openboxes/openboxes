@@ -34,10 +34,10 @@
             <g:if test="${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick()}">
                 <g:message code="enum.RequisitionItemStatus.CANCELED"/>
             </g:if>
-            <g:elseif test="${requisitionItem.isReduced()}">
+            <g:elseif test="${requisitionItem.isReduced() && !requisitionItem.isSubstituted()}">
                 <g:message code="enum.RequisitionItemStatus.REDUCED"/>
             </g:elseif>
-            <g:elseif test="${requisitionItem.isIncreased()}">
+            <g:elseif test="${requisitionItem.isIncreased() && !requisitionItem.isSubstituted()}">
                 <g:message code="enum.RequisitionItemStatus.INCREASED"/>
             </g:elseif>
             <g:elseif test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
