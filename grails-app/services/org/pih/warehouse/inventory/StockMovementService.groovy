@@ -1060,17 +1060,6 @@ class StockMovementService {
             newItem.requisition = requisition
             newItem.save()
 
-            //when line is split all not substituted quantity goes to the split item, when it's higher than quantity chosen for this item, split item is revised
-            //newQuantity - calculated on frontend, it's original item quantity minus sum of all substitution items quantities
-            //quantityRevised - quantity selected by the user for the split line item
-            if (stockMovementItem.quantityRevised != null && stockMovementItem.quantityRevised.intValueExact() < stockMovementItem.newQuantity?.intValueExact()) {
-                newItem.changeQuantity(
-                        stockMovementItem?.quantityRevised?.intValueExact(),
-                        stockMovementItem.reasonCode,
-                        stockMovementItem.comments)
-                newItem.quantityApproved = 0
-            }
-
             requisition.addToRequisitionItems(newItem)
 
             createMissingPicklistForStockMovementItem(StockMovementItem.createFromRequisitionItem(newItem))
