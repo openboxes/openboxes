@@ -37,7 +37,7 @@ class TableRowWithSubfields extends Component {
     const field = _.get(this.fieldRefs, `[${index}].${fieldName}`);
     const valueToCopy = _.get(this.fieldRefs, `[${index - 1}].${fieldName}.value`);
 
-    if (field && valueToCopy) {
+    if (field && valueToCopy && !field.disabled) {
       field.value = valueToCopy;
       field.focus();
     }
