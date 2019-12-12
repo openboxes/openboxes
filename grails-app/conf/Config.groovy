@@ -550,6 +550,9 @@ openboxes.locale.defaultCurrencySymbol = "\$"
 // Inventory snapshot configuration
 openboxes.inventorySnapshot.batchSize = 1500
 
+// Minimum date for expiration date
+openboxes.expirationDate.minValue = new Date("01/01/2000")
+
 // Global megamenu configuration
 openboxes.megamenu.dashboard.enabled = true
 openboxes.megamenu.analytics.enabled = true
@@ -620,4 +623,8 @@ grails.gorm.default.mapping = {
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentTimeOfDay, class: org.joda.time.TimeOfDay
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYearMonthDay, class: org.joda.time.YearMonthDay
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYears, class: org.joda.time.Years
+}
+
+grails.gorm.default.constraints = {
+    expirationDateConstraint(nullable:true, min: openboxes.expirationDate.minValue)
 }

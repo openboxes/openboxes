@@ -39,6 +39,7 @@ const initialState = {
   ipAddress: '',
   hostname: '',
   timezone: '',
+  minimumExpirationDate: '',
 };
 
 export default function (state = initialState, action) {
@@ -63,6 +64,7 @@ export default function (state = initialState, action) {
         ipAddress: _.get(action, 'payload.data.data.ipAddress'),
         hostname: _.get(action, 'payload.data.data.hostname'),
         timezone: _.get(action, 'payload.data.data.timezone'),
+        minimumExpirationDate: _.get(action, 'payload.data.data.minimumExpirationDate'),
       };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload };
