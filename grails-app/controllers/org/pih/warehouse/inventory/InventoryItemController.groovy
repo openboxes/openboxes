@@ -37,6 +37,7 @@ class InventoryItemController {
     def requisitionService
     def orderService
     def forecastingService
+    def grailsApplication
 
 
     def index = {
@@ -739,6 +740,7 @@ class InventoryItemController {
         log.info "Params " + params
         def itemInstance = InventoryItem.get(params.id)
         def productInstance = Product.get(params?.product?.id)
+        def date = grailsApplication.config.openboxes.expirationDate.minValue
         if (itemInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -757,8 +759,13 @@ class InventoryItemController {
             if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
             } else {
-                flash.message = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
+                flash.error = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
                 log.info "There were errors trying to save inventory item " + itemInstance?.errors
+                if (params.expirationDate < date) {
+                    flash.error = "This date is invalid. Please enter a date after ${date.getYear()+1900}."
+                    redirect(controller: "inventoryItem", action: "showLotNumbers", id: productInstance?.id)
+                    return
+                }
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"

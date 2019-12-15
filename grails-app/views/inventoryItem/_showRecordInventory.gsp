@@ -100,14 +100,22 @@
 										</g:else>
                                     </td>
                                     <td>
-                                        <g:hiddenField name="recordInventoryRows[${status}].expirationDate"
-                                                       value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
-                                        <g:if test="${recordInventoryRow?.expirationDate}">
-                                            <format:expirationDate obj="${recordInventoryRow?.expirationDate}"/>
-                                        </g:if>
-                                        <g:else>
-                                            <div class="fade">${warehouse.message(code: 'default.never.label')}</div>
-                                        </g:else>
+										<g:if test ="${!recordInventoryRow?.oldQuantity}">
+											<g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
+											<g:set var="minimumYear" value="${grailsApplication.config.openboxes.expirationDate.minValue[Calendar.YEAR]}"/>
+											<g:datePicker name="recordInventoryRows[${status}].expirationDate" years="${minimumYear..currentYear + 20}"
+														  noSelection="['': '']" precision="day"/>
+										</g:if>
+										<g:else>
+											<g:hiddenField name="recordInventoryRows[${status}].expirationDate"
+														   value="${formatDate(date: recordInventoryRow?.expirationDate, format: 'MM/dd/yyyy') }"/>
+											<g:if test="${recordInventoryRow?.expirationDate}">
+												<format:expirationDate obj="${recordInventoryRow?.expirationDate}"/>
+											</g:if>
+											<g:else>
+												<div class="fade">${warehouse.message(code: 'default.never.label')}</div>
+											</g:else>
+										</g:else>
                                     </td>
                                     <td class="middle center">
                                         ${recordInventoryRow?.oldQuantity }
@@ -434,10 +442,10 @@
             }
         </style>
         <g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
+		<g:set var="minimumYear" value="${grailsApplication.config.openboxes.expirationDate.minValue[Calendar.YEAR]}"/>
         <g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate"
-                      default="none" noSelection="['': '']" years="${currentYear - 10..currentYear + 20}"
+                      default="none" noSelection="['': '']" years="${minimumYear..currentYear + 20}"
                       precision="day"/>
-
 
     </td>
 	<td style="text-align: center; vertical-align: middle;">

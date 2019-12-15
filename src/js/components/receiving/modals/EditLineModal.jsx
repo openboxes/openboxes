@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { connect } from 'react-redux';
+import moment from 'moment';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import ArrayField from '../../form-elements/ArrayField';
@@ -82,22 +83,6 @@ const FIELDS = {
   },
 };
 
-function validate(values) {
-  const errors = {};
-  errors.lines = [];
-
-  _.forEach(values.lines, (line, key) => {
-    if (line && _.isNil(line.quantityShipped)) {
-      errors.lines[key] = { quantityShipped: 'react.partialReceiving.error.enterQuantityShipped.label' };
-    }
-    if (line.quantityShipped < 0) {
-      errors.lines[key] = { quantityShipped: 'react.partialReceiving.error.quantityShippedNegative.label' };
-    }
-  });
-
-  return errors;
-}
-
 /**
  * Modal window where user can edit receiving's line. User can open it on the first page
  * of partial receiving if they want to change lot information.
@@ -118,6 +103,7 @@ class EditLineModal extends Component {
 
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.validate = this.validate.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -169,13 +155,34 @@ class EditLineModal extends Component {
     );
   }
 
+  validate(values) {
+    const errors = {};
+    errors.lines = [];
+    const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
+
+    _.forEach(values.lines, (line, key) => {
+      if (line && _.isNil(line.quantityShipped)) {
+        errors.lines[key] = { quantityShipped: 'react.partialReceiving.error.enterQuantityShipped.label' };
+      }
+      if (line.quantityShipped < 0) {
+        errors.lines[key] = { quantityShipped: 'react.partialReceiving.error.quantityShippedNegative.label' };
+      }
+      const dateRequested = moment(line.expirationDate, 'MM/DD/YYYY');
+      if (date.diff(dateRequested) > 0) {
+        errors.lines[key] = { expirationDate: 'react.partialReceiving.error.invalidDate.label' };
+      }
+    });
+
+    return errors;
+  }
+
   render() {
     return (
       <ModalWrapper
         {...this.state.attr}
         onOpen={this.onOpen}
         onSave={this.onSave}
-        validate={validate}
+        validate={this.validate}
         initialValues={this.state.formValues}
         fields={FIELDS}
         formProps={{
@@ -198,6 +205,7 @@ class EditLineModal extends Component {
 const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  minimumExpirationDate: state.session.minimumExpirationDate,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(EditLineModal);
@@ -219,4 +227,5 @@ EditLineModal.propTypes = {
   locationId: PropTypes.string.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  minimumExpirationDate: PropTypes.string.isRequired,
 };
