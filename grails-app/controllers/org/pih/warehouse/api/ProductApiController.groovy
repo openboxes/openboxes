@@ -46,6 +46,8 @@ class ProductApiController extends BaseDomainApiController {
     def list = {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
+        def location = Location.get(session.warehouse.id)
+        def availableItems
         if (params.name && params.name.size() < minLength) {
             render([data: []])
             return
@@ -53,7 +55,23 @@ class ProductApiController extends BaseDomainApiController {
 
         String[] terms = params?.name?.split(",| ")?.findAll { it }
         def products = productService.searchProducts(terms, [])
+        if(params.availableItems) {
+            availableItems = inventoryService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
+            products = []
+            availableItems.each { k, v ->
+                products += [
+                    productCode: k,
+                    name: v[0].inventoryItem.product.name,
+                    id: v[0].inventoryItem.product.id,
+                    quantityAvailable: v.sum { it.quantityAvailable },
+                    minExpirationDate: v.findAll { it.inventoryItem.expirationDate != null }.collect {
+                        it.inventoryItem?.expirationDate
+                    }.min()?.format("MM/dd/yyyy")
+                ]
+            }
+        }
         products = products.unique()
+
         render([data: products] as JSON)
     }
 

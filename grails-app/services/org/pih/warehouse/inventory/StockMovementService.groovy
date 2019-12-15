@@ -1068,19 +1068,13 @@ class StockMovementService {
 
         if (stockMovementItem.substitutionItems) {
             stockMovementItem.substitutionItems?.each { subItem ->
-                if (!subItem.newProduct || !requisitionItem.product.isValidSubstitution(subItem.newProduct)) {
-                    throw new IllegalArgumentException("Product ${subItem.newProduct?.productCode} " +
-                            "${subItem.newProduct?.name} is not a valid substitution of " +
-                            "${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}")
-                } else {
-                    requisitionItem.chooseSubstitute(
-                            subItem.newProduct,
-                            null,
-                            subItem?.newQuantity?.intValueExact(),
-                            subItem.reasonCode,
-                            subItem.comments)
-                    requisitionItem.quantityApproved = 0
-                }
+                requisitionItem.chooseSubstitute(
+                        subItem.newProduct,
+                        null,
+                        subItem?.newQuantity?.intValueExact(),
+                        subItem.reasonCode,
+                        subItem.comments)
+                requisitionItem.quantityApproved = 0
             }
         }
 
