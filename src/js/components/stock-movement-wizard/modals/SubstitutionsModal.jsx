@@ -210,7 +210,10 @@ class SubstitutionsModal extends Component {
         ...this.state.attr.lineItem,
         originalItem: true,
         product: {
-          ...this.state.attr.lineItem.product,
+          label: `${this.state.attr.lineItem.productCode} - ${this.state.attr.lineItem.productName}`,
+          id: `${this.state.attr.lineItem.productId}`,
+          productCode: `${this.state.attr.lineItem.productCode}`,
+          name: `${this.state.attr.lineItem.productName}`,
           minExpirationDate: this.state.attr.lineItem.minExpirationDate,
           quantityAvailable: this.state.attr.lineItem.quantityAvailable,
         },

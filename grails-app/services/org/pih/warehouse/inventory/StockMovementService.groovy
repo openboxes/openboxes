@@ -1043,7 +1043,7 @@ class StockMovementService {
         Requisition requisition = requisitionItem.requisition
 
         //this is for split line during substitution (if substituted item has available quantity it shows up in the substitutions list)
-        if (stockMovementItem.newQuantity) {
+        if (stockMovementItem.quantityRevised) {
             Integer changedQuantity = requisitionItem.quantity - stockMovementItem.newQuantity?.intValueExact()
             requisitionItem.quantity = changedQuantity > 0 && changedQuantity < requisitionItem.quantity ? changedQuantity : requisitionItem.quantity
 
