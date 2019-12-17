@@ -256,7 +256,7 @@ class SubstitutionsModal extends Component {
       substitutionItems: _.map(substitutions, sub => ({
         'newProduct.id': sub.product.id,
         newQuantity: sub.quantitySelected,
-        reasonCode: `SUBSTITUTION${values.reasonCode ? ` (${values.reasonCode})` : ''}`,
+        reasonCode: values.reasonCode === 'SUBSTITUTION' ? values.reasonCode : `SUBSTITUTION${values.reasonCode ? ` (${values.reasonCode})` : ''}`,
         sortOrder: originalItem.sortOrder,
       })),
     };
