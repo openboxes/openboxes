@@ -40,7 +40,7 @@ class InventoryItemController {
     def forecastingService
     def userService
     def productAvailabilityService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
 
     def index = {
