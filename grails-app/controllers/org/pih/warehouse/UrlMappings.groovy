@@ -16,7 +16,10 @@ class UrlMappings {
 
         "/snapshot/$action?"(controller: "inventorySnapshot")
 
-        "/favicon.ico" (uri: "/assets/images/favicon.ico")
+        "/inventoryItem/delete/$id**?" {
+            controller = "inventoryItem"
+            action = "delete"
+        }
 
         "/$controller/$action?/$id?" {
             constraints {
@@ -166,6 +169,11 @@ class UrlMappings {
         "/api/stocklistItems/availableStocklists"(parseRequest: true) {
             controller = "stocklistItemApi"
             action = [GET: "availableStocklists"]
+        }
+
+        "/api/stocklistItems/$id"(parseRequest: true) {
+            controller = "stocklistItemApi"
+            action = [GET:"read", PUT:"update", DELETE:"remove", POST:"save"]
         }
 
         // Stocklist API

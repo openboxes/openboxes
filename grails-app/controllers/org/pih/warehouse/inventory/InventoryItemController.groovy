@@ -27,6 +27,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentItemException
 import util.ConfigHelper
+import grails.core.GrailsApplication
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -39,7 +40,7 @@ class InventoryItemController {
     def requisitionService
     def orderService
     def forecastingService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
 
     def index = {
