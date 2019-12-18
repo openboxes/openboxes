@@ -227,7 +227,6 @@ class SubstitutionsModal extends Component {
     this.setState({
       formValues: {
         substitutions,
-        reasonCode: originalItem ? '' : 'SUBSTITUTION',
       },
       originalItem,
     });
