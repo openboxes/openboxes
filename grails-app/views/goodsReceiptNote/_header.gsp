@@ -1,4 +1,4 @@
-<table border="0">
+<table>
     <tr>
         <td width="1%">
             <div class="requisition-header cf-header" style="margin-bottom: 20px;">
@@ -7,6 +7,7 @@
         </td>
         <td>
             <div class="header">
+                <div style="font-size: 25px; margin-bottom: 10px; font-weight: bold;">${shipment?.status}</div>
                 <h1>${title}</h1>
                 <h3>${shipment?.shipmentNumber} - ${shipment?.name }
                 <g:if test="${shipment.shipmentNumber}">
@@ -50,10 +51,17 @@
                         <g:formatDate date="${new Date()}" format="d MMMMM yyyy hh:mma"/>
                     </td>
                 </tr>
+                <tr>
+                    <td class="name right">
+                        <label><warehouse:message code="default.lastReceipt.label" default="Last receipt"/>:</label>
+                    </td>
+                    <td>
+                        <g:formatDate date="${shipment?.receipts?.last()?.actualDeliveryDate}" format="d MMMMM yyyy hh:mma"/>
+                    </td>
+                </tr>
 
             </table>
         </td>
-
     </tr>
 </table>
 <hr/>
