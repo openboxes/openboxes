@@ -1668,13 +1668,18 @@ class JsonController {
         render([aaData: activityList] as JSON)
     }
 
-
-    def getProductDemand = {
+    def getProductDemandDetails = {
         Product product = Product.get(params.id)
         Location location = Location.get(session.warehouse.id)
-        def demandDetails = forecastingService.getDemandDetails(location, product)
-        render([aaData: demandDetails] as JSON)
+        render([aaData: forecastingService.getDemandDetails(location, product)] as JSON)
     }
+
+    def getProductDemandSummary = {
+        Product product = Product.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        render([aaData: forecastingService.getDemandSummary(location, product)] as JSON)
+    }
+
 
     def getForecastingData = {
         Product product = Product.get(params.id)

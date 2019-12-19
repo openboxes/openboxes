@@ -52,6 +52,7 @@ class ForecastingService {
                 select 
                     request_status,
                     request_number,
+                    DATE_FORMAT(date_requested, '%b %Y') as month_requested,
                     date_requested,
                     origin_name,
                     destination_name,
@@ -60,11 +61,12 @@ class ForecastingService {
                     quantity_requested,
                     quantity_canceled,
                     quantity_approved,
-                    quantity_change_approved,
-                    quantity_substitution_approved,
+                    quantity_modified,
+                    quantity_substituted,
+                    quantity_picked,
                     quantity_demand,
-                    cancel_reason_code
-                FROM product_demand
+                    reason_code_classification
+                FROM product_demand_details
                 WHERE product_id = :productId
                 AND origin_id = :originId
             """
@@ -89,16 +91,15 @@ class ForecastingService {
                 select 
                     min(date_requested) as min_date_requested,
                     max(date_requested) as max_date_requested,
-                    DATE_FORMAT(date_requested, '%b %y') as date_key,
                     month(date_requested) as request_month,
                     year(date_requested) as request_year,
                     sum(quantity_requested) as quantity_requested,
                     sum(quantity_canceled) as quantity_canceled,
                     sum(quantity_approved) as quantity_approved,
-                    sum(quantity_change_approved) as quantity_change_approved,
-                    sum(quantity_substitution_approved) as quantity_substitution_approved,
+                    sum(quantity_modified) as quantity_modified,
+                    sum(quantity_substituted) as quantity_substituted,
                     sum(quantity_demand) as quantity_demand
-                FROM product_demand
+                FROM product_demand_details
                 WHERE product_id = :productId
                 AND origin_id = :originId
                 GROUP BY request_month, request_year
