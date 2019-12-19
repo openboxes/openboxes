@@ -451,6 +451,9 @@ openboxes.forecasting.enabled = false
 // Bill of Materials feature
 openboxes.bom.enabled = false
 
+// User Signup
+openboxes.signup.enabled = true
+
 // UserVoice widget
 openboxes.uservoice.widget.enabled = true
 openboxes.uservoice.widget.position = "right"
