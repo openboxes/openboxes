@@ -152,7 +152,30 @@
           event.stopPropagation();
         });
 
-      })
+        $("#stockHistoryFilter").keyup(function(event){
+          var filterCell = 9 // serial lot number
+          var filterValue = $("#stockHistoryFilter").val().toUpperCase();
+          filterTable(filterCell, filterValue)
+        });
+
+      });
+      function filterTable(cellIndex, filterValue) {
+        var tableRows = $("#stockHistoryTable tr.dataRow");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        $.each(tableRows, function(index, currentRow) {
+
+            // If filter matches text value then we display, otherwise hide
+            var txtValue = $(currentRow).find("td").eq(cellIndex).text();
+            if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
+                $(currentRow).show();
+            } else {
+                $(currentRow).hide();
+            }
+        });
+      }
+
+
     </script>
 </head>
 
@@ -172,7 +195,8 @@
             </div>
         </div>
     </h2>
-    <table class="stockHistory">
+    <input type="text" id="stockHistoryFilter" class="text large" placeholder="Filter by serial number or lot number"/>
+    <table id="stockHistoryTable" class="stockHistory">
         <thead>
             <tr class="odd">
                 <th>
