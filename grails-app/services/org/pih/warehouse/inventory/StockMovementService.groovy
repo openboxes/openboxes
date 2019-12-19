@@ -1564,7 +1564,8 @@ class StockMovementService {
                             documentType: DocumentGroupCode.GOODS_RECEIPT_NOTE.name(),
                             contentType : "text/html",
                             stepNumber  : null,
-                            uri         : g.createLink(controller: 'goodsReceiptNote', action: "print", id: stockMovement?.shipment?.id, absolute: true)
+                            uri         : g.createLink(controller: 'goodsReceiptNote', action: "print", id: stockMovement?.shipment?.id, absolute: true),
+                            hidden      : !stockMovement?.shipment?.receipt
                     ]
             ])
         }
