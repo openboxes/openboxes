@@ -83,7 +83,7 @@
                     <td align="right" class="no-padding">${warehouse.message(code: 'report.lastUpdated.label')}: <g:formatDate date="${stocklist?.requisition?.lastUpdated}" format="MMM d, yyyy"/></td>
                 </tr>
                 <tr>
-                    <td colspan="2" class="w100 no-padding" align="left">${stocklist?.requisition?.replenishmentPeriod?:"0"} ${warehouse.message(code: 'report.dayReplenishement.label')}</td>
+                    <td colspan="2" class="w100 no-padding" align="left">${stocklist?.requisition?.replenishmentPeriod?:"0"} ${warehouse.message(code: 'report.dayReplenishment.label')}</td>
                 </tr>
             </table>
         </div>
