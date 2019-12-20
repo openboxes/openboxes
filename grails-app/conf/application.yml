@@ -486,6 +486,9 @@ openboxes:
     chooseLocation:
         requiredActivities: ["MANAGE_INVENTORY"]
 
+    expirationDate:
+        minValue: "01/01/2000"
+
 mail:
     error:
         enabled: false
