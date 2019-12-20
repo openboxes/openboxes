@@ -1,18 +1,18 @@
 package org.pih.warehouse.jobs
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.core.GrailsApplication
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
 @DisallowConcurrentExecution
 class RefreshDemandDataJob {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def reportService
 
     static triggers = {
         cron name: 'refreshDemandDataJobCronTrigger',
-                cronExpression: ConfigurationHolder.config.openboxes.jobs.refreshDemandDataJob.cronExpression
+                cronExpression: grailsApplication.getConfig().getProperty('openboxes.jobs.refreshDemandDataJob.cronExpression')
     }
 
     def execute(JobExecutionContext context) {
