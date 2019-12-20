@@ -12,7 +12,14 @@
     <link rel="stylesheet" href="${createLinkTo(dir: 'js/jquery.nailthumb', file: 'jquery.nailthumb.1.1.css')}"
           type="text/css" media="all"/>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
-
+    <style>
+        .product-name {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 350px;
+            white-space: nowrap;
+        }
+    </style>
 
 </head>
 
