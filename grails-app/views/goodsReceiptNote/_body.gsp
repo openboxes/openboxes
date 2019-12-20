@@ -14,7 +14,7 @@
                         ${binLocation}
                     </th>
                 </g:each>
-                <th>${warehouse.message(code: 'shipmentItem.discrepancy.label')}</th>
+                <th class="center">${warehouse.message(code: 'shipmentItem.discrepancy.label')}</th>
                 <th>${warehouse.message(code: 'default.comment.label')}</th>
             </tr>
         </thead>
@@ -146,17 +146,19 @@
                                             &nbsp
                                         </div>
                                     </g:if>
-                                    <g:each in="${shipmentItem.receiptItems.sort()}" var="item">
+                                    <g:each in="${shipmentItem.receiptItems.sort()}" status="j" var="item">
+                                        <g:set value="${shipmentItem.receiptItems.any { it.isSplitItem }}" var="isSplitItem"/>
+                                        <g:set value="${!isSplitItem && !shipmentItem.receiptItems.any { it.binLocation == binLocation} && j == 0}" var="noReceivedItems"/>
                                         <g:if test="${item.binLocation == binLocation}">
                                             <div>
                                                 ${item?.quantityReceived}
                                             </div>
                                         </g:if>
-                                        <g:else>
+                                        <g:elseif test="${isSplitItem || noReceivedItems}">
                                             <div>
-                                                &nbsp
+                                                0
                                             </div>
-                                        </g:else>
+                                        </g:elseif>
                                     </g:each>
                                 </td>
                             </g:each>
@@ -167,14 +169,14 @@
                                     </div>
                                     <g:each in="${shipmentItem.receiptItems.sort()}" var="item">
                                         <g:set var="discrepancy" value="${item.quantityShipped - item.quantityReceived }" />
-                                        <div>
+                                        <div class="center">
                                             ${discrepancy}
                                         </div>
                                     </g:each>
                                 </g:if>
                                 <g:else>
                                     <g:set var="discrepancy" value="${shipmentItem.quantity - shipmentItem.receiptItems.sum { it.quantityReceived }}" />
-                                    <div>
+                                    <div class="center">
                                         ${discrepancy}
                                     </div>
                                 </g:else>
