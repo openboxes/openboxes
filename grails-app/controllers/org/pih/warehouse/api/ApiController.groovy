@@ -81,7 +81,8 @@ class ApiController {
         def timezone = session?.timezone?.ID
         def isPaginated = grailsApplication.config.openboxes.api.pagination.enabled
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
-        String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
+        String minValue = grailsApplication.getConfig().getProperty('openboxes.expirationDate.minValue')
+        String minimumExpirationDate = dateFormat.format(new Date(minValue))
         render([
                 data: [
                         user               : user,
