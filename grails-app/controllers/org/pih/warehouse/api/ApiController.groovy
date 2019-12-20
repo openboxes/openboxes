@@ -161,7 +161,8 @@ class ApiController {
         def timezone = session?.timezone?.ID
         def isPaginated = grailsApplication.config.openboxes.api.pagination.enabled
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
-        String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
+        String minValue = grailsApplication.getConfig().getProperty('openboxes.expirationDate.minValue')
+        String minimumExpirationDate = dateFormat.format(new Date(minValue))
         def logoLabel = grailsApplication.config.openboxes.logo.label
         def pageSize = grailsApplication.config.openboxes.api.pagination.pageSize
         def logoUrl = location?.logo ? "${createLink(controller: 'location', action: 'viewLogo', id: location?.id)}" : grailsApplication.config.openboxes.logo.url
