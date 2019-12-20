@@ -54,17 +54,17 @@
                             </td>
                             <td>
                                 <g:if test="${receiptItem?.isSplitItem}">
-                                    <div class="canceled">
+                                    <div class="canceled product-name">
                                         ${shipmentItem?.product?.name}
                                     </div>
                                     <g:each in="${shipmentItem.receiptItems.sort()}" var="item">
-                                        <div>
+                                        <div class="product-name">
                                             ${item?.product?.name}
                                         </div>
                                     </g:each>
                                 </g:if>
                                 <g:else>
-                                    <div>
+                                    <div class="product-name">
                                         ${receiptItem?.product?.name}
                                     </div>
                                 </g:else>
@@ -99,7 +99,7 @@
                                 <g:if test="${receiptItem?.inventoryItem?.expirationDate != receiptItem.shipmentItem.inventoryItem?.expirationDate || receiptItem?.isSplitItem}">
                                     <g:if test="${receiptItem?.shipmentItem?.lotNumber}">
                                         <div class="canceled">
-                                            g:formatDate date="${receiptItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
+                                            <g:formatDate date="${receiptItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
                                         </div>
                                     </g:if>
                                     <g:else>
@@ -152,12 +152,11 @@
                                                 ${item?.quantityReceived}
                                             </div>
                                         </g:if>
-                                        <g:elseif test="${previousItem?.isSplitItem}">
+                                        <g:else>
                                             <div>
                                                 &nbsp
                                             </div>
-                                        </g:elseif>
-                                        <g:set var="previousItem" value="${item}"/>
+                                        </g:else>
                                     </g:each>
                                 </td>
                             </g:each>
