@@ -80,7 +80,8 @@ class ApiController {
         def hostname = session.hostname ?: "Unknown"
         def timezone = session?.timezone?.ID
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
-        String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
+        String minValue = grailsApplication.getConfig().getProperty('openboxes.expirationDate.minValue')
+        String minimumExpirationDate = dateFormat.format(new Date(minValue))
         render([
                 data: [
                         user               : user,
