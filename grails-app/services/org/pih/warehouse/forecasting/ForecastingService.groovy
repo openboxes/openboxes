@@ -54,6 +54,7 @@ class ForecastingService {
     def getDemandDetails(Location origin, Product product) {
         List data = []
         Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
+        Map params = [demandPeriod: demandPeriod]
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
@@ -75,13 +76,20 @@ class ForecastingService {
                     quantity_demand,
                     reason_code_classification
                 FROM product_demand_details
-                WHERE product_id = :productId
-                AND origin_id = :originId
-                AND date_requested BETWEEN DATE_SUB(now(), INTERVAL :demandPeriod DAY) AND now()
-            """
+                WHERE date_requested BETWEEN DATE_SUB(now(), INTERVAL :demandPeriod DAY) AND now()
+                """
+            if (product) {
+                query += " AND product_id = :productId"
+                params << [productId: product.id]
+            }
+            if (origin) {
+                query += " AND origin_id = :originId"
+                params << [originId: origin.id]
+            }
+
             Sql sql = new Sql(dataSource)
             try {
-                data = sql.rows(query, [productId: product.id, originId: origin.id, demandPeriod: demandPeriod])
+                data = sql.rows(query, params)
 
             } catch (Exception e) {
                 log.error("Unable to execute query: " + e.message, e)
