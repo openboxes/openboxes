@@ -44,37 +44,44 @@ class FieldArrayComponent extends Component {
     const { maxTableHeight = 'calc(100vh - 400px)', virtualized } = fieldsConfig;
     const addRow = (row = {}) => fields.push(row);
     const TableBodyComponent = virtualized ? TableBodyVirtualized : TableBody;
+    const { hasBinLocationSupport } = properties;
 
     return (
       <div className="d-flex flex-column">
         <div className="text-center border">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1 mr-3">
-            {_.map(fieldsConfig.fields, (config, name) => (
-              <div
-                key={name}
-                className="mx-1"
-                style={{
-                  flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
-                  minWidth: 0,
-                  textAlign: config.headerAlign ? config.headerAlign : 'center',
-                }}
-              >
-                <Tooltip
-                  html={(config.label &&
-                    <div>{this.props.translate(config.label, config.defaultMessage)}</div>)}
-                  theme="transparent"
-                  arrow="true"
-                  delay="150"
-                  duration="250"
-                  hideDelay="50"
-                >
+            {_.map(fieldsConfig.fields, (config, name) => {
+              const hide = typeof config.hide === 'function' ? config.hide({ hasBinLocationSupport }) : config.hide;
+              if (!hide) {
+                return (
                   <div
-                    className={`mx-1 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
-                  >{config.label &&
-                    <Translate id={config.label} defaultMessage={config.defaultMessage} />}
-                  </div>
-                </Tooltip>
-              </div>))}
+                    key={name}
+                    className="mx-1"
+                    style={{
+                      flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+                      minWidth: 0,
+                      textAlign: config.headerAlign ? config.headerAlign : 'center',
+                    }}
+                  >
+                    <Tooltip
+                      html={(config.label &&
+                        <div>{this.props.translate(config.label, config.defaultMessage)}</div>)}
+                      theme="transparent"
+                      arrow="true"
+                      delay="150"
+                      duration="250"
+                      hideDelay="50"
+                    >
+                      <div
+                        className={`mx-1 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
+                      >{config.label &&
+                      <Translate id={config.label} defaultMessage={config.defaultMessage} />}
+                      </div>
+                    </Tooltip>
+                  </div>);
+              }
+              return null;
+})}
           </div>
         </div>
         <div

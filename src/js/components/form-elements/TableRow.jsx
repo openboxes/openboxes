@@ -31,31 +31,41 @@ class TableRow extends Component {
       fieldsConfig.getDynamicRowAttr({ ...properties, index, rowValues }) : {};
     const rowIndex = !_.isNil(properties.parentIndex) ? properties.parentIndex : index;
     const className = `table-row ${rowIndex % 2 === 0 ? 'even-row' : ''} ${dynamicAttr.className ? dynamicAttr.className : ''}`;
+    const { hasBinLocationSupport } = properties;
 
     return (
       <div {...dynamicAttr} className={className}>
         <div className="d-flex flex-row border-bottom table-inner-row">
-          {_.map(fieldsConfig.fields, (config, name) => (
-            <div
-              key={`${field}.${name}`}
-              className="align-self-center mx-1"
-              style={{ flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`, minWidth: 0 }}
-            >
-              {renderFormField(config, `${field}.${name}`, {
-                ...properties,
-                arrayField: true,
-                arrowsNavigation: fieldsConfig.arrowsNavigation,
-                focusLeft: focusFieldMap[name].left,
-                focusRight: focusFieldMap[name].right,
-                focusThis: name,
-                addRow,
-                removeRow,
-                rowIndex: index,
-                fieldValue: config.fieldKey === '' ? rowValues : _.get(rowValues, config.fieldKey || name),
-                fieldRef: el => rowRef(el, name),
-              })}
-            </div>
-          ))}
+          {_.map(fieldsConfig.fields, (config, name) => {
+            const hide = typeof config.hide === 'function' ? config.hide({ hasBinLocationSupport }) : config.hide;
+            if (!hide) {
+              return (
+                <div
+                  key={`${field}.${name}`}
+                  className="align-self-center mx-1"
+                  style={{
+                    flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+                    minWidth: 0,
+                  }}
+                >
+                  {renderFormField(config, `${field}.${name}`, {
+                    ...properties,
+                    arrayField: true,
+                    arrowsNavigation: fieldsConfig.arrowsNavigation,
+                    focusLeft: focusFieldMap[name].left,
+                    focusRight: focusFieldMap[name].right,
+                    focusThis: name,
+                    addRow,
+                    removeRow,
+                    rowIndex: index,
+                    fieldValue: config.fieldKey === '' ? rowValues : _.get(rowValues, config.fieldKey || name),
+                    fieldRef: el => rowRef(el, name),
+                  })}
+                </div>
+              );
+            }
+            return null;
+})}
         </div>
       </div>);
   }

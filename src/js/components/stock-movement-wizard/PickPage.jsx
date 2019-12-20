@@ -74,6 +74,7 @@ const FIELDS = {
         flexWidth: '1.1',
         label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin location',
+        hide: ({ hasBinLocationSupport }) => !hasBinLocationSupport,
       },
       quantityRequired: {
         type: LabelField,
@@ -104,7 +105,8 @@ const FIELDS = {
           btnOpenDisabled: showOnly,
         },
         getDynamicAttr: ({
-          fieldValue, subfield, stockMovementId, updatePickPageItem, reasonCodes,
+          fieldValue, subfield, stockMovementId, updatePickPageItem,
+          reasonCodes, hasBinLocationSupport,
         }) => ({
           fieldValue: flattenRequest(fieldValue),
           subfield,
@@ -114,6 +116,7 @@ const FIELDS = {
           btnOpenClassName: fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse: updatePickPageItem,
           reasonCodes,
+          hasBinLocationSupport,
         }),
       },
       buttonAdjustInventory: {
@@ -538,6 +541,7 @@ class PickPage extends Component {
                 locationId: this.state.values.origin.id,
                 reasonCodes: this.props.reasonCodes,
                 translate: this.props.translate,
+                hasBinLocationSupport: this.props.hasBinLocationSupport,
               }))}
               <div className="d-print-none">
                 <button type="button" disabled={showOnly} className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
@@ -560,6 +564,7 @@ const mapStateToProps = state => ({
   reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
+  hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
@@ -586,4 +591,6 @@ PickPage.propTypes = {
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
+  /** Is true when currently selected location supports bins */
+  hasBinLocationSupport: PropTypes.bool.isRequired,
 };

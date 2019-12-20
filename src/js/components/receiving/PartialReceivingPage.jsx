@@ -248,6 +248,7 @@ const FIELDS = {
             />),
         fieldKey: '',
         flexWidth: '1.7',
+        hide: ({ hasBinLocationSupport }) => !hasBinLocationSupport,
         label: 'react.partialReceiving.binLocation.label',
         defaultMessage: 'Bin Location',
         getDynamicAttr: ({
