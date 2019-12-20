@@ -71,9 +71,16 @@
                             </td>
                             <td>
                                 <g:if test="${receiptItem?.lotNumber != receiptItem?.shipmentItem?.lotNumber || receiptItem?.isSplitItem}">
-                                    <div class="canceled">
-                                        ${receiptItem?.shipmentItem?.inventoryItem?.lotNumber}
-                                    </div>
+                                    <g:if test="${receiptItem?.shipmentItem?.lotNumber}">
+                                        <div class="canceled">
+                                            ${receiptItem?.shipmentItem?.inventoryItem?.lotNumber}
+                                        </div>
+                                    </g:if>
+                                    <g:else>
+                                        <div>
+                                            &nbsp
+                                        </div>
+                                    </g:else>
                                     <g:if test="${receiptItem?.isSplitItem}">
                                         <g:each in="${shipmentItem.receiptItems.sort()}" var="item">
                                             <div>
@@ -90,9 +97,16 @@
                             </td>
                             <td>
                                 <g:if test="${receiptItem?.inventoryItem?.expirationDate != receiptItem.shipmentItem.inventoryItem?.expirationDate || receiptItem?.isSplitItem}">
-                                    <div class="canceled">
-                                        <g:formatDate date="${receiptItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
-                                    </div>
+                                    <g:if test="${receiptItem?.shipmentItem?.lotNumber}">
+                                        <div class="canceled">
+                                            g:formatDate date="${receiptItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
+                                        </div>
+                                    </g:if>
+                                    <g:else>
+                                        <div>
+                                            &nbsp
+                                        </div>
+                                    </g:else>
                                     <g:if test="${receiptItem?.isSplitItem}">
                                         <g:each in="${shipmentItem.receiptItems.sort()}" var="item">
                                             <div>
