@@ -14,38 +14,47 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
 import java.sql.Timestamp
+import java.text.DateFormatSymbols
+import java.text.NumberFormat
 
 class ForecastingService {
 
-    boolean transactional = true
+    boolean transactional = false
 
     def dataSource
     def grailsApplication
-
+    def inventoryService
 
     def getDemand(Location origin, Product product) {
 
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
+            def numberFormat = NumberFormat.getIntegerInstance()
             def rows = getDemandDetails(origin, product)
             def startDate = rows.min { it.date_requested }?.date_requested
-            def endDate = rows.max { it.date_requested }?.date_requested
+            def endDate = new Date()
             def totalDemand = rows.sum { it.quantity_demand } ?: 0
             def totalDays = (startDate && endDate) ? (endDate - startDate) : 1
             def dailyDemand = (totalDemand && totalDays) ? (totalDemand / totalDays) : 0
             def monthlyDemand = dailyDemand * 30
+            def quantityOnHand = inventoryService.getQuantityOnHand(origin, product)
+            def onHandMonths = monthlyDemand ? quantityOnHand / monthlyDemand : 0
+
             return [
                     dateRange    : [startDate: startDate, endDate: endDate],
                     totalDemand  : totalDemand,
                     totalDays    : totalDays,
                     dailyDemand  : dailyDemand,
-                    monthlyDemand: monthlyDemand
+                    monthlyDemand: "${numberFormat.format(monthlyDemand)}",
+                    onHandMonths: onHandMonths
             ]
         }
     }
 
     def getDemandDetails(Location origin, Product product) {
         List data = []
+        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
+        Map params = [demandPeriod: demandPeriod]
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
@@ -67,12 +76,20 @@ class ForecastingService {
                     quantity_demand,
                     reason_code_classification
                 FROM product_demand_details
-                WHERE product_id = :productId
-                AND origin_id = :originId
-            """
+                WHERE date_requested BETWEEN DATE_SUB(now(), INTERVAL :demandPeriod DAY) AND now()
+                """
+            if (product) {
+                query += " AND product_id = :productId"
+                params << [productId: product.id]
+            }
+            if (origin) {
+                query += " AND origin_id = :originId"
+                params << [originId: origin.id]
+            }
+
             Sql sql = new Sql(dataSource)
             try {
-                data = sql.rows(query, [productId: product.id, originId: origin.id])
+                data = sql.rows(query, params)
 
             } catch (Exception e) {
                 log.error("Unable to execute query: " + e.message, e)
@@ -84,7 +101,7 @@ class ForecastingService {
 
     def getDemandSummary(Location origin, Product product) {
         List data = []
-
+        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
@@ -102,6 +119,7 @@ class ForecastingService {
                 FROM product_demand_details
                 WHERE product_id = :productId
                 AND origin_id = :originId
+                AND date_requested BETWEEN DATE_SUB(now(), INTERVAL :demandPeriod DAY) AND now()
                 GROUP BY request_month, request_year
                 ORDER BY request_year, request_month
             """
@@ -109,7 +127,7 @@ class ForecastingService {
             List rows = []
 
             try {
-                rows = sql.rows(query, [productId: product.id, originId: origin.id])
+                rows = sql.rows(query, [productId: product.id, originId: origin.id, demandPeriod: demandPeriod])
             } catch (Exception e) {
                 log.error("Unable to execute query: " + e.message, e)
             }
@@ -118,22 +136,47 @@ class ForecastingService {
                 Timestamp startDate = rows.min { it.min_date_requested }?.min_date_requested
                 Timestamp endDate = rows.max { it.max_date_requested }?.max_date_requested
                 List allMonths = getMonths(startDate, endDate)
+                def numberFormat = NumberFormat.getIntegerInstance()
+                def totalDemand = 0
+                def numberOfDays = new Date() - startDate
 
                 data = allMonths.collect { monthYear ->
+                    // Find row that matches the month and year
                     def row = rows.find {
                         it.request_year == monthYear.year && it.request_month == monthYear.month
                     }
+
+                    // Aggregate demand
+                    totalDemand += row?.quantity_demand ?: 0
+
                     [
-                            dateKey          : "${monthYear?.month}/${monthYear?.year}",
-                            year             : monthYear?.year,
-                            month            : monthYear?.month,
-                            quantityRequested: row?.quantity_requested ?: 0,
-                            quantityCanceled : row?.quantity_canceled ?: 0,
-                            quantityApproved : row?.quantity_approved ?: 0,
-                            quantityDemand   : row?.quantity_demand ?: 0
+                            dateKey       : "${monthYear?.month}/${monthYear?.year}",
+                            year          : monthYear?.year,
+                            month         : monthYear?.month,
+                            monthName     : new DateFormatSymbols().months[monthYear?.month - 1],
+                            quantityDemand: "${numberFormat.format(row?.quantity_demand ?: 0)}",
                     ]
                 }
-                log.info "data: ${data}"
+
+
+                data <<
+                        [
+                                dateKey       : "",
+                                year          : "Average Monthly",
+                                month         : "",
+                                monthName     : "",
+                                quantityDemand: "${numberFormat.format(totalDemand / numberOfDays * 30)}",
+                        ]
+
+                data <<
+                        [
+                                dateKey       : "",
+                                year          : "Total Demand",
+                                month         : "",
+                                monthName     : "",
+                                quantityDemand: "${numberFormat.format(totalDemand)}",
+                        ]
+
             }
         }
         return data

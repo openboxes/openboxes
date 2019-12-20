@@ -2,8 +2,8 @@
     <h2><g:message code="demand.summary.label" default="Summary"/></h2>
     <table id="productDemandSummary" class="dataTable">
         <thead>
-        <th>Month</th>
         <th>Year</th>
+        <th>Month</th>
         <th>Demand</th>
         </thead>
         <tbody>
@@ -56,9 +56,9 @@
         "sAjaxSource": "${request.contextPath}/json/getProductDemandSummary/${product?.id}",
         //"aaSorting": [[2,'desc']],
         "aoColumns": [
-            { "mData": "month", "sWidth": "1%" },
             { "mData": "year", "sWidth": "1%" },
-            { "mData": "quantityDemand", "sWidth": "0%" },
+            { "mData": "monthName", "sWidth": "1%" },
+            { "mData": "quantityDemand", "sWidth": "1%", "sClass": "right" },
         ]
     });
 

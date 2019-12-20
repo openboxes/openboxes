@@ -35,6 +35,7 @@ class ReportController {
     def messageService
     def inventorySnapshotService
     def stockMovementService
+    def forecastingService
     StdScheduler quartzScheduler
 
     def refreshTransactionFact = {
@@ -134,8 +135,6 @@ class ReportController {
             ]
         }
 
-        long elapsedTime = System.currentTimeMillis() - startTime
-
         if (params.downloadFormat == "csv") {
             String csv = ReportUtil.getCsvForListOfMapEntries(binLocations)
             def filename = "Bin Locations - ${location.name}.csv"
@@ -144,7 +143,22 @@ class ReportController {
             return
         }
 
-        render([elapsedTime: elapsedTime, binLocationCount: binLocations.size(), productCount: products.size(), binLocations: binLocations] as JSON)
+        render([elapsedTime: (System.currentTimeMillis() - startTime), binLocationCount: binLocations.size(), productCount: products.size(), binLocations: binLocations] as JSON)
+    }
+
+
+    def exportDemandReport = {
+        long startTime = System.currentTimeMillis()
+        Location location = Location.get(session.warehouse.id)
+        def data = forecastingService.getDemandDetails(location, null)
+        if (params.downloadFormat == "csv") {
+            String csv = ReportUtil.getCsvForListOfMapEntries(data)
+            def filename = "Product Demand - ${location.name}.csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+            render(contentType: "text/csv", text: csv)
+            return
+        }
+        render([responseTime: (System.currentTimeMillis() - startTime), count: data.size(), data: data] as JSON)
     }
 
 

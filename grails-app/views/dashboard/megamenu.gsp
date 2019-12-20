@@ -421,6 +421,11 @@
                         <g:link controller="report" action="exportBinLocation" params="[downloadFormat:'csv']" class="">
                             <warehouse:message code="report.exportBinLocations.label" default="Export bin locations"/></g:link>
                     </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="exportDemandReport" params="[downloadFormat:'csv']" >
+                            <warehouse:message code="default.export.label" args="[g.message(code:'product.demand.label', default: 'product demand')]"/></g:link>
+                    </div>
+
                 </div>
             </div>
         </li>

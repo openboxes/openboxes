@@ -59,17 +59,17 @@
             <g:if test="${grailsApplication.config.openboxes.forecasting.enabled}">
                 <tr class="prop">
                     <td class="label">
-                        <label><warehouse:message code="forecasting.onHandMonths.label"/></label>
+                        <label><warehouse:message code="forecasting.demand.label"/></label>
                     </td>
-                    <td class="value" id="onHandMonths">
+                    <td class="value" id="demand">
                         <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
                     </td>
                 </tr>
                 <tr class="prop">
                     <td class="label">
-                        <label><warehouse:message code="forecasting.demand.label"/></label>
+                        <label><warehouse:message code="forecasting.onHandMonths.label"/></label>
                     </td>
-                    <td class="value" id="demand">
+                    <td class="value" id="onHandMonths">
                         <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
                     </td>
                 </tr>
@@ -424,7 +424,7 @@
         url: "${request.contextPath}/json/getForecastingData/${productInstance?.id}",
         success: function (data) {
           var onHandMonths = data.onHandMonths.toFixed(1);
-          var demand = data.monthlyDemand.toFixed(1);
+          var demand = data.monthlyDemand;
 
           $('#onHandMonths').html(onHandMonths + " months");
           $('#demand').html(demand + " per month");
