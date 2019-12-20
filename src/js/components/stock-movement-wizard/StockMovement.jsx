@@ -66,12 +66,18 @@ class StockMovements extends Component {
     if (request && (status === 'CREATED' || !status)) {
       stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
         this.props.translate('react.stockMovement.addItems.label', 'Add items')];
-    } else {
+    } else if (this.props.hasPackingSupport) {
       stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
         this.props.translate('react.stockMovement.addItems.label', 'Add items'),
         this.props.translate('react.stockMovement.edit.label', 'Edit'),
         this.props.translate('react.stockMovement.pick.label', 'Pick'),
         this.props.translate('react.stockMovement.pack.label', 'Pack'),
+        this.props.translate('react.stockMovement.send.label', 'Send')];
+    } else {
+      stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
+        this.props.translate('react.stockMovement.addItems.label', 'Add items'),
+        this.props.translate('react.stockMovement.edit.label', 'Edit'),
+        this.props.translate('react.stockMovement.pick.label', 'Pick'),
         this.props.translate('react.stockMovement.send.label', 'Send')];
     }
     return stepList;
@@ -96,7 +102,7 @@ class StockMovements extends Component {
           onSubmit={this.nextPage}
         />,
       ];
-    } else {
+    } else if (this.props.hasPackingSupport) {
       formList = [
         <CreateStockMovement
           initialValues={this.state.values}
@@ -119,6 +125,34 @@ class StockMovements extends Component {
           onSubmit={this.nextPage}
         />,
         <PackingPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          onSubmit={this.nextPage}
+        />,
+        <SendMovementPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          setValues={this.setValues}
+        />,
+      ];
+    } else {
+      formList = [
+        <CreateStockMovement
+          initialValues={this.state.values}
+          onSubmit={this.nextPage}
+        />,
+        <AddItemsPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          goToPage={this.goToPage}
+          onSubmit={this.nextPage}
+        />,
+        <EditPage
+          initialValues={this.state.values}
+          previousPage={this.previousPage}
+          onSubmit={this.nextPage}
+        />,
+        <PickPage
           initialValues={this.state.values}
           previousPage={this.previousPage}
           onSubmit={this.nextPage}
@@ -214,11 +248,13 @@ class StockMovements extends Component {
               prevPage = 4;
               break;
             default:
-              page = 6;
+              page = this.props.hasPackingSupport ? 6 : 5;
               if (values.origin.type === 'SUPPLIER' || !values.hasManageInventory) {
                 prevPage = 2;
-              } else {
+              } else if (this.props.hasPackingSupport) {
                 prevPage = 5;
+              } else {
+                prevPage = 4;
               }
           }
           this.setState({ values, page, prevPage });
@@ -291,6 +327,7 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  hasPackingSupport: state.session.currentLocation.hasPackingSupport,
 });
 
 export default connect(mapStateToProps, {
@@ -314,6 +351,8 @@ StockMovements.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  /** Is true when currently selected location supports packing */
+  hasPackingSupport: PropTypes.bool.isRequired,
 };
 
 StockMovements.defaultProps = {
