@@ -291,7 +291,7 @@ class SendMovementPage extends Component {
   saveValues(values) {
     let payload = {
       dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType,
+      shipmentType: values.shipmentType,
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
@@ -299,9 +299,9 @@ class SendMovementPage extends Component {
 
     if (values.statusCode === 'ISSUED') {
       payload = {
-        'destination.id': values.destination.id,
+        destination: values.destination.id,
         description: values.description,
-        'shipmentType.id': values.shipmentType,
+        shipmentType: values.shipmentType,
         trackingNumber: values.trackingNumber || '',
         driverName: values.driverName || '',
         comments: values.comments || '',
@@ -481,7 +481,7 @@ class SendMovementPage extends Component {
 
     const payload = {
       dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType,
+      shipmentType: values.shipmentType,
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
