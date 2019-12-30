@@ -114,35 +114,6 @@ const FIELDS = {
   },
 };
 
-function validate(values) {
-  const errors = {};
-  errors.substitutions = [];
-  let originalItem = null;
-  let subQty = 0;
-
-  _.forEach(values.substitutions, (item, key) => {
-    if (item.originalItem) {
-      originalItem = item;
-    }
-    if (item.quantitySelected) {
-      subQty += _.toInteger(item.quantitySelected);
-    }
-
-    if (item.product && item.quantitySelected > _.toInteger(item.product.quantityAvailable)) {
-      errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.higherQtySelected.label' };
-    }
-    if (item.quantitySelected < 0) {
-      errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.negativeQtySelected.label' };
-    }
-  });
-
-  if (originalItem && originalItem.quantitySelected && subQty < originalItem.quantityRequested
-    && !values.reasonCode) {
-    errors.reasonCode = 'react.default.error.requiredField.label';
-  }
-  return errors;
-}
-
 /**
  * Modal window where user can choose substitution and it's quantity.
  * It is available only when there is a substitution for an item.
@@ -165,6 +136,7 @@ class SubstitutionsModal extends Component {
 
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.validate = this.validate.bind(this);
 
     this.debouncedProductsFetch = debounceAvailableItemsFetch(
       this.props.debounceTime,
@@ -265,6 +237,30 @@ class SubstitutionsModal extends Component {
       .catch(() => { this.props.hideSpinner(); });
   }
 
+  validate(values) {
+    const errors = {};
+    errors.substitutions = [];
+    let subQty = 0;
+
+    _.forEach(values.substitutions, (item, key) => {
+      if (item.quantitySelected) {
+        subQty += _.toInteger(item.quantitySelected);
+      }
+
+      if (item.product && item.quantitySelected > _.toInteger(item.product.quantityAvailable)) {
+        errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.higherQtySelected.label' };
+      }
+      if (item.quantitySelected < 0) {
+        errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.negativeQtySelected.label' };
+      }
+    });
+
+    if (subQty < this.state.attr.lineItem.quantityRequested && !values.reasonCode) {
+      errors.reasonCode = 'react.default.error.requiredField.label';
+    }
+    return errors;
+  }
+
   /** Sums up quantity selected from all available substitutions.
    * @param {object} values
    * @public
@@ -290,7 +286,7 @@ class SubstitutionsModal extends Component {
         onOpen={this.onOpen}
         onSave={this.onSave}
         fields={FIELDS}
-        validate={validate}
+        validate={this.validate}
         initialValues={this.state.formValues}
         formProps={{
           reasonCodes: this.state.attr.reasonCodes,
