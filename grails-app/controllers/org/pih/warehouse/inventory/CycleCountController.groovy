@@ -24,7 +24,7 @@ class CycleCountController {
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
 
         List rows = binLocations.collect {
-            def latestInventoryDate = it.product.latestInventoryDate(location.id)
+            def latestInventoryDate = it.product.latestInventoryDate(location.id) ?: it.inventoryItem.firstReceivingDate(location.id, it.binLocation)
             [
                     "Product code"                                                                                         : StringEscapeUtils.escapeCsv(it.product.productCode),
                     "Product name"                                                                                         : it.product.name ?: "",
