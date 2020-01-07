@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
 /**
@@ -124,6 +126,42 @@ class InventoryItem implements Serializable {
             }
         }
         return "never"
+    }
+
+
+    /**
+     * Get the first receiving date for this inventory item in given bin location at the given location.
+     *
+     * @param locationId
+     * @return
+     */
+    Date firstReceivingDate(String locationId, Location binLocatiom) {
+        def inventory = Location.get(locationId).inventory
+        def date
+        if (binLocatiom) {
+            date = TransactionEntry.executeQuery("""
+						select 
+						     min(t.transactionDate)
+						from TransactionEntry as te
+						left join te.transaction as t
+						where te.binLocation = :binLocation
+						and te.inventoryItem = :inventoryItem
+						and t.inventory = :inventory
+						and t.transactionType in (:transactionTypes)
+						""", [inventory: inventory, binLocation: binLocatiom, inventoryItem: this, transactionTypes: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)]).first()
+        } else {
+            date = TransactionEntry.executeQuery("""
+						select 
+						     min(t.transactionDate)
+						from TransactionEntry as te
+						left join te.transaction as t
+						where te.binLocation = null
+						and te.inventoryItem = :inventoryItem
+						and t.inventory = :inventory
+						and t.transactionType in (:transactionTypes)
+						""", [inventory: inventory, inventoryItem: this, transactionTypes: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)]).first()
+        }
+        return date
     }
 
 
