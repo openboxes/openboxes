@@ -219,7 +219,7 @@ class StockMovementItem {
         }
 
         def date = ConfigurationHolder.config.openboxes.expirationDate.minValue
-        if (date > expirationDate) {
+        if (expirationDate && date > expirationDate) {
             throw new IllegalArgumentException("Expiration date for item ${productCode} is not valid. Please enter a date after ${date.getYear()+1900}.")
         }
 
