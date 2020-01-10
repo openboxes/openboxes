@@ -31,7 +31,7 @@ class ForecastingService {
         if (forecastingEnabled) {
             def numberFormat = NumberFormat.getIntegerInstance()
             def rows = getDemandDetails(origin, product)
-            def startDate = rows.min { it.date_requested }?.date_requested
+            def startDate = rows.min { it.date_issued }?.date_issued
             def endDate = new Date()
             def totalDemand = rows.sum { it.quantity_demand } ?: 0
             def totalDays = (startDate && endDate) ? (endDate - startDate) : 1
@@ -61,8 +61,11 @@ class ForecastingService {
                 select 
                     request_status,
                     request_number,
-                    DATE_FORMAT(date_requested, '%b %Y') as month_requested,
+                    DATE_FORMAT(date_issued, '%b %Y') as month_year,
                     date_requested,
+                    DATE_FORMAT(date_requested, '%d/%b/%Y') as date_requested_formatted,
+                    date_issued,
+                    DATE_FORMAT(date_issued, '%d/%b/%Y') as date_issued_formatted,
                     origin_name,
                     destination_name,
                     product_code,
@@ -76,7 +79,7 @@ class ForecastingService {
                     quantity_demand,
                     reason_code_classification
                 FROM product_demand_details
-                WHERE date_requested BETWEEN DATE_SUB(now(), INTERVAL :demandPeriod DAY) AND now()
+                WHERE date_issued BETWEEN DATE_SUB(now(), INTERVAL :demandPeriod DAY) AND now()
                 """
             if (product) {
                 query += " AND product_id = :productId"
@@ -106,10 +109,10 @@ class ForecastingService {
         if (forecastingEnabled) {
             String query = """
                 select 
-                    min(date_requested) as min_date_requested,
-                    max(date_requested) as max_date_requested,
-                    month(date_requested) as request_month,
-                    year(date_requested) as request_year,
+                    min(date_issued) as min_date_demand,
+                    max(date_issued) as max_date_demand,
+                    month(date_issued) as month_demand,
+                    year(date_issued) as year_demand,
                     sum(quantity_requested) as quantity_requested,
                     sum(quantity_canceled) as quantity_canceled,
                     sum(quantity_approved) as quantity_approved,
@@ -119,9 +122,9 @@ class ForecastingService {
                 FROM product_demand_details
                 WHERE product_id = :productId
                 AND origin_id = :originId
-                AND date_requested BETWEEN DATE_SUB(now(), INTERVAL :demandPeriod DAY) AND now()
-                GROUP BY request_month, request_year
-                ORDER BY request_year, request_month
+                AND date_issued BETWEEN DATE_SUB(now(), INTERVAL :demandPeriod DAY) AND now()
+                GROUP BY month_demand, year_demand
+                ORDER BY year_demand, month_demand
             """
             Sql sql = new Sql(dataSource)
             List rows = []
@@ -133,8 +136,8 @@ class ForecastingService {
             }
 
             if (rows) {
-                Timestamp startDate = rows.min { it.min_date_requested }?.min_date_requested
-                Timestamp endDate = rows.max { it.max_date_requested }?.max_date_requested
+                Timestamp startDate = rows.min { it.min_date_demand }?.min_date_demand
+                Timestamp endDate = rows.max { it.max_date_demand }?.max_date_demand
                 List allMonths = getMonths(startDate, endDate)
                 def numberFormat = NumberFormat.getIntegerInstance()
                 def totalDemand = 0
@@ -143,7 +146,7 @@ class ForecastingService {
                 data = allMonths.collect { monthYear ->
                     // Find row that matches the month and year
                     def row = rows.find {
-                        it.request_year == monthYear.year && it.request_month == monthYear.month
+                        it.year_demand == monthYear.year && it.month_demand == monthYear.month
                     }
 
                     // Aggregate demand
