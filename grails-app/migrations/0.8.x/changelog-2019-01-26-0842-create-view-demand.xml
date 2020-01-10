@@ -50,7 +50,7 @@
                 WHEN quantity_picked < quantity_requested AND reason_code_classification IN (NULL, 'INSUFFICIENT_QUANTITY_AVAILABLE')
 			            THEN quantity_requested
                 WHEN quantity_picked < quantity_requested AND reason_code_classification IN ('CLINICAL_JUDGMENT')
-			            THEN quantity_requested
+			            THEN quantity_picked
                 ELSE quantity_requested
                 END as quantity_demand
             FROM (
