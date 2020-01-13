@@ -57,4 +57,5 @@
     <include file="0.8.x/changelog-2019-08-29-1303-create-stock-alert-views.xml"/>
     <include file="0.8.x/changelog-2019-09-12-2110-update-inventory-snapshot-id.xml"/>
     <include file="0.8.x/changelog-2019-11-26-2246-update-transaction-set-requisition-id.xml"/>
+    <include file="0.8.x/changelog-2020-01-13-1630-replace-view-product-demand.xml"/>
 </databaseChangeLog>
