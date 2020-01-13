@@ -117,33 +117,15 @@
                     <warehouse:message code="orders.label"/>
                 </a>
                 <div class="mm-item-content">
-                    <div class="mm-content-base">
-                        <div class="mm-content-section">
-                            <h3><warehouse:message code="default.create.label" args="[warehouse.message(code: 'purchaseOrder.label')]" /></h3>
-                            <div class="mm-menu-item">
-                                <g:link controller="purchaseOrderWorkflow" action="index" class="create">
-                                    <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
-                                </g:link>
-                            </div>
-                            <g:if test="${incomingOrders}">
-                                <h3><warehouse:message code="order.listByStatus.label" default="List Order by Status" /></h3>
-                                <g:each in="${incomingOrders}" var="orderStatusRow">
-                                    <div class="mm-menu-item">
-                                        <g:link controller="order" action="list" params="[status:orderStatusRow[0]]" class="order-status-${orderStatusRow[0] }">
-                                            <format:metadata obj="${orderStatusRow[0]}"/> (${orderStatusRow[1]})
-                                        </g:link>
-                                    </div>
-                                </g:each>
-                            </g:if>
-                            <h3><warehouse:message code="order.listByType.label" default="List Orders by Type" /></h3>
-                            <g:each var="orderTypeCode" in="${OrderTypeCode?.list()}">
-                                <div class="mm-menu-item">
-                                    <g:link controller="order" action="list" params="[orderTypeCode:orderTypeCode]" class="list">
-                                        <format:metadata obj="${orderTypeCode}"/>
-                                    </g:link>
-                                </div>
-                            </g:each>
-                        </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="purchaseOrderWorkflow" action="index" class="create">
+                            <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
+                        </g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
+                            <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
+                        </g:link>
                     </div>
                 </div>
             </li>
