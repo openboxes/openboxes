@@ -293,6 +293,7 @@ openboxes:
     # Forecasting feature
     forecasting:
         enabled: false
+        demandPeriod: 180
 
     # Bill of Materials feature
     bom:
