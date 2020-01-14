@@ -422,8 +422,7 @@ class RequisitionService {
                 requisition.status = RequisitionStatus.CHECKING
                 requisition.issuedBy = null
                 requisition.dateIssued = null
-                requisition.transactions*.id.each { transactionId ->
-                    def transaction = Transaction.load(transactionId)
+                requisition.transactions.each { transaction ->
                     if (transaction) {
                         requisition.removeFromTransactions(transaction)
                         if (transaction.localTransfer) {
