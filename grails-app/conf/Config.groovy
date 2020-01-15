@@ -447,9 +447,13 @@ openboxes.hotjar.hjsv = 6
 
 // Forecasting feature
 openboxes.forecasting.enabled = false
+openboxes.forecasting.demandPeriod = 180
 
 // Bill of Materials feature
 openboxes.bom.enabled = false
+
+// User Signup
+openboxes.signup.enabled = true
 
 // UserVoice widget
 openboxes.uservoice.widget.enabled = true
@@ -491,13 +495,17 @@ openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 openboxes.jobs.refreshTransactionFactJob.enabled = true
 openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 
+// Refresh demand data snapshots
+openboxes.jobs.refreshDemandDataJob.enabled = true
+openboxes.jobs.refreshDemandDataJob.cronExpression = "0 2-59/5 * * * ?" // every five minutes starting at the first minute of the hour
+
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
 openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every five minutes
 
 // Calculate current quantity on hand
 openboxes.jobs.calculateQuantityJob.enabled = true
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 */5 * * * ?" // every five minutes
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 */5 * * * ?" // every five minutes starting at the top of the hour
 
 // Calculate historical quantity on hand
 openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
@@ -506,7 +514,7 @@ openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess = 540   // 18 months
 
 // Data Cleaning Job
 openboxes.jobs.dataCleaningJob.enabled = true
-openboxes.jobs.dataCleaningJob.cronExpression = "0 */5 * * * ?"       // every five minutes
+openboxes.jobs.dataCleaningJob.cronExpression = "0 */5 * * * ?" // every five minutes
 
 // Data Migration Job (enabled, but needs to be triggered manually)
 openboxes.jobs.dataMigrationJob.enabled = true
@@ -549,6 +557,9 @@ openboxes.locale.defaultCurrencySymbol = "\$"
 
 // Inventory snapshot configuration
 openboxes.inventorySnapshot.batchSize = 1500
+
+// Minimum date for expiration date
+openboxes.expirationDate.minValue = new Date("01/01/2000")
 
 // Global megamenu configuration
 openboxes.megamenu.dashboard.enabled = true
@@ -620,4 +631,8 @@ grails.gorm.default.mapping = {
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentTimeOfDay, class: org.joda.time.TimeOfDay
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYearMonthDay, class: org.joda.time.YearMonthDay
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentYears, class: org.joda.time.Years
+}
+
+grails.gorm.default.constraints = {
+    expirationDateConstraint(nullable:true, min: openboxes.expirationDate.minValue)
 }

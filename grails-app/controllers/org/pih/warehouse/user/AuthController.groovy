@@ -143,7 +143,16 @@ class AuthController {
     /**
      * Allow user to register a new account
      */
-    def signup = {}
+    def signup = {
+
+        Boolean enabled = grailsApplication.config.openboxes.signup.enabled
+        if (!enabled) {
+            flash.message = "Apologies, but the signup feature is disabled on your system. "  +
+                    "Please contact a system administrator for access."
+            redirect(controller: "auth", action: "login")
+        }
+
+    }
 
     /**
      * Handle account registration.

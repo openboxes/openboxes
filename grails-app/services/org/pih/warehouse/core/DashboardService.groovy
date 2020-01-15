@@ -90,8 +90,22 @@ class DashboardService {
     def getExpirationSummary(location) {
         def expirationSummary = [:]
         def expirationAlerts = getExpirationAlerts(location)
-        expirationAlerts.groupBy { it?.inventoryItem?.expires }.each { key, value ->
-            expirationSummary[key] = value.size()
+        def daysToExpiry = [30, 60, 90, 180, 365]
+        expirationAlerts.each {
+            if(it.inventoryItem.expires != "never") {
+                if (it.daysToExpiry > 0) {
+                    if (it.daysToExpiry > 365) {
+                        expirationSummary["greaterThan365Days"] = expirationSummary["greaterThan365Days"] ? expirationSummary["greaterThan365Days"] + 1 : 1
+                    }
+                    daysToExpiry.each { day ->
+                        if (it.daysToExpiry <= day ) {
+                            expirationSummary["within${day}Days"] =  expirationSummary["within${day}Days"] ? expirationSummary["within${day}Days"] + 1 : 1
+                        }
+                    }
+                } else {
+                    expirationSummary["expired"] = expirationSummary["expired"] ? expirationSummary["expired"] + 1 : 1
+                }
+            }
         }
 
         // FIXME Clean this up a bit
@@ -174,10 +188,25 @@ class DashboardService {
         }
 
         if (expirationStatus) {
+            def daysToExpiry = [30, 60, 90, 180, 365]
+
             expiringStock = expiringStock.findAll { inventoryItem ->
-                (inventoryItem.expirationStatus == expirationStatus)
+                if (expirationStatus == "greaterThan365Days") {
+                    inventoryItem.expirationDate - today > 365
+                } else if (expirationStatus == "expired") {
+                    inventoryItem.expirationDate - today <= 0
+                } else inventoryItem
+            }
+
+            daysToExpiry.each { day ->
+                if (expirationStatus == "within${day}Days") {
+                    expiringStock = expiringStock.findAll { inventoryItem ->
+                        inventoryItem.expirationDate - today <= day
+                    }
+                }
             }
         }
+
         log.debug "Get expiring stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return expiringStock
     }

@@ -11,6 +11,7 @@ import SelectField from '../../form-elements/SelectField';
 import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../../actions';
 import Translate from '../../../utils/Translate';
+import { debounceAvailableItemsFetch } from '../../../utils/option-utils';
 
 const FIELDS = {
   reasonCode: {
@@ -19,10 +20,10 @@ const FIELDS = {
     defaultMessage: 'Reason for not fulfilling full qty',
     attributes: {
       required: true,
+      className: 'mb-2',
     },
     getDynamicAttr: props => ({
       options: props.reasonCodes,
-      hidden: !props.originalItem,
     }),
   },
   substitutions: {
@@ -39,24 +40,41 @@ const FIELDS = {
       }
       return { className };
     },
+    // eslint-disable-next-line react/prop-types
+    addButton: ({ addRow }) => (
+      <button
+        type="button"
+        className="btn btn-outline-success btn-xs"
+        onClick={() => addRow({})}
+      ><Translate id="react.default.button.addCustomSubstitution.label" defaultMessage="Add custom substitution" />
+      </button>
+    ),
     fields: {
-      productCode: {
-        type: LabelField,
-        label: 'react.stockMovement.code.label',
-        defaultMessage: 'Code',
+      product: {
+        fieldKey: 'disabled',
+        type: SelectField,
+        label: 'react.stockMovement.product.label',
+        defaultMessage: 'Product',
+        headerAlign: 'left',
+        flexWidth: '9.5',
         attributes: {
+          async: true,
+          openOnClick: false,
+          autoload: false,
+          filterOptions: options => options,
+          cache: false,
+          options: [],
           showValueTooltip: true,
+          className: 'text-left',
         },
+        getDynamicAttr: ({
+          fieldValue, debouncedProductsFetch,
+        }) => ({
+          disabled: !!fieldValue,
+          loadOptions: debouncedProductsFetch,
+        }),
       },
-      productName: {
-        type: LabelField,
-        label: 'react.stockMovement.productName.label',
-        defaultMessage: 'Product name',
-        attributes: {
-          showValueTooltip: true,
-        },
-      },
-      minExpirationDate: {
+      'product.minExpirationDate': {
         type: LabelField,
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
@@ -64,14 +82,16 @@ const FIELDS = {
           showValueTooltip: true,
         },
       },
-      quantityAvailable: {
+      'product.quantityAvailable': {
         type: LabelField,
         label: 'react.stockMovement.quantityAvailable.label',
         defaultMessage: 'Qty Available',
         fixedWidth: '150px',
         fieldKey: '',
         attributes: {
-          formatValue: fieldValue => (_.get(fieldValue, 'quantityAvailable') ? _.get(fieldValue, 'quantityAvailable').toLocaleString('en-US') : null),
+          // eslint-disable-next-line no-nested-ternary
+          formatValue: fieldValue => (_.get(fieldValue, 'quantityAvailable') ? _.get(fieldValue, 'quantityAvailable').toLocaleString('en-US') :
+            _.get(fieldValue, 'product.quantityAvailable') ? _.get(fieldValue, 'product.quantityAvailable').toLocaleString('en-US') : null),
           showValueTooltip: true,
         },
         getDynamicAttr: ({ fieldValue }) => ({
@@ -93,35 +113,6 @@ const FIELDS = {
     },
   },
 };
-
-function validate(values) {
-  const errors = {};
-  errors.substitutions = [];
-  let originalItem = null;
-  let subQty = 0;
-
-  _.forEach(values.substitutions, (item, key) => {
-    if (item.originalItem) {
-      originalItem = item;
-    }
-    if (item.quantitySelected) {
-      subQty += _.toInteger(item.quantitySelected);
-    }
-
-    if (item.quantitySelected > item.quantityAvailable) {
-      errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.higherQtySelected.label' };
-    }
-    if (item.quantitySelected < 0) {
-      errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.negativeQtySelected.label' };
-    }
-  });
-
-  if (originalItem && originalItem.quantitySelected && subQty < originalItem.quantityRequested
-    && !values.reasonCode) {
-    errors.reasonCode = 'react.default.error.requiredField.label';
-  }
-  return errors;
-}
 
 /**
  * Modal window where user can choose substitution and it's quantity.
@@ -145,6 +136,12 @@ class SubstitutionsModal extends Component {
 
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.validate = this.validate.bind(this);
+
+    this.debouncedProductsFetch = debounceAvailableItemsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -162,21 +159,46 @@ class SubstitutionsModal extends Component {
    */
   onOpen() {
     this.state.attr.onOpen();
-    let substitutions = this.state.attr.lineItem.availableSubstitutions;
+
+    let substitutions = _.map(
+      this.state.attr.lineItem.availableSubstitutions,
+      val => ({
+        ...val,
+        disabled: true,
+        product: {
+          label: `${val.productCode} - ${val.productName}`,
+          id: `${val.productId}`,
+          productCode: `${val.productCode}`,
+          name: `${val.productName}`,
+          minExpirationDate: `${val.minExpirationDate}`,
+          quantityAvailable: `${val.quantityAvailable}`,
+        },
+      }),
+    );
     let originalItem = null;
 
     if (_.toInteger(this.state.attr.lineItem.quantityAvailable) > 0) {
-      originalItem = { ...this.state.attr.lineItem, originalItem: true };
+      originalItem = {
+        ...this.state.attr.lineItem,
+        originalItem: true,
+        product: {
+          label: `${this.state.attr.lineItem.productCode} - ${this.state.attr.lineItem.productName}`,
+          id: `${this.state.attr.lineItem.productId}`,
+          productCode: `${this.state.attr.lineItem.productCode}`,
+          name: `${this.state.attr.lineItem.productName}`,
+          minExpirationDate: this.state.attr.lineItem.minExpirationDate,
+          quantityAvailable: this.state.attr.lineItem.quantityAvailable,
+        },
+      };
       substitutions = [
         originalItem,
-        ...this.state.attr.lineItem.availableSubstitutions,
+        ...substitutions,
       ];
     }
 
     this.setState({
       formValues: {
         substitutions,
-        reasonCode: originalItem ? '' : 'SUBSTITUTION',
       },
       originalItem,
     });
@@ -200,12 +222,12 @@ class SubstitutionsModal extends Component {
     const payload = {
       newQuantity: originalItem.quantitySelected && originalItem.quantitySelected !== '0' ? originalItem.quantityRequested - subQty : '',
       quantityRevised: originalItem.quantitySelected,
-      reasonCode: values.reasonCode,
       sortOrder: originalItem.sortOrder,
+      reasonCode: values.reasonCode,
       substitutionItems: _.map(substitutions, sub => ({
-        'newProduct.id': sub.productId,
+        'newProduct.id': sub.product.id,
         newQuantity: sub.quantitySelected,
-        reasonCode: 'SUBSTITUTION',
+        reasonCode: values.reasonCode === 'SUBSTITUTION' ? values.reasonCode : `SUBSTITUTION${values.reasonCode ? ` (${values.reasonCode})` : ''}`,
         sortOrder: originalItem.sortOrder,
       })),
     };
@@ -213,6 +235,30 @@ class SubstitutionsModal extends Component {
     apiClient.post(url, payload)
       .then(() => { this.props.onResponse(); })
       .catch(() => { this.props.hideSpinner(); });
+  }
+
+  validate(values) {
+    const errors = {};
+    errors.substitutions = [];
+    let subQty = 0;
+
+    _.forEach(values.substitutions, (item, key) => {
+      if (item.quantitySelected) {
+        subQty += _.toInteger(item.quantitySelected);
+      }
+
+      if (item.product && item.quantitySelected > _.toInteger(item.product.quantityAvailable)) {
+        errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.higherQtySelected.label' };
+      }
+      if (item.quantitySelected < 0) {
+        errors.substitutions[key] = { quantitySelected: 'react.stockMovement.errors.negativeQtySelected.label' };
+      }
+    });
+
+    if (subQty < this.state.attr.lineItem.quantityRequested && !values.reasonCode) {
+      errors.reasonCode = 'react.default.error.requiredField.label';
+    }
+    return errors;
   }
 
   /** Sums up quantity selected from all available substitutions.
@@ -240,11 +286,12 @@ class SubstitutionsModal extends Component {
         onOpen={this.onOpen}
         onSave={this.onSave}
         fields={FIELDS}
-        validate={validate}
+        validate={this.validate}
         initialValues={this.state.formValues}
         formProps={{
           reasonCodes: this.state.attr.reasonCodes,
           originalItem: this.state.originalItem,
+          debouncedProductsFetch: this.debouncedProductsFetch,
         }}
         renderBodyWithValues={this.calculateSelected}
       >
@@ -264,7 +311,12 @@ class SubstitutionsModal extends Component {
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(SubstitutionsModal);
+const mapStateToProps = state => ({
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(SubstitutionsModal);
 
 SubstitutionsModal.propTypes = {
   /** Name of the field */
@@ -281,4 +333,6 @@ SubstitutionsModal.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function updating page on which modal is located called when user saves changes */
   onResponse: PropTypes.func.isRequired,
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
 };

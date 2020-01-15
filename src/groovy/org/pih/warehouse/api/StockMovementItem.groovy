@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import org.apache.commons.lang.math.NumberUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -215,6 +216,11 @@ class StockMovementItem {
         if (lotNumber?.contains("E") && NumberUtils.isNumber(lotNumber)) {
             throw new IllegalArgumentException("Lot numbers must not be specified in scientific notation. " +
                     "Please reformat field with Lot Number: \"${lotNumber}\" to a number format")
+        }
+
+        def date = ConfigurationHolder.config.openboxes.expirationDate.minValue
+        if (expirationDate && date > expirationDate) {
+            throw new IllegalArgumentException("Expiration date for item ${productCode} is not valid. Please enter a date after ${date.getYear()+1900}.")
         }
 
         Person recipient = recipientId ? Person.get(recipientId) : null

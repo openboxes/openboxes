@@ -792,7 +792,7 @@ class ProductController {
      */
     def exportAsCsv = {
 
-        boolean includeAttributes = params.boolean("includeAttributes")
+        boolean includeAttributes = params.boolean("includeAttributes")?:false
         def products = Product.findAllByActive(true, [fetch:[attributes:"eager", tags:"eager"]])
         if (products) {
             String csv = productService.exportProducts(products, includeAttributes)

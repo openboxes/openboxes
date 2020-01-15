@@ -106,6 +106,26 @@
 									</label>
 								</p>
 							</div>
+							<div class="filter-list-item">
+								<label><warehouse:message code="tag.label"/></label>
+								<p>
+									<g:selectTags name="tags"
+												  id="tags"
+												  value="${params?.tags}"
+												  multiple="true"
+												  class="chzn-select-deselect"/>
+								</p>
+							</div>
+							<div class="filter-list-item">
+								<label><warehouse:message code="catalogs.name.label"/></label>
+								<p>
+									<g:selectCatalogs id="catalogs"
+													  name="catalogs" noSelection="['null':'']"
+													  value="${params?.catalogs}"
+													  style="width:100%;"
+													  class="chzn-select-deselect"/>
+								</p>
+							</div>
 						</div>
 						<div class="buttons">
 							<button class="submit-button button">
@@ -202,6 +222,8 @@
 				data.push({ name: "startDate", value: $("#startDate").val() });
 				data.push({ name: "endDate", value: $("#endDate").val() });
 				data.push({ name: "category", value: $("#category").val() });
+				data.push({ name: "tags", value: $("#tags").val() });
+				data.push({ name: "catalogs", value: $("#catalogs").val() });
 				if($('#refreshBalances').is(':checked')) {
 					data.push({name: "refreshBalances", value: $("#refreshBalances").val()});
 				}
@@ -328,12 +350,14 @@
 				startDate: $("#startDate").val(),
 				endDate: $("#endDate").val(),
 				category: $("#category").val(),
+				tags: $("#tags").val(),
+				catalogs: $("#catalogs").val(),
 				format: "text/csv"
 			};
 			if($('#includeCategoryChildren').is(':checked')) {
 				params.includeCategoryChildren = $("#includeCategoryChildren").val();
 			}
-			var queryString = $.param(params);
+			var queryString = $.param(params, true);
 			window.location.href = '${request.contextPath}/json/getTransactionReport?' + queryString;
 		});
 

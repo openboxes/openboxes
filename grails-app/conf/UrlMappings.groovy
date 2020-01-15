@@ -16,7 +16,12 @@ class UrlMappings {
 
         "/snapshot/$action?"(controller: "inventorySnapshot")
 
-        "/$controller/$action?/$id**?" {
+        "/inventoryItem/delete/$id**?" {
+            controller = "inventoryItem"
+            action = "delete"
+        }
+
+        "/$controller/$action?/$id?" {
             constraints {
                 // apply constraints here
             }
@@ -166,6 +171,11 @@ class UrlMappings {
             action = [GET: "availableStocklists"]
         }
 
+        "/api/stocklistItems/$id"(parseRequest: true) {
+            controller = "stocklistItemApi"
+            action = [GET:"read", PUT:"update", DELETE:"remove", POST:"save"]
+        }
+
         // Stocklist API
 
         "/api/stocklists/sendMail/$id"(parseRequest: true) {
@@ -177,7 +187,7 @@ class UrlMappings {
 
         "/api/putawayItems/$id"(parseRequest: true) {
             controller = "putawayItemApi"
-            action = [DELETE: "remove"]
+            action = [DELETE: "removingItem"]
         }
 
         // Standard REST APIs

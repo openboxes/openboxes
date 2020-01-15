@@ -30,6 +30,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.reporting.Indicator
@@ -1362,6 +1363,27 @@ class JsonController {
         Location location = command.location ?: Location.get(session.warehouse.id)
 
         Category category = command.category
+        List<Tag> tagList = []
+        List<ProductCatalog> catalogList = []
+
+        if (params.tags) {
+            params.tags.split(",").each { tagId ->
+                Tag tag = Tag.findById(tagId)
+                if (tag) {
+                    tagList << tag
+                }
+            }
+        }
+
+        if (params.catalogs) {
+            params.catalogs.split(",").each { catalogId ->
+                ProductCatalog catalog = ProductCatalog.findById(catalogId)
+                if (catalog) {
+                    catalogList << catalog
+                }
+            }
+        }
+
         if (!category) {
             category = productService.getRootCategory()
         }
@@ -1396,8 +1418,8 @@ class JsonController {
         }
 
         def data = (params.format == "text/csv") ?
-                inventorySnapshotService.getTransactionReportDetails(location, categories, startDate, endDate) :
-                inventorySnapshotService.getTransactionReportSummary(location, categories, startDate, endDate)
+                inventorySnapshotService.getTransactionReportDetails(location, categories, tagList, catalogList, startDate, endDate) :
+                inventorySnapshotService.getTransactionReportSummary(location, categories, tagList, catalogList, startDate, endDate)
 
         if (params.format == "text/csv") {
             String csv = dataService.generateCsv(data)
@@ -1646,25 +1668,24 @@ class JsonController {
         render([aaData: activityList] as JSON)
     }
 
-
-    def getProductDemand = {
+    def getProductDemandDetails = {
         Product product = Product.get(params.id)
         Location location = Location.get(session.warehouse.id)
-        def demandDetails = forecastingService.getDemandDetails(location, product)
-        render([aaData: demandDetails] as JSON)
+        render([aaData: forecastingService.getDemandDetails(location, product)] as JSON)
     }
+
+    def getProductDemandSummary = {
+        Product product = Product.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        render([aaData: forecastingService.getDemandSummary(location, product)] as JSON)
+    }
+
 
     def getForecastingData = {
         Product product = Product.get(params.id)
         Location location = Location.get(session.warehouse.id)
-        def demand = forecastingService.getDemand(location, product)
-        def totalQuantity = inventoryService.getQuantityOnHand(location, product)
-        def onHandMonths = demand?.monthlyDemand ? totalQuantity / demand?.monthlyDemand : 0
-
-        def data = [
-                onHandMonths: onHandMonths,
-                monthlyDemand: demand?.monthlyDemand]
-        render data as JSON
+        def demandData = forecastingService.getDemand(location, product)
+        render demandData as JSON
     }
 }
 

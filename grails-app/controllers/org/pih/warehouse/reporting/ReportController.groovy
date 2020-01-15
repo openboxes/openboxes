@@ -35,6 +35,7 @@ class ReportController {
     def messageService
     def inventorySnapshotService
     def stockMovementService
+    def forecastingService
     StdScheduler quartzScheduler
 
     def refreshTransactionFact = {
@@ -78,6 +79,8 @@ class ReportController {
             csv += g.message(code: 'product.productCode.label') + ","
             csv += g.message(code: 'product.label') + ","
             csv += g.message(code: 'category.label') + ","
+            csv += g.message(code: 'product.formulary.label') + ","
+            csv += g.message(code: 'tag.label') + ","
             csv += g.message(code: 'inventoryItem.lotNumber.label') + ","
             csv += g.message(code: 'inventoryItem.expirationDate.label') + ","
             csv += g.message(code: 'location.binLocation.label') + ","
@@ -99,6 +102,8 @@ class ReportController {
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCode) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.name) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.category?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCatalogsToString()) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.tagsToString()) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.inventoryItem?.lotNumber) + ","
             csv += StringEscapeUtils.escapeCsv(expirationDate) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.binLocation?.name ?: defaultBinLocation) + ","
@@ -130,8 +135,6 @@ class ReportController {
             ]
         }
 
-        long elapsedTime = System.currentTimeMillis() - startTime
-
         if (params.downloadFormat == "csv") {
             String csv = ReportUtil.getCsvForListOfMapEntries(binLocations)
             def filename = "Bin Locations - ${location.name}.csv"
@@ -140,7 +143,22 @@ class ReportController {
             return
         }
 
-        render([elapsedTime: elapsedTime, binLocationCount: binLocations.size(), productCount: products.size(), binLocations: binLocations] as JSON)
+        render([elapsedTime: (System.currentTimeMillis() - startTime), binLocationCount: binLocations.size(), productCount: products.size(), binLocations: binLocations] as JSON)
+    }
+
+
+    def exportDemandReport = {
+        long startTime = System.currentTimeMillis()
+        Location location = Location.get(session.warehouse.id)
+        def data = forecastingService.getDemandDetails(location, null)
+        if (params.downloadFormat == "csv") {
+            String csv = ReportUtil.getCsvForListOfMapEntries(data)
+            def filename = "Product Demand - ${location.name}.csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+            render(contentType: "text/csv", text: csv)
+            return
+        }
+        render([responseTime: (System.currentTimeMillis() - startTime), count: data.size(), data: data] as JSON)
     }
 
 

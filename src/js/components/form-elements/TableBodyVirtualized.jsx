@@ -51,7 +51,10 @@ class TableBodyVirtualized extends Component {
         <RowComponent
           field={field}
           index={index}
-          properties={properties}
+          properties={{
+            ...properties,
+            rowCount: fields.length || 0,
+          }}
           addRow={addRow}
           fieldsConfig={fieldsConfig}
           removeRow={() => fields.remove(index)}

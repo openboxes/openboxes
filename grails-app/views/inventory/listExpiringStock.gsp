@@ -3,13 +3,13 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        
-        <title><warehouse:message code="inventory.expiringStock.label"/></title>    
-    </head>    
+
+        <title><warehouse:message code="inventory.expiringStock.label"/></title>
+    </head>
 
 	<body>
 		<div class="body">
-       		
+
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
@@ -52,7 +52,8 @@
 
                         </div>
 
-                        <g:link params="[format:'csv',threshold:params.threshold,category:params.category]" controller="${controllerName}" action="${actionName}"
+                        <g:link params="[format:'csv',threshold:params.threshold,category:params.category,status:params.status]"
+                                controller="${controllerName}" action="${actionName}"
                                 class="button">
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
                             &nbsp;<g:message code="default.button.download.label"/></g:link>
@@ -93,7 +94,7 @@
                                                     warehouse.message(code:'inventory.listGreaterThan365Days.label',
                                                             args: [365], default: 'Expires after {0} days')]"
 									optionKey="key" optionValue="value" value="${expirationStatus}"
-									noSelection="['': warehouse.message(code:'default.all.label')]" />   
+									noSelection="['': warehouse.message(code:'default.all.label')]" />
 				           	</div>
 
 				           	<div class="filter-list-item right">
@@ -104,10 +105,10 @@
                             </div>
 							<div class="clear"></div>
 						</div>
-		            </g:form>  
+		            </g:form>
 		   		</div>
 		   		<div class="yui-u">
-		   		
+
 					<div class="box">
                         <h2>
                             <warehouse:message code="inventoryItems.expiring.label" default="Expiring inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
@@ -188,11 +189,11 @@
                             </form>
                         </div>
 
-					</div>		   		
+					</div>
 		   		</div>
-		   	</div>   
-             
-			
+		   	</div>
+
+
 		</div>
 		<script>
 			$(document).ready(function() {
@@ -209,11 +210,11 @@
 						return false;
 					}
 				);
-				
+
 				$("#toggleCheckbox").click(function(event) {
                     var checked = ($(this).attr("checked") == 'checked');
                     $(".checkbox").attr("checked", checked);
-				});	
+				});
 
                 $(".button-action").click(function(event) {
                     var numChecked = $("input.checkbox:checked").length;
@@ -230,8 +231,8 @@
             });
 
 
-		</script>	
-		
+		</script>
+
 	</body>
 
 </html>

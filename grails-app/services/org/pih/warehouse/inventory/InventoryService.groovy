@@ -44,6 +44,7 @@ class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
     def persistenceInterceptor
+    def grailsApplication
 
     def dataService
     def productService
@@ -2969,6 +2970,11 @@ class InventoryService implements ApplicationContextAware {
                         } else {
                             expirationDate = row.expirationDate
                             command.warnings[index] << "Expiration date '${row.expirationDate}' has unknown format ${row?.expirationDate?.class}"
+                        }
+                        def date = grailsApplication.config.openboxes.expirationDate.minValue
+                        if (date > expirationDate) {
+                            command.errors.reject("Expiration date for item ${row.productCode} is not valid. Please enter a date after ${date.getYear()+1900}.")
+
                         }
 
                         if (expirationDate <= new Date()) {

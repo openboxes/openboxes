@@ -17,12 +17,23 @@ class FieldArrayComponent extends Component {
 
     this.fieldRefs = [];
     this.focusField = this.focusField.bind(this);
+    this.copyDown = this.copyDown.bind(this);
   }
 
   focusField(index, fieldName) {
     const field = _.get(this.fieldRefs, `[${index}].${fieldName}`);
 
     if (field) {
+      field.focus();
+    }
+  }
+
+  copyDown(index, fieldName) {
+    const field = _.get(this.fieldRefs, `[${index}].${fieldName}`);
+    const valueToCopy = _.get(this.fieldRefs, `[${index - 1}].${fieldName}.value`);
+
+    if (field && valueToCopy && !field.disabled) {
+      field.value = valueToCopy;
       field.focus();
     }
   }
@@ -73,7 +84,7 @@ class FieldArrayComponent extends Component {
           <TableBodyComponent
             fields={fields}
             properties={{
-              ...properties, rowCount: fields.length || 0, focusField: this.focusField,
+              ...properties, focusField: this.focusField, copyDown: this.copyDown,
             }}
             addRow={addRow}
             fieldsConfig={fieldsConfig}

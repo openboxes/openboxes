@@ -514,7 +514,9 @@ class ReportService implements ApplicationContextAware {
     def truncateFacts() {
         dataService.executeStatements(["SET FOREIGN_KEY_CHECKS = 0",
                                        "delete from transaction_fact",
+                                       "alter table transaction_fact AUTO_INCREMENT = 1",
                                        "delete from consumption_fact",
+                                       "alter table consumption_fact AUTO_INCREMENT = 1",
                                        "SET FOREIGN_KEY_CHECKS = 1"])
     }
 
@@ -522,10 +524,15 @@ class ReportService implements ApplicationContextAware {
         dataService.executeStatements([
                 "SET FOREIGN_KEY_CHECKS = 0",
                 "delete from date_dimension",
+                "alter table date_dimension AUTO_INCREMENT = 1",
                 "delete from location_dimension",
+                "alter table location_dimension AUTO_INCREMENT = 1",
                 "delete from lot_dimension",
+                "alter table lot_dimension AUTO_INCREMENT = 1",
                 "delete from product_dimension",
+                "alter table product_dimension AUTO_INCREMENT = 1",
                 "delete from transaction_type_dimension",
+                "alter table transaction_type_dimension AUTO_INCREMENT = 1",
                 "SET FOREIGN_KEY_CHECKS = 1"])
     }
 
@@ -676,5 +683,39 @@ class ReportService implements ApplicationContextAware {
         dataService.executeStatements([insertStatement])
     }
 
-
+    def refreshDemandData() {
+        List ddlStatements = [
+                "DROP TABLE IF EXISTS product_demand_details_tmp;",
+                """CREATE TABLE product_demand_details_tmp AS
+                    SELECT 
+                        request_id,
+                        request_status,
+                        request_number,
+                        date_created,
+                        date_requested,
+                        date_issued,
+                        origin_id,
+                        origin_name,
+                        destination_id,
+                        destination_name,
+                        request_item_id,
+                        product_id,
+                        product_code,
+                        product_name,
+                        quantity_requested,
+                        quantity_canceled,
+                        quantity_approved,
+                        quantity_modified,
+                        quantity_substituted,
+                        quantity_picked,
+                        quantity_demand,
+                        reason_code_classification
+                    FROM product_demand;""",
+                "DROP TABLE IF EXISTS product_demand_details;",
+                "CREATE TABLE IF NOT EXISTS product_demand_details LIKE product_demand_details_tmp;",
+                "TRUNCATE product_demand_details;",
+                "INSERT INTO product_demand_details SELECT * FROM product_demand_details_tmp;"
+        ]
+        dataService.executeStatements(ddlStatements)
+    }
 }

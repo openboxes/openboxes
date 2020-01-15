@@ -28,6 +28,10 @@
             top: 8px;
         }
 
+        .showYear {
+            float: right;
+        }
+
         /* Main parent row */
         .yearRow {
             cursor: pointer;
@@ -114,8 +118,64 @@
             $('.monthRow').hide().children().removeClass("active");
             $('.dataRow').hide();
           }
-        })
-      })
+        });
+
+        $('.showYear').on('click', function(event) {
+          var tr = $(this).closest('tr');
+          var td = $(this).closest('td');
+          var monthRows = getMonthRows(tr);
+          var allRowsVisible = true;
+
+          $.each(monthRows, function() {
+            if (allRowsVisible) {
+              allRowsVisible = $(this).children().hasClass("active");
+            }
+          });
+          $.each(monthRows, function() {
+            var dataRows = getDataRows($(this));
+            $.each(dataRows, function() {
+              if (allRowsVisible) {
+                $(this).hide();
+              } else {
+                $(this).show();
+              }
+            });
+            if (allRowsVisible) {
+              td.removeClass('active');
+              $(this).hide().children().removeClass("active");
+            } else {
+              td.addClass('active');
+              $(this).show().children().addClass("active");
+            }
+          });
+
+          event.stopPropagation();
+        });
+
+        $("#stockHistoryFilter").keyup(function(event){
+          var filterCell = 9 // serial lot number
+          var filterValue = $("#stockHistoryFilter").val().toUpperCase();
+          filterTable(filterCell, filterValue)
+        });
+
+      });
+      function filterTable(cellIndex, filterValue) {
+        var tableRows = $("#stockHistoryTable tr.dataRow");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        $.each(tableRows, function(index, currentRow) {
+
+            // If filter matches text value then we display, otherwise hide
+            var txtValue = $(currentRow).find("td").eq(cellIndex).text();
+            if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
+                $(currentRow).show();
+            } else {
+                $(currentRow).hide();
+            }
+        });
+      }
+
+
     </script>
 </head>
 
@@ -135,7 +195,8 @@
             </div>
         </div>
     </h2>
-    <table class="stockHistory">
+    <input type="text" id="stockHistoryFilter" class="text large" placeholder="Filter by serial number or lot number"/>
+    <table id="stockHistoryTable" class="stockHistory">
         <thead>
             <tr class="odd">
                 <th>
@@ -188,7 +249,14 @@
             <g:each var="year" in="${stockHistoryList}">
                 <g:set var="isCurrentYear" value="${(new Date().year + 1900 == year.key.toInteger())}"/>
                 <tr class="yearRow border-top">
-                    <td colspan="14" class="icon ${isCurrentYear ? 'active' : ''}">${year.key}</td>
+                    <div>
+                    <td colspan="14" class="icon ${isCurrentYear ? 'active' : ''}">
+                        ${year.key}
+                        <button class="showYear button">
+                            ${warehouse.message(code: 'default.showYear.label')}
+                        </button>
+                    </td>
+                    </div>
                 </tr>
                 <g:each var="month" in="${year.value}">
                     <tr class="monthRow border-top ${isCurrentYear ? 'currentYear' : ''}">

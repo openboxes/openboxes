@@ -9,6 +9,7 @@ import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import queryString from 'query-string';
+import moment from 'moment';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -65,8 +66,9 @@ const NO_STOCKLIST_FIELDS = {
       product: {
         fieldKey: 'disabled',
         type: SelectField,
-        label: 'react.stockMovement.requisitionItems.label',
-        defaultMessage: 'Requisition items',
+        label: 'react.stockMovement.requestedProduct.label',
+        defaultMessage: 'Requested product',
+        headerAlign: 'left',
         flexWidth: '9.5',
         attributes: {
           async: true,
@@ -153,8 +155,9 @@ const STOCKLIST_FIELDS = {
       product: {
         fieldKey: 'disabled',
         type: SelectField,
-        label: 'react.stockMovement.requisitionItems.label',
-        defaultMessage: 'Requisition items',
+        label: 'react.stockMovement.requestedProduct.label',
+        defaultMessage: 'Requested product',
+        headerAlign: 'left',
         flexWidth: '9',
         attributes: {
           async: true,
@@ -243,8 +246,9 @@ const VENDOR_FIELDS = {
       },
       product: {
         type: SelectField,
-        label: 'react.stockMovement.item.label',
-        defaultMessage: 'Item',
+        label: 'react.stockMovement.product.label',
+        defaultMessage: 'Product',
+        headerAlign: 'left',
         flexWidth: '4',
         required: true,
         attributes: {
@@ -317,21 +321,6 @@ const VENDOR_FIELDS = {
   },
 };
 
-function validate(values) {
-  const errors = {};
-  errors.lineItems = [];
-
-  _.forEach(values.lineItems, (item, key) => {
-    if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
-      errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
-    }
-    if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
-      errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
-    }
-  });
-  return errors;
-}
-
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -354,6 +343,7 @@ class AddItemsPage extends Component {
     this.confirmSave = this.confirmSave.bind(this);
     this.confirmTransition = this.confirmTransition.bind(this);
     this.newItemAdded = this.newItemAdded.bind(this);
+    this.validate = this.validate.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -486,6 +476,27 @@ class AddItemsPage extends Component {
   }
 
   dataFetched = false;
+
+
+  validate(values) {
+    const errors = {};
+    errors.lineItems = [];
+    const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
+
+    _.forEach(values.lineItems, (item, key) => {
+      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
+        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
+      }
+      if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
+        errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
+      }
+      const dateRequested = moment(item.expirationDate, 'MM/DD/YYYY');
+      if (date.diff(dateRequested) > 0) {
+        errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.invalidDate.label' };
+      }
+    });
+    return errors;
+  }
 
   newItemAdded() {
     this.setState({
@@ -786,7 +797,7 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndExit(formValues) {
-    const errors = validate(formValues).lineItems;
+    const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
@@ -997,7 +1008,7 @@ class AddItemsPage extends Component {
     return (
       <Form
         onSubmit={() => {}}
-        validate={validate}
+        validate={this.validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
@@ -1123,6 +1134,7 @@ const mapStateToProps = state => ({
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  minimumExpirationDate: state.session.minimumExpirationDate,
 });
 
 export default (connect(mapStateToProps, {
@@ -1160,4 +1172,5 @@ AddItemsPage.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  minimumExpirationDate: PropTypes.string.isRequired,
 };

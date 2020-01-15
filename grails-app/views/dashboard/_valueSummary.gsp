@@ -118,7 +118,8 @@
     }
 
     function formatCurrency(x) {
-        return "$" + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        var currencyCode = "${grailsApplication.config.openboxes.locale.defaultCurrencyCode}";
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " " + currencyCode;
     }
 
     function showError() {

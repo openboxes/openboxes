@@ -78,10 +78,11 @@ WantedBy=multi-user.target
 !!! note
     You will likely encounter OutOfMemoryErrors with Tomcat's default memory settings.  
     
-    You may be able to get away with using 256m as the max heap size, but 512m is a good setting, even for production environments.  Using more memory will allow you to cache more data, but does not always result in a better performing application.  So there's no need in getting carried away.  We've been using about 1024m in production for over a year and that suits us fine.    
-
-If you are in a limited memory environment (like an EC2 t2.micro which only has 1GB of memory) you will need to reduce 
-your memory settings a little more. 
+    You may be able to get away with using 256m as the max heap size, but 512m is a good setting, 
+    even for production environments.  
+    
+If you are in a limited memory environment (like an EC2 t2.micro which only has 1GB of memory) you 
+will need to reduce your memory settings a little more. 
 ```
 Environment='CATALINA_OPTS=-Xms128m -Xmx256m -XX:MaxPermSize=128m -Djava.security.egd=file:/dev/./urandom -server -XX:+UseParallelGC'
 ```
@@ -100,7 +101,7 @@ sudo systemctl daemon-reload
 
 ## Start Tomcat
 ```
-systemctl start tomcat
+sudo systemctl start tomcat
 ```
 
 ## Enable Tomcat service

@@ -1043,12 +1043,12 @@ class StockMovementService {
         Requisition requisition = requisitionItem.requisition
 
         //this is for split line during substitution (if substituted item has available quantity it shows up in the substitutions list)
-        if (stockMovementItem.newQuantity) {
+        if (stockMovementItem.quantityRevised) {
             Integer changedQuantity = requisitionItem.quantity - stockMovementItem.newQuantity?.intValueExact()
-            requisitionItem.quantity = changedQuantity > 0 ? changedQuantity : 0
+            requisitionItem.quantity = changedQuantity > 0 && changedQuantity < requisitionItem.quantity ? changedQuantity : requisitionItem.quantity
 
             RequisitionItem newItem = new RequisitionItem()
-            newItem.quantity = stockMovementItem.newQuantity?.intValueExact() > 0 ? stockMovementItem.newQuantity?.intValueExact() : 0
+            newItem.quantity = stockMovementItem.quantityRevised
             newItem.quantityApproved = newItem.quantity
             newItem.orderIndex = stockMovementItem.sortOrder
             newItem.product = requisitionItem.product
@@ -1060,17 +1060,6 @@ class StockMovementService {
             newItem.requisition = requisition
             newItem.save()
 
-            //when line is split all not substituted quantity goes to the split item, when it's higher than quantity chosen for this item, split item is revised
-            //newQuantity - calculated on frontend, it's original item quantity minus sum of all substitution items quantities
-            //quantityRevised - quantity selected by the user for the split line item
-            if (stockMovementItem.quantityRevised != null && stockMovementItem.quantityRevised.intValueExact() < stockMovementItem.newQuantity?.intValueExact()) {
-                newItem.changeQuantity(
-                        stockMovementItem?.quantityRevised?.intValueExact(),
-                        stockMovementItem.reasonCode,
-                        stockMovementItem.comments)
-                newItem.quantityApproved = 0
-            }
-
             requisition.addToRequisitionItems(newItem)
 
             createMissingPicklistForStockMovementItem(StockMovementItem.createFromRequisitionItem(newItem))
@@ -1079,19 +1068,13 @@ class StockMovementService {
 
         if (stockMovementItem.substitutionItems) {
             stockMovementItem.substitutionItems?.each { subItem ->
-                if (!subItem.newProduct || !requisitionItem.product.isValidSubstitution(subItem.newProduct)) {
-                    throw new IllegalArgumentException("Product ${subItem.newProduct?.productCode} " +
-                            "${subItem.newProduct?.name} is not a valid substitution of " +
-                            "${requisitionItem?.product?.productCode} ${requisitionItem?.product?.name}")
-                } else {
-                    requisitionItem.chooseSubstitute(
-                            subItem.newProduct,
-                            null,
-                            subItem?.newQuantity?.intValueExact(),
-                            subItem.reasonCode,
-                            subItem.comments)
-                    requisitionItem.quantityApproved = 0
-                }
+                requisitionItem.chooseSubstitute(
+                        subItem.newProduct,
+                        null,
+                        subItem?.newQuantity?.intValueExact(),
+                        subItem.reasonCode,
+                        subItem.comments)
+                requisitionItem.quantityApproved = 0
             }
         }
 
@@ -1581,7 +1564,8 @@ class StockMovementService {
                             documentType: DocumentGroupCode.GOODS_RECEIPT_NOTE.name(),
                             contentType : "text/html",
                             stepNumber  : null,
-                            uri         : g.createLink(controller: 'goodsReceiptNote', action: "print", id: stockMovement?.shipment?.id, absolute: true)
+                            uri         : g.createLink(controller: 'goodsReceiptNote', action: "print", id: stockMovement?.shipment?.id, absolute: true),
+                            hidden      : !stockMovement?.shipment?.receipt
                     ]
             ])
         }

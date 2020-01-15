@@ -28,7 +28,7 @@ const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
-  NO: 'disabled btn btn-outline-secondary',
+  NO: 'btn btn-outline-secondary',
   EARLIER: 'btn btn-outline-warning',
   HIDDEN: 'btn invisible',
 };
@@ -36,6 +36,7 @@ const BTN_CLASS_MAPPER = {
 const FIELDS = {
   editPageItems: {
     type: ArrayField,
+    arrowsNavigation: true,
     rowComponent: TableRowWithSubfields,
     getDynamicRowAttr: ({ rowValues, subfield }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
@@ -129,7 +130,7 @@ const FIELDS = {
           productCode: fieldValue.productCode,
           btnOpenText: `react.stockMovement.${fieldValue.substitutionStatus}.label`,
           btnOpenDefaultText: `${fieldValue.substitutionStatus}`,
-          btnOpenDisabled: fieldValue.substitutionStatus === 'NO' || fieldValue.statusCode === 'SUBSTITUTED' || showOnly,
+          btnOpenDisabled: fieldValue.statusCode === 'SUBSTITUTED' || showOnly,
           btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus || 'HIDDEN'],
           rowIndex,
           lineItem: fieldValue,
