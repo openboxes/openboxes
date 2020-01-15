@@ -1,27 +1,6 @@
 # Installing Tomcat 7
 Because we're using Java 7, we need to install a version of Tomcat that has been compiled with Java 7. Otherwise, you'll
 encounter the following error when deploying OpenBoxes.
-```
-2018-10-31 12:44:45,463 [localhost-startStop-1] INFO  xml.XmlBeanDefinitionReader  - Loading XML bean definitions from ServletContext resource [/WEB-INF/applicationContext.xml]
-2018-10-31 12:44:46,299 [localhost-startStop-1] ERROR context.ContextLoader  - Context initialization failed
-org.springframework.beans.factory.access.BootstrapException: Error executing bootstraps; nested exception is java.lang.NoSuchMethodError: java.util.concurrent.ConcurrentHashMap.keySet()Ljava/util/concurrent/ConcurrentHashMap$KeySetView;
-  at org.codehaus.groovy.grails.web.context.GrailsContextLoader.createWebApplicationContext(GrailsContextLoader.java:87)
-  at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:197)
-  at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:47)
-  at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:5068)
-  at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5584)
-  at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:147)
-  at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:899)
-  at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:875)
-  at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:652)
-  at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:1091)
-  at org.apache.catalina.startup.HostConfig$DeployWar.run(HostConfig.java:1980)
-  at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:471)
-  at java.util.concurrent.FutureTask.run(FutureTask.java:262)
-  at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
-  at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
-  at java.lang.Thread.run(Thread.java:745)
-```
 
 !!! note "Important"
     Tomcat 7 in the APT repository was compiled with Java 8, which causes the aforementioned error during deployment.
@@ -54,11 +33,20 @@ $ sudo chown -R tomcat:tomcat /opt/apache-tomcat-7.0.94
 # sudo chmod +x /opt/tomcat/bin/*.sh
 ```
 
+## Determine Java JRE path
+Copy and paste the output. It will be used to replace `<PASTE_PATH_TO_JRE_HERE>` in tomcat.service.
+```
+$ readlink -f /etc/alternatives/java
+/usr/lib/jvm/zulu-7-amd64/jre/bin/java
+```
+Copy the path up to `/bin/java`. For example, `/usr/lib/jvm/zulu-7-amd64/jre`.
+
 ## Create service
 ```
 sudo vi /etc/systemd/system/tomcat.service
 ```
-*tomcat.service*
+
+/etc/systemd/system/tomcat.service
 ```
 [Unit]
 Description=Apache Tomcat Web Application Container
@@ -67,15 +55,15 @@ After=network.target
 [Service]
 Type=forking
 
-Environment=JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64/jre
-Environment=CATALINA_PID=/opt/tomcat/apache-tomcat-7.0.91/temp/tomcat.pid
-Environment=CATALINA_HOME=/opt/tomcat/apache-tomcat-7.0.91
-Environment=CATALINA_BASE=/opt/tomcat/apache-tomcat-7.0.91
-Environment='CATALINA_OPTS=-Xms512m -Xmx512m -server -XX:+UseParallelGC'
+Environment=JAVA_HOME=<PASTE_PATH_TO_JRE_HERE>
+Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat
+Environment=CATALINA_BASE=/opt/tomcat
+Environment='CATALINA_OPTS=-Xms1024m -Xmx1024m -XX:MaxPermSize=128m -server -XX:+UseParallelGC'
 Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
 
-ExecStart=/opt/tomcat/apache-tomcat-7.0.91/bin/startup.sh
-ExecStop=/opt/tomcat/apache-tomcat-7.0.91/bin/shutdown.sh
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
 
 User=tomcat
 Group=tomcat
@@ -102,12 +90,11 @@ Environment='CATALINA_OPTS=-Xms128m -Xmx256m -XX:MaxPermSize=128m -Djava.securit
 Unfortunately, with so little memory allocated you will probably run into several types of OutOfMemoryError issues 
 (see Troublshooting section below).
 
-## Make service executable
+## Make Tomcat service executable
 ```
 chmod +x /etc/systemd/system/tomcat.service
 ```
-
-## Register service
+## Reload services
 ```
 sudo systemctl daemon-reload
 ```
@@ -117,12 +104,12 @@ sudo systemctl daemon-reload
 sudo systemctl start tomcat
 ```
 
-## Enable Tomcat to start on boot
+## Enable Tomcat service
 ```
 sudo systemctl enable tomcat
 ```
 
-## Other Systemctl commands
+## Systemctl commands
 ```
 systemctl start tomcat
 systemctl stop tomcat
