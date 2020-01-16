@@ -38,7 +38,7 @@
                         <tbody>
                             <tr class='prop'>
                                 <td class='name top'><label for='name'>
-                                    <warehouse:message code="default.name.label"/></label>
+                                    <warehouse:message code="order.description.label"/></label>
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'name','errors')}'>
                                     <g:textField type="text" id="name" name='name'
@@ -57,22 +57,7 @@
                                 </td>
                             </tr>
                             <tr class='prop'>
-                                <td class='name top'><label for='status'>
-                                    <warehouse:message code="order.status.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'status','errors')}'>
-                                    <div style="width:300px">
-                                        <g:select name="status"
-                                                  from="${org.pih.warehouse.order.OrderStatus.list()}" class="chzn-select-deselect"
-                                                  optionValue="${{format.metadata(obj:it)}}" value="${order?.status}"
-                                                  noSelection="['':warehouse.message(code:'')]" />
-
-                                    </div>
-
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='dateOrdered'><warehouse:message code="order.orderedOn.label"/></label></td>
+                                <td valign='top' class='name middle'><label for='dateOrdered'><warehouse:message code="order.creationDate.label"/></label></td>
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'dateOrdered','errors')}'>
                                     <g:jqueryDatePicker
@@ -88,7 +73,7 @@
 
                             <tr class='prop'>
                                 <td valign='top' class='name middle'><label for='origin.id'>
-                                    <warehouse:message code="order.orderFrom.label"/></label>
+                                    <warehouse:message code="order.orderedFrom.label"/></label>
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
                                     <div style="width: 300px;">
@@ -100,7 +85,7 @@
                             </tr>
                             <tr class='prop'>
                                 <td valign='top' class='name middle'>
-                                    <label for="destination.id"><warehouse:message code="order.orderFor.label"/></label>
+                                    <label for="destination.id"><warehouse:message code="order.destination.label"/></label>
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'destination','errors')}'>
                                     <g:if test="${order?.destination }">
@@ -115,7 +100,7 @@
                                 </td>
                             </tr>
                             <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.orderedBy.label"/></label></td>
+                                <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.createdBy.label"/></label></td>
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
                                     <div style="width: 300px;">
@@ -129,7 +114,6 @@
                 </div>
                 <div class="buttons">
                     <g:submitButton name="next" value="${warehouse.message(code:'default.button.save.label')}" class="button"></g:submitButton>
-                    <g:link action="purchaseOrder" event="cancel" class="button"><warehouse:message code="default.button.back.label"/></g:link>
                 </div>
             </div>
 		</g:form>
