@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import ArrayField from '../form-elements/ArrayField';
 import CheckboxField from '../form-elements/CheckboxField';
@@ -126,6 +127,7 @@ const FIELDS = {
         label: 'react.partialReceiving.binLocation.label',
         defaultMessage: 'Bin Location',
         flexWidth: '1.5',
+        hide: ({ hasBinLocationSupport }) => !hasBinLocationSupport,
       },
       'recipient.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -245,13 +247,18 @@ class ReceivingCheckScreen extends Component {
             onSave: this.onSave,
             saveDisabled: this.props.completed || !_.size(this.props.formValues.containers),
             saveAndExit: this.onExit,
+            hasBinLocationSupport: this.props.hasBinLocationSupport,
           }))}
       </div>
     );
   }
 }
 
-export default ReceivingCheckScreen;
+const mapStateToProps = state => ({
+  hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+});
+
+export default connect(mapStateToProps)(ReceivingCheckScreen);
 
 ReceivingCheckScreen.propTypes = {
   /** Function returning user to the previous page */
@@ -266,6 +273,8 @@ ReceivingCheckScreen.propTypes = {
   }),
   /** Indicator if partial receiving has been completed */
   completed: PropTypes.bool,
+  /** Is true when currently selected location supports bins */
+  hasBinLocationSupport: PropTypes.bool.isRequired,
 };
 
 ReceivingCheckScreen.defaultProps = {

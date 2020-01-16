@@ -643,7 +643,7 @@ class SendMovementPage extends Component {
                       <th><Translate id="react.stockMovement.lot.label" defaultMessage="Lot" /> </th>
                       <th><Translate id="react.stockMovement.expiry.label" defaultMessage="Expiry" /> </th>
                       <th style={{ width: '150px' }}><Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" /> </th>
-                      {!(this.state.supplier) &&
+                      {!(this.state.supplier) && this.props.hasBinLocationSupport &&
                       <th><Translate id="react.stockMovement.binLocation.label" defaultMessage="Bin Location" /> </th>
                     }
                       <th><Translate id="react.stockMovement.recipient.label" defaultMessage="Recipient" /> </th>
@@ -670,7 +670,7 @@ class SendMovementPage extends Component {
                               {(item.quantityShipped ? item.quantityShipped.toLocaleString('en-US') : item.quantityShipped) ||
                               (item.quantityRequested ? item.quantityRequested.toLocaleString('en-US') : item.quantityRequested)}
                             </td>
-                            {!(this.state.supplier) &&
+                            {!(this.state.supplier) && this.props.hasBinLocationSupport &&
                             <td>{item.binLocationName}</td>
                             }
                             <td>
@@ -723,6 +723,7 @@ const mapStateToProps = state => ({
   minSearchLength: state.session.searchConfig.minSearchLength,
   locale: state.session.activeLanguage,
   isUserAdmin: state.session.isUserAdmin,
+  hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -747,4 +748,6 @@ SendMovementPage.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   locale: PropTypes.string.isRequired,
   isUserAdmin: PropTypes.bool.isRequired,
+  /** Is true when currently selected location supports bins */
+  hasBinLocationSupport: PropTypes.bool.isRequired,
 };
