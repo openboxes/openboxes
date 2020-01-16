@@ -4,6 +4,12 @@
         <thead>
             <tr>
                 <th><warehouse:message code="report.number.label"/></th>
+                <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container }}}">
+                    <th><warehouse:message code="packLevel1.label"/></th>
+                </g:if>
+                <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container && it.container?.parentContainer }}}">
+                    <th><warehouse:message code="packLevel2.label"/></th>
+                </g:if>
                 <th>${warehouse.message(code: 'product.productCode.label')}</th>
                 <th>${warehouse.message(code: 'product.label')}</th>
                 <th>${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
@@ -27,6 +33,7 @@
             <g:each in="${requisitionItems?.sort()}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
                     <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.findAll { it.quantity > 0 }?.groupBy { it?.inventoryItem }}"/>
+                    <g:set var="shipmentItems" value="${requisitionItem?.requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == requisitionItem }}"/>
                     <g:set var="picklistItemsGroup" value="${inventoryItemMap?.values()?.toList()}"/>
                     <g:set var="numInventoryItem" value="${inventoryItemMap?.size() ?: 1}"/>
                 </g:if>
@@ -41,6 +48,37 @@
                             <td class="center middle" rowspan="${numInventoryItem}">
                                     ${i + 1}
                             </td>
+                            <g:if test="${shipmentItems.any { it.container }}">
+                            <td class="middle center" rowspan="${numInventoryItem}">
+                                <g:each in="${shipmentItems}" var="shipmentItem">
+                                    <div>
+                                        <g:if test="${previousPackLevel1?.container?.parentContainer?.name != shipmentItem.container?.parentContainer?.name
+                                        || previousPackLevel1?.container?.name != shipmentItem.container?.name}">
+                                            ${shipmentItem.container?.parentContainer?.name ?: shipmentItem?.container?.name}
+                                        </g:if>
+                                    </div>
+                                    <g:set var="previousPackLevel1" value="${shipmentItem}"/>
+                                </g:each>
+                            </td>
+                            </g:if>
+                            <g:if test="${shipmentItems.any { it.container && it.container?.parentContainer }}">
+                                <td class="center middle" rowspan="${numInventoryItem}">
+                                    <g:each in="${shipmentItems}" var="shipmentItem">
+                                        <div>
+                                        <g:if test="${previousPackLevel2?.container?.parentContainer?.name != shipmentItem.container?.parentContainer?.name
+                                                || previousPackLevel2?.container?.name != shipmentItem.container?.name}">
+                                            <g:if test="${ shipmentItem?.container?.parentContainer}">
+                                                ${shipmentItem.container?.name}
+                                            </g:if>
+                                            <g:else>
+                                                -
+                                            </g:else>
+                                        </g:if>
+                                        </div>
+                                        <g:set var="previousPackLevel2" value="${shipmentItem}"/>
+                                    </g:each>
+                                </td>
+                            </g:if>
                             <td class="center middle" rowspan="${numInventoryItem}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
