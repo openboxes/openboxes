@@ -23,6 +23,10 @@ grails:
         locations:
             - ~/.grails/openboxes.yml
             - ~/.grails/openboxes.groovy
+            - ~/.grails/openboxes.properties
+            - file:${catalina.base}/.grails/openboxes.groovy
+            - file:${catalina.base}/.grails/openboxes.yml
+            - file:${catalina.base}/.grails/openboxes.properties
     plugin:
         sentry:
             active: false
