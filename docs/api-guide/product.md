@@ -1,10 +1,12 @@
-## Product API
+# Product API
 
-[TOC]
+\[TOC\]
 
-### Create 
+## Create
+
 Create a new product.
-```
+
+```text
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{"name":"New product", "category.id":"ff80818163e2de8d0163eb93c5a00001"}' https://openboxes.ngrok.io/openboxes/api/products
 
@@ -18,9 +20,11 @@ Date: Sun, 10 Jun 2018 21:37:12 GMT
 {"id":"ff80818163e2de8d0163eba1b1e90002","productCode":null,"name":"New product","category":{"id":"ff80818163e2de8d0163eb93c5a00001","name":"New category"},"description":null,"dateCreated":"2018-06-10T21:37:12Z","lastUpdated":"2018-06-10T21:37:12Z"}
 ```
 
-### List 
-Return all products (results paginated using offset and max)
-```
+## List
+
+Return all products \(results paginated using offset and max\)
+
+```text
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 -d '{ "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
 
@@ -31,22 +35,24 @@ Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Sun, 10 Jun 2018 22:13:27 GMT
 [{
-	"id": "ff80818155df9de40155df9e329b0009",
-	"productCode": "00003",
-	"name": "Aspirin 20mg",
-	"category": {
-		"id": "1",
-		"name": "Medicines"
-	},
-	"description": null,
-	"dateCreated": "2016-07-12T14:58:55Z",
-	"lastUpdated": "2016-07-12T14:58:55Z"
+    "id": "ff80818155df9de40155df9e329b0009",
+    "productCode": "00003",
+    "name": "Aspirin 20mg",
+    "category": {
+        "id": "1",
+        "name": "Medicines"
+    },
+    "description": null,
+    "dateCreated": "2016-07-12T14:58:55Z",
+    "lastUpdated": "2016-07-12T14:58:55Z"
 }]
 ```
 
-### Search 
-Return products with Name starting with 'New product' (results paginged using offset and max)
-```
+## Search
+
+Return products with Name starting with 'New product' \(results paginged using offset and max\)
+
+```text
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 -d '{ "name":"Aspirin", "offset":0, "max":1 }' https://openboxes.ngrok.io/openboxes/api/products
 
@@ -57,21 +63,22 @@ Transfer-Encoding: chunked
 Date: Sun, 10 Jun 2018 22:15:08 GMT
 
 [{
-	"id": "ff80818163e2de8d0163eba1b1e90002",
-	"productCode": "KX43",
-	"name": "New product",
-	"category": {
-		"id": "ff80818163e2de8d0163eb93c5a00001",
-		"name": "New category"
-	},
-	"description": null,
-	"dateCreated": "2018-06-10T21:37:13Z",
-	"lastUpdated": "2018-06-10T21:37:13Z"
+    "id": "ff80818163e2de8d0163eba1b1e90002",
+    "productCode": "KX43",
+    "name": "New product",
+    "category": {
+        "id": "ff80818163e2de8d0163eb93c5a00001",
+        "name": "New category"
+    },
+    "description": null,
+    "dateCreated": "2018-06-10T21:37:13Z",
+    "lastUpdated": "2018-06-10T21:37:13Z"
 }]
 ```
 
-### Read
-```
+## Read
+
+```text
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/products/ff80818163e2de8d0163eba1b1e90002
 
@@ -82,24 +89,26 @@ Transfer-Encoding: chunked
 Date: Sun, 10 Jun 2018 21:38:27 GMT
 
 {
-	"id": "ff80818163e2de8d0163eba1b1e90002",
-	"productCode": "KX43",
-	"name": "New product",
-	"category": {
-		"id": "ff80818163e2de8d0163eb93c5a00001",
-		"name": "New category"
-	},
-	"description": null,
-	"dateCreated": "2018-06-10T21:37:13Z",
-	"lastUpdated": "2018-06-10T21:37:13Z"
+    "id": "ff80818163e2de8d0163eba1b1e90002",
+    "productCode": "KX43",
+    "name": "New product",
+    "category": {
+        "id": "ff80818163e2de8d0163eb93c5a00001",
+        "name": "New category"
+    },
+    "description": null,
+    "dateCreated": "2018-06-10T21:37:13Z",
+    "lastUpdated": "2018-06-10T21:37:13Z"
 }
 ```
 
-### Exceptions
+## Exceptions
 
-#### Create - Validation Errors 
-Returns validation error (Category is a required field of Product)
-```
+### Create - Validation Errors
+
+Returns validation error \(Category is a required field of Product\)
+
+```text
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 -d '{"name":"New product", "category":{"id":"ff80818163e2de8d0163eb93c5a00001"}}' \
 https://openboxes.ngrok.io/openboxes/api/products
@@ -113,8 +122,9 @@ Date: Sun, 10 Jun 2018 21:35:58 GMT
 {"errorCode":500,"errorMessage":"Unable to save category due to errors:\n- Field error in object 'org.pih.warehouse.product.Product' on field 'category': rejected value [null]; codes [org.pih.warehouse.product.Product.category.nullable.error.org.pih.warehouse.product.Product.category,org.pih.warehouse.product.Product.category.nullable.error.category,org.pih.warehouse.product.Product.category.nullable.error.org.pih.warehouse.product.Category,org.pih.warehouse.product.Product.category.nullable.error,product.category.nullable.error.org.pih.warehouse.product.Product.category,product.category.nullable.error.category,product.category.nullable.error.org.pih.warehouse.product.Category,product.category.nullable.error,org.pih.warehouse.product.Product.category.nullable.org.pih.warehouse.product.Product.category,org.pih.warehouse.product.Product.category.nullable.category,org.pih.warehouse.product.Product.category.nullable.org.pih.warehouse.product.Category,org.pih.warehouse.product.Product.category.nullable,product.category.nullable.org.pih.warehouse.product.Product.category,product.category.nullable.category,product.category.nullable.org.pih.warehouse.product.Category,product.category.nullable,nullable.org.pih.warehouse.product.Product.category,nullable.category,nullable.org.pih.warehouse.product.Category,nullable]; arguments [category,Product]; default message [Property [{0}] of class [{1}] cannot be null]\n"}
 ```
 
-### Read - Product not found
-```
+## Read - Product not found
+
+```text
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/products/invalididentifier
 
@@ -127,14 +137,13 @@ Date: Sun, 10 Jun 2018 21:43:37 GMT
 {"errorCode":404,"errorMessage":"Resource not found"}
 ```
 
-### Sub Resources
+## Sub Resources
 
-#### Available Items 
+### Available Items
 
-NOTE: I'm realizing it could be dangerous to use this endpoint because it leaves the bin location empty. 
-This is misleading since you should not be able to make any changes to the quantity associated with the inventory item
-without specifying a valid bin location. 
-```
+NOTE: I'm realizing it could be dangerous to use this endpoint because it leaves the bin location empty. This is misleading since you should not be able to make any changes to the quantity associated with the inventory item without specifying a valid bin location.
+
+```text
 $ curl  -b cookies.txt -X GET -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/products/ff80818155df9de40155df9e3312000d/availableItems?location.id=1"|jsonlint
 {
@@ -151,11 +160,11 @@ $ curl  -b cookies.txt -X GET -H "Content-Type: application/json" \
     }
   ]
 }
-
 ```
 
-#### Available Bin Locations 
-```
+### Available Bin Locations
+
+```text
 $ curl  -b cookies.txt -X GET -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/products/ff80818155df9de40155df9e3312000d/availableItems?location.id=1"|jsonlint
 {
@@ -194,9 +203,9 @@ $ curl  -b cookies.txt -X GET -H "Content-Type: application/json" \
 }
 ```
 
+### Product Associations
 
-#### Product Associations
-```
+```text
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/products/ff80818155df9de40155df9e31000001/associatedProducts?type=SUBSTITUTE&type=EQUIVALENT&location.id=1" \ |jsonlint
 {
@@ -269,3 +278,4 @@ $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
   }
 }
 ```
+

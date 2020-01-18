@@ -1,146 +1,161 @@
-# References 
-* SSH https://www.digitalocean.com/community/tutorials/how-to-create-a-sudo-user-on-ubuntu-quickstart
-* SSH https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1604
-* OpenJDK https://askubuntu.com/questions/761127/how-do-i-install-openjdk-7-on-ubuntu-16-04-or-higher
-* Mailutils https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-postfix-as-a-send-only-smtp-server-on-ubuntu-16-04
-* Tomcat https://www.digitalocean.com/community/tutorials/how-to-install-apache-tomcat-8-on-ubuntu-16-04
-* Certbot https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04
-* Apache2 + mod JK http://www.brandsoftonline.com/installing-tomcat-7-and-apache2-with-mod_jk-on-ubuntu-14-04/
-* Tomcat 8 https://www.liquidweb.com/kb/how-to-install-apache-tomcat-7-on-ubuntu-16-04/
-* Tomcat 8 https://www.digitalocean.com/community/questions/how-to-access-tomcat-8-admin-gui-from-different-host
+# ubuntu1604-notes
 
-# Installation 
+## References
 
-## Log onto server
-```
+* SSH [https://www.digitalocean.com/community/tutorials/how-to-create-a-sudo-user-on-ubuntu-quickstart](https://www.digitalocean.com/community/tutorials/how-to-create-a-sudo-user-on-ubuntu-quickstart)
+* SSH [https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1604](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1604)
+* OpenJDK [https://askubuntu.com/questions/761127/how-do-i-install-openjdk-7-on-ubuntu-16-04-or-higher](https://askubuntu.com/questions/761127/how-do-i-install-openjdk-7-on-ubuntu-16-04-or-higher)
+* Mailutils [https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-postfix-as-a-send-only-smtp-server-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-postfix-as-a-send-only-smtp-server-on-ubuntu-16-04)
+* Tomcat [https://www.digitalocean.com/community/tutorials/how-to-install-apache-tomcat-8-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-apache-tomcat-8-on-ubuntu-16-04)
+* Certbot [https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04)
+* Apache2 + mod JK [http://www.brandsoftonline.com/installing-tomcat-7-and-apache2-with-mod\_jk-on-ubuntu-14-04/](http://www.brandsoftonline.com/installing-tomcat-7-and-apache2-with-mod_jk-on-ubuntu-14-04/)
+* Tomcat 8 [https://www.liquidweb.com/kb/how-to-install-apache-tomcat-7-on-ubuntu-16-04/](https://www.liquidweb.com/kb/how-to-install-apache-tomcat-7-on-ubuntu-16-04/)
+* Tomcat 8 [https://www.digitalocean.com/community/questions/how-to-access-tomcat-8-admin-gui-from-different-host](https://www.digitalocean.com/community/questions/how-to-access-tomcat-8-admin-gui-from-different-host)
+
+## Installation
+
+### Log onto server
+
+```text
 ssh <root-username>@server.domain.tld
 ```
 
-## Create new user
-```
+### Create new user
+
+```text
 sudo adduser <username>
 sudo usermod -aG sudo <username>
 ```
 
-## Copy ssh public key to server
-```
+### Copy ssh public key to server
+
+```text
 ssh-copy-id <username>@server.domain.tld
 ```
 
 Or alternatively manually copy your public key to the server
-```
+
+```text
 sudo cat /home/username/.ssh/id_rsa.pub | ssh <username>@server.domain.tld 'cat - >> ~/.ssh/authorized_keys'
 ```
 
 NOTE: we need to copy the root user's public key because that's the user running Bamboo
 
-## Update apt-get repo
-```
+### Update apt-get repo
+
+```text
 sudo apt update
 ```
 
-## Install various dependencies
-```
+### Install various dependencies
+
+```text
 sudo apt-get install mailutils
 sudo apt-get install unzip
-
 ```
 
-## Install Java 7
+### Install Java 7
+
 You have a few options here and I would recommend the first one, but follow the instructions carefully.
 
-### Automatic Installation #1 [recommended] 
-See option 2 in StackOverflow answer 
-https://askubuntu.com/a/803616/292943
+#### Automatic Installation \#1 \[recommended\]
 
-### Automatic Installation #2
-Easiest, but very insecure [not recommended]
-https://askubuntu.com/a/761527/292943
+See option 2 in StackOverflow answer [https://askubuntu.com/a/803616/292943](https://askubuntu.com/a/803616/292943)
 
-### Manual Installation #1
-See option 1 in StackOverflow answer
-https://askubuntu.com/a/803616/292943
+#### Automatic Installation \#2
 
-### Manual Installation #2 
-Manually install OpenJDK7 from Azul
-https://www.azul.com/downloads/zulu/zulu-linux/
+Easiest, but very insecure \[not recommended\] [https://askubuntu.com/a/761527/292943](https://askubuntu.com/a/761527/292943)
 
+#### Manual Installation \#1
 
-## Check Java Version
-Check to make sure that 
-```
+See option 1 in StackOverflow answer [https://askubuntu.com/a/803616/292943](https://askubuntu.com/a/803616/292943)
+
+#### Manual Installation \#2
+
+Manually install OpenJDK7 from Azul [https://www.azul.com/downloads/zulu/zulu-linux/](https://www.azul.com/downloads/zulu/zulu-linux/)
+
+### Check Java Version
+
+Check to make sure that
+
+```text
 $ java -version
 java version "1.7.0_161"
 OpenJDK Runtime Environment (IcedTea 2.6.12) (7u161-2.6.12-1)
 OpenJDK 64-Bit Server VM (build 24.161-b01, mixed mode)
 ```
 
-## MySQL 5.7
+### MySQL 5.7
 
-### Install MySQL
-```
+#### Install MySQL
+
+```text
 sudo apt-get install mysql-server
 ```
 
-### Configure MySQL 
+#### Configure MySQL
+
 Add the following lines to `/etc/alternatives/my.cnf` using your favorite text editor.
-```
+
+```text
 [mysqld]
 sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
 ```
 
+#### External Connections \[optional\]
 
-### External Connections [optional]
 If you need to allow external connections to MySQL then you'll need to edit the mysqld configuration.
 
 /etc/mysql/mysql.conf.d/mysqld.cnf
 
-# Instead of skip-networking the default is now to listen only on
-# localhost which is more compatible and is not less secure.
-#bind-address           = 127.0.0.1
-bind-address            = 0.0.0.0
+## Instead of skip-networking the default is now to listen only on
 
-### Restart MySQL
-```
+## localhost which is more compatible and is not less secure.
+
+## bind-address           = 127.0.0.1
+
+bind-address = 0.0.0.0
+
+#### Restart MySQL
+
+```text
 sudo service mysql restart
 ```
 
+### Install Tomcat 7
 
-
-
-## Install Tomcat 7 
-https://www.liquidweb.com/kb/how-to-install-apache-tomcat-7-on-ubuntu-16-04/
+[https://www.liquidweb.com/kb/how-to-install-apache-tomcat-7-on-ubuntu-16-04/](https://www.liquidweb.com/kb/how-to-install-apache-tomcat-7-on-ubuntu-16-04/)
 
 1. Create tomcat directory
-```
-mkdir /opt/tomcat
-cd /opt/tomcat
-```
 
+   ```text
+   mkdir /opt/tomcat
+   cd /opt/tomcat
+   ```
 
+2. Find download
 
-1. Find download
-https://tomcat.apache.org/download-70.cgi
+   [https://tomcat.apache.org/download-70.cgi](https://tomcat.apache.org/download-70.cgi)
 
-### Copy 'zip' link under Core 
+#### Copy 'zip' link under Core
 
-### Download zip file
-```
+#### Download zip file
+
+```text
 wget http://mirrors.gigenet.com/apache/tomcat/tomcat-7/v7.0.91/bin/apache-tomcat-7.0.91.zip
 ```
 
-```
+```text
 unzip apache-tomcat-7.0.91.zip
 ```
 
-### Create new tomcat user
+#### Create new tomcat user
 
+#### Configure tomcat-users.xml \[optional\]
 
-### Configure tomcat-users.xml [optional]
-This configuration can be used for future upgrades. Make sure the file is only readable by root and/or the user that runs Tomcat. 
-Replace <manager-gui-\*> and <manager-script-\*> with appropriate values. See Tomcat docs for more information 
-(https://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access).
-```
+This configuration can be used for future upgrades. Make sure the file is only readable by root and/or the user that runs Tomcat. Replace  and  with appropriate values. See Tomcat docs for more information \([https://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html\#Configuring\_Manager\_Application\_Access](https://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access)\).
+
+```text
 <tomcat-users>
   <role rolename="manager-gui"/>
   <role rolename="manager-script"/>
@@ -150,27 +165,27 @@ Replace <manager-gui-\*> and <manager-script-\*> with appropriate values. See To
   <user username="<script-username>" password="<script-password>" roles="manager-script"/>
 </tomcat-users>
 ```
-NOTE: Please don't use obvious passwords (i.e. tomcat, password, s3cret, etc) because your server will get exploited. 
 
+NOTE: Please don't use obvious passwords \(i.e. tomcat, password, s3cret, etc\) because your server will get exploited.
 
+### Install Tomcat 8
 
-## Install Tomcat 8 
-* Tomcat 7 https://www.liquidweb.com/kb/how-to-install-apache-tomcat-7-on-ubuntu-16-04/
-* Tomcat 8 https://www.digitalocean.com/community/questions/how-to-access-tomcat-8-admin-gui-from-different-host
+* Tomcat 7 [https://www.liquidweb.com/kb/how-to-install-apache-tomcat-7-on-ubuntu-16-04/](https://www.liquidweb.com/kb/how-to-install-apache-tomcat-7-on-ubuntu-16-04/)
+* Tomcat 8 [https://www.digitalocean.com/community/questions/how-to-access-tomcat-8-admin-gui-from-different-host](https://www.digitalocean.com/community/questions/how-to-access-tomcat-8-admin-gui-from-different-host)
 
 sudo groupadd tomcat
 
-### TODO Start Tomcat automatically 
+#### TODO Start Tomcat automatically
 
-Also note that we're setting memory config in tomcat.service so we no longer need to edit $CATALINA_HOME/bin/setenv.sh
+Also note that we're setting memory config in tomcat.service so we no longer need to edit $CATALINA\_HOME/bin/setenv.sh
 
-```
+```text
 sudo vi /etc/systemd/system/tomcat.service
 ```
 
-
 tomcat.service
-```
+
+```text
 [Unit]
 Description=Apache Tomcat Web Application Container
 After=network.target
@@ -198,51 +213,55 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
+### Deployment
 
-## Deployment
+#### Create database
 
-### Create database
-```
+```text
 mysql -u root -p -e 'create database openboxes default charset utf8;'
 mysql -u root -p -e 'grant all on openboxes.* to 'openboxes'@'localhost' identified by "openboxes";'
 ```
 
-### Configuration
+#### Configuration
 
-#### Create openboxes-config.properties file
-```
+**Create openboxes-config.properties file**
+
+```text
 mkdir ~/.grails
 vi ~/.grails/openboxes-config.properties
 ```
 
-#### Copy the following into ~/.grails/openboxes-config.properties
-```
+**Copy the following into ~/.grails/openboxes-config.properties**
+
+```text
 # Database connection settings
 dataSource.username=openboxes
 dataSource.password=<password>
 dataSource.url=jdbc:mysql://localhost:3306/openboxes
 ```
 
-#### TODO Advanced configuration
+**TODO Advanced configuration**
 
 * Email 
 * Sentry 
 * ??
 
+#### Add environment variables to ~/.bashrc
 
-### Add environment variables to ~/.bashrc
-```
+```text
 export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 export CATALINA_HOME=/opt/tomcat/apache-tomcat-7.0.91
 ```
 
-### Execute ~/.bashrc to setup environment
-```
+#### Execute ~/.bashrc to setup environment
+
+```text
 . ~/.bashrc
 ```
 
-### Ensure the correct Java version is running
-```
+#### Ensure the correct Java version is running
+
+```text
 sudo update-alternatives --config java
 There is 1 choice for the alternative java (providing /usr/bin/java).
 
@@ -251,138 +270,143 @@ There is 1 choice for the alternative java (providing /usr/bin/java).
   0            /usr/lib/jvm/java-8-oracle/jre/bin/java   1081      auto mode
 * 1            /usr/lib/jvm/java-8-oracle/jre/bin/java   1081      manual mode
 
-Press <enter> to keep the current choice[*], or type selection number: 
+Press <enter> to keep the current choice[*], or type selection number:
 ```
 
-### Download latest development verison 
-```
+#### Download latest development verison
+
+```text
 cd ~
 wget http://bamboo.pih-emr.org:8085/browse/OPENBOXES-SDDEV-226/artifact/DJ/Latest-WAR/openboxes.war
 ```
 
-### Deploy WAR file
-```
+#### Deploy WAR file
+
+```text
 cp openboxes.war /opt/tomcat/apache-tomcat-7.0.91/webapps
 ```
 
-### Tail the log file and wait awhile (could take about 10 minutes to create the database)
-```
+#### Tail the log file and wait awhile \(could take about 10 minutes to create the database\)
+
+```text
 tail -f /opt/tomcat/apache-tomcat-7.0.91/logs/catalina.out
 ```
 
-### Open Chrome and profit
+#### Open Chrome and profit
 
+## Additional Configuration
 
-# Additional Configuration
-In order to get rid of the port 8080 and enable HTTPs, a common solution is to run a web server in front of Tomcat. 
+In order to get rid of the port 8080 and enable HTTPs, a common solution is to run a web server in front of Tomcat.
 
-## Install Apache 2.2
-```
+### Install Apache 2.2
+
+```text
 sudo apt-get install apache2
 ```
 
 NOTE: You can configure Tomcat to listen on port 80/443 and enable HTTPS.
 
+### Configure HTTPS
 
-## Configure HTTPS 
-The easiest way to do this is to use Let's Encrypt (Certbot). See docs here https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04
+The easiest way to do this is to use Let's Encrypt \(Certbot\). See docs here [https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04)
 
-### Install Certbot for Apache 
-```
+#### Install Certbot for Apache
+
+```text
 sudo add-apt-repository ppa:certbot/certbot
 sudo apt-get update
 sudo apt-get install python-certbot-apache
 ```
-### Create new HTTPS certificate
+
+#### Create new HTTPS certificate
+
 Ensure that your domain is accessible before proceeding.
-```
+
+```text
 sudo certbot --apache -d <subdomain.domain.tld>
 ```
 
+#### Configure automatic update of certificate
 
-### Configure automatic update of certificate
-```
+```text
+
 ```
 
-## 
+#### Configure mod\_jk
 
-### Configure mod_jk
-```
+```text
 sudo apt-get install libapache2-mod-jk
 ```
 
-### Enable mod_jk 
-```
+#### Enable mod\_jk
+
+```text
 sudo a2enmod mod_jk
 ```
 
-### Update workers.properties
-```
+#### Update workers.properties
+
+```text
 workers.tomcat_home=/opt/tomcat/apache-tomcat-7.0.91
 workers.java_home=/usr/lib/jvm/java-7-openjdk-amd64
 ```
 
-### Configure Tomcat server.xml
+#### Configure Tomcat server.xml
+
 Uncomment the following line in server.xml
-```
+
+```text
 <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
 ```
 
-### Configure Apache 
+#### Configure Apache
+
 Add the following line to all of your apache configuration in sites-enabled
+
 * /etc/apache2/sites-enabled/000-default.conf
 * /etc/apache2/sites-enabled/000-default-le-ssl.conf
-```
-JkMount /openboxes/* ajp13_worker
-JkMount /manager/* ajp13_worker
-```
 
-### Restart Apache
-### Restart Tomcat
+  ```text
+  JkMount /openboxes/* ajp13_worker
+  JkMount /manager/* ajp13_worker
+  ```
 
+#### Restart Apache
 
+#### Restart Tomcat
 
+## Troubleshooting
 
+### Unable to add the resource at \[/WEB-INF/classes/\] to the cache for web application
 
-# Troubleshooting
+#### Stacktrace
 
-## Unable to add the resource at [/WEB-INF/classes/] to the cache for web application 
+27-Sep-2018 03:30:09.077 WARNING \[localhost-startStop-1\] org.apache.catalina.webresources.Cache.getResource Unable to add the resource at \[/WEB-INF/classes/\] to the cache for web application \[/openboxes\] because there was insufficient free space available after evicting expired cache entries - consider increasing the maximum size of the cache
 
-### Stacktrace
-27-Sep-2018 03:30:09.077 WARNING [localhost-startStop-1] org.apache.catalina.webresources.Cache.getResource Unable to add the resource at [/WEB-INF/classes/] to the cache for web application [/openboxes] because there was insufficient free space available after evicting expired cache entries - consider increasing the maximum size of the cache
+#### Solution
 
-### Solution
 Increase size of cache in tomcat configuration.
 
+### Errors were encountered while processing ...
 
-## Errors were encountered while processing ...
+#### Stacktrace
 
+Errors were encountered while processing: fontconfig libpango-1.0-0:amd64 libpangoft2-1.0-0:amd64 libpangocairo-1.0-0:amd64 libgtk2.0-0:amd64 libgtk2.0-bin openjdk-7-jre:amd64 openjdk-7-jdk:amd64 E: Sub-process /usr/bin/dpkg returned an error code \(1\)
 
-### Stacktrace
-Errors were encountered while processing:
- fontconfig
- libpango-1.0-0:amd64
- libpangoft2-1.0-0:amd64
- libpangocairo-1.0-0:amd64
- libgtk2.0-0:amd64
- libgtk2.0-bin
- openjdk-7-jre:amd64
- openjdk-7-jdk:amd64
-E: Sub-process /usr/bin/dpkg returned an error code (1)
+### NullPointerException: Cannot invoke method getAt\(\) on null object
 
+This means that you're running Java 8 instead of Java 7.
 
-## NullPointerException: Cannot invoke method getAt() on null object
+#### Stacktrace
 
-This means that you're running Java 8 instead of Java 7. 
-
-### Stacktrace
-```
+```text
 2018-09-26 15:31:48,575 [localhost-startStop-1] ERROR context.ContextLoader  - Context initialization failed
 org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'pluginManager' defined in ServletContext resource [/WEB-INF/applicationContext.xml]: Invocation of init method failed; nested exception is java.lang.NullPointerException: Cannot invoke method getAt() on null object
 ```
 
-### Full logs
-```
+#### Full logs
+
+```text
 Sep 26, 2018 3:20:39 PM org.apache.catalina.core.StandardServer await
 INFO: A valid shutdown command was received via the shutdown port. Stopping the Server instance.
 Sep 26, 2018 3:20:39 PM org.apache.coyote.AbstractProtocol pause
@@ -471,59 +495,59 @@ Using [:] SMTP appender org.apache.log4j.net.SMTPAppender
 2018-09-26 15:31:48,567 [localhost-startStop-1] INFO  support.DefaultListableBeanFactory  - Destroying singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@4e04539a: defining beans [grailsApplication,pluginManager,grailsConfigurator,grailsResourceLoader,grailsResourceHolder,characterEncodingFilter]; root of factory hierarchy
 2018-09-26 15:31:48,575 [localhost-startStop-1] ERROR context.ContextLoader  - Context initialization failed
 org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'pluginManager' defined in ServletContext resource [/WEB-INF/applicationContext.xml]: Invocation of init method failed; nested exception is java.lang.NullPointerException: Cannot invoke method getAt() on null object
-	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	at java.lang.Thread.run(Thread.java:748)
+    at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+    at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+    at java.lang.Thread.run(Thread.java:748)
 Caused by: java.lang.NullPointerException: Cannot invoke method getAt() on null object
-	... 5 more
+    ... 5 more
 log4j:ERROR Error occured while sending e-mail notification.
 javax.mail.MessagingException: Could not connect to SMTP host: localhost, port: 25;
   nested exception is:
-	java.net.ConnectException: Connection refused (Connection refused)
-	at com.sun.mail.smtp.SMTPTransport.openServer(SMTPTransport.java:1391)
-	at com.sun.mail.smtp.SMTPTransport.protocolConnect(SMTPTransport.java:412)
-	at javax.mail.Service.connect(Service.java:288)
-	at javax.mail.Service.connect(Service.java:169)
-	at javax.mail.Service.connect(Service.java:118)
-	at javax.mail.Transport.send0(Transport.java:188)
-	at javax.mail.Transport.send(Transport.java:118)
-	at org.apache.log4j.net.SMTPAppender.sendBuffer(SMTPAppender.java:416)
-	at org.apache.log4j.net.SMTPAppender.append(SMTPAppender.java:256)
-	at org.apache.log4j.AppenderSkeleton.doAppend(AppenderSkeleton.java:251)
-	at org.apache.log4j.helpers.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:66)
-	at org.apache.log4j.Category.callAppenders(Category.java:206)
-	at org.apache.log4j.Category.forcedLog(Category.java:391)
-	at org.apache.log4j.Category.log(Category.java:856)
-	at org.slf4j.impl.Log4jLoggerAdapter.log(Log4jLoggerAdapter.java:597)
-	at org.apache.commons.logging.impl.SLF4JLocationAwareLog.error(SLF4JLocationAwareLog.java:225)
-	at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:220)
-	at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:47)
-	at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:5157)
-	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5680)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:145)
-	at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:1018)
-	at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:994)
-	at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:652)
-	at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:1127)
-	at org.apache.catalina.startup.HostConfig$DeployWar.run(HostConfig.java:2021)
-	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	at java.lang.Thread.run(Thread.java:748)
+    java.net.ConnectException: Connection refused (Connection refused)
+    at com.sun.mail.smtp.SMTPTransport.openServer(SMTPTransport.java:1391)
+    at com.sun.mail.smtp.SMTPTransport.protocolConnect(SMTPTransport.java:412)
+    at javax.mail.Service.connect(Service.java:288)
+    at javax.mail.Service.connect(Service.java:169)
+    at javax.mail.Service.connect(Service.java:118)
+    at javax.mail.Transport.send0(Transport.java:188)
+    at javax.mail.Transport.send(Transport.java:118)
+    at org.apache.log4j.net.SMTPAppender.sendBuffer(SMTPAppender.java:416)
+    at org.apache.log4j.net.SMTPAppender.append(SMTPAppender.java:256)
+    at org.apache.log4j.AppenderSkeleton.doAppend(AppenderSkeleton.java:251)
+    at org.apache.log4j.helpers.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:66)
+    at org.apache.log4j.Category.callAppenders(Category.java:206)
+    at org.apache.log4j.Category.forcedLog(Category.java:391)
+    at org.apache.log4j.Category.log(Category.java:856)
+    at org.slf4j.impl.Log4jLoggerAdapter.log(Log4jLoggerAdapter.java:597)
+    at org.apache.commons.logging.impl.SLF4JLocationAwareLog.error(SLF4JLocationAwareLog.java:225)
+    at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:220)
+    at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:47)
+    at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:5157)
+    at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5680)
+    at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:145)
+    at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:1018)
+    at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:994)
+    at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:652)
+    at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:1127)
+    at org.apache.catalina.startup.HostConfig$DeployWar.run(HostConfig.java:2021)
+    at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+    at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+    at java.lang.Thread.run(Thread.java:748)
 Caused by: java.net.ConnectException: Connection refused (Connection refused)
-	at java.net.PlainSocketImpl.socketConnect(Native Method)
-	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
-	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:589)
-	at com.sun.mail.util.SocketFetcher.createSocket(SocketFetcher.java:231)
-	at com.sun.mail.util.SocketFetcher.getSocket(SocketFetcher.java:189)
-	at com.sun.mail.smtp.SMTPTransport.openServer(SMTPTransport.java:1359)
-	... 30 more
+    at java.net.PlainSocketImpl.socketConnect(Native Method)
+    at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
+    at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
+    at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
+    at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+    at java.net.Socket.connect(Socket.java:589)
+    at com.sun.mail.util.SocketFetcher.createSocket(SocketFetcher.java:231)
+    at com.sun.mail.util.SocketFetcher.getSocket(SocketFetcher.java:189)
+    at com.sun.mail.smtp.SMTPTransport.openServer(SMTPTransport.java:1359)
+    ... 30 more
 Sep 26, 2018 3:31:48 PM org.apache.catalina.core.StandardContext startInternal
 SEVERE: One or more listeners failed to start. Full details will be found in the appropriate container log file
 Sep 26, 2018 3:31:48 PM org.apache.catalina.core.StandardContext startInternal
@@ -542,16 +566,14 @@ Sep 26, 2018 3:31:48 PM org.apache.catalina.startup.HostConfig deployDirectory
 INFO: Deployment of web application directory /opt/tomcat/apache-tomcat-7.0.91/webapps/docs has finished in 33 ms
 ```
 
+### MessagingException: Could not connect to SMTP host: localhost, port: 25;
 
-## MessagingException: Could not connect to SMTP host: localhost, port: 25;
+#### Solution
 
-### Solution 
-* Configure OpenBoxes to use an external SMTP server [recommended]
-* Install and configure an SMTP server on localhost [not recommended] 
+* Configure OpenBoxes to use an external SMTP server \[recommended\]
+* Install and configure an SMTP server on localhost \[not recommended\] 
 
-### Stacktrace
-```log4j:ERROR Error occured while sending e-mail notification.
-javax.mail.MessagingException: Could not connect to SMTP host: localhost, port: 25;
-  nested exception is:
-	java.net.ConnectException: Connection refused (Connection refused)
+#### Stacktrace
+
+\`\`\`log4j:ERROR Error occured while sending e-mail notification. javax.mail.MessagingException: Could not connect to SMTP host: localhost, port: 25; nested exception is: java.net.ConnectException: Connection refused \(Connection refused\)
 

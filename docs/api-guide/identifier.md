@@ -1,20 +1,22 @@
+# Identifier API
 
-## Identifier API
 The identifier API only supports POST.
 
-### Create 
+## Create
+
 Create a new alphanumeric identifier for a given `identifierType` or `identifierFormat`.
 
-#### Identifier format
+### Identifier format
+
 Create your own identifier format using the following codes.
 
 * A = Alphanumeric
 * L = Alphabetic characters only
 * N = Numeric 
 * D = Numeric
-* Any other character (i.e. dashes, periods) will be included as-is.
+* Any other character \(i.e. dashes, periods\) will be included as-is.
 
-```
+```text
 $ curl -i -X POST -b cookies.txt \
 -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/identifiers?identifierFormat=AAANNN
@@ -28,8 +30,10 @@ Date: Thu, 21 Jun 2018 04:49:26 GMT
 {"data":"VCU789"}
 ```
 
-#### Identifier type
-Allowed `identifierType` values: 
+### Identifier type
+
+Allowed `identifierType` values:
+
 * `requisition`
 * `product`
 * `productSupplier`
@@ -37,7 +41,7 @@ Allowed `identifierType` values:
 * `shipment`
 * `order`
 
-```
+```text
 $ curl -i -X POST -b cookies.txt \
 -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/identifiers?identifierType=product
@@ -49,10 +53,11 @@ Transfer-Encoding: chunked
 Date: Thu, 21 Jun 2018 04:49:40 GMT
 
 {"data":"VR26"}
+```
 
-```
 These formats can be configured in openboxes-config.properties
-```
+
+```text
 openboxes.identifier.transaction.format = AAA-AAA-AAA
 openboxes.identifier.order.format = NNNLLL
 openboxes.identifier.product.format = LLNN
@@ -60,11 +65,12 @@ openboxes.identifier.productSupplier.format = LLNN
 openboxes.identifier.requisition.format = NNNLLL
 openboxes.identifier.shipment.format = NNNLLL
 ```
-You can also edit the available characters and digits available for the `identifierFormat` 
-mask. This allows you to remove characters that may be confused with others (i.e. I, 1, l or 0 and O). 
-By default we keep all numeric digits and remove the conflicting alphabetic characters.
-```
+
+You can also edit the available characters and digits available for the `identifierFormat` mask. This allows you to remove characters that may be confused with others \(i.e. I, 1, l or 0 and O\). By default we keep all numeric digits and remove the conflicting alphabetic characters.
+
+```text
 openboxes.identifier.numeric = 0123456789
 openboxes.identifier.alphabetic = ABCDEFGHJKMNPQRSTUVXYZ
 openboxes.identifier.alphanumeric = 0123456789ABCDEFGHJKMNPQRSTUVWXYZ
 ```
+

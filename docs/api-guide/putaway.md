@@ -1,7 +1,8 @@
 # Putaway API
 
 ## Get Putaway Candidates
-```
+
+```text
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/putaways?location.id=ff808181646b260401646b3f2ced0002"|jsonlint
 {
@@ -37,16 +38,19 @@ $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 }
 ```
 
-## Create Putaway 
+## Create Putaway
 
 ### Request
-```
+
+```text
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @createPutawayItem.json \
 "https://openboxes.ngrok.io/openboxes/api/putaways"|jsonlint
 ```
+
 ### Data
-```
+
+```text
 {
     "putawayNumber":"",
     "putawayAssignee.id":"",
@@ -65,8 +69,10 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
     }]
 }
 ```
+
 ### Response
-```
+
+```text
 {
   "data": {
     "putawayNumber": "ABC123",
@@ -113,17 +119,19 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 }
 ```
 
-## Update Putaway 
+## Update Putaway
 
 ### Request
-```
+
+```text
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @updatePutaway.json \
 "https://openboxes.ngrok.io/openboxes/api/putaways"|jsonlint
 ```
 
 ### Data
-```
+
+```text
 {
     "putawayNumber":"ABC123",
     "putawayAssignee.id":"1",
@@ -146,13 +154,16 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 ## Split Putaway Item
 
 ### Request
-```
+
+```text
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @splitPutawayItems.json \
 "https://openboxes.ngrok.io/openboxes/api/putaways"|jsonlint
 ```
+
 ### Data
-```
+
+```text
 {
     "putawayNumber":"",
     "putawayAssignee.id":"1",
@@ -182,8 +193,10 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
     }]
 }
 ```
+
 ### Response
-```
+
+```text
 {
   "data": {
     "id": null,
@@ -258,22 +271,23 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 }
 ```
 
-## Complete Putaway 
-Change the `putawayStatus` of the root object to `COMPLETE` in order to actually complete the 
-putaway process. 
+## Complete Putaway
 
-NOTE: If you see a transactionNumber associated with each putaway item you will know that it worked.
-Do not send this request more than once or else you will create multiple putaways.
+Change the `putawayStatus` of the root object to `COMPLETE` in order to actually complete the putaway process.
+
+NOTE: If you see a transactionNumber associated with each putaway item you will know that it worked. Do not send this request more than once or else you will create multiple putaways.
 
 ### Request
-```
+
+```text
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 -d @updatePutaway.json \
 "https://openboxes.ngrok.io/openboxes/api/putaways"|jsonlint
 ```
 
 ### Data
-```
+
+```text
 {
     "putawayNumber":"ABC123",
     "putawayAssignee.id":"1",
@@ -292,3 +306,4 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
     }]
 }
 ```
+

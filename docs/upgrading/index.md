@@ -1,52 +1,76 @@
-### To upgrade using the command line
+# index
+
+## To upgrade using the command line
+
 1. SSH into your server
 
-        ssh openboxes.example.com
+   ```text
+    ssh openboxes.example.com
+   ```
 
-1. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
+2. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
 
-        wget `curl -s https://api.github.com/repos/openboxes/openboxes/releases/latest | grep browser_download_url | cut -d '"' -f 4`
+   ```text
+    wget `curl -s https://api.github.com/repos/openboxes/openboxes/releases/latest | grep browser_download_url | cut -d '"' -f 4`
+   ```
 
-1. Shutdown tomcat 
+3. Shutdown tomcat
 
-        sudo service tomcat stop
+   ```text
+    sudo service tomcat stop
+   ```
 
-1. Remove existing deployment
+4. Remove existing deployment
 
-        sudo rm -rf TOMCAT_HOME/webapps/openboxes*
+   ```text
+    sudo rm -rf TOMCAT_HOME/webapps/openboxes*
+   ```
 
-1. Copy WAR file to Tomcat webapps directory (NOTE: we need to change the name of the WAR file)
+5. Copy WAR file to Tomcat webapps directory \(NOTE: we need to change the name of the WAR file\)
 
-        sudo cp openboxes.war TOMCAT_HOME/webapps/openboxes.war
+   ```text
+    sudo cp openboxes.war TOMCAT_HOME/webapps/openboxes.war
+   ```
 
-1. Start Tomcat (NOTE: this may take awhile if there are lots of data migrations)
-    
-        sudo service tomcat start
+6. Start Tomcat \(NOTE: this may take awhile if there are lots of data migrations\)
 
-1. Check the logs 
+   ```text
+    sudo service tomcat start
+   ```
 
-        sudo tail -f TOMCAT_HOME/logs/tomcat7/catalina.out
+7. Check the logs
 
-### To upgrade using Tomcat Manager 
+   ```text
+    sudo tail -f TOMCAT_HOME/logs/tomcat7/catalina.out
+   ```
+
+## To upgrade using Tomcat Manager
+
 1. Install Tomcat manager
 
-        sudo apt-get install tomcat-admin
-        
-1. Edit tomcat-users.xml to add a new user (`TOMCAT_HOME/conf/tomcat-users.xml`)
-    
-        <user username="<username>" password="<password>" roles="manager-gui"/>
+   ```text
+    sudo apt-get install tomcat-admin
+   ```
 
-1. Restart Tomcat
+2. Edit tomcat-users.xml to add a new user \(`TOMCAT_HOME/conf/tomcat-users.xml`\)
+3. Restart Tomcat
 
-        sudo service tomcat restart
+   ```text
+    sudo service tomcat restart
+   ```
 
-1. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
+4. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
 
-        wget `curl -s https://api.github.com/repos/openboxes/openboxes/releases/latest | grep browser_download_url | cut -d '"' -f 4`
+   ```text
+    wget `curl -s https://api.github.com/repos/openboxes/openboxes/releases/latest | grep browser_download_url | cut -d '"' -f 4`
+   ```
 
-1. Log into Tomcat Manager 
-1. Undeploy all existing OpenBoxes applications 
-1. Upload WAR file to Tomcat Manager (under WAR file to deploy)
-1. Restart Tomcat from the command line (optional, but hightly recommended)
+5. Log into Tomcat Manager
+6. Undeploy all existing OpenBoxes applications 
+7. Upload WAR file to Tomcat Manager \(under WAR file to deploy\)
+8. Restart Tomcat from the command line \(optional, but hightly recommended\)
 
-        sudo service tomcat restart
+   ```text
+    sudo service tomcat restart
+   ```
+

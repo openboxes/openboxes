@@ -1,7 +1,8 @@
-## Location API
+# Location API
 
-### List
-```
+## List
+
+```text
 $ curl -X GET -b cookies.txt \
 -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/locations" | jsonlint
@@ -101,9 +102,9 @@ $ curl -X GET -b cookies.txt \
 }
 ```
 
+## Read
 
-### Read
-```
+```text
 $ curl -X GET -b cookies.txt \
 -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/locations/1" | jsonlint 
@@ -126,10 +127,9 @@ $ curl -X GET -b cookies.txt \
 }
 ```
 
+## Create
 
-
-### Create 
-```
+```text
 $ curl -X POST -b cookies.txt \
 -H "Content-Type: application/json" \
 -d '{"name":"new depot location","locationType.id":"2"}' \
@@ -153,8 +153,9 @@ $ curl -X POST -b cookies.txt \
 }
 ```
 
-### Update 
-```
+## Update
+
+```text
 $ curl -X POST -b cookies.txt \
 -H "Content-Type: application/json" \
 -d '{"description":"this is that new one"}' \
@@ -176,11 +177,11 @@ $ curl -X POST -b cookies.txt \
       "locationTypeCode": "DEPOT"
     }
   }
-
 ```
 
-### Delete
-```
+## Delete
+
+```text
 $ curl -i -X DELETE -b cookies.txt \
 -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/locations/ff8081816430012d0164301b8eda0008" 
@@ -189,5 +190,4 @@ HTTP/1.1 204 No Content
 Server: Apache-Coyote/1.1
 Date: Sun, 24 Jun 2018 04:44:57 GMT
 ```
-
 

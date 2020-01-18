@@ -1,16 +1,14 @@
-
 # Search APIs
-These are APIs that support lookup requests like listing and read operations (GET). That means that most of these APIs
-don't currently support create (POST), update (PUT) or delete (DELETE) operations.
 
-However, all of the domain objects in OpenBoxes will respond to the Generic API (e.g. `/api/generic/product`), but the following 
-API endpoints will handle more advanced search criteria.
+These are APIs that support lookup requests like listing and read operations \(GET\). That means that most of these APIs don't currently support create \(POST\), update \(PUT\) or delete \(DELETE\) operations.
 
+However, all of the domain objects in OpenBoxes will respond to the Generic API \(e.g. `/api/generic/product`\), but the following API endpoints will handle more advanced search criteria.
 
 ## Bin Locations
 
 Supports filtering by `parentLocation.id`
-```
+
+```text
 $ curl -X GET -b cookies.txt -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/binLocations?parentLocation.id=1" | jsonlint 
 {
@@ -106,10 +104,11 @@ $ curl -X GET -b cookies.txt -H "Content-Type: application/json" \
 }
 ```
 
-
 ## Stocklists
+
 Supports filtering by `name`, `requisitionNumber`, `origin.id`, `destination.id` as well as other attributes to be documented at a later time.
-```
+
+```text
 $ curl -X GET -b cookies.txt \
 -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/stocklists" | jsonlint
@@ -259,3 +258,4 @@ $ curl -X GET -b cookies.txt \
   ]
 }
 ```
+

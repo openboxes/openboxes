@@ -2,32 +2,27 @@
 
 ## Authentication
 
-First of all, we're going to need to authenticate. And although not entirely necessary 
-it is recommended that you use cURL's `-c` argument in order to create a local cookies 
-file (cookies.txt) so that you don't need to keep passing auth headers around on every
-request.
+First of all, we're going to need to authenticate. And although not entirely necessary it is recommended that you use cURL's `-c` argument in order to create a local cookies file \(cookies.txt\) so that you don't need to keep passing auth headers around on every request.
 
-``` 
+```text
 curl -i -c cookies.txt -X POST -H "Content-Type: application/json" \
 -d '{"username":"jmiranda","password":"password","location":"1"}' \
 https://openboxes.ngrok.io/openboxes/api/login
 ```
 
-
 ## Using Generic API
-Once that's done, let's start with the views that require the read/list APIs like shipments and requisitions. For this we're going to use 
-what I'm calling the [Generic API](http://docs.openboxes.com/en/latest/api-guide/generic/). You should be able to handle most (if not all) 
-of the basic CRUD operations through the Generic API. 
+
+Once that's done, let's start with the views that require the read/list APIs like shipments and requisitions. For this we're going to use what I'm calling the [Generic API](http://docs.openboxes.com/en/latest/api-guide/generic/). You should be able to handle most \(if not all\) of the basic CRUD operations through the Generic API.
 
 In general, you have access to the following operations against the Generic API.
 
-* List = GET https://openboxes.ngrok.io/openboxes/api/generic/**resource**
-* Read = GET https://openboxes.ngrok.io/openboxes/api/generic/**resource**/:id
-* Create = POST https://openboxes.ngrok.io/openboxes/api/generic/**resource**
-* Update = PUT (or POST) https://openboxes.ngrok.io/openboxes/api/generic/**resource**/:id
-* Delete = DELETE https://openboxes.ngrok.io/openboxes/api/generic/**resource**/:id
+* List = GET [https://openboxes.ngrok.io/openboxes/api/generic/\*\*resource\*\*](https://openboxes.ngrok.io/openboxes/api/generic/**resource**)
+* Read = GET [https://openboxes.ngrok.io/openboxes/api/generic/\*\*resource\*\*/:id](https://openboxes.ngrok.io/openboxes/api/generic/**resource**/:id)
+* Create = POST [https://openboxes.ngrok.io/openboxes/api/generic/\*\*resource\*\*](https://openboxes.ngrok.io/openboxes/api/generic/**resource**)
+* Update = PUT \(or POST\) [https://openboxes.ngrok.io/openboxes/api/generic/\*\*resource\*\*/:id](https://openboxes.ngrok.io/openboxes/api/generic/**resource**/:id)
+* Delete = DELETE [https://openboxes.ngrok.io/openboxes/api/generic/\*\*resource\*\*/:id](https://openboxes.ngrok.io/openboxes/api/generic/**resource**/:id)
 
-where <domain> is any of the domain classes in the system and <id> is the primary key.
+where  is any of the domain classes in the system and  is the primary key.
 
 Here are some example **resources**:
 
@@ -40,12 +35,11 @@ Here are some example **resources**:
 * Transaction = transaction
 * TransactionEntry = transactionEntry
 
-
 ## Get shipments
-So let's start off with Shipments by retrieving a list of max = 1 shipments.
-NOTE: I've added a paging parameter (max=1) in the following request. You should review the 
-[pagination documentation](http://docs.openboxes.com/en/latest/api-guide/#pagination) when you get a chance.
-```
+
+So let's start off with Shipments by retrieving a list of max = 1 shipments. NOTE: I've added a paging parameter \(max=1\) in the following request. You should review the [pagination documentation](http://docs.openboxes.com/en/latest/api-guide/#pagination) when you get a chance.
+
+```text
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" https://openboxes.ngrok.io/openboxes/api/generic/shipment?max=1 | jsonlint
 {
   "data": [
@@ -131,10 +125,11 @@ $ curl -b cookies.txt -X GET -H "Content-Type: application/json" https://openbox
 }
 ```
 
-## Read shipment 
+## Read shipment
 
 Now let's read the details for a specific shipment.
-```
+
+```text
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/generic/shipment/ff808181646b260401646b61df3f0034|jsonlint
 {
@@ -220,6 +215,7 @@ https://openboxes.ngrok.io/openboxes/api/generic/shipment/ff808181646b260401646b
 ```
 
 ## Create a new shipment
+
 Pass an empty JSON object to the create method and it'll tell you what fields are required.
 
 * name
@@ -228,7 +224,7 @@ Pass an empty JSON object to the create method and it'll tell you what fields ar
 * expectedShippingDate
 * shipmentType
 
-```
+```text
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d '{}' \
 https://openboxes.ngrok.io/openboxes/api/generic/shipment|jsonlint
 {
@@ -413,3 +409,4 @@ https://openboxes.ngrok.io/openboxes/api/generic/shipment|jsonlint
   ]
 }
 ```
+

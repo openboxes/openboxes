@@ -3,12 +3,15 @@
 ## Get Partial Receipt Candidates
 
 ### Request
-```
+
+```text
 curl -b cookies.txt -X GET -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/partialReceiving/ff808181646b260401646b61df3f0034"|jsonlint
 ```
+
 ### Response
-```
+
+```text
 {
   "data": {
     "receipt.id": null,
@@ -54,20 +57,22 @@ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
     ]
   }
 }
-
 ```
 
-## Create Partial Receipt 
-This endpoint does not save to the database unless the `receiptStatus` is set to `COMPLETE`. 
-That way you can save a draft before checking the receipt and completing it
+## Create Partial Receipt
+
+This endpoint does not save to the database unless the `receiptStatus` is set to `COMPLETE`. That way you can save a draft before checking the receipt and completing it
 
 ### Request
-```
+
+```text
 curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialReceiving.json \
 "https://openboxes.ngrok.io/openboxes/api/partialReceiving/ff808181646b260401646b61df3f0034"|jsonlint
 ```
+
 ### Data
-```
+
+```text
 {
     "shipment.id":"ff808181646b260401646b61df3f0034",
     "receiptStatus":"PENDING",
@@ -86,11 +91,11 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
         }]
     }]  
 }
-
-
 ```
+
 ### Response
-```
+
+```text
 {
   "data": {
     "receipt.id": null,
@@ -136,23 +141,22 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
     ]
   }
 }
-
-
 ```
 
 ## Complete Partial Receipt
-Saves the partial receipt to the database and creates an inbound transaction for the receipt. 
-NOTE: The response is just a `GET /api/partialReceiving` for the remaining items. The items
-won't remember previous quantities and bin locations selected.
+
+Saves the partial receipt to the database and creates an inbound transaction for the receipt. NOTE: The response is just a `GET /api/partialReceiving` for the remaining items. The items won't remember previous quantities and bin locations selected.
 
 ### Request
-```
+
+```text
 curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialReceiving.json \
 "https://openboxes.ngrok.io/openboxes/api/partialReceiving/ff808181646b260401646b61df3f0034"|jsonlint
 ```
 
-### Data (partialReceiving.json)
-```
+### Data \(partialReceiving.json\)
+
+```text
 {
     "shipment.id":"ff808181646b260401646b61df3f0034",
     "receiptStatus":"COMPLETE",
@@ -171,11 +175,11 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
         }]
     }]  
 }
-
 ```
 
 ### Response
-```
+
+```text
 {
   "data": {
     "receipt.id": null,
@@ -221,27 +225,28 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
     ]
   }
 }
-
 ```
 
-## Rollback Partial Receipts 
+## Rollback Partial Receipts
 
 ### Request
-```
+
+```text
 curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialReceivingRollback.json \
 "https://openboxes.ngrok.io/openboxes/api/partialReceiving/ff808181646b260401646b61df3f0034"|jsonlint
 ```
 
-### Data (partialReceivingRollback.json)
-```
+### Data \(partialReceivingRollback.json\)
+
+```text
 {
     "receiptStatus":"ROLLBACK"
 }
 ```
 
-
 ### Response
-```
+
+```text
 {
   "data": {
     "receipt.id": null,
@@ -287,6 +292,5 @@ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d @partialRecei
     ]
   }
 }
-
 ```
 

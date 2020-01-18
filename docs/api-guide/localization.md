@@ -1,8 +1,10 @@
-## Localization API
+# Localization API
 
-### List 
-Return all localized messages for a given locale (language code only).
-```
+## List
+
+Return all localized messages for a given locale \(language code only\).
+
+```text
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" "https://openboxes.ngrok.io/openboxes/api/localizations?lang=fr" |jsonlint
 {
   "messages": {
@@ -38,15 +40,13 @@ $ curl -b cookies.txt -X GET -H "Content-Type: application/json" "https://openbo
   ],
   "currentLocale": "fr"
 }
-
 ```
 
+## Read
 
-### Read
+### Read localized message with arguments \(English\)
 
-#### Read localized message with arguments (English)
-
-```
+```text
 $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizations/dashboard.greeting.label?args=Justin&args=Boston&lang=en" |jsonlint
 {
   "code": "dashboard.greeting.label",
@@ -54,9 +54,9 @@ $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizat
 }
 ```
 
-#### Read localized message with arguments (French)
+### Read localized message with arguments \(French\)
 
-```
+```text
 $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizations/dashboard.greeting.label?args=Justin&args=Boston&lang=fr"
 {
   "code": "dashboard.greeting.label",
@@ -65,9 +65,9 @@ $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizat
 }
 ```
 
-#### Read localized message with arguments (Spanish)
+### Read localized message with arguments \(Spanish\)
 
-```
+```text
 $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizations/dashboard.greeting.label?args=Justin&args=Boston&lang=es"
 {
   "code": "dashboard.greeting.label",
@@ -76,11 +76,11 @@ $ curl -b cookies.txt -X GET "https://openboxes.ngrok.io/openboxes/api/localizat
 }
 ```
 
-### Exceptions
+## Exceptions
 
-#### List - Bogus Locale 
+### List - Bogus Locale
 
-```
+```text
 $ curl -b cookies.txt -X GET -H "Accept: application/json" "https://openboxes.ngrok.io/openboxes/api/localizations?lang=ensfsaf" |jsonlint  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
 {
   "errorCode": 500,
@@ -88,8 +88,9 @@ $ curl -b cookies.txt -X GET -H "Accept: application/json" "https://openboxes.ng
 }
 ```
 
-### Read - No message found
-```
+## Read - No message found
+
+```text
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" "https://openboxes.ngrok.io/openboxes/api/localizations/invalid.message.code?lang=en" |jsonlint
 {
   "errorCode": 500,
