@@ -1,7 +1,7 @@
 
 ## Basic Architecture
 
-![Basic Architecture](http://docs.openboxes.com/static/img/technology-soup.png)
+![Basic Architecture]([https://docs.openboxes.com/en/latest/img/technology-soup.png](https://docs.openboxes.com/en/latest/img/technology-soup.png)
 
 This diagram is an attempt to convey the following concepts about OpenBoxes: 
 
@@ -20,5 +20,5 @@ Android or React Native. This application would likely support barcoding and off
 With respect to Twilio integration, we are planning to implement SMS notifications for stock 
 and expiry events.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEzOTk4MDExNjddfQ==
+eyJoaXN0b3J5IjpbMjA3MTA4NTYwNV19
 -->
