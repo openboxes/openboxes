@@ -53,7 +53,7 @@ class InventoryItem implements Serializable {
     Date dateCreated
     Date lastUpdated
 
-    static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise']
+    static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise', 'expirationStatus']
 
     static belongsTo = [product: Product]
 
@@ -105,8 +105,6 @@ class InventoryItem implements Serializable {
 
     def getExpirationStatus() {
         def today = new Date()
-
-
         if (expirationDate) {
             def daysToExpiry = expirationDate - today
             if (daysToExpiry <= 0) {
@@ -127,42 +125,5 @@ class InventoryItem implements Serializable {
         }
         return "never"
     }
-
-
-    /**
-     * Get the first receiving date for this inventory item in given bin location at the given location.
-     *
-     * @param locationId
-     * @return
-     */
-    Date firstReceivingDate(String locationId, Location binLocatiom) {
-        def inventory = Location.get(locationId).inventory
-        def date
-        if (binLocatiom) {
-            date = TransactionEntry.executeQuery("""
-						select 
-						     min(t.transactionDate)
-						from TransactionEntry as te
-						left join te.transaction as t
-						where te.binLocation = :binLocation
-						and te.inventoryItem = :inventoryItem
-						and t.inventory = :inventory
-						and t.transactionType in (:transactionTypes)
-						""", [inventory: inventory, binLocation: binLocatiom, inventoryItem: this, transactionTypes: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)]).first()
-        } else {
-            date = TransactionEntry.executeQuery("""
-						select 
-						     min(t.transactionDate)
-						from TransactionEntry as te
-						left join te.transaction as t
-						where te.binLocation = null
-						and te.inventoryItem = :inventoryItem
-						and t.inventory = :inventory
-						and t.transactionType in (:transactionTypes)
-						""", [inventory: inventory, inventoryItem: this, transactionTypes: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)]).first()
-        }
-        return date
-    }
-
 
 }
