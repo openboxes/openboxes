@@ -14,6 +14,7 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
+import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshotEvent
@@ -220,7 +221,7 @@ class Product implements Comparable, Serializable {
     User updatedBy
 
     // "inventoryLevels"
-    static transients = ["rootCategory", "images", "genericProduct", "thumbnail", "binLocation", "substitutions"]
+    static transients = ["rootCategory", "categoriesList", "images", "genericProduct", "thumbnail", "binLocation", "substitutions"]
 
     static hasMany = [
             categories         : Category,
@@ -442,15 +443,54 @@ class Product implements Comparable, Serializable {
     }
 
 
+    Date latestInventoryDate(String locationId) {
+        return latestTransactionDate(locationId, [TransactionCode.PRODUCT_INVENTORY])
+    }
+
+    Date earliestReceivingDate(String locationId) {
+        return earliestTransactionDate(locationId, [TransactionCode.CREDIT])
+    }
+
     /**
      * Get the latest inventory date for this product at the given location.
      *
      * @param locationId
      * @return
      */
-    Date latestInventoryDate(String locationId) {
+    Date latestTransactionDate(String locationId, List<TransactionCode> transactionCodes) {
         def inventory = Location.get(locationId).inventory
-        def date = TransactionEntry.executeQuery("select max(t.transactionDate) from TransactionEntry as te left join te.inventoryItem as ii left join te.transaction as t where ii.product= :product and t.inventory = :inventory and t.transactionType.transactionCode in (:transactionCodes)", [product: this, inventory: inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY]]).first()
+        def date = TransactionEntry.executeQuery("""
+          select 
+            max(t.transactionDate) 
+          from TransactionEntry as te 
+          left join te.inventoryItem as ii 
+          left join te.transaction as t 
+          where ii.product= :product 
+          and t.inventory = :inventory 
+          and t.transactionType.transactionCode in (:transactionCodes)
+          """, [product: this, inventory: inventory, transactionCodes: transactionCodes]).first()
+        return date
+    }
+
+/**
+     * Get the first receiving date for this inventory item in given bin location at the given location.
+     *
+     * @param locationId
+     * @return
+     */
+    Date earliestTransactionDate(String locationId, List<TransactionCode> transactionCodes) {
+        Inventory inventory = Location.get(locationId).inventory
+        def date
+            date = TransactionEntry.executeQuery("""
+                select 
+                  min(t.transactionDate)
+                from TransactionEntry as te
+                left join te.transaction as t
+                left join te.inventoryItem as ii
+                where ii.product = :product
+                and t.inventory = :inventory
+                and t.transactionType.transactionCode in (:transactionCodes)
+                """, [inventory: inventory, product: this, transactionCodes: transactionCodes]).first()
         return date
     }
 
