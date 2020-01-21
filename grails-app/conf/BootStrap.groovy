@@ -30,6 +30,7 @@ import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
@@ -148,7 +149,8 @@ class BootStrap {
                     parentLocation       : location.parentLocation,
                     locationType         : location.locationType,
                     sortOrder            : location.sortOrder,
-                    hasBinLocationSupport: location.hasBinLocationSupport()
+                    hasBinLocationSupport: location.hasBinLocationSupport(),
+                    hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT)
             ]
         }
 
