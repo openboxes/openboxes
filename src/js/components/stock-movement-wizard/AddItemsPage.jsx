@@ -245,13 +245,20 @@ const VENDOR_FIELDS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder, updateTotalCount }) => (
+    addButton: ({
+      // eslint-disable-next-line react/prop-types
+      addRow, getSortOrder, showOnly, isPurchaseOrder, updateTotalCount,
+    }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
+        disabled={showOnly}
+        hidden={isPurchaseOrder}
         onClick={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
+          addRow({
+            sortOrder: getSortOrder(),
+          });
         }}
       ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
@@ -1218,6 +1225,7 @@ class AddItemsPage extends Component {
                   isRowLoaded: this.isRowLoaded,
                   updateTotalCount: this.updateTotalCount,
                   isPaginated: this.props.isPaginated,
+                  isPurchaseOrder: !_.isNil(this.state.values.associations.order.id),
                   showOnly,
                 }))}
               <div>

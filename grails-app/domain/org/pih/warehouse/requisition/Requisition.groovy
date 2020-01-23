@@ -115,6 +115,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     Integer replenishmentPeriod = 0
 
+    Order order
+
     // Removed comments, documents, events for the time being.
     static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
     static hasOne = [picklist: Picklist]
@@ -170,6 +172,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         requisitionTemplate(nullable: true)
         replenishmentPeriod(nullable: true)
         sortByCode(nullable: true)
+        order(nullable: true)
     }
 
     def getRequisitionItemCount() {
