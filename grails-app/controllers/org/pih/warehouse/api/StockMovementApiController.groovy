@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
@@ -455,6 +456,9 @@ class StockMovementApiController {
 
             // Update recipient
             stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
+
+            // Order item
+            stockMovementItem.orderItem = lineItem["orderItem.id"] ? OrderItem.load(lineItem["orderItem.id"]) : null
 
             // Pack page fields
             stockMovementItem.quantityShipped = lineItem.quantityShipped ? new BigDecimal(lineItem.quantityShipped) : null

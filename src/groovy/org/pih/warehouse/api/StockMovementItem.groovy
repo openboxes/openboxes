@@ -6,6 +6,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
@@ -22,6 +23,7 @@ class StockMovementItem {
 
     StockMovement stockMovement
     RequisitionItem requisitionItem
+    OrderItem orderItem
 
     BigDecimal quantityRequested
     BigDecimal quantityAvailable
@@ -93,6 +95,7 @@ class StockMovementItem {
         palletName(nullable: true)
         boxName(nullable: true)
         sortOrder(nullable: true)
+        orderItem(nullable: true)
     }
 
     String toString() {
@@ -121,7 +124,8 @@ class StockMovementItem {
                 comments         : comments,
                 recipient        : recipient,
                 substitutionItems: substitutionItems,
-                sortOrder        : sortOrder
+                sortOrder        : sortOrder,
+                orderItem        : orderItem
         ]
     }
 
@@ -193,7 +197,21 @@ class StockMovementItem {
                 lotNumber: requisitionItem?.lotNumber ?: "",
                 expirationDate: requisitionItem?.expirationDate,
                 sortOrder: requisitionItem?.orderIndex,
-                requisitionItem: requisitionItem
+                requisitionItem: requisitionItem,
+                orderItem: requisitionItem.orderItem
+        )
+    }
+
+
+    static StockMovementItem createFromOrderItem(OrderItem orderItem) {
+        return new StockMovementItem(
+                statusCode: orderItem.orderItemStatusCode,
+                productCode: orderItem?.product?.productCode,
+                product: orderItem?.product,
+                inventoryItem: orderItem?.inventoryItem,
+                quantityRequested: orderItem.quantity,
+                recipient: orderItem.requestedBy,
+                orderItem: orderItem
         )
     }
 

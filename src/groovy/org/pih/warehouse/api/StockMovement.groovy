@@ -9,6 +9,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ReferenceNumber
@@ -173,6 +174,27 @@ class StockMovement {
         if (description) name += "${separator}${description}"
         name = name.replace(" ", "")
         return name
+    }
+
+    static StockMovement createFormOrder(Order order) {
+        StockMovement stockMovement = new StockMovement(
+            destination: order.destination,
+            origin: order.origin,
+            dateRequested: new Date(),
+            requestedBy: order.orderedBy,
+            description: order.name,
+            statusCode:"CREATED"
+        )
+
+        if (order.orderItems) {
+            order.orderItems.each { orderItem ->
+                StockMovementItem stockMovementItem = StockMovementItem.createFromOrderItem(orderItem)
+                stockMovementItem.sortOrder = stockMovement.lineItems ? stockMovement.lineItems.size() * 100 : 0
+                stockMovement.lineItems.add(stockMovementItem)
+            }
+        }
+
+        return stockMovement
     }
 
 
