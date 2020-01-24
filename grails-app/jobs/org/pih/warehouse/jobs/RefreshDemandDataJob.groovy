@@ -1,6 +1,6 @@
 package org.pih.warehouse.jobs
 
-import grails.core.GrailsApplication
+import grails.util.Holders
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
@@ -13,7 +13,7 @@ class RefreshDemandDataJob {
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {
         cron name: 'refreshDemandDataJobCronTrigger',
-                cronExpression: grailsApplication.getConfig().getProperty('openboxes.jobs.refreshDemandDataJob.cronExpression')
+                cronExpression: Holders.grailsApplication.config.openboxes.jobs.refreshDemandDataJob.cronExpression
     }
 
     def execute(JobExecutionContext context) {
