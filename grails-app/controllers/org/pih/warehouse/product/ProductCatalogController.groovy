@@ -161,8 +161,6 @@ class ProductCatalogController {
 
         log.info "uploadCsv " + params
 
-        def columns
-        def localFile
         def uploadFile = command?.importFile
 
         if (request.method == "POST") {
