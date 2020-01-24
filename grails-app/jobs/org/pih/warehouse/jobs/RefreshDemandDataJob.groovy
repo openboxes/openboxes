@@ -16,7 +16,7 @@ class RefreshDemandDataJob {
     }
 
     def execute(JobExecutionContext context) {
-        Boolean enabled = grailsApplication.config.openboxes.jobs.refreshDemandDataJob.enabled
+        Boolean enabled = Holders.grailsApplication.config.openboxes.jobs.refreshDemandDataJob.enabled
         if (enabled) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing demand data: " + context.mergedJobDataMap)
