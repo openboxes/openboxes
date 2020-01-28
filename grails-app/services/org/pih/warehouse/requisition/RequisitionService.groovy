@@ -312,6 +312,18 @@ class RequisitionService {
             }
         }
 
+        results.each { result ->
+            def dateIssued = Transaction.executeQuery("""
+                  select 
+                    max(t.transactionDate) 
+                  from Transaction as t
+                  where t.requisition = :requisition 
+                  and t.transactionType in (:transactionTypes)
+                  """, [requisition: result, transactionTypes: TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)]).first()
+            result.dateIssued = dateIssued
+            result.save(flush:true)
+        }
+
         return results
 
     }

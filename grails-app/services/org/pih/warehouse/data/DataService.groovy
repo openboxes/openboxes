@@ -621,7 +621,7 @@ class DataService {
      * @return
      */
     String exportRequisitions(requisitions) {
-        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+        def formatDate = new SimpleDateFormat("MMM dd, yyyy")
         def sw = new StringWriter()
 
         def csvWriter = new CSVWriter(sw, {
@@ -684,7 +684,7 @@ class DataService {
                     datePicked       : requisition?.picklist?.datePicked ? "${formatDate.format(requisition?.picklist?.datePicked)}" : "",
 
                     issuedBy         : requisition.issuedBy,
-                    dateIssued       : requisition.dateIssued ? "${formatDate.format(requisition.dateIssued)}" : "",
+                    dateIssued       : requisition.dateIssued ?  "${formatDate.format(requisition.dateIssued)}" : "",
 
                     receivedBy       : requisition.receivedBy,
                     dateReceived     : requisition.dateReceived ? "${formatDate.format(requisition.dateReceived)}" : "",

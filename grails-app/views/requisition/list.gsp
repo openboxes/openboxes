@@ -252,13 +252,13 @@
                                     ${requisition.requestedBy?:warehouse.message(code:'default.none.label')}
                                 </td>
                                 <td class="middle">
-                                    <div title="<g:formatDate date="${requisition.dateRequested }"/>">
-                                        <g:prettyDateFormat date="${requisition.dateRequested}"/>
+                                    <div title="<g:formatDate format="MMM dd, yyyy" date="${requisition.dateRequested }"/>">
+                                        <g:formatDate format="MMM dd, yyyy" date="${requisition?.dateRequested}"/>
                                     </div>
                                 </td>
                                 <td class="middle">
-                                    <div title="<g:formatDate date="${requisition.dateIssued }"/>">
-                                        <g:prettyDateFormat date="${requisition.dateIssued}"/>
+                                    <div title="<g:formatDate format="MMM dd, yyyy" date="${requisition.dateIssued }"/>">
+                                        <g:formatDate format="MMM dd, yyyy" date="${requisition?.dateIssued}"/>
                                     </div>
                                 </td>
                                 <td class="middle">
@@ -423,7 +423,7 @@
 
 
     <script type="text/javascript">
-			$(function() { 
+			$(function() {
 		    	$(".tabs").tabs(
 	    			{
 	    				cookie: {
@@ -446,7 +446,7 @@
 
 
             });
-        </script>        
-        
+        </script>
+
     </body>
 </html>
