@@ -45,11 +45,6 @@ class RequisitionService {
     }
 
     def getRequisitionStatistics(Location destination, Location origin, User user, Date date, List<RequisitionStatus> excludedStatuses) {
-        log.info "destination " + destination
-        log.info "origin " + origin
-        log.info "user " + user
-
-        log.info "Date " + date
         def statistics = [:]
         def criteria = Requisition.createCriteria()
         def results = criteria.list {
@@ -235,7 +230,14 @@ class RequisitionService {
         def results = criteria.list(max: params?.max ?: 10, offset: params?.offset ?: 0) {
             and {
                 if (issuedDateRange) {
-                    between("dateIssued", issuedDateRange[0], issuedDateRange[1])
+                    // FIXME Could possibly use an OR but this would be redundant
+                    //between("dateIssued", issuedDateRange[0], issuedDateRange[1])
+                    transactions {
+                        and {
+                            isNotNull("outgoingShipment")
+                            between("transactionDate", issuedDateRange[0], issuedDateRange[1])
+                        }
+                    }
                 }
 
                 if (requestedDateRange) {
@@ -310,18 +312,6 @@ class RequisitionService {
                     }
                 }
             }
-        }
-
-        results.each { result ->
-            def dateIssued = Transaction.executeQuery("""
-                  select 
-                    max(t.transactionDate) 
-                  from Transaction as t
-                  where t.requisition = :requisition 
-                  and t.transactionType in (:transactionTypes)
-                  """, [requisition: result, transactionTypes: TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)]).first()
-            result.dateIssued = dateIssued
-            result.save(flush:true)
         }
 
         return results
@@ -413,7 +403,7 @@ class RequisitionService {
             } else {
                 Date now = new Date()
                 requisition.status = RequisitionStatus.ISSUED
-                requisition.dateIssued = now
+                //requisition.dateIssued = now
                 requisition.issuedBy = issuedBy
                 requisition.dateDelivered = now
                 requisition.deliveredBy = deliveredBy
@@ -433,7 +423,7 @@ class RequisitionService {
             if (requisition.status == RequisitionStatus.ISSUED) {
                 requisition.status = RequisitionStatus.CHECKING
                 requisition.issuedBy = null
-                requisition.dateIssued = null
+                //requisition.dateIssued = null
                 requisition.transactions.each { transaction ->
                     if (transaction) {
                         requisition.removeFromTransactions(transaction)
