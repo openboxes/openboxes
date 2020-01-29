@@ -886,6 +886,7 @@ class StockMovementService {
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName()
+        requisition.order = stockMovement.order
         requisition.requisitionItems = []
 
         stockMovement.lineItems.each { stockMovementItem ->
