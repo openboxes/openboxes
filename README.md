@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/openboxes/openboxes.svg?branch=develop)](https://travis-ci.org/openboxes/openboxes)
 [![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
-[![Slack Signup](http://slack-signup.openboxes.com/badge.svg)](http://slack-signup.openboxes.com)
+[![Financial Contributors on Open Collective](https://opencollective.com/openboxes/all/badge.svg?label=financial+contributors)](https://opencollective.com/openboxes) [![Slack Signup](http://slack-signup.openboxes.com/badge.svg)](http://slack-signup.openboxes.com)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![Join the chat at https://gitter.im/openboxes/openboxes](https://badges.gitter.im/openboxes/openboxes.svg)](https://gitter.im/openboxes/openboxes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 OpenBoxes
@@ -9,6 +9,36 @@ OpenBoxes
 ### About
 
 OpenBoxes is an Open Source Inventory and Supply Chain Management System. The initial implementation of OpenBoxes will occur at Partners In Health-supported facilities in Haiti.
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/openboxes/openboxes/graphs/contributors"><img src="https://opencollective.com/openboxes/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/openboxes/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/openboxes"><img src="https://opencollective.com/openboxes/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/openboxes/contribute)]
+
+<a href="https://opencollective.com/openboxes/organization/0/website"><img src="https://opencollective.com/openboxes/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/openboxes/organization/1/website"><img src="https://opencollective.com/openboxes/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/openboxes/organization/2/website"><img src="https://opencollective.com/openboxes/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/openboxes/organization/3/website"><img src="https://opencollective.com/openboxes/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/openboxes/organization/4/website"><img src="https://opencollective.com/openboxes/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/openboxes/organization/5/website"><img src="https://opencollective.com/openboxes/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/openboxes/organization/6/website"><img src="https://opencollective.com/openboxes/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/openboxes/organization/7/website"><img src="https://opencollective.com/openboxes/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/openboxes/organization/8/website"><img src="https://opencollective.com/openboxes/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/openboxes/organization/9/website"><img src="https://opencollective.com/openboxes/organization/9/avatar.svg"></a>
 
 ### License
 
