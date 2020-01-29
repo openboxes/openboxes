@@ -10,11 +10,13 @@
 package org.pih.warehouse.requisition
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
@@ -46,7 +48,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Date dateVerified
     Date dateChecked
     Date dateDelivered
-    Date dateIssued
+    //Date dateIssued
     Date dateReceived
 
     Date requestedDeliveryDate = new Date()
@@ -114,13 +116,27 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Integer replenishmentPeriod = 0
 
     // Removed comments, documents, events for the time being.
-    static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
+    static transients = [
+            "sortedStocklistItems",
+            "requisitionItemCount",
+            "requisitionItemsByDateCreated",
+            "requisitionItemsByOrderIndex",
+            "requisitionItemsByCategory",
+            "completeRequisitionItems",
+            "incompleteRequisitionItems",
+            "initialRequisitionItems",
+            "originalRequisitionItems",
+            "additionalRequisitionItems",
+            "pending",
+            "shipment",
+            "totalCost",
+            "dateIssued"
+    ]
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
     static mapping = {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
-
         monthRequested formula: "date_format(date_requested, '%M %Y')"
     }
 
@@ -154,7 +170,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         dateVerified(nullable: true)
         dateDelivered(nullable: true)
         dateReceived(nullable: true)
-        dateIssued(nullable: true)
+        //dateIssued(nullable: true)
         lastUpdated(nullable: true)
         dateValidFrom(nullable: true)
         dateValidTo(nullable: true)
@@ -168,6 +184,17 @@ class Requisition implements Comparable<Requisition>, Serializable {
         requisitionTemplate(nullable: true)
         replenishmentPeriod(nullable: true)
         sortByCode(nullable: true)
+    }
+
+
+    def getDateIssued() {
+        return Transaction.executeQuery("""
+                  select 
+                    max(t.transactionDate) 
+                  from Transaction as t
+                  where t.requisition = :requisition 
+                  and t.transactionType in (:transactionTypes)
+                  """, [requisition: this, transactionTypes: TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)]).first()
     }
 
     def getRequisitionItemCount() {
@@ -217,22 +244,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return requisitionItems?.findAll { it.parentRequisitionItem }
     }
 
-    Boolean isWardRequisition() {
-        return (type in [RequisitionType.NON_STOCK, RequisitionType.STOCK, RequisitionType.ADHOC])
-    }
-
-    Boolean isOpen() {
-        return (status in [RequisitionStatus.CREATED, RequisitionStatus.EDITING])
-    }
-
     Boolean isPending() {
         return (status in [RequisitionStatus.CREATED, RequisitionStatus.EDITING, RequisitionStatus.VERIFYING, RequisitionStatus.PICKING, RequisitionStatus.PENDING])
     }
-
-    Boolean isRequested() {
-        return (status in [RequisitionStatus.VERIFYING, RequisitionStatus.PICKING, RequisitionStatus.PENDING, RequisitionStatus.ISSUED, RequisitionStatus.RECEIVED])
-    }
-
 
     /**
      * Sort by sort order, name
