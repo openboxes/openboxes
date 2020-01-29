@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
@@ -22,27 +23,15 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.*
 import org.pih.warehouse.shipping.*
-import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.shipping.Container
-import org.pih.warehouse.shipping.ReferenceNumber
-import org.pih.warehouse.shipping.ReferenceNumberType
-import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentType
-import org.pih.warehouse.shipping.ShipmentWorkflow
 
+@Transactional
 class StockMovementService {
 
     def productService
     def identifierService
     def requisitionService
     def shipmentService
-    def locationService
     def inventoryService
     def inventorySnapshotService
 

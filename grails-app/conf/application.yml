@@ -14,11 +14,12 @@ grails:
     dbconsole:
         enabled: true
     gorm:
+        autoFlush: true
         reactor:
             # Whether to translate GORM events into Reactor events
             # Disabled by default for performance reasons
             events: false
-        failOnError: false
+        failOnError: true
     config:
         locations:
             - ~/.grails/openboxes.yml
@@ -163,6 +164,8 @@ hibernate:
         queries: false
         use_second_level_cache: false
         use_query_cache: true
+    flush:
+        mode: AUTO
 
 dataSource:
     pooled: true
