@@ -34,7 +34,7 @@
                             <warehouse:message code="default.button.save.label"/>
                         </button>
                         &nbsp;
-                        <a href="javascript:void(-1);" class="close-dialog">
+                        <a href="javascript:void(-1);" class="btn-close-dialog">
                             ${warehouse.message(code: 'default.button.cancel.label')}
                         </a>
                     </div>

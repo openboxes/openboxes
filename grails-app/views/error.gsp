@@ -1,7 +1,7 @@
 <html>
   <head>
 	  <title>General Error</title>
-	  <meta name="layout" content="custom" />	  
+	  <meta name="layout" content="custom" />
 	  <style type="text/css">
 	  		.message {
 	  			border: 1px solid black;
@@ -21,14 +21,14 @@
 	  			margin:3px;
 	  			font-family:courier;
 	  		}
-	  		.dialog { 
+	  		.dialog {
 	  			display: none;
 	  		}
 	  </style>
   </head>
 
   <body>
-  
+
   	<div class="" style="padding: 10px;">
 
 
@@ -150,7 +150,7 @@
                                 <warehouse:message code="default.button.submit.label"/>
                             </button>
                             &nbsp;
-                            <button class="close-dialog button icon remove">
+                            <button class="btn-close-dialog button icon remove">
                                 <warehouse:message code="default.button.close.label"/>
                             </button>
                         </td>
@@ -165,7 +165,7 @@
         </g:else>
 
 	</div>
-	
+
 	<script>
         function checkFormSubmission() {
             var comments = $("#comments").val();
@@ -176,24 +176,24 @@
             }
             return true;
         }
-		$(".go-back").click(function() { 
+		$(".go-back").click(function() {
 			parent.history.back();
 	        return false;
 		});
 		$(".open-dialog").click(function() {
-			$("#error-dialog").dialog({ 
-				autoOpen: true, 
-				modal: true, 
+			$("#error-dialog").dialog({
+				autoOpen: true,
+				modal: true,
 				width: '1000px'
 			});
 
 			$("#comments").focus();
 
-			
+
 		});
 		$(".close-dialog").click(function(event) {
-			event.preventDefault(); 
-			$("#error-dialog").dialog("close"); 
+			event.preventDefault();
+			$("#error-dialog").dialog("close");
 		});
 
 	</script>
