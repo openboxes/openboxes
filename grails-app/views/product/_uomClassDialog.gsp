@@ -34,7 +34,7 @@
             <td>
                 <div>
                     <button type="submit" name="create" class="button icon approve" value="Create" id="create">${warehouse.message(code: 'default.button.create.label', default: 'Create')}</button>
-                    <a href="#" class="close-dialog button icon remove" dialog-id="uom-class-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
+                    <a href="#" class="btn-close-dialog button icon remove" data-target="uom-class-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
                 </div>
             </td>
         </tr>
