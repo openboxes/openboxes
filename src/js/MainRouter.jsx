@@ -26,6 +26,7 @@ class MainRouter extends React.Component {
         { name: 'German', code: 'de' },
         { name: 'Italian', code: 'it' },
         { name: 'Spanish', code: 'es' },
+        { name: 'Finnish', code: 'fi' },
         { name: 'Portuguese', code: 'pt' },
       ],
       options: {
@@ -41,6 +42,7 @@ class MainRouter extends React.Component {
     this.props.addTranslationForLanguage(en, 'it');
     this.props.addTranslationForLanguage(en, 'de');
     this.props.addTranslationForLanguage(ar, 'ar');
+    this.props.addTranslationForLanguage(en, 'fi');
   }
 
   componentDidMount() {
