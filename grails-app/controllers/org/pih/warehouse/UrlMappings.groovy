@@ -187,7 +187,7 @@ class UrlMappings {
 
         "/api/putawayItems/$id"(parseRequest: true) {
             controller = "putawayItemApi"
-            action = [DELETE: "removeItem"]
+            action = [DELETE: "removingItem"]
         }
 
         // Standard REST APIs
