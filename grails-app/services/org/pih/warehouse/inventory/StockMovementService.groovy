@@ -10,7 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.core.GrailsApplication
-import grails.orm.PagedResultList
+import org.pih.warehouse.PagedResultList
 import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
