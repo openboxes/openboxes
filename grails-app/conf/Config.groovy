@@ -548,7 +548,7 @@ openboxes.stockCard.consumption.reasonCodes = [ReasonCode.STOCKOUT, ReasonCode.L
 // Localization configuration - default and supported locales
 openboxes.locale.custom.enabled = false
 openboxes.locale.defaultLocale = 'en'
-openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt']
+openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt', 'fi']
 
 // Currency configuration
 openboxes.locale.defaultCurrencyCode = "USD"
