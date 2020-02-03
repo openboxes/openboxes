@@ -1,7 +1,7 @@
 package org.pih.warehouse.api
 
+import grails.util.Holders
 import org.apache.commons.lang.math.NumberUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -252,7 +252,7 @@ class StockMovementItem {
                     "Please reformat field with Lot Number: \"${lotNumber}\" to a number format")
         }
 
-        def date = ConfigurationHolder.config.openboxes.expirationDate.minValue
+        def date = Holders.grailsApplication.config.openboxes.expirationDate.minValue
         if (expirationDate && date > expirationDate) {
             throw new IllegalArgumentException("Expiration date for item ${productCode} is not valid. Please enter a date after ${date.getYear()+1900}.")
         }
