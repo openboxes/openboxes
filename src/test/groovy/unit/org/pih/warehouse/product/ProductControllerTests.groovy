@@ -1,6 +1,6 @@
 package org.pih.warehouse.product
 
-import grails.orm.PagedResultList
+import org.pih.warehouse.PagedResultList
 import grails.test.ControllerUnitTestCase
 
 // import MessageTagLib;
