@@ -10,7 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
-import grails.orm.PagedResultList
+import org.pih.warehouse.PagedResultList
 import grails.validation.ValidationException
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringUtils
