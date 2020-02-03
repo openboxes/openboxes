@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.core
 
-import grails.orm.PagedResultList
+import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationService
