@@ -15,8 +15,6 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
@@ -115,8 +113,6 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     Integer replenishmentPeriod = 0
 
-    Order order
-
     // Removed comments, documents, events for the time being.
     static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
     static hasOne = [picklist: Picklist]
@@ -172,7 +168,6 @@ class Requisition implements Comparable<Requisition>, Serializable {
         requisitionTemplate(nullable: true)
         replenishmentPeriod(nullable: true)
         sortByCode(nullable: true)
-        order(nullable: true)
     }
 
     def getRequisitionItemCount() {
