@@ -1,12 +1,13 @@
 [![Build Status](https://travis-ci.org/openboxes/openboxes.svg?branch=develop)](https://travis-ci.org/openboxes/openboxes)
 [![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
-[![Financial Contributors on Open Collective](https://opencollective.com/openboxes/all/badge.svg?label=financial+contributors)](https://opencollective.com/openboxes) [![Slack Signup](http://slack-signup.openboxes.com/badge.svg)](http://slack-signup.openboxes.com)
+[![Financial Contributors on Open Collective](https://opencollective.com/openboxes/all/badge.svg?label=financial+contributors)](https://opencollective.com/openboxes) 
+[![Slack Signup](http://slack-signup.openboxes.com/badge.svg)](http://slack-signup.openboxes.com)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![Join the chat at https://gitter.im/openboxes/openboxes](https://badges.gitter.im/openboxes/openboxes.svg)](https://gitter.im/openboxes/openboxes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 OpenBoxes
 =========
 
-### About
+## About
 
 OpenBoxes is an Open Source Inventory and Supply Chain Management System. The initial implementation of OpenBoxes will occur at Partners In Health-supported facilities in Haiti.
 
@@ -40,7 +41,7 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/openboxes/organization/8/website"><img src="https://opencollective.com/openboxes/organization/8/avatar.svg"></a>
 <a href="https://opencollective.com/openboxes/organization/9/website"><img src="https://opencollective.com/openboxes/organization/9/avatar.svg"></a>
 
-### License
+## License
 
 Copyright (c) 2012 Partners In Health.  All rights reserved.
 The use and distribution terms for this software are covered by the
@@ -50,30 +51,30 @@ By using this software in any fashion, you are agreeing to be bound by
 the terms of this license.
 You must not remove this notice, or any other, from this software.
 
-### Setup development environment
+## Setup development environment
 
-#### Install Dependencies
+### Install Dependencies
 
-##### Required
+#### Required
 * Java 7 (must install Java 7)
 * MySQL 5.7
 * [SDK Man](http://sdkman.io/install.html)
 * [Grails 1.3.9](http://grails.org/download/archive/Grails)
 * NPM
 
-##### Optional
+#### Optional
 * [IntelliJ IDEA 14.1](https://www.jetbrains.com/idea/download/)
 * Chrome
 
-#### Basic setup instructions for developers
+### Basic setup instructions for developers
 
 These instructions are for developers only.  If you are a user/implementer, please check out our 
 [Installation](http://docs.openboxes.com/en/latest/installation/) documentation.
 
-##### 1. Install Dependencies
+#### 1. Install Dependencies
 Install required dependencies above
 
-##### 2. Install Grails
+#### 2. Install Grails
 Check that you have SDK Man installed properly (otherwise follow instructions on the skdman install page).
 ```
 $ sdk version
@@ -85,7 +86,7 @@ Install Grails 1.3.9
 $ sdk install grails 1.3.9
 ```
 
-##### 3. Clone repository 
+#### 3. Clone repository 
 If you are a core contributor:
 ```
 git clone git@github.com:openboxes/openboxes.git      
@@ -96,7 +97,7 @@ and replace git url with the one of your forked repository
 git clone git@github.com:<gitusername>/openboxes.git      
 ```
 
-##### 4. Create database 
+#### 4. Create database 
 Create openboxes database
 ```
 mysql -u root -p -e 'create database openboxes default charset utf8;'
@@ -107,7 +108,7 @@ Create openboxes user
 mysql -u root -p -e 'grant all on openboxes.* to "openboxes"@"localhost" identified by "openboxes";'
 ```
 
-##### 5. Create Openboxes configuration file 
+#### 5. Create Openboxes configuration file 
 Edit `$HOME/.grails/openboxes-config.properties`
 
 ```
@@ -130,25 +131,25 @@ instruct the application to not setup test fixtures automatically by uncommentin
 openboxes.fixtures.enabled=false
 ```
 
-##### 6. Install NPM dependencies
+#### 6. Install NPM dependencies
 ```    
 npm install
 ```
 
-##### 7. Build React frontend
+#### 7. Build React frontend
 You can build React frontend with this command, but it will be automatically build when starting the application.
 ```    
 npm run bundle
 ```
 
-##### 8. React frontend Hot-Reload
+#### 8. React frontend Hot-Reload
 When using this command React fronted will be rebuild automatically after any change, you just need to refresh the 
 browser to see the effect.
 ```    
 npm run watch
 ```
 
-##### 9. Upgrade the project to the currently installed grails version 
+#### 9. Upgrade the project to the currently installed grails version 
 Either of the following actions (upgrade, compile, run-app) should generate the all important Spring configuration 
 (`/WEB-INF/applicationContext.xml`) and start the dependency resolution process.  
 
@@ -174,7 +175,7 @@ Once the dependency resolution phase has completed, all dependencies will be sto
 under `$USER_HOME/.grails/ivy-cache`).  You do not have to worry about this, just know that the dependencies are now 
 on your machine and Grails will attempt to find them there before it tries to resolve them in a remote repository. 
 
-##### 10. Start application in development mode
+#### 10. Start application in development mode
 The application can be run in development mode.  This starts the application running in an instance of Tomcat within 
 the Grails console.
 You may need to run 'grails run-app' several times in order to download all dependencies.
@@ -182,21 +183,21 @@ You may need to run 'grails run-app' several times in order to download all depe
 grails run-app
 ```
 
-##### 11. Open application in Google Chrome 
+#### 11. Open application in Google Chrome 
 ```
 http://localhost:8080/openboxes
 ```
 
-##### 12. Log into OpenBoxes 
+#### 12. Log into OpenBoxes 
 You can use the default accounts (manager:password OR admin:password). Once you are logged in as an admin, you can 
 create own account. Or you can use the signup form to create a new account.
 
-##### 13. React tests
+#### 13. React tests
 To run new frontend (React) tests type:
 ```
 npm test
 ```
-##### 14. React documentation
+#### 14. React documentation
 Start a style guide dev server:
 ```
 npm run styleguide
@@ -206,9 +207,9 @@ View your style guide in the browser:
 http://localhost:6060
 ```
 
-### Troubleshooting
+## Troubleshooting
 
-#### How to Debug 
+### How to Debug 
 * Run Grails in debug mode
     ```
     grails-debug run-app
@@ -226,11 +227,11 @@ http://localhost:6060
     ```
 
 
-#### Problem
+### Problem
 ```
 Caused by: java.io.FileNotFoundException: Could not open ServletContext resource [/WEB-INF/applicationContext.xml]
 ```
-#### Solution
+### Solution
 Execute the grails upgrade command in order to generate the files nece
 ```
 $ grails upgrade
