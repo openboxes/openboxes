@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import grails.core.GrailsApplication
 import org.pih.warehouse.PagedResultList
 import grails.validation.ValidationException
@@ -60,6 +61,7 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 
+@Transactional
 class StockMovementService {
 
     def productService
