@@ -79,7 +79,7 @@ class StockMovementService {
     }
 
     def createFromOrder(Order order) {
-        StockMovement stockMovement = StockMovement.createFormOrder(order)
+        StockMovement stockMovement = StockMovement.createFromOrder(order)
 
         Requisition requisition = createRequisition(stockMovement)
         return StockMovement.createFromRequisition(requisition)
