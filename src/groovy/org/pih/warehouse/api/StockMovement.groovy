@@ -116,9 +116,9 @@ class StockMovement {
                         shipments  : requisition?.shipments?.collect {
                             [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
                         },
-                        order      : [id: order?.id],
                         documents  : documents
                 ],
+                isFromOrder        : isFromOrder(),
         ]
     }
 
@@ -151,6 +151,10 @@ class StockMovement {
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
     }
 
+    Boolean isFromOrder() {
+        return lineItems.find { it.orderItem } ? true : false
+    }
+
     /**
      * “FROM.TO.DATEREQUESTED.STOCKLIST.TRACKING#.DESCRIPTION”
      *
@@ -171,7 +175,7 @@ class StockMovement {
         return name
     }
 
-    static StockMovement createFormOrder(Order order) {
+    static StockMovement createFromOrder(Order order) {
         StockMovement stockMovement = new StockMovement(
             destination: order.destination,
             origin: order.origin,
@@ -219,7 +223,6 @@ class StockMovement {
                 trackingNumber: trackingNumber?.identifier,
                 currentStatus: shipment?.currentStatus,
                 stocklist: requisition?.requisitionTemplate,
-                order: requisition?.order
         )
 
         // Include all requisition items except those that are substitutions or modifications because the
@@ -236,6 +239,7 @@ class StockMovement {
         }
         return stockMovement
     }
+
 }
 
 enum DocumentGroupCode {

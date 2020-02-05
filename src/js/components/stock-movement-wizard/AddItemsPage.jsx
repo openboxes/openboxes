@@ -247,13 +247,13 @@ const VENDOR_FIELDS = {
     // eslint-disable-next-line react/prop-types
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, showOnly, isPurchaseOrder, updateTotalCount,
+      addRow, getSortOrder, showOnly, isFromOrder, updateTotalCount,
     }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
         disabled={showOnly}
-        hidden={isPurchaseOrder}
+        hidden={isFromOrder}
         onClick={() => {
           updateTotalCount(1);
           addRow({
@@ -1225,7 +1225,7 @@ class AddItemsPage extends Component {
                   isRowLoaded: this.isRowLoaded,
                   updateTotalCount: this.updateTotalCount,
                   isPaginated: this.props.isPaginated,
-                  isPurchaseOrder: !_.isNil(this.state.values.associations.order.id),
+                  isFromOrder: this.state.values.isFromOrder,
                   showOnly,
                 }))}
               <div>
