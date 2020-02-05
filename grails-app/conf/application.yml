@@ -53,7 +53,7 @@ spring:
 quartz:
     pluginEnabled: true
     jdbcStore: false
-    autoStartup: true
+    autoStartup: false
 
 # Spring Actuator Endpoints are Disabled by Default
 endpoints:
