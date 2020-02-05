@@ -11,6 +11,8 @@
 	<include file="install/changelog-disable-foreign-key-checks.groovy"/>
 	<include file="install/changelog-insert-data-core.groovy"/>
 	<include file="install/changelog-insert-data-roles.xml"/>
+	<include file="install/changelog-insert-data-user-roles.xml"/>
+	<include file="install/changelog-insert-data-location-type-supported-activities.xml"/>
 	<!-- Enable foreign key checks when done inserting data -->
 	<include file="install/changelog-enable-foreign-key-checks.groovy"/>
 
