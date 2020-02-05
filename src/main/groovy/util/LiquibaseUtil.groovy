@@ -43,4 +43,14 @@ class LiquibaseUtil {
         }
         return false
     }
+
+    static getExecutedChangelogVersions() {
+        def ctx = Holders.grailsApplication.mainContext
+        def dataService = ctx.getBean("dataService")
+        String sql = """
+            SELECT DISTINCT(SUBSTRING(filename, 1, locate('/', filename)-1)) as version
+            FROM DATABASECHANGELOG"""
+        return dataService.executeQuery(sql);
+    }
+
 }
