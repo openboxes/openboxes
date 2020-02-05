@@ -33,6 +33,9 @@ grails:
             dsn: https://{PUBLIC_KEY}@sentry.io/{PROJECT_ID}
             logClassName: true
             logHttpRequest: true
+        databasemigration:
+            updateOnStart: false
+            updateOnStartFileName: changelog.groovy
 
 info:
     app:
