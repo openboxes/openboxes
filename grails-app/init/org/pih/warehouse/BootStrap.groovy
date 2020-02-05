@@ -121,25 +121,28 @@ class BootStrap {
             liquibase = new Liquibase(null as DatabaseChangeLog, new ClassLoaderResourceAccessor(), database)
             liquibase.checkLiquibaseTables(false, null, new Contexts(), new LabelExpression())
 
-            //If nothing has been created yet, let's create all new database objects with the install scripts
-            List<ChangeSet> hasExecutedAnyChangesets = database.getRanChangeSetList()
-            if (!hasExecutedAnyChangesets) {
-                log.info("Has no executed changesets, creating schema from scratch")
-                liquibase = new Liquibase("install/changelog.xml", new ClassLoaderResourceAccessor(), database)
-                liquibase.update(null as Contexts, new LabelExpression());
-            }
+            def executedChangelogVersions = LiquibaseUtil.getExecutedChangelogVersions()
+            log.info ("executedChangelogVersions: " + executedChangelogVersions)
 
             // FIXME Not good that we'll need to update this on subsequent versions so this needs some more thought
             List previousChangelogVersions = ["0.5.x", "0.6.x", "0.7.x", "0.8.x"]
-            def executedChangelogVersions = LiquibaseUtil.getExecutedChangelogVersions()
-            log.info ("changelogVersions: " + executedChangelogVersions)
 
             // Check if the executed changelog versions include one of the previous versions
             // and if so, then we need to keep running the old updates to catch up to 0.9.x
             boolean hasExecutedAnyPreviousChangesets =
                     executedChangelogVersions.any { previousChangelogVersions.contains(it.version) }
+
+            // FIXME Remove !hasExecutedAnyPreviousChangesets once this goes to production
+            //If nothing has been created yet, let's create all new database objects with the install scripts
+            List<ChangeSet> hasExecutedAnyChangesets = database.getRanChangeSetList()
+            if (!hasExecutedAnyChangesets || !hasExecutedAnyPreviousChangesets) {
+                log.info("Running install changelog ...")
+                liquibase = new Liquibase("install/changelog.xml", new ClassLoaderResourceAccessor(), database)
+                liquibase.update(null as Contexts, new LabelExpression());
+            }
+
             if (hasExecutedAnyPreviousChangesets) {
-                log.info("Has executed previous changelog version, running all updates")
+                log.info("Running upgrade changelog ...")
                 liquibase = new Liquibase("upgrade/changelog.xml", new ClassLoaderResourceAccessor(), database)
                 liquibase.update(null as Contexts, new LabelExpression())
             }
