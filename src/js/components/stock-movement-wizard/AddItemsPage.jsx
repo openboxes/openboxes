@@ -692,7 +692,7 @@ class AddItemsPage extends Component {
           }
           this.transitionToNextStep('CHECKING')
             .then(() => {
-              this.props.goToPage(6, values);
+              this.props.goToPage(this.props.hasPackingSupport ? 6 : 5, values);
             })
             .catch(() => this.props.hideSpinner());
         })
@@ -1135,6 +1135,7 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   minimumExpirationDate: state.session.minimumExpirationDate,
+  hasPackingSupport: state.session.currentLocation.hasPackingSupport,
 });
 
 export default (connect(mapStateToProps, {
@@ -1173,4 +1174,6 @@ AddItemsPage.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
+  /** Is true when currently selected location supports packing */
+  hasPackingSupport: PropTypes.bool.isRequired,
 };
