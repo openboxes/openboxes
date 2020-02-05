@@ -73,15 +73,10 @@
             ${warehouse.message(code: 'order.wizard.placeOrder.label')}
         </g:link>
     </g:else>
-
-    <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
-        <g:if test="${!orderInstance?.isReceived() && orderInstance?.isPlaced() || orderInstance?.isPartiallyReceived()}">
-            <g:link controller="receiveOrderWorkflow" action="receiveOrder" id="${orderInstance?.id}" class="button">
-                <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                ${warehouse.message(code: 'order.wizard.receiveOrder.label')}
-            </g:link>
-        </g:if>
-    </g:if>
+    <g:link controller="order" action="shipOrder" id="${order?.id}" class="button">
+        <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
+        <warehouse:message code="order.shipOrder.label" default="Ship Order"/>
+    </g:link>
 
     <div class="right">
         <g:if test="${orderInstance?.id}">
