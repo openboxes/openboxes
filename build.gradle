@@ -23,6 +23,7 @@ buildscript {
         classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.15.1"
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.2.0"
+        classpath 'org.grails.plugins:database-migration:3.1.0.RC1'
     }
 }
 
@@ -116,6 +117,7 @@ dependencies {
     runtime "org.springframework:spring-test:3.0.5.RELEASE" // latest 5.1.x
 
     compile 'org.grails.plugins:database-migration:3.1.0.RC1'
+    compile 'org.liquibase:liquibase-core:3.6.1'
 
     // Required by database connection
     compile "mysql:mysql-connector-java:5.1.47" // latest (5) 5.1.48, latest (8) 8.0.17
@@ -203,6 +205,15 @@ dependencies {
     compile ('org.grails.plugins:ajax-tags:1.0.0')
 
 }
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'grails-app/migrations'
+        }
+    }
+}
+
 
 war {
     archiveName = "openboxes.war"
