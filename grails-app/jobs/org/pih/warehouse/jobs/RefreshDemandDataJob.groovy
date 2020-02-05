@@ -1,6 +1,6 @@
 package org.pih.warehouse.jobs
 
-import grails.util.Holders
+import grails.core.GrailsApplication
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
@@ -12,11 +12,12 @@ class RefreshDemandDataJob {
 
     static triggers = {
         cron name: 'refreshDemandDataJobCronTrigger',
-                cronExpression: Holders.grailsApplication.config.openboxes.jobs.refreshDemandDataJob.cronExpression
+                cronExpression: grailsApplication.getConfig().getProperty('openboxes.jobs.refreshDemandDataJob.cronExpression')
     }
 
     def execute(JobExecutionContext context) {
-        Boolean enabled = Holders.grailsApplication.config.openboxes.jobs.refreshDemandDataJob.enabled
+
+        Boolean enabled = grailsApplication.config.openboxes.jobs.refreshDemandDataJob.enabled
         if (enabled) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing demand data: " + context.mergedJobDataMap)
