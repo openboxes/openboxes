@@ -26,6 +26,11 @@ buildscript {
     }
 }
 
+//include gradle-node plugin
+plugins {
+    id "com.moowork.node" version "0.12"
+}
+
 //grails.project.class.dir = "target/classes"
 //grails.project.docs.output.dir = "web-app/docs"
 //grails.project.test.class.dir = "target/test-classes"
@@ -36,6 +41,13 @@ buildscript {
 
 version "0.9.0-SNAPSHOT"
 group "com.openboxes"
+
+node {
+    version = '13.5.0'
+    npmVersion = '6.13.6'
+    distBaseUrl = 'https://nodejs.org/dist'
+    download = true
+}
 
 apply plugin:"eclipse"
 apply plugin:"idea"
@@ -212,6 +224,12 @@ assets {
     minifyJs = true
     minifyCss = true
 }
+
+//Generate webpack bundle when starting up the app
+bootRun.dependsOn(['npmInstall', 'npm_run_bundle'])
+
+//Generate webpack bundle when packaging the app
+assetCompile.dependsOn(['npmInstall', 'npm_run_bundle'])
 
 buildProperties.doLast {
     // Find the right file
