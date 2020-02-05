@@ -3,9 +3,6 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-	<include file="install/baseline-tables.xml"/>
-	<include file="install/baseline-data.xml"/>
-	<include file="install/baseline-constraints.xml"/>
-	<include file="install/baseline-add-root-category.xml"/>
+<!--    <include file="0.9.x/changelog-do-something-new.xml"/>-->
 
 </databaseChangeLog>

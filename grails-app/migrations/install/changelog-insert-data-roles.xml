@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="adminuser (generated)" id="1580445121860-11">
+        <insert tableName="role">
+            <column name="id" value="1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Admin"/>
+            <column name="description"/>
+            <column name="role_type" value="ROLE_ADMIN"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Manager"/>
+            <column name="description"/>
+            <column name="role_type" value="ROLE_MANAGER"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="User"/>
+            <column name="description"/>
+            <column name="role_type" value="ROLE_USER"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Assistant"/>
+            <column name="description"/>
+            <column name="role_type" value="ROLE_ASSISTANT"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Superuser"/>
+            <column name="description"/>
+            <column name="role_type" value="ROLE_SUPERUSER"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
