@@ -715,3 +715,37 @@ div.crossed-out .table-inner-row:before {
   border-bottom: 1px solid $gray-gamma;
   border-radius: 5px 5px 0 0;
 }
+
+.cardComponent{
+display: flex;
+justify-content: space-around;
+flex-direction: row;
+}
+
+.card{
+  width: 200px;
+  height: 124px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.main{
+  background-color: #fbfbfb;
+}
+
+.titleCard{
+  color: #cdcdcd;
+}
+
+.resultCard{
+  color: #282d32;
+  font-size: 28px;
+}
+
+.subtitleCard{
+  color: #282d32;
+  font-size: 14px;
+}
