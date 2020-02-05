@@ -220,13 +220,13 @@ const VENDOR_FIELDS = {
     // eslint-disable-next-line react/prop-types
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, showOnly, isPurchaseOrder,
+      addRow, getSortOrder, showOnly, isFromOrder,
     }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
         disabled={showOnly}
-        hidden={isPurchaseOrder}
+        hidden={isFromOrder}
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
@@ -1122,7 +1122,7 @@ class AddItemsPage extends Component {
                   getSortOrder: this.getSortOrder,
                   newItemAdded: this.newItemAdded,
                   newItem: this.state.newItem,
-                  isPurchaseOrder: !_.isNil(this.state.values.associations.order.id),
+                  isFromOrder: this.state.values.isFromOrder,
                   showOnly,
                 }))}
               <div>
