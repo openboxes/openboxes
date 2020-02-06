@@ -152,7 +152,7 @@ class StockMovement {
     }
 
     Boolean isFromOrder() {
-        return lineItems.find { it.orderItem } ? true : false
+        return false
     }
 
     /**

@@ -470,9 +470,6 @@ class StockMovementApiController {
             // Update recipient
             stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
 
-            // Order item
-            stockMovementItem.orderItem = lineItem["orderItem.id"] ? OrderItem.load(lineItem["orderItem.id"]) : null
-
             // Pack page fields
             stockMovementItem.quantityShipped = lineItem.quantityShipped ? new BigDecimal(lineItem.quantityShipped) : null
             stockMovementItem.shipmentItemId = lineItem.shipmentItemId

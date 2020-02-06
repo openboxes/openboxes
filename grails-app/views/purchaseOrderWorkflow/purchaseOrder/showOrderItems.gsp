@@ -107,17 +107,6 @@
                                 </td>
                             </tr>
                         </g:each>
-                        <g:unless test="${order?.orderItems}">
-                            <tr>
-                                <td colspan="11">
-                                    <div class="fade center empty">
-                                        <p name="numItemInOrder">
-                                            <warehouse:message code="order.itemsInOrder.message" args="[(order?.orderItems)?order?.orderItems?.size():0]"/>
-                                        </p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </g:unless>
                         <g:form action="purchaseOrder" method="post">
                             <g:hiddenField name="order.id" value="${order?.id }"></g:hiddenField>
                             <g:hiddenField name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
@@ -138,13 +127,8 @@
                                 <td class="center middle">
                                     <input type="text" id="unitPrice" name='unitPrice' value="" size="10" class="text" />
                                 </td>
-                                <td colspan="2"></td>
-                            </tr>
-                            <tr class="prop">
-                                <td colspan="11" class="center">
-                                    <g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${order?.id}" event="enterOrderDetails" params="[skipTo:'details']" class="button">
-                                        <warehouse:message code="default.back.label" default="Back"/>
-                                    </g:link>
+                                <td></td>
+                                <td class="center">
                                     <g:submitButton name="addItem" value="${warehouse.message(code:'order.button.addItem.label', default: 'Add line item')}" class="button icon add"/>
                                 </td>
                             </tr>
@@ -242,8 +226,12 @@
                 $tabs.tabs( 'select', stickyTab );
             }
         } );
-        
+
         $(document).ready(function(){
+
+            // Place focus on product search box
+            $("#product-suggest").focus();
+
             $("#edit-item-dialog").dialog({autoOpen:false, modal: true, width: 800, title: "Edit line item"});
             $(".edit-item-button").click(function(event){
                 var id = $(this).attr("data-order-item-id");
