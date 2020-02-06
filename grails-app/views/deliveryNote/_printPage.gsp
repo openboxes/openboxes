@@ -11,12 +11,12 @@
                     <th><warehouse:message code="packLevel2.label"/></th>
                 </g:if>
                 <th>${warehouse.message(code: 'product.productCode.label')}</th>
-                <th>${warehouse.message(code: 'product.label')}</th>
-                <th>${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
-                <th>${warehouse.message(code: 'requisitionItem.quantityDelivered.label', default: "Delivered")}</th>
+                <th class="left">${warehouse.message(code: 'product.label')}</th>
+                <th>${warehouse.message(code: 'deliveryNote.totalRequested.label', default: "Total Requested")}</th>
+                <th>${warehouse.message(code: 'deliveryNote.totalDelivered.label', default: "Total Delivered")}</th>
                 <th>${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
-                <th>${warehouse.message(code: 'requisitionItem.quantity.label', default: "Quantity")}</th>
+                <th>${warehouse.message(code: 'deliveryNote.deliveredByLot.label', default: "Delivered by Lot")}</th>
                 <th>${warehouse.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
             </tr>
         </thead>
