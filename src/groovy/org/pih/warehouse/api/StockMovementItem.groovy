@@ -23,7 +23,6 @@ class StockMovementItem {
 
     StockMovement stockMovement
     RequisitionItem requisitionItem
-    OrderItem orderItem
 
     BigDecimal quantityRequested
     BigDecimal quantityAvailable
@@ -95,7 +94,6 @@ class StockMovementItem {
         palletName(nullable: true)
         boxName(nullable: true)
         sortOrder(nullable: true)
-        orderItem(nullable: true)
     }
 
     String toString() {
@@ -124,8 +122,7 @@ class StockMovementItem {
                 comments         : comments,
                 recipient        : recipient,
                 substitutionItems: substitutionItems,
-                sortOrder        : sortOrder,
-                orderItem        : orderItem
+                sortOrder        : sortOrder
         ]
     }
 
@@ -197,8 +194,7 @@ class StockMovementItem {
                 lotNumber: requisitionItem?.lotNumber ?: "",
                 expirationDate: requisitionItem?.expirationDate,
                 sortOrder: requisitionItem?.orderIndex,
-                requisitionItem: requisitionItem,
-                orderItem: requisitionItem.orderItem
+                requisitionItem: requisitionItem
         )
     }
 
@@ -210,8 +206,7 @@ class StockMovementItem {
                 product: orderItem?.product,
                 inventoryItem: orderItem?.inventoryItem,
                 quantityRequested: orderItem.quantity,
-                recipient: orderItem.requestedBy,
-                orderItem: orderItem
+                recipient: orderItem.requestedBy
         )
     }
 

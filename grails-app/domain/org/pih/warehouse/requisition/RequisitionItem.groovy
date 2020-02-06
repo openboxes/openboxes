@@ -16,8 +16,6 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -90,9 +88,18 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     // Picking
     String pickReasonCode
 
-    OrderItem orderItem
 
-    static transients = ["type", "substitutionItems", "monthlyDemand", 'totalCost', 'quantityIssued', 'quantityAdjusted']
+    static transients = [
+            "type",
+            "substitutionItems",
+            "monthlyDemand",
+            "totalCost",
+            "quantityIssued",
+            "quantityAdjusted",
+            "status",
+            "change",
+            "substitution"
+    ]
 
     static belongsTo = [requisition: Requisition]
     static hasMany = [requisitionItems: RequisitionItem, picklistItems: PicklistItem]
@@ -140,19 +147,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         createdBy(nullable: true)
         updatedBy(nullable: true)
         pickReasonCode(nullable: true)
-        orderItem(nullable: true)
 	}
 
-    static RequisitionItem createFromStockMovementItem(StockMovementItem stockMovementItem, Requisition requisition) {
+    static RequisitionItem createFromStockMovementItem(StockMovementItem stockMovementItem) {
         return new RequisitionItem(
                 id: stockMovementItem?.id,
                 product: stockMovementItem?.product,
                 inventoryItem: stockMovementItem?.inventoryItem,
                 quantity: stockMovementItem.quantityRequested,
                 recipient: stockMovementItem.recipient,
-                orderItem: stockMovementItem.orderItem,
-                orderIndex: stockMovementItem.sortOrder,
-                requisition: requisition,
+                orderIndex: stockMovementItem.sortOrder
         )
     }
 

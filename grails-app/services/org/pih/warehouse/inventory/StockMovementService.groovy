@@ -889,8 +889,8 @@ class StockMovementService {
         requisition.requisitionItems = []
 
         stockMovement.lineItems.each { stockMovementItem ->
-            RequisitionItem requisitionItem = RequisitionItem.createFromStockMovementItem(stockMovementItem, requisition)
-            requisition.requisitionItems.add(requisitionItem)
+            RequisitionItem requisitionItem = RequisitionItem.createFromStockMovementItem(stockMovementItem)
+            requisition.addToRequisitionItems(requisitionItem)
         }
 
         addStockListItemsToRequisition(stockMovement, requisition)
@@ -983,7 +983,6 @@ class StockMovementService {
                     requisitionItem.lotNumber = stockMovementItem.lotNumber
                     requisitionItem.expirationDate = stockMovementItem.expirationDate
                     requisitionItem.orderIndex = stockMovementItem.sortOrder
-                    requisitionItem.orderItem = stockMovementItem.orderItem
                     requisition.addToRequisitionItems(requisitionItem)
                 }
             }
@@ -1503,12 +1502,6 @@ class StockMovementService {
         }
 
         shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
-        requisition.requisitionItems.each { requisitionItem ->
-            if (requisitionItem.orderItem) {
-                OrderItem orderItem = OrderItem.get(requisitionItem.orderItem.id)
-                orderService.updateOrderItem(orderItem, requisitionItem.quantity)
-            }
-        }
     }
 
     void validateRequisition(Requisition requisition) {
@@ -1542,12 +1535,6 @@ class StockMovementService {
         if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
             shipmentService.rollbackLastEvent(shipment)
             requisitionService.rollbackRequisition(requisition)
-            requisition.requisitionItems.each { requisitionItem ->
-                if (requisitionItem.orderItem) {
-                    OrderItem orderItem = OrderItem.get(requisitionItem.orderItem.id)
-                    orderService.updateOrderItem(orderItem, -requisitionItem.quantity)
-                }
-            }
         }
     }
 
