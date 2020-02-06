@@ -36,6 +36,19 @@
                     <h2><warehouse:message code="order.enterOrderDetails.label" /></h2>
                     <table>
                         <tbody>
+
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'><label for='origin.id'>
+                                    <warehouse:message code="order.orderedFrom.label"/></label>
+                                </td>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
+                                    <div style="width: 300px;">
+                                        <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect" style="width:350px;"
+                                                               optionKey="id" value="${order?.origin?.id}" noSelection="['null':'']"/>
+                                    </div>
+
+                                </td>
+                            </tr>
                             <tr class='prop'>
                                 <td class='name top'><label for='name'>
                                     <warehouse:message code="order.description.label"/></label>
@@ -71,18 +84,7 @@
                             </tr>
 
 
-                            <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='origin.id'>
-                                    <warehouse:message code="order.orderedFrom.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-                                    <div style="width: 300px;">
-                                        <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect" style="width:350px;"
-                                                               optionKey="id" value="${order?.origin?.id}" noSelection="['null':'']"/>
-                                    </div>
 
-                                </td>
-                            </tr>
                             <tr class='prop'>
                                 <td valign='top' class='name middle'>
                                     <label for="destination.id"><warehouse:message code="order.destination.label"/></label>
