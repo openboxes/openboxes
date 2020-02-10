@@ -181,7 +181,7 @@ class StockMovement {
             origin: order.origin,
             dateRequested: new Date(),
             requestedBy: order.orderedBy,
-            description: order.name,
+            description: order.orderNumber,
             order: order,
             statusCode:"CREATED"
         )
