@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 const Loading = ({ error, pastDelay, retry }) => {
   if (error) {
-    console.log("this is the error : " + error)
     return (
       <div className="text-center">
         <div className="my-3">Error occurred when loading the component</div>

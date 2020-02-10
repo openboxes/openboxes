@@ -27,7 +27,7 @@ body {
   font-size: 1.5em !important;
   font-weight: bold;
   color: $gray-zeta !important;
-  font-family: "Trebuchet MS",Trebuchet,Calibri,Tahoma,Segoe;
+  font-family: "Trebuchet MS", Trebuchet, Calibri, Tahoma, Segoe;
   text-transform: lowercase;
 }
 
@@ -53,6 +53,7 @@ body {
 
 .dropdown:hover {
   background-color: white;
+
   .nav-link {
     color: black !important;
   }
@@ -78,7 +79,8 @@ body {
   overflow-x: hidden;
 }
 
-.dropdown-item:hover, .dropdown-item:active {
+.dropdown-item:hover,
+.dropdown-item:active {
   background-color: lightgrey !important;
   color: black;
 }
@@ -103,17 +105,18 @@ body {
   bottom: 0;
   vertical-align: middle;
   border-top: 1px solid #aaa;
-  width:100%;
+  width: 100%;
   height: 3.5vh;
   text-align: center;
   font-size: 12px;
   background-color: white;
   color: $gray-delta;
-    div {
-      a {
-        color: $gray-delta;
-      }
+
+  div {
+    a {
+      color: $gray-delta;
     }
+  }
 }
 
 .content-wrap {
@@ -138,6 +141,7 @@ body {
 
 .form-group {
   font-size: .885rem;
+
   &.required {
     .col-form-label:after {
       content: "*";
@@ -155,6 +159,7 @@ body {
     margin-left: 30%;
     overflow-x: hidden;
   }
+
   .btn {
     margin: 40px 0px 20px 0px;
   }
@@ -182,9 +187,10 @@ body {
 
 .font-size-xs {
   font-size: .875rem;
+
   &.required::after {
-      content: "*";
-      color: red;
+    content: "*";
+    color: red;
   }
 }
 
@@ -234,7 +240,8 @@ body {
   }
 }
 
-.table-xs th, .table-xs td {
+.table-xs th,
+.table-xs td {
   padding: 0.3rem;
   font-size: 0.875rem;
 }
@@ -251,7 +258,7 @@ body {
 
   .shipment-status {
     border: 1px solid #a5d24a;
-    border-radius:2px;
+    border-radius: 2px;
     padding: 5px;
     background: #cde69c;
     color: #638421;
@@ -301,12 +308,13 @@ a.disabled {
   padding: .8em;
   margin-bottom: 1em;
   border: 2px solid #FFD324;
-  background:#FFF6BF;
-  color:#514721;
+  background: #FFF6BF;
+  color: #514721;
   font-size: 13px;
-    a {
-      color: #514721;
-    }
+
+  a {
+    color: #514721;
+  }
 }
 
 /* = WIZARD STEPS CONTAINER
@@ -331,12 +339,15 @@ a.disabled {
   padding-bottom: 2px;
 }
 
-.wizard-steps div, .wizard-steps div a, .wizard-steps div span {
+.wizard-steps div,
+.wizard-steps div a,
+.wizard-steps div span {
   display: inline-block;
   vertical-align: top
 }
 
-.wizard-steps div a, .wizard-steps div:not(:first-child) span {
+.wizard-steps div a,
+.wizard-steps div:not(:first-child) span {
   height: 35px;
   padding: 0 20px 0 35px;
   line-height: 36px;
@@ -362,7 +373,8 @@ a.disabled {
   padding-left: 10px
 }
 
-.wizard-steps div a:after, .wizard-steps div a:before {
+.wizard-steps div a:after,
+.wizard-steps div a:before {
   position: absolute;
   top: -1px;
   width: 0;
@@ -384,12 +396,14 @@ a.disabled {
   border-left: 11px solid $blue-beta
 }
 
-.wizard-steps div a:focus, .wizard-steps div a:hover {
+.wizard-steps div a:focus,
+.wizard-steps div a:hover {
   background-color: $blue-delta;
   border: 1px solid $blue-delta
 }
 
-.wizard-steps div a:focus:before, .wizard-steps div a:hover:before {
+.wizard-steps div a:focus:before,
+.wizard-steps div a:hover:before {
   border-left-color: $blue-delta
 }
 
@@ -507,17 +521,17 @@ tr.crossed-out td:before {
   white-space: normal;
 }
 
-.spinner-container > div {
+.spinner-container>div {
   position: fixed;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: rgba(255,255,255, 0.8);
+  background-color: rgba(255, 255, 255, 0.8);
   z-index: 110;
 }
 
-.spinner-container > div > div {
+.spinner-container>div>div {
   top: 40%;
 }
 
@@ -559,6 +573,7 @@ div.crossed-out .table-inner-row:before {
 .dropzone {
   border: 2px dashed $gray-zeta;
   border-radius: 5px;
+
   a {
     color: $gray-zeta;
   }
@@ -570,7 +585,7 @@ div.crossed-out .table-inner-row:before {
   }
 }
 
-.dropzone > div {
+.dropzone>div {
   border: none !important;
   width: 100% !important;
   height: auto !important;
@@ -597,23 +612,26 @@ div.crossed-out .table-inner-row:before {
 /* CUSTOM CHECKBOX
 ----------------------------*/
 
-.custom-checkbox input[type=checkbox] { display:none; }
-.custom-checkbox input[type=checkbox] + label {
+.custom-checkbox input[type=checkbox] {
+  display: none;
+}
+
+.custom-checkbox input[type=checkbox]+label {
   margin: 0;
 }
 
-.custom-checkbox input[type=checkbox] + label:before {
+.custom-checkbox input[type=checkbox]+label:before {
   font-family: FontAwesome;
   display: inline-block;
   cursor: pointer;
 }
 
-.custom-checkbox input[type=checkbox] + label:before {
+.custom-checkbox input[type=checkbox]+label:before {
   content: "\f068";
   color: $red-beta;
 }
 
-.custom-checkbox input[type=checkbox]:checked + label:before {
+.custom-checkbox input[type=checkbox]:checked+label:before {
   content: "\f0e2";
   color: $blue-gamma;
 }
@@ -716,36 +734,62 @@ div.crossed-out .table-inner-row:before {
   border-radius: 5px 5px 0 0;
 }
 
-.cardComponent{
-display: flex;
-justify-content: space-around;
-flex-direction: row;
-}
-
-.card{
-  width: 200px;
-  height: 124px;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
-}
-
-.main{
+.page-dashboard {
   background-color: #fbfbfb;
 }
 
-.titleCard{
-  color: #cdcdcd;
-}
+.cardsContainer {
+  .cardComponent {
+    margin: 20px;
+    display: flex;
+    flex-direction: row;
 
-.resultCard{
-  color: #282d32;
-  font-size: 28px;
-}
+    .numberCard {
+      width: 200px;
+      height: 124px;
+      margin: 20px;
+      padding: 24px;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
 
-.subtitleCard{
-  color: #282d32;
-  font-size: 14px;
+      .titleCard {
+        color: #cdcdcd;
+        font-size: 14px;
+      }
+
+      .resultCard {
+        color: #282d32;
+        font-size: 28px;
+      }
+
+      .subtitleCard {
+        color: #282d32;
+        font-size: 14px;
+      }
+    }
+
+    .graphCard {
+      margin: 20px;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      > div {
+        padding: 24px;
+      }
+
+      .headerCard {
+        height: 68px;
+        border-bottom: 1px solid #d8d8d8;
+        display: flex;
+        align-items: center;
+        color: #282d32;
+      }
+    }
+  }
 }

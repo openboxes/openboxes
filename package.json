@@ -51,6 +51,7 @@
     "prop-types": "15.6.2",
     "query-string": "^6.10.1",
     "react": "16.4.2",
+    "react-chartjs-2": "^2.9.0",
     "react-confirm-alert": "^2.4.1",
     "react-datepicker": "1.7.0",
     "react-dom": "16.4.2",
