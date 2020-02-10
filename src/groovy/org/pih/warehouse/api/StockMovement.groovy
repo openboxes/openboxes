@@ -159,7 +159,7 @@ class StockMovement {
     }
 
     Boolean isFromOrder() {
-        Order order = Order.findByOrderNumber(this.description)
+        Order order = this.description ? Order.findByOrderNumber(this.description) : null
         if (order) {
             return true
         }
