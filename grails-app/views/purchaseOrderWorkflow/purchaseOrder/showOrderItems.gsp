@@ -132,6 +132,30 @@
                                     <g:submitButton name="addItem" value="${warehouse.message(code:'order.button.addItem.label', default: 'Add line item')}" class="button icon add"/>
                                 </td>
                             </tr>
+                            <tr class="prop">
+                                <td colspan="11" class="center">
+                                    <g:link controller="purchaseOrderWorkflow"
+                                            action="purchaseOrder"
+                                            id="${order?.id}"
+                                            event="enterOrderDetails"
+                                            params="[skipTo:'details']"
+                                            class="button">
+                                        <warehouse:message code="default.back.label" default="Back"/>
+                                    </g:link>
+                                    <g:if test="${!order?.isPlaced()}">
+                                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" >
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'creditcards.png')}" />&nbsp;
+                                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}
+                                        </g:link>
+                                    </g:if>
+                                    <g:else>
+                                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" disabled="disabled" >
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
+                                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}
+                                        </g:link>
+                                    </g:else>
+                                </td>
+                            </tr>
                         </g:form>
                     </tbody>
                     <tfoot>
