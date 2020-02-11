@@ -35,16 +35,16 @@
                     <thead>
                         <tr class="odd">
                             <th><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
-                            <g:sortableColumn property="product.productCode" title="${warehouse.message(code:'product.productCode.label')}" />
-                            <g:sortableColumn property="product.name" title="${warehouse.message(code:'product.name.label')}" />
-                            <g:sortableColumn property="product.vendor" title="${warehouse.message(code:'vendor.name.label', default: 'Vendor')}" />
-                            <g:sortableColumn property="product.manufacturer" title="${warehouse.message(code:'manufacturer.name.label', default: 'Manufacturer')}" />
-                            <g:sortableColumn property="product.manufacturerCode" title="${warehouse.message(code:'product.manufacturerNumber.label', default: 'Manufacturer number')}" />
-
-                            <g:sortableColumn class="center" property="quantity" title="${warehouse.message(code:'default.quantity.label')}" />
-                            <g:sortableColumn class="center" property="unitOfMeasure" title="${warehouse.message(code:'default.uom.label', default: 'UOM')}" class="center"/>
-                            <g:sortableColumn class="center" property="unitPrice" title="${warehouse.message(code:'order.unitPrice.label')}" />
-                            <g:sortableColumn class="right" property="totalPrice" title="${warehouse.message(code:'orderItem.totalCost.label')}" />
+                            <th><warehouse:message code="product.code.label"/></th>
+                            <th><warehouse:message code="product.name.label"/></th>
+                            <th class="center"><warehouse:message code="product.sourceCode.label"/></th>
+                            <th class="center"><warehouse:message code="product.supplierCode.label"/></th>
+                            <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
+                            <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
+                            <th class="center"><warehouse:message code="default.quantity.label"/></th>
+                            <th class="center"><warehouse:message code="default.uom.label"/></th>
+                            <th class="center"><warehouse:message code="order.unitPrice.label"/></th>
+                            <th class="right"><warehouse:message code="orderItem.totalCost.label"/></th>
                             <th class="center" ><warehouse:message code="default.actions.label"/></th>
                         </tr>
                     </thead>
@@ -66,19 +66,17 @@
                                         ${orderItem?.product?.name?:orderItem?.description?.encodeAsHTML()}
                                     </g:link>
                                 </td>
-                                <td class="middle">
-                                    ${orderItem?.product?.vendor?:"N/A"}
-                                    <g:if test="${orderItem?.product?.vendorCode}">
-                                        #${orderItem?.product?.vendorCode}
-                                    </g:if>
+                                <td class="center middle">
+                                    ${orderItem?.productSupplier?.code}
                                 </td>
-                                <td class="middle">
-                                    ${orderItem?.product?.manufacturer?:"N/A"}
+                                <td class="center middle">
+                                    ${orderItem?.productSupplier?.supplierCode}
                                 </td>
-                                <td class="middle">
-                                    <g:if test="${orderItem?.product?.manufacturerCode}">
-                                        #${orderItem?.product?.manufacturerCode}
-                                    </g:if>
+                                <td class="center middle">
+                                    ${orderItem?.productSupplier?.manufacturer}
+                                </td>
+                                <td class="center middle">
+                                    ${orderItem?.productSupplier?.manufacturerCode}
                                 </td>
                                 <td class="middle center">
                                     ${orderItem?.quantity }
@@ -116,7 +114,23 @@
                                     <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
                                                    width="400" valueId="" valueName="" styleClass="text"/>
                                 </td>
-                                <td colspan="3"></td>
+                                <td class="middle center">
+                                    <g:select id="productSupplier" name="productSupplier.id" style="width: 100px;"/>
+                                </td>
+                                <td class="middle center">
+                                    <input type="text" id="supplierCode" name='supplierCode' disabled value="" size="10" class="text" />
+                                </td>
+                                <td class="middle center">
+                                    <g:selectOrganization name="manufacturer"
+                                                          id="manufacturer"
+                                                          noSelection="['':'']"
+                                                          disabled="true"
+                                                          roleTypes="[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER]"
+                                                          value="" />
+                                </td>
+                                <td class="middle center">
+                                    <input type="text" id="manufacturerCode" name='manufacturerCode' disabled value="" size="10" class="text" />
+                                </td>
                                 <td class="middle center">
                                     <input type="text" id="quantity" name='quantity' value="" size="10" class="text" />
                                 </td>
@@ -133,7 +147,7 @@
                                 </td>
                             </tr>
                             <tr class="prop">
-                                <td colspan="11" class="center">
+                                <td colspan="13" class="center">
                                     <g:link controller="purchaseOrderWorkflow"
                                             action="purchaseOrder"
                                             id="${order?.id}"
@@ -250,6 +264,47 @@
                 $tabs.tabs( 'select', stickyTab );
             }
         } );
+
+        // When chosen product has changed, trigger function that updates source code column
+        $("#product-id").change(function() {
+          productChanged(this.value);
+        });
+
+        // When chosen source code has changed, trigger function that updates supplier code, manufacturer and manufacturer code columns
+        $("#productSupplier").change(function() {
+          sourceCodeChanged($("#productSupplier option:selected").val());
+        });
+
+        // Update source code column with product supplier source codes based on product chosen by user
+        function productChanged(productId) {
+          $.ajax({
+            type: 'POST',
+            data: 'productId=' + productId,
+            url: '${request.contextPath}/json/productChanged',
+            success: function (data, textStatus) {
+              $('#productSupplier').html(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+            }
+          });
+        }
+
+        // Update supplier code, manufacturer and manufacturer code columns based on source code chosen by user
+        function sourceCodeChanged(productSupplierId) {
+          $.ajax({
+            type: 'POST',
+            data: 'productSupplierId=' + productSupplierId,
+            url: '${request.contextPath}/json/productSupplierChanged',
+            success: function (data, textStatus) {
+              $('#supplierCode').val(data.supplierCode);
+              $('#manufacturerCode').val(data.manufacturerCode);
+              $('#manufacturer').html(data.manufacturer);
+              console.log(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+            }
+          });
+        }
 
         $(document).ready(function(){
 
