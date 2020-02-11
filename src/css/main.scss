@@ -743,6 +743,7 @@ div.crossed-out .table-inner-row:before {
     margin: 20px;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 
     .numberCard {
       width: 200px;
@@ -778,8 +779,10 @@ div.crossed-out .table-inner-row:before {
       display: flex;
       flex-direction: column;
       justify-content: center;
+      height: 415px;
+      width: 680px;
 
-      > div {
+      >div {
         padding: 24px;
       }
 
@@ -795,6 +798,61 @@ div.crossed-out .table-inner-row:before {
           color: #999999;
           font-size: 25px;
           cursor: all-scroll;
+        }
+      }
+
+      .contentCard {
+        height: 100%;
+
+        .gyrIndicator {
+          height: 100%;
+          display: flex;
+          align-items: center;
+
+          .numberIndicator {
+            flex-grow: 1;
+            height: 80%;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            &:not(:last-child) {
+              border-right: 1px solid #d8d8d8;
+            }
+
+            .value {
+              font-size: 40px;
+              display: flex;
+              align-items: center;
+
+              .circle {
+                width: 12px;
+                height: 12px;
+                border-radius: 100%;
+                position: absolute;
+                margin-left: -22px;
+                
+                &.green {
+                  background-color: #519a04;
+                }
+                
+                &.yellow {
+                  background-color: #f7b500;
+                }
+                
+                &.red {
+                  background-color: #e02020;
+                }
+              }
+            }
+
+            .subtitle {
+              font-size: 12px;
+              color: #818181;
+            }
+          }
         }
       }
     }

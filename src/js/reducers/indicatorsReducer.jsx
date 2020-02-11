@@ -16,6 +16,7 @@ export default function (state = initialState, action) {
       const indicators = [
         {
           title: 'Expiration summary',
+          type: 'line',
           id: Math.random(),
           data: {
             labels: ['January', 'February', 'March', 'April', 'May', 'June'],
@@ -28,6 +29,7 @@ export default function (state = initialState, action) {
         },
         {
           title: 'Expiration summary bis',
+          type: 'line',
           id: Math.random(),
           data: {
             labels: ['January', 'February', 'March', 'April', 'May', 'June'],
@@ -40,6 +42,7 @@ export default function (state = initialState, action) {
         },
         {
           title: 'Expiration summary ter',
+          type: 'line',
           id: Math.random(),
           data: {
             labels: ['January', 'February', 'March', 'April', 'May', 'June'],
@@ -48,6 +51,25 @@ export default function (state = initialState, action) {
               fill: true,
               data: [14, 30, 26, 7, 18, 17],
             }],
+          },
+        },
+        {
+          title: 'Outgoing stock movements',
+          type: 'numbers',
+          id: Math.random(),
+          data: {
+            green: {
+              value: 18,
+              subtitle: 'Created < 4 days ago'
+            },
+            yellow: {
+              value: 48,
+              subtitle: 'Created > 4 days ago'
+            },
+            red: {
+              value: 24,
+              subtitle: 'Created > 7 days ago'
+            }
           },
         },
       ];

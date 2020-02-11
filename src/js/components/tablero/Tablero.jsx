@@ -17,6 +17,7 @@ const SortableCards = SortableContainer(({ data }) => (
         key={`item-${value.id}`}
         index={index}
         cardTitle={value.title}
+        cardType={value.type}
         data={value.data} />
     ))}
   </div>

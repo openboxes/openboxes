@@ -3,26 +3,59 @@ import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 
+const Numbers = ({ data }) => (
+    <div className="gyrIndicator">
+        <div className="numberIndicator">
+            <div className="value">
+                <div className="circle green"></div> {data.green.value}
+            </div>
+            <div className="subtitle">{data.green.subtitle}</div>
+        </div>
+        <div className="numberIndicator">
+            <div className="value">
+                <div className="circle yellow"></div> {data.yellow.value}
+            </div>
+            <div className="subtitle">{data.yellow.subtitle}</div>
+        </div>
+        <div className="numberIndicator">
+            <div className="value">
+                <div className="circle red"></div> {data.red.value}
+            </div>
+            <div className="subtitle">{data.red.subtitle}</div>
+        </div>
+    </div>
+);
+
 const DragHandle = sortableHandle(() => <span className="dragHandler">::</span>);
 
 const GraphCard = SortableElement(({
-    cardTitle, data,
-}) => (
+    cardTitle, cardType, data,
+}) => {
+    let graph;
+    if (cardType === 'line') {
+        graph = <Line data={data} />;
+    } else if (cardType === 'numbers') {
+        graph = <Numbers data={data} />
+    }
+
+    return (
         <div className="graphCard">
             <div className="headerCard">
                 <span className="titleCard"> {cardTitle} </span>
                 <DragHandle />
             </div>
             <div className="contentCard">
-                <Line data={data} width={632} height={300} />
+                {graph}
             </div>
         </div>
     )
+}
 );
 
 export default GraphCard;
 
 GraphCard.propTypes = {
     cardTitle: PropTypes.string.isRequired,
+    cardType: PropTypes.string.isRequired,
     data: PropTypes.any.isRequired
 };
