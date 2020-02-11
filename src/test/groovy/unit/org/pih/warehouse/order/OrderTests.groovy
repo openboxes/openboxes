@@ -13,7 +13,7 @@ import grails.test.*
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 
-class OrderTests extends GrailsUnitTestCase {
+class OrderTests {
     protected void setUp() {
         super.setUp()
     }

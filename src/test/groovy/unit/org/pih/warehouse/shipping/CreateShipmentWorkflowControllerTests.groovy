@@ -9,13 +9,13 @@
 **/ 
 package org.pih.warehouse.shipping
 
-import grails.test.*
+import grails.testing.web.controllers.ControllerUnitTest
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.CreateShipmentWorkflowController
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
-class CreateShipmentWorkflowControllerTests extends ControllerUnitTestCase {
+class CreateShipmentWorkflowControllerTests implements ControllerUnitTest {
 
 
     void testMakeDestinationMap_shouldAllowMovingToUnpackedItems() {

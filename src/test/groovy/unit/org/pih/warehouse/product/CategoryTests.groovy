@@ -9,14 +9,14 @@
 **/ 
 package org.pih.warehouse.product
 
-import grails.test.GrailsUnitTestCase
+// import grails.test.GrailsUnitTestCase
 import org.junit.Test
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 // import InventoryItem
 
-class CategoryTests extends GrailsUnitTestCase {
+class CategoryTests {
 
 
     def category1 = new Category(name: "A", parentCategory: null)

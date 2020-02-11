@@ -9,7 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
-import grails.test.GrailsUnitTestCase
+// import grails.test.GrailsUnitTestCase
 import org.joda.time.DateTime
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
@@ -18,7 +18,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
 
-class ShipmentServiceUnitTest extends GrailsUnitTestCase {
+class ShipmentServiceUnitTest {
 
     private oneYearFromNow = new DateTime().plusYears(1).toDate();
     private twoYearsFromNow = new DateTime().plusYears(2).toDate();
@@ -38,7 +38,7 @@ class ShipmentServiceUnitTest extends GrailsUnitTestCase {
 
     private ArrayList<ShipmentItem> allShipmentItems
 
-    @Override
+//    @Override
     protected void setUp() {
         super.setUp()
 

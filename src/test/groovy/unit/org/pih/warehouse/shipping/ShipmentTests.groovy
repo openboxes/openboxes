@@ -18,7 +18,7 @@ import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType;
 
-class ShipmentTests extends GrailsUnitTestCase {
+class ShipmentTests {
     protected void setUp() {
         super.setUp()
 		def depot = new LocationType(name: "Depot")

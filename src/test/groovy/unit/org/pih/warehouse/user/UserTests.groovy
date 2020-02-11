@@ -17,7 +17,7 @@ import org.pih.warehouse.core.User;
 
 import grails.test.*
 
-class UserTests extends GrailsUnitTestCase {
+class UserTests {
 
 
 	@Before

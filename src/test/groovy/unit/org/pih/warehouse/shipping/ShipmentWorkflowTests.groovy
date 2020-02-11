@@ -13,7 +13,7 @@ import grails.test.*
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 
-class ShipmentWorkflowTests extends GrailsUnitTestCase {
+class ShipmentWorkflowTests {
     protected void setUp() {
         super.setUp()
     }

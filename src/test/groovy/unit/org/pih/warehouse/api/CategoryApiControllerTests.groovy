@@ -10,12 +10,12 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.test.ControllerUnitTestCase
+import grails.testing.web.controllers.ControllerUnitTest
 import org.grails.web.json.JSONObject
 import org.codehaus.groovy.runtime.GroovyCategorySupport
 import org.pih.warehouse.product.Category
 
-class CategoryApiControllerTests extends ControllerUnitTestCase {
+class CategoryApiControllerTests implements ControllerUnitTest {
 
     Category rootCategory = new Category(name: "ROOT")
     Category childCategory1 = new Category(name: "A category", parentCategory: rootCategory)

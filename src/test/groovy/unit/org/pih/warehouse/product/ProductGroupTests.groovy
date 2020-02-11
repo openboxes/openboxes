@@ -19,7 +19,7 @@ import org.pih.warehouse.product.ProductGroup
 // import Document;
 // import InventoryItem
 
-class ProductGroupTests extends GrailsUnitTestCase {
+class ProductGroupTests {
 	protected void setUp() {
 		super.setUp()
 

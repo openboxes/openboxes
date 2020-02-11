@@ -1,6 +1,6 @@
 package org.pih.warehouse.requisition
 
-import grails.test.GrailsUnitTestCase
+// import grails.test.GrailsUnitTestCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -13,7 +13,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 
 
-class RequisitionTests extends GrailsUnitTestCase {
+class RequisitionTests {
 
     @Before
     void setUp() {

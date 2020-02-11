@@ -21,7 +21,7 @@ import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product
 
 
-class BaseUnitTest extends GrailsUnitTestCase {
+class BaseUnitTest {
 	protected void setUp() {
         super.setUp()
         

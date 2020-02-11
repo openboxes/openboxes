@@ -1,6 +1,6 @@
 package org.pih.warehouse.core
 
-import grails.test.GrailsUnitTestCase
+// import grails.test.GrailsUnitTestCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -9,7 +9,7 @@ import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
 
-class UserTests extends GrailsUnitTestCase {
+class UserTests {
 
 
     @Before
