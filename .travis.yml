@@ -11,7 +11,7 @@ before_script:
 - nvm install 10.12.0
 - npm install
 - npm run bundle
-script: 'grails test-app unit: --non-interactive -echoOut -echoErr'
+script: 'grails test-app -unit --non-interactive -echoOut -echoErr'
 cache:
   directories:
   - "$HOME/.grails"
