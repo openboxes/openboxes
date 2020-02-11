@@ -788,7 +788,14 @@ div.crossed-out .table-inner-row:before {
         border-bottom: 1px solid #d8d8d8;
         display: flex;
         align-items: center;
+        justify-content: space-between;
         color: #282d32;
+
+        .dragHandler {
+          color: #999999;
+          font-size: 25px;
+          cursor: all-scroll;
+        }
       }
     }
   }

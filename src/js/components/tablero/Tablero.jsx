@@ -1,98 +1,81 @@
 import React, { Component } from 'react';
-import { defaults, Line } from 'react-chartjs-2';
-import { getTranslate } from 'react-localize-redux';
+import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
+import { SortableContainer } from 'react-sortable-hoc';
 import 'react-table/react-table.css';
-import { fetchTranslations, hideSpinner, showSpinner } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { addToIndicators, fetchIndicators, reorderIndicators } from '../../actions';
+import GraphCard from './GraphCard';
+import NumberCard from './NumberCard';
 
-// Disable animating charts by default.
+// Disable charts legends by default.
 defaults.global.legend = false;
 
+const SortableCards = SortableContainer(({ data }) => (
+  <div className="cardComponent">
+    {data.map((value, index) => (
+      <GraphCard
+        key={`item-${value.id}`}
+        index={index}
+        cardTitle={value.title}
+        data={value.data} />
+    ))}
+  </div>
+));
+
 class Tablero extends Component {
+  dataFetched = false;
+
   constructor(props) {
     super(props);
-
-    this.state = {
-      expirationSummary: {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-        datasets: [{
-          label: 'Expiration summary',
-          fill: true,
-          data: [12, 30, 26, 7, 19, 17],
-        }],
-      }
-    };
   }
 
   componentDidMount() {
-    if (this.props.stockListManagementTranslationsFetched) {
-      this.dataFetched = true;
-
-      this.fetchData();
-    }
+    this.fetchData();
   }
 
-  dataFetched = false;
+  // componentWillReceiveProps(nextProps) {
+  //   console.log(nextProps);
+  // }
 
   fetchData() {
-    this.props.showSpinner();
-
-    this.setState({ isDataLoading: false })
+    this.props.fetchIndicators();
   }
 
   render() {
     return (
       <div className="cardsContainer">
         <div className="cardComponent">
-          <div className="numberCard">
-            <span className="titleCard"> Bin Location Summary</span>
-            <span className="resultCard"> 2,696</span>
-            <span className="subtitleCard"> In stock </span>
-          </div>
-          <div className="numberCard">
-            <span className="titleCard"> Bin Location Summary</span>
-            <span className="resultCard"> 1,082</span>
-            <span className="subtitleCard"> Out of Stock </span>
-          </div>
-          <div className="numberCard">
-            <span className="titleCard"> S.M not received </span>
-            <span className="resultCard"> 468</span>
-            <span className="subtitleCard"> N° of S.M not shipped </span>
-          </div>
-          <div className="numberCard">
-            <span className="titleCard"> User incomplete tasks </span>
-            <span className="resultCard"> 188</span>
-            <span className="subtitleCard"> N° of put aways not co... </span>
-          </div>
-          <div className="numberCard">
-            <span className="titleCard"> Discrepancy </span>
-            <span className="resultCard"> 290</span>
-            <span className="subtitleCard"> N° of items received </span>
-          </div>
+          <NumberCard
+            cardTitle={'Bin Location Summary'}
+            cardNumber={2696}
+            cardSubtitle={'In stock'} />
+          <NumberCard
+            cardTitle={'Bin Location Summary'}
+            cardNumber={1082}
+            cardSubtitle={'Out of stock'} />
+          <NumberCard
+            cardTitle={'S.M not received'}
+            cardNumber={468}
+            cardSubtitle={'N° of S.M not shipped'} />
+          <NumberCard
+            cardTitle={'User incomplete tasks'}
+            cardNumber={188}
+            cardSubtitle={'N° of put aways not completed'} />
+          <NumberCard
+            cardTitle={'Discrepancy'}
+            cardNumber={290}
+            cardSubtitle={'N° of items received'} />
         </div>
-        <div className="cardComponent">
-          <div className="graphCard">
-            <div className="headerCard">
-              <span className="titleCard"> Expiration summary </span>
-            </div>
-            <div className="contentCard">
-              <Line data={this.state.expirationSummary} width={632} height={300} />
-            </div>
-          </div>
-        </div>
+        <SortableCards data={this.props.indicatorsData} onSortEnd={this.props.reorderIndicators} axis="xy" useDragHandle />
       </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  locale: state.session.activeLanguage,
-  stockListManagementTranslationsFetched: state.session.fetchedTranslations.stockListManagement,
-  isUserAdmin: state.session.isUserAdmin,
+  indicatorsData: state.indicators.data,
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations,
+  fetchIndicators, addToIndicators, reorderIndicators,
 })(Tablero);

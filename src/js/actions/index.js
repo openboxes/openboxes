@@ -9,6 +9,10 @@ import {
   CHANGE_CURRENT_LOCATION,
   TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
+  FETCH_INDICATORS,
+  ADD_TO_INDICATORS,
+  REMOVE_FROM_INDICATORS,
+  REORDER_INDICATORS
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
 
@@ -100,5 +104,31 @@ export function changeCurrentLocale(locale) {
           payload: locale,
         });
       });
+  };
+}
+
+export function fetchIndicators() {
+  return {
+    type: FETCH_INDICATORS
+  };
+}
+
+export function addToIndicators(element) {
+  return {
+    type: ADD_TO_INDICATORS,
+    payload: element,
+  };
+}
+
+export function reorderIndicators({oldIndex, newIndex}, e) {
+  if (e.target.id === 'delete') {
+    return {
+      type: REMOVE_FROM_INDICATORS,
+      payload: { index: oldIndex },
+    };
+  }
+  return {
+    type: REORDER_INDICATORS,
+    payload: { oldIndex, newIndex },
   };
 }
