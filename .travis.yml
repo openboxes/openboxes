@@ -8,6 +8,7 @@ before_install:
 - source "/home/travis/.sdkman/bin/sdkman-init.sh"
 - sdk install grails 3.3.10
 before_script:
+- nvm install 10.12.0
 - npm install
 - npm run bundle
 script: 'grails test-app unit: --non-interactive -echoOut -echoErr'
