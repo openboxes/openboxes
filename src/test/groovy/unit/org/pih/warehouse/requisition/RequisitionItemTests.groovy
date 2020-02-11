@@ -17,6 +17,7 @@ import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 
+@Ignore
 class RequisitionItemTests {
 
     Requisition requisition

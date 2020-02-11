@@ -22,6 +22,7 @@ import org.pih.warehouse.requisition.RequisitionService
 import testutils.MockBindDataMixin
 
 //@Mixin(MockBindDataMixin)
+@Ignore
 class RequisitionControllerTests implements ControllerUnitTest {
 
     protected void setUp(){

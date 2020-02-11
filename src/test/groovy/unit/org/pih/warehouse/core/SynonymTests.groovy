@@ -19,6 +19,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.springframework.context.ApplicationEvent
 
+@Ignore
 class SynonymTests {
 
     protected void setUp() {

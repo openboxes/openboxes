@@ -17,6 +17,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionService
 
 
+@Ignore
 class RequisitionServiceTests {
 
 	def requisitionService = new RequisitionService()

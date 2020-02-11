@@ -10,11 +10,13 @@
 package org.pih.warehouse.shipping
 
 import grails.testing.web.controllers.ControllerUnitTest
+import org.junit.Ignore
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.CreateShipmentWorkflowController
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
+@Ignore
 class CreateShipmentWorkflowControllerTests implements ControllerUnitTest {
 
 

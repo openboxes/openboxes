@@ -4,6 +4,7 @@ import org.junit.Ignore
 import org.junit.Test
 //import com.dumbster.smtp.SimpleSmtpServer
 
+@Ignore
 class MailServiceTests extends GroovyTestCase {
   
 	def mailService
@@ -17,7 +18,6 @@ class MailServiceTests extends GroovyTestCase {
 		grailsApplication.config.grails.mail.port = 2525
 	}
 
-	@Ignore
 	@Test
 	void sendHtmlMail_shouldHandleAccentedCharactersCorrectly() { 
 //		def server = SimpleSmtpServer.start(2525)

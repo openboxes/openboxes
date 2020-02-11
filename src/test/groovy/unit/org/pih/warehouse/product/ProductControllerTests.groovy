@@ -24,6 +24,7 @@ import org.pih.warehouse.product.ProductService
 import testutils.MockBindDataMixin
 
 //@Mixin(MockBindDataMixin)
+@Ignore
 class ProductControllerTests implements ControllerUnitTest{
 
     protected void setUp(){

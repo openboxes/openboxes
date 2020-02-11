@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.product
 
+import org.junit.Ignore
+
 // import grails.test.GrailsUnitTestCase
 import org.junit.Test
 import org.pih.warehouse.product.Category
@@ -16,6 +18,7 @@ import org.pih.warehouse.product.Product
 
 // import InventoryItem
 
+@Ignore
 class CategoryTests {
 
 

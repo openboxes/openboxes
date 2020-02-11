@@ -1,9 +1,12 @@
 package org.pih.warehouse.core
 
+import org.junit.Ignore
+
 // import grails.test.GrailsUnitTestCase
 import org.junit.Test
 import org.pih.warehouse.core.Person
 
+@Ignore
 class PersonTests {
 
     @Test

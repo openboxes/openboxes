@@ -11,6 +11,7 @@ package org.pih.warehouse.shipping
 
 // import grails.test.GrailsUnitTestCase
 import org.joda.time.DateTime
+import org.junit.Ignore
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Container
@@ -18,6 +19,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
 
+@Ignore
 class ShipmentServiceUnitTest {
 
     private oneYearFromNow = new DateTime().plusYears(1).toDate();
