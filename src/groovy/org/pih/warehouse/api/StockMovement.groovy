@@ -4,13 +4,12 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.validation.Validateable
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ReferenceNumber
@@ -187,12 +186,12 @@ class StockMovement {
         return name
     }
 
-    static StockMovement createFromOrder(Order order, User user) {
+    static StockMovement createFromOrder(Order order) {
         StockMovement stockMovement = new StockMovement(
             destination: order.destination,
             origin: order.origin,
             dateRequested: new Date(),
-            requestedBy: user,
+            requestedBy: AuthService.getCurrentUser().get(),
             description: order.orderNumber,
             order: order,
             statusCode:"CREATED"
