@@ -8,6 +8,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.Requisition
@@ -179,12 +180,12 @@ class StockMovement {
         return name
     }
 
-    static StockMovement createFromOrder(Order order) {
+    static StockMovement createFromOrder(Order order, User user) {
         StockMovement stockMovement = new StockMovement(
             destination: order.destination,
             origin: order.origin,
             dateRequested: new Date(),
-            requestedBy: order.orderedBy,
+            requestedBy: user,
             description: order.orderNumber,
             order: order,
             statusCode:"CREATED"
