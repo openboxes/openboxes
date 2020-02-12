@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './tablero.scss';
 
 function truncateString(value, length) {
     return (value.length > length) ? value.substr(0, length - 1) + '...' : value;

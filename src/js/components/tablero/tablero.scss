@@ -1,0 +1,124 @@
+.page-dashboard {
+    background-color: #fbfbfb;
+}
+
+.cardsContainer {
+    .cardComponent {
+      margin: 20px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+  
+      .numberCard {
+        width: 200px;
+        height: 124px;
+        margin: 20px;
+        padding: 24px;
+        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+  
+        .titleCard {
+          color: #cdcdcd;
+          font-size: 14px;
+        }
+  
+        .resultCard {
+          color: #282d32;
+          font-size: 28px;
+        }
+  
+        .subtitleCard {
+          color: #282d32;
+          font-size: 14px;
+        }
+      }
+}
+}
+
+.graphCard {
+    margin: 20px;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 415px;
+    width: 680px;
+  
+    >div {
+      padding: 24px;
+    }
+  
+    .headerCard {
+      height: 68px;
+      border-bottom: 1px solid #d8d8d8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #282d32;
+  
+      .dragHandler {
+        color: #999999;
+        font-size: 25px;
+        cursor: all-scroll;
+      }
+    }
+  
+    .contentCard {
+      height: 100%;
+  
+      .gyrIndicator {
+        height: 100%;
+        display: flex;
+        align-items: center;
+  
+        .numberIndicator {
+          flex-grow: 1;
+          height: 80%;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+  
+          &:not(:last-child) {
+            border-right: 1px solid #d8d8d8;
+          }
+  
+          .value {
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+  
+            .circle {
+              width: 12px;
+              height: 12px;
+              border-radius: 100%;
+              position: absolute;
+              margin-left: -22px;
+              
+              &.green {
+                background-color: #519a04;
+              }
+              
+              &.yellow {
+                background-color: #f7b500;
+              }
+              
+              &.red {
+                background-color: #e02020;
+              }
+            }
+          }
+  
+          .subtitle {
+            font-size: 12px;
+            color: #818181;
+          }
+        }
+      }
+    }
+  }

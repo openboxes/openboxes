@@ -6,6 +6,7 @@ import 'react-table/react-table.css';
 import { addToIndicators, fetchIndicators, reorderIndicators } from '../../actions';
 import GraphCard from './GraphCard';
 import NumberCard from './NumberCard';
+import './tablero.scss';
 
 // Disable charts legends by default.
 defaults.global.legend = false;
