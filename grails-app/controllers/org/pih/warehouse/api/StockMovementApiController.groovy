@@ -46,7 +46,7 @@ class StockMovementApiController {
     }
 
     def read = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, params.stepNumber)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         // FIXME Debugging
         JSONObject jsonObject = new JSONObject(stockMovement.toJson())

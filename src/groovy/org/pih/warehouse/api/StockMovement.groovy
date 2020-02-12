@@ -15,6 +15,7 @@ import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 
 enum StockMovementType {
 
@@ -57,8 +58,6 @@ class StockMovement {
 
     StockMovementType stockMovementType
 
-    PickPage pickPage
-    EditPage editPage
     PackPage packPage
 
     List<StockMovementItem> lineItems =
@@ -112,8 +111,6 @@ class StockMovement {
                 comments          : comments,
                 requestedBy       : requestedBy,
                 lineItems         : lineItems,
-                pickPage          : pickPage,
-                editPage          : editPage,
                 packPage          : packPage,
                 associations      : [
                         requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
@@ -205,12 +202,14 @@ class StockMovement {
 
         // Include all requisition items except those that are substitutions or modifications because the
         // original requisition item will represent these changes
-        if (requisition.requisitionItems) {
-            SortedSet<RequisitionItem> requisitionItems = new TreeSet<RequisitionItem>(requisition.requisitionItems)
-            requisitionItems.each { requisitionItem ->
-                if (!requisitionItem.parentRequisitionItem) {
-                    StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
-                    stockMovement.lineItems.add(stockMovementItem)
+        if (!CH.config.openboxes.api.pagination.enabled) {
+            if (requisition.requisitionItems) {
+                SortedSet<RequisitionItem> requisitionItems = new TreeSet<RequisitionItem>(requisition.requisitionItems)
+                requisitionItems.each { requisitionItem ->
+                    if (!requisitionItem.parentRequisitionItem) {
+                        StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+                        stockMovement.lineItems.add(stockMovementItem)
+                    }
                 }
             }
         }
@@ -238,34 +237,6 @@ enum DocumentGroupCode {
         return [EXPORT, INVOICE, PICKLIST, PACKING_LIST, CERTIFICATE_OF_DONATION, DELIVERY_NOTE, GOODS_RECEIPT_NOTE]
     }
 
-}
-
-class PickPage {
-    List<PickPageItem> pickPageItems = []
-
-    static constraints = {
-        pickPageItems(nullable: true)
-    }
-
-    Map toJson() {
-        return [
-                pickPageItems: pickPageItems
-        ]
-    }
-}
-
-class EditPage {
-    List<EditPageItem> editPageItems = []
-
-    static constraints = {
-        editPageItems(nullable: true)
-    }
-
-    Map toJson() {
-        return [
-                editPageItems: editPageItems
-        ]
-    }
 }
 
 class PackPage {

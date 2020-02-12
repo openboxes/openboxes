@@ -35,6 +35,11 @@ class StockMovementItemApiController {
         render([data: stockMovementItem] as JSON)
     }
 
+    def getStockMovementItems = {
+        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(params.id, params.stepNumber, params.max, params.offset)
+        render([data: stockMovementItems, totalCount: stockMovementItems.totalCount] as JSON)
+    }
+
     def updatePicklist = {
         JSONObject jsonObject = request.JSON
 

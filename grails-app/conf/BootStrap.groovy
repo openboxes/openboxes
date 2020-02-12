@@ -14,14 +14,12 @@ import grails.util.Environment
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPage
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
-import org.pih.warehouse.api.PickPage
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockAdjustment
 import org.pih.warehouse.api.StockMovement
@@ -345,10 +343,6 @@ class BootStrap {
             return availableItem.toJson()
         }
 
-        JSON.registerObjectMarshaller(EditPage) { EditPage editPage ->
-            return editPage.toJson()
-        }
-
         JSON.registerObjectMarshaller(EditPageItem) { EditPageItem editPageItem ->
             return editPageItem.toJson()
         }
@@ -362,10 +356,6 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(PartialReceiptContainer) { PartialReceiptContainer partialReceiptContainer ->
             return partialReceiptContainer.toJson()
-        }
-
-        JSON.registerObjectMarshaller(PickPage) { PickPage pickPage ->
-            return pickPage.toJson()
         }
 
         JSON.registerObjectMarshaller(PickPageItem) { PickPageItem pickPageItem ->
