@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 
 const Numbers = ({ data }) => (
@@ -34,9 +34,16 @@ const GraphCard = SortableElement(({
     let graph;
     if (cardType === 'line') {
         graph = <Line data={data} />;
+    } else if (cardType === 'bar') {
+        graph = <Bar data={data} />
+    } else if (cardType === 'doughnut') {
+        graph = <Doughnut data={data} />
+    } else if (cardType === 'horizontalBar') {
+        graph = <HorizontalBar data={data} />
     } else if (cardType === 'numbers') {
         graph = <Numbers data={data} />
     }
+
 
     return (
         <div className="graphCard">
