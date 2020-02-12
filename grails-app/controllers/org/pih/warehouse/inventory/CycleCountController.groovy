@@ -31,7 +31,7 @@ class CycleCountController {
                     "Generic product"                                                                                      : it.genericProduct?.name ?: "",
                     "Category"                                                                                             : StringEscapeUtils.escapeCsv(it.category?.name ?: ""),
                     "Formularies"                                                                                          : it.product.productCatalogs.join(", ") ?: "",
-                    "Lot number"                                                                                           : StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber ?: ""),
+                    "Lot number"                                                                                           : StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber.replace(";", "-") ?: ""),
                     "Expiration date"                                                                                      : it.inventoryItem.expirationDate ? it.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
                     "ABC classification"                                                                                   : StringEscapeUtils.escapeCsv(it.product.getAbcClassification(location.id) ?: ""),
                     "Bin location"                                                                                         : StringEscapeUtils.escapeCsv(it?.binLocation?.name?.replace(";", "-") ?: ""),
