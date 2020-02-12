@@ -55,17 +55,17 @@ class Tablero extends Component {
             cardNumber={1082}
             cardSubtitle={'Out of stock'} />
           <NumberCard
-            cardTitle={'S.M not received'}
+            cardTitle={'Stock Movements'}
             cardNumber={468}
-            cardSubtitle={'N° of S.M not shipped'} />
+            cardSubtitle={'Not shipped'} />
           <NumberCard
-            cardTitle={'User incomplete tasks'}
+            cardTitle={'User Incomplete Tasks'}
             cardNumber={188}
-            cardSubtitle={'N° of put aways not completed'} />
+            cardSubtitle={'Not completed'} />
           <NumberCard
             cardTitle={'Discrepancy'}
             cardNumber={290}
-            cardSubtitle={'N° of items received'} />
+            cardSubtitle={'Items received'} />
         </div>
         <SortableCards data={this.props.indicatorsData} onSortEnd={this.props.reorderIndicators} axis="xy" useDragHandle />
       </div>
