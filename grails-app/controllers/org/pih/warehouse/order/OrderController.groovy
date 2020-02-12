@@ -76,7 +76,8 @@ class OrderController {
 
     def shipOrder = {
         def orderInstance = Order.get(params.id)
-        StockMovement stockMovement = stockMovementService.createFromOrder(orderInstance);
+        def userInstance = User.get(session.user.id)
+        StockMovement stockMovement = stockMovementService.createFromOrder(orderInstance, userInstance);
         redirect(controller: 'stockMovement', action: "create", params: [id: stockMovement.id])
     }
 
