@@ -46,7 +46,7 @@ class StockMovementApiController {
     }
 
     def read = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, params.stepNumber)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         // FIXME Debugging
         JSONObject jsonObject = new JSONObject(stockMovement.toJson())
@@ -227,13 +227,13 @@ class StockMovementApiController {
 
         stockMovementService.updateAdjustedItems(stockMovement, params.adjustedProduct)
 
-        stockMovement = stockMovementService.getStockMovement(params.id, "4")
+        stockMovement = stockMovementService.getStockMovement(params.id)
 
         render([data: stockMovement] as JSON)
     }
 
     def exportPickListItems = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, "4")
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         List<PicklistItem> picklistItems = stockMovement?.pickPage?.pickPageItems?.inject([]) { result, pickPageItem ->
             result.addAll(pickPageItem.picklistItems)
@@ -261,7 +261,7 @@ class StockMovementApiController {
     def importPickListItems = { ImportDataCommand command ->
 
         try {
-            StockMovement stockMovement = stockMovementService.getStockMovement(params.id, "4")
+            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
             def importFile = command.importFile
             if (importFile.isEmpty()) {
@@ -472,8 +472,6 @@ class StockMovementApiController {
     void bindPackPage(StockMovement stockMovement, List lineItems) {
         log.debug "line items: " + lineItems
         List<PackPageItem> packPageItems = createPackPageItemsFromJson(stockMovement, lineItems)
-        PackPage packPage = new PackPage(packPageItems: packPageItems)
-        stockMovement.packPage = packPage
     }
 
     List<PackPageItem> createPackPageItemsFromJson(StockMovement stockMovement, List lineItems) {
