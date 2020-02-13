@@ -31,10 +31,6 @@ const Numbers = ({ data }) => (
 const ErrorCard = () => (
     <div>
         <i className="fa fa-repeat" />
-        <div className="errorDiv">
-            <br />
-            <span>This chart couldn't be loaded. Try reloading the page.</span>
-        </div>
     </div>
 );
 

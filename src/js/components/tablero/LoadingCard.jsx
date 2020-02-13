@@ -14,7 +14,6 @@ const LoadingCard = () => {
     return (
         <div className="loaderDiv">
             <ReactLoading type="bubbles" color={getColor()} height={'60%'} width={'60%'} />
-            <span className="subtitleLoader">Loading...</span>
         </div>
     );
 };
