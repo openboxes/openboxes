@@ -26,6 +26,7 @@ import org.pih.warehouse.product.Product
 import org.springframework.core.io.ClassPathResource
 import testutils.DbHelper
 
+@Ignore
 class InventoryServiceTests extends GroovyTestCase {
 
     def inventoryService

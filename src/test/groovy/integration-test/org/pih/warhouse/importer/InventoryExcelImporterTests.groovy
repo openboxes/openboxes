@@ -1,8 +1,10 @@
 package org.pih.warehouse.importer
 
+import org.junit.Ignore
 import org.junit.Test
 import org.springframework.core.io.ClassPathResource
 
+@Ignore
 class InventoryExcelImporterTests extends GroovyTestCase {
 
     protected void setUp() {

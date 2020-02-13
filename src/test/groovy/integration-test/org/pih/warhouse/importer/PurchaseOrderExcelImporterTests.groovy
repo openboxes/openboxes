@@ -1,11 +1,13 @@
 package org.pih.warehouse.importer
 
 import org.apache.commons.lang.StringUtils
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.product.Product
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 
+@Ignore
 class PurchaseOrderExcelImporterTests extends GroovyTestCase {
     protected void setUp() {
         super.setUp()

@@ -13,6 +13,7 @@ import org.pih.warehouse.requisition.RequisitionController
 import org.pih.warehouse.requisition.RequisitionItem
 import testutils.DbHelper
 
+@Ignore
 class RequisitionControllerIntegrationTests extends GroovyTestCase {
 
     def sessionFactory

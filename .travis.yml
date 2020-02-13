@@ -1,16 +1,17 @@
 dist: trusty
 language: groovy
 jdk:
-- openjdk7
+- openjdk8
 before_install:
 - curl -s http://get.sdkman.io | bash
 - echo sdkman_auto_answer=true > ~/.sdkman/etc/config
 - source "/home/travis/.sdkman/bin/sdkman-init.sh"
-- sdk install grails 1.3.9
+- sdk install grails 3.3.10
 before_script:
+- nvm install 10.12.0
 - npm install
 - npm run bundle
-script: 'grails test-app unit: --non-interactive -echoOut -echoErr'
+script: 'grails test-app -unit --non-interactive -echoOut -echoErr'
 cache:
   directories:
   - "$HOME/.grails"

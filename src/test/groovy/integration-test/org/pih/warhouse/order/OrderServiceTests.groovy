@@ -2,6 +2,7 @@ package org.pih.warehouse.order
 
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.Location
@@ -10,6 +11,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import testutils.DbHelper
 
+@Ignore
 class OrderServiceTests extends GroovyTestCase {
 
 	def orderService
