@@ -16,7 +16,8 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.springframework.context.ApplicationEvent
 
-class LocationTests extends GrailsUnitTestCase {
+@Ignore
+class LocationTests {
     Location location1
     Location location2
     Location location3

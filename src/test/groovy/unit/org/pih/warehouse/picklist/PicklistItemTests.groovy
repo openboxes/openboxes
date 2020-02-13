@@ -1,13 +1,13 @@
 package org.pih.warehouse.picklist
 
-import grails.test.GrailsUnitTestCase
+// import grails.test.GrailsUnitTestCase
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
 
-class PicklistItemTests extends GrailsUnitTestCase
+class PicklistItemTests
 {
     void testNotNullableConstraints() {
         mockForConstraintsTests(RequisitionItem)

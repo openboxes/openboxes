@@ -1,17 +1,14 @@
 package org.pih.warehouse.reporting
 
-import grails.converters.JSON
-import grails.test.ControllerUnitTestCase
+import grails.testing.web.controllers.ControllerUnitTest
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.*
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.reporting.ReportController
 
-class ReportControllerTests extends ControllerUnitTestCase {
+class ReportControllerTests implements ControllerUnitTest {
 
-    @Test
+    @Ignore
+	@Test
     void testSomething() {
         assert true
     }
