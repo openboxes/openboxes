@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
+import LoadingCard from './LoadingCard';
 import './tablero.scss';
 
 const Numbers = ({ data }) => (
@@ -43,6 +44,8 @@ const GraphCard = SortableElement(({
         graph = <HorizontalBar data={data} />
     } else if (cardType === 'numbers') {
         graph = <Numbers data={data} />
+    } else if (cardType === 'loading') {
+        graph = <LoadingCard data={data} />
     }
 
 

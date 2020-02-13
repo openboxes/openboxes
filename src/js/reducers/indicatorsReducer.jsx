@@ -140,7 +140,12 @@ export default function (state = initialState, action) {
             }],
           },
         },
-
+        {
+          title: 'Stock movements received',
+          type: 'loading',
+          id: Math.random(),
+          data: {},
+        }
       ];
       return {
         ...state,
