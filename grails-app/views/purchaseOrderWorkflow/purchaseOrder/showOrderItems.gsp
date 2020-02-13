@@ -109,13 +109,18 @@
                             <g:hiddenField name="order.id" value="${order?.id }"></g:hiddenField>
                             <g:hiddenField name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
                             <tr>
-                                <td colspan="2"></td>
+                                <td>
+                                    ${i+1}
+                                </td>
+                                <td>
+
+                                </td>
                                 <td>
                                     <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
                                                    width="400" valueId="" valueName="" styleClass="text"/>
                                 </td>
                                 <td class="middle center">
-                                    <g:select id="productSupplier" name="productSupplier.id" style="width: 100px;"/>
+                                    <g:select id="productSupplier" name="productSupplier.id"/>
                                 </td>
                                 <td class="middle center">
                                     <input type="text" id="supplierCode" name='supplierCode' disabled value="" size="10" class="text" />
@@ -146,37 +151,12 @@
                                     <g:submitButton name="addItem" value="${warehouse.message(code:'order.button.addItem.label', default: 'Add line item')}" class="button icon add"/>
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td colspan="13" class="center">
-                                    <g:link controller="purchaseOrderWorkflow"
-                                            action="purchaseOrder"
-                                            id="${order?.id}"
-                                            event="enterOrderDetails"
-                                            params="[skipTo:'details']"
-                                            class="button">
-                                        <warehouse:message code="default.back.label" default="Back"/>
-                                    </g:link>
-                                    <g:if test="${!order?.isPlaced()}">
-                                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" >
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'creditcards.png')}" />&nbsp;
-                                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}
-                                        </g:link>
-                                    </g:if>
-                                    <g:else>
-                                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" disabled="disabled" >
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
-                                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}
-                                        </g:link>
-                                    </g:else>
-                                </td>
-                            </tr>
+
                         </g:form>
                     </tbody>
                     <tfoot>
                         <tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
-                            <th>
-                            </th>
-                            <th colspan="10" class="right">
+                            <th colspan="12" class="right">
                                 <warehouse:message code="default.total.label"/>
                                 <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
                                 ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
@@ -185,6 +165,34 @@
                     </tfoot>
 
                 </table>
+            </div>
+
+            <div class="buttons">
+                <div class="left">
+                    <g:link controller="purchaseOrderWorkflow"
+                            action="purchaseOrder"
+                            id="${order?.id}"
+                            event="enterOrderDetails"
+                            params="[skipTo:'details']"
+                            class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" />&nbsp;
+                        <warehouse:message code="default.back.label" default="Back"/>
+                    </g:link>
+                </div>
+                <div class="right">
+                    <g:if test="${!order?.isPlaced()}">
+                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" >
+                            <img src="${resource(dir: 'images/icons/silk', file: 'creditcards.png')}" />&nbsp;
+                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}
+                        </g:link>
+                    </g:if>
+                    <g:else>
+                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" disabled="disabled" >
+                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
+                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}
+                        </g:link>
+                    </g:else>
+                </div>
             </div>
 		</div>
         <div id="edit-item-dialog" class="dlg box">
