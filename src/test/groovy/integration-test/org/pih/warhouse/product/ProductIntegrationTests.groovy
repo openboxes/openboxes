@@ -13,6 +13,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import testutils.DbHelper
 
+@Ignore
 class ProductIntegrationTests extends GroovyTestCase {
 
     @Test

@@ -4,6 +4,10 @@ import grails.test.GrailsUnitTestCase
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
+// import InventoryService
+// import Transaction
+import org.pih.warehouse.product.*
+// import grails.test.GrailsUnitTestCase
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
@@ -13,7 +17,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.springframework.context.ApplicationEvent
 
 
-class PicklistServiceTests extends GrailsUnitTestCase {
+class PicklistServiceTests {
      void testCreateNewPicklist(){
         def requisition = new Requisition(id:"requisition1", name:"myTestRequisition")
         def picklistItem1 = [id:"", "requisitionItem.id":"ri1", "inventoryItem.id":"ii1", quantity:100]

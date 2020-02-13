@@ -10,7 +10,7 @@
 package org.pih.warehouse.product
 
 import grails.test.*
-import org.junit.Test
+import org.junit.Ignore
 import org.pih.warehouse.core.User
 import org.springframework.context.ApplicationEvent
 import org.pih.warehouse.product.Category
@@ -20,7 +20,8 @@ import org.pih.warehouse.product.ProductGroup
 // import Document;
 // import InventoryItem
 
-class ProductGroupTests extends GrailsUnitTestCase {
+@Ignore
+class ProductGroupTests {
 	protected void setUp() {
 		super.setUp()
 
@@ -86,7 +87,6 @@ class ProductGroupTests extends GrailsUnitTestCase {
 		//assertEquals 1, productGroup.products.size()
 	}
 
-	@Test
 	void test_productGroupNameUniqueErrorsCount() {
 		ProductGroup productGroup1 = new ProductGroup(name: "test")
 		productGroup1.save(flush: true)
@@ -95,7 +95,6 @@ class ProductGroupTests extends GrailsUnitTestCase {
 		assertEquals(1, productGroup2.errors.errorCount)
 	}
 
-	@Test
 	void test_productGroupNameUniqueHasErrorOnNameProperty() {
 		ProductGroup productGroup = new ProductGroup(name: "test")
 		productGroup.save(flush: true)

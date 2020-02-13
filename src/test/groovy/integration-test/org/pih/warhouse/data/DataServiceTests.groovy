@@ -19,6 +19,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import testutils.DbHelper
 
+@Ignore
 class DataServiceTests extends GroovyTestCase {
 
 
