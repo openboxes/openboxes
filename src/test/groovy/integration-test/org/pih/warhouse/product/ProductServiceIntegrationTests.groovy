@@ -10,18 +10,18 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import testutils.DbHelper
 
+@Ignore
 class ProductServiceIntegrationTests extends GroovyTestCase {
 
-
 	def productService
-	def product1;
-	def product2;
-	def product3;
-	def product4;
-	def product5;
-	def product6;
-	def group1;
-	def group2;
+	def product1
+	def product2
+	def product3
+	def product4
+	def product5
+	def product6
+	def group1
+	def group2
 
     /**
      *

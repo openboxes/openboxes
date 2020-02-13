@@ -1,8 +1,10 @@
 package org.pih.warehouse.core
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringUtils
+import org.junit.Ignore;
 import org.junit.Test
 
+@Ignore
 class IdentifierServiceTests extends GroovyTestCase{
   
 	def identifierService
