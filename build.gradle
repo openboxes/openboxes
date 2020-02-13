@@ -43,7 +43,7 @@ version "0.9.0-SNAPSHOT"
 group "com.openboxes"
 
 node {
-    version = '13.5.0'
+    version = '10.12.0'
     npmVersion = '6.13.6'
     distBaseUrl = 'https://nodejs.org/dist'
     download = true
@@ -207,7 +207,7 @@ war {
 }
 
 bootRun {
-    jvmArgs('-Dspring.output.ansi.enabled=always')
+    jvmArgs = ["-Dspring.output.ansi.enabled=always", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"]
     addResources = true
     String springProfilesActive = 'spring.profiles.active'
     systemProperty springProfilesActive, System.getProperty(springProfilesActive)
@@ -223,6 +223,12 @@ tasks.withType(Test) {
 assets {
     minifyJs = true
     minifyCss = true
+
+    minifyOptions = [
+        languageMode: 'ES6',
+        targetLanguage: 'ES5',
+        optimizationLevel: 'SIMPLE',
+    ]
 }
 
 //Generate webpack bundle when starting up the app
