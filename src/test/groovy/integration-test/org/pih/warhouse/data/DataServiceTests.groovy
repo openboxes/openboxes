@@ -18,6 +18,7 @@ import org.pih.warehouse.product.Product
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 
+@Ignore
 class DataServiceTests extends GroovyTestCase {
 
 

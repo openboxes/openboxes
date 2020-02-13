@@ -18,10 +18,10 @@ import org.pih.warehouse.core.LocationType
 // import Location;
 import org.pih.warehouse.inventory.InventoryService;
 
-import grails.test.*
+import grails.testing.web.controllers.ControllerUnitTest
 // import grails.converters.JSON
 
-class LocationControllerTests extends ControllerUnitTestCase {
+class LocationControllerTests implements ControllerUnitTest {
 
 	protected void setUp() {
 		super.setUp()

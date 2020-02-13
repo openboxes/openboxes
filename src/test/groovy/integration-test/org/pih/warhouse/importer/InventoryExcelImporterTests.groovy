@@ -1,6 +1,7 @@
 package org.pih.warehouse.importer
 
 import org.apache.commons.lang.StringUtils
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -14,6 +15,7 @@ import org.springframework.core.io.Resource
 
 import java.text.SimpleDateFormat
 
+@Ignore
 class InventoryExcelImporterTests extends GroovyTestCase {
 
     protected void setUp() {

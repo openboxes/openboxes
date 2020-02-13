@@ -1,8 +1,10 @@
 package org.pih.warehouse.core
 
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Role
 
+@Ignore
 class RoleIntegrationTests extends GroovyTestCase {
 
     @Override

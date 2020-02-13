@@ -9,9 +9,9 @@
 **/ 
 package org.pih.warehouse.core
 
-import grails.test.*
+import grails.testing.web.controllers.ControllerUnitTest
 
-class EventTypeControllerTests extends ControllerUnitTestCase {
+class EventTypeControllerTests implements ControllerUnitTest {
     protected void setUp() {
         super.setUp()
     }

@@ -19,8 +19,8 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 
-
-class ProductTests extends GrailsUnitTestCase {
+@Ignore
+class ProductTests {
 
     protected void setUp() {
         super.setUp()

@@ -1,7 +1,8 @@
 package org.pih.warehouse.picklist
 
 import grails.converters.JSON
-import grails.test.ControllerUnitTestCase
+import grails.testing.web.controllers.ControllerUnitTest
+import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.picklist.Picklist
@@ -10,7 +11,7 @@ import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 
-class PicklistControllerTests extends ControllerUnitTestCase {
+class PicklistControllerTests implements ControllerUnitTest {
 
   void testSave() {
         def picklist = new Picklist(id: "2345", version: 3)

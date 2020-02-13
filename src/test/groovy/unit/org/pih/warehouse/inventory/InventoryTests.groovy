@@ -15,7 +15,7 @@ import org.pih.warehouse.core.LocationType;
 import grails.test.*
 import org.pih.warehouse.inventory.Inventory
 
-class InventoryTests extends GrailsUnitTestCase {
+class InventoryTests {
     protected void setUp() {
         super.setUp()
 		def depot = new LocationType(name: "Depot")

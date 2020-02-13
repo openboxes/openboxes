@@ -14,7 +14,8 @@ import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.LocationGroup
 
-class LocationGroupTests extends GrailsUnitTestCase {
+@Ignore
+class LocationGroupTests {
     def bos = new LocationGroup(name: "Boston")
     def pap = new LocationGroup(name: "Port au Prince")
     def hum = new LocationGroup(name: "HUM")

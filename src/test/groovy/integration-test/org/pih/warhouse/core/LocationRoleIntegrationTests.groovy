@@ -1,11 +1,12 @@
 package org.pih.warehouse.core
 
+import org.junit.Ignore
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
 
-
+@Ignore
 class LocationRoleIntegrationTests extends GroovyTestCase {
   void test_save(){
     def user = User.list().first()

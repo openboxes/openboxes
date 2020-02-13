@@ -1,17 +1,19 @@
 package org.pih.warehouse.shipping
 
-import grails.test.ControllerUnitTestCase
+import grails.testing.web.controllers.ControllerUnitTest
+import org.junit.Ignore
 import org.pih.warehouse.MessageTagLib
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentController
 import org.pih.warehouse.shipping.ShipmentService
 
-class ShipmentControllerTests  extends ControllerUnitTestCase {
+@Ignore
+class ShipmentControllerTests  implements ControllerUnitTest {
 
     def shipmentServiceMock
 
-    @Override
+//    @Override
     Class getControllerClass() {
         return ShipmentController;
     }
