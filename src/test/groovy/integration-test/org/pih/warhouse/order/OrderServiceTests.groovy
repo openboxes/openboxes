@@ -1,5 +1,6 @@
 package org.pih.warehouse.order
 
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Location;
 import org.pih.warehouse.core.LocationType;
@@ -8,7 +9,7 @@ import org.pih.warehouse.order.Order;
 import testutils.DbHelper;
 
 
-
+@Ignore
 class OrderServiceTests extends GroovyTestCase {
 	
 	

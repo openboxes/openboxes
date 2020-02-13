@@ -19,6 +19,7 @@ import testutils.DbHelper
 
 
 
+@Ignore
 class ProductServiceIntegrationTests extends GroovyTestCase {
 	
 	

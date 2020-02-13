@@ -10,10 +10,12 @@
 package org.pih.warehouse.shipping
 
 import grails.test.*
+import org.junit.Ignore
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 
-class ShipmentWorkflowTests extends GrailsUnitTestCase {
+@Ignore
+class ShipmentWorkflowTests {
     protected void setUp() {
         super.setUp()
     }

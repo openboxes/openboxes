@@ -1,11 +1,11 @@
 package org.pih.warehouse.inventory
 
-import grails.test.GrailsUnitTestCase
+// import grails.test.GrailsUnitTestCase
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category;
 import org.pih.warehouse.product.Product
 
-class InventoryItemTests extends GrailsUnitTestCase {
+class InventoryItemTests {
 
 	protected void setUp() {
 		super.setUp()

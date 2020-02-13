@@ -2,7 +2,7 @@ package org.pih.warehouse.user
 
 import org.junit.Ignore
 import org.pih.warehouse.core.*
-import grails.test.ControllerUnitTestCase
+import grails.testing.web.controllers.ControllerUnitTest
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.Role
@@ -12,8 +12,8 @@ import org.pih.warehouse.core.UserService
 // import org.springframework.mock.web.MockHttpServletResponse
 import testutils.MockBindDataMixin
 
-@Mixin(MockBindDataMixin)
-class UserControllerTests extends ControllerUnitTestCase{
+//@Mixin(MockBindDataMixin)
+class UserControllerTests implements ControllerUnitTest {
 
     protected void setUp(){
         super.setUp()

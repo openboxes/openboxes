@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import org.junit.Ignore
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
@@ -24,6 +25,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
+@Ignore
 class ShipmentItemTests extends GroovyTestCase {
 	
 	def shipmentItem1

@@ -26,6 +26,7 @@ import testutils.DbHelper
 
 import org.junit.Test
 
+@Ignore
 class InventoryServiceTests extends GroovyTestCase {
 	
 	def inventoryService
