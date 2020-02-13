@@ -42,11 +42,8 @@
                                     <warehouse:message code="order.orderedFrom.label"/></label>
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-                                    <div style="width: 300px;">
-                                        <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect" style="width:350px;"
-                                                               optionKey="id" value="${order?.origin?.id}" noSelection="['null':'']"/>
-                                    </div>
-
+                                    <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect"
+                                                           optionKey="id" value="${order?.origin?.id}" noSelection="['null':'']"/>
                                 </td>
                             </tr>
                             <tr class='prop'>
@@ -55,7 +52,7 @@
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'name','errors')}'>
                                     <g:textField type="text" id="name" name='name'
-                                                 placeholder="${warehouse.message(code:'order.description.placeholder')}" size="100" class="text large" value="${order?.name?.encodeAsHTML()}"/>
+                                                 placeholder="${warehouse.message(code:'order.description.placeholder')}" class="text large" value="${order?.name?.encodeAsHTML()}"/>
 
                                 </td>
                             </tr>
@@ -65,7 +62,7 @@
                                 </td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'orderNumber','errors')}'>
                                     <input type="text" id="orderNumber" name='orderNumber'
-                                           value="${order?.orderNumber?.encodeAsHTML()}" size="50" class="text"
+                                           value="${order?.orderNumber?.encodeAsHTML()}" class="text large"
                                            placeholder="${warehouse.message(code:'order.orderNumber.placeholder')}"/>
                                 </td>
                             </tr>
@@ -105,10 +102,8 @@
                                 <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.createdBy.label"/></label></td>
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
-                                    <div style="width: 300px;">
-                                        <g:select class="chzn-select-deselect" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort()}"
-                                                  optionKey="id" value="${order?.orderedBy?.id}" noSelection="['null':'']" />
-                                    </div>
+                                    <g:select class="chzn-select-deselect" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort()}"
+                                              optionKey="id" value="${order?.orderedBy?.id}" noSelection="['null':'']" />
                                 </td>
                             </tr>
                         </tbody>
