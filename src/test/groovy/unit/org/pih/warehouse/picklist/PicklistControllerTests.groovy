@@ -1,6 +1,6 @@
 package org.pih.warehouse.picklist
 
-import grails.test.ControllerUnitTestCase
+import grails.testing.web.controllers.ControllerUnitTest
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.requisition.*
@@ -17,7 +17,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 // import ActivityCode
 // import testutils.MockBindDataMixin
 
-class PicklistControllerTests extends ControllerUnitTestCase{
+class PicklistControllerTests implements ControllerUnitTest{
 
   void testSave() {
         def picklist = new Picklist(id: "2345", version: 3)

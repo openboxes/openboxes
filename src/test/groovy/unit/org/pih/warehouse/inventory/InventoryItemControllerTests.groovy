@@ -1,8 +1,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import grails.test.ControllerUnitTestCase
-import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+import grails.testing.web.controllers.ControllerUnitTest
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.inventory.Inventory
@@ -11,7 +10,7 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.product.Product
 
-class InventoryItemControllerTests extends ControllerUnitTestCase {
+class InventoryItemControllerTests implements ControllerUnitTest {
 
     void test_showRecordInventory() {
 
