@@ -13,9 +13,8 @@ const getColor = () => {
 const LoadingCard = () => {
     return (
         <div className="loaderDiv">
-            <div>
-                <ReactLoading type="spin" color={getColor()} height={'60%'} width={'60%'} />
-            </div>
+            <ReactLoading type="bubbles" color={getColor()} height={'60%'} width={'60%'} />
+            <span className="subtitleLoader">Loading...</span>
         </div>
     );
 };

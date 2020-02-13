@@ -34,8 +34,7 @@ export default function (state = initialState, action) {
               lineTension: 0.4,
             }],
           },
-        },
-        {
+        }, {
           title: 'Fill rate',
           type: 'line',
           id: Math.random(),
@@ -75,8 +74,7 @@ export default function (state = initialState, action) {
               backgroundColor: '#004445',
             }],
           },
-        },
-        {
+        }, {
           title: 'Outgoing stock movements',
           type: 'numbers',
           id: Math.random(),
@@ -94,8 +92,7 @@ export default function (state = initialState, action) {
               subtitle: 'Created > 7 days ago'
             }
           },
-        },
-        {
+        }, {
           title: 'Inventory Summary',
           type: 'horizontalBar',
           id: Math.random(),
@@ -109,8 +106,7 @@ export default function (state = initialState, action) {
               ],
             }],
           },
-        },
-        {
+        }, {
           title: 'Sent stock movements',
           type: 'bar',
           id: Math.random(),
@@ -124,8 +120,7 @@ export default function (state = initialState, action) {
               barThickness: 35,
             }],
           },
-        },
-        {
+        }, {
           title: 'Stock movements received',
           type: 'doughnut',
           id: Math.random(),
@@ -139,8 +134,22 @@ export default function (state = initialState, action) {
               ]
             }],
           },
-        },
-        {
+        }, {
+          title: 'Stock movements received',
+          type: 'loading',
+          id: Math.random(),
+          data: {},
+        }, {
+          title: 'Stock movements received',
+          type: 'loading',
+          id: Math.random(),
+          data: {},
+        }, {
+          title: 'Stock movements received',
+          type: 'error',
+          id: Math.random(),
+          data: {},
+        }, {
           title: 'Stock movements received',
           type: 'loading',
           id: Math.random(),

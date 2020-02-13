@@ -73,8 +73,19 @@
     .loaderDiv {
       margin: auto;
       position: relative;
-      padding-left: 26%;
+      padding-left: 25%;
       padding-top: 1%;
+
+      .subtitleLoader {
+        padding-left: 22%;
+        padding-top: 30%;
+        font-size: 20px;
+      }
+    }
+
+    .errorDiv {
+      padding-left: 18%;
+      padding-top: 2%;
     }
 
     .gyrIndicator {
@@ -127,5 +138,18 @@
         }
       }
     }
+  }
+}
+
+.errorCard {
+  background-color: #fafafa;
+  color: #282d32;
+
+  .fa-repeat {
+    font-size: 200px;
+    margin: auto;
+    position: relative;
+    padding-left: 35%;
+    padding-top: 3%;
   }
 }

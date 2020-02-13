@@ -28,6 +28,17 @@ const Numbers = ({ data }) => (
     </div>
 );
 
+const ErrorCard = () => (
+    <div>
+        <i className="fa fa-repeat" />
+        <div className="errorDiv">
+            <br />
+            <span>This chart couldn't be loaded. Try reloading the page.</span>
+        </div>
+    </div>
+);
+
+let graphClass = "graphCard";
 const DragHandle = sortableHandle(() => <span className="dragHandler">::</span>);
 
 const GraphCard = SortableElement(({
@@ -36,21 +47,29 @@ const GraphCard = SortableElement(({
     let graph;
     if (cardType === 'line') {
         graph = <Line data={data} />;
+        graphClass = "graphCard";
     } else if (cardType === 'bar') {
-        graph = <Bar data={data} />
+        graph = <Bar data={data} />;
+        graphClass = "graphCard";
     } else if (cardType === 'doughnut') {
-        graph = <Doughnut data={data} />
+        graph = <Doughnut data={data} />;
+        graphClass = "graphCard";
     } else if (cardType === 'horizontalBar') {
         graph = <HorizontalBar data={data} />
     } else if (cardType === 'numbers') {
-        graph = <Numbers data={data} />
+        graph = <Numbers data={data} />;
+        graphClass = "graphCard";
     } else if (cardType === 'loading') {
-        graph = <LoadingCard data={data} />
+        graph = <LoadingCard />;
+        graphClass = "graphCard";
+    } else if (cardType === 'error') {
+        graph = <ErrorCard />;
+        graphClass = "graphCard errorCard";
     }
 
 
     return (
-        <div className="graphCard">
+        <div className={graphClass}>
             <div className="headerCard">
                 <span className="titleCard"> {cardTitle} </span>
                 <DragHandle />
