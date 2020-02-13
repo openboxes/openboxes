@@ -1,6 +1,6 @@
 package org.pih.warehouse.core
 
-import grails.test.GrailsUnitTestCase
+// import grails.test.GrailsUnitTestCase
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
@@ -8,7 +8,7 @@ import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 
-class UserServiceTests extends GrailsUnitTestCase {
+class UserServiceTests {
     def user1
     def user2
     def user3

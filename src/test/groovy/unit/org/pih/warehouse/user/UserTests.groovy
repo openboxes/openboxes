@@ -11,13 +11,15 @@ package org.pih.warehouse.user
 
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.User;
 // import java.util.Locale;
 
 import grails.test.*
 
-class UserTests extends GrailsUnitTestCase {
+@Ignore
+class UserTests {
 
 
 	@Before
