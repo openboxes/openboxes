@@ -234,6 +234,7 @@
                                             <table>
                                                 <thead>
                                                 <tr class="odd">
+                                                    <th><warehouse:message code="default.id.label"/></th>
                                                     <th><warehouse:message code="default.type.label"/></th>
                                                     <th><warehouse:message code="shipment.label"/></th>
                                                     <th><warehouse:message code="product.label"/></th>
@@ -244,6 +245,9 @@
                                                 <g:each var="shipmentItem" in="${orderInstance?.orderItems?.shipmentItems[0]}" status="i">
                                                     <tr>
                                                         <td>
+                                                            ${shipmentItem?.id}
+                                                        </td>
+                                                        <td>
                                                             <format:metadata obj="${shipmentItem?.shipment?.shipmentType}"/>
                                                         </td>
                                                         <td>
@@ -252,7 +256,6 @@
                                                         <td>
                                                             ${shipmentItem?.product?.productCode}
                                                             <format:product product="${shipmentItem?.product}"/>
-
                                                         </td>
                                                         <td>
                                                             ${shipmentItem?.quantity}

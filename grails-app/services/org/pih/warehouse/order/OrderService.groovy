@@ -317,13 +317,12 @@ class OrderService {
                             }
                         }
 
-                        shipmentInstance.shipmentItems.toArray().each { shipmentItem ->
+                        shipmentInstance.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
 
                             // Remove all order shipment records associated with this shipment item
-                            shipmentItem.orderShipments.toArray().each { orderShipment ->
-                                orderShipment.orderItem.removeFromOrderShipments(orderShipment)
-                                orderShipment.shipmentItem.removeFromOrderShipments(orderShipment)
-                                orderShipment.delete()
+                            shipmentItem.orderItems.toArray().each { OrderItem orderItem ->
+                                orderItem.removeFromShipmentItems(shipmentItem)
+                                shipmentItem.removeFromOrderItems(orderItem)
                             }
 
                             // Remove the shipment item from the shipment
