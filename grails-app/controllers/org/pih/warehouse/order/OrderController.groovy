@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentType
 import org.springframework.web.multipart.MultipartFile
 
 class OrderController {
@@ -28,6 +29,32 @@ class OrderController {
 
     def index = {
         redirect(action: "list", params: params)
+    }
+
+    def createShipment = {
+        def order = Order.get(params.id)
+
+        Shipment shipment = new Shipment()
+        shipment.shipmentType = ShipmentType.findByName("DEFAULT")
+        shipment.expectedShippingDate = new Date()
+        shipment.name = order.name
+        shipment.origin = order.origin
+        shipment.destination = order.destination
+
+        order.orderItems.each { OrderItem orderItem ->
+            ShipmentItem shipmentItem = new ShipmentItem()
+            shipmentItem.product = orderItem.product
+            shipmentItem.quantity = orderItem.quantity
+            orderItem.addToShipmentItems(shipmentItem)
+            shipment.addToShipmentItems(shipmentItem)
+        }
+        try {
+            shipment.save(flush:true)
+            flash.message = "Created shipment ${shipment.id}"
+        } catch (Exception e) {
+            log.error(e.message)
+        }
+        redirect(action: "show", id: params.id)
     }
 
     def list = {

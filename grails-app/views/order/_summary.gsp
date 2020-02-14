@@ -65,6 +65,12 @@
         <warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create purchase order" />
     </g:link>
 
+
+    <g:link controller="order" action="createShipment" id="${orderInstance?.id}" class="button">
+        <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+        <warehouse:message code="default.create.label" args="[g.message(code: 'shipment.label')]" default="Create shipment" />
+    </g:link>
+
     <div class="right">
 
         <g:if test="${orderInstance?.id}">

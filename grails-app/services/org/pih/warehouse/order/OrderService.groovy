@@ -171,11 +171,8 @@ class OrderService {
                 shipmentItem.quantity = orderItemCommand.quantityReceived
                 shipmentItem.recipient = orderCommand?.recipient
                 shipmentItem.inventoryItem = inventoryItem
+                shipmentItem.addToOrderItems(orderItemCommand?.orderItem)
                 shipmentInstance.addToShipmentItems(shipmentItem)
-
-                def orderShipment = new OrderShipment(shipmentItem: shipmentItem, orderItem: orderItemCommand?.orderItem)
-                shipmentItem.addToOrderShipments(orderShipment)
-                orderItemCommand?.orderItem.addToOrderShipments(orderShipment)
             }
         }
 
