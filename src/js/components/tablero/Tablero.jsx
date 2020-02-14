@@ -68,7 +68,7 @@ class Tablero extends Component {
             cardNumber={290}
             cardSubtitle={'Items received'} />
         </div>
-        <SortableCards data={this.props.indicatorsData} onSortEnd={this.props.reorderIndicators} axis="xy" useDragHandle />
+        <SortableCards data={this.props.indicatorsData} options="maintainAspectRatio : false" onSortEnd={this.props.reorderIndicators} axis="xy" useDragHandle />
       </div>
     );
   }

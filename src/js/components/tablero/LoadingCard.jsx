@@ -13,7 +13,7 @@ const getColor = () => {
 const LoadingCard = () => {
     return (
         <div className="loaderDiv">
-            <ReactLoading type="bubbles" color={getColor()} height={'60%'} width={'60%'} />
+            <ReactLoading type="bubbles" color={getColor()} height={'150px'} width={'150px'} />
         </div>
     );
 };
