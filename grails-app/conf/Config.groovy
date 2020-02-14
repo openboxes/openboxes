@@ -339,9 +339,9 @@ grails.plugins.raven.active = false
 grails.plugins.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PROJECT_ID}"
 
 // Additional columns for cycle count report
-openboxes.cycleCount.additionalColumns = []
+openboxes.cycleCount.additionalColumns = [:]
 
-// Acceptable values
+// Acceptable values - MUST be added to openboxes-config.groovy!
 //openboxes.cycleCount.additionalColumns = [
 //    "Column1": { obj -> return "string literal" },
 //    "Column2": { obj -> return "${obj.product.productCode}" },

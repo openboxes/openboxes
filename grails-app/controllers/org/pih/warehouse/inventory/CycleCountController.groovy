@@ -23,7 +23,7 @@ class CycleCountController {
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
 
-        List additionalColumns = grailsApplication.config.openboxes.cycleCount.additionalColumns
+        Map additionalColumns = grailsApplication.config.openboxes.cycleCount.additionalColumns
 
         List rows = binLocations.collect { row ->
             def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
