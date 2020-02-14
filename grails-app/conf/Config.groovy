@@ -338,6 +338,18 @@ openboxes.anonymize.enabled = false
 grails.plugins.raven.active = false
 grails.plugins.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PROJECT_ID}"
 
+// Additional columns for cycle count report
+openboxes.cycleCount.additionalColumns = []
+
+// Acceptable values
+//openboxes.cycleCount.additionalColumns = [
+//    "Column1": { obj -> return "string literal" },
+//    "Column2": { obj -> return "${obj.product.productCode}" },
+//    "Column3": { obj -> return "" },
+//    "Column4": { obj -> return null },
+//    "Column5": null,
+//]
+
 // Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
 openboxes.dashboard.column1.widgets = ["requisitionItemSummary", "requisitionSummary", "receiptSummary", "shipmentSummary", "indicatorSummary"]
 openboxes.dashboard.column2.widgets = ["binLocationSummary", "expiringSummary", "productSummary", "genericProductSummary",]
