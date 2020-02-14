@@ -47,13 +47,14 @@ class OrderItem implements Serializable {
 
     static mapping = {
         id generator: 'uuid'
+        shipmentItems joinTable: [name: 'order_shipment', key: 'order_item_id']
     }
 
     static transients = ["orderItemType"]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
 
-    static hasMany = [orderShipments: OrderShipment, orderItems: OrderItem]
+    static hasMany = [orderItems: OrderItem, shipmentItems: ShipmentItem]
 
     static constraints = {
         description(nullable: true)
@@ -78,15 +79,7 @@ class OrderItem implements Serializable {
     }
 
     Integer quantityFulfilled() {
-        def quantity = 0
-        try {
-            def shipmentItems = shipmentItems()
-            quantity = shipmentItems?.sum { it?.quantity }
-        }
-        catch (Exception e) {
-            log.error "Error calculating quantity fulfilled: " + e.message
-        }
-        return quantity ?: 0
+        return shipmentItems?.sum { it?.quantity } ?: 0
     }
 
     Integer quantityRemaining() {
@@ -113,17 +106,6 @@ class OrderItem implements Serializable {
      * @return
      */
     def shipmentItems() {
-        def shipmentItems = []
-        orderShipments?.each {
-            try {
-                def shipmentItem = ShipmentItem.get(it?.shipmentItem?.id)
-                if (shipmentItem) {
-                    shipmentItems << shipmentItem
-                }
-            } catch (Exception e) {
-                log.error "Error getting shipment items: " + e.message
-            }
-        }
         return shipmentItems
     }
 
@@ -134,18 +116,7 @@ class OrderItem implements Serializable {
      * @return
      */
     def listShipments() {
-        def shipments = []
-        orderShipments.each {
-            try {
-                def shipment = Shipment.get(it?.shipmentItem?.shipment?.id)
-                if (shipment) {
-                    shipments << shipment
-                }
-            } catch (Exception e) {
-                log.error "Error getting shipment: " + e.message
-            }
-        }
-        return shipments
+        return shipmentItems*.shipment
     }
 
     def totalPrice() {

@@ -171,11 +171,8 @@ class OrderService {
                 shipmentItem.quantity = orderItemCommand.quantityReceived
                 shipmentItem.recipient = orderCommand?.recipient
                 shipmentItem.inventoryItem = inventoryItem
+                shipmentItem.addToOrderItems(orderItemCommand?.orderItem)
                 shipmentInstance.addToShipmentItems(shipmentItem)
-
-                def orderShipment = new OrderShipment(shipmentItem: shipmentItem, orderItem: orderItemCommand?.orderItem)
-                shipmentItem.addToOrderShipments(orderShipment)
-                orderItemCommand?.orderItem.addToOrderShipments(orderShipment)
             }
         }
 
@@ -320,13 +317,12 @@ class OrderService {
                             }
                         }
 
-                        shipmentInstance.shipmentItems.toArray().each { shipmentItem ->
+                        shipmentInstance.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
 
                             // Remove all order shipment records associated with this shipment item
-                            shipmentItem.orderShipments.toArray().each { orderShipment ->
-                                orderShipment.orderItem.removeFromOrderShipments(orderShipment)
-                                orderShipment.shipmentItem.removeFromOrderShipments(orderShipment)
-                                orderShipment.delete()
+                            shipmentItem.orderItems.toArray().each { OrderItem orderItem ->
+                                orderItem.removeFromShipmentItems(orderItem)
+                                shipmentItem.removeFromOrderItems(orderItem)
                             }
 
                             // Remove the shipment item from the shipment
