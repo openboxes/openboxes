@@ -11,6 +11,35 @@ import './tablero.scss';
 // Disable charts legends by default.
 defaults.global.legend = false;
 
+const numberData = [
+  {
+    title: 'Bin Location Summary',
+    number: 2696,
+    subtitle: 'In stock',
+    id: Math.random()
+  }, {
+    title: 'Bin Location Summary',
+    number: 1082,
+    subtitle: 'Out of stock',
+    id: Math.random()
+  }, {
+    title: 'Stock Movements',
+    number: 468,
+    subtitle: 'Not shipped',
+    id: Math.random()
+  }, {
+    title: 'User Incomplete Tasks',
+    number: 188,
+    subtitle: 'Not completed',
+    id: Math.random()
+  }, {
+    title: 'Discrepancy',
+    number: 290,
+    subtitle: 'Items received',
+    id: Math.random()
+  },
+];
+
 const SortableCards = SortableContainer(({ data }) => (
   <div className="cardComponent">
     {data.map((value, index) => (
@@ -24,6 +53,19 @@ const SortableCards = SortableContainer(({ data }) => (
   </div>
 ));
 
+const NumberCardsRow = ({ data }) => (
+  <div className="cardComponent">
+    {data.map((value, index) => (
+      <NumberCard
+        key={`item-${value.id}`}
+        index={index}
+        cardTitle={value.title}
+        cardNumber={value.number}
+        cardSubtitle={value.subtitle} />
+    ))}
+  </div>
+);
+
 class Tablero extends Component {
   dataFetched = false;
 
@@ -35,10 +77,6 @@ class Tablero extends Component {
     this.fetchData();
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   console.log(nextProps);
-  // }
-
   fetchData() {
     this.props.fetchIndicators();
   }
@@ -46,29 +84,8 @@ class Tablero extends Component {
   render() {
     return (
       <div className="cardsContainer">
-        <div className="cardComponent">
-          <NumberCard
-            cardTitle={'Bin Location Summary'}
-            cardNumber={2696}
-            cardSubtitle={'In stock'} />
-          <NumberCard
-            cardTitle={'Bin Location Summary'}
-            cardNumber={1082}
-            cardSubtitle={'Out of stock'} />
-          <NumberCard
-            cardTitle={'Stock Movements'}
-            cardNumber={468}
-            cardSubtitle={'Not shipped'} />
-          <NumberCard
-            cardTitle={'User Incomplete Tasks'}
-            cardNumber={188}
-            cardSubtitle={'Not completed'} />
-          <NumberCard
-            cardTitle={'Discrepancy'}
-            cardNumber={290}
-            cardSubtitle={'Items received'} />
-        </div>
-        <SortableCards data={this.props.indicatorsData} options="maintainAspectRatio : false" onSortEnd={this.props.reorderIndicators} axis="xy" useDragHandle />
+        <NumberCardsRow data={numberData} />
+        <SortableCards data={this.props.indicatorsData} onSortEnd={this.props.reorderIndicators} axis="xy" useDragHandle />
       </div>
     );
   }
