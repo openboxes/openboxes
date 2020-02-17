@@ -229,23 +229,35 @@
 
                                     <div class="box">
                                         <h2><warehouse:message code="shipments.label"/></h2>
-
-                                        <g:if test="${orderInstance?.listShipments() }">
+                                        <g:if test="${orderInstance?.orderItems?.shipmentItems }">
                                             <table>
                                                 <thead>
                                                 <tr class="odd">
+                                                    <th><warehouse:message code="default.id.label"/></th>
                                                     <th><warehouse:message code="default.type.label"/></th>
-                                                    <th><warehouse:message code="default.name.label"/></th>
+                                                    <th><warehouse:message code="shipment.label"/></th>
+                                                    <th><warehouse:message code="product.label"/></th>
+                                                    <th><warehouse:message code="default.quantity.label"/></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <g:each var="shipmentInstance" in="${orderInstance?.listShipments()}" status="i">
+                                                <g:each var="shipmentItem" in="${orderInstance?.orderItems?.shipmentItems[0]}" status="i">
                                                     <tr>
                                                         <td>
-                                                            <format:metadata obj="${shipmentInstance?.shipmentType}"/>
+                                                            ${shipmentItem?.id}
                                                         </td>
                                                         <td>
-                                                            <g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">${shipmentInstance?.name }</g:link>
+                                                            <format:metadata obj="${shipmentItem?.shipment?.shipmentType}"/>
+                                                        </td>
+                                                        <td>
+                                                            <g:link controller="shipment" action="showDetails" id="${shipmentItem?.shipment?.id }">${shipmentItem?.shipment?.shipmentNumber} ${shipmentItem?.shipment?.name }</g:link>
+                                                        </td>
+                                                        <td>
+                                                            ${shipmentItem?.product?.productCode}
+                                                            <format:product product="${shipmentItem?.product}"/>
+                                                        </td>
+                                                        <td>
+                                                            ${shipmentItem?.quantity}
                                                         </td>
                                                     </tr>
                                                 </g:each>
