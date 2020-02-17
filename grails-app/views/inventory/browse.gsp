@@ -8,8 +8,8 @@
         <title><warehouse:message code="inventory.browse.label" default="Browse inventory"/></title>
     </head>
     <body>
-    
-    	
+
+
         <div class="body">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -24,22 +24,13 @@
 
             <div class="dialog">
 
+				<g:set var="pageParams" value="${pageScope.variables['params']}"/>
 	        	<g:set var="varStatus" value="${0}"/>
 	        	<g:set var="totalProducts" value="${0}"/>
-
                 <g:set var="maxResults" value="${(params.max as int)}"/>
-                <g:set var="showQuantity" value="${maxResults>0 && maxResults <= 100}"/>
-
-                <g:if test="${!showQuantity }">
-                    <div class="message">
-                        <warehouse:message code="inventory.tooManyProducts.message"></warehouse:message>
-                    </div>
-                </g:if>
-
-
                 <div class="yui-gf">
 					<div class="yui-u first">
-                        <g:render template="filters" model="[commandInstance:commandInstance, quickCategories:quickCategories]"/>
+                        <g:render template="filters" model="[commandInstance:commandInstance]"/>
                     </div>
 					<div class="yui-u">
 
@@ -47,7 +38,7 @@
                             <h2>
                                 <g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
                                 <g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
-                                <g:set var="totalResults" value="${numProducts }"/>
+                                <g:set var="totalResults" value="${commandInstance.totalCount }"/>
 
                                 <g:if test="${totalResults < rangeEnd || rangeEnd < 0}">
                                     <g:set var="rangeEnd" value="${totalResults }"/>
@@ -62,38 +53,33 @@
                                     "${commandInstance.searchTerms }"
                                 </g:if>
                             </h2>
+
                             <div id="tabs-1" style="padding: 0px;">
 					            <form id="inventoryBrowserForm" method="POST">
 					                <table id="inventoryBrowserTable" border="0">
-										<thead> 
+										<thead>
 				           					<tr>
 				           						<th>
-				           						
+
 				           						</th>
-				           						<th class="center middle">
-                                                   <g:render template="./actions" model="[]"/>
-				           						</th>
-												<th class="center middle" style="width: 1%">
-													<input type="checkbox" id="toggleCheckbox">
-												</th>
-												<th class="middle" style="width: 1%">
-													<g:message code="product.productCode.label"/>
-												</th>
+%{--				           						<th class="center middle">--}%
+%{--                                                   <g:render template="./actions" model="[]"/>--}%
+%{--				           						</th>--}%
+%{--												<th class="center middle" style="width: 1%">--}%
+%{--													<input type="checkbox" id="toggleCheckbox">--}%
+%{--												</th>--}%
 												<th class="middle">
-													<g:message code="product.name.label"/>
+													<g:message code="product.label"/>
 												</th>
                                                 <th class="middle">
                                                     <g:message code="category.label"/>
                                                 </th>
-												<th class="middle">
-													<g:message code="product.manufacturer.label"/>
-												</th>
-												<th class="middle">
-													<g:message code="product.brandName.label"/>
-												</th>
-												<th class="middle">
-													<g:message code="product.manufacturerCode.label"/>
-												</th>
+                                                <th class="middle">
+                                                    <g:message code="tag.label"/>
+                                                </th>
+                                                <th class="middle">
+                                                    <g:message code="productCatalog.label"/>
+                                                </th>
 												<th class="center" style="width: 7%;">
 													<g:message code="inventory.qtyin.label"/>
 												</th>
@@ -106,234 +92,96 @@
 				           					</tr>
 										</thead>
                                         <tbody>
-                                            <g:if test="${commandInstance?.categoryToProductMap}">
-                                                <g:set var="counter" value="${0 }"/>
-                                                <g:each var="entry" in="${commandInstance?.categoryToProductMap}" status="i">
-                                                   <g:set var="category" value="${entry.key }"/>
-                                                   <g:set var="categoryInventoryItems" value="${commandInstance?.categoryToProductMap[entry.key]}"/>
-                                                   <g:each var="inventoryItem" in="${categoryInventoryItems}" status="status">
-                                                       <g:if test="${inventoryItem.product }">
-                                                           <tr class="${counter%2==0?'even':'odd' } product prop">
-                                                               <td class="center middle">
-                                                                   <g:if test="${inventoryItem?.product?.images }">
-                                                                       <div class="nailthumb-container">
-                                                                           <g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
-                                                                           <img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
-                                                                       </div>
-                                                                   </g:if>
-                                                                   <g:else>
-                                                                       <div class="nailthumb-container">
-                                                                           <img src="${resource(dir: 'images', file: 'default-product.png')}" style="display:none" />
-                                                                       </div>
-                                                                   </g:else>
-                                                               </td>
-                                                               <td class="center middle">
-                                                                   <div class="action-menu hover">
-                                                                       <button class="action-btn">
-                                                                           <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
-                                                                                style="vertical-align: middle" />
-                                                                       </button>
-                                                                       <div class="actions left">
-                                                                           <div class="action-menu-info">
-                                                                               <table style="width: 600px">
-                                                                                   <tr>
-                                                                                       <td style="width: 100px;" class="center middle">
-                                                                                           <g:if test="${inventoryItem?.product?.images }">
-                                                                                               <div class="nailthumb-container-100">
-                                                                                                   <g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
-                                                                                                   <img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
-                                                                                               </div>
-                                                                                           </g:if>
-                                                                                           <g:else>
-                                                                                               <div class="nailthumb-container-100">
-                                                                                                   <img src="${resource(dir: 'images', file: 'default-product.png')}" style="display:none" />
-                                                                                               </div>
-                                                                                           </g:else>
+                                            <g:if test="${commandInstance?.searchResults}">
+												<g:each var="searchResult" in="${commandInstance?.searchResults}" status="i">
+													<tr class="${i%2?'even':'odd' }" style="color: ${searchResult.color}">
+														<td>
+															<g:if test="${searchResult?.product?.images }">
+															   <div class="nailthumb-container">
+																   <g:set var="image" value="${searchResult?.product?.images?.sort()?.first()}"/>
+																   <img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
+															   </div>
+														   </g:if>
+														   <g:else>
+															   <div class="nailthumb-container">
+																   <img src="${resource(dir: 'images', file: 'default-product.png')}" style="display:none" />
+															   </div>
+														   </g:else>
+														</td>
+														<td>
+															<g:link controller="inventoryItem" action="showStockCard" id="${searchResult?.product?.id}"
+																	style="color: ${searchResult.color}">
+																${searchResult?.product?.productCode}
+																${searchResult?.product?.name}
+														   	</g:link>
+														</td>
+														<td>
+															${searchResult?.product?.category?.name}
+														</td>
+														<td>
+															<g:each var="tag" in="${searchResult?.product?.tags}">
+																<div class="tag">
+																	<g:link controller="inventory" action="browse" params="${params + ['tags':tag.id]}">
+																		${tag.tag}
+																	</g:link>
+																</div>
+															</g:each>
+														</td>
+														<td>
+															<g:each var="catalog" in="${searchResult?.product?.productCatalogs}">
+																<div class="tag tag-info">
+																	<g:link controller="inventory" action="browse" params="${params + ['catalogs':catalog.id]}">
+																		${catalog.name}
+																	</g:link>
+																</div>
+															</g:each>
+														</td>
+														<td>
 
-                                                                                       </td>
-                                                                                       <td>
-                                                                                           <table>
-                                                                                               <tr>
-                                                                                                   <td>
-                                                                                                       <div class="title">
-                                                                                                           ${inventoryItem?.product?.productCode}
-                                                                                                           ${inventoryItem?.product?.name}
-                                                                                                       </div>
+														</td>
+														<td>
 
-                                                                                                   </td>
-                                                                                               </tr>
-                                                                                               <g:if test="${inventoryItem?.product?.productGroups }">
-                                                                                                   <tr>
-                                                                                                       <td>
-                                                                                                           <span style="text-transform:uppercase;" class="fade">
-                                                                                                               <format:category category="${inventoryItem?.product?.category }"/> &rsaquo;
-                                                                                                               ${inventoryItem?.product?.productGroups?.sort()?.first()?.name}
-                                                                                                           </span>
-                                                                                                       </td>
-                                                                                                   </tr>
-                                                                                               </g:if>
-                                                                                               <tr>
-                                                                                                   <td>
-                                                                                                       <p>${inventoryItem?.product?.description }</p>
-                                                                                                   </td>
-                                                                                               </tr>
-                                                                                           </table>
-                                                                                       </td>
-                                                                                   </tr>
-                                                                                   <tr>
-                                                                                       <td>
-
-                                                                                       </td>
-                                                                                       <td >
-                                                                                           <div class="button-group">
-                                                                                               <g:link class="button" controller="inventoryItem" action="showStockCard" params="['product.id': inventoryItem?.product?.id]">
-                                                                                                   <img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}"/>
-                                                                                                   <warehouse:message code="inventory.showStockCard.label"/>
-                                                                                               </g:link>
-                                                                                               <g:link class="button" controller="product" action="edit" id="${inventoryItem?.product?.id }">
-                                                                                                   <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-                                                                                                   <warehouse:message code="product.edit.label"/>
-                                                                                               </g:link>
-                                                                                               <g:link class="button" controller="inventoryItem" action="showTransactionLog" params="['product.id': inventoryItem?.product?.id, 'disableFilter':true]">
-                                                                                                   <img src="${resource(dir: 'images/icons/silk', file: 'chart_bar.png')}"/>
-                                                                                                   <warehouse:message code="inventory.showTransactionLog.label"/>
-                                                                                               </g:link>
-                                                                                           </div>
-                                                                                       </td>
-                                                                                   </tr>
-                                                                               </table>
-
-                                                                           </div>
-                                                                       </div>
-                                                                   </div>
-                                                               </td>
-                                                               <td class="middle center">
-                                                                   <g:checkBox id="${inventoryItem?.product?.id }" name="product.id"
-                                                                               class="checkbox" style="top:0em;" checked="${false }"
-                                                                               value="${inventoryItem?.product?.id }" />
-                                                               </td>
-                                                               <%--
-                                                           <td class="checkable center middle">
-                                                               <img src="${resource(dir: 'images/icons/inventoryStatus', file: inventoryItem?.inventoryLevel?.status?.name()?.toLowerCase() + '.png')}"
-                                                                   alt="${inventoryItem?.inventoryLevel?.status?.name() }" title="${inventoryItem?.inventoryLevel?.status?.name() }" style="vertical-align: middle;"/>
-
-                                                           </td>
-                                                               --%>
-                                                               <td class="checkable center middle">
-                                                                   <span class="fade">${inventoryItem?.product?.productCode }</span>
-                                                               </td>
-                                                               <td class="checkable left middle">
-                                                                   <g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]" fragment="inventory" style="z-index: 999">
-                                                                       <div title="${inventoryItem?.product?.description }" class="popover-trigger" data-id="${inventoryItem?.product?.id }">
-                                                                           <g:if test="${inventoryItem?.product?.name?.trim()}">
-                                                                               ${inventoryItem?.product?.name}
-                                                                           </g:if>
-                                                                           <g:else>
-                                                                               <warehouse:message code="product.untitled.label"/>
-                                                                           </g:else>
-                                                                       </div>
-
-                                                                   </g:link>
-                                                               </td>
-                                                               <td class="checkable middle">
-                                                                   ${inventoryItem?.product?.category}
-                                                               </td>
-                                                               <td class="checkable middle left">
-                                                                   <span class="fade">${inventoryItem?.product?.manufacturer }</span>
-                                                               </td>
-                                                               <td class="checkable middle left">
-                                                                   <span class="fade">${inventoryItem?.product?.brandName}</span>
-                                                               </td>
-                                                               <td class="checkable middle left">
-                                                                   <span class="fade">${inventoryItem?.product?.manufacturerCode }</span>
-                                                               </td>
-                                                               <td class="checkable middle center" style="width: 7%; border-left: 1px solid lightgrey;">
-
-                                                                   <g:if test="${!showQuantity }">
-
-                                                                   </g:if>
-                                                                   <g:elseif test="${inventoryItem?.supported && showQuantity }">
-                                                                   <%-- <g:formatNumber number="${inventoryItem?.quantityToReceive?:0}"/>--%>
-                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToReceive"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-                                                                   </g:elseif>
-                                                                   <g:else>
-                                                                       <span class="fade"><warehouse:message code="default.na.label"/></span>
-                                                                   </g:else>
-                                                               </td>
-                                                               <td class="checkable middle center" style="width: 7%; border-right: 1px solid lightgrey;">
-                                                                   <g:if test="${!showQuantity }">
-
-                                                                   </g:if>
-                                                                   <g:elseif test="${inventoryItem?.supported && showQuantity}">
-                                                                   <%-- <g:formatNumber number="${inventoryItem?.quantityToShip?:0}"/>--%>
-                                                                       <div data-product-id="${inventoryItem?.product?.id }" class="quantityToShip"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-                                                                   </g:elseif>
-                                                                   <g:else>
-                                                                       <span class="fade"><warehouse:message code="default.na.label"/></span>
-                                                                   </g:else>
-                                                               </td>
-                                                               <td class="checkable middle center" style="width: 7%;">
-
-                                                                   <g:if test="${!showQuantity }">
-                                                                       <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-                                                                           <warehouse:message code="default.clickToView.label"/>
-                                                                       </g:link>
-                                                                   </g:if>
-                                                                   <g:elseif test="${inventoryItem?.supported && showQuantity}">
-                                                                       <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-                                                                       <%-- <g:formatNumber number="${inventoryItem?.quantityOnHand?:0}"/>--%>
-                                                                           <div data-product-id="${inventoryItem?.product?.id }" class="quantityOnHand"><img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/></div>
-                                                                       </g:link>
-                                                                   </g:elseif>
-                                                                   <g:else>
-                                                                       <span class="fade"><warehouse:message code="default.na.label"/></span>
-                                                                   </g:else>
-                                                               </td>
-                                                           </tr>
-
-                                                       </g:if>
-                                                       <g:set var="counter" value="${counter+1 }"/>
-
-                                                   </g:each>
-                                                </g:each>
-										    </g:if>
-                                            <g:unless test="${commandInstance?.categoryToProductMap}">
+														</td>
+														<td class="center">
+															${searchResult?.quantityOnHand}
+														</td>
+													</tr>
+												</g:each>
+											</g:if>
+											<g:unless test="${commandInstance?.searchResults}">
 												<tr>
 													<td colspan="12" class="even center">
 														<div class="fade empty">
                                                             <warehouse:message code="inventory.searchNoMatch.message"
-                                                                               args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.categoryInstance)]"/>
+                                                                               args="[commandInstance?.searchTerms?:'',format.metadata(obj:commandInstance?.category)]"/>
 														</div>
 													</td>
 												</tr>
                                             </g:unless>
+
+
                                         </tbody>
 									</table>
 
-								</form>		
+								</form>
 							</div>
                             <div class="paginateButtons">
 
-                                <g:set var="pageParams"
-                                       value="${[tag: params.tag, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
-
-
-                                <g:paginate total="${numProducts}"
-                                            action="browse" max="${params.max}" params="${[tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}"/>
+                                <g:paginate total="${commandInstance?.totalCount}"
+                                            action="browse" max="${params.max}" params="${pageParams}"/>
 
                                 <div class="right">
                                     <warehouse:message code="inventory.browseResultsPerPage.label"/>:
-                                    <g:if test="${params.max != '10'}"><g:link action="browse" params="${[max:10, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
-                                    <g:if test="${params.max != '25'}"><g:link action="browse" params="${[max:25, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
-                                    <g:if test="${params.max != '50'}"><g:link action="browse" params="${[max:50, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
-                                    <g:if test="${params.max != '100'}"><g:link action="browse" params="${[max:100, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
-                                    <g:if test="${params.max != '-1'}"><g:link action="browse" params="${[max:-1, tags: params.tags, searchTerms: params.searchTerms, subcategoryId: params.subcategoryId].findAll {it.value}}">${warehouse.message(code:'default.all.label') }</g:link></g:if><g:else><span class="currentStep">${warehouse.message(code:'default.all.label') }</span></g:else>
+                                    <g:if test="${params.max != '10'}"><g:link action="browse" params="${pageParams + [max:10]}">10</g:link></g:if><g:else><span class="currentStep">10</span></g:else>
+                                    <g:if test="${params.max != '25'}"><g:link action="browse" params="${pageParams + [max:25]}">25</g:link></g:if><g:else><span class="currentStep">25</span></g:else>
+                                    <g:if test="${params.max != '50'}"><g:link action="browse" params="${pageParams + [max:50]}">50</g:link></g:if><g:else><span class="currentStep">50</span></g:else>
+                                    <g:if test="${params.max != '100'}"><g:link action="browse" params="${pageParams + [max:100]}">100</g:link></g:if><g:else><span class="currentStep">100</span></g:else>
                                 </div>
                             </div>
 						</div>
 
 					</div>
-				</div>    	
+				</div>
 			</div>
 		</div>
         <script src="${createLinkTo(dir:'js/jquery.nailthumb', file:'jquery.nailthumb.1.1.js')}" type="text/javascript" ></script>
@@ -353,7 +201,7 @@
 						return false;
 					}
 				);
-				
+
 				$("#toggleCheckbox").click(function(event) {
                     var checked = ($(this).attr("checked") == 'checked');
 		            $(".checkbox").attr("checked", checked);
@@ -362,16 +210,16 @@
 		    	$(".isRelated").hide();
 		    	$(".expandable").click(function(event) {
 			    	var isVisible = $(".productGroup-"+event.target.id).is(":visible");
-			    	if (isVisible) { 
+			    	if (isVisible) {
 				    	$("#productGroup-"+event.target.id).removeClass("showRelated");
 				    	$("#productGroup-"+event.target.id).addClass("hideRelated");
 				    }
-			    	else { 
+			    	else {
 				    	$("#productGroup-"+event.target.id).addClass("showRelated");
 				    	$("#productGroup-"+event.target.id).removeClass("hideRelated");
 			    	}
 		    		$(".productGroup-"+event.target.id).toggle();
-					
+
 		    	});
 
 		    	$('.nailthumb-container').nailthumb({ width : 20, height : 20 });
@@ -392,24 +240,24 @@
 		    	function refreshQuantity() {
 			    	$.each($(".quantityOnHand"), function(index, value) {
 						var productId = $(this).attr("data-product-id");
-						$(this).load('${request.contextPath}/json/getQuantityOnHand?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
+						$(this).load('${request.contextPath}/json/getQuantityOnHand?product.id='+productId+'&location.id=${session.warehouse.id}');
 			    	});
 
 			    	$.each($(".quantityToShip"), function(index, value) {
 						var productId = $(this).attr("data-product-id");
-						$(this).load('${request.contextPath}/json/getQuantityToShip?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
+						$(this).load('${request.contextPath}/json/getQuantityToShip?product.id='+productId+'&location.id=${session.warehouse.id}');
 			    	});
 
 			    	$.each($(".quantityToReceive"), function(index, value) {
 						var productId = $(this).attr("data-product-id");
-						$(this).load('${request.contextPath}/json/getQuantityToReceive?product.id='+productId+'&location.id=${session.warehouse.id}');									    		  
-			    	});			    	
+						$(this).load('${request.contextPath}/json/getQuantityToReceive?product.id='+productId+'&location.id=${session.warehouse.id}');
+			    	});
 		    	}
 				<g:if test="${showQuantity}">
 					refreshQuantity();
 				</g:if>
-			    
-			});	
+
+			});
 		</script>
     </body>
 </html>

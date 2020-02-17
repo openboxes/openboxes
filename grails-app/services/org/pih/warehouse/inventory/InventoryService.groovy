@@ -31,6 +31,7 @@ import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.util.DateUtil
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
@@ -199,20 +200,53 @@ class InventoryService implements ApplicationContextAware {
      * @param commandInstance
      * @return
      */
-    InventoryCommand browseInventory(InventoryCommand commandInstance) {
+    void browseInventory(InventoryCommand command) {
 
-        // add an inventory to this warehouse if it doesn't exist
-        if (!commandInstance?.warehouseInstance?.inventory) {
-            addInventory(commandInstance.warehouseInstance)
+        def currentDate = DateUtil.clearTime(new Date())
+        def startTime = System.currentTimeMillis()
+        def products = command?.searchPerformed ? getProducts(command) : []
+
+        // Define query parameters
+        def defaultParams = [location: command.location, date: currentDate]
+        def searchResultsQueryParams = defaultParams
+        def totalCountQueryParams = defaultParams
+
+        //
+        if (command.maxResults) searchResultsQueryParams += [max: command.maxResults as Integer, offset: command.offset as Integer]
+
+        // Define total count query
+        String totalCountQuery = "select count(distinct p) " +
+                        "from InventorySnapshot invsnap join invsnap.product p " +
+                        "where invsnap.location = :location " +
+                        "and invsnap.date = :date "
+
+        // Define search results query
+        String searchResultsQuery =
+                "select new map(p as product, sum(invsnap.quantityOnHand) as quantityOnHand) " +
+                        "from InventorySnapshot invsnap join invsnap.product p " +
+                        "where invsnap.location = :location " +
+                        "and invsnap.date = :date "
+
+        if (products) {
+            searchResultsQuery += "and p in (:products) "
+            searchResultsQueryParams += [products:products]
+            totalCountQuery += "and p in (:products)"
+            totalCountQueryParams += [products:products]
         }
 
-        // Get the selected category or use the root category
-        def rootCategory = productService?.getRootCategory()
-        commandInstance.categoryInstance = commandInstance?.categoryInstance ?: productService.getRootCategory()
+        searchResultsQuery += "group by p "
 
-        getCurrentInventory(commandInstance)
+        startTime = System.currentTimeMillis()
+        def totalCount = InventorySnapshot.executeQuery(totalCountQuery, totalCountQueryParams)
+        log.info ("totalCount: " + (System.currentTimeMillis()-startTime))
 
-        return commandInstance
+        startTime = System.currentTimeMillis()
+        def searchResults = InventorySnapshot.executeQuery(searchResultsQuery, searchResultsQueryParams)
+        log.info ("searchResults: " + (System.currentTimeMillis()-startTime))
+
+        log.info("searchResults: " + searchResults)
+        log.info("totalCount: " + totalCount)
+        command.searchResults = new PagedResultList(searchResults, totalCount[0] as Integer)
     }
 
     /**
@@ -220,94 +254,61 @@ class InventoryService implements ApplicationContextAware {
      * @param commandInstance
      * @return
      */
-    Map getCurrentInventory(InventoryCommand commandInstance) {
+    List searchProducts(InventoryCommand command) {
 
-        long initialStartTime = System.currentTimeMillis()
-        long startTime = System.currentTimeMillis()
-        log.debug "getCurrentInventory()"
-        def inventoryItemCommands = []
-        List categories = new ArrayList()
-        if (commandInstance?.subcategoryInstance) {
-            categories.add(commandInstance?.subcategoryInstance)
-        } else {
-            categories.add(commandInstance?.categoryInstance)
-        }
+        def categories = getExplodedCategories([command.category])
+        List searchTerms = (command?.searchTerms ? Arrays.asList(command?.searchTerms?.split(" ")) : null)
 
-        List searchTerms = (commandInstance?.searchTerms ? Arrays.asList(commandInstance?.searchTerms?.split(" ")) : null)
-        log.info "searchTerms = " + searchTerms
-        log.debug("get products: " + commandInstance?.warehouseInstance)
-        log.info "command.tag  = " + commandInstance.tags
-        log.info "command.catalog  = " + commandInstance.catalogs
-
-        def products = []
-
-        // User wants to view all products that match the given tag
-        if (commandInstance.tags) {
-            commandInstance.numResults = countProductsByTags(commandInstance.tags)
-            products = getProductsByTags(commandInstance.tags, commandInstance?.maxResults as int, commandInstance?.offset as int)
-        }
-
-        // User wants to view all products that match the given catalog
-        else if (commandInstance.catalogs) {
-            commandInstance.numResults = countProductsByCatalogs(commandInstance.catalogs)
-            products = getProductsByCatalogs(commandInstance.catalogs, commandInstance?.maxResults as int, commandInstance?.offset as int)
-        }
-
-        // User wants to view all products in the given shipment
-        else if (commandInstance.shipment) {
-            commandInstance.numResults = countProductsByShipment(commandInstance.shipment)
-            products = getProductsByShipment(commandInstance.shipment, commandInstance?.maxResults as int, commandInstance?.offset as int)
-        } else {
-            // Get all products, including hidden ones
-            def matchCategories = getExplodedCategories(categories)
-            log.info " * Get all categories: " + (System.currentTimeMillis() - startTime) + " ms"
-            startTime = System.currentTimeMillis()
-
-            products = getProductsByTermsAndCategories(searchTerms, matchCategories, commandInstance?.showHiddenProducts, commandInstance?.warehouseInstance.inventory, commandInstance?.maxResults, commandInstance?.offset)
-            log.info " * Get products by terms and categories: " + (System.currentTimeMillis() - startTime) + " ms"
-            startTime = System.currentTimeMillis()
-
-            commandInstance.numResults = products.totalCount
-
-            if (!commandInstance?.showHiddenProducts) {
-                products.removeAll(getHiddenProducts(commandInstance?.warehouseInstance))
+        // Only search if there are search terms otherwise the list of product IDs includes all products
+        def innerProductIds = !searchTerms ? [] : Product.createCriteria().list {
+            projections {
+                distinct 'id'
             }
-            log.info " * After removing all hidden products: " + (System.currentTimeMillis() - startTime) + " ms"
-            startTime = System.currentTimeMillis()
-
-        }
-        products = products?.sort() { map1, map2 -> map1.category <=> map2.category ?: map1.name <=> map2.name }
-        log.info "Sort products " + (System.currentTimeMillis() - startTime) + " ms"
-
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(commandInstance?.warehouseInstance?.inventory)?.groupBy {
-            it.productId
-        }
-        log.debug "Get inventory level map: " + (System.currentTimeMillis() - startTime) + " ms"
-        startTime = System.currentTimeMillis()
-
-        log.info "Products: " + products
-
-        products.each { product ->
-            def innerStartTime = System.currentTimeMillis()
-            def inventoryLevel = (inventoryLevelMap[product.id]) ? inventoryLevelMap[product.id][0] : null
-            if (inventoryLevel && inventoryLevel instanceof ArrayList) {
-                throw new Exception("Cannot have multiple inventory levels for a single product [" + product.productCode + ":" + product.name + "]: " + inventoryLevel)
+            and {
+                searchTerms.each { searchTerm ->
+                    or {
+                        ilike("name", "%" + searchTerm + "%")
+                        inventoryItems {
+                            ilike("lotNumber", "%" + searchTerm + "%")
+                        }
+                    }
+                }
             }
-            inventoryItemCommands << getInventoryItemCommand(product,
-                    commandInstance?.warehouseInstance?.inventory,
-                    inventoryLevel, 0, 0, 0, commandInstance?.showOutOfStockProducts)
-            log.info " * process product : " + (System.currentTimeMillis() - innerStartTime) + " ms"
         }
-        log.info " * process on hand quantity: " + (System.currentTimeMillis() - startTime) + " ms"
-        startTime = System.currentTimeMillis()
+
+        def searchProductsQuery = {
+            and {
+                'in'("category", categories)
+                if (command.tags) {
+                    tags {
+                        'in'("id", command.tags*.id)
+                    }
+                }
+                if (command.catalogs) {
+                    productCatalogItems {
+                        productCatalog {
+                            'in'("id", command.catalogs*.id)
+                        }
+                    }
+                }
+                if (innerProductIds) {
+                    'in'("id", innerProductIds)
+                }
+            }
+        }
 
 
-        commandInstance?.categoryToProductMap = getProductMap(inventoryItemCommands)
+        def listPaginatedProductsQuery = {
+            searchProductsQuery.delegate = delegate
+            searchProductsQuery()
+            maxResults command.maxResults
+            firstResult command.offset
+        }
 
-        log.info " * Get category to product map: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        log.info "Total time - Get current inventory: " + (System.currentTimeMillis() - initialStartTime) + " ms"
-        return commandInstance?.categoryToProductMap
+        def totalCount = Product.createCriteria().count(searchProductsQuery)
+        def productIds = Product.createCriteria().list(listPaginatedProductsQuery)
+        def products = productIds ? Product.getAll(productIds*.id) : []
+        return new PagedResultList(products, totalCount)
     }
 
 
@@ -331,28 +332,6 @@ class InventoryService implements ApplicationContextAware {
         inventoryItemCommand.category = productGroup.category
 
         return inventoryItemCommand
-    }
-
-    /**
-     *
-     * @param inventoryCommand
-     * @return
-     */
-    Set<ProductGroup> getProductGroups(InventoryCommand inventoryCommand) {
-        List categoryFilters = new ArrayList()
-        if (inventoryCommand?.subcategoryInstance) {
-            categoryFilters.add(inventoryCommand?.subcategoryInstance)
-        } else {
-            categoryFilters.add(inventoryCommand?.categoryInstance)
-        }
-
-        List searchTerms = (inventoryCommand?.searchTerms ? Arrays.asList(inventoryCommand?.searchTerms.split(" ")) : null)
-
-        def productGroups = getProductGroups(inventoryCommand?.warehouseInstance, searchTerms, categoryFilters,
-                inventoryCommand?.showHiddenProducts)
-
-        productGroups = productGroups?.sort() { it?.name }
-        return productGroups
     }
 
     /**
@@ -2399,9 +2378,7 @@ class InventoryService implements ApplicationContextAware {
      * @return
      */
     def getTransactionEntries(Location location, Category category, Date startDate, Date endDate) {
-        def categories = []
-        categories << category
-        def matchCategories = getExplodedCategories(categories)
+        def matchCategories = getExplodedCategories([category])
         return getTransactionEntries(location, matchCategories, startDate, endDate)
 
     }

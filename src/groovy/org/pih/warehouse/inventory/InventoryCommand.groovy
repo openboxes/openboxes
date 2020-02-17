@@ -9,55 +9,48 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.shipping.Shipment
+
 class InventoryCommand {
 
-    def shipment
-    def warehouseInstance                                // warehouseInstance
-    def searchTerms                                    // request-level search terms
-    def categoryInstance                                // categoryInstance
-    def subcategoryInstance
-    // child category to show within the categoryInstance
+    List<Tag> tags
+    List<ProductCatalog> catalogs
+    Shipment shipment
+    Category category
+    Location location
+    String searchTerms
+    List searchResults = []
 
-    // InventoryItemCommand objects
-    def inventoryItems
-
-    // Product groups
-    def productGroups
-
-    def showHiddenProducts = Boolean.FALSE
     // indicates whether to display hidden products
-    def showUnsupportedProducts = Boolean.FALSE
+    def showHiddenProducts = Boolean.FALSE
     // indicates whether unsupported products for the warehouse should be included
-    def showNonInventoryProducts = Boolean.FALSE
+    def showUnsupportedProducts = Boolean.FALSE
     // indicates whether non-inventory products for the warehouse should be included
-    def showOutOfStockProducts = Boolean.TRUE
+    def showNonInventoryProducts = Boolean.FALSE
     // indicates whether out of stock products for the warehouse should be included
-    def categoryToProductMap = {}
+    def showOutOfStockProducts = Boolean.TRUE
+
     // all of the resulting ProductCommands above, organized by Category
     Boolean searchPerformed = Boolean.FALSE
 
-    def maxResults = 0
-    def offset = 0
-    def numResults = 0
+    Integer offset = 0
+    Integer maxResults = 0
+    Integer totalCount = 0
 
-    // Tags
-    List tags
-    // Catalogs
-    List catalogs
 
     static constraints = {
         shipment(nullable: true)
-        warehouseInstance(nullable: true)
+        location(nullable: true)
         searchTerms(nullable: true)
-        categoryInstance(nullable: true)
-        subcategoryInstance(nullable: true)
+        category(nullable: true)
         showHiddenProducts(nullable: true)
         showUnsupportedProducts(nullable: true)
         showNonInventoryProducts(nullable: true)
         showOutOfStockProducts(nullable: true)
-        categoryToProductMap(nullable: true)
-        inventoryItems(nullable: true)
-        productGroups(nullable: true)
         searchPerformed(nullable: true)
     }
 }
