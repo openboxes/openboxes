@@ -33,6 +33,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.reporting.Indicator
 import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.requisition.Requisition
@@ -1686,6 +1687,23 @@ class JsonController {
         Location location = Location.get(session.warehouse.id)
         def demandData = forecastingService.getDemand(location, product)
         render demandData as JSON
+    }
+
+    def productChanged = {
+        Product product = Product.get(params.productId)
+        def productSuppliers = []
+        if (product != null) {
+            productSuppliers = ProductSupplier.findAllByProduct(product)
+        }
+        render g.select(id:'productSupplier', name:'productSupplier.id', from: productSuppliers, optionKey:'id', optionValue: { it.code }, noSelection:['':''])
+    }
+
+    def productSupplierChanged = {
+        ProductSupplier productSupplier = ProductSupplier.findById(params.productSupplierId)
+
+        render([supplierCode: productSupplier.supplierCode,
+                manufacturer: g.selectOrganization(id:'manufacturer', name:'manufacturer', roleTypes:[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER], noSelection:['':''], value:productSupplier?.manufacturer?.id),
+                manufacturerCode: productSupplier.manufacturerCode] as JSON)
     }
 }
 
