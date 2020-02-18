@@ -1,4 +1,4 @@
-import { addTranslationForLanguage } from 'react-localize-redux';
+import { addTranslationForLanguage } from "react-localize-redux";
 
 import {
   SHOW_SPINNER,
@@ -13,97 +13,94 @@ import {
   ADD_TO_INDICATORS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS
-} from './types';
-import apiClient, { parseResponse } from '../utils/apiClient';
-
+} from "./types";
+import apiClient, { parseResponse } from "../utils/apiClient";
 
 export function showSpinner() {
   return {
     type: SHOW_SPINNER,
-    payload: true,
+    payload: true
   };
 }
 
 export function hideSpinner() {
   return {
     type: HIDE_SPINNER,
-    payload: false,
+    payload: false
   };
 }
 
 export function fetchReasonCodes() {
-  const url = '/openboxes/api/reasonCodes';
+  const url = "/openboxes/api/reasonCodes";
   const request = apiClient.get(url);
 
   return {
     type: FETCH_REASONCODES,
-    payload: request,
+    payload: request
   };
 }
 
 export function fetchUsers() {
-  const url = '/openboxes/api/generic/person';
+  const url = "/openboxes/api/generic/person";
   const request = apiClient.get(url);
 
   return {
     type: FETCH_USERS,
-    payload: request,
+    payload: request
   };
 }
 
 export function fetchSessionInfo() {
-  const url = '/openboxes/api/getAppContext';
+  const url = "/openboxes/api/getAppContext";
   const request = apiClient.get(url);
 
   return {
     type: FETCH_SESSION_INFO,
-    payload: request,
+    payload: request
   };
 }
 
 export function changeCurrentLocation(location) {
-  return (dispatch) => {
+  return dispatch => {
     const url = `/openboxes/api/chooseLocation/${location.id}`;
 
-    apiClient.put(url)
-      .then(() => {
-        dispatch({
-          type: CHANGE_CURRENT_LOCATION,
-          payload: location,
-        });
+    apiClient.put(url).then(() => {
+      dispatch({
+        type: CHANGE_CURRENT_LOCATION,
+        payload: location
       });
+    });
   };
 }
 
 export function fetchTranslations(lang, prefix) {
-  return (dispatch) => {
-    const url = `/openboxes/api/localizations?lang=${lang || ''}&prefix=react.${prefix || ''}`;
+  return dispatch => {
+    const url = `/openboxes/api/localizations?lang=${lang ||
+      ""}&prefix=react.${prefix || ""}`;
 
-    apiClient.get(url)
-      .then((response) => {
-        const { messages, currentLocale } = parseResponse(response.data);
+    apiClient.get(url).then(response => {
+      const { messages, currentLocale } = parseResponse(response.data);
 
-        dispatch(addTranslationForLanguage(messages, currentLocale));
+      dispatch(addTranslationForLanguage(messages, currentLocale));
 
-        dispatch({
-          type: TRANSLATIONS_FETCHED,
-          payload: prefix,
-        });
+      dispatch({
+        type: TRANSLATIONS_FETCHED,
+        payload: prefix
       });
+    });
   };
 }
 
 export function changeCurrentLocale(locale) {
-  return (dispatch) => {
+  return dispatch => {
     const url = `/openboxes/api/chooseLocale/${locale}`;
 
-    apiClient.put(url)
-      .then(() => {
-        dispatch({
-          type: CHANGE_CURRENT_LOCALE,
-          payload: locale,
-        });
+    apiClient.put(url).then(() => {
+      dispatch({
+        type: CHANGE_CURRENT_LOCALE,
+        payload: locale
       });
+    });
   };
 }
 
@@ -116,19 +113,19 @@ export function fetchIndicators() {
 export function addToIndicators(element) {
   return {
     type: ADD_TO_INDICATORS,
-    payload: element,
+    payload: element
   };
 }
 
-export function reorderIndicators({oldIndex, newIndex}, e) {
-  if (e.target.id === 'delete') {
+export function reorderIndicators({ oldIndex, newIndex }, e) {
+  if (e.target.id === "archive") {
     return {
       type: REMOVE_FROM_INDICATORS,
-      payload: { index: oldIndex },
+      payload: { index: oldIndex }
     };
   }
   return {
     type: REORDER_INDICATORS,
-    payload: { oldIndex, newIndex },
+    payload: { oldIndex, newIndex }
   };
 }
