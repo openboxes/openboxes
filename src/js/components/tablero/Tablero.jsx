@@ -116,25 +116,41 @@ class Tablero extends Component {
 
   handle = () => {
     hideArchive = false;
-    //console.log(hideArchive);
+    console.log(hideArchive);
   };
 
   onDragStart = (ev, id) => {
     hideArchive = !hideArchive;
-    //console.log("dragstart: ", id);
+    console.log("dragstart: ", id);
     //ev.dataTransfer.setData("text/plain", id);
   };
 
   onDragOver = ev => {
-    //console.log("dragOver: ", ev);
+    console.log("dragOver: ", ev);
     ev.preventDefault();
   };
 
   onDrop = (ev, cat) => {
     let id = ev.dataTransfer.getData("text");
 
-    //console.log("Dropped:", id, cat);
+    console.log("Dropped:", id, cat);
     hideArchive = !hideArchive;
+  };
+
+  sortStartHandle = () => {
+    console.log("start");
+    //hideArchive = false;
+  };
+  sortMoveHandle = () => {
+    console.log("move");
+    //hideArchive = false;
+  };
+  sortEndHandle = () => {
+    console.log("end");
+    //hideArchive = true;
+  };
+  sortOverHandle = () => {
+    console.log("sortOver");
   };
 
   render() {
@@ -143,14 +159,20 @@ class Tablero extends Component {
         <NumberCardsRow data={numberData} />
         <SortableCards
           data={this.props.indicatorsData}
-          onSortEnd={this.props.reorderIndicators}
+          onSortStart={this.sortStartHandle()}
+          onSortMove={this.sortMoveHandle()}
+          onSortEnd={(this.sortEndHandle(), this.props.reorderIndicators)}
           handle={this.handle}
           axis="xy"
           useDragHandle
           onDragStartHandle={this.onDragStart}
           distance={1}
         />
-        <ArchiveIndicator hideArchive={hideArchive} />
+        <ArchiveIndicator
+          hideArchive={hideArchive}
+          onSortOver={this.sortOverHandle()}
+          onDrop={this.onDrop}
+        />
         <div className="unarchive">
           <span>Unarchive indicator (2) </span>
           <i className="fa fa-archive"></i>
