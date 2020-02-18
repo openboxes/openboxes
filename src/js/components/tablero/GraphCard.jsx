@@ -3,6 +3,8 @@ import React from 'react';
 import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 
+import { loadColors } from '../../../assets/dataFormat/dataLoading'
+
 const Numbers = ({ data }) => (
     <div className="gyrIndicator">
         <div className="numberIndicator">
@@ -33,12 +35,18 @@ const GraphCard = SortableElement(({
 }) => {
     let graph;
     if (cardType === 'line') {
+        data['datasets'][0] = loadColors(data, "line");
         graph = <Line data={data} />;
-    } else if (cardType === 'bar') {
+    }
+     
+    else if (cardType === 'bar') {
+        data['datasets'][0] = loadColors(data, "bar");
         graph = <Bar data={data} />
     } else if (cardType === 'doughnut') {
+        data['datasets'][0] = loadColors(data, "doughnut");
         graph = <Doughnut data={data} />
     } else if (cardType === 'horizontalBar') {
+        data['datasets'][0] = loadColors(data, "horizontalBar");
         graph = <HorizontalBar data={data} />
     } else if (cardType === 'numbers') {
         graph = <Numbers data={data} />
