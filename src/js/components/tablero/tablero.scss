@@ -2,6 +2,49 @@
   background-color: #fbfbfb;
 }
 
+.archiveDiv {
+  position: fixed;
+  width: 100%;
+  text-align: center;
+  padding: 5% 0 35px 0;
+  bottom: 0;
+  background-image: linear-gradient(transparent, rgb(255, 188, 188));
+  font-size: 20px;
+  color: #aa0f0f;
+  animation-name: comeIn;
+  animation-duration: 600ms;
+}
+
+.hideArchive {
+  bottom: -200px;
+  animation-name: comeOut;
+  animation-duration: 600ms;
+}
+
+@keyframes comeIn {
+  from {
+    bottom: -200;
+  }
+
+  to {
+    bottom: 0;
+  }
+}
+
+@keyframes comeOut {
+  from {
+    bottom: 0;
+  }
+
+  to {
+    bottom: -200;
+  }
+}
+
+.archiveDiv:hover {
+  background-image: linear-gradient(transparent, rgb(228, 128, 128));
+}
+
 .cardsContainer {
   .numberCardComponent {
     padding-left: 4%;
@@ -202,4 +245,10 @@
     position: relative;
     padding: 19% 40%;
   }
+}
+
+.unarchive {
+  padding-left: 4%;
+  margin: 25px 0 30px 0;
+  color: #818181;
 }
