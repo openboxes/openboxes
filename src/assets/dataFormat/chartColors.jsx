@@ -25,4 +25,41 @@ const doughnutChart = {
       ]
 }
 
-export { colorLineChart, colorBarChart, colorHorizontalBarChart, doughnutChart} ; 
+const graphMultipleChart0 = {
+        borderColor: '#fcc169',
+        pointBorderColor: '#fcc169',
+        pointBorderWidth: 3,
+        pointBackgroundColor: '#fcc169',
+        pointHoverBackgroundColor: '#fcc169',
+        pointHoverBorderColor: '#fcc169',
+        pointHoverBorderWidth: 6
+}
+
+const graphMultipleChart1 = {
+    borderColor: '#ee4540',
+    pointBorderColor: '#ee4540',
+    pointBorderWidth: 3,
+    pointBackgroundColor: '#ee4540',
+    pointHoverBackgroundColor: '#ee4540',
+    pointHoverBorderColor: '#ee4540',
+    pointHoverBorderWidth: 6
+}
+
+const graphMultipleChart2 = {
+    backgroundColor: '#6fb98f',
+}
+
+const graphMultipleChart3 = {
+    backgroundColor: '#004445',
+}
+
+export { 
+colorLineChart,
+colorBarChart, 
+colorHorizontalBarChart,
+doughnutChart,
+graphMultipleChart0,
+graphMultipleChart1,
+graphMultipleChart2,
+graphMultipleChart3
+} ; 

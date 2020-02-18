@@ -44,20 +44,20 @@ const GraphCard = SortableElement(({
 }) => {
     let graph;
     if (cardType === 'line') {
-        data['datasets'][0] = loadColors(data, "line");
+        data['datasets'] = loadColors(data, "line");
         graph = <Line data={data} />;
         graphClass = "graphCard";
     } else if (cardType === 'bar') {
-        data['datasets'][0] = loadColors(data, "bar");
+        data['datasets'] = loadColors(data, "bar");
         graph = <Bar data={data} />;
         graphClass = "graphCard";
     } else if (cardType === 'doughnut') {
-        data['datasets'][0] = loadColors(data, "doughnut");
+        data['datasets'] = loadColors(data, "doughnut");
         graph = <Doughnut data={data} />;
         graphClass = "graphCard";
     }
     else if (cardType === 'horizontalBar') {
-        data['datasets'][0] = loadColors(data, "horizontalBar");
+        data['datasets'] = loadColors(data, "horizontalBar");
         graph = <HorizontalBar data={data} />
     } else if (cardType === 'numbers') {
         graph = <Numbers data={data} />;
