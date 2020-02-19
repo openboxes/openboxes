@@ -7,24 +7,28 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.core
+package unit.org.pih.warehouse.core
 
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.domain.DomainClassUnitTestMixin
 import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationController
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
+import org.springframework.mock.web.MockMultipartFile
+import spock.lang.Specification
 
-// import Location;
-import org.pih.warehouse.inventory.InventoryService;
+@TestFor(LocationController)
+@Mock([Location, LocationService])
+@TestMixin(DomainClassUnitTestMixin)
+class LocationControllerTests extends Specification {
+	def stubMessager = new Expando()
 
-import grails.testing.web.controllers.ControllerUnitTest
-// import grails.converters.JSON
-
-class LocationControllerTests implements ControllerUnitTest {
-
-	protected void setUp() {
-		super.setUp()
+	void setup() {
 		def depot = new LocationType(id: "1", name: "Depot")
 		def ward = new LocationType(id: "2", name: "Ward")
 		def boston = new LocationGroup(id: "boston", name: "Boston")
@@ -39,87 +43,75 @@ class LocationControllerTests implements ControllerUnitTest {
 		mockDomain(LocationType, [depot, ward])
 		mockDomain(LocationGroup, [boston, mirebalais])
 
-		def locationServiceMock = mockFor(LocationService)
-		locationServiceMock.demand.getLocations { locationType, locationGroup, query, max, offset ->
-            println "Get locations"
-            if (query=="Bos") {
-                return new PagedResultList([Location.get(1)], 1)
-            }
-			return new PagedResultList(Location.list(), 4)
-		}
-
-		controller.locationService = locationServiceMock.createMock()
-		
-		depot = LocationType.get("1")
-		assertNotNull depot
+		controller.inventoryService = [
+				getLocation: { locationId -> Location.get(locationId) },
+				saveLocation: { location -> location }
+		]
 	}
 
-	protected void tearDown() {
-		super.tearDown()
-	}
-
-	void test_index_shouldRedirectToList() {
+	void "test index shouldRedirectToList"() {
+		when:
 		controller.index()
-		assertEquals "list", controller.redirectArgs["action"]
+
+		then:
+		response.redirectedUrl == '/location/list'
 	}
 
-	void test_list_shouldListAllLocations() {
+	void "test list shouldListAllLocations"() {
+		when:
 		def model = controller.list()
-		assertEquals 4, model["locationInstanceList"].size()
-		assertEquals 4, model["locationInstanceTotal"]
+
+		then:
+		model.locationInstanceList.size() == 4
+		model.locationInstanceTotal == 4
 	}
 
-	void test_list_shouldListLocationsMatchingQuery() {
-		this.controller.params.q = "Bos"
+	void "test list should list locations matching LocationType 1 and query param"() {
+		when:
+		controller.params.q = "Bos"
+		controller.params.locationType = "1"
 		def model = controller.list()
-		assertEquals 1, model["locationInstanceList"].size()
-		assertEquals 1, model["locationInstanceTotal"]
+
+		then:
+		model.locationInstanceList.size() == 1
+		model.locationInstanceTotal == 1
 	}
 
-	/*
-	void test_list_shouldListLocationsMatchingLocationType() { 
-		this.controller.params["locationType"] = "1"
-		def model = controller.list()
-		assertEquals 3, model["locationInstanceList"].size()
-		assertEquals 3, model["locationInstanceTotal"]
+	void "test show shouldIncludeLocationInModel"() {
+		when:
+		controller.params.id = "1"
+		def model = controller.show()
 
-		this.controller.params["locationType"] = "2"
-		model = controller.list()
-		assertEquals 1, model["locationInstanceList"].size()
-		assertEquals 1, model["locationInstanceTotal"]
+		then:
+		model.locationInstance.name == "Boston"
 
-		this.controller.params["q"] = "Bos"
-		this.controller.params["locationType"] = "1"
-		model = controller.list()
-		assertEquals 1, model["locationInstanceList"].size()
-		assertEquals 1, model["locationInstanceTotal"]
 	}
-	*/
-		
-	void test_show_shouldIncludeLocationInModel() {
-		// Mock the inventory service.
-		//def location = new Location(id: 1, name: "Boston", locationType: depot)
-		//assertTrue location.validate()
-		def inventoryControl = mockFor(InventoryService)
-		inventoryControl.demand.getLocation(1..1) { locationId -> Location.get(locationId) }
 
-		// 	Initialise the service and test the target method.
-		this.controller.inventoryService = inventoryControl.createMock()
-		this.controller.params.id = "1"
-		def model = this.controller.show()
-		assertEquals "Boston", model["locationInstance"]?.name
-		
+	void "test uploadLogo action should render uploadLogo view if wrong content is sent"() {
+		when:
+		stubMessager.message = { args -> return "wrong content" }
+		controller.metaClass.warehouse = stubMessager
+		controller.params.id = "1"
+		controller.request.addFile(new MockMultipartFile('logo', 'logo.jpg', 'wrong content type', "1234567" as byte[]))
+		controller.request.method = "POST"
+		controller.uploadLogo()
+
+		then:
+		view == '/location/uploadLogo'
+		model.locationInstance.name == "Boston"
 	}
-	
-	/*
-	void test_uploadLogo_shouldDoSomething() { 
-		this.controller.params.id = "1"
-		def model = this.controller.uploadLogo()
-		
-		
-		println model 		
-	}	
-	*/
 
+	void "test uploadLogo action should render uploadLogo view if proper file is sent"() {
+		when:
+		stubMessager.message = { args -> return "wrong content" }
+		controller.metaClass.warehouse = stubMessager
+		controller.params.id = "1"
+		controller.request.addFile(new MockMultipartFile('logo', 'logo.jpg', 'image/jpeg', "1234567" as byte[]))
+		controller.request.method = "POST"
+		controller.uploadLogo()
 
+		then:
+		response.redirectedUrl.startsWith('/location/show/')
+		flash.message != null
+	}
 }
