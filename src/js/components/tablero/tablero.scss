@@ -11,34 +11,11 @@
   background-image: linear-gradient(transparent, rgb(255, 188, 188));
   font-size: 20px;
   color: #aa0f0f;
-  animation-name: comeIn;
-  animation-duration: 700ms;
+  transition: 0.8s ease;
 }
 
 .hideArchive {
-  bottom: -200px;
-  animation-name: comeOut;
-  animation-duration: 1s;
-}
-
-@keyframes comeIn {
-  from {
-    bottom: -200;
-  }
-
-  to {
-    bottom: 0;
-  }
-}
-
-@keyframes comeOut {
-  from {
-    bottom: 0px;
-  }
-
-  to {
-    bottom: -200;
-  }
+  bottom: -200 !important;
 }
 
 .archiveDiv:hover {

@@ -74,6 +74,9 @@ class Tablero extends Component {
     this.setState({ isDragging: true });
   };
   sortEndHandle = ({ oldIndex, newIndex }, e) => {
+    if (e.clientY > 850) {
+      e.target.id = "archive";
+    }
     this.props.reorderIndicators({ oldIndex, newIndex }, e);
     this.setState({ isDragging: false });
   };
@@ -85,15 +88,11 @@ class Tablero extends Component {
         <SortableCards
           data={this.props.indicatorsData}
           onSortStart={this.sortStartHandle}
-          //onSortMove={this.sortMoveHandle}
           onSortEnd={this.sortEndHandle}
           axis="xy"
           useDragHandle
         />
-        <ArchiveIndicator
-          hideArchive={!this.state.isDragging}
-          //onSortOver={this.sortOverHandle}
-        />
+        <ArchiveIndicator hideArchive={!this.state.isDragging} />
         <div className="unarchive">
           <span>Unarchive indicator (2) </span>
           <i className="fa fa-archive"></i>
