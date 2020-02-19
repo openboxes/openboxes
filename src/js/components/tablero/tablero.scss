@@ -12,13 +12,13 @@
   font-size: 20px;
   color: #aa0f0f;
   animation-name: comeIn;
-  animation-duration: 600ms;
+  animation-duration: 700ms;
 }
 
 .hideArchive {
   bottom: -200px;
   animation-name: comeOut;
-  animation-duration: 600ms;
+  animation-duration: 1s;
 }
 
 @keyframes comeIn {
@@ -33,7 +33,7 @@
 
 @keyframes comeOut {
   from {
-    bottom: 0;
+    bottom: 0px;
   }
 
   to {

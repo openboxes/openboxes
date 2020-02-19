@@ -36,62 +36,49 @@ const ErrorCard = () => (
   </div>
 );
 
-const DragHandle = sortableHandle(({ onDragStartHandle, cardTitle }) => (
-  <span
-    draggable
-    className="dragHandler"
-    onMouseDown={e => onDragStartHandle(e, cardTitle)}
-  >
-    ::
-  </span>
+const DragHandle = sortableHandle(() => (
+  <span className="dragHandler">::</span>
 ));
 
 let graphClass = "graphCard";
-const GraphCard = SortableElement(
-  ({ cardTitle, cardType, data, onDragStartHandle }) => {
-    let graph;
-    if (cardType === 'line') {
-        data['datasets'] = loadColors(data, "line");
-        graph = <Line data={data} />;
-        graphClass = "graphCard";
-    } else if (cardType === 'bar') {
-        data['datasets'] = loadColors(data, "bar");
-        graph = <Bar data={data} />;
-        graphClass = "graphCard";
-    } else if (cardType === 'doughnut') {
-        data['datasets'] = loadColors(data, "doughnut");
-        graph = <Doughnut data={data} />;
-        graphClass = "graphCard";
-    }
-    else if (cardType === 'horizontalBar') {
-        data['datasets'] = loadColors(data, "horizontalBar");
-        graph = <HorizontalBar data={data} />
-    } else if (cardType === 'numbers') {
-        graph = <Numbers data={data} />;
-        graphClass = "graphCard";
-    } else if (cardType === 'loading') {
-        graph = <LoadingCard />;
-        graphClass = "graphCard";
-    } else if (cardType === 'error') {
-        graph = <ErrorCard />;
-        graphClass = "graphCard errorCard";
-    }
-
-
-    return (
-      <div className={graphClass}>
-        <div className="headerCard">
-          <span className="titleCard"> {cardTitle} </span>
-          <DragHandle
-            onDragStartHandle={onDragStartHandle}
-            cardTitle={cardTitle}
-          />
-        </div>
-        <div className="contentCard">{graph}</div>
-      </div>
-    );
+const GraphCard = SortableElement(({ cardTitle, cardType, data }) => {
+  let graph;
+  if (cardType === "line") {
+    data["datasets"] = loadColors(data, "line");
+    graph = <Line data={data} />;
+    graphClass = "graphCard";
+  } else if (cardType === "bar") {
+    data["datasets"] = loadColors(data, "bar");
+    graph = <Bar data={data} />;
+    graphClass = "graphCard";
+  } else if (cardType === "doughnut") {
+    data["datasets"] = loadColors(data, "doughnut");
+    graph = <Doughnut data={data} />;
+    graphClass = "graphCard";
+  } else if (cardType === "horizontalBar") {
+    data["datasets"] = loadColors(data, "horizontalBar");
+    graph = <HorizontalBar data={data} />;
+  } else if (cardType === "numbers") {
+    graph = <Numbers data={data} />;
+    graphClass = "graphCard";
+  } else if (cardType === "loading") {
+    graph = <LoadingCard />;
+    graphClass = "graphCard";
+  } else if (cardType === "error") {
+    graph = <ErrorCard />;
+    graphClass = "graphCard errorCard";
   }
-);
+
+  return (
+    <div className={graphClass}>
+      <div className="headerCard">
+        <span className="titleCard"> {cardTitle} </span>
+        <DragHandle />
+      </div>
+      <div className="contentCard">{graph}</div>
+    </div>
+  );
+});
 
 export default GraphCard;
 

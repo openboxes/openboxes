@@ -1,22 +1,22 @@
-import React, { Component } from 'react';
-import { defaults } from 'react-chartjs-2';
-import { connect } from 'react-redux';
-import { SortableContainer } from 'react-sortable-hoc';
-import 'react-table/react-table.css';
-import { addToIndicators, fetchIndicators, reorderIndicators } from '../../actions';
-import GraphCard from './GraphCard';
-import NumberCard from './NumberCard';
-import './tablero.scss';
-import { numberData } from '../../../assets/dataFormat/numberData'
+import React, { Component } from "react";
+import { defaults } from "react-chartjs-2";
+import { connect } from "react-redux";
+import { SortableContainer } from "react-sortable-hoc";
+import "react-table/react-table.css";
+import {
+  addToIndicators,
+  fetchIndicators,
+  reorderIndicators
+} from "../../actions";
+import GraphCard from "./GraphCard";
+import NumberCard from "./NumberCard";
+import "./tablero.scss";
+import { numberData } from "../../../assets/dataFormat/numberData";
 
 // Disable charts legends by default.
 defaults.global.legend = false;
 
-//Should be on JSON package with charts Data
-
-let hideArchive = true;
-
-const SortableCards = SortableContainer(({ data, onDragStartHandle }) => (
+const SortableCards = SortableContainer(({ data }) => (
   <div className="cardComponent">
     {data.map((value, index) => (
       <GraphCard
@@ -25,8 +25,6 @@ const SortableCards = SortableContainer(({ data, onDragStartHandle }) => (
         cardTitle={value.title}
         cardType={value.type}
         data={value.data}
-        onDragStartHandle={onDragStartHandle}
-        onMouseDown={e => onDragStartHandle(e, cardTitle)}
       />
     ))}
   </div>
@@ -46,12 +44,8 @@ const NumberCardsRow = ({ data }) => (
   </div>
 );
 
-const ArchiveIndicator = ({ hideArchive, onDragOver, onDrop }) => (
-  <div
-    className={hideArchive ? "archiveDiv hideArchive" : "archiveDiv"}
-    onDragOver={e => onDragOver(e)}
-    onDrop={() => onDrop(e, "archived")}
-  >
+const ArchiveIndicator = ({ hideArchive }) => (
+  <div className={hideArchive ? "archiveDiv hideArchive" : "archiveDiv"}>
     <span>
       Archive indicator <i className="fa fa-archive"></i>
     </span>
@@ -60,6 +54,9 @@ const ArchiveIndicator = ({ hideArchive, onDragOver, onDrop }) => (
 
 class Tablero extends Component {
   dataFetched = false;
+  state = {
+    isDragging: false
+  };
 
   constructor(props) {
     super(props);
@@ -73,43 +70,12 @@ class Tablero extends Component {
     this.props.fetchIndicators();
   }
 
-  handle = () => {
-    hideArchive = false;
-    console.log(hideArchive);
-  };
-
-  onDragStart = (ev, id) => {
-    hideArchive = !hideArchive;
-    console.log("dragstart: ", id);
-    //ev.dataTransfer.setData("text/plain", id);
-  };
-
-  onDragOver = ev => {
-    console.log("dragOver: ", ev);
-    ev.preventDefault();
-  };
-
-  onDrop = (ev, cat) => {
-    let id = ev.dataTransfer.getData("text");
-
-    console.log("Dropped:", id, cat);
-    hideArchive = !hideArchive;
-  };
-
   sortStartHandle = () => {
-    console.log("start");
-    //hideArchive = false;
+    this.setState({ isDragging: true });
   };
-  sortMoveHandle = () => {
-    console.log("move");
-    //hideArchive = false;
-  };
-  sortEndHandle = () => {
-    console.log("end");
-    //hideArchive = true;
-  };
-  sortOverHandle = () => {
-    console.log("sortOver");
+  sortEndHandle = ({ oldIndex, newIndex }, e) => {
+    this.props.reorderIndicators({ oldIndex, newIndex }, e);
+    this.setState({ isDragging: false });
   };
 
   render() {
@@ -118,19 +84,15 @@ class Tablero extends Component {
         <NumberCardsRow data={numberData} />
         <SortableCards
           data={this.props.indicatorsData}
-          onSortStart={this.sortStartHandle()}
-          onSortMove={this.sortMoveHandle()}
-          onSortEnd={(this.sortEndHandle(), this.props.reorderIndicators)}
-          handle={this.handle}
+          onSortStart={this.sortStartHandle}
+          //onSortMove={this.sortMoveHandle}
+          onSortEnd={this.sortEndHandle}
           axis="xy"
           useDragHandle
-          onDragStartHandle={this.onDragStart}
-          distance={1}
         />
         <ArchiveIndicator
-          hideArchive={hideArchive}
-          onSortOver={this.sortOverHandle()}
-          onDrop={this.onDrop}
+          hideArchive={!this.state.isDragging}
+          //onSortOver={this.sortOverHandle}
         />
         <div className="unarchive">
           <span>Unarchive indicator (2) </span>
