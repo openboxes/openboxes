@@ -29,6 +29,10 @@ const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 const FIELDS = {
   pickPageItems: {
     type: ArrayField,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'picklistItems',
     getDynamicRowAttr: ({ rowValues, subfield }) => {
@@ -172,7 +176,8 @@ class PickPage extends Component {
       bins: [],
       sorted: false,
       printPicksUrl: '',
-      values: this.props.initialValues,
+      values: { ...this.props.initialValues, pickPageItems: [] },
+      totalCount: 0,
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -180,6 +185,8 @@ class PickPage extends Component {
     this.fetchAdjustedItems = this.fetchAdjustedItems.bind(this);
     this.sortByBins = this.sortByBins.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
+    this.loadMoreRows = this.loadMoreRows.bind(this);
   }
 
   componentDidMount() {
@@ -198,6 +205,26 @@ class PickPage extends Component {
     }
   }
 
+  setPickPageItems(response) {
+    const { data } = response.data;
+    this.setState({
+      values: {
+        ...this.state.values,
+        pickPageItems: this.props.isPaginated ? _.uniq(_.concat(
+          this.state.values.pickPageItems,
+          _.map(
+            parseResponse(data),
+            item => this.checkForInitialPicksChanges(item),
+          ),
+        )) : _.map(
+          parseResponse(data),
+          item => this.checkForInitialPicksChanges(item),
+        ),
+      },
+      sorted: false,
+    });
+  }
+
   dataFetched = false;
 
   /**
@@ -213,6 +240,9 @@ class PickPage extends Component {
     }
 
     this.fetchPickPageData();
+    if (!this.props.isPaginated) {
+      this.fetchPickPageItems();
+    }
   }
 
   /**
@@ -254,24 +284,59 @@ class PickPage extends Component {
 
     return apiClient.get(url)
       .then((resp) => {
+        const { totalCount } = resp.data;
         const { associations } = resp.data.data;
-        const { pickPageItems } = resp.data.data.pickPage;
-
         const printPicks = _.find(
           associations.documents,
           doc => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
         );
         this.setState({
+          totalCount,
           printPicksUrl: printPicks ? printPicks.uri : '/',
-          values: {
-            ...this.state.values,
-            pickPageItems: _.map(parseResponse(pickPageItems), item =>
-              this.checkForInitialPicksChanges(item)),
-          },
           sorted: false,
         }, () => this.fetchBins());
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  fetchPickPageItems() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
+    apiClient.get(url)
+      .then((response) => {
+        this.setPickPageItems(response);
+      });
+  }
+
+  fetchItemsAfterImport() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
+    apiClient.get(url)
+      .then((response) => {
+        const { data } = response.data;
+        this.setState({
+          values: {
+            ...this.state.values,
+            pickPageItems: _.map(
+              parseResponse(data),
+              item => this.checkForInitialPicksChanges(item),
+            ),
+          },
+          sorted: false,
+        });
+      });
+  }
+
+  loadMoreRows({ startIndex, stopIndex }) {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=4`;
+    apiClient.get(url)
+      .then((response) => {
+        if (stopIndex - startIndex > 0) {
+          this.setPickPageItems(response);
+        }
+      });
+  }
+
+  isRowLoaded({ index }) {
+    return !!this.state.values.pickPageItems[index];
   }
 
   fetchAdjustedItems(adjustedProductCode) {
@@ -428,7 +493,7 @@ class PickPage extends Component {
     return apiClient.post(url, formData, config)
       .then(() => {
         this.props.hideSpinner();
-        this.fetchAllData(false);
+        this.fetchItemsAfterImport();
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -544,6 +609,10 @@ class PickPage extends Component {
                 reasonCodes: this.props.reasonCodes,
                 translate: this.props.translate,
                 hasBinLocationSupport: this.props.hasBinLocationSupport,
+                totalCount: this.state.totalCount,
+                loadMoreRows: this.loadMoreRows,
+                isRowLoaded: this.isRowLoaded,
+                isPaginated: this.props.isPaginated,
               }))}
               <div className="d-print-none">
                 <button type="button" disabled={showOnly} className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
@@ -568,6 +637,7 @@ const mapStateToProps = state => ({
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
+  isPaginated: state.session.isPaginated,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
@@ -598,4 +668,6 @@ PickPage.propTypes = {
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Is true when currently selected location supports packing */
   hasPackingSupport: PropTypes.bool.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
 };

@@ -15,7 +15,6 @@ import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
-import org.pih.warehouse.api.PackPage
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
@@ -360,10 +359,6 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(PickPageItem) { PickPageItem pickPageItem ->
             return pickPageItem.toJson()
-        }
-
-        JSON.registerObjectMarshaller(PackPage) { PackPage packPage ->
-            return packPage.toJson()
         }
 
         JSON.registerObjectMarshaller(PackPageItem) { PackPageItem packPageItem ->

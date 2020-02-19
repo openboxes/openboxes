@@ -149,6 +149,10 @@ const SHIPMENT_FIELDS = {
 const SUPPLIER_FIELDS = {
   tableItems: {
     type: ArrayField,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     fields: {
       palletName: {
         type: LabelField,
@@ -202,6 +206,10 @@ const SUPPLIER_FIELDS = {
 const FIELDS = {
   tableItems: {
     type: ArrayField,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     fields: {
       palletName: {
         type: LabelField,
@@ -282,13 +290,15 @@ class SendMovementPage extends Component {
     super(props);
     this.state = {
       shipmentTypes: [],
-      supplier: false,
       documents: [],
       files: [],
       values: { ...this.props.initialValues, tableItems: [] },
+      totalCount: 0,
     };
     this.props.showSpinner();
     this.onDrop = this.onDrop.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
+    this.loadMoreRows = this.loadMoreRows.bind(this);
 
     this.debouncedLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -408,6 +418,40 @@ class SendMovementPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+
+  fetchStockMovementItems() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
+    apiClient.get(url)
+      .then((response) => {
+        const { data } = response.data;
+        const tableItems = data;
+        this.setState({
+          values: {
+            ...this.state.values,
+            tableItems,
+          },
+        });
+      });
+  }
+
+  loadMoreRows({ startIndex, stopIndex }) {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=6`;
+    apiClient.get(url)
+      .then((response) => {
+        const { data } = response.data;
+        this.setState({
+          values: {
+            ...this.state.values,
+            tableItems: _.uniq(_.concat(this.state.values.tableItems, data)),
+          },
+        });
+      });
+  }
+
+  isRowLoaded({ index }) {
+    return !!this.state.values.tableItems[index];
+  }
+
   /**
    * Fetches 5th step data from current stock movement.
    * @public
@@ -419,22 +463,13 @@ class SendMovementPage extends Component {
       .then((response) => {
         const stockMovementData = response.data.data;
         const { associations } = response.data.data;
+        const { totalCount } = response.data;
 
-        let tableItems;
-        let supplier;
-        if (!_.isEmpty(stockMovementData) && stockMovementData.packPage
-          && stockMovementData.packPage.packPageItems.length) {
-          tableItems = stockMovementData.packPage.packPageItems;
-          supplier = false;
-        } else {
-          tableItems = stockMovementData.lineItems;
-          supplier = true;
-        }
         const documents = _.filter(associations.documents, doc => doc.stepNumber === 5);
         const destinationType = stockMovementData.destination.locationType;
         this.setState({
-          supplier,
           documents,
+          totalCount,
           values: {
             ...this.state.values,
             dateShipped: stockMovementData.dateShipped,
@@ -452,11 +487,13 @@ class SendMovementPage extends Component {
               label: `${stockMovementData.destination.name}
                 [${destinationType ? destinationType.description : null}]`,
             },
-            tableItems,
           },
         }, () => {
           this.props.setValues(this.state.values);
           this.fetchShipmentTypes();
+          if (!this.props.isPaginated) {
+            this.fetchStockMovementItems();
+          }
         });
       })
       .catch(() => this.props.hideSpinner());
@@ -762,7 +799,11 @@ class SendMovementPage extends Component {
                   {_.map(this.getFields(), (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
                       hasBinLocationSupport: this.props.hasBinLocationSupport,
-                      supplier: this.state.supplier,
+                      supplier: values.origin.type === 'SUPPLIER',
+                      totalCount: this.state.totalCount,
+                      loadMoreRows: this.loadMoreRows,
+                      isRowLoaded: this.isRowLoaded,
+                      isPaginated: this.props.isPaginated,
                     }))}
                 </div>
                 <button
@@ -807,6 +848,7 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   isUserAdmin: state.session.isUserAdmin,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  isPaginated: state.session.isPaginated,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -833,4 +875,6 @@ SendMovementPage.propTypes = {
   isUserAdmin: PropTypes.bool.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
 };
