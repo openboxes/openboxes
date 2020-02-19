@@ -38,8 +38,9 @@ const DELETE_BUTTON_FIELD = {
   getDynamicAttr: ({
     fieldValue, removeItem, removeRow, showOnly,
   }) => ({
-    onClick: fieldValue.id ? () => removeItem(fieldValue.id).then(() => removeRow()) : removeRow,
-    disabled: fieldValue.statusCode === 'SUBSTITUTED' || showOnly,
+    onClick: fieldValue && fieldValue.id ?
+      () => removeItem(fieldValue.id).then(() => removeRow()) : removeRow,
+    disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || showOnly,
   }),
   attributes: {
     className: 'btn btn-outline-danger',
@@ -100,7 +101,7 @@ const NO_STOCKLIST_FIELDS = {
         getDynamicAttr: ({
           fieldValue,
         }) => ({
-          disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
+          disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
         }),
       },
       recipient: {
@@ -113,7 +114,7 @@ const NO_STOCKLIST_FIELDS = {
           fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder,
         }) => ({
           options: recipients,
-          disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
+          disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
           onTabPress: rowCount === rowIndex + 1 ? () => addRow({
             sortOrder: getSortOrder(),
           }) : null,

@@ -95,7 +95,7 @@ const FIELDS = {
           showValueTooltip: true,
         },
         getDynamicAttr: ({ fieldValue }) => ({
-          tooltipValue: _.map(fieldValue.availableItems, availableItem =>
+          tooltipValue: _.map(fieldValue && fieldValue.availableItems, availableItem =>
             (
               <p>{fieldValue.productCode} {fieldValue.productName}, {availableItem.expirationDate ? availableItem.expirationDate : '---'}, Qty {availableItem.quantityAvailable}</p>
             )),

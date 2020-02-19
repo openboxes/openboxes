@@ -55,7 +55,9 @@ const FIELDS = {
         label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin location',
         flexWidth: '1',
-        hide: ({ hasBinLocationSupport }) => !hasBinLocationSupport,
+        getDynamicAttr: ({ hasBinLocationSupport }) => ({
+          hide: !hasBinLocationSupport,
+        }),
       },
       lotNumber: {
         type: LabelField,

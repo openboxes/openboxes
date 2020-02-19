@@ -44,14 +44,14 @@ class FieldArrayComponent extends Component {
     const { maxTableHeight = 'calc(100vh - 400px)', virtualized } = fieldsConfig;
     const addRow = (row = {}) => fields.push(row);
     const TableBodyComponent = virtualized ? TableBodyVirtualized : TableBody;
-    const { hasBinLocationSupport } = properties;
 
     return (
       <div className="d-flex flex-column">
         <div className="text-center border">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1 mr-3">
             {_.map(fieldsConfig.fields, (config, name) => {
-              const hide = typeof config.hide === 'function' ? config.hide({ hasBinLocationSupport }) : config.hide;
+              const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
+              const { hide } = dynamicAttr;
               if (!hide) {
                 return (
                   <div

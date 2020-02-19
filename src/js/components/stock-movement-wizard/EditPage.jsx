@@ -81,8 +81,8 @@ const FIELDS = {
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = '';
-          if (!fieldValue.quantityAvailable ||
-            fieldValue.quantityAvailable < fieldValue.quantityRequested) {
+          if (fieldValue && (!fieldValue.quantityAvailable ||
+            fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
             className = 'text-danger';
           }
           return {
@@ -127,11 +127,11 @@ const FIELDS = {
           reviseRequisitionItems, values, reasonCodes,
         }) => ({
           onOpen: () => reviseRequisitionItems(values),
-          productCode: fieldValue.productCode,
-          btnOpenText: `react.stockMovement.${fieldValue.substitutionStatus}.label`,
-          btnOpenDefaultText: `${fieldValue.substitutionStatus}`,
-          btnOpenDisabled: fieldValue.statusCode === 'SUBSTITUTED' || showOnly,
-          btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus || 'HIDDEN'],
+          productCode: fieldValue && fieldValue.productCode,
+          btnOpenText: `react.stockMovement.${fieldValue && fieldValue.substitutionStatus}.label`,
+          btnOpenDefaultText: `${fieldValue && fieldValue.substitutionStatus}`,
+          btnOpenDisabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || showOnly,
+          btnOpenClassName: BTN_CLASS_MAPPER[(fieldValue && fieldValue.substitutionStatus) || 'HIDDEN'],
           rowIndex,
           lineItem: fieldValue,
           stockMovementId,
@@ -149,7 +149,7 @@ const FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({ fieldValue, subfield }) => ({
-          disabled: fieldValue === 'SUBSTITUTED' || subfield || showOnly,
+          disabled: (fieldValue && fieldValue === 'SUBSTITUTED') || subfield || showOnly,
         }),
       },
       reasonCode: {
@@ -173,9 +173,9 @@ const FIELDS = {
         buttonLabel: 'react.default.button.undo.label',
         buttonDefaultMessage: 'Undo',
         getDynamicAttr: ({ fieldValue, revertItem, values }) => ({
-          onClick: fieldValue.requisitionItemId ?
+          onClick: fieldValue && fieldValue.requisitionItemId ?
             () => revertItem(values, fieldValue.requisitionItemId) : () => null,
-          hidden: fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
+          hidden: fieldValue && fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
         }),
         attributes: {
           className: 'btn btn-outline-danger',
