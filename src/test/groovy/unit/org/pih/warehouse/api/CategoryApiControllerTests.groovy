@@ -7,17 +7,23 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.api
+package unit.org.pih.warehouse.api
 
-import grails.converters.JSON
-import grails.testing.web.controllers.ControllerUnitTest
+import grails.test.mixin.TestMixin
+import grails.test.mixin.domain.DomainClassUnitTestMixin
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import org.grails.web.json.JSONObject
-import org.codehaus.groovy.runtime.GroovyCategorySupport
-import org.junit.Ignore
+import org.pih.warehouse.api.CategoryApiController
+import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.product.Category
+import spock.lang.Specification
 
-@Ignore
-class CategoryApiControllerTests implements ControllerUnitTest {
+@TestFor(CategoryApiController)
+@Mock([User, UserService])
+@TestMixin(DomainClassUnitTestMixin)
+class CategoryApiControllerTests extends Specification {
 
     Category rootCategory = new Category(name: "ROOT")
     Category childCategory1 = new Category(name: "A category", parentCategory: rootCategory)
@@ -25,49 +31,45 @@ class CategoryApiControllerTests implements ControllerUnitTest {
     Category grandChildCategory1 = new Category(name: "The last category", parentCategory: childCategory1)
     List<Category> categoryList = [rootCategory, childCategory1, childCategory2, grandChildCategory1]
 
-    protected void setUp() {
-        super.setUp()
-    }
-
-    protected void tearDown() {
-        super.tearDown()
-    }
-
-    void testGetCategoryList() {
+    void "test get category list"() {
+        when:
         mockDomain(Category.class, categoryList)
         controller.productService = [
                 getCategoryTree: { -> return Category.list() }
         ]
         controller.list()
-        println controller.response.contentAsString
+
+        then:
         JSONObject json = new JSONObject(controller.response.contentAsString)
-        assertEquals(200, controller.response.status)
-        assertEquals(4, json.data.size())
-        assertEquals("ROOT", json.data[0].name)
+        controller.response.status == 200
+        json.data.size() == 4
+        json.data[0].name == "ROOT"
     }
 
-    void testGetCategory() {
+    void "test get category"() {
+        when:
         mockDomain(Category.class, categoryList)
         controller.params.id = 1
         controller.read()
-        println controller.response.contentAsString
+
+        then:
         JSONObject json = new JSONObject(controller.response.contentAsString)
-        assertEquals(200, controller.response.status)
-        assertEquals("ROOT", json.name)
+        controller.response.status == 200
+        json.name == "ROOT"
     }
 
-    void testCreateCategory() {
+    void "test create category"() {
+        when:
         mockDomain(Category.class, categoryList)
         controller.request.contentType = "application/json"
-        //controller.request.json = '{ "name" : "a great great grandchild" }'
         controller.request.method = 'POST'
         controller.request.content = '{ "name" : "a great great grandchild" }'
         controller.save()
-        println controller.response.contentAsString
 
-        assertEquals(200, controller.response.status)
+        then:
+        controller.response.status == 200
         def categories = Category.list()
-        assertEquals(5, categories.size())
+        categories.size() == 5
     }
 
 }
