@@ -7,24 +7,29 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/
-package org.pih.warehouse.core
+package unit.org.pih.warehouse.core
 
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.domain.DomainClassUnitTestMixin
 import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationController
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.inventory.InventoryService
+import org.springframework.mock.web.MockMultipartFile
+import spock.lang.Specification
 
-// import Location;
-import org.pih.warehouse.inventory.InventoryService;
+@TestFor(LocationController)
+@Mock([Location, LocationService, InventoryService])
+@TestMixin(DomainClassUnitTestMixin)
+class LocationControllerTests extends Specification {
+	def stubMessager = new Expando()
 
-import grails.testing.web.controllers.ControllerUnitTest
-// import grails.converters.JSON
-
-class LocationControllerTests implements ControllerUnitTest {
-
-	protected void setUp() {
-		super.setUp()
+	void setup() {
 		def depot = new LocationType(id: "1", name: "Depot")
 		def ward = new LocationType(id: "2", name: "Ward")
 		def boston = new LocationGroup(id: "boston", name: "Boston")
@@ -54,52 +59,61 @@ class LocationControllerTests implements ControllerUnitTest {
 		mockDomain(LocationGroup, [boston, mirebalais])
 		mockDomain(Organization, [main, sister])
 
-		def locationServiceMock = mockFor(LocationService)
-		locationServiceMock.demand.getLocations { organization, locationType, locationGroup, query, max, offset ->
-            if (query=="Bos") {
-                return new PagedResultList([Location.get(1)], 1)
-            }
-			return new PagedResultList(Location.list(), 4)
-		}
+		controller.inventoryService = [
+				getLocation: { locationId -> Location.get(locationId) },
+				saveLocation: { location -> location }
+		]
 
-		controller.locationService = locationServiceMock.createMock()
+//		def locationServiceMock = mockFor(LocationService)
+//		locationServiceMock.demand.getLocations { organization, locationType, locationGroup, query, max, offset ->
+//			if (query=="Bos") {
+//				return new PagedResultList([Location.get(1)], 1)
+//			}
+//			return new PagedResultList(Location.list(), 4)
+//		}
+//
+//		controller.locationService = locationServiceMock.createMock()
 
 		depot = LocationType.get("1")
 		assertNotNull depot
 	}
 
-	protected void tearDown() {
-		super.tearDown()
-	}
-
-	void test_index_shouldRedirectToList() {
+	void "test index shouldRedirectToList"() {
+		when:
 		controller.index()
-		assertEquals "list", controller.redirectArgs["action"]
+
+		then:
+		response.redirectedUrl == '/location/list'
 	}
 
-	void test_list_shouldListAllLocations() {
+	void "test list shouldListAllLocations"() {
+		when:
 		def model = controller.list()
-		assertEquals 4, model["locationInstanceList"].size()
-		assertEquals 4, model["locationInstanceTotal"]
+
+		then:
+		model.locationInstanceList.size() == 4
+		model.locationInstanceTotal == 4
 	}
 
-	void test_list_shouldListLocationsMatchingQuery() {
-		this.controller.params.q = "Bos"
+	void "test list should list locations matching LocationType 1 and query param"() {
+		when:
+		controller.params.q = "Bos"
+		controller.params.locationType = "1"
 		def model = controller.list()
-		assertEquals 1, model["locationInstanceList"].size()
-		assertEquals 1, model["locationInstanceTotal"]
+
+		then:
+		model.locationInstanceList.size() == 1
+		model.locationInstanceTotal == 1
 	}
 
 	// Show action redirects to edit action
 	void test_edit_shouldIncludeLocationInModel() {
-		// Mock the inventory service.
-		def inventoryControl = mockFor(InventoryService)
-		inventoryControl.demand.getLocation(1..1) { locationId -> Location.get(locationId) }
+		when:
+		controller.params.id = "1"
+		def model = controller.edit()
 
-		// 	Initialise the service and test the target method.
-		this.controller.inventoryService = inventoryControl.createMock()
-		this.controller.params.id = "1"
-		def model = this.controller.edit()
-		assertEquals "Boston", model["locationInstance"]?.name
+		then:
+		view == '/location/edit'
+		model.locationInstance.name == "Boston"
 	}
 }
