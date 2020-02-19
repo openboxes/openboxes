@@ -62,6 +62,10 @@ class Tablero extends Component {
     super(props);
   }
 
+  updateWindowDimensions() {
+    this.setState({ width: window.innerWidth, height: window.innerHeight });
+  }
+
   componentDidMount() {
     this.fetchData();
   }
@@ -74,7 +78,8 @@ class Tablero extends Component {
     this.setState({ isDragging: true });
   };
   sortEndHandle = ({ oldIndex, newIndex }, e) => {
-    if (e.clientY > 850) {
+    let maxHeight = window.innerHeight - ((6 * window.innerHeight) / 100 + 80);
+    if (e.clientY > maxHeight) {
       e.target.id = "archive";
     }
     this.props.reorderIndicators({ oldIndex, newIndex }, e);
