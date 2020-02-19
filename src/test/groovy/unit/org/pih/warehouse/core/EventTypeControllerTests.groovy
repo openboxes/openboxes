@@ -7,20 +7,32 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.core
+package unit.org.pih.warehouse.core
 
-import grails.testing.web.controllers.ControllerUnitTest
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventType
+import org.pih.warehouse.core.EventTypeController
+import spock.lang.Specification
 
-class EventTypeControllerTests implements ControllerUnitTest {
-    protected void setUp() {
-        super.setUp()
-    }
+@TestFor(EventTypeController)
+@Mock(EventType)
+class EventTypeControllerTests extends Specification {
+    def stubMessager = new Expando()
 
-    protected void tearDown() {
-        super.tearDown()
-    }
+    void "test saving valid EventType"() {
+        when:
+        stubMessager.message = { args -> return "success" }
+        controller.metaClass.warehouse = stubMessager
+        controller.params.name = "testEvent"
+        controller.params.eventCode = EventCode.SCHEDULED
+        request.method = "POST"
+        controller.save()
 
-    void testSomething() {
-
+        then:
+        response.redirectedUrl.startsWith('/eventType/list/')
+        flash.message != null
+        EventType.count() == 1
     }
 }
