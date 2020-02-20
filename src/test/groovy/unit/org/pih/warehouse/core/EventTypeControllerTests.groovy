@@ -7,13 +7,10 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package unit.org.pih.warehouse.core
+package org.pih.warehouse.core
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.pih.warehouse.core.EventCode
-import org.pih.warehouse.core.EventType
-import org.pih.warehouse.core.EventTypeController
 import spock.lang.Specification
 
 @TestFor(EventTypeController)
