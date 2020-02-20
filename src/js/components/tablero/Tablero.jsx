@@ -117,13 +117,39 @@ class Tablero extends Component {
             </span>
           </div>
           <div className="unarchive-popover">
-            <span onClick={this.unarchiveHandler}>&times;</span>
+            <span className="close-button" onClick={this.unarchiveHandler}>
+              &times;
+            </span>
             <ul className="unarchivedList">
               <li className="unarchivedItem">
-                <button>Chart 1</button>
+                <div className="archived-indicator">
+                  <div className="row">
+                    <div className="col col-5">
+                      <span>Graph</span>
+                    </div>
+                    <div className="col col-4">
+                      <span>Timeline 1</span>
+                    </div>
+                    <div className="col col-3">
+                      <span className="unarchive-button">Unarchive</span>
+                    </div>
+                  </div>
+                </div>
               </li>
               <li className="unarchivedItem">
-                <button>Chart 2</button>
+                <div className="archived-indicator">
+                  <div className="row">
+                    <div className="col col-5">
+                      <span>Graph</span>
+                    </div>
+                    <div className="col col-4">
+                      <span>Chart 2</span>
+                    </div>
+                    <div className="col col-3">
+                      <span className="unarchive-button">Unarchive</span>
+                    </div>
+                  </div>
+                </div>
               </li>
             </ul>
           </div>

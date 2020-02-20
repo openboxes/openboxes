@@ -239,10 +239,10 @@
   .unarchive-popover {
     border-radius: 4px;
     margin: 8px 0;
-    min-width: 100%;
-    padding: 40px 0;
-    bottom: 130%;
-    left: 88%;
+    min-width: 200%;
+    padding: 40px 0 10px 0;
+    bottom: 100%;
+    left: 16%;
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
     position: absolute;
     background-color: #fbfbfb;
@@ -256,57 +256,71 @@
     display: block;
     opacity: 0;
 
-    &:after {
-      top: 100%;
-      left: 7.5%;
-      border: solid transparent;
-      height: 0;
-      width: 0;
+    .close-button {
       position: absolute;
-      border-color: rgba(41, 41, 41, 0.09);
-      margin-left: -0.5em;
-      box-sizing: border-box;
-      border: 1em solid black;
-      border-color: transparent transparent #fbfbfb #fbfbfb;
-      transform-origin: 0 0;
-      transform: rotate(-45deg);
-      box-shadow: -3px 3px 3px 0 rgba(0, 0, 0, 0.08);
-      border-width: 8px;
-      content: " ";
-    }
-
-    span {
-      position: absolute;
-      color: #818181;
-      font-size: 30px;
+      color: #a5a5a5;
+      font-size: 32px;
       margin: 0;
       padding: 0;
-      right: 4%;
+      right: 12px;
       top: -2%;
       user-select: none;
       cursor: pointer;
     }
 
     .unarchivedList {
+      height: 275px;
+      overflow: auto;
       list-style-type: none;
       padding: 0;
-
+      margin: 0;
 
       .unarchivedItem {
         white-space: nowrap;
+        border: 2px 0;
+        border-color: #a5a5a5;
 
-        button {
-          border: 0;
-          border-radius: 0;
+        .archived-indicator {
+          border-style: solid;
           width: 100%;
-          height: 40px;
-          text-align: left;
+          height: 80px;
+          text-align: center;
+          line-height: 80px;
           background-color: #fff;
+          border-color: rgb(207, 207, 207);
+          border-width: 1.2px 0;
 
           &:hover {
-            background-color: #fbfbfb;
+            background-color: rgb(250, 250, 250);
           }
         }
+      }
+    }
+  }
+
+  @media (min-width: 858px) {
+    .unarchive-popover {
+      min-width: 165%;
+      bottom: 150%;
+      left: 83%;
+
+      &:after {
+        top: 100%;
+        left: 7.55%;
+        border: solid transparent;
+        height: 0;
+        width: 0;
+        position: absolute;
+        border-color: rgba(41, 41, 41, 0.09);
+        margin-left: -0.5em;
+        box-sizing: border-box;
+        border: 1em solid black;
+        border-color: transparent transparent #fbfbfb #fbfbfb;
+        transform-origin: 0 0;
+        transform: rotate(-45deg);
+        box-shadow: -3px 3px 3px 0 rgba(0, 0, 0, 0.08);
+        border-width: 8px;
+        content: " ";
       }
     }
   }
@@ -316,4 +330,15 @@
   transform: scale(1);
   display: block;
   opacity: 1;
+}
+
+.row {
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+
+  .unarchive-button {
+    color: rgb(14, 109, 199);
+    cursor: pointer;
+  }
 }
