@@ -97,7 +97,7 @@ class StockMovementItem {
     }
 
     String toString() {
-        return "${id}:${productCode}:${statusCode}:${quantityRequested}:${quantityRevised}:${reasonCode}:${!substitutionItems?.empty}"
+        return "${id}:${product}:${statusCode}:${quantityRequested}:${quantityRevised}:${reasonCode}:${!substitutionItems?.empty}"
     }
 
     Map toJson() {
@@ -141,17 +141,9 @@ class StockMovementItem {
                 id: shipmentItem?.id,
                 statusCode: null,
                 productCode: shipmentItem?.product?.productCode,
-                product: shipmentItem?.inventoryItem?.product,
+                product: shipmentItem?.product,
                 inventoryItem: shipmentItem?.inventoryItem,
                 quantityRequested: shipmentItem?.quantity,
-                quantityAllowed: null,
-                quantityAvailable: null,
-                quantityCanceled: null,
-                quantityRevised: null,
-                quantityPicked: null,
-                substitutionItems: null,
-                reasonCode: null,
-                comments: null,
                 recipient: shipmentItem.recipient,
                 palletName: palletName,
                 boxName: boxName,
@@ -201,11 +193,12 @@ class StockMovementItem {
 
     static StockMovementItem createFromOrderItem(OrderItem orderItem) {
         return new StockMovementItem(
-                statusCode: orderItem.orderItemStatusCode,
+                id: orderItem?.id,
+                statusCode: orderItem?.orderItemStatusCode,
                 productCode: orderItem?.product?.productCode,
                 product: orderItem?.product,
                 inventoryItem: orderItem?.inventoryItem,
-                quantityRequested: orderItem.quantity,
+                quantityRequested: orderItem.quantityRemaining(),
                 recipient: orderItem.requestedBy
         )
     }

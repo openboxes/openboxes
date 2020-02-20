@@ -44,10 +44,12 @@ class StockMovement {
     Location destination
     Person requestedBy
     Person createdBy
-    Date dateRequested
 
-    // Shipment information
+    Date dateRequested
     Date dateShipped
+    Date dateCreated
+    Date lastUpdated
+
     ShipmentType shipmentType
     ShipmentStatusCode receiptStatusCode
     String trackingNumber
@@ -77,16 +79,22 @@ class StockMovement {
         stocklist(nullable: true)
         requestedBy(nullable: false)
         dateRequested(nullable: false)
+
         stockMovementType(nullable: true)
         receiptStatusCode(nullable: true)
-        shipment(nullable: true)
         dateShipped(nullable: true)
         shipmentType(nullable: true)
         trackingNumber(nullable: true)
         driverName(nullable: true)
         comments(nullable: true)
         totalValue(nullable: true)
+
+        shipment(nullable:true)
+        requisition(nullable:true)
         order(nullable: true)
+
+        dateCreated(nullable: true)
+        lastUpdated(nullable: true)
     }
 
 
@@ -96,7 +104,7 @@ class StockMovement {
                 name              : name,
                 description       : description,
                 statusCode        : statusCode,
-                identifier        : requisition?.requestNumber,
+                identifier        : identifier,
                 origin            : origin,
                 destination       : destination,
                 hasManageInventory: origin?.supports(ActivityCode.MANAGE_INVENTORY),
@@ -112,7 +120,7 @@ class StockMovement {
                 lineItems         : lineItems,
                 associations      : [
                         requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
-                        shipment   : [id: shipment?.id, shipmentNUmber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
+                        shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
                         shipments  : requisition?.shipments?.collect {
                             [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
                         },
@@ -181,13 +189,19 @@ class StockMovement {
 
     static StockMovement createFromOrder(Order order) {
         StockMovement stockMovement = new StockMovement(
-            destination: order.destination,
-            origin: order.origin,
-            dateRequested: new Date(),
-            requestedBy: AuthService.getCurrentUser().get(),
-            description: order.orderNumber,
-            order: order,
-            statusCode:"CREATED"
+                id: order.id,
+                statusCode: order.status.toString(),
+                stockMovementType: StockMovementType.INBOUND,
+                // FIXME Need to translate
+                receiptStatusCode: ShipmentStatusCode.PENDING,
+                identifier: order.orderNumber,
+                origin: order.origin,
+                destination: order.destination,
+                dateRequested: new Date(),
+                dateCreated: order.dateCreated,
+                lastUpdated: order.lastUpdated,
+                requestedBy: AuthService.getCurrentUser().get(),
+                description: order.orderNumber
         )
 
         if (order.orderItems) {
@@ -212,6 +226,7 @@ class StockMovement {
                 id: requisition.id,
                 name: requisition.name,
                 identifier: requisition.requestNumber,
+                stockMovementType: StockMovementType.OUTBOUND,
                 description: requisition.description,
                 statusCode: requisition?.status?.name(),
                 origin: requisition.origin,

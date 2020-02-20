@@ -529,6 +529,21 @@ class Shipment implements Comparable, Serializable {
         return shipmentItems.get(nextIndex)
     }
 
+    ShipmentItem findOrCreateShipmentItem(String id) {
+        ShipmentItem shipmentItem
+        if (id) {
+            shipmentItem = shipmentItems.find { ShipmentItem si -> si.id == id }
+            if (!shipmentItem) {
+                throw new IllegalArgumentException("Could not find shipmente item with id ${id}")
+            }
+        }
+        if (!shipmentItem) {
+            shipmentItem = new ShipmentItem()
+            addToShipmentItems(shipmentItem)
+        }
+        return shipmentItem
+    }
+
 
     ShipmentItem findShipmentItem(InventoryItem inventoryItem, Container container, Person recipient) {
         ShipmentItem shipmentItem = ShipmentItem.withCriteria(uniqueResult: true) {

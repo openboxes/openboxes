@@ -42,11 +42,8 @@ class StockMovementController {
     }
 
     def show = {
-
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
         [stockMovement: stockMovement]
-
     }
 
     def list = {
@@ -99,8 +96,10 @@ class StockMovementController {
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
         stockMovement.receiptStatusCode = params?.receiptStatusCode ? params.receiptStatusCode as ShipmentStatusCode : null
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, params, max, offset)
-        def statistics = requisitionService.getRequisitionStatistics(requisition.destination, requisition.origin, currentUser)
+        def stockMovements = stockMovementService.getInboundStockMovements(stockMovement, [max:max, offset:offset])
+        def statistics = [:]
+        //def stockMovements = stockMovementService.getStockMovements(stockMovement, params, max, offset)
+        //def statistics = requisitionService.getRequisitionStatistics(requisition.destination, requisition.origin, currentUser)
 
         if (params.format && stockMovements) {
 
@@ -219,18 +218,12 @@ class StockMovementController {
 
     def packingList = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        stockMovement.shipment = stockMovement?.requisition?.shipment
         render(template: "packingList", model: [stockMovement: stockMovement])
     }
 
     def receipts = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        def receiptItems = shipments*.receipts*.receiptItems?.flatten()?.sort { a, b ->
-            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
-                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
-                            a?.sortOrder <=> b?.sortOrder
-        }
+        def receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement)
         render(template: "receipts", model: [receiptItems: receiptItems])
     }
 

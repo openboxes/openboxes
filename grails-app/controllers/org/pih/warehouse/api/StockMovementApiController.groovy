@@ -14,6 +14,7 @@ import org.apache.commons.lang.math.NumberUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
@@ -33,7 +34,10 @@ class StockMovementApiController {
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
         int offset = params.offset ? params.int("offset") : 0
-        def stockMovements = stockMovementService.getStockMovements(max, offset)
+        def stockMovements = params.direction == "INBOUND" ?
+                stockMovementService.getInboundStockMovements(max, offset) :
+                stockMovementService.getOutboundStockMovements(max, offset)
+
         stockMovements = stockMovements.collect { StockMovement stockMovement ->
             Map json = stockMovement.toJson()
             def excludes = params.list("exclude")
@@ -52,6 +56,7 @@ class StockMovementApiController {
         String stepNumber = params.stepNumber
         def totalCount = stockMovement.lineItems.size()
 
+        // FIXME this should happen in the service
         if (params.stepNumber == "4") {
             totalCount = stockMovementService.getPickPageItems(params.id, null, null).size()
         }
@@ -70,40 +75,35 @@ class StockMovementApiController {
     }
 
     def create = { StockMovement stockMovement ->
+        // Detect whether inbound or outbound stock movement
+        def currentLocation = Location.get(session.warehouse.id)
+        def stockMovementType = stockMovement.origin.equals(currentLocation) ?
+                StockMovementType.OUTBOUND ? stockMovement.destination.equals(currentLocation) :
+                        StockMovementType.INBOUND : null
 
-        JSONObject jsonObject = request.JSON
-        log.debug "create " + jsonObject.toString(4)
-
-        stockMovement = stockMovementService.createStockMovement(stockMovement)
+        stockMovement.stockMovementType = stockMovementType
+        StockMovement newStockMovement = stockMovementService.createStockMovement(stockMovement)
         response.status = 201
-        render([data: stockMovement] as JSON)
+        render([data: newStockMovement] as JSON)
     }
 
+    /**
+     * @deprecated FIXME refactor to avoid using RPC-style endpoints
+     */
     def updateRequisition = { //StockMovement stockMovement ->
-
-        JSONObject jsonObject = request.JSON
-        log.debug "update: " + jsonObject.toString(4)
-
-        // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
-        bindStockMovement(stockMovement, jsonObject)
-        stockMovementService.updateRequisition(stockMovement)
-
+        bindStockMovement(stockMovement, request.JSON)
+        stockMovementService.updateStockMovement(stockMovement)
         forward(action: "read")
     }
 
+    /**
+     * @deprecated FIXME refactor to avoid using RPC-style endpoints
+     */
     def updateShipment = { //StockMovement stockMovement ->
-
-        JSONObject jsonObject = request.JSON
-        log.debug "update: " + jsonObject.toString(4)
-
-        // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
-        bindStockMovement(stockMovement, jsonObject)
+        bindStockMovement(stockMovement, request.JSON)
         stockMovementService.updateShipment(stockMovement)
-
         render status: 200
     }
 
@@ -127,102 +127,46 @@ class StockMovementApiController {
      * Peforms a status update on the stock movement and forwards to the read action.
      */
     def updateStatus = {
-
-
         JSONObject jsonObject = request.JSON
         log.debug "update status: " + jsonObject.toString(4)
-
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
-        Boolean statusOnly =
-                jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
-
-        Boolean clearPicklist =
-                jsonObject.containsKey("clearPicklist") ? jsonObject.getBoolean("clearPicklist") : false
-
-        Boolean createPicklist =
-                jsonObject.containsKey("createPicklist") ? jsonObject.getBoolean("createPicklist") : false
-
-        RequisitionStatus status =
-                jsonObject.containsKey("status") ? jsonObject.status as RequisitionStatus : null
-
-        Boolean rollback =
-                jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
-
-        if (status && statusOnly) {
-            stockMovementService.updateStatus(params.id, status)
-        } else {
-            if (rollback) {
-                stockMovementService.rollbackStockMovement(params.id)
-            }
-
-            if (status) {
-                switch (status) {
-                    case RequisitionStatus.CREATED:
-                        break
-                    case RequisitionStatus.EDITING:
-                        break
-                    case RequisitionStatus.VERIFYING:
-                        break
-                    case RequisitionStatus.PICKING:
-                        if (clearPicklist) stockMovementService.clearPicklist(stockMovement)
-                        if (createPicklist) stockMovementService.createPicklist(stockMovement)
-                        break
-                    case RequisitionStatus.PICKED:
-                        stockMovementService.createShipment(stockMovement)
-                        break
-                    case RequisitionStatus.CHECKING:
-                        stockMovementService.createShipment(stockMovement)
-                        break
-                    case RequisitionStatus.ISSUED:
-                        stockMovementService.sendStockMovement(params.id)
-                        break
-                    default:
-                        throw new IllegalArgumentException("Cannot update status with invalid status ${jsonObject.status}")
-                        break
-
-                }
-                // If the dependent actions were updated properly then we can update the
-                stockMovementService.updateStatus(params.id, status)
-            }
-        }
+        stockMovementService.updateStatus(stockMovement, jsonObject)
         render status: 200
     }
 
+
+    /**
+     * @deprecated FIXME refactor to avoid using RPC-style endpoints
+     */
     def removeAllItems = {
         Requisition requisition = Requisition.get(params.id)
-
         stockMovementService.removeRequisitionItems(requisition)
-
         render status: 204
     }
 
+    /**
+     * @deprecated FIXME refactor to avoid using RPC-style endpoints
+     */
     def reviseItems = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
-        JSONObject jsonObject = request.JSON
-        log.debug "revise items: " + jsonObject.toString(4)
-
-        bindStockMovement(stockMovement, jsonObject)
-
+        bindStockMovement(stockMovement, request.JSON)
         List<EditPageItem> revisedItems = stockMovementService.reviseItems(stockMovement)
-
         render([data: revisedItems] as JSON)
     }
 
+    /**
+     * @deprecated FIXME refactor to avoid using RPC-style endpoints
+     */
     def updateItems = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
-        JSONObject jsonObject = request.JSON
-        log.debug "update items: " + jsonObject.toString(4)
-
-        bindStockMovement(stockMovement, jsonObject)
-
-        stockMovement = stockMovementService.updateItems(stockMovement)
-
+        bindStockMovement(stockMovement, request.JSON)
+        stockMovementService.updateItems(stockMovement)
         render([data: stockMovement] as JSON)
     }
 
+    /**
+     * @deprecated FIXME refactor to avoid using RPC-style endpoints
+     */
     def updateShipmentItems = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
@@ -238,7 +182,6 @@ class StockMovementApiController {
 
     def updateAdjustedItems = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
         stockMovementService.updateAdjustedItems(stockMovement, params.adjustedProduct)
 
         stockMovement = stockMovementService.getStockMovement(params.id)
@@ -396,6 +339,7 @@ class StockMovementApiController {
 
         // Bind all line items
         if (lineItems) {
+            log.info "lineItems: " + lineItems
             bindLineItems(stockMovement, lineItems)
         }
 
