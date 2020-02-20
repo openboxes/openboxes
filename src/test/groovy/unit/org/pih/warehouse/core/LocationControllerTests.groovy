@@ -78,7 +78,7 @@ class LocationControllerTests extends Specification {
 		assertNotNull depot
 	}
 
-	void "test index shouldRedirectToList"() {
+	void "index should redirect to list page"() {
 		when:
 		controller.index()
 
@@ -86,7 +86,7 @@ class LocationControllerTests extends Specification {
 		response.redirectedUrl == '/location/list'
 	}
 
-	void "test list shouldListAllLocations"() {
+	void "should list all locations"() {
 		when:
 		def model = controller.list()
 
@@ -95,7 +95,7 @@ class LocationControllerTests extends Specification {
 		model.locationInstanceTotal == 4
 	}
 
-	void "test list should list locations matching LocationType 1 and query param"() {
+	void "should list locations matching LocationType 1 and query param"() {
 		when:
 		controller.params.q = "Bos"
 		controller.params.locationType = "1"
