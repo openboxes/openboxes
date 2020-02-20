@@ -55,7 +55,8 @@ const ArchiveIndicator = ({ hideArchive }) => (
 class Tablero extends Component {
   dataFetched = false;
   state = {
-    isDragging: false
+    isDragging: false,
+    showPopout: false
   };
 
   constructor(props) {
@@ -86,6 +87,10 @@ class Tablero extends Component {
     this.setState({ isDragging: false });
   };
 
+  unarchiveHandler = () => {
+    this.setState({ showPopout: !this.state.showPopout });
+  };
+
   render() {
     return (
       <div className="cardsContainer">
@@ -98,9 +103,30 @@ class Tablero extends Component {
           useDragHandle
         />
         <ArchiveIndicator hideArchive={!this.state.isDragging} />
-        <div className="unarchive">
-          <span>Unarchive indicator (2) </span>
-          <i className="fa fa-archive"></i>
+
+        <div
+          className={
+            this.state.showPopout
+              ? "unarchivedItems popover-active"
+              : "unarchivedItems"
+          }
+        >
+          <div className="unarchive" onClick={this.unarchiveHandler}>
+            <span>
+              Unarchive indicator (2) <i className="fa fa-archive" />
+            </span>
+          </div>
+          <div className="unarchive-popover">
+            <span onClick={this.unarchiveHandler}>&times;</span>
+            <ul className="unarchivedList">
+              <li className="unarchivedItem">
+                <button>Chart 1</button>
+              </li>
+              <li className="unarchivedItem">
+                <button>Chart 2</button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     );

@@ -36,6 +36,8 @@
   },
   "homepage": "https://github.com/openboxes/openboxes#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.12.1",
+    "@fortawesome/react-fontawesome": "^0.1.8",
     "axios": "0.19.0",
     "bootstrap": "4.3.1",
     "chart.js": "^2.9.3",
