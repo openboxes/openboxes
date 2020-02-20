@@ -13,12 +13,6 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
-import org.pih.warehouse.PagedResultList
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationController
-import org.pih.warehouse.core.LocationGroup
-import org.pih.warehouse.core.LocationService
-import org.pih.warehouse.core.LocationType
 import org.springframework.mock.web.MockMultipartFile
 import spock.lang.Specification
 
@@ -77,7 +71,7 @@ class LocationControllerTests extends Specification {
 		assertNotNull depot
 	}
 
-	void "test index shouldRedirectToList"() {
+	void "index should redirect to list page"() {
 		when:
 		controller.index()
 
@@ -85,7 +79,7 @@ class LocationControllerTests extends Specification {
 		response.redirectedUrl == '/location/list'
 	}
 
-	void "test list shouldListAllLocations"() {
+	void "should list all locations"() {
 		when:
 		def model = controller.list()
 
@@ -94,7 +88,7 @@ class LocationControllerTests extends Specification {
 		model.locationInstanceTotal == 4
 	}
 
-	void "test list should list locations matching LocationType 1 and query param"() {
+	void "should list locations matching LocationType 1 and query param"() {
 		when:
 		controller.params.q = "Bos"
 		controller.params.locationType = "1"
@@ -105,7 +99,7 @@ class LocationControllerTests extends Specification {
 		model.locationInstanceTotal == 1
 	}
 
-	void "test show shouldIncludeLocationInModel"() {
+	void "should include location in model"() {
 		when:
 		controller.params.id = "1"
 		def model = controller.show()
@@ -115,7 +109,7 @@ class LocationControllerTests extends Specification {
 
 	}
 
-	void "test uploadLogo action should render uploadLogo view if wrong content is sent"() {
+	void "uploadLogo action should render uploadLogo view if wrong content is sent"() {
 		when:
 		stubMessager.message = { args -> return "wrong content" }
 		controller.metaClass.warehouse = stubMessager
@@ -129,7 +123,7 @@ class LocationControllerTests extends Specification {
 		model.locationInstance.name == "Boston"
 	}
 
-	void "test uploadLogo action should render uploadLogo view if proper file is sent"() {
+	void "uploadLogo action should render uploadLogo view if proper file is sent"() {
 		when:
 		stubMessager.message = { args -> return "wrong content" }
 		controller.metaClass.warehouse = stubMessager

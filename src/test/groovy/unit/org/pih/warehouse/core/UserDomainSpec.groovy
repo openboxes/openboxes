@@ -1,7 +1,6 @@
-package unit.org.pih.warehouse.core
+package org.pih.warehouse.core
 
 import grails.test.mixin.Mock
-import org.pih.warehouse.core.User
 import spock.lang.Ignore
 import spock.lang.Specification
 
