@@ -1,12 +1,8 @@
-package unit.org.pih.warehouse.product
+package org.pih.warehouse.product
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.pih.warehouse.PagedResultList
-import org.pih.warehouse.product.Category
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductController
-import org.pih.warehouse.product.ProductService
 import spock.lang.Specification
 
 @TestFor(ProductController)
@@ -26,7 +22,7 @@ class ProductControllerTests extends Specification {
 		Product.count() == 2
 	}
 
-	void "test list should contain two products"() {
+	void "should contain two products"() {
 		when:
 		controller.productService = [
 				getProducts: { arg1, arg2, arg3, arg4, arg5 ->

@@ -10,7 +10,7 @@ import spock.lang.Specification
 @Rollback
 class UserSpec extends Specification {
 
-    def setupData() {
+    def setup() {
         new User(username: "asd",
                 firstName: "Asd",
                 lastName: "Qwe",
@@ -20,9 +20,6 @@ class UserSpec extends Specification {
 
     @Ignore("TODO: fix java.lang.IllegalStateException: No GORM implementations configured. Ensure GORM has been initialized correctly at...")
     void "test user count"() {
-        given:
-        setupData()
-
         expect:
         User.count() == 1
     }
