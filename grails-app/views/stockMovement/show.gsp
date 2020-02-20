@@ -72,12 +72,12 @@
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
 
-            <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
+            <g:set var="hasBeenIssued" value="${stockMovement?.statusCode==RequisitionStatus.ISSUED.toString()}"/>
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
             <g:set var="hasBeenPartiallyReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"/>
             <g:set var="hasBeenShipped" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.SHIPPED}"/>
             <g:set var="hasBeenPending" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PENDING}"/>
-            <g:set var="isSameLocation" value="${stockMovement?.requisition?.destination?.id==session.warehouse.id}"/>
+            <g:set var="isSameLocation" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
             <g:set var="disableReceivingButton" value="${!hasBeenIssued || !isSameLocation || !(hasBeenShipped || hasBeenPartiallyReceived)}"/>
             <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
             <g:if test="${!(hasBeenShipped || hasBeenPartiallyReceived)}">
