@@ -7,14 +7,13 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package unit.org.pih.warehouse.api
+package org.pih.warehouse.api
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.grails.web.json.JSONObject
-import org.pih.warehouse.api.CategoryApiController
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.product.Category
