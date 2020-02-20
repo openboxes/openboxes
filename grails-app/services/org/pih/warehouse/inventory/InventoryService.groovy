@@ -200,60 +200,6 @@ class InventoryService implements ApplicationContextAware {
      * @param commandInstance
      * @return
      */
-    void browseInventory(InventoryCommand command) {
-
-        def currentDate = DateUtil.clearTime(new Date())
-        def startTime = System.currentTimeMillis()
-        def products = command?.searchPerformed ? getProducts(command) : []
-
-        // Define query parameters
-        def defaultParams = [location: command.location, date: currentDate]
-        def searchResultsQueryParams = defaultParams
-        def totalCountQueryParams = defaultParams
-
-        //
-        if (command.maxResults) searchResultsQueryParams += [max: command.maxResults as Integer, offset: command.offset as Integer]
-
-        // Define total count query
-        String totalCountQuery = "select count(distinct p) " +
-                        "from InventorySnapshot invsnap join invsnap.product p " +
-                        "where invsnap.location = :location " +
-                        "and invsnap.date = :date "
-
-        // Define search results query
-        String searchResultsQuery =
-                "select new map(p as product, sum(invsnap.quantityOnHand) as quantityOnHand) " +
-                        "from InventorySnapshot invsnap join invsnap.product p " +
-                        "where invsnap.location = :location " +
-                        "and invsnap.date = :date "
-
-        if (products) {
-            searchResultsQuery += "and p in (:products) "
-            searchResultsQueryParams += [products:products]
-            totalCountQuery += "and p in (:products)"
-            totalCountQueryParams += [products:products]
-        }
-
-        searchResultsQuery += "group by p "
-
-        startTime = System.currentTimeMillis()
-        def totalCount = InventorySnapshot.executeQuery(totalCountQuery, totalCountQueryParams)
-        log.info ("totalCount: " + (System.currentTimeMillis()-startTime))
-
-        startTime = System.currentTimeMillis()
-        def searchResults = InventorySnapshot.executeQuery(searchResultsQuery, searchResultsQueryParams)
-        log.info ("searchResults: " + (System.currentTimeMillis()-startTime))
-
-        log.info("searchResults: " + searchResults)
-        log.info("totalCount: " + totalCount)
-        command.searchResults = new PagedResultList(searchResults, totalCount[0] as Integer)
-    }
-
-    /**
-     *
-     * @param commandInstance
-     * @return
-     */
     List searchProducts(InventoryCommand command) {
 
         def categories = getExplodedCategories([command.category])
@@ -309,62 +255,6 @@ class InventoryService implements ApplicationContextAware {
         def productIds = Product.createCriteria().list(listPaginatedProductsQuery)
         def products = productIds ? Product.getAll(productIds*.id) : []
         return new PagedResultList(products, totalCount)
-    }
-
-
-    InventoryItemCommand getInventoryItemCommand(Product product, Inventory inventory, InventoryLevel inventoryLevel, Integer quantityOnHand, Integer quantityToReceive, Integer quantityToShip, Boolean showOutOfStockProducts) {
-        InventoryItemCommand inventoryItemCommand = new InventoryItemCommand()
-
-        inventoryItemCommand.description = product.name
-        inventoryItemCommand.category = product.category
-        inventoryItemCommand.product = product
-        inventoryItemCommand.inventoryLevel = inventoryLevel
-        inventoryItemCommand.quantityOnHand = quantityOnHand
-        inventoryItemCommand.quantityToReceive = quantityToReceive
-        inventoryItemCommand.quantityToShip = quantityToShip
-        return inventoryItemCommand
-    }
-
-    InventoryItemCommand getInventoryItemCommand(ProductGroup productGroup, Inventory inventory, Boolean showOutOfStockProducts) {
-        InventoryItemCommand inventoryItemCommand = new InventoryItemCommand()
-        inventoryItemCommand.description = productGroup.name
-        inventoryItemCommand.productGroup = productGroup
-        inventoryItemCommand.category = productGroup.category
-
-        return inventoryItemCommand
-    }
-
-    /**
-     * Get all product groups for the given location, searchTerms, categories.
-     * @param location
-     * @param searchTerms
-     * @param categoryFilters
-     * @param showHiddenProducts
-     * @return
-     */
-    Set<ProductGroup> getProductGroups(Location location, List searchTerms, List categoryFilters, Boolean showHiddenProducts) {
-        def productGroups = ProductGroup.list()
-        productGroups = productGroups.intersect(getProductGroups(searchTerms, categoryFilters))
-        return productGroups
-    }
-
-
-    List getProductGroups(List searchTerms, List categories) {
-        def productGroups = ProductGroup.createCriteria().list() {
-            or {
-                if (searchTerms) {
-                    and {
-                        searchTerms.each { searchTerm ->
-                            ilike("description", "%" + searchTerm + "%")
-                        }
-                    }
-                }
-                if (categories) {
-                    'in'("category", categories)
-                }
-            }
-        }
-        return productGroups
     }
 
     /**

@@ -12,7 +12,7 @@
 			</div>
 			<div class="filter-list-item">
 				<g:selectCategory id="category"
-								  name="category.id"
+								  name="categoryId"
 								  class="chzn-select-deselect"
 								  noSelection="['null':'']"
 								  data-placeholder="Select a category"
@@ -35,8 +35,8 @@
 					<warehouse:message code="default.search.label"/>
 				</button>
 				&nbsp;
-				<g:link controller="inventory" action="browse" params="[categoryId:session?.rootCategory?.id,resetSearch:true]" >
-					<warehouse:message code="inventoryBrowser.resetAll.label" default="Reset all"/>
+				<g:link controller="inventory" action="browse" params="[resetSearch:true]" class="button icon reload">
+					<warehouse:message code="default.button.reset.label" default="Reset"/>
 				</g:link>
 			</div>
 		</div>

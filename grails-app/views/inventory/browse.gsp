@@ -8,8 +8,6 @@
         <title><warehouse:message code="inventory.browse.label" default="Browse inventory"/></title>
     </head>
     <body>
-
-
         <div class="body">
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -52,6 +50,10 @@
                                 <g:if test="${commandInstance?.searchTerms}">
                                     "${commandInstance.searchTerms }"
                                 </g:if>
+
+								<g:link controller="inventory" action="browse" class="button icon reload">
+									<warehouse:message code="default.showAll.label" default="Show all"/>
+								</g:link>
                             </h2>
 
                             <div id="tabs-1" style="padding: 0px;">
@@ -80,12 +82,6 @@
                                                 <th class="middle">
                                                     <g:message code="productCatalog.label"/>
                                                 </th>
-												<th class="center" style="width: 7%;">
-													<g:message code="inventory.qtyin.label"/>
-												</th>
-												<th class="center" style="width: 7%;">
-													<g:message code="inventory.qtyout.label"/>
-												</th>
 												<th class="center middle" style="width: 7%;">
 													<g:message code="default.qty.label"/>
 												</th>
@@ -116,31 +112,23 @@
 														   	</g:link>
 														</td>
 														<td>
-															${searchResult?.product?.category?.name}
+															<g:link controller="inventory" action="browse" params="${params + ['categoryId':searchResult?.product?.category.id]}">
+																${searchResult?.product?.category?.name}
+															</g:link>
 														</td>
 														<td>
 															<g:each var="tag" in="${searchResult?.product?.tags}">
-																<div class="tag">
-																	<g:link controller="inventory" action="browse" params="${params + ['tags':tag.id]}">
-																		${tag.tag}
-																	</g:link>
-																</div>
+																<g:link controller="inventory" action="browse" params="${params + ['tags':tag.id]}">
+																	<div class="tag">${tag.tag}</div>
+																</g:link>
 															</g:each>
 														</td>
 														<td>
 															<g:each var="catalog" in="${searchResult?.product?.productCatalogs}">
-																<div class="tag tag-info">
-																	<g:link controller="inventory" action="browse" params="${params + ['catalogs':catalog.id]}">
-																		${catalog.name}
-																	</g:link>
-																</div>
+																<g:link controller="inventory" action="browse" params="${params + ['catalogs':catalog.id]}">
+																	<div class="tag tag-info">${catalog.name}</div>
+																</g:link>
 															</g:each>
-														</td>
-														<td>
-
-														</td>
-														<td>
-
 														</td>
 														<td class="center">
 															${searchResult?.quantityOnHand}

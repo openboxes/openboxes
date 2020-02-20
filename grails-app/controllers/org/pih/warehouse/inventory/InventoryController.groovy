@@ -132,7 +132,7 @@ class InventoryController {
 
         // Set defaults
         command.location = command?.location ?: Location.get(session.warehouse.id)
-        command.category = command?.category ?: productService.getRootCategory()
+        command.category = params.categoryId ? Category.get(params.categoryId) : productService.getRootCategory()
         command.maxResults = params?.max as Integer
         command.offset = params?.offset as Integer
 
@@ -142,7 +142,6 @@ class InventoryController {
         // Calculate quantity for all products
         Date date = DateUtil.clearTime(new Date())
         def quantityList = products ? inventorySnapshotService.getQuantityOnHand(products, command.location, date) : []
-        log.info "Results " + quantityList
 
         def searchResults = products.collect { product ->
             def quantityOnHand = quantityList.find { it.p == product }?.quantityOnHand ?: 0
