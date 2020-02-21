@@ -32,7 +32,7 @@ import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.util.DateUtil
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.springframework.context.ApplicationContext
