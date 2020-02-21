@@ -11,7 +11,7 @@ import {
 } from "../../actions";
 import GraphCard from "./GraphCard";
 import NumberCard from "./NumberCard";
-import UnarchiveIndicator from "./Archive";
+import UnarchiveIndicator from "./UnarchivePopout";
 import "./tablero.scss";
 
 // Disable charts legends by default.
@@ -19,15 +19,17 @@ defaults.global.legend = false;
 
 const SortableCards = SortableContainer(({ data }) => (
   <div className="cardComponent">
-    {data.map((value, index) => (
-      <GraphCard
-        key={`item-${value.id}`}
-        index={index}
-        cardTitle={value.title}
-        cardType={value.type}
-        data={value.data}
-      />
-    ))}
+    {data.map((value, index) =>
+      value.archived ? null : (
+        <GraphCard
+          key={`item-${value.id}`}
+          index={index}
+          cardTitle={value.title}
+          cardType={value.type}
+          data={value.data}
+        />
+      )
+    )}
   </div>
 ));
 
@@ -89,7 +91,14 @@ class Tablero extends Component {
   };
 
   unarchiveHandler = () => {
-    this.setState({ showPopout: !this.state.showPopout });
+    this.props.indicatorsData.filter(data => data.archived).length
+      ? this.setState({ showPopout: !this.state.showPopout })
+      : this.setState({ showPopout: false });
+  };
+
+  handleAdd = index => {
+    this.props.addToIndicators(index);
+    this.unarchiveHandler();
   };
 
   render() {
@@ -108,6 +117,7 @@ class Tablero extends Component {
           data={this.props.indicatorsData}
           showPopout={this.state.showPopout}
           unarchiveHandler={this.unarchiveHandler}
+          handleAdd={this.handleAdd}
         />
       </div>
     );

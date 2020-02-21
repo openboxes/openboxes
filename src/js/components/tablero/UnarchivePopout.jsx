@@ -64,6 +64,7 @@ const ArchivedIndicators = props => {
   } else if (props.type === "error") {
     graph = <i className="fa fa-repeat" />;
   }
+
   return (
     <li className="unarchivedItem">
       <div className="archived-indicator">
@@ -73,7 +74,12 @@ const ArchivedIndicators = props => {
             <span>{props.title}</span>
           </div>
           <div className="col col-3">
-            <span className="unarchive-button">Unarchive</span>
+            <span
+              className="unarchive-button"
+              onClick={() => props.handleAdd(props.index)}
+            >
+              Unarchive
+            </span>
           </div>
         </div>
       </div>
@@ -81,34 +87,54 @@ const ArchivedIndicators = props => {
   );
 };
 
-const UnarchiveIndicator = props => (
-  <div
-    className={
-      props.showPopout ? "unarchivedItems popover-active" : "unarchivedItems"
-    }
-  >
-    <div className="unarchive" onClick={props.unarchiveHandler}>
-      <span>
-        Unarchive indicator ({props.data.length}){" "}
-        <i className="fa fa-archive" />
-      </span>
-    </div>
-    <div className="unarchive-popover">
-      <span className="close-button" onClick={props.unarchiveHandler}>
-        &times;
-      </span>
-      <ul className="unarchivedList">
-        {props.data.map(value => (
-          <ArchivedIndicators
-            key={`item-${value.id}`}
-            title={value.title}
-            type={value.type}
-            data={value.data}
-          />
-        ))}
-      </ul>
-    </div>
+const PopOut = props => (
+  <div>
+    {props.data.map((value, index) =>
+      value.archived ? (
+        <ArchivedIndicators
+          key={`item-${value.id}`}
+          index={index}
+          title={value.title}
+          type={value.type}
+          data={value.data}
+          handleAdd={props.handleAdd}
+          unarchiveHandler={props.unarchiveHandler}
+          size={props.size}
+        />
+      ) : null
+    )}
   </div>
 );
+
+const UnarchiveIndicator = props => {
+  let size = props.data.filter(data => data.archived).length;
+
+  return (
+    <div
+      className={
+        props.showPopout ? "unarchivedItems popover-active" : "unarchivedItems"
+      }
+    >
+      <div className="unarchive" onClick={props.unarchiveHandler}>
+        <span>
+          Unarchive indicator ({size}) <i className="fa fa-archive" />
+        </span>
+      </div>
+      <div className="unarchive-popover">
+        <span className="close-button" onClick={props.unarchiveHandler}>
+          &times;
+        </span>
+        <ul className="unarchivedList">
+          <PopOut
+            data={props.data}
+            handleAdd={props.handleAdd}
+            unarchiveHandler={props.unarchiveHandler}
+            size={size}
+          />
+        </ul>
+      </div>
+    </div>
+  );
+};
 
 export default UnarchiveIndicator;

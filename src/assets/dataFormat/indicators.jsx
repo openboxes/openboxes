@@ -1,5 +1,6 @@
 const indicatorsFetched = [
   {
+    archived: 1,
     title: "Expiration summary",
     type: "line",
     id: Math.random(),

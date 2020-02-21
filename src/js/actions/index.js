@@ -110,10 +110,10 @@ export function fetchIndicators() {
   };
 }
 
-export function addToIndicators(element) {
+export function addToIndicators(index) {
   return {
     type: ADD_TO_INDICATORS,
-    payload: element
+    payload: { index: index }
   };
 }
 
