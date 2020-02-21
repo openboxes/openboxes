@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { defaults } from "react-chartjs-2";
 import { connect } from "react-redux";
 import { SortableContainer } from "react-sortable-hoc";
+import { numberData } from "../../../assets/dataFormat/numberData";
 import "react-table/react-table.css";
 import {
   addToIndicators,
@@ -10,8 +11,8 @@ import {
 } from "../../actions";
 import GraphCard from "./GraphCard";
 import NumberCard from "./NumberCard";
+import UnarchiveIndicator from "./Archive";
 import "./tablero.scss";
-import { numberData } from "../../../assets/dataFormat/numberData";
 
 // Disable charts legends by default.
 defaults.global.legend = false;
@@ -103,57 +104,11 @@ class Tablero extends Component {
           useDragHandle
         />
         <ArchiveIndicator hideArchive={!this.state.isDragging} />
-
-        <div
-          className={
-            this.state.showPopout
-              ? "unarchivedItems popover-active"
-              : "unarchivedItems"
-          }
-        >
-          <div className="unarchive" onClick={this.unarchiveHandler}>
-            <span>
-              Unarchive indicator (2) <i className="fa fa-archive" />
-            </span>
-          </div>
-          <div className="unarchive-popover">
-            <span className="close-button" onClick={this.unarchiveHandler}>
-              &times;
-            </span>
-            <ul className="unarchivedList">
-              <li className="unarchivedItem">
-                <div className="archived-indicator">
-                  <div className="row">
-                    <div className="col col-5">
-                      <span>Graph</span>
-                    </div>
-                    <div className="col col-4">
-                      <span>Timeline 1</span>
-                    </div>
-                    <div className="col col-3">
-                      <span className="unarchive-button">Unarchive</span>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li className="unarchivedItem">
-                <div className="archived-indicator">
-                  <div className="row">
-                    <div className="col col-5">
-                      <span>Graph</span>
-                    </div>
-                    <div className="col col-4">
-                      <span>Chart 2</span>
-                    </div>
-                    <div className="col col-3">
-                      <span className="unarchive-button">Unarchive</span>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <UnarchiveIndicator
+          data={this.props.indicatorsData}
+          showPopout={this.state.showPopout}
+          unarchiveHandler={this.unarchiveHandler}
+        />
       </div>
     );
   }

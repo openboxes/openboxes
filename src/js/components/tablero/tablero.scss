@@ -240,15 +240,13 @@
     border-radius: 4px;
     margin: 8px 0;
     min-width: 200%;
-    padding: 40px 0 10px 0;
-    bottom: 100%;
-    left: 16%;
+    padding: 50px 0 50px 0;
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
     position: absolute;
     background-color: #fbfbfb;
 
     transition-property: transform, opacity;
-    transition-duration: 200ms;
+    transition-duration: 200ms, 200ms;
     transition-timing-function: ease;
 
     transform: scale(.9);
@@ -256,20 +254,23 @@
     display: block;
     opacity: 0;
 
+    bottom: 150%;
+    left: -9999px;
+
     .close-button {
       position: absolute;
       color: #a5a5a5;
-      font-size: 32px;
+      font-size: 38px;
       margin: 0;
       padding: 0;
       right: 12px;
-      top: -2%;
+      top: -1%;
       user-select: none;
       cursor: pointer;
     }
 
     .unarchivedList {
-      height: 275px;
+      height: 240px;
       overflow: auto;
       list-style-type: none;
       padding: 0;
@@ -285,7 +286,6 @@
           width: 100%;
           height: 80px;
           text-align: center;
-          line-height: 80px;
           background-color: #fff;
           border-color: rgb(207, 207, 207);
           border-width: 1.2px 0;
@@ -301,8 +301,6 @@
   @media (min-width: 858px) {
     .unarchive-popover {
       min-width: 165%;
-      bottom: 150%;
-      left: 83%;
 
       &:after {
         top: 100%;
@@ -327,18 +325,81 @@
 }
 
 .popover-active .unarchive-popover {
+  bottom: 100%;
+  left: 16%;
   transform: scale(1);
   display: block;
   opacity: 1;
 }
 
+@media (min-width: 858px) {
+  .popover-active .unarchive-popover {
+    bottom: 150%;
+    left: 83%;
+  }
+}
+
 .row {
-  padding: 0;
-  margin: 0;
   max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
 
   .unarchive-button {
     color: rgb(14, 109, 199);
+    user-select: none;
     cursor: pointer;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    align-items: center;
+
+    &.graph-preview {
+      font-size: 25px;
+      margin: auto;
+      width: 50%;
+      padding: 20px 0;
+
+      i:not(.fa-repeat) {
+        font-size: 40px;
+      }
+
+      .fa-repeat {
+        font-size: 20px;
+        padding: 8px 0 8px 5px;
+      }
+
+      .horizontal-bar {
+        transform: rotate(90deg) scaleX(-1);
+      }
+
+      .value {
+        display: flex;
+        align-items: center;
+
+        .circle {
+          width: 7px;
+          height: 7px;
+          border-radius: 100%;
+          margin-right: 6px;
+
+          &.green {
+            background-color: #519a04;
+          }
+
+          &.yellow {
+            background-color: #f7b500;
+          }
+
+          &.red {
+            background-color: #e02020;
+          }
+        }
+      }
+    }
   }
 }

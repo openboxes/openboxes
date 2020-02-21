@@ -3,7 +3,6 @@ import React from "react";
 import { Line, Bar, Doughnut, HorizontalBar } from "react-chartjs-2";
 import { SortableElement, sortableHandle } from "react-sortable-hoc";
 import LoadingCard from "./LoadingCard";
-import "./tablero.scss";
 
 import { loadColors } from "../../../assets/dataFormat/dataLoading";
 
@@ -27,12 +26,6 @@ const Numbers = ({ data }) => (
       </div>
       <div className="subtitle">{data.red.subtitle}</div>
     </div>
-  </div>
-);
-
-const ErrorCard = () => (
-  <div>
-    <i className="fa fa-repeat" />
   </div>
 );
 
@@ -65,7 +58,7 @@ const GraphCard = SortableElement(({ cardTitle, cardType, data }) => {
     graph = <LoadingCard />;
     graphClass = "graphCard";
   } else if (cardType === "error") {
-    graph = <ErrorCard />;
+    graph = <i className="fa fa-repeat" />;
     graphClass = "graphCard errorCard";
   }
 
