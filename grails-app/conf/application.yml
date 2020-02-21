@@ -425,7 +425,7 @@ openboxes:
         custom:
             enabled: false
         defaultLocale: 'en'
-        supportedLocales: ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt']
+        supportedLocales: ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt', 'fi']
         # Currency configuration
         defaultCurrencyCode: "USD"
         defaultCurrencySymbol: '\$'
@@ -500,6 +500,8 @@ openboxes:
 
     expirationDate:
         minValue: "01/01/2000"
+    cycleCount:
+        additionalColumns: {}
 
 mail:
     error:
