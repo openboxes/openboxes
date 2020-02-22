@@ -95,10 +95,12 @@
                                 </td>
                                 <td class="actionButtons center">
                                     <g:if test="${orderItem?.id }">
-                                        <a href="javascript:void(-1);" id="edit-item-dialog-${orderItem?.id}" class="button icon edit edit-item-button" data-order-item-id="${orderItem?.id}">
+                                        <a href="javascript:void(-1);" id="edit-item-dialog-${orderItem?.id}"
+                                           class="button edit-item-button" data-order-item-id="${orderItem?.id}">
                                             <warehouse:message code="default.button.edit.label"/>
                                         </a>
-                                        <g:link action="purchaseOrder" id="${orderItem.id}" event="deleteItem" class="button icon trash" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                        <g:link action="purchaseOrder" id="${orderItem.id}" event="deleteItem"
+                                                class="button" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                                             <warehouse:message code="default.button.delete.label"/>
                                         </g:link>
                                     </g:if>
@@ -116,7 +118,7 @@
 
                                 </td>
                                 <td>
-                                    <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
+                                    <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true"
                                                    width="400" valueId="" valueName="" styleClass="text"/>
                                 </td>
                                 <td class="middle center">
@@ -148,7 +150,7 @@
                                 </td>
                                 <td></td>
                                 <td class="center">
-                                    <g:submitButton name="addItem" value="${warehouse.message(code:'order.button.addItem.label', default: 'Add line item')}" class="button icon add"/>
+                                    <g:submitButton name="addItem" value="${warehouse.message(code:'order.button.save.label', default: 'Save')}" class="button icon add"/>
                                 </td>
                             </tr>
 

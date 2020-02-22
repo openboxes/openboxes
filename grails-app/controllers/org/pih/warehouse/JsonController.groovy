@@ -836,6 +836,8 @@ class JsonController {
             }
         }
 
+        String NEVER = "${warehouse.message(code: 'default.never.label')}"
+
         boolean skipQuantity = params.boolean("skipQuantity") ?: false
         // Convert from products to json objects
         if (products) {
@@ -856,7 +858,7 @@ class JsonController {
                                 lotNumber     : (inventoryItem?.lotNumber) ?: "",
                                 expirationDate: (inventoryItem?.expirationDate) ?
                                         (dateFormat.format(inventoryItem?.expirationDate)) :
-                                        "${warehouse.message(code: 'default.never.label')}",
+                                        NEVER,
                                 quantity      : quantity
                         ]
                     }
