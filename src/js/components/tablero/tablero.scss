@@ -247,7 +247,7 @@
 
     transition-property: transform, opacity, left;
     transition-duration: 300ms;
-    transition-timing-function: ease;
+    transition-timing-function: ease-in-out;
 
     transform: scale(.9);
     transform-origin: bottom;
@@ -286,6 +286,14 @@
       top: -1%;
       user-select: none;
       cursor: pointer;
+
+      transition-property: color;
+      transition-duration: 300ms;
+      transition-timing-function: ease-in-out;
+
+      &:hover {
+        color: rgb(199, 57, 14);
+      }
     }
 
     .unarchivedList {

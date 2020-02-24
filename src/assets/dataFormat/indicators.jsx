@@ -107,7 +107,6 @@ const indicatorsFetched = [
     title: "Sent stock movements",
     type: "bar",
     id: Math.random(),
-    id: Math.random(),
     data: {
       labels: ["January", "February", "March", "April", "May", "June"],
       datasets: [
