@@ -51,6 +51,7 @@ const GraphCard = SortableElement(({ cardTitle, cardType, data }) => {
   } else if (cardType === "horizontalBar") {
     data["datasets"] = loadColors(data, "horizontalBar");
     graph = <HorizontalBar data={data} />;
+    graphClass = "graphCard";
   } else if (cardType === "numbers") {
     graph = <Numbers data={data} />;
     graphClass = "graphCard";

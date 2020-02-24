@@ -15,7 +15,7 @@
 }
 
 .hideArchive {
-  bottom: -200 !important;
+  bottom: -200;
 }
 
 .archiveDiv:hover {
@@ -245,8 +245,8 @@
     position: absolute;
     background-color: #fbfbfb;
 
-    transition-property: transform, opacity;
-    transition-duration: 200ms, 200ms;
+    transition-property: transform, opacity, left;
+    transition-duration: 300ms;
     transition-timing-function: ease;
 
     transform: scale(.9);
@@ -255,7 +255,7 @@
     opacity: 0;
 
     bottom: 150%;
-    left: -9999px;
+    left: -500px;
 
     &:after {
       top: 100%;
