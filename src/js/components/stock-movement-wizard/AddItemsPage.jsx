@@ -333,18 +333,18 @@ const VENDOR_FIELDS = {
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
         getDynamicAttr: ({
-          recipients, addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
+          recipients, addRow, rowCount, rowIndex, getSortOrder, isFromOrder, updateTotalCount,
         }) => ({
           options: recipients,
-          onTabPress: rowCount === rowIndex + 1 ? () => {
+          onTabPress: rowCount === rowIndex + 1 && !isFromOrder ? () => {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder() });
           } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
+          arrowRight: rowCount === rowIndex + 1 && !isFromOrder ? () => {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder() });
           } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
+          arrowDown: rowCount === rowIndex + 1 && !isFromOrder ? () => {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder() });
           } : null,
