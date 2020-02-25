@@ -90,7 +90,7 @@
                                         <tbody>
                                             <g:if test="${commandInstance?.searchResults}">
 												<g:each var="searchResult" in="${commandInstance?.searchResults}" status="i">
-													<tr class="${i%2?'even':'odd' }" style="color: ${searchResult.color}">
+													<tr class="${i%2?'even':'odd' }">
 														<td>
 															<g:if test="${searchResult?.product?.images }">
 															   <div class="nailthumb-container">
@@ -105,8 +105,7 @@
 														   </g:else>
 														</td>
 														<td>
-															<g:link controller="inventoryItem" action="showStockCard" id="${searchResult?.product?.id}"
-																	style="color: ${searchResult.color}">
+															<g:link controller="inventoryItem" action="showStockCard" id="${searchResult?.product?.id}" style="color: ${searchResult.color}">
 																${searchResult?.product?.productCode}
 																${searchResult?.product?.name}
 														   	</g:link>
