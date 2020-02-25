@@ -31,7 +31,7 @@ const SortableCards = SortableContainer(({ data }) => (
 ));
 
 const NumberCardsRow = ({ data }) => (
-  <div className={data.length ? "cardComponent" : "loading-numbers"}>
+  <div className="cardComponent">
     {data.map((value, index) => (
       <NumberCard
         key={`item-${value.id}`}
