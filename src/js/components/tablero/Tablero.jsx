@@ -1,18 +1,16 @@
-import React, { Component } from "react";
-import { defaults } from "react-chartjs-2";
-import { connect } from "react-redux";
-import { SortableContainer } from "react-sortable-hoc";
-import { numberData } from "../../../assets/dataFormat/numberData";
-import "react-table/react-table.css";
-import {
-  addToIndicators,
-  fetchIndicators,
-  reorderIndicators
-} from "../../actions";
-import GraphCard from "./GraphCard";
-import NumberCard from "./NumberCard";
-import UnarchiveIndicator from "./UnarchivePopout";
-import "./tablero.scss";
+/* eslint-disable no-unused-expressions */
+/* eslint-disable react/prop-types */
+import React, { Component } from 'react';
+import { defaults } from 'react-chartjs-2';
+import { connect } from 'react-redux';
+import { SortableContainer } from 'react-sortable-hoc';
+import 'react-table/react-table.css';
+import { numberData } from '../../../assets/dataFormat/numberData';
+import { addToIndicators, fetchIndicators, reorderIndicators } from '../../actions';
+import GraphCard from './GraphCard';
+import NumberCard from './NumberCard';
+import UnarchiveIndicator from './UnarchivePopout';
+import './tablero.scss';
 
 // Disable charts legends by default.
 defaults.global.legend = false;
@@ -20,7 +18,7 @@ defaults.global.legend = false;
 const SortableCards = SortableContainer(({ data }) => (
   <div className="cardComponent">
     {data.map((value, index) =>
-      value.archived ? null : (
+      (value.archived ? null : (
         <GraphCard
           key={`item-${value.id}`}
           index={index}
@@ -28,8 +26,7 @@ const SortableCards = SortableContainer(({ data }) => (
           cardType={value.type}
           data={value.data}
         />
-      )
-    )}
+      )))}
   </div>
 ));
 
@@ -48,31 +45,22 @@ const NumberCardsRow = ({ data }) => (
 );
 
 const ArchiveIndicator = ({ hideArchive }) => (
-  <div className={hideArchive ? "archiveDiv hideArchive" : "archiveDiv"}>
+  <div className={hideArchive ? 'archiveDiv hideArchive' : 'archiveDiv'}>
     <span>
-      Archive indicator <i className="fa fa-archive"></i>
+      Archive indicator <i className="fa fa-archive" />
     </span>
   </div>
 );
 
 class Tablero extends Component {
-  dataFetched = false;
   state = {
     isDragging: false,
-    showPopout: false
+    showPopout: false,
   };
-
-  constructor(props) {
-    super(props);
-  }
-
-  updateWindowDimensions() {
-    this.setState({ width: window.innerWidth, height: window.innerHeight });
-  }
-
   componentDidMount() {
     this.fetchData();
   }
+  dataFetched = false;
 
   fetchData() {
     this.props.fetchIndicators();
@@ -81,10 +69,11 @@ class Tablero extends Component {
   sortStartHandle = () => {
     this.setState({ isDragging: true });
   };
+
   sortEndHandle = ({ oldIndex, newIndex }, e) => {
-    let maxHeight = window.innerHeight - ((6 * window.innerHeight) / 100 + 80);
+    const maxHeight = window.innerHeight - (((6 * window.innerHeight) / 100) + 80);
     if (e.clientY > maxHeight) {
-      e.target.id = "archive";
+      e.target.id = 'archive';
     }
     this.props.reorderIndicators({ oldIndex, newIndex }, e);
     this.setState({ isDragging: false });
@@ -96,7 +85,7 @@ class Tablero extends Component {
       : this.setState({ showPopout: false });
   };
 
-  handleAdd = index => {
+  handleAdd = (index) => {
     this.props.addToIndicators(index);
     this.props.indicatorsData.filter(data => data.archived).length
       ? this.setState({ showPopout: true })
@@ -127,11 +116,11 @@ class Tablero extends Component {
 }
 
 const mapStateToProps = state => ({
-  indicatorsData: state.indicators.data
+  indicatorsData: state.indicators.data,
 });
 
 export default connect(mapStateToProps, {
   fetchIndicators,
   addToIndicators,
-  reorderIndicators
+  reorderIndicators,
 })(Tablero);
