@@ -58,16 +58,16 @@ class Tablero extends Component {
     this.fetchData();
   }
 
+  fetchData() {
+    this.props.fetchIndicators();
+    this.fetchNumbersData();
+  }
+
   fetchNumbersData() {
     const url = "/openboxes/apitablero/getNumberData";
     apiClient.get(url).then(res => {
       this.setState({ numberData: res.data });
     });
-  }
-
-  fetchData() {
-    this.props.fetchIndicators();
-    this.fetchNumbersData();
   }
 
   render() {
