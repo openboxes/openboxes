@@ -19,5 +19,10 @@ def getNumberData= {
     render  numberDataService.getListNumberData() as JSON;
 }
 
+def getExpirationSummary= {
+
+    render("Here are the data of expiration summary")
+}
+
 
 }

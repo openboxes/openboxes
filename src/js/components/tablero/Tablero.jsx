@@ -46,9 +46,7 @@ const NumberCardsRow = ({ data }) => (
 
 class Tablero extends Component {
   dataFetched = false;
-  state = {
-    numberData: []
-  };
+  state = { numberData: [] };
 
   constructor(props) {
     super(props);
