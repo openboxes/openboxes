@@ -224,7 +224,9 @@ class InventoryService implements ApplicationContextAware {
 
         def searchProductsQuery = {
             and {
-                'in'("category", categories)
+                if (categories) {
+                    'in'("category", categories)
+                }
                 if (command.tags) {
                     tags {
                         'in'("id", command.tags*.id)
@@ -237,12 +239,12 @@ class InventoryService implements ApplicationContextAware {
                         }
                     }
                 }
+                // This is pretty inefficient if the previous query does not narrow the results
                 if (innerProductIds) {
                     'in'("id", innerProductIds)
                 }
             }
         }
-
 
         def listPaginatedProductsQuery = {
             searchProductsQuery.delegate = delegate
@@ -251,8 +253,8 @@ class InventoryService implements ApplicationContextAware {
             firstResult command.offset
         }
 
-        def totalCount = Product.createCriteria().count(searchProductsQuery)
-        def productIds = Product.createCriteria().list(listPaginatedProductsQuery)
+        def totalCount = !searchTerms || innerProductIds ? Product.createCriteria().count(searchProductsQuery) : 0
+        def productIds = !searchTerms || innerProductIds ? Product.createCriteria().list(listPaginatedProductsQuery) : []
         def products = productIds ? Product.getAll(productIds*.id) : []
         return new PagedResultList(products, totalCount)
     }
