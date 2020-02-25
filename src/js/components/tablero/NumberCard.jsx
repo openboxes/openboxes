@@ -7,7 +7,7 @@ function truncateString(value, length) {
 }
 
 const NumberCard = ({ cardTitle, cardNumber, cardSubtitle }) => (
-  <div className="loading-numbers numberCard">
+  <div className="numberCard">
     <span className="titleCard"> {cardTitle} </span>
     <span className="resultCard"> {cardNumber.toLocaleString()} </span>
     <span className="subtitleCard"> {truncateString(cardSubtitle, 22)} </span>
