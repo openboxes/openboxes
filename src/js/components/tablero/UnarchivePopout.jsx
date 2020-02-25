@@ -1,13 +1,17 @@
-import React from "react";
-import ReactLoading from "react-loading";
-import { loadColors } from "../../../assets/dataFormat/dataLoading";
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable no-param-reassign */
+/* eslint-disable react/prop-types */
+import React from 'react';
+import ReactLoading from 'react-loading';
+import { loadColors } from '../../../assets/dataFormat/dataLoading';
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 const Numbers = () => {
-  let colors = ["green", "yellow", "red"];
-  let classColor = "circle " + colors[getRandomInt(0, colors.length)];
+  const colors = ['green', 'yellow', 'red'];
+  const classColor = `circle ${colors[getRandomInt(0, colors.length)]}`;
 
   return (
     <div className="value">
@@ -17,51 +21,51 @@ const Numbers = () => {
 };
 
 const getColor = () => {
-  let colors = [
-    "#6fb98f",
-    "#004445",
-    "#2e5685",
-    "#fcc169",
-    "#cf455c",
-    "#e89da2",
-    "#e0b623",
-    "#444444"
+  const colors = [
+    '#6fb98f',
+    '#004445',
+    '#2e5685',
+    '#fcc169',
+    '#cf455c',
+    '#e89da2',
+    '#e0b623',
+    '#444444',
   ];
   return colors[getRandomInt(0, colors.length)];
 };
 
-const ArchivedIndicators = props => {
+const ArchivedIndicators = (props) => {
   let graph;
 
-  if (props.type === "line") {
-    props.data["datasets"] = loadColors(props.data, "line");
+  if (props.type === 'line') {
+    props.data.datasets = loadColors(props.data, 'line');
     graph = <i className="fa fa-line-chart" style={{ color: getColor() }} />;
-  } else if (props.type === "bar") {
-    props.data["datasets"] = loadColors(props.data, "bar");
+  } else if (props.type === 'bar') {
+    props.data.datasets = loadColors(props.data, 'bar');
     graph = <i className="fa fa-bar-chart" style={{ color: getColor() }} />;
-  } else if (props.type === "doughnut") {
-    props.data["datasets"] = loadColors(props.data, "doughnut");
+  } else if (props.type === 'doughnut') {
+    props.data.datasets = loadColors(props.data, 'doughnut');
     graph = <i className="fa fa-pie-chart" style={{ color: getColor() }} />;
-  } else if (props.type === "horizontalBar") {
-    props.data["datasets"] = loadColors(props.data, "horizontalBar");
+  } else if (props.type === 'horizontalBar') {
+    props.data.datasets = loadColors(props.data, 'horizontalBar');
     graph = (
       <i
         className="fa fa-bar-chart horizontal-bar"
         style={{ color: getColor() }}
       />
     );
-  } else if (props.type === "numbers") {
+  } else if (props.type === 'numbers') {
     graph = <Numbers />;
-  } else if (props.type === "loading") {
+  } else if (props.type === 'loading') {
     graph = (
       <ReactLoading
         type="bubbles"
         color={getColor()}
-        height={"40px"}
-        width={"40px"}
+        height="40px"
+        width="40px"
       />
     );
-  } else if (props.type === "error") {
+  } else if (props.type === 'error') {
     graph = <i className="fa fa-repeat" />;
   }
 
@@ -90,7 +94,7 @@ const ArchivedIndicators = props => {
 const PopOut = props => (
   <div>
     {props.data.map((value, index) =>
-      value.archived ? (
+      (value.archived ? (
         <ArchivedIndicators
           key={`item-${value.id}`}
           index={index}
@@ -101,18 +105,17 @@ const PopOut = props => (
           unarchiveHandler={props.unarchiveHandler}
           size={props.size}
         />
-      ) : null
-    )}
+      ) : null))}
   </div>
 );
 
-const UnarchiveIndicator = props => {
-  let size = props.data.filter(data => data.archived).length;
+const UnarchiveIndicator = (props) => {
+  const size = props.data.filter(data => data.archived).length;
 
   return (
     <div
       className={
-        props.showPopout ? "unarchivedItems popover-active" : "unarchivedItems"
+        props.showPopout ? 'unarchivedItems popover-active' : 'unarchivedItems'
       }
     >
       <div className="unarchive" onClick={props.unarchiveHandler}>

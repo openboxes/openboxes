@@ -1,9 +1,11 @@
+/* eslint-disable react/jsx-indent */
+/* eslint-disable indent */
 import React from 'react';
 import PropTypes from 'prop-types';
 import './tablero.scss';
 
 function truncateString(value, length) {
-    return (value.length > length) ? value.substr(0, length - 1) + '...' : value;
+    return (value.length > length) ? `${value.substr(0, length - 1)}...` : value;
 }
 
 const NumberCard = ({
@@ -16,7 +18,7 @@ const NumberCard = ({
         </div>
     );
 
-export default NumberCard
+export default NumberCard;
 NumberCard.propTypes = {
     cardTitle: PropTypes.string.isRequired,
     cardNumber: PropTypes.number.isRequired,

@@ -12,7 +12,7 @@ const rootReducer = combineReducers({
   reasonCodes: reasonCodesReducer,
   users: usersReducer,
   session: sessionReducer,
-  indicators: indicatorsReducer
+  indicators: indicatorsReducer,
 });
 
 export default rootReducer;

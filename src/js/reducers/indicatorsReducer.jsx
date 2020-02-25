@@ -1,32 +1,35 @@
-import { arrayMove } from "react-sortable-hoc";
+import { arrayMove } from 'react-sortable-hoc';
 import {
   ADD_TO_INDICATORS,
   FETCH_INDICATORS,
   REMOVE_FROM_INDICATORS,
-  REORDER_INDICATORS
-} from "../actions/types";
-import { indicatorsFetched } from "../../assets/dataFormat/indicators";
+  REORDER_INDICATORS,
+} from '../actions/types';
+import { indicatorsFetched } from '../../assets/dataFormat/indicators';
 
 function arrayArchive(array, index) {
+  // eslint-disable-next-line no-param-reassign
   array[index].archived = 1;
   return arrayMove(array, index, 0);
 }
 function arrayUnarchive(array, index) {
+  // eslint-disable-next-line no-param-reassign
   array[index].archived = 0;
   return array;
 }
 
 const initialState = {
-  data: []
+  data: [],
 };
 
-export default function(state = initialState, action) {
+export default function (state = initialState, action) {
   switch (action.type) {
+    // eslint-disable-next-line no-case-declarations
     case FETCH_INDICATORS:
       const indicators = indicatorsFetched;
       return {
         ...state,
-        data: indicators
+        data: indicators,
       };
     case REORDER_INDICATORS:
       return {
@@ -34,18 +37,18 @@ export default function(state = initialState, action) {
         data: arrayMove(
           state.data,
           action.payload.oldIndex,
-          action.payload.newIndex
-        )
+          action.payload.newIndex,
+        ),
       };
     case ADD_TO_INDICATORS:
       return {
         ...state,
-        data: arrayUnarchive(state.data, action.payload.index)
+        data: arrayUnarchive(state.data, action.payload.index),
       };
     case REMOVE_FROM_INDICATORS:
       return {
         ...state,
-        data: arrayArchive(state.data, action.payload.index)
+        data: arrayArchive(state.data, action.payload.index),
       };
     default:
       return state;
