@@ -1,4 +1,4 @@
-import { addTranslationForLanguage } from 'react-localize-redux';
+import { addTranslationForLanguage } from "react-localize-redux";
 
 import {
   SHOW_SPINNER,
@@ -19,49 +19,49 @@ import apiClient, { parseResponse } from '../utils/apiClient';
 export function showSpinner() {
   return {
     type: SHOW_SPINNER,
-    payload: true,
+    payload: true
   };
 }
 
 export function hideSpinner() {
   return {
     type: HIDE_SPINNER,
-    payload: false,
+    payload: false
   };
 }
 
 export function fetchReasonCodes() {
-  const url = '/openboxes/api/reasonCodes';
+  const url = "/openboxes/api/reasonCodes";
   const request = apiClient.get(url);
 
   return {
     type: FETCH_REASONCODES,
-    payload: request,
+    payload: request
   };
 }
 
 export function fetchUsers() {
-  const url = '/openboxes/api/generic/person';
+  const url = "/openboxes/api/generic/person";
   const request = apiClient.get(url);
 
   return {
     type: FETCH_USERS,
-    payload: request,
+    payload: request
   };
 }
 
 export function fetchSessionInfo() {
-  const url = '/openboxes/api/getAppContext';
+  const url = "/openboxes/api/getAppContext";
   const request = apiClient.get(url);
 
   return {
     type: FETCH_SESSION_INFO,
-    payload: request,
+    payload: request
   };
 }
 
 export function changeCurrentLocation(location) {
-  return (dispatch) => {
+  return dispatch => {
     const url = `/openboxes/api/chooseLocation/${location.id}`;
 
     apiClient.put(url).then(() => {
@@ -92,7 +92,7 @@ export function fetchTranslations(lang, prefix) {
 }
 
 export function changeCurrentLocale(locale) {
-  return (dispatch) => {
+  return dispatch => {
     const url = `/openboxes/api/chooseLocale/${locale}`;
 
     apiClient.put(url).then(() => {
@@ -121,11 +121,11 @@ export function reorderIndicators({ oldIndex, newIndex }, e) {
   if (e.target.id === 'archive') {
     return {
       type: REMOVE_FROM_INDICATORS,
-      payload: { index: oldIndex },
+      payload: { index: oldIndex }
     };
   }
   return {
     type: REORDER_INDICATORS,
-    payload: { oldIndex, newIndex },
+    payload: { oldIndex, newIndex }
   };
 }

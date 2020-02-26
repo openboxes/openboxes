@@ -35,6 +35,7 @@
     flex-wrap: wrap;
 
     .numberCard {
+      position: relative;
       width: 47.5%;
       height: 124px;
       margin: 1%;
@@ -44,6 +45,10 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+
+      animation-name: slide-down;
+      animation-duration: 1s;
+      animation-timing-function: ease-out;
 
       .titleCard {
         color: #cdcdcd;
@@ -78,6 +83,20 @@
         width: 14.32%;
       }
     }
+  }
+}
+
+@keyframes slide-down {
+  from {
+    top: -200;
+    margin: -100 1% -100 1%;
+    padding: -100 24px -100 24px;
+  }
+
+  to {
+    top: 0;
+    margin: 1%;
+    padding: 24px;
   }
 }
 

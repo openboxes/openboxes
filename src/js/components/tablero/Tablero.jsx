@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
@@ -64,6 +62,14 @@ class Tablero extends Component {
 
   fetchData() {
     this.props.fetchIndicators();
+    this.fetchNumbersData();
+  }
+
+  fetchNumbersData() {
+    const url = "/openboxes/apitablero/getNumberData";
+    apiClient.get(url).then(res => {
+      this.setState({ numberData: res.data });
+    });
   }
 
   sortStartHandle = () => {
@@ -116,7 +122,7 @@ class Tablero extends Component {
 }
 
 const mapStateToProps = state => ({
-  indicatorsData: state.indicators.data,
+  indicatorsData: state.indicators.data
 });
 
 export default connect(mapStateToProps, {
