@@ -8,12 +8,10 @@ import {
 import { indicatorsFetched } from '../../assets/dataFormat/indicators';
 
 function arrayArchive(array, index) {
-  // eslint-disable-next-line no-param-reassign
   array[index].archived = 1;
   return arrayMove(array, index, 0);
 }
 function arrayUnarchive(array, index) {
-  // eslint-disable-next-line no-param-reassign
   array[index].archived = 0;
   return array;
 }
@@ -24,7 +22,6 @@ const initialState = {
 
 export default function (state = initialState, action) {
   switch (action.type) {
-    // eslint-disable-next-line no-case-declarations
     case FETCH_INDICATORS:
       const indicators = indicatorsFetched;
       return {

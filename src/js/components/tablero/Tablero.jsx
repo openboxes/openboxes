@@ -8,6 +8,7 @@ import { addToIndicators, fetchIndicators, reorderIndicators } from '../../actio
 import GraphCard from './GraphCard';
 import NumberCard from './NumberCard';
 import UnarchiveIndicator from './UnarchivePopout';
+import apiClient from '../../utils/apiClient';
 import './tablero.scss';
 
 // Disable charts legends by default.
