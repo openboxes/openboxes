@@ -27,6 +27,9 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderAdjustmentType
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
@@ -203,6 +206,26 @@ class SelectTagLib {
         }
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+
+    def selectOrderAdjustmentTypes = { attrs, body ->
+        attrs.from = OrderAdjustmentType.list()
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.name }
+        out << g.select(attrs)
+
+    }
+
+
+    def selectOrderItems = { attrs, body ->
+        def order = Order.get(attrs.orderId)
+        if (!order) {
+            throw new IllegalArgumentException("Order items drop down requires a valid order")
+        }
+        attrs.from = OrderItem.findAllByOrder(order)
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.toString() }
         out << g.select(attrs)
     }
 
