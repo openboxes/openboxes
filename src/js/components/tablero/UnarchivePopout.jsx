@@ -1,7 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable no-param-reassign */
-/* eslint-disable react/prop-types */
 import React from 'react';
 import ReactLoading from 'react-loading';
 import { loadColors } from '../../../assets/dataFormat/dataLoading';
@@ -120,7 +116,7 @@ const UnarchiveIndicator = (props) => {
     >
       <div className="unarchive" onClick={props.unarchiveHandler}>
         <span>
-          Unarchive indicator ({size}) <i className="fa fa-archive" />
+          Archived Indicators ({size}) <i className="fa fa-archive" />
         </span>
       </div>
       <div className="unarchive-popover">

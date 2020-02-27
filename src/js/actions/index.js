@@ -16,6 +16,8 @@ import {
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
 
+import { expirationSummary, fillRate, sentStock, stockReceived, outgoingStock, inventorySummary } from '../../assets/dataFormat/indicators';
+
 export function showSpinner() {
   return {
     type: SHOW_SPINNER,
@@ -104,9 +106,102 @@ export function changeCurrentLocale(locale) {
   };
 }
 
-export function fetchIndicators() {
-  return {
+function fetchIndicator(indicatorName, dispatch) {
+  let data = null;
+  let title = null;
+  let type = null;
+  let archived = 0;
+  const id = Math.random();
+
+  switch (indicatorName) {
+    case 'inventorySummary':
+      data = inventorySummary;
+      title = 'Inventory Summary';
+      type = 'horizontalBar';
+      break;
+    case 'expirationSummary':
+      data = expirationSummary;
+      title = 'Expiration Summary';
+      type = 'line';
+      break;
+    case 'fillRate':
+      data = fillRate;
+      title = 'Fill Rate';
+      type = 'line';
+      break;
+    case 'sentStock':
+      data = sentStock;
+      title = 'Sent Stock Movements';
+      type = 'bar';
+      break;
+    case 'stockReceived':
+      data = stockReceived;
+      title = 'Stock Movements Received';
+      type = 'doughnut';
+      archived = 1;
+      break;
+    case 'outgoingStock':
+      data = outgoingStock;
+      title = 'Outgoing Stock Movements';
+      type = 'numbers';
+      break;
+    default:
+      title = 'Error';
+      type = 'error';
+  }
+
+  dispatch({
     type: FETCH_INDICATORS,
+    payload: {
+      id,
+      title,
+      type: 'loading',
+      data,
+      archived,
+    },
+  });
+
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (data) {
+        resolve(data);
+      } else {
+        reject();
+      }
+    }, Math.floor((Math.random() * 5) + 2) * 1000); // between 2 and 6 seconds
+  }).then((res) => {
+    dispatch({
+      type: FETCH_INDICATORS,
+      payload: {
+        id,
+        title,
+        type,
+        data: res,
+        archived,
+      },
+    });
+  }, () => {
+    dispatch({
+      type: FETCH_INDICATORS,
+      payload: {
+        id,
+        title,
+        type: 'error',
+        data: [],
+        archived,
+      },
+    });
+  });
+}
+
+export function fetchIndicators() {
+  return (dispatch) => {
+    fetchIndicator('inventorySummary', dispatch);
+    fetchIndicator('expirationSummary', dispatch);
+    fetchIndicator('fillRate', dispatch);
+    fetchIndicator('sentStock', dispatch);
+    fetchIndicator('stockReceived', dispatch);
+    fetchIndicator('outgoingStock', dispatch);
   };
 }
 

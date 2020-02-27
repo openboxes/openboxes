@@ -5,11 +5,11 @@ import { SortableContainer } from 'react-sortable-hoc';
 import 'react-table/react-table.css';
 import { numberData } from '../../../assets/dataFormat/numberData';
 import { addToIndicators, fetchIndicators, reorderIndicators } from '../../actions';
+import apiClient from '../../utils/apiClient';
 import GraphCard from './GraphCard';
 import NumberCard from './NumberCard';
-import UnarchiveIndicator from './UnarchivePopout';
-import apiClient from '../../utils/apiClient';
 import './tablero.scss';
+import UnarchiveIndicator from './UnarchivePopout';
 
 // Disable charts legends by default.
 defaults.global.legend = false;

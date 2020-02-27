@@ -5,15 +5,26 @@ import {
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
 } from '../actions/types';
-import { indicatorsFetched } from '../../assets/dataFormat/indicators';
 
 function arrayArchive(array, index) {
-  array[index].archived = 1;
-  return arrayMove(array, index, 0);
+  const newArray = array;
+  newArray[index].archived = 1;
+  return newArray;
 }
+
 function arrayUnarchive(array, index) {
-  array[index].archived = 0;
-  return array;
+  const newArray = array;
+  newArray[index].archived = 0;
+  return newArray;
+}
+
+function findInArray(id, array) {
+  for (let i = 0; i < array.length; i += 1) {
+    if (array[i].id === id) {
+      return i;
+    }
+  }
+  return false;
 }
 
 const initialState = {
@@ -22,12 +33,20 @@ const initialState = {
 
 export default function (state = initialState, action) {
   switch (action.type) {
-    case FETCH_INDICATORS:
-      const indicators = indicatorsFetched;
+    case FETCH_INDICATORS: {
+      // new reference to array so the component is re-rendered when value changes
+      const newState = [].concat(state.data);
+      const index = findInArray(action.payload.id, state.data);
+      if (index === false) {
+        newState.push(action.payload);
+      } else {
+        newState[index] = action.payload;
+      }
       return {
         ...state,
-        data: indicators,
+        data: newState,
       };
+    }
     case REORDER_INDICATORS:
       return {
         ...state,
