@@ -23,7 +23,7 @@ def getNumberData= {
 def getExpirationSummary= {
     IndicatorDataService indicator = new IndicatorDataService();
 
-    render indicator.getIndicatorData() as JSON;
+    render indicator.getExpirationSummaryData().toJson() as JSON;
 }
 
 
