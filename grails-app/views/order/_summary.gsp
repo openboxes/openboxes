@@ -60,10 +60,31 @@
         <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List purchase order"/>
     </g:link>
 
-    <g:link controller="order" action="create" class="button">
-        <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-        <warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create purchase order" />
-    </g:link>
+    <g:if test="${!orderInstance?.id}">
+        <g:link controller="order" action="create" class="button">
+            <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+            <warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create purchase order" />
+        </g:link>
+    </g:if>
+    <g:else>
+        <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
+            <g:if test="${!orderInstance?.isPlaced()}">
+                <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button" >
+                    <img src="${resource(dir: 'images/icons/silk', file: 'creditcards.png')}" />&nbsp;
+                    ${warehouse.message(code: 'order.wizard.placeOrder.label')}</g:link>
+            </g:if>
+            <g:else>
+                <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button" disabled="disabled" >
+                    <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
+                    ${warehouse.message(code: 'order.wizard.placeOrder.label')}</g:link>
+
+            </g:else>
+            <g:link controller="order" action="shipOrder" id="${orderInstance?.id}" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
+                <warehouse:message code="order.shipOrder.label" default="Ship Order"/>
+            </g:link>
+        </g:if>
+    </g:else>
 
     <div class="right">
 
@@ -92,6 +113,10 @@
                 </g:elseif>
             </div>
             <div class="button-group">
+                <g:link controller="order" action="addAdjustment" id="${orderInstance?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'basket_put.png')}" />&nbsp;
+                    <warehouse:message code="default.add.label" args="[g.message(code: 'orderAdjustment.label')]"/>
+                </g:link>
                 <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
                     <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>

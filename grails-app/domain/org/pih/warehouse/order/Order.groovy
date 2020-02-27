@@ -33,7 +33,15 @@ class Order implements Serializable {
     Date dateCreated
     Date lastUpdated
 
-    static hasMany = [orderItems: OrderItem, comments: Comment, documents: Document, events: Event]
+    static transients = ["totalAdjustments", "subtotal", "total"]
+
+    static hasMany = [
+            orderItems: OrderItem,
+            comments: Comment,
+            documents: Document,
+            events: Event,
+            orderAdjustments: OrderAdjustment,
+    ]
     static mapping = {
         id generator: 'uuid'
         table "`order`"
@@ -145,10 +153,22 @@ class Order implements Serializable {
     }
 
     def totalPrice() {
-        def totalPrice = orderItems.collect { it.totalPrice() }.sum()
-        return totalPrice ?: 0
+        return orderItems.collect { it.totalPrice() }.sum() ?: 0
     }
 
+    def getTotalAdjustments() {
+        return orderAdjustments.sum {
+            return it.amount ?: it.percentage ? (it.percentage/100) * totalPrice() : 0
+        }?:0
+    }
+
+    def getSubtotal() {
+        totalPrice()
+    }
+
+    def getTotal() {
+        return (totalPrice() + totalAdjustments)?:0
+    }
 
     String generateName() {
         final String separator =

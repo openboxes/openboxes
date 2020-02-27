@@ -36,7 +36,7 @@ class OrderController {
 
         def name = params.name
         def orderNumber = params.orderNumber
-        def orderTypeCode = params.orderTypeCode ? params.orderTypeCode as OrderTypeCode : null
+        def orderTypeCode = params.orderTypeCode ? params.orderTypeCode as OrderTypeCode : OrderTypeCode.PURCHASE_ORDER
         def origin = params.origin ? Location.get(params.origin) : null
         def destination = params.destination ? Location.get(params.destination) : Location.get(session?.warehouse?.id)
         def status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
@@ -170,6 +170,87 @@ class OrderController {
             redirect(action: "list")
         }
     }
+
+    def addAdjustment = {
+        def orderInstance = Order.get(params?.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        } else {
+            render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: new OrderAdjustment()])
+        }
+    }
+
+    def editAdjustment = {
+        log.info "params: ${params}"
+        def orderInstance = Order.get(params?.order?.id)
+        if (!orderInstance) {
+                log.info "order not found"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        } else {
+            def orderAdjustment = OrderAdjustment.get(params?.id)
+            if (!orderAdjustment) {
+                log.info "order adjustement not found"
+                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
+                redirect(action: "show", id: orderInstance?.id)
+            }
+            render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
+        }
+    }
+
+    def saveAdjustment = {
+        def orderInstance = Order.get(params?.order?.id)
+        if (orderInstance) {
+            def orderAdjustment = OrderAdjustment.get(params?.id)
+            if (orderAdjustment) {
+                orderAdjustment.properties = params
+                if (!orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
+                    redirect(action: "show", id: orderInstance.id)
+                } else {
+                    render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
+                }
+            } else {
+                orderAdjustment = new OrderAdjustment(params)
+                orderInstance.addToOrderAdjustments(orderAdjustment)
+                if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
+                    redirect(action: "show", id: orderInstance.id)
+                } else {
+                    render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
+                }
+            }
+        } else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        }
+
+    }
+
+    def deleteAdjustment = {
+        def orderInstance = Order.get(params.order.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
+            redirect(action: "list")
+        } else {
+            def orderAdjustment = OrderAdjustment.get(params?.id)
+            if (!orderAdjustment) {
+                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), params.id])}"
+                redirect(action: "show", id: orderInstance?.id)
+            } else {
+                orderInstance.removeFromOrderAdjustments(orderAdjustment)
+                orderAdjustment.delete()
+                if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
+                    redirect(action: "show", id: orderInstance.id)
+                } else {
+                    render(view: "show", model: [orderInstance: orderInstance])
+                }
+            }
+        }
+    }
+
 
 
     def addComment = {
