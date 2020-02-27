@@ -15,7 +15,6 @@ import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 
 enum StockMovementType {
 
