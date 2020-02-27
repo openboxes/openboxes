@@ -17,18 +17,4 @@ class NumberData implements Serializable {
         
     }
 
-    String toString() {
-        return "id" + this.id  + "title" + this.title + "number" + this.number + "subtitle" + this.subtitle;
-    }
-
-    Map toJson() {
-        
-        return [
-                "id"       : id,
-                "title"     : title,
-                "number": number,
-                "subtitle" : subtitle
-        ]
-    }
-
 }

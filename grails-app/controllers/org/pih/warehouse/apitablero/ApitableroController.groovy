@@ -3,6 +3,7 @@ package org.pih.warehouse.apitablero
 
 import grails.converters.JSON
 import org.pih.warehouse.tableroapi.NumberDataService
+import org.pih.warehouse.tableroapi.IndicatorDataService
 import org.pih.warehouse.tablero.NumberData
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -20,8 +21,9 @@ def getNumberData= {
 }
 
 def getExpirationSummary= {
+    IndicatorDataService indicator = new IndicatorDataService();
 
-    render("Here are the data of expiration summary")
+    render indicator.getIndicatorData() as JSON;
 }
 
 
