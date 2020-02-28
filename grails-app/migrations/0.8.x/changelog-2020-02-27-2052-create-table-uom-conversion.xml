@@ -2,7 +2,7 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-  <changeSet author="jmiranda (generated)" id="1582860014268-11">
+  <changeSet author="jmiranda (generated)" id="1582866990971-1">
     <preConditions onFail="MARK_RAN">
       <not>
         <tableExists tableName="unit_of_measure_conversion"/>
@@ -35,5 +35,28 @@
       </column>
     </createTable>
   </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582866990971-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK2E4511844A3E746"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="from_unit_of_measure_id"
+      baseTableName="unit_of_measure_conversion" constraintName="FK2E4511844A3E746"
+      deferrable="false" initiallyDeferred="false" referencedColumnNames="id"
+      referencedTableName="unit_of_measure"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582866990971-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK2E4511849B9434D5"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="to_unit_of_measure_id"
+      baseTableName="unit_of_measure_conversion" constraintName="FK2E4511849B9434D5"
+      deferrable="false" initiallyDeferred="false" referencedColumnNames="id"
+      referencedTableName="unit_of_measure"/>
+  </changeSet>
+
 
 </databaseChangeLog>
