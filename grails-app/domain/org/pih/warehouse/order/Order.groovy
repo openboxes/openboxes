@@ -15,19 +15,23 @@ import org.pih.warehouse.core.*
 class Order implements Serializable {
 
     String id
-    OrderStatus status
+    OrderStatus status = OrderStatus.PENDING
     OrderTypeCode orderTypeCode
     String name
     String description        // a user-defined, searchable name for the order
     String orderNumber        // an auto-generated shipment number
+
     Location origin            // the vendor
     Location destination    // the customer location
     Person recipient
     Person orderedBy
-    Date dateOrdered
     Person completedBy
+    Date dateOrdered
     Date dateCompleted
 
+    // Currency conversion
+    String currencyCode
+    BigDecimal exchangeRate
 
     // Audit fields
     Date dateCreated
@@ -49,6 +53,7 @@ class Order implements Serializable {
         name(nullable: false)
         description(nullable: true, maxSize: 255)
         orderNumber(nullable: true, maxSize: 255)
+        currencyCode(nullable:true)
         origin(nullable: false)
         destination(nullable: false)
         recipient(nullable: true)
@@ -64,7 +69,7 @@ class Order implements Serializable {
      * Override the status getter so that we return pending if no state set
      */
     OrderStatus getStatus() {
-        return status ?: OrderStatus.PENDING
+        return status
     }
 
 
@@ -75,7 +80,6 @@ class Order implements Serializable {
      *  done manually)
      */
     OrderStatus updateStatus() {
-
         if (orderItems?.size() > 0 && orderItems?.size() == orderItems?.findAll {
             it.isCompletelyFulfilled()
         }?.size()) {

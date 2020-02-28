@@ -79,9 +79,6 @@
                                             showTrigger="false" />
                                 </td>
                             </tr>
-
-
-
                             <tr class='prop'>
                                 <td valign='top' class='name middle'>
                                     <label for="destination.id"><warehouse:message code="order.destination.label"/></label>
@@ -96,6 +93,13 @@
                                         <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
                                     </g:else>
 
+                                </td>
+                            </tr>
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'><label for='currencyCode'><warehouse:message code="order.currencyCode.label"/></label></td>
+                                <td valign='top'
+                                    class='value ${hasErrors(bean:order,field:'currency','errors')}'>
+                                    <g:selectCurrency name="currencyCode" class="chzn-select-deselect" value="${order?.currencyCode}" noSelection="['':'']"/>
                                 </td>
                             </tr>
                             <tr class='prop'>

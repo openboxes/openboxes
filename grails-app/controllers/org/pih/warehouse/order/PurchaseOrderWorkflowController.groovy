@@ -50,7 +50,7 @@ class PurchaseOrderWorkflowController {
 
         enterOrderDetails {
             on("next") {
-                log.info "Enter order details " + params
+                log.info "Save order details " + params
 
                 flow.order.properties = params
                 log.info "Order " + flow.order.properties
