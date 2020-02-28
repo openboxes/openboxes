@@ -157,7 +157,7 @@ class Order implements Serializable {
     }
 
     def getTotalAdjustments() {
-        return orderAdjustments.sum {
+        return orderAdjustments?.sum {
             return it.amount ?: it.percentage ? (it.percentage/100) * totalPrice() : 0
         }?:0
     }
