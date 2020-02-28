@@ -60,4 +60,5 @@
     <include file="0.8.x/changelog-2020-01-13-1630-replace-view-product-demand.xml"/>
     <include file="0.8.x/changelog-2020-01-14-1235-alter-table-order-shipment.xml"/>
     <include file="0.8.x/changelog-2020-02-12-2045-add-column-order-item-product-supplier-id.xml"/>
+    <include file="0.8.x/changelog-2020-02-27-2108-alter-table-order-shipment.xml"/>
 </databaseChangeLog>
