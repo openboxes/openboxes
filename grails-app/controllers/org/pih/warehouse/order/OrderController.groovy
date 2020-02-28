@@ -30,21 +30,22 @@ class OrderController {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list = { OrderCommand command ->
 
         def suppliers = orderService.getSuppliers().sort()
 
-        def name = params.name
-        def orderNumber = params.orderNumber
-        def orderTypeCode = params.orderTypeCode ? params.orderTypeCode as OrderTypeCode : OrderTypeCode.PURCHASE_ORDER
-        def origin = params.origin ? Location.get(params.origin) : null
-        def destination = params.destination ? Location.get(params.destination) : Location.get(session?.warehouse?.id)
-        def status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
+        def orderTemplate = new Order(params)
+        orderTemplate.status = null
+//        def name = params.name
+//        def orderNumber = params.orderNumber
+//        def orderTypeCode = params.orderTypeCode ? params.orderTypeCode as OrderTypeCode : null
+//        def origin = params.origin ? Location.get(params.origin) : null
+//        def destination = params.destination ? Location.get(params.destination) : Location.get(session?.warehouse?.id)
+//        def status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
         def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
         def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-        def orderedBy = params.orderedById ? User.get(params.orderedById) : null
-
-        def orders = orderService.getOrders(name, orderNumber, destination, origin, orderedBy, orderTypeCode, status, statusStartDate, statusEndDate)
+//        def orderedBy = params.orderedById ? User.get(params.orderedById) : null
+        def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
 
         // sort by order date
         orders = orders.sort({ a, b ->
@@ -58,10 +59,16 @@ class OrderController {
 
         def orderedByList = orders.collect { it.orderedBy }.unique()
 
-        [orders       : orders, origin: origin?.id, destination: destination?.id,
-         status       : status, statusStartDate: statusStartDate, statusEndDate: statusEndDate,
-         suppliers    : suppliers, totalPrice: totalPrice, orderedByList: orderedByList,
-         orderTypeCode: orderTypeCode
+        [
+                orders         : orders,
+                command        : command,
+                status         : orderTemplate.status,
+                statusStartDate: statusStartDate,
+                statusEndDate  : statusEndDate,
+                suppliers      : suppliers,
+                totalPrice     : totalPrice,
+                orderedByList  : orderedByList,
+                orderTypeCode  : orderTemplate?.orderTypeCode
         ]
     }
 

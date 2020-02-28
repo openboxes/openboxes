@@ -31,36 +31,40 @@ class OrderService {
     def inventoryService
 
 
-    List<Order> getOrders(String name, String orderNumber, Location destination, Location origin, User orderedBy, OrderTypeCode orderTypeCode, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
-        def orders = Order.withCriteria {
+    //List<Order> getOrders(Order order, Map params) {
+        //String name, String orderNumber, Location destination, Location origin, User orderedBy, OrderTypeCode orderTypeCode, OrderStatus status, Date orderedFromDate, Date orderedToDate
+    //}
+
+    def getOrders(Order order, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
+        def orders = Order.createCriteria().list(params) {
             and {
-                if (name) {
+                if (order.name || order.description) {
                     or {
-                        ilike("name", "%" + name + "%")
-                        ilike("description", "%" + name + "%")
+                        ilike("name", "%" + order.name + "%")
+                        ilike("description", "%" + order.name + "%")
                     }
                 }
-                if (orderNumber) {
-                    ilike("orderNumber", "%" + orderNumber + "%")
+                if (order.orderNumber) {
+                    ilike("orderNumber", "%" + order.orderNumber + "%")
                 }
-                if (orderTypeCode) {
-                    eq("orderTypeCode", orderTypeCode)
+                if (order.orderTypeCode) {
+                    eq("orderTypeCode", order.orderTypeCode)
                 }
-                if (destination) eq("destination", destination)
-                if (origin) {
-                    eq("origin", origin)
+                if (order.destination) eq("destination", order.destination)
+                if (order.origin) {
+                    eq("origin", order.origin)
                 }
-                if (status) {
-                    eq("status", status)
+                if (order.status) {
+                    eq("status", order.status)
                 }
-                if (orderedFromDate) {
-                    ge("dateOrdered", orderedFromDate)
+                if (dateOrderedFrom) {
+                    ge("dateOrdered", dateOrderedFrom)
                 }
-                if (orderedToDate) {
-                    le("dateOrdered", orderedToDate)
+                if (dateOrderedTo) {
+                    le("dateOrdered", dateOrderedTo)
                 }
-                if (orderedBy) {
-                    eq("orderedBy", orderedBy)
+                if (order.orderedBy) {
+                    eq("orderedBy", order.orderedBy)
                 }
             }
         }

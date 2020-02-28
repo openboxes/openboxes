@@ -33,14 +33,15 @@
 			<div class="yui-gf">
 				<div class="yui-u first">
 					<g:render template="filters" model="[]"/>
-
 				</div>
 				<div class="yui-u">
 
 					<div class="box">
-						<h2><warehouse:message code="default.list.label" args="[entityName]" /> <small>(<g:formatNumber number="${totalPrice}"/>
-                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode})</small></h2>
-						<table class="${orders?'dataTable':''}">
+						<h2>
+							<warehouse:message code="default.list.label" args="[entityName]" />
+%{--							<small>(<g:formatNumber number="${totalPrice}"/> ${grailsApplication.config.openboxes.locale.defaultCurrencyCode})</small>--}%
+						</h2>
+						<table>
 							<thead>
 								<tr>
 									<th>${warehouse.message(code: 'default.actions.label')}</th>
@@ -55,6 +56,7 @@
                                     <th>${warehouse.message(code: 'order.orderedBy.label')}</th>
 									<th>${warehouse.message(code: 'order.dateOrdered.label')}</th>
 									<th>${warehouse.message(code: 'order.orderItems.label')}</th>
+									<th>${warehouse.message(code: 'order.totalPrice.label')}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -69,7 +71,7 @@
 								</g:unless>
 
 								<g:each var="orderInstance" in="${orders}" status="i">
-									<g:set var="totalPrice" value="${totalPrice + (orderInstance.totalPrice()?:0)}"/>
+
 									<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 										<td class="middle" width="1%">
 											<div class="action-menu">
@@ -112,28 +114,27 @@
 											<g:set var="lineItems" value="${orderInstance?.orderItems?.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }}"/>
 											${lineItems.size()?:0}
 										</td>
+										<td class="right middle">
+											<g:formatNumber number="${orderInstance.totalPrice()}"/>
+											${orderInstance.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+										</td>
 									</tr>
 								</g:each>
 							</tbody>
-                            <%--
-							<tfoot>
-							<tr class="odd">
-								<th colspan="7"><label>${warehouse.message(code:'default.total.label')}</label></th>
-								<th colspan="1" class="right">
-									<div class="text large">
-
-										<g:formatNumber number="${totalPrice}"/>
-										${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-
-									</div>
-								</th>
-								<th>
-
-								</th>
-							</tr>
-							</tfoot>
-							--%>
+%{--							<tfoot>--}%
+%{--								<tr class="odd">--}%
+%{--									<th colspan="10"><label>${warehouse.message(code:'default.total.label')}</label></th>--}%
+%{--									<th colspan="1" class="right">--}%
+%{--										<g:formatNumber number="${totalPrice}"/>--}%
+%{--										${grailsApplication.config.openboxes.locale.defaultCurrencyCode}--}%
+%{--									</th>--}%
+%{--								</tr>--}%
+%{--							</tfoot>--}%
 						</table>
+					</div>
+					<div class="paginateButtons">
+						<g:set var="pageParams" value="${pageScope.variables['params']}"/>
+						<g:paginate total="${orders.totalCount}" params="${params}"/>
 					</div>
 				</div>
 
