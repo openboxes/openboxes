@@ -29,6 +29,10 @@ const FIELDS = {
   packPageItems: {
     type: ArrayField,
     arrowsNavigation: true,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     fields: {
       productCode: {
         type: LabelField,
@@ -169,9 +173,12 @@ class PackingPage extends Component {
 
     this.state = {
       values: { ...this.props.initialValues, packPageItems: [] },
+      totalCount: 0,
     };
 
     this.saveSplitLines = this.saveSplitLines.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
+    this.loadMoreRows = this.loadMoreRows.bind(this);
 
     this.debouncedUsersFetch =
       debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -195,6 +202,16 @@ class PackingPage extends Component {
     }
   }
 
+  setPackPageItems(response) {
+    const { data } = response.data;
+    this.setState({
+      values: {
+        ...this.state.values,
+        packPageItems: _.uniq(_.concat(this.state.values.packPageItems, data)),
+      },
+    });
+  }
+
   dataFetched = false;
 
   /**
@@ -202,15 +219,50 @@ class PackingPage extends Component {
    * @public
    */
   fetchAllData() {
-    this.fetchLineItems().then((resp) => {
-      const { packPageItems } = resp.data.data.packPage;
-      const { statusCode } = resp.data.data;
-      this.setState({ values: { ...this.state.values, statusCode, packPageItems } }, () => {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=5`;
+
+    apiClient.get(url)
+      .then((resp) => {
+        const { statusCode } = resp.data.data;
+        const { totalCount } = resp.data;
+
+        this.setState({ values: { ...this.state.values, statusCode }, totalCount }, () => {
+          this.props.hideSpinner();
+        });
+      }).catch(() => {
         this.props.hideSpinner();
       });
-    }).catch(() => {
-      this.props.hideSpinner();
-    });
+
+
+    if (!this.props.isPaginated) {
+      this.fetchLineItems().then((response) => {
+        this.setPackPageItems(response);
+      });
+    }
+  }
+
+  loadMoreRows({ startIndex, stopIndex }) {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=5`;
+    apiClient.get(url)
+      .then((response) => {
+        this.setPackPageItems(response);
+      });
+  }
+
+  isRowLoaded({ index }) {
+    return !!this.state.values.packPageItems[index];
+  }
+
+  /**
+   * Fetches 5th step data from current stock movement.
+   * @public
+   */
+  fetchLineItems() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=5`;
+
+    return apiClient.get(url)
+      .then(resp => resp)
+      .catch(err => err);
   }
 
   /**
@@ -222,8 +274,8 @@ class PackingPage extends Component {
     this.props.showSpinner();
     this.savePackingData(formValues.packPageItems)
       .then((resp) => {
-        const { packPageItems } = resp.data.data.packPage;
-        this.setState({ values: { ...this.state.values, packPageItems } });
+        const { data } = resp.data;
+        this.setState({ values: { ...this.state.values, packPageItems: data } });
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
@@ -266,18 +318,6 @@ class PackingPage extends Component {
       return apiClient.post(url, payload);
     }
     return Promise.resolve();
-  }
-
-  /**
-   * Fetches 5th step data from current stock movement.
-   * @public
-   */
-  fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=5`;
-
-    return apiClient.get(url)
-      .then(resp => resp)
-      .catch(err => err);
   }
 
   /**
@@ -335,8 +375,14 @@ class PackingPage extends Component {
       },
     }))
       .then((resp) => {
-        const { packPageItems } = resp.data.data.packPage;
-        this.setState({ values: { ...this.state.values, packPageItems } });
+        const { data } = resp.data;
+        this.setState({
+          values: {
+            ...this.state.values,
+            packPageItems: data,
+          },
+          totalCount: this.state.totalCount + (splitLineItems.length - 1),
+        });
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
@@ -396,6 +442,10 @@ class PackingPage extends Component {
                 formValues: values,
                 debouncedUsersFetch: this.debouncedUsersFetch,
                 hasBinLocationSupport: this.props.hasBinLocationSupport,
+                totalCount: this.state.totalCount,
+                loadMoreRows: this.loadMoreRows,
+                isRowLoaded: this.isRowLoaded,
+                isPaginated: this.props.isPaginated,
               }))}
               <div>
                 <button
@@ -427,6 +477,7 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  isPaginated: state.session.isPaginated,
 });
 
 export default (connect(mapStateToProps, {
@@ -453,4 +504,6 @@ PackingPage.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
 };

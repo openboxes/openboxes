@@ -617,6 +617,9 @@ openboxes.shipping.search.maxResults = 1000
 openboxes.receiving.createReceivingLocation.enabled = true
 openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX
 
+// Pagination
+openboxes.api.pagination.enabled = true
+
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
 grails.doc.subtitle = ""
