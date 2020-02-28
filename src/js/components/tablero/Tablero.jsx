@@ -3,10 +3,10 @@ import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import { SortableContainer } from 'react-sortable-hoc';
 import 'react-table/react-table.css';
-import { numberData } from '../../../assets/dataFormat/numberData';
 import { addToIndicators, fetchIndicators, reorderIndicators } from '../../actions';
 import apiClient from '../../utils/apiClient';
 import GraphCard from './GraphCard';
+import LoadingNumbers from './LoadingNumbers';
 import NumberCard from './NumberCard';
 import './tablero.scss';
 import UnarchiveIndicator from './UnarchivePopout';
@@ -29,19 +29,27 @@ const SortableCards = SortableContainer(({ data }) => (
   </div>
 ));
 
-const NumberCardsRow = ({ data }) => (
-  <div className="cardComponent">
-    {data.map((value, index) => (
-      <NumberCard
-        key={`item-${value.id}`}
-        index={index}
-        cardTitle={value.title}
-        cardNumber={value.number}
-        cardSubtitle={value.subtitle}
-      />
-    ))}
-  </div>
-);
+const NumberCardsRow = ({ data }) => {
+  if (data) {
+    return (
+      <div className="cardComponent">
+        {data.map((value, index) => (
+          <NumberCard
+            key={`item-${value.id}`}
+            index={index}
+            cardTitle={value.title}
+            cardNumber={value.number}
+            cardSubtitle={value.subtitle}
+          />
+        ))}
+      </div>
+    );
+  } else {
+    return (
+      <LoadingNumbers />
+    );
+  }
+};
 
 const ArchiveIndicator = ({ hideArchive }) => (
   <div className={hideArchive ? 'archiveDiv hideArchive' : 'archiveDiv'}>
@@ -102,7 +110,7 @@ class Tablero extends Component {
   render() {
     return (
       <div className="cardsContainer">
-        <NumberCardsRow data={numberData} />
+        <NumberCardsRow data={this.state.numberData} />
         <SortableCards
           data={this.props.indicatorsData}
           onSortStart={this.sortStartHandle}
