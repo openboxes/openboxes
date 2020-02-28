@@ -9,7 +9,7 @@ class IndicatorDataService {
 DataGraph getExpirationSummaryData(){
 
     List<IndicatorDatasets> datasets = [
-        new IndicatorDatasets(3, 'Expiration summary', [400, 380, 395, 375, 430, 370], true).toJson()
+        new IndicatorDatasets(3, 'Expiration summary', [400, 380, 395, 375, 430, 370], true)
     ];
 
     IndicatorData data = new IndicatorData(datasets, 2, ['January', 'February', 'March', 'April', 'May', 'June']);
