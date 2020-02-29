@@ -79,9 +79,6 @@
                                             showTrigger="false" />
                                 </td>
                             </tr>
-
-
-
                             <tr class='prop'>
                                 <td valign='top' class='name middle'>
                                     <label for="destination.id"><warehouse:message code="order.destination.label"/></label>
@@ -98,6 +95,24 @@
 
                                 </td>
                             </tr>
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'>
+                                    <label for="paymentMethodType.id"><warehouse:message code="order.paymentMethodType.label"/></label>
+                                </td>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'paymentMethodType','errors')}'>
+                                    <g:selectPaymentMethodType name="paymentMethodType.id" value="${order?.paymentMethodType?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
+                                </td>
+                            </tr>
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'>
+                                    <label for="paymentTerm.id"><warehouse:message code="order.paymentTerm.label"/></label>
+                                </td>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'paymentTerm','errors')}'>
+                                    <g:selectPaymentTerm name="paymentTerm.id" value="${order?.paymentTerm?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
+                                </td>
+                            </tr>
+
+
                             <tr class='prop'>
                                 <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.createdBy.label"/></label></td>
                                 <td valign='top'

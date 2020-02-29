@@ -28,6 +28,9 @@ class Order implements Serializable {
     Person completedBy
     Date dateCompleted
 
+    PaymentMethodType paymentMethodType
+    PaymentTerm paymentTerm
+
 
     // Audit fields
     Date dateCreated
@@ -56,6 +59,8 @@ class Order implements Serializable {
         dateOrdered(nullable: true)
         completedBy(nullable: true)
         dateCompleted(nullable: true)
+        paymentMethodType(nullable: true)
+        paymentTerm(nullable: true)
         dateCreated(nullable: true)
         lastUpdated(nullable: true)
     }

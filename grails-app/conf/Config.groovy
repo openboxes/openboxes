@@ -7,6 +7,8 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
+
+import com.mchange.v2.c3p0.example.IsValidOnlyConnectionTester30
 import grails.util.GrailsUtil
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.ReasonCode
