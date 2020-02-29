@@ -15,6 +15,8 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PartyRole
+import org.pih.warehouse.core.PaymentMethodType
+import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
@@ -205,6 +207,22 @@ class SelectTagLib {
             attrs.from = organizations
         }
         attrs.optionKey = 'id'
+        attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+
+    def selectPaymentMethodType = { attrs, body ->
+        attrs.from = PaymentMethodType.list().sort { it?.name?.toLowerCase() }
+        attrs.optionKey = 'id'
+        attrs.value = attrs.value
+        attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+
+    def selectPaymentTerm = { attrs, body ->
+        attrs.from = PaymentTerm.list().sort { it?.name?.toLowerCase() }
+        attrs.optionKey = 'id'
+        attrs.value = attrs.value
         attrs.optionValue = { it.name }
         out << g.select(attrs)
     }

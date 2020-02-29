@@ -65,4 +65,6 @@
     <include file="0.8.x/changelog-2020-02-27-2052-create-table-uom-conversion.xml"/>
     <include file="0.8.x/changelog-2020-02-27-2108-alter-table-order-shipment.xml"/>
     <include file="0.8.x/changelog-2020-02-27-2235-create-table-order-adjustment.xml"/>
+    <include file="0.8.x/changelog-2020-02-29-0005-alter-table-order-add-column-payment-method-type.xml"/>
+    <include file="0.8.x/changelog-2020-02-29-0005-alter-table-order-add-column-payment-terms.xml"/>
 </databaseChangeLog>

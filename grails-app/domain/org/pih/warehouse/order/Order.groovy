@@ -29,9 +29,13 @@ class Order implements Serializable {
     Date dateOrdered
     Date dateCompleted
 
+    PaymentMethodType paymentMethodType
+    PaymentTerm paymentTerm
+
     // Currency conversion
     String currencyCode
     BigDecimal exchangeRate
+
 
     // Audit fields
     Date dateCreated
@@ -69,6 +73,8 @@ class Order implements Serializable {
         dateOrdered(nullable: true)
         completedBy(nullable: true)
         dateCompleted(nullable: true)
+        paymentMethodType(nullable: true)
+        paymentTerm(nullable: true)
         dateCreated(nullable: true)
         lastUpdated(nullable: true)
     }

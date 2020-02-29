@@ -693,6 +693,16 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
+                                <g:link controller="paymentMethodType" action="list">
+                                    <warehouse:message code="paymentMethodTypes.label" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="paymentTerm" action="list">
+                                    <warehouse:message code="paymentTerms.label" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="shipper" action="list" class="shipper">
                                     <warehouse:message code="location.shippers.label" />
                                 </g:link>
