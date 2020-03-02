@@ -9,21 +9,27 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 class ApitableroController {
 
+IndicatorDataService indicator = new IndicatorDataService();
+NumberDataService numberDataService = new NumberDataService();
+
 def index= {
-    
     render("You are in the api")
 }
 
 def getNumberData= {
-    NumberDataService numberDataService = new NumberDataService();
-
     render  numberDataService.getListNumberData() as JSON;
 }
 
 def getExpirationSummary= {
-    IndicatorDataService indicator = new IndicatorDataService();
-
     render indicator.getExpirationSummaryData().toJson() as JSON;
+}
+
+def getFillRate= {
+    render indicator.getFillRate().toJson() as JSON
+}
+
+def getSentStockMovements= {
+    render indicator.getSentStockMovements().toJson() as JSON
 }
 
 
