@@ -21,7 +21,7 @@ class IndicatorDatasets implements Serializable {
                 "label"      : label,
                 "data"    : data,
                 "fill"      : fill,
-                "type" : type
+                "type" : type,
                 "barThickness" : barThickness
         ]
     }

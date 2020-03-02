@@ -1,4 +1,4 @@
-import { addTranslationForLanguage } from "react-localize-redux";
+import { addTranslationForLanguage } from 'react-localize-redux';
 
 import {
   SHOW_SPINNER,
@@ -12,120 +12,215 @@ import {
   FETCH_INDICATORS,
   ADD_TO_INDICATORS,
   REMOVE_FROM_INDICATORS,
-  REORDER_INDICATORS
-} from "./types";
-import apiClient, { parseResponse } from "../utils/apiClient";
+  REORDER_INDICATORS,
+} from './types';
+import apiClient, { parseResponse } from '../utils/apiClient';
+
+import { expirationSummary, fillRate, sentStock, stockReceived, outgoingStock, inventorySummary } from '../../assets/dataFormat/indicators';
 
 export function showSpinner() {
   return {
     type: SHOW_SPINNER,
-    payload: true
+    payload: true,
   };
 }
 
 export function hideSpinner() {
   return {
     type: HIDE_SPINNER,
-    payload: false
+    payload: false,
   };
 }
 
 export function fetchReasonCodes() {
-  const url = "/openboxes/api/reasonCodes";
+  const url = '/openboxes/api/reasonCodes';
   const request = apiClient.get(url);
 
   return {
     type: FETCH_REASONCODES,
-    payload: request
+    payload: request,
   };
 }
 
 export function fetchUsers() {
-  const url = "/openboxes/api/generic/person";
+  const url = '/openboxes/api/generic/person';
   const request = apiClient.get(url);
 
   return {
     type: FETCH_USERS,
-    payload: request
+    payload: request,
   };
 }
 
 export function fetchSessionInfo() {
-  const url = "/openboxes/api/getAppContext";
+  const url = '/openboxes/api/getAppContext';
   const request = apiClient.get(url);
 
   return {
     type: FETCH_SESSION_INFO,
-    payload: request
+    payload: request,
   };
 }
 
 export function changeCurrentLocation(location) {
-  return dispatch => {
+  return (dispatch) => {
     const url = `/openboxes/api/chooseLocation/${location.id}`;
 
     apiClient.put(url).then(() => {
       dispatch({
         type: CHANGE_CURRENT_LOCATION,
-        payload: location
+        payload: location,
       });
     });
   };
 }
 
 export function fetchTranslations(lang, prefix) {
-  return dispatch => {
+  return (dispatch) => {
     const url = `/openboxes/api/localizations?lang=${lang ||
-      ""}&prefix=react.${prefix || ""}`;
+      ''}&prefix=react.${prefix || ''}`;
 
-    apiClient.get(url).then(response => {
+    apiClient.get(url).then((response) => {
       const { messages, currentLocale } = parseResponse(response.data);
 
       dispatch(addTranslationForLanguage(messages, currentLocale));
 
       dispatch({
         type: TRANSLATIONS_FETCHED,
-        payload: prefix
+        payload: prefix,
       });
     });
   };
 }
 
 export function changeCurrentLocale(locale) {
-  return dispatch => {
+  return (dispatch) => {
     const url = `/openboxes/api/chooseLocale/${locale}`;
 
     apiClient.put(url).then(() => {
       dispatch({
         type: CHANGE_CURRENT_LOCALE,
-        payload: locale
+        payload: locale,
       });
     });
   };
 }
 
+function fetchIndicator(indicatorName, dispatch) {
+  let data = null;
+  let title = null;
+  let type = null;
+  let archived = 0;
+  const id = Math.random();
+
+  switch (indicatorName) {
+    case 'inventorySummary':
+      data = inventorySummary;
+      title = 'Inventory Summary';
+      type = 'horizontalBar';
+      break;
+    case 'expirationSummary':
+      data = expirationSummary;
+      title = 'Expiration Summary';
+      type = 'line';
+      break;
+    case 'fillRate':
+      data = fillRate;
+      title = 'Fill Rate';
+      type = 'line';
+      break;
+    case 'sentStock':
+      data = sentStock;
+      title = 'Sent Stock Movements';
+      type = 'bar';
+      break;
+    case 'stockReceived':
+      data = stockReceived;
+      title = 'Stock Movements Received';
+      type = 'doughnut';
+      archived = 1;
+      break;
+    case 'outgoingStock':
+      data = outgoingStock;
+      title = 'Outgoing Stock Movements';
+      type = 'numbers';
+      break;
+    default:
+      title = 'Error';
+      type = 'error';
+  }
+
+  dispatch({
+    type: FETCH_INDICATORS,
+    payload: {
+      id,
+      title,
+      type: 'loading',
+      data,
+      archived,
+    },
+  });
+
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (data) {
+        resolve(data);
+      } else {
+        reject();
+      }
+    }, Math.floor((Math.random() * 5) + 2) * 1000); // between 2 and 6 seconds
+  }).then((res) => {
+    dispatch({
+      type: FETCH_INDICATORS,
+      payload: {
+        id,
+        title,
+        type,
+        data: res,
+        archived,
+      },
+    });
+  }, () => {
+    dispatch({
+      type: FETCH_INDICATORS,
+      payload: {
+        id,
+        title,
+        type: 'error',
+        data: [],
+        archived,
+      },
+    });
+  });
+}
+
 export function fetchIndicators() {
-  return {
-    type: FETCH_INDICATORS
+  return (dispatch) => {
+    fetchIndicator('inventorySummary', dispatch);
+    fetchIndicator('expirationSummary', dispatch);
+    fetchIndicator('fillRate', dispatch);
+    fetchIndicator('sentStock', dispatch);
+    fetchIndicator('stockReceived', dispatch);
+    fetchIndicator('outgoingStock', dispatch);
   };
 }
 
-export function addToIndicators(element) {
+export function addToIndicators(index) {
   return {
     type: ADD_TO_INDICATORS,
-    payload: element
+    payload: { index },
   };
 }
 
 export function reorderIndicators({ oldIndex, newIndex }, e) {
-  if (e.target.id === "delete") {
+  if (e.target.id === 'archive') {
     return {
       type: REMOVE_FROM_INDICATORS,
-      payload: { index: oldIndex }
+      payload: { index: oldIndex },
     };
   }
   return {
     type: REORDER_INDICATORS,
-    payload: { oldIndex, newIndex }
+    payload: { oldIndex, newIndex },
   };
 }

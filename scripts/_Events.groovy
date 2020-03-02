@@ -89,16 +89,16 @@ eventRunAppStart = {
 	metadata.'app.buildNumber' = buildNumber.toString()
 	//metadata.persist()
 
-    println "Building React frontend"
-    def command = """npm run bundle"""
-    def proc = command.execute()
-    proc.waitFor()
-    println "${proc.in.text}"
-    if (proc.exitValue() == 1) {
-        event("ReactBuildFailed", ["React build FAILED"])
-    } else {
-        println "React build finished"
-    }
+    // println "Building React frontend"
+    // def command = """npm run bundle"""
+    // def proc = command.execute()
+    // proc.waitFor()
+    // println "${proc.in.text}"
+    // if (proc.exitValue() == 1) {
+    //     event("ReactBuildFailed", ["React build FAILED"])
+    // } else {
+    //     println "React build finished"
+    // }
 }
 
 eventReactBuildFailed = { msg ->

@@ -2,6 +2,26 @@
   background-color: #fbfbfb;
 }
 
+.archiveDiv {
+  position: fixed;
+  width: 100%;
+  text-align: center;
+  padding: 5% 0 35px 0;
+  bottom: 0;
+  background-image: linear-gradient(transparent, rgb(255, 188, 188));
+  font-size: 20px;
+  color: #aa0f0f;
+  transition: 0.8s ease;
+}
+
+.hideArchive {
+  bottom: -200;
+}
+
+.archiveDiv:hover {
+  background-image: linear-gradient(transparent, rgb(228, 128, 128));
+}
+
 .cardsContainer {
   .numberCardComponent {
     padding-left: 4%;
@@ -27,7 +47,7 @@
       justify-content: center;
 
       animation-name: slide-down;
-      animation-duration: 1s;
+      animation-duration: .8s;
       animation-timing-function: ease-out;
 
       .titleCard {
@@ -43,6 +63,10 @@
       .subtitleCard {
         color: #282d32;
         font-size: 14px;
+      }
+
+      .loaderDiv {
+        margin: auto;
       }
     }
 
@@ -115,7 +139,7 @@
     .loaderDiv {
       margin: auto;
       position: relative;
-      padding: 20% 0 0 33.33%;
+      padding: 10% 0 0 32%;
     }
 
     .gyrIndicator {
@@ -216,9 +240,200 @@
   color: #282d32;
 
   .fa-repeat {
-    font-size: 80px;
+    font-size: 40px;
     margin: auto;
     position: relative;
-    padding: 19% 40%;
+    padding: 19% 46%;
+  }
+}
+
+.unarchive {
+  color: #818181;
+  user-select: none;
+  cursor: pointer;
+}
+
+.unarchivedItems {
+  padding-left: 4%;
+  margin: 25px 0 30px 0;
+  display: inline-block;
+  position: relative;
+
+  .unarchive-popover {
+    border-radius: 4px;
+    margin: 8px 0;
+    min-width: 200%;
+    padding: 50px 0 50px 0;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
+    position: absolute;
+    background-color: #fbfbfb;
+
+    transition-property: transform, opacity, left;
+    transition-duration: 300ms;
+    transition-timing-function: ease-in-out;
+
+    transform: scale(.9);
+    transform-origin: bottom;
+    display: block;
+    opacity: 0;
+
+    bottom: 150%;
+    left: -500px;
+
+    &:after {
+      top: 100%;
+      left: 42%;
+      border: solid transparent;
+      height: 0;
+      width: 0;
+      position: absolute;
+      border-color: rgba(41, 41, 41, 0.09);
+      margin-left: -0.5em;
+      box-sizing: border-box;
+      border: 1em solid black;
+      border-color: transparent transparent #fbfbfb #fbfbfb;
+      transform-origin: 0 0;
+      transform: rotate(-45deg);
+      box-shadow: -3px 3px 3px 0 rgba(0, 0, 0, 0.08);
+      border-width: 8px;
+      content: " ";
+    }
+
+    .close-button {
+      position: absolute;
+      color: #a5a5a5;
+      font-size: 38px;
+      margin: 0;
+      padding: 0;
+      right: 12px;
+      top: -1%;
+      user-select: none;
+      cursor: pointer;
+
+      transition-property: color;
+      transition-duration: 300ms;
+      transition-timing-function: ease-in-out;
+
+      &:hover {
+        color: rgb(199, 57, 14);
+      }
+    }
+
+    .unarchivedList {
+      height: 240px;
+      overflow: auto;
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+
+      .unarchivedItem {
+        white-space: nowrap;
+        border: 2px 0;
+        border-color: #a5a5a5;
+
+        .archived-indicator {
+          border-style: solid;
+          width: 100%;
+          height: 80px;
+          text-align: center;
+          background-color: #fff;
+          border-color: rgb(207, 207, 207);
+          border-width: 1.2px 0;
+
+          &:hover {
+            background-color: rgb(250, 250, 250);
+          }
+        }
+      }
+    }
+  }
+
+  @media (min-width: 858px) {
+    .unarchive-popover {
+      min-width: 165%;
+
+      &:after {
+        left: 7.55%;
+      }
+    }
+  }
+}
+
+.popover-active .unarchive-popover {
+  bottom: 150%;
+  left: 12%;
+  transform: scale(1);
+  display: block;
+  opacity: 1;
+}
+
+@media (min-width: 858px) {
+  .popover-active .unarchive-popover {
+    left: 83%;
+  }
+}
+
+.row {
+  max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .unarchive-button {
+    color: rgb(14, 109, 199);
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    align-items: center;
+
+    &.graph-preview {
+      font-size: 25px;
+      margin: auto;
+      width: 50%;
+      padding: 20px 0;
+
+      i:not(.fa-repeat) {
+        font-size: 40px;
+      }
+
+      .fa-repeat {
+        font-size: 20px;
+        padding: 8px 0 8px 5px;
+      }
+
+      .horizontal-bar {
+        transform: rotate(90deg) scaleX(-1);
+      }
+
+      .value {
+        display: flex;
+        align-items: center;
+
+        .circle {
+          width: 7px;
+          height: 7px;
+          border-radius: 100%;
+          margin-right: 6px;
+
+          &.green {
+            background-color: #519a04;
+          }
+
+          &.yellow {
+            background-color: #f7b500;
+          }
+
+          &.red {
+            background-color: #e02020;
+          }
+        }
+      }
+    }
   }
 }

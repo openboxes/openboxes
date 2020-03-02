@@ -1,17 +1,14 @@
-import _ from "lodash";
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
-import { withRouter } from "react-router-dom";
+import _ from 'lodash';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 
-import PutAwayPage from "./PutAwayPage";
-import PutAwaySecondPage from "./PutAwaySecondPage";
-import PutAwayCheckPage from "./PutAwayCheckPage";
-import apiClient, {
-  parseResponse,
-  flattenRequest
-} from "../../utils/apiClient";
-import { showSpinner, hideSpinner, fetchTranslations } from "../../actions";
+import PutAwayPage from './PutAwayPage';
+import PutAwaySecondPage from './PutAwaySecondPage';
+import PutAwayCheckPage from './PutAwayCheckPage';
+import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
+import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
 
 /** Main put-away form's component. */
 class PutAwayMainPage extends Component {
@@ -20,7 +17,7 @@ class PutAwayMainPage extends Component {
 
     this.state = {
       page: props.match.params.putAwayId ? 1 : 0,
-      props: { putAway: {} }
+      props: { putAway: {} },
     };
 
     this.nextPage = this.nextPage.bind(this);
@@ -31,7 +28,7 @@ class PutAwayMainPage extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchTranslations("", "putAway");
+    this.props.fetchTranslations('', 'putAway');
 
     if (this.props.putAwayTranslationsFetched) {
       this.dataFetched = true;
@@ -42,7 +39,7 @@ class PutAwayMainPage extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, "putAway");
+      this.props.fetchTranslations(nextProps.locale, 'putAway');
     }
 
     if (nextProps.putAwayTranslationsFetched && !this.dataFetched) {
@@ -58,7 +55,10 @@ class PutAwayMainPage extends Component {
    */
   getFormList(location) {
     return [
-      <PutAwayPage nextPage={this.nextPage} locationId={location.id} />,
+      <PutAwayPage
+        nextPage={this.nextPage}
+        locationId={location.id}
+      />,
       <PutAwaySecondPage
         {...this.state.props}
         nextPage={this.nextPage}
@@ -71,7 +71,7 @@ class PutAwayMainPage extends Component {
         prevPage={this.prevPage}
         firstPage={this.firstPage}
         location={location}
-      />
+      />,
     ];
   }
 
@@ -83,17 +83,13 @@ class PutAwayMainPage extends Component {
 
       const url = `/openboxes/api/putaways/${this.props.match.params.putAwayId}`;
 
-      apiClient
-        .get(url)
-        .then(response => {
+      apiClient.get(url)
+        .then((response) => {
           const putAway = parseResponse(response.data.data);
 
           this.props.hideSpinner();
 
-          this.setState({
-            props: { putAway },
-            page: putAway.putawayStatus === "COMPLETED" ? 2 : 1
-          });
+          this.setState({ props: { putAway }, page: putAway.putawayStatus === 'COMPLETED' ? 2 : 1 });
         })
         .catch(() => this.props.hideSpinner());
     }
@@ -111,9 +107,8 @@ class PutAwayMainPage extends Component {
     this.props.showSpinner();
     const url = `/openboxes/api/putaways?location.id=${this.props.location.id}`;
 
-    return apiClient
-      .post(url, flattenRequest(putAwayToSave))
-      .then(response => {
+    return apiClient.post(url, flattenRequest(putAwayToSave))
+      .then((response) => {
         const putAway = parseResponse(response.data.data);
 
         this.setState({ props: { putAway } }, () => {
@@ -150,7 +145,7 @@ class PutAwayMainPage extends Component {
    * @public
    */
   firstPage() {
-    this.props.history.push("/openboxes/putAway/create");
+    this.props.history.push('/openboxes/putAway/create');
     this.setState({ page: 0, props: null });
   }
 
@@ -158,10 +153,14 @@ class PutAwayMainPage extends Component {
     const { page } = this.state;
     const { location } = this.props;
 
-    if (_.get(location, "id")) {
+    if (_.get(location, 'id')) {
       const formList = this.getFormList(location);
 
-      return <div>{formList[page]}</div>;
+      return (
+        <div>
+          {formList[page]}
+        </div>
+      );
     }
 
     return null;
@@ -171,20 +170,16 @@ class PutAwayMainPage extends Component {
 const mapStateToProps = state => ({
   location: state.session.currentLocation,
   locale: state.session.activeLanguage,
-  putAwayTranslationsFetched: state.session.fetchedTranslations.putAway
+  putAwayTranslationsFetched: state.session.fetchedTranslations.putAway,
 });
 
-export default withRouter(
-  connect(mapStateToProps, {
-    showSpinner,
-    hideSpinner,
-    fetchTranslations
-  })(PutAwayMainPage)
-);
+export default withRouter(connect(mapStateToProps, {
+  showSpinner, hideSpinner, fetchTranslations,
+})(PutAwayMainPage));
 
 PutAwayMainPage.propTypes = {
   location: PropTypes.shape({
-    id: PropTypes.string
+    id: PropTypes.string,
   }).isRequired,
   locale: PropTypes.string.isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
@@ -195,8 +190,8 @@ PutAwayMainPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** React router's object which contains information about url varaiables and params */
   match: PropTypes.shape({
-    params: PropTypes.shape({ putAwayId: PropTypes.string })
+    params: PropTypes.shape({ putAwayId: PropTypes.string }),
   }).isRequired,
   /** React router's object used to manage session history */
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired
+  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
 };
