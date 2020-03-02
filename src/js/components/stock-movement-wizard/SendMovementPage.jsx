@@ -330,7 +330,7 @@ class SendMovementPage extends Component {
             },
           },
         }, () => {
-          this.props.setValues(this.state.values);
+          this.props.nextPage(this.state.values);
           this.fetchShipmentTypes();
         });
       })
@@ -739,7 +739,7 @@ SendMovementPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  setValues: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   /** Name of the currently selected location */
   currentLocationId: PropTypes.string.isRequired,
