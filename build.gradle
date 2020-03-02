@@ -114,8 +114,6 @@ dependencies {
     testRuntime "org.seleniumhq.selenium:selenium-ie-driver:2.47.1" // was 2.25.0
     testRuntime "org.seleniumhq.selenium:selenium-support:2.47.1"// was 2.25.0
 
-    runtime "org.springframework:spring-test:3.0.5.RELEASE" // latest 5.1.x
-
     compile 'org.grails.plugins:database-migration:3.1.0.RC1'
     compile 'org.liquibase:liquibase-core:3.6.1'
 
