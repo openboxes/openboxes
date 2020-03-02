@@ -172,7 +172,7 @@ dataSource:
     jmxExport: true
     driverClassName: com.mysql.jdbc.Driver
     username: 'root'
-    password: 'root'
+    password: 'password'
     dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     logSql: false
     formatSql: false
@@ -198,12 +198,12 @@ dataSource:
 environments:
     development:
         dataSource:
-            dbCreate: update
-            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false
+            dbCreate: none
+            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false&createDatabaseIfNotExist=true
     test:
         dataSource:
-            dbCreate: update
-            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false
+            dbCreate: none
+            url: jdbc:mysql://localhost:3306/testDB?useSSL=false&createDatabaseIfNotExist=true
     production:
         dataSource:
             dbCreate: none
