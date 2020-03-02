@@ -49,21 +49,6 @@ class StockMovements extends Component {
   }
 
   /**
-   * Returns array of form steps.
-   * @public
-   */
-  stepList = [
-    this.props.translate('react.stockMovement.create.label', 'Create'),
-    this.props.translate('react.stockMovement.addItems.label', 'Add items'),
-    this.props.translate('react.stockMovement.send.label', 'Send')];
-
-  /**
-   * Returns array of form's components.
-   * @public
-   */
-  pageList = [CreateStockMovement, AddItemsPage, SendMovementPage ];
-
-  /**
    * Returns shipment's name containing shipment's origin, destination, requisition date,
    * tracking number given by user on the last step, description and stock list if chosen.
    * @public
@@ -100,6 +85,21 @@ class StockMovements extends Component {
     }
     return null;
   }
+
+  /**
+   * Returns array of form steps.
+   * @public
+   */
+  stepList = [
+    this.props.translate('react.stockMovement.create.label', 'Create'),
+    this.props.translate('react.stockMovement.addItems.label', 'Add items'),
+    this.props.translate('react.stockMovement.send.label', 'Send')];
+
+  /**
+   * Returns array of form's components.
+   * @public
+   */
+  pageList = [CreateStockMovement, AddItemsPage, SendMovementPage];
 
   dataFetched = false;
 

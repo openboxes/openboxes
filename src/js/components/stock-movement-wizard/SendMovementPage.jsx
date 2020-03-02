@@ -158,7 +158,7 @@ function validate(values) {
   return errors;
 }
 
-//TODO: Remove when each workflow has its own pages (and after rebase)
+// TODO: Remove when each workflow has its own pages (and after rebase)
 
 /**
  * The last step of stock movement where user can see the whole movement,

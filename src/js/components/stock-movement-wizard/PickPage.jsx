@@ -157,7 +157,7 @@ const FIELDS = {
   },
 };
 
-//TODO: Remove when each workflow has its own pages (and after rebase)
+// TODO: Remove when each workflow has its own pages (and after rebase)
 
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 /**

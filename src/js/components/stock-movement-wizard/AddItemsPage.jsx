@@ -350,7 +350,7 @@ const VENDOR_FIELDS = {
   },
 };
 
-//TODO: Remove when each workflow has its own pages (and after rebase)
+// TODO: Remove when each workflow has its own pages (and after rebase)
 
 /**
  * The second step of stock movement where user can add items to stock list.

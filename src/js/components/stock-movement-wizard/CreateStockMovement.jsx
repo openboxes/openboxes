@@ -149,7 +149,7 @@ const FIELDS = {
   },
 };
 
-//TODO: Remove when each workflow has its own pages (and after rebase)
+// TODO: Remove when each workflow has its own pages (and after rebase)
 
 /** The first step of stock movement where user can add all the basic information. */
 class CreateStockMovement extends Component {
