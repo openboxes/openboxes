@@ -157,6 +157,8 @@ const FIELDS = {
   },
 };
 
+//TODO: Remove when each workflow has its own pages (and after rebase)
+
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 /**
  * The forth step of stock movement(for movements from a depot) where user

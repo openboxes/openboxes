@@ -222,6 +222,8 @@ function validate(values) {
   return errors;
 }
 
+//TODO: Remove when each workflow has its own pages (and after rebase)
+
 /**
  * The third step of stock movement(for movements from a depot) where user can see the
  * stock available and adjust quantities or make substitutions based on that information.

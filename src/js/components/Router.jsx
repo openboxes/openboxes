@@ -24,6 +24,11 @@ const AsyncStockMovementInbound = Loadable({
   loading: Loading,
 });
 
+const AsyncStockMovementPurchaseOrders = Loadable({
+  loader: () => import('./stock-movement-wizard/StockMovementPurchaseOrders'),
+  loading: Loading,
+});
+
 const AsyncReceivingPage = Loadable({
   loader: () => import('./receiving/ReceivingPage'),
   loading: Loading,
@@ -46,6 +51,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
         <MainLayoutRoute path="/**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
         <MainLayoutRoute path="/**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
+        <MainLayoutRoute path="/**/stockMovement/createPurchaseOrders/:stockMovementId?" component={AsyncStockMovementPurchaseOrders} />
         <MainLayoutRoute path="/**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
         <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
         <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />

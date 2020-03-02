@@ -13,17 +13,16 @@ import moment from 'moment';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import TextField from '../form-elements/TextField';
-import SelectField from '../form-elements/SelectField';
-import ArrayField from '../form-elements/ArrayField';
-import ButtonField from '../form-elements/ButtonField';
-import LabelField from '../form-elements/LabelField';
-import DateField from '../form-elements/DateField';
-import { renderFormField } from '../../utils/form-utils';
-import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
-import apiClient from '../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import { debounceProductsFetch } from '../../utils/option-utils';
+import TextField from '../../form-elements/TextField';
+import SelectField from '../../form-elements/SelectField';
+import ArrayField from '../../form-elements/ArrayField';
+import ButtonField from '../../form-elements/ButtonField';
+import DateField from '../../form-elements/DateField';
+import { renderFormField } from '../../../utils/form-utils';
+import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
+import apiClient from '../../../utils/apiClient';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import { debounceProductsFetch } from '../../../utils/option-utils';
 
 const request = queryString.parse(window.location.search).type === 'REQUEST';
 
@@ -43,173 +42,6 @@ const DELETE_BUTTON_FIELD = {
   }),
   attributes: {
     className: 'btn btn-outline-danger',
-  },
-};
-
-const NO_STOCKLIST_FIELDS = {
-  lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder, showOnly }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        disabled={showOnly}
-        onClick={() => addRow({
-          sortOrder: getSortOrder(),
-        })}
-      ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </button>
-    ),
-    fields: {
-      product: {
-        fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9.5',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-        },
-        getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount,
-        }) => ({
-          disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
-          autoFocus: rowIndex === rowCount - 1,
-        }),
-      },
-      quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.quantity.label',
-        defaultMessage: 'Quantity',
-        flexWidth: '2.5',
-        attributes: {
-          type: 'number',
-        },
-        fieldKey: '',
-        getDynamicAttr: ({
-          fieldValue,
-        }) => ({
-          disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
-        }),
-      },
-      recipient: {
-        type: SelectField,
-        label: 'react.stockMovement.recipient.label',
-        defaultMessage: 'Recipient',
-        flexWidth: '2.5',
-        fieldKey: '',
-        getDynamicAttr: ({
-          fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder,
-        }) => ({
-          options: recipients,
-          disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
-          onTabPress: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-        }),
-        attributes: {
-          labelKey: 'name',
-          openOnClick: false,
-        },
-      },
-      deleteButton: DELETE_BUTTON_FIELD,
-    },
-  },
-};
-
-const STOCKLIST_FIELDS = {
-  lineItems: {
-    type: ArrayField,
-    virtualized: true,
-    arrowsNavigation: true,
-    // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder, newItemAdded }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </button>
-    ),
-    fields: {
-      product: {
-        fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-        },
-        getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
-        }) => ({
-          disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
-          autoFocus: newItem && rowIndex === rowCount - 1,
-        }),
-      },
-      quantityAllowed: {
-        type: LabelField,
-        label: 'react.stockMovement.maxQuantity.label',
-        defaultMessage: 'Max Qty',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.neededQuantity.label',
-        defaultMessage: 'Needed Qty',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-        getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder,
-        }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-        }),
-      },
-      deleteButton: DELETE_BUTTON_FIELD,
-    },
   },
 };
 
@@ -350,7 +182,7 @@ const VENDOR_FIELDS = {
   },
 };
 
-//TODO: Remove when each workflow has its own pages (and after rebase)
+// TODO: Cleanup not required code
 
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -397,20 +229,6 @@ class AddItemsPage extends Component {
 
       this.fetchAllData(false);
     }
-  }
-
-  /**
-   * Returns proper fields depending on origin type or if stock list is chosen.
-   * @public
-   */
-  getFields() {
-    if (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) {
-      return VENDOR_FIELDS;
-    } else if (_.get(this.state.values.stocklist, 'id')) {
-      return STOCKLIST_FIELDS;
-    }
-
-    return NO_STOCKLIST_FIELDS;
   }
 
   /**
@@ -1113,7 +931,7 @@ class AddItemsPage extends Component {
                 <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.exit.label" defaultMessage="Exit" /></span>
               </button> }
             <form onSubmit={handleSubmit}>
-              {_.map(this.getFields(), (fieldConfig, fieldName) =>
+              {_.map(VENDOR_FIELDS, (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
                   stocklist: values.stocklist,
                   recipients: this.props.recipients,

@@ -12,16 +12,16 @@ import queryString from 'query-string';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import { renderFormField } from '../../utils/form-utils';
-import { showSpinner, hideSpinner } from '../../actions';
-import apiClient from '../../utils/apiClient';
-import DateField from '../form-elements/DateField';
-import DocumentButton from '../DocumentButton';
-import SelectField from '../form-elements/SelectField';
-import TextField from '../form-elements/TextField';
-import LabelField from '../form-elements/LabelField';
-import { debounceLocationsFetch } from '../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import { renderFormField } from '../../../utils/form-utils';
+import { showSpinner, hideSpinner } from '../../../actions';
+import apiClient from '../../../utils/apiClient';
+import DateField from '../../form-elements/DateField';
+import DocumentButton from '../../DocumentButton';
+import SelectField from '../../form-elements/SelectField';
+import TextField from '../../form-elements/TextField';
+import LabelField from '../../form-elements/LabelField';
+import { debounceLocationsFetch } from '../../../utils/option-utils';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
@@ -158,7 +158,7 @@ function validate(values) {
   return errors;
 }
 
-//TODO: Remove when each workflow has its own pages (and after rebase)
+// TODO: Cleanup not required code
 
 /**
  * The last step of stock movement where user can see the whole movement,

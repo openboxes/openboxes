@@ -11,14 +11,14 @@ import { getTranslate } from 'react-localize-redux';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import moment from 'moment';
 
-import TextField from '../form-elements/TextField';
-import SelectField from '../form-elements/SelectField';
-import DateField from '../form-elements/DateField';
-import { renderFormField } from '../../utils/form-utils';
-import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import { debounceUsersFetch, debounceLocationsFetch } from '../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import TextField from '../../form-elements/TextField';
+import SelectField from '../../form-elements/SelectField';
+import DateField from '../../form-elements/DateField';
+import { renderFormField } from '../../../utils/form-utils';
+import apiClient from '../../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../../actions';
+import { debounceUsersFetch, debounceLocationsFetch } from '../../../utils/option-utils';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const request = queryString.parse(window.location.search).type === 'REQUEST';
 const inbound = queryString.parse(window.location.search).direction === 'INBOUND';
@@ -149,7 +149,7 @@ const FIELDS = {
   },
 };
 
-//TODO: Remove when each workflow has its own pages (and after rebase)
+// TODO: Cleanup not required code
 
 /** The first step of stock movement where user can add all the basic information. */
 class CreateStockMovement extends Component {
