@@ -467,7 +467,7 @@ class EditItemsPage extends Component {
     this.reviseRequisitionItems(formValues)
       .then(() => {
         this.transitionToNextStep()
-          .then(() => this.props.onSubmit(formValues))
+          .then(() => this.props.nextPage(formValues))
           .catch(() => this.props.hideSpinner());
       }).catch(() => this.props.hideSpinner());
   }
@@ -728,7 +728,7 @@ EditItemsPage.propTypes = {
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
    */
-  onSubmit: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */

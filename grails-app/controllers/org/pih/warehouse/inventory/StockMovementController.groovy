@@ -41,6 +41,14 @@ class StockMovementController {
         render(template: "/common/react", params: params)
     }
 
+    def createOutbound = {
+        render(template: "/common/react", params: params)
+    }
+
+    def createInbound = {
+        render(template: "/common/react", params: params)
+    }
+
     def show = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         [stockMovement: stockMovement]

@@ -325,7 +325,7 @@ class PickPage extends Component {
   nextPage(formValues) {
     this.props.showSpinner();
     this.transitionToNextStep()
-      .then(() => this.props.onSubmit(formValues))
+      .then(() => this.props.nextPage(formValues))
       .catch(() => this.props.hideSpinner());
   }
 
@@ -577,7 +577,7 @@ PickPage.propTypes = {
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
    */
-  onSubmit: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
   /** Function called when data is loading */
