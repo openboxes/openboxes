@@ -34,7 +34,7 @@ class Wizard extends Component {
    * @public
    */
   nextPage(values) {
-    if (this.props.pageList.length > this.state.currentPage + 1) {
+    if (this.props.pageList.length > this.state.currentPage) {
       this.setState({
         prevPage: this.state.currentPage, currentPage: this.state.currentPage + 1, values,
       });
@@ -49,7 +49,7 @@ class Wizard extends Component {
    * @public
    */
   prevPage(values) {
-    if (this.state.prevPage > 1) {
+    if (this.state.prevPage > 0) {
       this.setState({
         prevPage: this.state.prevPage - 1, currentPage: this.state.prevPage, values,
       });

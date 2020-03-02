@@ -138,13 +138,7 @@ class StockMovementPurchaseOrders extends Component {
               label: resp.requestedBy.name,
             },
           };
-
-          const statuses = ['NEW', 'CREATED', 'PENDING'];
-
-          let currentPage = 1;
-          if (statuses.indexOf(values.statusCode) > 0) {
-            currentPage = statuses.indexOf(values.statusCode) + 1;
-          }
+          const currentPage = values.statusCode === 'PENDING' ? 2 : 3;
           this.setState({ values, currentPage });
         })
         .catch(() => this.props.hideSpinner());
