@@ -11,12 +11,13 @@ const GRAILS_VIEWS = path.resolve(__dirname, 'grails-app/views');
 const COMMON_VIEW = path.resolve(GRAILS_VIEWS, 'common');
 const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
 
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 
-module.exports = {
+module.exports = env => ({
   entry: {
     app: `${SRC}/index.jsx`,
   },
@@ -77,18 +78,21 @@ module.exports = {
         jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
         cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
         receivingIfStatement:
-          // eslint-disable-next-line no-template-curly-in-string
+        // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
           'You can access the Partial Receiving feature through the details page for an inbound shipment.' +
           '</g:if>',
       }),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.REACT_APP_API_PATH': JSON.stringify(env && env.REACT_APP_API_PATH ? env.REACT_APP_API_PATH : '/openboxes')
     }),
   ],
   module: {
     rules: [
       {
         enforce: 'pre',
-        test: /\.jsx?$/,
+        test: /\.jsx$/,
         exclude: /node_modules/,
         loader: 'eslint-loader',
       },
@@ -150,4 +154,4 @@ module.exports = {
     },
     extensions: ['.js', '.jsx'],
   },
-};
+});
