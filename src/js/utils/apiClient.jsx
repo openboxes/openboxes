@@ -77,7 +77,18 @@ const handleError = (error) => {
   return Promise.reject(error);
 };
 
+const urlInterceptor = (config) => {
+  const path = process.env.REACT_APP_API_PATH;
+
+  if (!path || path === '/') {
+    return config;
+  }
+
+  const url = _.trimEnd(path, '/') + config.url;
+  return { ...config, url };
+};
+
 apiClient.interceptors.response.use(handleSuccess, handleError);
-apiClient.interceptors.request.use(config => config, justRejectRequestError);
+apiClient.interceptors.request.use(urlInterceptor, justRejectRequestError);
 
 export default apiClient;
