@@ -56,9 +56,6 @@
                                         <format:metadata obj="${orderInstance?.orderTypeCode}"/>
                                     </td>
                                 </tr>
-
-
-
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="order.destination.label"/></label>
@@ -75,7 +72,6 @@
                                         ${orderInstance?.origin?.name }
                                     </td>
                                 </tr>
-
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="order.dateOrdered.label"/></label>
@@ -94,10 +90,28 @@
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
+                                        <label><warehouse:message code="order.subtotal.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:formatNumber number="${orderInstance?.subtotal?:0 }"/>
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="orderAdjustments.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:formatNumber number="${orderInstance?.totalAdjustments?:0 }"/>
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
                                         <label><warehouse:message code="order.totalPrice.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        <g:formatNumber number="${orderInstance?.totalPrice()?:0 }"/>
+                                        <g:formatNumber number="${orderInstance?.total?:0 }"/>
                                         ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                     </td>
                                 </tr>
@@ -111,6 +125,7 @@
                             <ul>
                                 <li><a href="#tabs-items"><warehouse:message code="order.orderItems.label"/></a></li>
                                 <g:if test="${orderInstance.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+                                    <li><a href="#tabs-adjustments"><warehouse:message code="orderAdjustments.label"/></a></li>
                                     <li><a href="#tabs-shipments"><warehouse:message code="shipments.label"/></a></li>
                                 </g:if>
                                 <li><a href="#tabs-documents"><warehouse:message code="documents.label"/></a></li>
@@ -118,7 +133,7 @@
 
                             </ul>
                             <div id="tabs-items" class="ui-tabs-hide">
-                                <div class="box">
+                                <div id="tab-content" class="box">
                                     <h2>
                                         <warehouse:message code="order.orderItems.label"/>
                                     </h2>
@@ -205,8 +220,7 @@
                                             <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
                                                 <tfoot>
                                                 <tr class="">
-                                                    <th colspan="5" class="left">
-                                                        <warehouse:message code="default.total.label"/>
+                                                    <th colspan="5" class="right">
                                                     </th>
                                                     <th colspan="1" class="left">
                                                         <g:formatNumber number="${orderInstance?.totalPrice()?:0.0 }"/>
@@ -223,6 +237,88 @@
                                     </g:else>
                                 </div>
                             </div>
+                            <div id="tabs-adjustments" class="ui-tabs-hide">
+                                <div class="box">
+                                    <h2>
+                                        <warehouse:message code="orderAdjustments.label"/>
+                                    </h2>
+                                    <g:if test="${orderInstance?.orderAdjustments }">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr class="odd">
+                                                <th><warehouse:message code="order.orderItem.label"/></th>
+                                                <th><warehouse:message code="default.type.label"/></th>
+                                                <th><warehouse:message code="default.description.label"/></th>
+                                                <th><warehouse:message code="orderAdjustment.percentage.label"/></th>
+                                                <th><warehouse:message code="orderAdjustment.amount.label"/></th>
+                                                <th class="right"><g:message code="default.actions.label"/></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <g:each var="orderAdjustment" in="${orderInstance.orderAdjustments}" status="status">
+                                                <tr class="${status%2==0?'odd':'even'}">
+                                                    <td>
+                                                        ${orderAdjustment?.orderItem?.product?:g.message(code:'default.all.label')}
+                                                    </td>
+                                                    <td>
+                                                        ${orderAdjustment?.orderAdjustmentType?.name}
+                                                    </td>
+                                                    <td>
+                                                        ${orderAdjustment.description}
+                                                    </td>
+                                                    <td>
+                                                        ${orderAdjustment.percentage}
+                                                    </td>
+                                                    <td>
+                                                        <g:if test="${orderAdjustment.amount}">
+                                                            ${orderAdjustment.amount}
+                                                        </g:if>
+                                                        <g:elseif test="${orderAdjustment.percentage}">
+                                                            <g:if test="${orderAdjustment.orderItem}">
+                                                                <g:formatNumber number="${orderAdjustment.orderItem.totalAdjustments}"/>
+                                                            </g:if>
+                                                            <g:else>
+                                                                <g:formatNumber number="${orderAdjustment.totalAdjustments}"/>
+                                                            </g:else>
+                                                        </g:elseif>
+                                                    </td>
+                                                    <td class="right">
+                                                        <g:link action="editAdjustment" id="${orderAdjustment.id}" params="['order.id':orderInstance?.id]" class="button">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
+                                                            <g:message code="default.button.edit.label"/>
+                                                        </g:link>
+
+                                                        <g:link action="deleteAdjustment" id="${orderAdjustment.id}" params="['order.id':orderInstance?.id]" class="button"
+                                                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete" />
+                                                            <g:message code="default.button.delete.label"/>
+                                                        </g:link>
+
+                                                    </td>
+                                                </tr>
+                                            </g:each>
+                                            </tbody>
+                                            <tfoot>
+                                            <tr>
+                                                <th colspan="4">
+                                                </th>
+                                                <th>
+                                                    <g:formatNumber number="${orderInstance.totalAdjustments}"/>
+                                                </th>
+                                                <th></th>
+                                            </tr>
+                                            </tfoot>
+                                        </table>
+                                    </g:if>
+                                    <g:else>
+                                        <div class="fade center empty"><warehouse:message code="default.noItems.label" /></div>
+                                    </g:else>
+
+                                </div>
+                            </div>
+
+
+
                             <g:if test="${orderInstance.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
 
                                 <div id="tabs-shipments" class="ui-tabs-hide">

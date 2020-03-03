@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+  <changeSet author="jmiranda (generated)" id="1582860014268-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="order_adjustment_type"/>
+      </not>
+    </preConditions>
+    <createTable tableName="order_adjustment_type">
+      <column name="id" type="CHAR(38)">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="version" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="code" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="VARCHAR(255)"/>
+      <column name="date_created" type="DATETIME">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_updated" type="DATETIME">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="order_adjustment"/>
+      </not>
+    </preConditions>
+    <createTable tableName="order_adjustment">
+      <column name="id" type="CHAR(38)">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="version" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="order_id" type="CHAR(38)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="order_item_id" type="CHAR(38)"/>
+      <column name="order_adjustment_type_id" type="CHAR(38)"/>
+      <column name="amount" type="DECIMAL(19,4)"/>
+      <column name="percentage" type="DECIMAL(19,2)"/>
+      <column name="description" type="VARCHAR(255)"/>
+      <column name="comments" type="VARCHAR(255)"/>
+      <column name="date_created" type="DATETIME">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_updated" type="DATETIME">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK4A1ABEFEE1A39520"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="order_adjustment_type_id"
+      baseTableName="order_adjustment" constraintName="FK4A1ABEFEE1A39520" deferrable="false"
+      initiallyDeferred="false" referencedColumnNames="id"
+      referencedTableName="order_adjustment_type"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK4A1ABEFED08EDBE6"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="order_id" baseTableName="order_adjustment"
+      constraintName="FK4A1ABEFED08EDBE6" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="order"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-5">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK4A1ABEFE3BE9D843"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="order_item_id" baseTableName="order_adjustment"
+      constraintName="FK4A1ABEFE3BE9D843" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="order_item"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-6">
+      <insert tableName="order_adjustment_type">
+          <column name="id" value="DISCOUNT"/>
+          <column name="version" valueNumeric="0"/>
+          <column name="code" value="DISCOUNT_ADJUSTMENT"/>
+          <column name="name" value="Discount"/>
+          <column name="date_created" valueDate="2020-02-27T00:00:00.0"/>
+          <column name="last_updated" valueDate="2020-02-27T00:00:00.0"/>
+      </insert>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-7">
+      <insert tableName="order_adjustment_type">
+          <column name="id" value="SURCHARGE"/>
+          <column name="version" valueNumeric="0"/>
+          <column name="code" value="SURCHARGE_ADJUSTMENT"/>
+          <column name="name" value="Surcharge"/>
+          <column name="date_created" valueDate="2020-02-27T00:00:00.0"/>
+          <column name="last_updated" valueDate="2020-02-27T00:00:00.0"/>
+      </insert>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-8">
+      <insert tableName="order_adjustment_type">
+          <column name="id" value="MISCELLANEOUS"/>
+          <column name="version" valueNumeric="0"/>
+          <column name="code" value="MISCELLANEOUS_CHARGE"/>
+          <column name="name" value="Miscellaneous Charge"/>
+          <column name="date_created" valueDate="2020-02-27T00:00:00.0"/>
+          <column name="last_updated" valueDate="2020-02-27T00:00:00.0"/>
+      </insert>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-9">
+      <insert tableName="order_adjustment_type">
+          <column name="id" value="SHIPPING_CHARGE"/>
+          <column name="version" valueNumeric="0"/>
+          <column name="code" value="SHIPPING_CHARGE"/>
+          <column name="name" value="Shipping Charge"/>
+          <column name="date_created" valueDate="2020-02-27T00:00:00.0"/>
+          <column name="last_updated" valueDate="2020-02-27T00:00:00.0"/>
+      </insert>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-10">
+      <insert tableName="order_adjustment_type">
+          <column name="id" value="SALES_TAX"/>
+          <column name="version" valueNumeric="0"/>
+          <column name="code" value="SALES_TAX"/>
+          <column name="name" value="Sales Tax"/>
+          <column name="date_created" valueDate="2020-02-27T00:00:00.0"/>
+          <column name="last_updated" valueDate="2020-02-27T00:00:00.0"/>
+      </insert>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1582860014268-11">
+      <insert tableName="order_adjustment_type">
+          <column name="id" value="FEE"/>
+          <column name="version" valueNumeric="0"/>
+          <column name="code" value="FEE"/>
+          <column name="name" value="Fee"/>
+          <column name="date_created" valueDate="2020-02-27T00:00:00.0"/>
+          <column name="last_updated" valueDate="2020-02-27T00:00:00.0"/>
+      </insert>
+  </changeSet>
+
+</databaseChangeLog>
+
