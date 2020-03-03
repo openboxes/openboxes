@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.inventory
 
 import grails.validation.ValidationException
@@ -111,14 +111,14 @@ class StockMovementServiceTests extends GroovyTestCase {
 	@Test
 	void test_updateRequisition_shouldThrowExceptionIfNoRequisition() {
 		shouldFail (ObjectNotFoundException) {
-			stockMovementService.updateRequisition(stockMovementEmpty)
+			stockMovementService.updateOutboundStockMovement(stockMovementEmpty)
 		}
 	}
 
 	@Test
 	void test_updateRequisition_shouldUpdateRequisition() {
 		stockMovement.description = "changed"
-		def updated = stockMovementService.updateRequisition(stockMovement)
+		def updated = stockMovementService.updateOutboundStockMovement(stockMovement)
 		assert updated.description == "changed"
 	}
 

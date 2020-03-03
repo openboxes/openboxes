@@ -29,8 +29,8 @@
 		</g:each>
 		<g:form action="purchaseOrder" method="post">
 
-            <g:hiddenField name="orderTypeCode" value="PURCHASE_ORDER"/>
-			<div class="dialog">
+        <g:hiddenField name="orderTypeCode" value="PURCHASE_ORDER"/>
+            <div class="dialog">
                 <g:render template="/order/summary" model="[orderInstance:order,currentState:'editOrder']"/>
                 <div class="box">
                     <h2><warehouse:message code="order.enterOrderDetails.label" /></h2>
@@ -96,6 +96,13 @@
                                 </td>
                             </tr>
                             <tr class='prop'>
+                                <td valign='top' class='name middle'><label for='currencyCode'><warehouse:message code="order.currencyCode.label"/></label></td>
+                                <td valign='top'
+                                    class='value ${hasErrors(bean:order,field:'currency','errors')}'>
+                                    <g:selectCurrency name="currencyCode" class="chzn-select-deselect" value="${order?.currencyCode}" noSelection="['':'']"/>
+                                </td>
+                            </tr>
+                            <tr class='prop'>
                                 <td valign='top' class='name middle'>
                                     <label for="paymentMethodType.id"><warehouse:message code="order.paymentMethodType.label"/></label>
                                 </td>
@@ -111,8 +118,6 @@
                                     <g:selectPaymentTerm name="paymentTerm.id" value="${order?.paymentTerm?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
                                 </td>
                             </tr>
-
-
                             <tr class='prop'>
                                 <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.createdBy.label"/></label></td>
                                 <td valign='top'
