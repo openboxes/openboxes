@@ -65,6 +65,7 @@ class Order implements Serializable {
         description(nullable: true, maxSize: 255)
         orderNumber(nullable: true, maxSize: 255)
         currencyCode(nullable:true)
+        exchangeRate(nullable:true)
         origin(nullable: false)
         destination(nullable: false)
         recipient(nullable: true)
