@@ -198,7 +198,6 @@ class SelectTagLib {
 
     def selectOrganization = { attrs, body ->
         def roleTypes = attrs.roleTypes
-
         if (roleTypes) {
             def partyRoles = PartyRole.findAllByRoleTypeInList(roleTypes)
             def organizations = partyRoles.collect { it.party }.unique()
@@ -214,9 +213,7 @@ class SelectTagLib {
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name }
         out << g.select(attrs)
-
     }
-
 
     def selectOrderItems = { attrs, body ->
         def order = Order.get(attrs.orderId)
@@ -229,6 +226,15 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectCurrency = { attrs, body ->
+        println "attrs: ${attrs}"
+        UnitOfMeasureClass currencyClass = UnitOfMeasureClass.findByType(UnitOfMeasureType.CURRENCY)
+        attrs.from = UnitOfMeasure.findAllByUomClass(currencyClass)
+        attrs.optionKey = 'code'
+        attrs.value = attrs.value ?: currencyClass.baseUom?.code
+        attrs.optionValue = { it.name + " " + it.code }
+        out << g.select(attrs)
+    }
 
     def selectShipper = { attrs, body ->
         attrs.from = Shipper.list().sort { it?.name?.toLowerCase() }
