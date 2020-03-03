@@ -75,7 +75,7 @@ class OrderController {
         StockMovement stockMovement = StockMovement.createFromOrder(orderInstance)
         Shipment shipment = stockMovementService.createInboundShipment(stockMovement)
 
-        redirect(controller: 'stockMovement', action: "create", params: [id: shipment.id])
+        redirect(controller: 'stockMovement', action: "createPurchaseOrders", params: [id: shipment.id])
     }
 
     def save = {

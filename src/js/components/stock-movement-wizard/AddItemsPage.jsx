@@ -383,6 +383,8 @@ const VENDOR_FIELDS = {
   },
 };
 
+// TODO: Remove when each workflow has its own pages (and after rebase)
+
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -813,7 +815,7 @@ class AddItemsPage extends Component {
           }
           this.transitionToNextStep('VERIFYING')
             .then(() => {
-              this.props.onSubmit(values);
+              this.props.nextPage(values);
             })
             .catch(() => this.props.hideSpinner());
         })
@@ -1297,7 +1299,7 @@ AddItemsPage.propTypes = {
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
    */
-  onSubmit: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */

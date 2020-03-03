@@ -6,22 +6,16 @@ import { getTranslate } from 'react-localize-redux';
 
 import CreateStockMovement from './CreateStockMovement';
 import AddItemsPage from './AddItemsPage';
-import EditPage from './EditPage';
-import PickPage from './PickPage';
-import PackingPage from './PackingPage';
 import SendMovementPage from './SendMovementPage';
 import Wizard from '../wizard/Wizard';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
-// TODO: Add SM wizard for REQUEST type (see code below)
-// const request = queryString.parse(window.location.search).type === 'REQUEST';
-// if (request && (status === 'CREATED' || !status)) { [ createStockMovement, addItemsPage ] }
-// TODO: check docs for SM wizard and Wizard related components
-// TODO: create separate pages for each workflow
+// TODO: Cleanup not required code
+// TODO: Revise docs
 
-/** Main outbound stock movement form's wizard component. */
+/** Main inbound stock movement form's wizard component. */
 class StockMovements extends Component {
   constructor(props) {
     super(props);
@@ -55,56 +49,6 @@ class StockMovements extends Component {
   }
 
   /**
-   * Returns array of form steps.
-   * @public
-   */
-  getStepList() {
-    let stepList = [];
-    if (this.props.hasPackingSupport) {
-      stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
-        this.props.translate('react.stockMovement.addItems.label', 'Add items'),
-        this.props.translate('react.stockMovement.edit.label', 'Edit'),
-        this.props.translate('react.stockMovement.pick.label', 'Pick'),
-        this.props.translate('react.stockMovement.pack.label', 'Pack'),
-        this.props.translate('react.stockMovement.send.label', 'Send')];
-    } else {
-      stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
-        this.props.translate('react.stockMovement.addItems.label', 'Add items'),
-        this.props.translate('react.stockMovement.edit.label', 'Edit'),
-        this.props.translate('react.stockMovement.pick.label', 'Pick'),
-        this.props.translate('react.stockMovement.send.label', 'Send')];
-    }
-    return stepList;
-  }
-
-  /**
-   * Returns array of form's components.
-   * @public
-   */
-  getPageList() {
-    let formList = [];
-    if (this.props.hasPackingSupport) {
-      formList = [
-        CreateStockMovement,
-        AddItemsPage,
-        EditPage,
-        PickPage,
-        PackingPage,
-        SendMovementPage,
-      ];
-    } else {
-      formList = [
-        CreateStockMovement,
-        AddItemsPage,
-        EditPage,
-        PickPage,
-        SendMovementPage,
-      ];
-    }
-    return formList;
-  }
-
-  /**
    * Returns shipment's name containing shipment's origin, destination, requisition date,
    * tracking number given by user on the last step, description and stock list if chosen.
    * @public
@@ -132,7 +76,7 @@ class StockMovements extends Component {
 
   getAdditionalWizardTitle() {
     const { currentPage, values } = this.state;
-    if (currentPage === 6) {
+    if (currentPage === 3) {
       return (
         <span className="shipment-status float-right">
           {`${values.shipmentStatus ? values.shipmentStatus : 'PENDING'}`}
@@ -141,6 +85,21 @@ class StockMovements extends Component {
     }
     return null;
   }
+
+  /**
+   * Returns array of form steps.
+   * @public
+   */
+  stepList = [
+    this.props.translate('react.stockMovement.create.label', 'Create'),
+    this.props.translate('react.stockMovement.addItems.label', 'Add items'),
+    this.props.translate('react.stockMovement.send.label', 'Send')];
+
+  /**
+   * Returns array of form's components.
+   * @public
+   */
+  pageList = [CreateStockMovement, AddItemsPage, SendMovementPage];
 
   dataFetched = false;
 
@@ -180,18 +139,11 @@ class StockMovements extends Component {
             },
           };
 
-          let statuses = [];
-          if (this.props.hasPackingSupport) {
-            statuses = ['NEW', 'CREATED', 'VERIFYING', 'PICKING', 'PACKED', 'PICKED'];
-          } else {
-            statuses = ['NEW', 'CREATED', 'VERIFYING', 'PICKING', 'PICKED'];
-          }
+          const statuses = ['NEW', 'CREATED', 'PICKED'];
 
           let currentPage = 1;
           if (statuses.indexOf(values.statusCode) > 0) {
             currentPage = statuses.indexOf(values.statusCode) + 1;
-          } else {
-            currentPage = this.props.hasPackingSupport ? 6 : 5;
           }
           this.setState({ values, currentPage });
         })
@@ -203,13 +155,11 @@ class StockMovements extends Component {
     const { values, currentPage } = this.state;
     const title = this.getWizardTitle();
     const additionalTitle = this.getAdditionalWizardTitle();
-    const pageList = this.getPageList();
-    const stepList = this.getStepList();
 
     return (
       <Wizard
-        pageList={pageList}
-        stepList={stepList}
+        pageList={this.pageList}
+        stepList={this.stepList}
         initialValues={values}
         title={title}
         additionalTitle={additionalTitle}
@@ -224,8 +174,6 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  hasPackingSupport: state.session.currentLocation.hasPackingSupport,
-  currentLocation: state.session.currentLocation,
 });
 
 export default connect(mapStateToProps, {
@@ -249,11 +197,6 @@ StockMovements.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
-  /** Is true when currently selected location supports packing */
-  hasPackingSupport: PropTypes.bool.isRequired,
-  currentLocation: PropTypes.shape({
-    id: PropTypes.string,
-  }).isRequired,
 };
 
 StockMovements.defaultProps = {
