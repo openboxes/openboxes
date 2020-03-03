@@ -7,13 +7,15 @@ class IndicatorDatasets implements Serializable {
     List<Integer> data;
     Boolean fill;
     String type;
-    int barThickness;
+    def barThickness;
 
-    IndicatorDatasets(String label, List<Integer> data, Boolean fill, String type, int barThickness)
+    IndicatorDatasets(String label, List<Integer> data, Boolean fill = false, String type = null, def barThickness = "flex") 
     {
         this.label = label;
         this.data = data;
-        this.fill = fill;        
+        this.fill = fill;  
+        this.type = type;
+        this.barThickness = barThickness;      
     }
 
     Map toJson() {

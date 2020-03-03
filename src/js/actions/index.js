@@ -16,8 +16,6 @@ import {
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
 
-import { expirationSummary, fillRate, sentStock, stockReceived, outgoingStock, inventorySummary } from '../../assets/dataFormat/indicators';
-
 export function showSpinner() {
   return {
     type: SHOW_SPINNER,
@@ -106,42 +104,52 @@ export function changeCurrentLocale(locale) {
   };
 }
 
+//New Dashboard
+
+function getDataWithMethod(method) {
+  const url = "/openboxes/apitablero/" + method;
+  return apiClient.get(url).then(res => {
+    return res.data;
+  });
+}
+
 function fetchIndicator(indicatorName, dispatch) {
-  let data = null;
+  let data = [];
   let title = null;
   let type = null;
+  let options = [];
   let archived = 0;
   const id = Math.random();
 
   switch (indicatorName) {
-    case 'inventorySummary':
-      data = inventorySummary;
-      title = 'Inventory Summary';
-      type = 'horizontalBar';
-      break;
     case 'expirationSummary':
-      data = expirationSummary;
+      data = getDataWithMethod('getExpirationSummary');
       title = 'Expiration Summary';
       type = 'line';
       break;
+    case 'inventorySummary':
+      data = getDataWithMethod('getInventorySummary');
+      title = 'Inventory Summary';
+      type = 'horizontalBar';
+      break;
     case 'fillRate':
-      data = fillRate;
+      data = getDataWithMethod('getFillRate');
       title = 'Fill Rate';
       type = 'line';
       break;
     case 'sentStock':
-      data = sentStock;
+      data = getDataWithMethod('getSentStockMovements');
       title = 'Sent Stock Movements';
       type = 'bar';
       break;
     case 'stockReceived':
-      data = stockReceived;
+      data = getDataWithMethod('getReceivedStockMovements');
       title = 'Stock Movements Received';
       type = 'doughnut';
       archived = 1;
       break;
     case 'outgoingStock':
-      data = outgoingStock;
+      data = getDataWithMethod('getOutgoingStock');
       title = 'Outgoing Stock Movements';
       type = 'numbers';
       break;
@@ -196,8 +204,8 @@ function fetchIndicator(indicatorName, dispatch) {
 
 export function fetchIndicators() {
   return (dispatch) => {
-    fetchIndicator('inventorySummary', dispatch);
     fetchIndicator('expirationSummary', dispatch);
+    fetchIndicator('inventorySummary', dispatch);
     fetchIndicator('fillRate', dispatch);
     fetchIndicator('sentStock', dispatch);
     fetchIndicator('stockReceived', dispatch);

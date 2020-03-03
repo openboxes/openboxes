@@ -6,7 +6,7 @@ const colorLineChart = {
   pointHoverBackgroundColor: "#2e5685",
   pointHoverBorderColor: "#2e5685",
   pointHoverBorderWidth: 6,
-  lineTension: 0.4
+  lineTension: 0
 };
 
 const colorBarChart = {
@@ -14,7 +14,8 @@ const colorBarChart = {
 };
 
 const colorHorizontalBarChart = {
-  backgroundColor: ["#2c7873", "#52de97", "#a7e9af", "#ff0000", "#e89da2"]
+  backgroundColor: ["#2c7873", "#52de97", "#a7e9af", "#ff0000", "#e89da2"],
+  //barThickness: 35
 };
 
 const doughnutChart = {

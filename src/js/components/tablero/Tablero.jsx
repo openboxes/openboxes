@@ -13,6 +13,7 @@ import UnarchiveIndicator from './UnarchivePopout';
 
 // Disable charts legends by default.
 defaults.global.legend = false;
+Chart.defaults.scale.ticks.beginAtZero = true;
 
 const SortableCards = SortableContainer(({ data }) => (
   <div className="cardComponent">
