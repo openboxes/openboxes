@@ -16,6 +16,8 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 
 class StockMovementItemApiController {
 
@@ -163,10 +165,14 @@ class StockMovementItemApiController {
     }
 
     def removeItem = {
-        RequisitionItem requisitionItem = RequisitionItem.get(params.id)
+        throw new UnsupportedOperationException("Requires a good refactoring")
+//        ShipmentItem shipmentItem = ShipmentItem.get(params.id)
+//        Shipment shipment = shipmentItem.shipment
+//        shipment.removeFromShipmentItems(shipmentItem)
+//        shipment.save()
 
-        stockMovementService.removeRequisitionItem(requisitionItem)
-
+//        RequisitionItem requisitionItem = RequisitionItem.get(params.id)
+//        stockMovementService.removeRequisitionItem(requisitionItem)
         render status: 204
     }
 
