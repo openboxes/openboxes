@@ -13,7 +13,7 @@
     "test": "test"
   },
   "scripts": {
-    "watch": "webpack --watch --progress --mode=development",
+    "watch": "webpack --watch --progress --mode=development --env.REACT_APP_API_PATH=/",
     "bundle": "webpack --no-color --mode=production",
     "test": "jest",
     "styleguide": "styleguidist server",
