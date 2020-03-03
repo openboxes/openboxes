@@ -15,6 +15,8 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PartyRole
+import org.pih.warehouse.core.PaymentMethodType
+import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
@@ -208,6 +210,22 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectPaymentMethodType = { attrs, body ->
+        attrs.from = PaymentMethodType.list().sort { it?.name?.toLowerCase() }
+        attrs.optionKey = 'id'
+        attrs.value = attrs.value
+        attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+
+    def selectPaymentTerm = { attrs, body ->
+        attrs.from = PaymentTerm.list().sort { it?.name?.toLowerCase() }
+        attrs.optionKey = 'id'
+        attrs.value = attrs.value
+        attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+  
     def selectOrderAdjustmentTypes = { attrs, body ->
         attrs.from = OrderAdjustmentType.list()
         attrs.optionKey = 'id'
@@ -260,7 +278,6 @@ class SelectTagLib {
         out << render(template: '/taglib/selectContainer', model: [attrs: attrs])
 
     }
-
 
     def selectDepot = { attrs, body ->
         def currentLocation = Location.get(session?.warehouse?.id)

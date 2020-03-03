@@ -29,6 +29,9 @@ class Order implements Serializable {
     Date dateOrdered
     Date dateCompleted
 
+    PaymentMethodType paymentMethodType
+    PaymentTerm paymentTerm
+
     // Currency conversion
     String currencyCode
     BigDecimal exchangeRate
@@ -69,6 +72,8 @@ class Order implements Serializable {
         dateOrdered(nullable: true)
         completedBy(nullable: true)
         dateCompleted(nullable: true)
+        paymentMethodType(nullable: true)
+        paymentTerm(nullable: true)
         dateCreated(nullable: true)
         lastUpdated(nullable: true)
     }
@@ -173,6 +178,7 @@ class Order implements Serializable {
             return it.amount ?: it.percentage ? (it.percentage/100) * subtotal : 0
         }?:0
     }
+
     def getTotalOrderItemAdjustments() {
         return orderItems?.sum { it?.totalAdjustments }?:0
     }
