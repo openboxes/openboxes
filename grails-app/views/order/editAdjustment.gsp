@@ -43,16 +43,16 @@
 
 								</td>
 							</tr>
-%{--							<tr class="prop">--}%
-%{--								<td valign="top" class="name"><label><g:message code="order.orderItem.label"/></label></td>--}%
-%{--								<td valign="top" class="value ${hasErrors(bean: orderAdjustment, field: 'order', 'errors')}">--}%
-%{--									<g:selectOrderItems name="orderItem.id"--}%
-%{--														orderId="${orderInstance?.id}"--}%
-%{--														value="${orderAdjustment?.orderItem?.id}"--}%
-%{--														class="chzn-select-deselect"--}%
-%{--														noSelection="['':'']"/>--}%
-%{--								</td>--}%
-%{--							</tr>--}%
+							<tr class="prop">
+								<td valign="top" class="name"><label><g:message code="order.orderItem.label"/></label></td>
+								<td valign="top" class="value ${hasErrors(bean: orderAdjustment, field: 'order', 'errors')}">
+									<g:selectOrderItems name="orderItem.id"
+														orderId="${orderInstance?.id}"
+														value="${orderAdjustment?.orderItem?.id}"
+														class="chzn-select-deselect"
+														noSelection="['':'']"/>
+								</td>
+							</tr>
 							<tr class="prop">
 								<td valign="top" class="name"><label><g:message code="orderAdjustment.orderAdjustmentType.label"/></label></td>
 								<td valign="top" class="value ${hasErrors(bean: orderAdjustment, field: 'orderAdjustmentType', 'errors')}">

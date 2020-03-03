@@ -50,11 +50,11 @@ class OrderItem implements Serializable {
         shipmentItems joinTable: [name: 'order_shipment', key: 'order_item_id']
     }
 
-    static transients = ["orderItemType"]
+    static transients = ["orderItemType", "total", "subtotal", "totalAdjustments"]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
 
-    static hasMany = [orderItems: OrderItem, shipmentItems: ShipmentItem]
+    static hasMany = [orderItems: OrderItem, shipmentItems: ShipmentItem, orderAdjustments: OrderAdjustment]
 
     static constraints = {
         description(nullable: true)
@@ -120,7 +120,21 @@ class OrderItem implements Serializable {
     }
 
     def totalPrice() {
-        return (quantity ? quantity : 0.0) * (unitPrice ? unitPrice : 0.0)
+        return total
+    }
+
+    def getTotalAdjustments() {
+        return orderAdjustments?.sum {
+            return it.amount ?: it.percentage ? (it.percentage/100) * subtotal : 0
+        }?:0
+    }
+
+    def getSubtotal() {
+        return (quantity ?: 0.0) * (unitPrice ?: 0.0)
+    }
+
+    def getTotal() {
+        return (subtotal + totalAdjustments)?:0
     }
 
 }

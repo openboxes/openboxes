@@ -9,7 +9,7 @@
 **/
 package org.pih.warehouse.order
 
-class OrderAdjustment {
+class OrderAdjustment implements Serializable {
 
     String id
     BigDecimal amount
@@ -22,6 +22,8 @@ class OrderAdjustment {
     // Audit fields
     Date dateCreated
     Date lastUpdated
+
+    static transients = ['totalAdjustments']
 
     static belongsTo = [order: Order, orderItem: OrderItem]
 
@@ -36,5 +38,10 @@ class OrderAdjustment {
         percentage(nullable:true)
         description(nullable:true)
         comments(nullable: true)
+    }
+
+
+    def getTotalAdjustments() {
+        return amount ?: percentage ? orderItem ? orderItem?.subtotal * (percentage/100) : order.subtotal * (percentage/100) : 0
     }
 }
