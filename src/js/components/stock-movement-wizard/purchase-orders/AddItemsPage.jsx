@@ -7,7 +7,6 @@ import arrayMutators from 'final-form-arrays';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
-import queryString from 'query-string';
 import moment from 'moment';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -23,8 +22,6 @@ import apiClient from '../../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import { debounceProductsFetch } from '../../../utils/option-utils';
 
-const request = queryString.parse(window.location.search).type === 'REQUEST';
-
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'react.default.button.delete.label',
@@ -34,9 +31,9 @@ const DELETE_BUTTON_FIELD = {
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
-    fieldValue, removeItem, removeRow,
+    fieldValue, removeRow,
   }) => ({
-    onClick: fieldValue.id ? () => removeItem(fieldValue.id).then(() => removeRow()) : removeRow,
+    onClick: fieldValue.id ? () => null : removeRow,
     disabled: !!fieldValue.id,
   }),
   attributes: {
@@ -155,7 +152,6 @@ const VENDOR_FIELDS = {
   },
 };
 
-// TODO: Cleanup not required code
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["getLineItemsToBeSaved"] }] */
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -168,15 +164,12 @@ class AddItemsPage extends Component {
     this.state = {
       sortOrder: 0,
       values: this.props.initialValues,
-      newItem: false,
     };
 
     this.props.showSpinner();
-    this.removeItem = this.removeItem.bind(this);
     this.getSortOrder = this.getSortOrder.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
     this.confirmTransition = this.confirmTransition.bind(this);
-    this.newItemAdded = this.newItemAdded.bind(this);
     this.validate = this.validate.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
@@ -266,12 +259,6 @@ class AddItemsPage extends Component {
       }
     });
     return errors;
-  }
-
-  newItemAdded() {
-    this.setState({
-      newItem: true,
-    });
   }
 
   /**
@@ -452,35 +439,19 @@ class AddItemsPage extends Component {
   saveAndTransitionToNextStep(formValues, lineItems) {
     this.props.showSpinner();
 
-    if (formValues.origin.type === 'SUPPLIER' || !formValues.hasManageInventory) {
-      this.saveRequisitionItems(lineItems)
-        .then((resp) => {
-          let values = formValues;
-          if (resp) {
-            values = { ...formValues, lineItems: resp.data.data.lineItems };
-          }
-          this.transitionToNextStep('CHECKING')
-            .then(() => {
-              this.props.nextPage(values);
-            })
-            .catch(() => this.props.hideSpinner());
-        })
-        .catch(() => this.props.hideSpinner());
-    } else {
-      this.saveRequisitionItems(lineItems)
-        .then((resp) => {
-          let values = formValues;
-          if (resp) {
-            values = { ...formValues, lineItems: resp.data.data.lineItems };
-          }
-          this.transitionToNextStep('VERIFYING')
-            .then(() => {
-              this.props.nextPage(values);
-            })
-            .catch(() => this.props.hideSpinner());
-        })
-        .catch(() => this.props.hideSpinner());
-    }
+    this.saveRequisitionItems(lineItems)
+      .then((resp) => {
+        let values = formValues;
+        if (resp) {
+          values = { ...formValues, lineItems: resp.data.data.lineItems };
+        }
+        this.transitionToNextStep('CHECKING')
+          .then(() => {
+            this.props.nextPage(values);
+          })
+          .catch(() => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -628,21 +599,6 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Removes chosen item from requisition's items list.
-   * @param {string} itemId
-   * @public
-   */
-  removeItem(itemId) {
-    const removeItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/removeItem`;
-
-    return apiClient.delete(removeItemsUrl)
-      .catch(() => {
-        this.props.hideSpinner();
-        return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
-      });
-  }
-
-  /**
    * Transition to next stock movement status:
    * - 'CHECKING' if origin type is supplier.
    * - 'VERIFYING' if origin type is other than supplier.
@@ -652,15 +608,9 @@ class AddItemsPage extends Component {
   transitionToNextStep(status) {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status };
-    const { movementNumber } = this.state.values;
 
     if (this.state.values.statusCode === 'CREATED') {
-      return apiClient.post(url, payload)
-        .then(() => {
-          if (request) {
-            window.location = `/openboxes/stockMovement/list?type=REQUEST&movementNumber=${movementNumber}&submitted=true`;
-          }
-        });
+      return apiClient.post(url, payload);
     }
     return Promise.resolve();
   }
@@ -731,11 +681,8 @@ class AddItemsPage extends Component {
                 renderFormField(fieldConfig, fieldName, {
                   stocklist: values.stocklist,
                   recipients: this.props.recipients,
-                  removeItem: this.removeItem,
                   debouncedProductsFetch: this.debouncedProductsFetch,
                   getSortOrder: this.getSortOrder,
-                  newItemAdded: this.newItemAdded,
-                  newItem: this.state.newItem,
                   isFromOrder: this.state.values.isFromOrder,
                 }))}
               <div>
@@ -751,11 +698,7 @@ class AddItemsPage extends Component {
                   type="submit"
                   onClick={() => {
                     if (!invalid) {
-                      if (!request) {
-                        this.nextPage(values);
-                      } else {
-                        this.confirmSubmit(() => this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() => this.transitionToNextStep('VERIFYING')));
-                      }
+                      this.nextPage(values);
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
