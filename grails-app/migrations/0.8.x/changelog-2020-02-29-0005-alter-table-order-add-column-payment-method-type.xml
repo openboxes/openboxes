@@ -15,7 +15,7 @@
   <changeSet author="jmiranda (generated)" id="1582956153073-2">
     <preConditions onFail="MARK_RAN">
       <not>
-        <foreignKeyConstraintExists foreignKeyName="FK651874E9E52B00C"/>
+        <foreignKeyConstraintExists foreignKeyName="FK651874E6A8010C1"/>
       </not>
     </preConditions>
     <addForeignKeyConstraint baseColumnNames="payment_method_type_id" baseTableName="order"
