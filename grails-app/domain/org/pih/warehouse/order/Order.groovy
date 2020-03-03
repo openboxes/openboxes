@@ -33,7 +33,7 @@ class Order implements Serializable {
     Date dateCreated
     Date lastUpdated
 
-    static transients = ["totalAdjustments", "subtotal", "total"]
+    static transients = ["totalAdjustments", "totalOrderAdjustments", "totalOrderItemAdjustments", "subtotal", "total"]
 
     static hasMany = [
             orderItems: OrderItem,
@@ -152,22 +152,33 @@ class Order implements Serializable {
         } : []
     }
 
+    /**
+     * @deprecated should use total
+     * @return
+     */
     def totalPrice() {
-        return orderItems.collect { it.totalPrice() }.sum() ?: 0
+        return total
     }
 
     def getTotalAdjustments() {
-        return orderAdjustments?.sum {
-            return it.amount ?: it.percentage ? (it.percentage/100) * totalPrice() : 0
+        return totalOrderItemAdjustments + totalOrderAdjustments
+    }
+
+    def getTotalOrderAdjustments() {
+        return orderAdjustments?.findAll { !it.orderItem } ?.sum {
+            return it.amount ?: it.percentage ? (it.percentage/100) * subtotal : 0
         }?:0
+    }
+    def getTotalOrderItemAdjustments() {
+        return orderItems.sum { it.totalAdjustments }?:0
     }
 
     def getSubtotal() {
-        totalPrice()
+        return orderItems.collect { it.totalPrice() }.sum() ?: 0
     }
 
     def getTotal() {
-        return (totalPrice() + totalAdjustments)?:0
+        return (subtotal + totalAdjustments)?:0
     }
 
     String generateName() {

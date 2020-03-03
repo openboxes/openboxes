@@ -56,9 +56,6 @@
                                         <format:metadata obj="${orderInstance?.orderTypeCode}"/>
                                     </td>
                                 </tr>
-
-
-
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="order.destination.label"/></label>
@@ -75,7 +72,6 @@
                                         ${orderInstance?.origin?.name }
                                     </td>
                                 </tr>
-
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="order.dateOrdered.label"/></label>
@@ -250,6 +246,7 @@
                                         <table class="table table-bordered">
                                             <thead>
                                             <tr class="odd">
+                                                <th><warehouse:message code="order.orderItem.label"/></th>
                                                 <th><warehouse:message code="default.type.label"/></th>
                                                 <th><warehouse:message code="default.description.label"/></th>
                                                 <th><warehouse:message code="orderAdjustment.percentage.label"/></th>
@@ -261,7 +258,10 @@
                                             <g:each var="orderAdjustment" in="${orderInstance.orderAdjustments}" status="status">
                                                 <tr class="${status%2==0?'odd':'even'}">
                                                     <td>
-                                                        ${orderAdjustment.orderAdjustmentType.name}
+                                                        ${orderAdjustment?.orderItem?.product?:g.message(code:'default.all.label')}
+                                                    </td>
+                                                    <td>
+                                                        ${orderAdjustment?.orderAdjustmentType?.name}
                                                     </td>
                                                     <td>
                                                         ${orderAdjustment.description}
@@ -273,9 +273,14 @@
                                                         <g:if test="${orderAdjustment.amount}">
                                                             ${orderAdjustment.amount}
                                                         </g:if>
-                                                        <g:if test="${orderAdjustment.percentage}">
-                                                            <g:formatNumber number="${orderInstance.totalPrice() * (orderAdjustment.percentage / 100)}"/>
-                                                        </g:if>
+                                                        <g:elseif test="${orderAdjustment.percentage}">
+                                                            <g:if test="${orderAdjustment.orderItem}">
+                                                                <g:formatNumber number="${orderAdjustment.orderItem.totalAdjustments}"/>
+                                                            </g:if>
+                                                            <g:else>
+                                                                <g:formatNumber number="${orderAdjustment.totalAdjustments}"/>
+                                                            </g:else>
+                                                        </g:elseif>
                                                     </td>
                                                     <td class="right">
                                                         <g:link action="editAdjustment" id="${orderAdjustment.id}" params="['order.id':orderInstance?.id]" class="button">
@@ -295,7 +300,7 @@
                                             </tbody>
                                             <tfoot>
                                             <tr>
-                                                <th colspan="3">
+                                                <th colspan="4">
                                                 </th>
                                                 <th>
                                                     <g:formatNumber number="${orderInstance.totalAdjustments}"/>
