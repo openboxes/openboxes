@@ -65,7 +65,9 @@
         <warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create purchase order" />
     </g:link>
 
-    <div class="right">
+
+
+    <div class="right button-container">
 
         <g:if test="${orderInstance?.id}">
             <div class="button-group">
@@ -103,29 +105,31 @@
             </div>
 
             <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
+                <g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                    ${warehouse.message(code: 'default.button.rollback.label')}
+                </g:link>
                 <div class="button-group">
-                    <g:if test="${!orderInstance?.isPlaced()}">
-                        <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button" >
-                            <img src="${resource(dir: 'images/icons/silk', file: 'creditcards.png')}" />&nbsp;
-                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}</g:link>
-                    </g:if>
-                    <g:else>
-                        <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button" disabled="disabled" >
-                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
-                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}</g:link>
-
-                    </g:else>
-                    <g:link controller="order" action="shipOrder" id="${orderInstance?.id}" class="button">
+                    <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button"
+                            disabled="${orderInstance?.status >= OrderStatus.PLACED}"
+                            disabledMessage="Order has already been placed">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
+                        ${warehouse.message(code: 'order.wizard.placeOrder.label')}
+                    </g:link>
+                    <g:link controller="order" action="print" id="${orderInstance?.id}" class="button" target="_blank"
+                            disabled="${orderInstance?.status < org.pih.warehouse.order.OrderStatus.PLACED}"
+                            disabledMessage="Order must be placed in order to print.">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
+                        <warehouse:message code="order.wizard.printOrder.label" default="Print Order"/>
+                    </g:link>
+                    <g:link controller="order" action="shipOrder" id="${orderInstance?.id}" class="button"
+                            disabled="${orderInstance?.status < OrderStatus.PLACED}"
+                            disabledMessage="Order must be placed in order to ship">
                         <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
                         <warehouse:message code="order.shipOrder.label" default="Ship Order"/>
                     </g:link>
                 </div>
                 <div class="button-group">
-                    <g:link controller="order" action="print" id="${orderInstance?.id}" class="button" target="_blank">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-                        <warehouse:message code="order.wizard.printOrder.label" default="Print PO"/>
-                    </g:link>
-
                     <g:link controller="order" action="download" id="${orderInstance?.id}" class="button" target="_blank">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                         <warehouse:message code="order.wizard.downloadOrder.label" default="Download Order"/>
@@ -134,13 +138,10 @@
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                         <warehouse:message code="order.wizard.downloadOrderItems.label" default="Download Items Only"/>
                     </g:link>
-
                 </div>
-
             </g:if>
-            <g:elseif test="${orderInstance?.orderTypeCode==OrderTypeCode.TRANSFER_ORDER}">
+            <g:if test="${orderInstance?.orderTypeCode==OrderTypeCode.TRANSFER_ORDER}">
                 <div class="right">
-
                     <div class="button-group">
                         <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
                             <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
@@ -148,7 +149,7 @@
                         </g:link>
                     </div>
                 </div>
-            </g:elseif>
+            </g:if>
         </g:if>
     </div>
 </div>
