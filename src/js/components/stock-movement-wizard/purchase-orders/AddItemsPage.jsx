@@ -49,22 +49,6 @@ const VENDOR_FIELDS = {
   lineItems: {
     type: ArrayField,
     arrowsNavigation: true,
-    // eslint-disable-next-line react/prop-types
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, showOnly, isFromOrder,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        disabled={showOnly}
-        hidden={isFromOrder}
-        onClick={() => addRow({
-          sortOrder: getSortOrder(),
-        })}
-      ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </button>
-    ),
     fields: {
       palletName: {
         type: TextField,
@@ -134,19 +118,8 @@ const VENDOR_FIELDS = {
         label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
-        getDynamicAttr: ({
-          recipients, addRow, rowCount, rowIndex, getSortOrder,
-        }) => ({
+        getDynamicAttr: ({ recipients }) => ({
           options: recipients,
-          onTabPress: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
         }),
         attributes: {
           labelKey: 'name',
