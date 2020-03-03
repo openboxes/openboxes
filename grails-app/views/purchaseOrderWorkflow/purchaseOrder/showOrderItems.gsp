@@ -87,11 +87,11 @@
                                 </td>
                                 <td class="center middle">
                                     <g:formatNumber number="${orderItem?.unitPrice ?: 0.00 }" format="###,###,##0.00##"/>
-                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </td>
                                 <td class="right middle">
                                     <g:formatNumber number="${orderItem?.totalPrice() }" />
-                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </td>
                                 <td class="actionButtons center">
                                     <g:if test="${orderItem?.id }">
@@ -161,7 +161,7 @@
                             <th colspan="12" class="right">
                                 <warehouse:message code="default.total.label"/>
                                 <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
-                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                             </th>
                         </tr>
                     </tfoot>

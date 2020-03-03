@@ -98,7 +98,7 @@
                                     </td>
                                     <td valign="top" class="value">
                                         <g:formatNumber number="${orderInstance?.totalPrice()?:0 }"/>
-                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                     </td>
                                 </tr>
 
@@ -178,11 +178,11 @@
                                                         </td>
                                                         <td class="">
                                                             <g:formatNumber number="${orderItem?.unitPrice?:0}" />
-                                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                                         </td>
                                                         <td class="">
                                                             <g:formatNumber number="${orderItem?.totalPrice()?:0}" />
-                                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                                         </td>
                                                     </g:if>
                                                     <g:elseif test="${orderInstance.orderTypeCode==OrderTypeCode.TRANSFER_ORDER}">
@@ -210,7 +210,7 @@
                                                     </th>
                                                     <th colspan="1" class="left">
                                                         <g:formatNumber number="${orderInstance?.totalPrice()?:0.0 }"/>
-                                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                                     </th>
                                                 </tr>
                                                 </tfoot>

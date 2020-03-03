@@ -206,6 +206,15 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectCurrency = { attrs, body ->
+        println "attrs: ${attrs}"
+        UnitOfMeasureClass currencyClass = UnitOfMeasureClass.findByType(UnitOfMeasureType.CURRENCY)
+        attrs.from = UnitOfMeasure.findAllByUomClass(currencyClass)
+        attrs.optionKey = 'code'
+        attrs.value = attrs.value ?: currencyClass.baseUom?.code
+        attrs.optionValue = { it.name + " " + it.code }
+        out << g.select(attrs)
+    }
 
     def selectShipper = { attrs, body ->
         attrs.from = Shipper.list().sort { it?.name?.toLowerCase() }
