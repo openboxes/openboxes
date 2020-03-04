@@ -205,7 +205,6 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(`/openboxes/stockMovement/create/${resp.id}`);
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,
@@ -325,10 +324,6 @@ CreateStockMovement.propTypes = {
    * is fired from within the form component.
    */
   nextPage: PropTypes.func.isRequired,
-  /** React router's object used to manage session history */
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
   /** Current location */
   location: PropTypes.shape({
     name: PropTypes.string,

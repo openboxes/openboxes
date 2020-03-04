@@ -41,6 +41,7 @@ class Wizard extends Component {
     } else {
       this.setState({ values });
     }
+    this.props.updateWizardValues(values);
   }
 
   /**
@@ -56,6 +57,7 @@ class Wizard extends Component {
     } else {
       this.setState({ values });
     }
+    this.props.updateWizardValues(values);
   }
 
   /**
@@ -66,6 +68,7 @@ class Wizard extends Component {
    */
   goToPage(currentPage, values) {
     this.setState({ prevPage: currentPage - 1, currentPage, values });
+    this.props.updateWizardValues(values);
   }
 
   render() {
@@ -114,9 +117,11 @@ Wizard.propTypes = {
   prevPage: PropTypes.number.isRequired,
   pageList: PropTypes.arrayOf(PropTypes.func).isRequired,
   stepList: PropTypes.arrayOf(PropTypes.string).isRequired,
+  updateWizardValues: PropTypes.func,
 };
 
 Wizard.defaultProps = {
   initialValues: {},
   additionalTitle: null,
+  updateWizardValues: () => {},
 };
