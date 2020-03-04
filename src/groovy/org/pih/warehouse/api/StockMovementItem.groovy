@@ -147,8 +147,10 @@ class StockMovementItem {
                 recipient: shipmentItem.recipient,
                 palletName: palletName,
                 boxName: boxName,
-                sortOrder: null
-
+                comments: null,
+                lotNumber: shipmentItem?.inventoryItem?.lotNumber ?: "",
+                expirationDate: shipmentItem?.inventoryItem?.expirationDate,
+                sortOrder: shipmentItem?.sortOrder,
         )
     }
 
