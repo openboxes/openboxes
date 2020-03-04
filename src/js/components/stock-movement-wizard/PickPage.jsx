@@ -8,7 +8,6 @@ import { getTranslate } from 'react-localize-redux';
 import fileDownload from 'js-file-download';
 import update from 'immutability-helper';
 import Alert from 'react-s-alert';
-import queryString from 'query-string';
 import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -23,8 +22,6 @@ import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import ButtonField from '../form-elements/ButtonField';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-
-const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
 const FIELDS = {
   pickPageItems: {
@@ -108,13 +105,13 @@ const FIELDS = {
         flexWidth: '0.7',
         attributes: {
           title: 'react.stockMovement.editPick.label',
-          btnOpenDisabled: showOnly,
         },
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, updatePickPageItem,
-          reasonCodes, hasBinLocationSupport,
+          reasonCodes, hasBinLocationSupport, showOnly,
         }) => ({
           fieldValue: flattenRequest(fieldValue),
+          btnOpenDisabled: showOnly,
           subfield,
           stockMovementId,
           btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
@@ -135,10 +132,10 @@ const FIELDS = {
         flexWidth: '1',
         attributes: {
           className: 'btn btn-outline-primary',
-          disabled: showOnly,
         },
-        getDynamicAttr: ({ subfield, translate }) => ({
+        getDynamicAttr: ({ subfield, translate, showOnly }) => ({
           hidden: subfield,
+          disabled: showOnly,
           onClick: () => Alert.error(translate('react.stockMovement.alert.disabledAdjustment.label', 'This feature is not available yet. Please adjust stock on the electronic stock card page.')),
         }),
       },
@@ -150,13 +147,15 @@ const FIELDS = {
         fieldKey: '',
         buttonLabel: 'react.default.button.undoEdit.label',
         buttonDefaultMessage: 'Undo edit',
-        getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
+        getDynamicAttr: ({
+          fieldValue, revertUserPick, subfield, showOnly,
+        }) => ({
           onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
           hidden: subfield,
+          disabled: showOnly,
         }),
         attributes: {
           className: 'btn btn-outline-danger',
-          disabled: showOnly,
         },
       },
     },
@@ -526,6 +525,7 @@ class PickPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -613,6 +613,7 @@ class PickPage extends Component {
                 loadMoreRows: this.loadMoreRows,
                 isRowLoaded: this.isRowLoaded,
                 isPaginated: this.props.isPaginated,
+                showOnly,
               }))}
               <div className="d-print-none">
                 <button type="button" disabled={showOnly} className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
@@ -670,4 +671,5 @@ PickPage.propTypes = {
   hasPackingSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  showOnly: PropTypes.bool.isRequired,
 };
