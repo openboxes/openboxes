@@ -12,8 +12,10 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
@@ -212,6 +214,45 @@ class StockMovement {
             }
         }
 
+        return stockMovement
+    }
+
+    static StockMovement createFromShipment(Shipment shipment) {
+
+        String statusCode
+        if (shipment.status.code == ShipmentStatusCode.SHIPPED) {
+            statusCode = RequisitionStatus.ISSUED.toString()
+        }
+        else {
+            statusCode = RequisitionStatus.PENDING.toString()
+        }
+
+        StockMovement stockMovement = new StockMovement(
+                id: shipment.id,
+                name: shipment.name,
+                description: shipment.description,
+                shipmentType: shipment.shipmentType,
+                statusCode: statusCode,
+                stockMovementType: StockMovementType.INBOUND,
+                dateShipped: shipment.expectedShippingDate,
+                //receiptStatusCode: , // FIXME Need to translate
+                identifier: shipment.shipmentNumber,
+                origin: shipment.origin,
+                destination: shipment.destination,
+                dateRequested: shipment.dateCreated,
+                dateCreated: shipment.dateCreated,
+                lastUpdated: shipment.lastUpdated,
+                requestedBy: shipment.createdBy,
+                shipment: shipment
+        )
+
+        if (shipment.shipmentItems) {
+            shipment.shipmentItems.each { ShipmentItem shipmentItem ->
+                StockMovementItem stockMovementItem = StockMovementItem.createFromShipmentItem(shipmentItem)
+                stockMovementItem.sortOrder = stockMovement.lineItems ? stockMovement.lineItems.size() * 100 : 0
+                stockMovement.lineItems.add(stockMovementItem)
+            }
+        }
         return stockMovement
     }
 

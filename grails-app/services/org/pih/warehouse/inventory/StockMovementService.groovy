@@ -205,22 +205,22 @@ class StockMovementService {
     StockMovement updateInboundStockMovement(StockMovement stockMovement) {
         log.info "Update stock movement " + new JSONObject(stockMovement.toJson()).toString(4)
 
-        Order order = Order.get(stockMovement.id)
-        if (!order) {
+        Shipment shipment = Shipment.get(stockMovement.id)
+        if (!shipment) {
             throw new ObjectNotFoundException(stockMovement.id, StockMovement.class.toString())
         }
-        if (stockMovement.destination) order.destination = stockMovement.destination
-        if (stockMovement.origin) order.origin = stockMovement.origin
-        if (stockMovement.description) order.description = stockMovement.description
-        if (stockMovement.requestedBy) order.orderedBy = stockMovement.requestedBy
-        if (stockMovement.dateRequested) order.dateOrdered = stockMovement.dateRequested
-        order.name = stockMovement.generateName()
+        if (stockMovement.destination) shipment.destination = stockMovement.destination
+        if (stockMovement.origin) shipment.origin = stockMovement.origin
+        if (stockMovement.description) shipment.description = stockMovement.description
+        if (stockMovement.requestedBy) shipment.createdBy = stockMovement.requestedBy
+        if (stockMovement.dateRequested) shipment.dateCreated = stockMovement.dateRequested
+        shipment.name = stockMovement.generateName()
 
         if (stockMovement?.stocklist?.id) {
             throw new UnsupportedOperationException("Stocklists not yet supported for inbound stock movements")
         }
-        if (order.hasErrors() || !order.save(flush: true)) {
-            throw new ValidationException("Invalid order", order.errors)
+        if (shipment.hasErrors() || !shipment.save(flush: true)) {
+            throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
 //        if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status || RequisitionStatus.ISSUED == requisition.status) {
@@ -228,7 +228,7 @@ class StockMovementService {
 //            updateShipmentWhenRequisitionChanged(stockMovement)
 //        }
 
-        StockMovement inboundStockMovement = StockMovement.createFromOrder(order)
+        StockMovement inboundStockMovement = StockMovement.createFromShipment(shipment)
 
         //createMissingShipmentItems(stockMovement)
 
@@ -415,7 +415,7 @@ class StockMovementService {
     }
 
     StockMovement getInboundStockMovement(Shipment shipment) {
-        StockMovement stockMovement = createFromShipment(shipment)
+        StockMovement stockMovement = StockMovement.createFromShipment(shipment)
         stockMovement.documents = getDocuments(stockMovement)
         return stockMovement
     }
@@ -1138,47 +1138,7 @@ class StockMovementService {
     }
 
 
-    // FIXME Move to StockMovement or Shipment
-    StockMovement createFromShipment(Shipment shipment) {
 
-        // FIXME Translate shipment statuses into stock movement statuses
-        String statusCode
-        if (shipment.status.code == ShipmentStatusCode.SHIPPED) {
-            statusCode = RequisitionStatus.ISSUED.toString()
-        }
-        else {
-            statusCode = RequisitionStatus.PENDING.toString()
-        }
-
-        StockMovement stockMovement = new StockMovement(
-                id: shipment.id,
-                name: shipment.name,
-                description: shipment.description,
-                shipmentType: shipment.shipmentType,
-                statusCode: statusCode,
-                stockMovementType: StockMovementType.INBOUND,
-                dateShipped: shipment.expectedShippingDate,
-                //receiptStatusCode: , // FIXME Need to translate
-                identifier: shipment.shipmentNumber,
-                origin: shipment.origin,
-                destination: shipment.destination,
-                dateRequested: shipment.dateCreated,
-                dateCreated: shipment.dateCreated,
-                lastUpdated: shipment.lastUpdated,
-                requestedBy: AuthService.getCurrentUser().get(),
-                shipment: shipment
-        )
-
-        if (shipment.shipmentItems) {
-            shipment.shipmentItems.each { ShipmentItem shipmentItem ->
-                StockMovementItem stockMovementItem = StockMovementItem.createFromShipmentItem(shipmentItem)
-                stockMovementItem.sortOrder = stockMovement.lineItems ? stockMovement.lineItems.size() * 100 : 0
-                stockMovement.lineItems.add(stockMovementItem)
-            }
-        }
-
-        return stockMovement
-    }
 
     StockMovement createOutboundStockMovement(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
@@ -1262,11 +1222,17 @@ class StockMovementService {
                                     stockMovementItem?.product,
                                     stockMovementItem?.lotNumber,
                                     stockMovementItem?.expirationDate)
+
+                    // There's a case where the user might change the expiration date
+                    if (stockMovementItem.inventoryItem.expirationDate != stockMovementItem.expirationDate) {
+                        stockMovementItem.inventoryItem.expirationDate = stockMovementItem.expirationDate
+                    }
                 }
             }
 
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 ShipmentItem shipmentItem = findOrCreateShipmentItem(shipment, stockMovementItem.id)
+                shipmentItem.container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
                 shipmentItem.lotNumber = stockMovementItem.lotNumber
                 shipmentItem.expirationDate = stockMovementItem.expirationDate
                 shipmentItem.product = stockMovementItem.product
@@ -1280,7 +1246,7 @@ class StockMovementService {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
-        return createFromShipment(shipment)
+        return StockMovement.createFromShipment(shipment)
     }
 
 

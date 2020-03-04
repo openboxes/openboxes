@@ -27,7 +27,7 @@
         </g:hasErrors>
 
         <div class="dialog">
-            <g:render template="/order/addItemsSummary" model="[orderInstance:order,currentState:'addItems']"/>
+            <g:render template="/order/summary" model="[orderInstance:order,currentState:'addItems']"/>
 
             <div class="box">
                 <h2><warehouse:message code="order.wizard.addItems.label"/></h2>
