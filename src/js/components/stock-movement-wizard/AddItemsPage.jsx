@@ -408,7 +408,7 @@ class AddItemsPage extends Component {
    * @public
    */
   getFields() {
-    if (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) {
+    if ((this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) && !request) {
       return VENDOR_FIELDS;
     } else if (_.get(this.state.values.stocklist, 'id')) {
       return STOCKLIST_FIELDS;
@@ -1099,7 +1099,7 @@ class AddItemsPage extends Component {
   }
 
   render() {
-    const showOnly = request && this.state.values.statusCode !== 'CREATED';
+    const showOnly = this.props.showOnly && this.state.values.statusCode !== 'CREATED';
     return (
       <Form
         onSubmit={() => {}}
@@ -1208,8 +1208,11 @@ class AddItemsPage extends Component {
                     if (!invalid) {
                       if (!request) {
                         this.nextPage(values);
-                      } else {
-                        this.confirmSubmit(() => this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() => this.transitionToNextStep('VERIFYING')));
+                      } else if (request || (this.props.currentLocation.id !== this.state.values.origin.id && this.state.values.origin.type !== 'SUPPLIER')) {
+                        this.confirmSubmit(() =>
+                          // eslint-disable-next-line max-len
+                          this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() =>
+                            this.transitionToNextStep(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory ? 'CHECKING' : 'VERIFYING')));
                       }
                     }
                   }}
@@ -1279,4 +1282,8 @@ AddItemsPage.propTypes = {
   hasPackingSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string,
+  }).isRequired,
+  showOnly: PropTypes.bool.isRequired,
 };

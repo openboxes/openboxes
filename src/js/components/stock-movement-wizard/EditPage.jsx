@@ -8,7 +8,6 @@ import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import update from 'immutability-helper';
-import queryString from 'query-string';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -23,8 +22,6 @@ import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../actions';
 import ButtonField from '../form-elements/ButtonField';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-
-const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
@@ -128,7 +125,7 @@ const FIELDS = {
         },
         getDynamicAttr: ({
           fieldValue, rowIndex, stockMovementId, onResponse,
-          reviseRequisitionItems, values, reasonCodes,
+          reviseRequisitionItems, values, reasonCodes, showOnly,
         }) => ({
           onOpen: () => reviseRequisitionItems(values),
           productCode: fieldValue && fieldValue.productCode,
@@ -152,7 +149,7 @@ const FIELDS = {
         attributes: {
           type: 'number',
         },
-        getDynamicAttr: ({ fieldValue, subfield }) => ({
+        getDynamicAttr: ({ fieldValue, subfield, showOnly }) => ({
           disabled: (fieldValue && fieldValue === 'SUBSTITUTED') || subfield || showOnly,
         }),
       },
@@ -176,14 +173,16 @@ const FIELDS = {
         fieldKey: '',
         buttonLabel: 'react.default.button.undo.label',
         buttonDefaultMessage: 'Undo',
-        getDynamicAttr: ({ fieldValue, revertItem, values }) => ({
+        getDynamicAttr: ({
+          fieldValue, revertItem, values, showOnly,
+        }) => ({
           onClick: fieldValue && fieldValue.requisitionItemId ?
             () => revertItem(values, fieldValue.requisitionItemId) : () => null,
           hidden: fieldValue && fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
+          btnOpenDisabled: showOnly,
         }),
         attributes: {
           className: 'btn btn-outline-danger',
-          btnOpenDisabled: showOnly,
         },
       },
     },
@@ -667,6 +666,7 @@ class EditItemsPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <Form
         onSubmit={() => {}}
@@ -714,7 +714,6 @@ class EditItemsPage extends Component {
               :
               <button
                 type="button"
-                disabled={invalid}
                 onClick={() => {
                   window.location = '/openboxes/stockMovement/list?type=REQUEST';
                 }}
@@ -736,6 +735,7 @@ class EditItemsPage extends Component {
                 isRowLoaded: this.isRowLoaded,
                 isPaginated: this.props.isPaginated,
                 values,
+                showOnly,
               }))}
               <div>
                 <button
@@ -803,4 +803,5 @@ EditItemsPage.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  showOnly: PropTypes.bool.isRequired,
 };

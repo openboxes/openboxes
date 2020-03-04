@@ -8,7 +8,6 @@ import Alert from 'react-s-alert';
 import update from 'immutability-helper';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
-import queryString from 'query-string';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -22,8 +21,6 @@ import { showSpinner, hideSpinner } from '../../actions';
 import PackingSplitLineModal from './modals/PackingSplitLineModal';
 import { debounceUsersFetch } from '../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-
-const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
 const FIELDS = {
   packPageItems: {
@@ -102,11 +99,11 @@ const FIELDS = {
           cache: false,
           options: [],
           labelKey: 'name',
-          disabled: showOnly,
           filterOptions: options => options,
         },
         getDynamicAttr: props => ({
           loadOptions: props.debouncedUsersFetch,
+          disabled: props.showOnly,
         }),
       },
       palletName: {
@@ -114,18 +111,18 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
         flexWidth: '0.8',
-        attributes: {
+        getDynamicAttr: ({ showOnly }) => ({
           disabled: showOnly,
-        },
+        }),
       },
       boxName: {
         type: TextField,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '0.8',
-        attributes: {
+        getDynamicAttr: ({ showOnly }) => ({
           disabled: showOnly,
-        },
+        }),
       },
       splitLineItems: {
         type: PackingSplitLineModal,
@@ -138,12 +135,12 @@ const FIELDS = {
           btnOpenText: 'react.stockMovement.splitLine.label',
           btnOpenDefaultText: 'Split line',
           btnOpenClassName: 'btn btn-outline-success',
-          btnOpenDisabled: showOnly,
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, onSave, formValues,
+          fieldValue, rowIndex, onSave, formValues, showOnly,
         }) => ({
           lineItem: fieldValue,
+          btnOpenDisabled: showOnly,
           onSave: splitLineItems => onSave(formValues, rowIndex, splitLineItems),
         }),
       },
@@ -389,6 +386,7 @@ class PackingPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -446,6 +444,7 @@ class PackingPage extends Component {
                 loadMoreRows: this.loadMoreRows,
                 isRowLoaded: this.isRowLoaded,
                 isPaginated: this.props.isPaginated,
+                showOnly,
               }))}
               <div>
                 <button
@@ -506,4 +505,5 @@ PackingPage.propTypes = {
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  showOnly: PropTypes.bool.isRequired,
 };

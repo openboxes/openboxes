@@ -8,7 +8,6 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { getTranslate } from 'react-localize-redux';
 import { confirmAlert } from 'react-confirm-alert';
-import queryString from 'query-string';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -23,8 +22,6 @@ import LabelField from '../form-elements/LabelField';
 import { debounceLocationsFetch } from '../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 import ArrayField from '../form-elements/ArrayField';
-
-const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
 const BASIC_FIELDS = {
   description: {
@@ -103,7 +100,7 @@ const SHIPMENT_FIELDS = {
       showTimeSelect: true,
       autoComplete: 'off',
     },
-    getDynamicAttr: ({ issued }) => ({
+    getDynamicAttr: ({ issued, showOnly }) => ({
       disabled: issued || showOnly,
     }),
   },
@@ -115,7 +112,7 @@ const SHIPMENT_FIELDS = {
       required: true,
       showValueTooltip: true,
     },
-    getDynamicAttr: ({ shipmentTypes, received }) => ({
+    getDynamicAttr: ({ shipmentTypes, received, showOnly }) => ({
       options: shipmentTypes,
       disabled: showOnly || received,
     }),
@@ -124,7 +121,7 @@ const SHIPMENT_FIELDS = {
     type: TextField,
     label: 'react.stockMovement.trackingNumber.label',
     defaultMessage: 'Tracking number',
-    getDynamicAttr: ({ received }) => ({
+    getDynamicAttr: ({ received, showOnly }) => ({
       disabled: showOnly || received,
     }),
   },
@@ -132,7 +129,7 @@ const SHIPMENT_FIELDS = {
     type: TextField,
     label: 'react.stockMovement.driverName.label',
     defaultMessage: 'Driver name',
-    getDynamicAttr: ({ received }) => ({
+    getDynamicAttr: ({ received, showOnly }) => ({
       disabled: showOnly || received,
     }),
   },
@@ -140,7 +137,7 @@ const SHIPMENT_FIELDS = {
     type: TextField,
     label: 'react.stockMovement.comments.label',
     defaultMessage: 'Comments',
-    getDynamicAttr: ({ received }) => ({
+    getDynamicAttr: ({ received, showOnly }) => ({
       disabled: showOnly || received,
     }),
   },
@@ -671,6 +668,7 @@ class SendMovementPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <div>
         <hr />
@@ -767,6 +765,7 @@ class SendMovementPage extends Component {
                     shipmentTypes: this.state.shipmentTypes,
                     issued: values.statusCode === 'ISSUED',
                     received: values.shipmentStatus === 'RECEIVED',
+                    showOnly,
                   }))}
               </div>
               <div>
@@ -877,4 +876,5 @@ SendMovementPage.propTypes = {
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  showOnly: PropTypes.bool.isRequired,
 };
