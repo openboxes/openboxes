@@ -117,7 +117,6 @@ function fetchIndicator(indicatorName, dispatch) {
   let data = [];
   let title = null;
   let type = null;
-  let options = [];
   let archived = 0;
   const id = Math.random();
 

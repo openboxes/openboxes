@@ -23,12 +23,11 @@ class DataGraph implements Serializable {
 
     Map toJson() {
         [
-                "id": id,
-                "title"      : title,
-                "type"    : type,
-                "archived"      : archived,
-                "data"    : data.toJson(),
+                "id"       : id,
+                "title"    : title,
+                "type"     : type,
+                "archived" : archived,
+                "data"     : data.toJson(),
         ]
     }
-
 }

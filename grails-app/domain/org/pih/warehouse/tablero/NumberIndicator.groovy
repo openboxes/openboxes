@@ -17,10 +17,9 @@ class NumberIndicator implements Serializable {
 
     Map toJson() {
         [
-                "green": green.toJson(),
-                "yellow"      : yellow.toJson(),
+                "green"  : green.toJson(),
+                "yellow" : yellow.toJson(),
                 "red"    : red.toJson(),
         ]
     }
-
 }

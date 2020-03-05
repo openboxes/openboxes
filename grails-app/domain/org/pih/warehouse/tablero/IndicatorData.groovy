@@ -17,8 +17,8 @@ class IndicatorData implements Serializable {
         for(int i=0;i<datasets.size();i++)
             datasets[i] = datasets[i].toJson();
         [
-                "labels"      : labels,
-                "datasets"    : datasets,
+                "labels"   : labels,
+                "datasets" : datasets,
         ]
     }
 }

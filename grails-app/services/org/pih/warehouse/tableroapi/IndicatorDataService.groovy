@@ -171,7 +171,6 @@ DataGraph getReceivedStockData(def location){
     return indicatorData;
 }
 
-
 NumberIndicator getOutgoingStock(def location){
     def m4 = today - 4;
     def m7 = today - 7;
