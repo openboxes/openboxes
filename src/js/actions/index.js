@@ -104,86 +104,33 @@ export function changeCurrentLocale(locale) {
   };
 }
 
-//New Dashboard
+// New Dashboard
 
-function getDataWithMethod(method) {
-  const url = "/openboxes/apitablero/" + method;
-  return apiClient.get(url).then(res => {
-    return res.data;
-  });
-}
-
-function fetchIndicator(indicatorName, dispatch) {
-  let data = [];
-  let title = null;
-  let type = null;
+function fetchIndicator(indicatorMethod, indicatorType, indicatorTitle, dispatch) {
   let archived = 0;
   const id = Math.random();
 
-  switch (indicatorName) {
-    case 'expirationSummary':
-      data = getDataWithMethod('getExpirationSummary');
-      title = 'Expiration Summary';
-      type = 'line';
-      break;
-    case 'inventorySummary':
-      data = getDataWithMethod('getInventorySummary');
-      title = 'Inventory Summary';
-      type = 'horizontalBar';
-      break;
-    case 'fillRate':
-      data = getDataWithMethod('getFillRate');
-      title = 'Fill Rate';
-      type = 'line';
-      break;
-    case 'sentStock':
-      data = getDataWithMethod('getSentStockMovements');
-      title = 'Sent Stock Movements';
-      type = 'bar';
-      break;
-    case 'stockReceived':
-      data = getDataWithMethod('getReceivedStockMovements');
-      title = 'Stock Movements Received';
-      type = 'doughnut';
-      archived = 1;
-      break;
-    case 'outgoingStock':
-      data = getDataWithMethod('getOutgoingStock');
-      title = 'Outgoing Stock Movements';
-      type = 'numbers';
-      break;
-    default:
-      title = 'Error';
-      type = 'error';
-  }
+  const url = "/openboxes/apitablero/" + indicatorMethod;
 
   dispatch({
     type: FETCH_INDICATORS,
     payload: {
       id,
-      title,
+      title: indicatorTitle,
       type: 'loading',
-      data,
+      data: [],
       archived,
     },
   });
 
-  new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (data) {
-        resolve(data);
-      } else {
-        reject();
-      }
-    }, Math.floor((Math.random() * 5) + 2) * 1000); // between 2 and 6 seconds
-  }).then((res) => {
+  apiClient.get(url).then((res) => {
     dispatch({
       type: FETCH_INDICATORS,
       payload: {
         id,
-        title,
-        type,
-        data: res,
+        title: indicatorTitle,
+        type: indicatorType,
+        data: res.data,
         archived,
       },
     });
@@ -192,7 +139,7 @@ function fetchIndicator(indicatorName, dispatch) {
       type: FETCH_INDICATORS,
       payload: {
         id,
-        title,
+        title: indicatorTitle,
         type: 'error',
         data: [],
         archived,
@@ -203,12 +150,12 @@ function fetchIndicator(indicatorName, dispatch) {
 
 export function fetchIndicators() {
   return (dispatch) => {
-    fetchIndicator('expirationSummary', dispatch);
-    fetchIndicator('inventorySummary', dispatch);
-    fetchIndicator('fillRate', dispatch);
-    fetchIndicator('sentStock', dispatch);
-    fetchIndicator('stockReceived', dispatch);
-    fetchIndicator('outgoingStock', dispatch);
+    fetchIndicator('getExpirationSummary', 'line', 'Expiration Summary', dispatch);
+    fetchIndicator('getInventorySummary', 'horizontalBar', 'Inventory Summary', dispatch);
+    fetchIndicator('getFillRate', 'line', 'Fill Rate', dispatch);
+    fetchIndicator('getSentStockMovements', 'bar', 'Sent Stock Movements', dispatch);
+    fetchIndicator('getReceivedStockMovements', 'doughnut', 'Stock Movements Received', dispatch);
+    fetchIndicator('getOutgoingStock', 'numbers', 'Outgoing Stock Movements', dispatch);
   };
 }
 
