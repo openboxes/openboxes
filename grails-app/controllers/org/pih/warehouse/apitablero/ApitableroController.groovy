@@ -49,7 +49,7 @@ def getOutgoingStock = {
     render indicator.getOutgoingStock(location).toJson() as JSON;
 }
 
-def getCommingStock = {
-    render indicator.getCommingStock(location).toJson() as JSON;
+def getInComingStock = {
+    render indicator.getInComingStock(location).toJson() as JSON;
 }
 }

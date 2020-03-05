@@ -196,7 +196,7 @@ NumberIndicator getOutgoingStock(def location){
     return indicatorData;
 }
 
-NumberIndicator getCommingStock(def location){
+NumberIndicator getInComingStock(def location){
     def m4 = today - 4;
     def m7 = today - 7;
     m4.clearTime();
