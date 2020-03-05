@@ -137,4 +137,8 @@ class OrderItem implements Serializable {
         return (subtotal + totalAdjustments)?:0
     }
 
+    String toString() {
+        return product?.name
+    }
+
 }
