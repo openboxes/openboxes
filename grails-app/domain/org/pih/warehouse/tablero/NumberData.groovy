@@ -4,11 +4,11 @@ package org.pih.warehouse.tablero
 class NumberData implements Serializable {
     
      String title;
-     int number;
+     Long number;
      String subtitle;
      int id;
 
-    NumberData(String title, int number, String subtitle, int id)
+    NumberData(String title, Long number, String subtitle, int id)
     {
         this.title = title;
         this.number = number;

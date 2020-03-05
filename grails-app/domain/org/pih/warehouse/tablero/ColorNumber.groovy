@@ -3,10 +3,10 @@ package org.pih.warehouse.tablero
 
 class ColorNumber implements Serializable {
     
-    Integer value;
+    Long value;
     String subtitle;
 
-    ColorNumber(Integer value, String subtitle)
+    ColorNumber(Long value, String subtitle)
     {
         this.value = value;
         this.subtitle = subtitle;
