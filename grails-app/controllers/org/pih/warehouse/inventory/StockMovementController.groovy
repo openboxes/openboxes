@@ -110,8 +110,6 @@ class StockMovementController {
 
         def stockMovements = stockMovementService.getInboundStockMovements(stockMovement, [max:max, offset:offset])
         def statistics = [:]
-        //def stockMovements = stockMovementService.getStockMovements(stockMovement, params, max, offset)
-        //def statistics = requisitionService.getRequisitionStatistics(requisition.destination, requisition.origin, currentUser)
 
         if (params.format && stockMovements) {
 

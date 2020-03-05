@@ -10,11 +10,8 @@
 package org.pih.warehouse.order
 
 import org.apache.commons.lang.StringEscapeUtils
-import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.web.multipart.MultipartFile
@@ -71,13 +68,32 @@ class OrderController {
     }
 
     def shipOrder = {
-        def orderInstance = Order.get(params.id)
-
-        StockMovement stockMovement = StockMovement.createFromOrder(orderInstance)
-        Shipment shipment = stockMovementService.createInboundShipment(stockMovement)
-
+        Order order = Order.get(params.id)
+        Shipment shipment = stockMovementService.createInboundShipment(order)
         redirect(controller: 'stockMovement', action: "createPurchaseOrders", params: [id: shipment.id])
     }
+
+    def shipOrderItems = {
+        Order orderInstance = Order.get(params.id)
+        [orderInstance:orderInstance]
+    }
+
+    def shipOrderItemsAction = { ShipOrderCommand command ->
+        log.info "Command: ${command}"
+        if (!command.validate() || command.hasErrors()) {
+            render(view: "shipOrderItems", model: [orderInstance: command.order, command: command])
+            return
+        }
+
+        Shipment shipment = stockMovementService.createInboundShipment(command)
+        if (shipment) {
+            redirect(controller: 'stockMovement', action: "createPurchaseOrders", params: [id: shipment.id])
+            return
+        }
+        redirect (action: "shipOrderItems", id: command.order.id)
+
+    }
+
 
     def save = {
         def orderInstance = new Order(params)

@@ -27,7 +27,7 @@
         </g:hasErrors>
 
         <div class="dialog">
-            <g:render template="/order/addItemsSummary" model="[orderInstance:order,currentState:'addItems']"/>
+            <g:render template="/order/summary" model="[orderInstance:order,currentState:'addItems']"/>
 
             <div class="box">
                 <h2><warehouse:message code="order.wizard.addItems.label"/></h2>
@@ -177,21 +177,21 @@
                             event="enterOrderDetails"
                             params="[skipTo:'details']"
                             class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'reload.png')}" />&nbsp;
+                        <img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" />&nbsp;
                         <warehouse:message code="default.back.label" default="Back"/>
                     </g:link>
                 </div>
                 <div class="right">
                     <g:if test="${!order?.isPlaced()}">
                         <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" >
-                            <img src="${resource(dir: 'images/icons/silk', file: 'creditcards.png')}" />&nbsp;
+                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
                             ${warehouse.message(code: 'order.wizard.placeOrder.label')}
                         </g:link>
                     </g:if>
                     <g:else>
-                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" disabled="disabled" >
-                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
-                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}
+                        <g:link controller="order" action="shipOrderItems" id="${order?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
+                            ${warehouse.message(code: 'order.wizard.shipOrderitems.label', default: 'Ship Order')}
                         </g:link>
                     </g:else>
                 </div>
