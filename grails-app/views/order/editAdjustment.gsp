@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${warehouse.message(code: 'default.comment.label', default: 'Comment').toLowerCase()}" />
-	<title><warehouse:message code="default.add.label" args="[entityName]" /></title>
+	<title><warehouse:message code="order.orderAdjustments.label" default="Order Adjustments" /></title>
 </head>
 
 <body>
@@ -28,7 +28,7 @@
 		<div class="dialog">
 			<g:render template="summary" model="[orderInstance:orderInstance]" />
 			<div class="box">
-				<h2><warehouse:message code="default.add.label" args="[entityName]" /></h2>
+				<h2><warehouse:message code="order.orderAjustments.label" default="Order Adjustments"/></h2>
 				<g:form action="saveAdjustment">
 					<g:hiddenField name="id" value="${orderAdjustment?.id}" />
 
