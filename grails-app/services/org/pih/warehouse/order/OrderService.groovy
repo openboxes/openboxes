@@ -307,7 +307,7 @@ class OrderService {
 
         try {
 
-            if (orderInstance.status == OrderStatus.RECEIVED || orderInstance.status == OrderStatus.PARTIALLY_RECEIVED) {
+            if (orderInstance.status in [OrderStatus.PLACED,  OrderStatus.PARTIALLY_RECEIVED, OrderStatus.RECEIVED]) {
                 orderInstance?.listShipments().each { Shipment shipmentInstance ->
                     if (shipmentInstance) {
 
@@ -319,11 +319,11 @@ class OrderService {
                             }
                         }
 
-                        shipmentInstance.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
+                        shipmentInstance.shipmentItems.flatten().toArray().each { ShipmentItem shipmentItem ->
 
                             // Remove all order shipment records associated with this shipment item
-                            shipmentItem.orderItems.toArray().each { OrderItem orderItem ->
-                                orderItem.removeFromShipmentItems(orderItem)
+                            shipmentItem.orderItems?.flatten().toArray().each { OrderItem orderItem ->
+                                orderItem.removeFromShipmentItems(shipmentItem)
                                 shipmentItem.removeFromOrderItems(orderItem)
                             }
 
@@ -334,26 +334,31 @@ class OrderService {
                             shipmentItem.delete()
                         }
 
+                        shipmentInstance.events.toArray().each { Event event ->
+                            shipmentInstance.removeFromEvents(event)
+                            shipmentInstance.currentEvent = null
+                        }
+
                         // Delete all receipt items associated with the receipt
-                        shipmentInstance.receipt.receiptItems.toArray().each { receiptItem ->
+                        shipmentInstance?.receipt?.receiptItems?.toArray().each { receiptItem ->
                             shipmentInstance.receipt.removeFromReceiptItems(receiptItem)
                             receiptItem.delete()
                         }
 
                         // Delete the receipt from the shipment
-                        shipmentInstance.receipt.delete()
+                        if (shipmentInstance.receipt) {
+                            shipmentInstance?.receipt?.delete()
+                        }
 
                         // Delete the shipment
                         shipmentInstance.delete()
 
                     }
                 }
-                orderInstance.status = OrderStatus.PLACED
+                orderInstance.status = OrderStatus.PENDING
             } else if (orderInstance?.status == OrderStatus.COMPLETED) {
                 deleteTransactions(orderInstance)
                 orderInstance.status = OrderStatus.PENDING
-            } else if (orderInstance.status == OrderStatus.PLACED) {
-                orderInstance?.status = OrderStatus.PENDING
             }
 
 
