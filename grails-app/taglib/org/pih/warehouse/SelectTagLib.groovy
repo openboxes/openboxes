@@ -250,7 +250,7 @@ class SelectTagLib {
         UnitOfMeasureClass currencyClass = UnitOfMeasureClass.findByType(UnitOfMeasureType.CURRENCY)
         attrs.from = UnitOfMeasure.findAllByUomClass(currencyClass)
         attrs.optionKey = 'code'
-        attrs.value = attrs.value ?: currencyClass.baseUom?.code
+        attrs.value = attrs.value ?: currencyClass?.baseUom?.code
         attrs.optionValue = { it.name + " " + it.code }
         out << g.select(attrs)
     }
