@@ -40,6 +40,7 @@ import org.pih.warehouse.requisition.CommodityClass
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.Shipper
 import org.springframework.beans.SimpleTypeConverter
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
@@ -225,7 +226,7 @@ class SelectTagLib {
         attrs.optionValue = { it.name }
         out << g.select(attrs)
     }
-  
+
     def selectOrderAdjustmentTypes = { attrs, body ->
         attrs.from = OrderAdjustmentType.list()
         attrs.optionKey = 'id'
@@ -263,8 +264,10 @@ class SelectTagLib {
     }
 
     def selectShipment = { attrs, body ->
+
+        ShipmentStatusCode shipmentStatusCode = attrs.statusCode as ShipmentStatusCode
         def currentLocation = Location.get(session?.warehouse?.id)
-        attrs.from = shipmentService.getShipmentsByLocation(currentLocation).sort {
+        attrs.from = shipmentService.getShipmentsByLocation(null, currentLocation, shipmentStatusCode).sort {
             it?.name?.toLowerCase()
         }
         attrs.optionKey = 'id'

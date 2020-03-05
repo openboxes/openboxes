@@ -220,16 +220,29 @@ class ShipmentService {
     }
 
 
+    List<Shipment> getShipmentsByLocation(Location location) {
+        return getShipmentsByLocation(location, location, null)
+    }
+
     /**
      *
      * @param location
      * @return
      */
-    List<Shipment> getShipmentsByLocation(Location location) {
+    List<Shipment> getShipmentsByLocation(Location origin, Location destination, ShipmentStatusCode shipmentStatusCode) {
         return Shipment.withCriteria {
-            or {
-                eq("destination", location)
-                eq("origin", location)
+            and {
+                or {
+                    if (origin) {
+                        eq("origin", origin)
+                    }
+                    if (destination) {
+                        eq("destination", destination)
+                    }
+                }
+                if (shipmentStatusCode) {
+                    eq("currentStatus", shipmentStatusCode)
+                }
             }
         }
     }

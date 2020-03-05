@@ -146,9 +146,9 @@
                                                 </g:if>
                                                 <th><warehouse:message code="product.productCode.label" /></th>
                                                 <th><warehouse:message code="product.label" /></th>
-                                                <th><warehouse:message code="order.qtyOrdered.label" /></th>
+                                                <th><warehouse:message code="order.quantityOrdered.label" default="Ordered" /></th>
                                                 <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
-                                                    <th><warehouse:message code="order.qtyFulfilled.label" /></th>
+                                                    <th><warehouse:message code="shipmentItem.quantityShipped.label" /></th>
                                                     <th><warehouse:message code="order.unitPrice.label" /></th>
                                                     <th><warehouse:message code="order.totalPrice.label" /></th>
                                                 </g:if>
@@ -329,33 +329,49 @@
                                             <table>
                                                 <thead>
                                                 <tr class="odd">
-                                                    <th><warehouse:message code="default.id.label"/></th>
+                                                    <th><warehouse:message code="order.orderItem.label"/></th>
+                                                    <th><warehouse:message code="product.label"/></th>
                                                     <th><warehouse:message code="default.type.label"/></th>
                                                     <th><warehouse:message code="shipment.label"/></th>
-                                                    <th><warehouse:message code="product.label"/></th>
+                                                    <th><warehouse:message code="default.status.label"/></th>
+                                                    <th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
+                                                    <th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
                                                     <th><warehouse:message code="default.quantity.label"/></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <g:each var="shipmentItem" in="${orderInstance?.orderItems?.shipmentItems[0]}" status="i">
-                                                    <tr>
+                                                <g:each var="orderItem" in="${orderInstance?.orderItems}" status="i">
+                                                    <g:each var="shipmentItem" in="${orderItem.shipmentItems}" status="j">
+                                                    <tr class="${i%2?'even':'odd'}">
                                                         <td>
-                                                            ${shipmentItem?.id}
-                                                        </td>
-                                                        <td>
-                                                            <format:metadata obj="${shipmentItem?.shipment?.shipmentType}"/>
-                                                        </td>
-                                                        <td>
-                                                            <g:link controller="shipment" action="showDetails" id="${shipmentItem?.shipment?.id }">${shipmentItem?.shipment?.shipmentNumber} ${shipmentItem?.shipment?.name }</g:link>
+                                                            <g:if test="${!j}">
+                                                                ${g.message(code:'order.orderItem.label')} ${i+1}
+                                                            </g:if>
                                                         </td>
                                                         <td>
                                                             ${shipmentItem?.product?.productCode}
                                                             <format:product product="${shipmentItem?.product}"/>
                                                         </td>
                                                         <td>
+                                                            <g:link controller="stockMovement" action="show" id="${shipmentItem?.shipment?.id }">${shipmentItem?.shipment?.shipmentNumber} ${shipmentItem?.shipment?.name }</g:link>
+                                                        </td>
+                                                        <td>
+                                                            <format:metadata obj="${shipmentItem?.shipment?.shipmentType}"/>
+                                                        </td>
+                                                        <td>
+                                                            <format:metadata obj="${shipmentItem?.shipment?.currentStatus}"/>
+                                                        </td>
+                                                        <td>
+                                                            ${shipmentItem?.inventoryItem?.lotNumber}
+                                                        </td>
+                                                        <td>
+                                                            <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+                                                        </td>
+                                                        <td>
                                                             ${shipmentItem?.quantity}
                                                         </td>
                                                     </tr>
+                                                        </g:each>
                                                 </g:each>
                                                 </tbody>
                                             </table>

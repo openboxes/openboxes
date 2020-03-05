@@ -130,11 +130,17 @@
                         <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
                         <warehouse:message code="order.wizard.printOrder.label" default="Print Order"/>
                     </g:link>
-                    <g:link controller="order" action="shipOrder" id="${orderInstance?.id}" class="button"
+%{--                    <g:link controller="order" action="shipOrder" id="${orderInstance?.id}" class="button"--}%
+%{--                            disabled="${orderInstance?.status < OrderStatus.PLACED}"--}%
+%{--                            disabledMessage="Order must be placed in order to ship">--}%
+%{--                        <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;--}%
+%{--                        <warehouse:message code="order.shipOrder.label" default="Ship Order"/>--}%
+%{--                    </g:link>--}%
+                    <g:link controller="order" action="shipOrderItems" id="${orderInstance?.id}" class="button"
                             disabled="${orderInstance?.status < OrderStatus.PLACED}"
                             disabledMessage="Order must be placed in order to ship">
                         <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                        <warehouse:message code="order.shipOrder.label" default="Ship Order"/>
+                        <warehouse:message code="order.shipOrderItems.label" default="Ship Order"/>
                     </g:link>
                 </div>
                 <div class="button-group">
