@@ -215,13 +215,15 @@
                     <g:isSuperuser>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="shipping.shipment.label"/>
+                                <g:message code="order.label"/>
                             </td>
                             <td class="value">
-                                <g:link controller="shipment" action="showDetails" id="${stockMovement?.shipment?.id}" params="[override:true]">
-                                    ${g.message(code:'default.view.label', args: [g.message(code: 'shipment.label')])}
-                                    ${stockMovement?.shipment?.shipmentNumber}
-                                </g:link>
+                                <g:each var="order" in="${stockMovement?.shipment?.shipmentItems*.orderItems[0].order}">
+                                    <g:link controller="order" action="show" id="${order?.id}" params="[override:true]">
+                                        ${g.message(code:'default.view.label', args: [g.message(code: 'order.label')])}
+                                        ${order.orderNumber}
+                                    </g:link>
+                                </g:each>
                             </td>
                         </tr>
                         <tr class="prop">

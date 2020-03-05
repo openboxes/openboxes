@@ -131,8 +131,13 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="buttons">
-                    <g:submitButton name="next" value="${warehouse.message(code:'default.button.save.label')}" class="button"></g:submitButton>
+                <div class="buttons right">
+
+                    <button name="_eventId_next" class="button">
+                        <warehouse:message code="default.button.next.label"/>
+                        <img src="${resource(dir:'images/icons/silk', file: 'resultset_next.png')}">
+                    </button>
+
                 </div>
             </div>
 		</g:form>

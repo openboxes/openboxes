@@ -35,6 +35,8 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.order.ShipOrderCommand
+import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -312,10 +314,11 @@ class StockMovementService {
         def shipments = Shipment.createCriteria().list(max: params.max, offset: params.offset) {
             if (criteria.destination) eq("destination", criteria.destination)
             if (criteria.origin) eq("origin", criteria.origin)
+            if (criteria.receiptStatusCode) eq("currentStatus", criteria.receiptStatusCode)
             order("dateCreated", "desc")
         }
         def stockMovements = shipments.collect { Shipment shipment ->
-            return createFromShipment(shipment)
+            return StockMovement.createFromShipment(shipment)
         }
         return new PagedResultList(stockMovements, shipments.totalCount)
     }
@@ -1096,6 +1099,85 @@ class StockMovementService {
         }
 
         return order
+    }
+
+
+    Shipment createInboundShipment(Order order) {
+
+        Shipment shipment = new Shipment()
+        shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
+        shipment.expectedShippingDate = new Date()
+        shipment.name = order.name
+        shipment.description = order.description
+        shipment.origin = order.origin
+        shipment.destination = order.destination
+        shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+
+        order.orderItems.each { OrderItem orderItem ->
+            InventoryItem.withNewSession {
+                log.info "inventoryItem: ${orderItem.inventoryItem}"
+                if (!orderItem.inventoryItem) {
+                    orderItem.inventoryItem =
+                            inventoryService.findOrCreateInventoryItem(
+                                    orderItem.product,
+                                    orderItem?.inventoryItem?.lotNumber,
+                                    orderItem?.inventoryItem?.expirationDate)
+                }
+                log.info "inventoryItem: ${orderItem.inventoryItem}"
+            }
+
+            ShipmentItem shipmentItem = new ShipmentItem()
+            shipmentItem.product = orderItem.product
+            shipmentItem.inventoryItem = orderItem.inventoryItem
+            shipmentItem.lotNumber = orderItem?.inventoryItem?.lotNumber
+            shipmentItem.expirationDate = orderItem?.inventoryItem?.expirationDate
+            shipmentItem.quantity = orderItem.quantity
+            shipment.addToShipmentItems(shipmentItem)
+            orderItem.addToShipmentItems(shipmentItem)
+        }
+
+
+        if (shipment.hasErrors() || !shipment.save(flush: true)) {
+            throw new ValidationException("Invalid shipment", shipment.errors)
+        }
+        if (order.hasErrors() || !order.save(flush: true)) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+
+        return shipment
+    }
+
+    Shipment createInboundShipment(ShipOrderCommand command) {
+
+        Order order = command.order
+        Shipment shipment = new Shipment()
+        shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
+        shipment.expectedShippingDate = new Date()
+        shipment.name = order.name
+        shipment.description = order.description
+        shipment.origin = order.origin
+        shipment.destination = order.destination
+        shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+
+        command.orderItems.each { ShipOrderItemCommand orderItemCommand ->
+            OrderItem orderItem = orderItemCommand.orderItem
+            ShipmentItem shipmentItem = new ShipmentItem()
+            shipmentItem.lotNumber = orderItemCommand?.inventoryItem?.lotNumber
+            shipmentItem.expirationDate = orderItemCommand?.inventoryItem?.expirationDate
+            shipmentItem.product = orderItemCommand.orderItem.product
+            shipmentItem.inventoryItem = orderItemCommand.inventoryItem
+            shipmentItem.quantity = orderItemCommand.quantityToShip
+            shipment.addToShipmentItems(shipmentItem)
+            orderItem.addToShipmentItems(shipmentItem)
+        }
+        if (shipment.hasErrors() || !shipment.save(flush: true)) {
+            throw new ValidationException("Invalid shipment", shipment.errors)
+        }
+        if (order.hasErrors() || !order.save(flush: true)) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+
+        return shipment
     }
 
     Shipment createInboundShipment(StockMovement stockMovement) {
