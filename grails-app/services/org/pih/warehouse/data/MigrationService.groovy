@@ -9,18 +9,24 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.hibernate.criterion.CriteriaSpecification
-import org.pih.warehouse.core.*
-import org.pih.warehouse.inventory.*
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PartyType
+import org.pih.warehouse.core.PreferenceTypeCode
+import org.pih.warehouse.core.RatingTypeCode
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
@@ -29,8 +35,8 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.core.Location
 
+@Transactional
 class MigrationService {
 
     def dataService

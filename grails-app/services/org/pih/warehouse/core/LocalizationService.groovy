@@ -10,17 +10,11 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
-import grails.web.context.ServletContextHolder
-import org.apache.commons.io.IOUtils
 import org.grails.core.io.ResourceLocator
 import org.pih.warehouse.LocalizationUtil
-import org.springframework.core.io.ClassPathResource
 import org.springframework.web.context.request.RequestContextHolder
 
 class LocalizationService {
-
-    // TODO: do we need to make this read-only?
-    boolean transactional = false
 
     // session-scoped (because it needs access to the user)
     static scope = "session"

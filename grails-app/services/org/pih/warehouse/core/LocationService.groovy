@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import org.apache.commons.collections.comparators.NullComparator
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -19,12 +20,10 @@ import util.ConfigHelper
 
 import javax.xml.bind.ValidationException
 
-
+@Transactional
 class LocationService {
 
     GrailsApplication grailsApplication
-    boolean transactional = true
-
 
     Location findInternalLocation(Location parentLocation, String[] names) {
         return Location.createCriteria().get {

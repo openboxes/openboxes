@@ -10,12 +10,12 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.PagedResultList
 import grails.validation.ValidationException
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
+import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -32,12 +32,10 @@ import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.DateUtil
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
+
 import java.sql.Timestamp
 import java.text.NumberFormat
 import java.text.ParseException
@@ -55,8 +53,6 @@ class InventoryService implements ApplicationContextAware {
     def identifierService
     def messageService
     def locationService
-
-    static transactional = true
 
     ApplicationContext applicationContext
 

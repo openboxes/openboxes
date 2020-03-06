@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.shipping
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.apache.commons.validator.EmailValidator
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -49,9 +50,8 @@ import grails.util.Holders
 import javax.mail.internet.InternetAddress
 import java.math.RoundingMode
 
+@Transactional
 class ShipmentService {
-
-    boolean transactional = true
 
     MailService mailService
     def sessionFactory
