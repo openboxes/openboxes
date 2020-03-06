@@ -9,10 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.core.Attachment
 import org.pih.warehouse.requisition.Requisition
 
+@Transactional
 class StocklistService {
 
     def requisitionService
@@ -20,8 +22,6 @@ class StocklistService {
     def mailService
     def pdfRenderingService
     def documentService
-
-    boolean transactional = true
 
     Stocklist getStocklist(String id) {
         Requisition requisition = Requisition.findByIdAndIsTemplate(id, true)
