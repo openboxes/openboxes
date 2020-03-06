@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.core.GrailsApplication
 import grails.core.GrailsDomainClass
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
@@ -19,9 +20,8 @@ import org.hibernate.SessionFactory
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.Restrictions
 
+@Transactional
 class GenericApiService {
-
-    boolean transactional = true
 
     SessionFactory sessionFactory
     GrailsApplication grailsApplication

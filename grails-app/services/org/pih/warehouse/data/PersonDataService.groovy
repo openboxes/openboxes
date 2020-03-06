@@ -9,11 +9,13 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
 import org.springframework.validation.BeanPropertyBindingResult
 
+@Transactional
 class PersonDataService {
 
     Boolean validateData(ImportDataCommand command) {

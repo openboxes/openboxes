@@ -9,13 +9,12 @@
  **/
 package org.pih.warehouse.fulfillment
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.requisition.Requisition
 
+@Transactional
 class FulfillmentService {
-
-    boolean transactional = true
-
 
     /**
      * Adds a fulfillment item to a fulfillment object and saves the parent.

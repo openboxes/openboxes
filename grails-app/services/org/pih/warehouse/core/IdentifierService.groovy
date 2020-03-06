@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.ProductSupplier
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -28,9 +29,9 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.receiving.Receipt
 
+@Transactional
 class IdentifierService {
 
-    boolean transactional = true
     GrailsApplication grailsApplication
     def dataService
     def productTypeService

@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.poi.hssf.usermodel.*
@@ -37,6 +38,7 @@ import org.pih.warehouse.product.ProductTypeCode
 
 import java.text.SimpleDateFormat
 
+@Transactional
 class DataService {
 
     def dataSource
@@ -48,8 +50,6 @@ class DataService {
         session.flush()
         session.clear()
     }
-
-    static transactional = true
 
     List executeQuery(String query) {
         return new Sql(dataSource).rows(query)

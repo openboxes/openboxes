@@ -26,8 +26,6 @@ import org.pih.warehouse.core.SynonymTypeCode
 
 class ForecastingService {
 
-    boolean transactional = false
-
     def dataSource
     GrailsApplication grailsApplication
     def productAvailabilityService

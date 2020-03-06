@@ -10,6 +10,7 @@
 package org.pih.warehouse.product
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
 import org.hibernate.criterion.CriteriaSpecification
@@ -30,6 +31,7 @@ import org.pih.warehouse.product.ProductGroup
 /**
  * @author jmiranda*
  */
+@Transactional
 class ProductService {
 
     def sessionFactory

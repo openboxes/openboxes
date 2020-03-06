@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.hibernate.criterion.CriteriaSpecification
@@ -33,6 +34,7 @@ import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
+@Transactional
 class MigrationService {
 
     def dataService
