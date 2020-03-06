@@ -107,7 +107,8 @@ class Shipment implements Comparable, Serializable {
             "recipients",
             "consignorAddress",
             "consigneeAddress",
-            "receipt"
+            "receipt",
+            "isFromPurchaseOrder",
     ]
 
     static mappedBy = [
@@ -295,7 +296,6 @@ class Shipment implements Comparable, Serializable {
         return !this.hasShipped() && !this.wasReceived()
     }
 
-
     Boolean hasShipped() {
         return events.any { it.eventType?.eventCode == EventCode.SHIPPED }
     }
@@ -306,6 +306,10 @@ class Shipment implements Comparable, Serializable {
 
     Boolean wasPartiallyReceived() {
         return events.any { it.eventType?.eventCode == EventCode.PARTIALLY_RECEIVED }
+    }
+
+    Boolean getIsFromPurchaseOrder() {
+        return !shipmentItems?.orderItems?.flatten()?.isEmpty()
     }
 
     Boolean isStockMovement() {
