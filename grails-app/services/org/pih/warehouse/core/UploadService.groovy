@@ -16,8 +16,6 @@ class UploadService {
     GrailsApplication grailsApplication
     FileService fileService
 
-    boolean transactional = false
-
     File createLocalFile(String filename) {
         log.info "Create local file ${filename}"
         def uploadsDirectory = findOrCreateUploadsDirectory()

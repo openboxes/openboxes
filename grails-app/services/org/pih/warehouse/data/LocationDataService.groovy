@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Location
@@ -22,6 +23,7 @@ import org.pih.warehouse.util.LocalizationUtil
 
 import javax.annotation.Nullable
 
+@Transactional
 class LocationDataService {
 
     def organizationService

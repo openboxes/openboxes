@@ -10,11 +10,11 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.PagedResultList
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
+import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -52,8 +52,6 @@ class InventoryService implements ApplicationContextAware {
     def identifierService
     def messageService
     def locationService
-
-    static transactional = true
 
     ApplicationContext applicationContext
 

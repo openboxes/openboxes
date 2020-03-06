@@ -555,11 +555,12 @@ class StockMovementService {
         return new PagedResultList(stockMovements, requisitions.totalCount)
     }
 
-
+    @Transactional(readOnly=true)
     StockMovement getStockMovement(String id) {
         return getStockMovement(id, (String) null)
     }
 
+    @Transactional(readOnly=true)
     StockMovement getStockMovement(String id, String stepNumber) {
         Requisition requisition = Requisition.get(id)
         if (requisition) {
@@ -578,13 +579,13 @@ class StockMovementService {
                 throw new ObjectNotFoundException(id, StockMovement.class.toString())
             }
         }
-    }
 
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
         stockMovement.documents = getDocuments(stockMovement)
         return stockMovement
     }
 
+    @Transactional(readOnly=true)
     StockMovementItem getStockMovementItem(String id) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
         return StockMovementItem.createFromRequisitionItem(requisitionItem)
@@ -1999,6 +2000,20 @@ class StockMovementService {
 
         createMissingPicklistForStockMovementItem(StockMovementItem.createFromRequisitionItem(requisitionItem))
         createMissingShipmentItem(requisitionItem)
+    }
+
+    def cancelItem(StockMovementItem stockMovementItem) {
+        removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+
+        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
+
+        log.debug "Item canceled " + requisitionItem.id
+        requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
+        requisitionItem.quantityApproved = 0
+
+        requisitionItem.save()
+
+        return StockMovementItem.createFromRequisitionItem(requisitionItem)
     }
 
     /**
