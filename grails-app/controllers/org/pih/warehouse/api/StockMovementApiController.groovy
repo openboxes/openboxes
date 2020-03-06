@@ -356,8 +356,8 @@ class StockMovementApiController {
             stockMovementItem.quantityRequested = lineItem.quantityRequested ? new BigDecimal(lineItem.quantityRequested) : null
 
             // Containers (optional)
-            stockMovementItem.palletName = lineItem["palletName"]
-            stockMovementItem.boxName = lineItem["boxName"]
+            stockMovementItem.palletName = !isNull(lineItem["palletName"]) ? lineItem["palletName"] : null
+            stockMovementItem.boxName = !isNull(lineItem["boxName"]) ? lineItem["boxName"] : null
 
             // Inventory item (optional)
             // FIXME Lookup inventory item by product, lot number, expiration date
