@@ -189,9 +189,9 @@
                         </g:link>
                     </g:if>
                     <g:else>
-                        <g:link controller="order" action="shipOrderItems" id="${order?.id}" class="button">
+                        <g:link controller="order" action="shipOrder" id="${order?.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                            ${warehouse.message(code: 'order.wizard.shipOrderitems.label', default: 'Ship Order')}
+                            ${warehouse.message(code: 'order.wizard.shipOrder.label', default: 'Ship Order')}
                         </g:link>
                     </g:else>
                 </div>
