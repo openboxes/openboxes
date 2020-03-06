@@ -9,13 +9,13 @@
  **/
 package org.pih.warehouse.shipping
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.RoleType
-import org.springframework.context.ApplicationListener
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
+import org.springframework.context.ApplicationListener
 
+@Transactional
 class ShipmentStatusTransitionEventService implements ApplicationListener<ShipmentStatusTransitionEvent> {
-
-    boolean transactional = true
 
     def notificationService
 

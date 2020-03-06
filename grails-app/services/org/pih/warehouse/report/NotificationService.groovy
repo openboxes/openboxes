@@ -32,8 +32,6 @@ class NotificationService {
     def grailsApplication
     def messageSource
 
-    boolean transactional = false
-
     def renderTemplate(String template, Map model) {
         // Hack to ensure that the GSP template engine has access to a request.
         // FIXME Need to fix this when we migrate to grails 3

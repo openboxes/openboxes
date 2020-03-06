@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
+import org.pih.warehouse.core.IdentifierService
 import groovy.sql.Sql
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
@@ -24,6 +26,7 @@ import org.pih.warehouse.product.ProductSupplierPreference
 
 import java.text.SimpleDateFormat
 
+@Transactional
 class ProductSupplierDataService {
 
     def uomService

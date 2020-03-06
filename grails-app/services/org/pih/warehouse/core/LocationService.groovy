@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.apache.commons.collections.comparators.NullComparator
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -20,12 +21,12 @@ import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ConfigHelper
 
+@Transactional
 class LocationService {
 
     GrailsApplication grailsApplication
     def dataService
     def productTypeService
-    boolean transactional = true
 
 
     Location findInternalLocation(Location parentLocation, String[] names) {

@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.report
 
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
@@ -20,6 +21,7 @@ import org.pih.warehouse.product.Product
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class ConsumptionService {
 
     def dataService

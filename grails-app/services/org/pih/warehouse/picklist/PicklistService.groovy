@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.picklist
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
@@ -19,8 +20,8 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.requisition.Requisition
 
+@Transactional
 class PicklistService {
 
     def productAvailabilityService

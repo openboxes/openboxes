@@ -45,8 +45,6 @@ class ReportService implements ApplicationContextAware {
 
     ApplicationContext applicationContext
 
-    boolean transactional = false
-
     void generateShippingReport(ChecklistReportCommand command) {
         def shipmentItems = command?.shipment?.shipmentItems?.sort()
         shipmentItems.each { shipmentItem ->
