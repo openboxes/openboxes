@@ -12,7 +12,11 @@ package org.pih.warehouse.order
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import grails.plugins.csv.CSVMapReader
-import org.pih.warehouse.core.*
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
@@ -24,9 +28,8 @@ import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
 
+@Transactional
 class OrderService {
-
-    boolean transactional = true
 
     UserService userService
     ShipmentService shipmentService

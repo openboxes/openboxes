@@ -20,7 +20,6 @@ import javax.mail.internet.InternetAddress
 
 class MailService {
 
-    boolean transactional = false
     def userService
     GrailsApplication grailsApplication
     def config = Holders.getConfig()

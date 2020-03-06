@@ -9,12 +9,14 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.springframework.validation.BeanPropertyBindingResult
 
+@Transactional
 class ProductSupplierDataService {
 
     def identifierService

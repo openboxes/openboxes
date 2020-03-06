@@ -26,8 +26,6 @@ class NotificationService {
     def userService
     MailService mailService
 
-    boolean transactional = false
-
     def getExpiryAlertsByLocation(Location location, Integer daysUntilExpiry = 0) {
         String query = """
             select * 

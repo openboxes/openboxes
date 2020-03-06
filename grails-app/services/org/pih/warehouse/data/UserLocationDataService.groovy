@@ -9,13 +9,15 @@
  **/
 package org.pih.warehouse.data
 
-import org.pih.warehouse.core.*
-import org.pih.warehouse.importer.ImportDataCommand
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.ImportDataCommand
 
+@Transactional
 class UserLocationDataService {
 
     /**
