@@ -67,10 +67,8 @@ class StockMovementService {
     def identifierService
     def requisitionService
     def shipmentService
-    def locationService
     def inventoryService
     def inventorySnapshotService
-    def orderService
 
     boolean transactional = true
 
@@ -272,12 +270,12 @@ class StockMovementService {
             updateShipmentWhenRequisitionChanged(stockMovement)
         }
 
-        stockMovement = StockMovement.createFromRequisition(requisition.refresh())
+        StockMovement savedStockMovement = StockMovement.createFromRequisition(requisition.refresh())
 
-        createMissingPicklistItems(stockMovement)
-        createMissingShipmentItems(stockMovement)
+        createMissingPicklistItems(savedStockMovement)
+        createMissingShipmentItems(savedStockMovement)
 
-        return stockMovement
+        return savedStockMovement
     }
 
     void updateRequisitionWhenShipmentChanged(StockMovement stockMovement) {
@@ -407,7 +405,6 @@ class StockMovementService {
     }
 
     StockMovement getStockMovement(String id, String stepNumber) {
-
         Shipment shipment = Shipment.get(id)
         Requisition requisition = Requisition.get(id)
         if (requisition) {
@@ -418,7 +415,6 @@ class StockMovementService {
         else {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
         }
-
     }
 
 
@@ -1336,69 +1332,6 @@ class StockMovementService {
         return shipmentItem
     }
 
-
-    StockMovement updateInboundOrderItems(StockMovement stockMovement) {
-        Order order = Order.get(stockMovement.id)
-
-        if (stockMovement.lineItems) {
-            stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
-                OrderItem orderItem
-                // Try to find a matching stock movement item
-                if (stockMovementItem.id) {
-                    orderItem = order.orderItems.find { it.id == stockMovementItem.id }
-                    if (!orderItem) {
-                        throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
-                    }
-                }
-
-                if (orderItem) {
-                    log.info "Item updated " + orderItem.id
-
-                    //removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
-
-                    if (!stockMovementItem.quantityRequested) {
-                        log.info "Item deleted " + orderItem.id
-                        order.removeFromOrderItems(orderItem)
-                        orderItem.delete()
-                    }
-                    else {
-                        if (stockMovementItem.quantityRequested) orderItem.quantity = stockMovementItem.quantityRequested
-                        if (stockMovementItem.product) orderItem.product = stockMovementItem.product
-                        if (stockMovementItem.inventoryItem) orderItem.inventoryItem = stockMovementItem.inventoryItem
-                        //if (stockMovementItem.sortOrder) orderItem.sort = stockMovementItem.sortOrder
-                        orderItem.recipient = stockMovementItem.recipient
-                    }
-                }
-                // Otherwise we create a new one
-                else {
-                    log.info "Item not found"
-                    if (stockMovementItem.quantityRevised) {
-                        throw new IllegalArgumentException("Cannot specify quantityRevised when creating a new item")
-                    }
-                    orderItem = new OrderItem()
-                    orderItem.product = stockMovementItem.product
-                    orderItem.inventoryItem = stockMovementItem.inventoryItem
-                    orderItem.quantity = stockMovementItem.quantityRequested
-                    orderItem.recipient = stockMovementItem.recipient
-                    order.addToOrderItems(orderItem)
-                }
-            }
-        }
-
-        if (order.hasErrors() || !order.save(flush: true)) {
-            throw new ValidationException("Invalid order", order.errors)
-        }
-
-
-        def inboundStockMovement = StockMovement.createFromOrder(order)
-
-        createInboundShipment(inboundStockMovement)
-
-        //createMissingPicklistItems(updatedStockMovement)
-        //createMissingShipmentItems(updatedStockMovement)
-
-        return inboundStockMovement
-    }
 
     StockMovement updateOutboundItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
