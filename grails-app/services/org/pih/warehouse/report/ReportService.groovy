@@ -24,7 +24,6 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
-import org.pih.warehouse.core.Location
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import util.InventoryUtil
@@ -44,8 +43,6 @@ class ReportService implements ApplicationContextAware {
 
 
     ApplicationContext applicationContext
-
-    boolean transactional = false
 
     void generateShippingReport(ChecklistReportCommand command) {
         def shipmentItems = command?.shipment?.shipmentItems?.sort()

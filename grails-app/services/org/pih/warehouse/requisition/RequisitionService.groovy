@@ -9,7 +9,9 @@
  **/
 package org.pih.warehouse.requisition
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -23,12 +25,9 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.DateUtil
 
+@Transactional
 class RequisitionService {
-
-    boolean transactional = true
 
     def identifierService
     def productService

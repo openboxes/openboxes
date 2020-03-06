@@ -9,12 +9,14 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.springframework.validation.BeanPropertyBindingResult
 
+@Transactional
 class LocationDataService {
 
     /**

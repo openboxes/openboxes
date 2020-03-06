@@ -39,8 +39,6 @@ class DocumentService {
 
     GrailsApplication grailsApplication
     def userService
-    boolean transactional = false
-
 
     private getMessageTagLib() {
         return grailsApplication.mainContext.getBean('MessageTagLib')
