@@ -12,8 +12,6 @@ package org.pih.warehouse.core
 import grails.core.GrailsApplication
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang.text.StrSubstitutor
-import grails.util.Holders
-import org.grails.core.DefaultGrailsDomainClass
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
@@ -22,7 +20,6 @@ import org.docx4j.fonts.IdentityPlusMapper
 import org.docx4j.jaxb.Context
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart
-import org.docx4j.openpackaging.parts.relationships.Namespaces
 import org.docx4j.wml.Body
 import org.docx4j.wml.BooleanDefaultTrue
 import org.docx4j.wml.CTBorder
@@ -42,6 +39,7 @@ import org.docx4j.wml.Tc
 import org.docx4j.wml.Text
 import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
+import org.grails.core.DefaultGrailsDomainClass
 import org.pih.warehouse.FormatTagLib
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
@@ -54,7 +52,6 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
 class FileService {
-    boolean transactional = false
 
     def userService
     GrailsApplication grailsApplication

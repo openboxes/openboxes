@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
@@ -27,9 +28,8 @@ import org.pih.warehouse.util.LocalizationUtil
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class InventorySnapshotService {
-
-    boolean transactional = true
 
     def dataSource
     def locationService

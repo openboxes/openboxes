@@ -11,13 +11,12 @@ package org.pih.warehouse.order
 
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
-import org.pih.warehouse.core.ActivityCode
-
+import grails.core.GrailsApplication
+import grails.utils.Holders
 import java.math.RoundingMode
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.grails.plugins.csv.CSVMapReader
+import grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
@@ -44,18 +43,18 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 import util.ReportUtil
+import java.text.SimpleDateFormat
 
+@Transactional
 class OrderService {
 
-    boolean transactional = true
-
-    def userService
-    def dataService
-    def shipmentService
-    def identifierService
-    def inventoryService
-    def productSupplierDataService
-    def personDataService
+    UserService userService
+    DataService dataService
+    ShipmentService shipmentService
+    IdentifierService identifierService
+    InventoryService inventoryService
+    ProductSupplierDataService productSupplierDataService
+    PersonDataService personDataService
     def stockMovementService
     GrailsApplication grailsApplication
 
@@ -362,10 +361,10 @@ class OrderService {
             String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString(), sequenceNumberFormat)
 
             // Properties to be used to get argument values for the template
-            Map properties = ConfigurationHolder.config.openboxes.identifier.purchaseOrder.properties
+            Map properties = Holders.grailsApplication.config.openboxes.identifier.purchaseOrder.properties
             Map model = dataService.transformObject(order, properties)
             model.put("sequenceNumber", sequenceNumberStr)
-            String template = ConfigurationHolder.config.openboxes.identifier.purchaseOrder.format
+            String template = Holders.grailsApplication.config.openboxes.identifier.purchaseOrder.format
             return identifierService.renderTemplate(template, model)
         } catch(Exception e) {
             log.error("Error " + e.message, e)
@@ -381,7 +380,7 @@ class OrderService {
 
         if (!order.orderNumber) {
             IdentifierGeneratorTypeCode identifierGeneratorTypeCode =
-                    ConfigurationHolder.config.openboxes.identifier.purchaseOrder.generatorType
+                    Holders.grailsApplication.config.openboxes.identifier.purchaseOrder.generatorType
 
             if (identifierGeneratorTypeCode == IdentifierGeneratorTypeCode.SEQUENCE) {
                 order.orderNumber = generatePurchaseOrderSequenceNumber(order)
@@ -589,9 +588,9 @@ class OrderService {
     }
 
     void updateProductUnitPrice(OrderItem orderItem) {
-        Boolean enabled = ConfigurationHolder.config.openboxes.purchasing.updateUnitPrice.enabled
+        Boolean enabled = Holders.grailsApplication.config.openboxes.purchasing.updateUnitPrice.enabled
         if (enabled) {
-            UpdateUnitPriceMethodCode method = ConfigurationHolder.config.openboxes.purchasing.updateUnitPrice.method
+            UpdateUnitPriceMethodCode method = Holders.grailsApplication.config.openboxes.purchasing.updateUnitPrice.method
             if (method == UpdateUnitPriceMethodCode.LAST_PURCHASE_PRICE) {
                 BigDecimal pricePerPackage = orderItem.unitPrice * orderItem?.order?.lookupCurrentExchangeRate()
                 BigDecimal pricePerUnit = pricePerPackage / orderItem?.quantityPerUom
