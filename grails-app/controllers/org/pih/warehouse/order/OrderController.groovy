@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.order
 
+import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
@@ -66,30 +67,34 @@ class OrderController {
         redirect(controller: 'purchaseOrderWorkflow', action: 'index')
     }
 
-    def shipOrder = {
-        Order order = Order.get(params.id)
-        Shipment shipment = stockMovementService.createInboundShipment(order)
-        redirect(controller: 'stockMovement', action: "createPurchaseOrders", params: [id: shipment.id])
-    }
 
-    def shipOrderItems = {
+
+    def shipOrder = {
         Order orderInstance = Order.get(params.id)
         [orderInstance:orderInstance]
     }
 
-    def shipOrderItemsAction = { ShipOrderCommand command ->
+    def saveShipmentItems = { ShipOrderCommand command ->
         log.info "Command: ${command}"
         if (!command.validate() || command.hasErrors()) {
             render(view: "shipOrderItems", model: [orderInstance: command.order, command: command])
             return
         }
 
-        Shipment shipment = stockMovementService.createInboundShipment(command)
-        if (shipment) {
-            redirect(controller: 'stockMovement', action: "createPurchaseOrders", params: [id: shipment.id])
+        try {
+            Shipment shipment = stockMovementService.createInboundShipment(command)
+            if (shipment) {
+                redirect(controller: 'stockMovement', action: "createPurchaseOrders", params: [id: shipment.id])
+                return
+            }
+        } catch (ValidationException e) {
+            command.errors = e.errors
+            command.order = Order.load(command.order.id)
+            render (view: "shipOrder", model: [command:command, orderInstance: command.order])
             return
+
         }
-        redirect (action: "shipOrderItems", id: command.order.id)
+        redirect (action: "shipOrder", id: command.order.id)
 
     }
 

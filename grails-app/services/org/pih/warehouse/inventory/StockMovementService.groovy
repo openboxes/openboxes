@@ -1160,16 +1160,23 @@ class StockMovementService {
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         command.orderItems.each { ShipOrderItemCommand orderItemCommand ->
-            OrderItem orderItem = orderItemCommand.orderItem
-            ShipmentItem shipmentItem = new ShipmentItem()
-            shipmentItem.lotNumber = orderItemCommand?.inventoryItem?.lotNumber
-            shipmentItem.expirationDate = orderItemCommand?.inventoryItem?.expirationDate
-            shipmentItem.product = orderItemCommand.orderItem.product
-            shipmentItem.inventoryItem = orderItemCommand.inventoryItem
-            shipmentItem.quantity = orderItemCommand.quantityToShip
-            shipment.addToShipmentItems(shipmentItem)
-            orderItem.addToShipmentItems(shipmentItem)
+            if (orderItemCommand.quantityToShip > 0) {
+                OrderItem orderItem = orderItemCommand.orderItem
+                ShipmentItem shipmentItem = new ShipmentItem()
+                shipmentItem.lotNumber = orderItemCommand?.inventoryItem?.lotNumber
+                shipmentItem.expirationDate = orderItemCommand?.inventoryItem?.expirationDate
+                shipmentItem.product = orderItemCommand.orderItem.product
+                shipmentItem.inventoryItem = orderItemCommand.inventoryItem
+                shipmentItem.quantity = orderItemCommand.quantityToShip
+                shipment.addToShipmentItems(shipmentItem)
+                orderItem.addToShipmentItems(shipmentItem)
+            }
         }
+
+        if (!shipment?.shipmentItems || shipment.shipmentItems.size() == 0) {
+            shipment.errors.rejectValue("shipmentItems", "shipment.mustContainAtLeastOneShipmentItem.message", "Shipment must contain at least one shipment item.")
+        }
+
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
