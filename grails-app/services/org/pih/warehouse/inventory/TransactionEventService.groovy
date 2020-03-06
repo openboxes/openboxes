@@ -9,12 +9,13 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import groovy.time.TimeCategory
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.springframework.context.ApplicationListener
-class TransactionEventService implements ApplicationListener<TransactionEvent> {
 
-    boolean transactional = true
+@Transactional
+class TransactionEventService implements ApplicationListener<TransactionEvent> {
 
     void onApplicationEvent(TransactionEvent event) {
         log.info "Application event $event has been published!"

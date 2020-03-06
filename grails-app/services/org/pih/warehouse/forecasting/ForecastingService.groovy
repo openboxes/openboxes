@@ -23,8 +23,6 @@ import java.text.NumberFormat
 
 class ForecastingService {
 
-    boolean transactional = false
-
     def dataSource
     GrailsApplication grailsApplication
     def inventoryService

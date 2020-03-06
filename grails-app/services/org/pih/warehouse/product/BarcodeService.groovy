@@ -19,7 +19,7 @@ import com.google.zxing.common.BitMatrix
  * @author Michael Astreiko
  */
 class BarcodeService {
-    static transactional = false
+
     MultiFormatWriter barCodeWriter = new MultiFormatWriter()
 
     void renderImage(response, String data, int width, int height, BarcodeFormat format = BarcodeFormat.QR_CODE) {

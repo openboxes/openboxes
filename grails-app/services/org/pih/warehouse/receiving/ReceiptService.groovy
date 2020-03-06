@@ -10,6 +10,7 @@
 package org.pih.warehouse.receiving
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
@@ -29,9 +30,8 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 import grails.util.Holders
 
+@Transactional
 class ReceiptService {
-
-    boolean transactional = true
 
     def shipmentService
     def inventoryService
@@ -41,6 +41,7 @@ class ReceiptService {
     def notificationService
     def productAvailabilityService
 
+    @Transactional(readOnly=true)
     PartialReceipt getPartialReceipt(String id, String stepNumber) {
         Shipment shipment = Shipment.get(id)
         if (!shipment) {

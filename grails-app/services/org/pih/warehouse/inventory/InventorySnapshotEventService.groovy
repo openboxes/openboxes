@@ -9,11 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import org.springframework.context.ApplicationListener
 
+@Transactional
 class InventorySnapshotEventService implements ApplicationListener<InventorySnapshotEvent> {
 
-    def transactional = true
     def inventorySnapshotService
 
     void onApplicationEvent(InventorySnapshotEvent event) {

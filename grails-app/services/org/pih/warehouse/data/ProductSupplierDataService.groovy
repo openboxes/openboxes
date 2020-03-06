@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
@@ -18,6 +19,7 @@ import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
 import org.springframework.validation.BeanPropertyBindingResult
 
+@Transactional
 class ProductSupplierDataService {
 
     def uomService

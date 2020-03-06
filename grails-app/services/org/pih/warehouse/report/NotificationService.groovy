@@ -30,8 +30,6 @@ class NotificationService {
     MailService mailService
     def grailsApplication
 
-    boolean transactional = false
-
     def getExpiryAlertsByLocation(Location location, Integer daysUntilExpiry = 0) {
         String query = """
             select * 

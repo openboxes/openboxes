@@ -9,18 +9,18 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.product.Product
 
+@Transactional
 class StocklistItemService {
 
     def requisitionService
     def locationService
-
-    boolean transactional = true
 
     List<StocklistItem> getStocklistItems(String productId) {
         List<Requisition> templates = requisitionService.getRequisitionTemplates()

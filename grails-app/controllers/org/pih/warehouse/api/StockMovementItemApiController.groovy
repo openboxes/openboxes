@@ -161,17 +161,7 @@ class StockMovementItemApiController {
     def cancelItem = {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
-        stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
-
-        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
-
-        log.debug "Item canceled " + requisitionItem.id
-        requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
-        requisitionItem.quantityApproved = 0
-
-        requisitionItem.save()
-
-        stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+        stockMovementItem = stockMovementService.cancelItem(stockMovementItem)
 
         render([data: stockMovementItem] as JSON)
     }
