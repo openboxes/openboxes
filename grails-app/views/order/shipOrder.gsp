@@ -3,12 +3,13 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
-	<title><warehouse:message code="order.shipOrderItems.label" default="Ship Order Items" /></title>
+	<title><warehouse:message code="order.shipOrder.label" default="Ship Order" /></title>
 </head>
 
 <body>
 
 	<div class="body">
+
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -28,9 +29,10 @@
 		<div class="dialog">
 
 			<g:render template="summary" model="[orderInstance:orderInstance]" />
-			<g:form action="shipOrderItemsAction">
+
+			<g:form action="saveShipmentItems">
 				<div class="box">
-					<h2><warehouse:message code="order.shipOrderItems" default="Ship Order Items" /></h2>
+					<h2><warehouse:message code="order.shipOrder" default="Ship Order" /></h2>
 					<g:hiddenField name="order.id" value="${orderInstance?.id}" />
 
 					<table>
@@ -72,11 +74,6 @@
 								</tr>
 							</g:each>
 						</tbody>
-						<tfoot>
-							<tr>
-								<th colspan="7"></th>
-							</tr>
-						</tfoot>
 					</table>
 				</div>
 				<div class="buttons">

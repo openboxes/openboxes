@@ -69,6 +69,8 @@ class StockMovement {
     List<StockMovementItem> lineItems =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class))
 
+    Boolean isFromOrder = Boolean.FALSE
+
     Requisition stocklist
     Requisition requisition
     Order order
@@ -135,7 +137,7 @@ class StockMovement {
                         },
                         documents  : documents
                 ],
-                isFromOrder        : isFromOrder(),
+                isFromOrder        : isFromOrder,
         ]
     }
 
@@ -168,14 +170,6 @@ class StockMovement {
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
     }
 
-    Boolean isFromOrder() {
-        Order order = this.description ? Order.findByOrderNumber(this.description) : null
-        if (order) {
-            return true
-        }
-        return false
-    }
-
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
         Location origin = requisition?.origin?:shipment?.origin
         Location destination = requisition?.destination?:shipment?.destination
@@ -205,43 +199,10 @@ class StockMovement {
         return name
     }
 
-    static StockMovement createFromOrder(Order order) {
-        StockMovement stockMovement = new StockMovement(
-                id: order.id,
-                statusCode: order.status.toString(),
-                stockMovementType: StockMovementType.INBOUND,
-                // FIXME Need to translate
-                receiptStatusCode: ShipmentStatusCode.PENDING,
-                identifier: order.orderNumber,
-                origin: order.origin,
-                destination: order.destination,
-                dateRequested: new Date(),
-                dateCreated: order.dateCreated,
-                lastUpdated: order.lastUpdated,
-                requestedBy: AuthService.getCurrentUser().get(),
-                description: order.orderNumber
-        )
-
-        if (order.orderItems) {
-            order.orderItems.each { orderItem ->
-                StockMovementItem stockMovementItem = StockMovementItem.createFromOrderItem(orderItem)
-                stockMovementItem.sortOrder = stockMovement.lineItems ? stockMovement.lineItems.size() * 100 : 0
-                stockMovement.lineItems.add(stockMovementItem)
-            }
-        }
-
-        return stockMovement
-    }
-
     static StockMovement createFromShipment(Shipment shipment) {
 
-        String statusCode
-        if (shipment.status.code == ShipmentStatusCode.SHIPPED) {
-            statusCode = RequisitionStatus.ISSUED.toString()
-        }
-        else {
-            statusCode = RequisitionStatus.PENDING.toString()
-        }
+        String statusCode = (shipment.status.code == ShipmentStatusCode.SHIPPED) ?
+                RequisitionStatus.ISSUED.toString() : RequisitionStatus.PENDING.toString()
 
         StockMovement stockMovement = new StockMovement(
                 id: shipment.id,
@@ -259,7 +220,8 @@ class StockMovement {
                 dateCreated: shipment.dateCreated,
                 lastUpdated: shipment.lastUpdated,
                 requestedBy: shipment.createdBy,
-                shipment: shipment
+                shipment: shipment,
+                isFromOrder: shipment?.isFromPurchaseOrder
         )
 
         if (shipment.shipmentItems) {
