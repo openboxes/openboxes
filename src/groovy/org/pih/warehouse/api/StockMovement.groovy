@@ -176,6 +176,15 @@ class StockMovement {
         return false
     }
 
+    Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
+        Location origin = requisition?.origin?:shipment?.origin
+        Location destination = requisition?.destination?:shipment?.destination
+        boolean isOrigin = origin?.id == currentLocation.id
+        boolean isDestination = destination?.id == currentLocation.id
+        boolean canOriginManageInventory = origin?.supports(ActivityCode.MANAGE_INVENTORY)
+        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination))
+    }
+
     /**
      * “FROM.TO.DATEREQUESTED.STOCKLIST.TRACKING#.DESCRIPTION”
      *

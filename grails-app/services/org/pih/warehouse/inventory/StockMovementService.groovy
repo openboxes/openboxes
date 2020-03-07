@@ -301,11 +301,23 @@ class StockMovementService {
 
     void deleteStockMovement(String id) {
         StockMovement stockMovement = getStockMovement(id)
+        deleteStockMovement(stockMovement)
+    }
+
+    void deleteStockMovement(StockMovement stockMovement) {
         if (stockMovement?.requisition) {
-            stockMovement.requisition.delete()
+            def shipments = stockMovement?.requisition?.shipments
+            shipments.toArray().each { Shipment shipment ->
+                stockMovement?.requisition.removeFromShipments(shipment)
+                if (!shipment?.events?.empty) {
+                    shipmentService.rollbackLastEvent(shipment)
+                }
+                shipmentService.deleteShipment(shipment)
+            }
+            requisitionService.deleteRequisition(stockMovement?.requisition)
         }
-        if (stockMovement?.shipment) {
-            stockMovement.shipment.delete()
+        else {
+            shipmentService.deleteShipment(stockMovement?.shipment)
         }
     }
 

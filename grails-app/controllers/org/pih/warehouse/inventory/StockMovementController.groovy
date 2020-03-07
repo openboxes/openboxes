@@ -156,11 +156,9 @@ class StockMovementController {
     }
 
     def rollback = {
+        Location currentLocation = Location.get(session.warehouse.id)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        boolean isOrigin = stockMovement?.requisition?.origin?.id == session.warehouse.id
-        boolean isDestination = stockMovement?.requisition?.destination?.id == session.warehouse.id
-        boolean canManageInventory = stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)
-        if ((canManageInventory && isOrigin) || (!canManageInventory && isDestination)) {
+        if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
             try {
                 stockMovementService.rollbackStockMovement(params.id)
                 flash.message = "Successfully rolled back stock movement with ID ${params.id}"
@@ -176,39 +174,29 @@ class StockMovementController {
     }
 
 
-    def removeStockMovement = {
+    def remove = {
+        Location currentLocation = Location.get(session.warehouse.id)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        boolean isOrigin = stockMovement?.requisition?.origin?.id == session.warehouse.id
-        boolean isDestination = stockMovement?.requisition?.destination?.id == session.warehouse.id
-        boolean canManageInventory = stockMovement?.requisition?.origin?.supports(ActivityCode.MANAGE_INVENTORY)
-        if (!((canManageInventory && isOrigin) || (!canManageInventory && isDestination))) {
-            flash.error = "You are not able to delete stock movement from your location."
-            if (params.show) {
-                redirect(action: "show", id: params.id)
-                return
-            }
-        } else if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
-            try {
-                Requisition requisition = stockMovement?.requisition
-                if (requisition) {
-                    def shipments = stockMovement?.requisition?.shipments
-                    shipments.toArray().each { Shipment shipment ->
-                        requisition.removeFromShipments(shipment)
-                        if (!shipment?.events?.empty) {
-                            shipmentService.rollbackLastEvent(shipment)
-                        }
-                        shipmentService.deleteShipment(shipment)
-                    }
-                    //requisitionService.rollbackRequisition(requisition)
-                    requisitionService.deleteRequisition(requisition)
+        if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
+            if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
+                try {
+                    stockMovementService.deleteStockMovement(params.id)
+                    flash.message = "Successfully deleted stock movement with ID ${params.id}"
+                } catch (Exception e) {
+                    log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
+                    flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
                 }
-                flash.message = "Successfully deleted stock movement with ID ${params.id}"
-            } catch (Exception e) {
-                log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
-                flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+            } else {
+                flash.message = "You cannot delete this shipment"
             }
-        } else {
-            flash.message = "You cannot delete this shipment"
+        }
+        else {
+            flash.error = "You are not able to delete stock movement from your location."
+        }
+
+        if (params.show) {
+            redirect(action: "show", id: params.id)
+            return
         }
 
         redirect(action: "list")

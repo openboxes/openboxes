@@ -30,7 +30,7 @@
                 <g:if test="${stockMovement?.shipment?.currentStatus==org.pih.warehouse.shipping.ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus}">
                     <hr/>
                     <div class="action-menu-item">
-                        <g:link controller="stockMovement" action="removeStockMovement" id="${stockMovement?.id}"
+                        <g:link controller="stockMovement" action="remove" id="${stockMovement?.id}"
                                 onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                             <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
                             &nbsp;${warehouse.message(code: 'default.delete.label', args:[warehouse.message(code:'stockMovement.label')])}

@@ -111,7 +111,7 @@
                     </g:link>
                 </g:elseif>
                 <g:if test="${hasBeenPending || !stockMovement?.shipment?.currentStatus}">
-                    <g:link controller="stockMovement" action="removeStockMovement" id="${stockMovement.id}" params="[show:true]" class="button"
+                    <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
                             onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
                         <warehouse:message code="default.button.delete.label" />
