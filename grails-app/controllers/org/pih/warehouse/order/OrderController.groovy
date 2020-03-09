@@ -131,7 +131,7 @@ class OrderController {
 
     def placeOrder = {
         log.info "Issue order " + params
-        def orderInstance = orderService.placeOrder(params.id)
+        def orderInstance = orderService.placeOrder(params.id, session.user.id)
         if (orderInstance) {
             if (orderInstance.hasErrors()) {
                 render(view: 'show', model: [orderInstance: orderInstance])

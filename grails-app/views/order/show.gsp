@@ -28,7 +28,7 @@
                     <div class="yui-u first">
                         <div id="details" class="box">
                             <h2>
-                                <label><warehouse:message code="order.orderHeader.label" default="Order Header"/></label>
+                                <warehouse:message code="order.orderHeader.label" default="Order Header"/>
                             </h2>
                             <table>
                                 <tbody>
@@ -72,22 +72,7 @@
                                         ${orderInstance?.origin?.name }
                                     </td>
                                 </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.dateOrdered.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        <format:date obj="${orderInstance?.dateOrdered}"/>
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                            <label><warehouse:message code="order.orderedBy.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        ${orderInstance?.orderedBy?.name }
-                                    </td>
-                                </tr>
+
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="order.subtotal.label"/></label>
@@ -117,6 +102,69 @@
                                 </tr>
 
                                 </tbody>
+                            </table>
+                        </div>
+                        <div class="box">
+                            <h2><g:message code="default.auditing.label"/></h2>
+                            <table>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                            <label><warehouse:message code="default.dateCreated.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <small><format:date obj="${orderInstance?.dateOrdered}"/></small>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                            <label><warehouse:message code="default.lastUpdated.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <small><format:date obj="${orderInstance?.dateOrdered}"/></small>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                            <label><warehouse:message code="order.orderedBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:if test="${orderInstance?.orderedBy}">
+                                            <div>${orderInstance?.orderedBy?.name }</div>
+                                            <small><format:date obj="${orderInstance?.dateOrdered}"/></small>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                            <label><warehouse:message code="order.approvedBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:if test="${orderInstance?.approvedBy}">
+                                            <div>${orderInstance?.approvedBy?.name }</div>
+                                            <small><format:date obj="${orderInstance?.dateApproved}"/></small>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                            <label><warehouse:message code="order.completedBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:if test="${orderInstance?.completedBy}">
+                                            <div>${orderInstance?.completedBy?.name }</div>
+                                            <small><format:date obj="${orderInstance?.dateCompleted}"/></small>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                     </div>

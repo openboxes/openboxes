@@ -9,10 +9,11 @@
  **/
 package org.pih.warehouse.order
 
-
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
@@ -20,15 +21,17 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentService
 
 class OrderService {
 
     boolean transactional = true
 
-    def productService
-    def shipmentService
-    def identifierService
-    def inventoryService
+    UserService userService
+    ShipmentService shipmentService
+    IdentifierService identifierService
+    InventoryService inventoryService
+    GrailsApplication grailsApplication
 
     def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
         def orders = Order.createCriteria().list(params) {
@@ -230,24 +233,45 @@ class OrderService {
         }
     }
 
-    Order placeOrder(String id) {
+    Order placeOrder(String id, String userId) {
         def orderInstance = Order.get(id)
+        def userInstance = User.get(userId)
         if (orderInstance) {
             if (orderInstance?.status >= OrderStatus.PLACED) {
                 orderInstance.errors.rejectValue("status", "order.hasAlreadyBeenPlaced.message")
             } else {
                 if (orderInstance?.orderItems?.size() > 0) {
-                    orderInstance.status = OrderStatus.PLACED
-                    if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
-                        return orderInstance
+                    if (canApproveOrder(orderInstance, userInstance)) {
+                        orderInstance.status = OrderStatus.PLACED
+                        orderInstance.dateApproved = new Date()
+                        orderInstance.approvedBy = userInstance
+                        if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                            return orderInstance
+                        }
                     }
+                    else {
+                        orderInstance.errors.reject("User does not have permission to approve order")
+                    }
+
                 } else {
                     orderInstance.errors.rejectValue("orderItems", "order.mustContainAtLeastOneItem.message")
                 }
             }
         }
         return orderInstance
+    }
 
+    boolean canApproveOrder(Order order, User userInstance) {
+        if (isApprovalRequired(order)) {
+            List<RoleType> defaultRoleTypes = grailsApplication.config.openboxes.purchasing.approval.defaultRoleTypes
+            return userService.hasAnyRoles(userInstance, defaultRoleTypes)
+        }
+        return Boolean.TRUE
+    }
+
+    boolean isApprovalRequired(Order order) {
+        // FIXME this could take order into account (see Order.isApprovalRequired())
+        return grailsApplication.config.openboxes.purchasing.approval.enabled
     }
 
     /**
@@ -311,8 +335,7 @@ class OrderService {
                 orderInstance?.listShipments().each { Shipment shipmentInstance ->
                     if (shipmentInstance) {
 
-                        def transactions = Transaction.findAllByIncomingShipment(shipmentInstance)
-                        transactions.each { transactionInstance ->
+                        shipmentInstance.incomingTransactions.each { transactionInstance ->
                             if (transactionInstance) {
                                 shipmentInstance.removeFromIncomingTransactions(transactionInstance)
                                 transactionInstance?.delete()
@@ -356,6 +379,9 @@ class OrderService {
                     }
                 }
                 orderInstance.status = OrderStatus.PENDING
+                orderInstance.approvedBy = null
+                orderInstance.dateApproved = null
+
             } else if (orderInstance?.status == OrderStatus.COMPLETED) {
                 deleteTransactions(orderInstance)
                 orderInstance.status = OrderStatus.PENDING
