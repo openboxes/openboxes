@@ -536,7 +536,7 @@ class AddItemsPage extends Component {
       values: {
         ...this.state.values,
         lineItems: this.props.isPaginated ?
-          _.uniq(_.concat(this.state.values.lineItems, lineItemsData)) : lineItemsData,
+          _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
       sortOrder,
       totalCount: lineItemsData.length > this.state.totalCount ?
