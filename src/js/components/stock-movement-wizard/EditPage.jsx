@@ -289,12 +289,10 @@ class EditItemsPage extends Component {
       revisedItems: _.filter(editPageItems, item => item.statusCode === 'CHANGED'),
       values: {
         ...this.state.values,
-        editPageItems: this.state.totalCount > this.state.values.editPageItems.length ?
-          _.uniq(_.concat(this.state.values.editPageItems, editPageItems)) :
-          _.uniq(this.state.values.editPageItems),
+        editPageItems: _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId'),
       },
       hasItemsLoaded: this.state.hasItemsLoaded
-        || this.state.totalCount === this.state.values.editPageItems.length,
+        || this.state.totalCount === _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId').length,
     }, () => this.props.hideSpinner());
   }
 
