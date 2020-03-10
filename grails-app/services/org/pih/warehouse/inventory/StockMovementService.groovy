@@ -9,31 +9,48 @@
  **/
 package org.pih.warehouse.inventory
 
-import grails.gorm.transactions.Transactional
 import grails.core.GrailsApplication
-import org.pih.warehouse.PagedResultList
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
-import org.pih.warehouse.api.*
+import org.pih.warehouse.PagedResultList
+import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.DocumentGroupCode
+import org.pih.warehouse.api.EditPage
+import org.pih.warehouse.api.EditPageItem
+import org.pih.warehouse.api.PackPage
+import org.pih.warehouse.api.PackPageItem
+import org.pih.warehouse.api.PickPage
+import org.pih.warehouse.api.PickPageItem
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.SubstitutionItem
+import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.*
-import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.picklist.PicklistItem
-import org.pih.warehouse.product.ProductAssociationTypeCode
-import org.pih.warehouse.requisition.*
-import org.pih.warehouse.shipping.*
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemSortByCode
+import org.pih.warehouse.requisition.RequisitionItemStatus
+import org.pih.warehouse.requisition.RequisitionItemType
+import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 
@@ -44,11 +61,8 @@ class StockMovementService {
     def identifierService
     def requisitionService
     def shipmentService
-    def locationService
     def inventoryService
     def inventorySnapshotService
-
-    boolean transactional = true
 
     GrailsApplication grailsApplication
 
@@ -148,14 +162,17 @@ class StockMovementService {
         }
     }
 
+    @Transactional(readOnly=true)
     def getStockMovements(Integer maxResults, Integer offset) {
         return getStockMovements(new StockMovement(), [:], maxResults, offset)
     }
 
+    @Transactional(readOnly=true)
     def getStockMovements(Map params, Integer maxResults, Integer offset) {
         return getStockMovements(new StockMovement(), params, maxResults, offset)
     }
 
+    @Transactional(readOnly=true)
     def getStockMovements(StockMovement stockMovement, Map params, Integer maxResults, Integer offset) {
         log.info "Get stock movements: " + stockMovement.toJson()
 
@@ -226,11 +243,12 @@ class StockMovementService {
         return new PagedResultList(stockMovements, requisitions.totalCount)
     }
 
-
+    @Transactional(readOnly=true)
     StockMovement getStockMovement(String id) {
         return getStockMovement(id, null)
     }
 
+    @Transactional(readOnly=true)
     StockMovement getStockMovement(String id, String stepNumber) {
         log.info "Getting stock movement for id ${id} step number ${stepNumber}"
 
@@ -268,6 +286,7 @@ class StockMovementService {
         return stockMovement
     }
 
+    @Transactional(readOnly=true)
     StockMovementItem getStockMovementItem(String id) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
         return StockMovementItem.createFromRequisitionItem(requisitionItem)
@@ -1055,6 +1074,20 @@ class StockMovementService {
 
         createMissingPicklistForStockMovementItem(StockMovementItem.createFromRequisitionItem(requisitionItem))
         createMissingShipmentItem(requisitionItem)
+    }
+
+    def cancelItem(StockMovementItem stockMovementItem) {
+        removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+
+        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
+
+        log.debug "Item canceled " + requisitionItem.id
+        requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
+        requisitionItem.quantityApproved = 0
+
+        requisitionItem.save()
+
+        return StockMovementItem.createFromRequisitionItem(requisitionItem)
     }
 
     /**
