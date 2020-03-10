@@ -55,21 +55,28 @@ class TableBodyVirtualized extends Component {
     const { totalCount } = properties;
 
 
+    if (fields.value[index]) {
+      return (
+        <div key={key} style={style}>
+          <RowComponent
+            field={field}
+            index={index}
+            properties={{
+              ...properties,
+              rowCount: totalCount || 50,
+            }}
+            addRow={addRow}
+            fieldsConfig={fieldsConfig}
+            removeRow={() => fields.remove(index)}
+            rowValues={fields.value[index]}
+            rowRef={(el, fieldName) => tableRef(el, fieldName, index)}
+          />
+        </div>
+      );
+    }
     return (
       <div key={key} style={style}>
-        <RowComponent
-          field={field}
-          index={index}
-          properties={{
-            ...properties,
-            rowCount: totalCount || 50,
-          }}
-          addRow={addRow}
-          fieldsConfig={fieldsConfig}
-          removeRow={() => fields.remove(index)}
-          rowValues={fields.value[index]}
-          rowRef={(el, fieldName) => tableRef(el, fieldName, index)}
-        />
+        Loading...
       </div>
     );
   }
