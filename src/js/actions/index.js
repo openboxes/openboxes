@@ -159,7 +159,7 @@ export function fetchIndicators() {
     fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
     fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Sent Stock Movements');
     fetchIndicator(dispatch, 'getReceivedStockMovements', 'doughnut', 'Stock Movements Received');
-    fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements', '/openboxes/shipment/list?status=PENDING');
+    fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/openboxes/shipment/list?status=PENDING');
   };
 }
 
