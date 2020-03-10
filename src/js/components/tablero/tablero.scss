@@ -54,6 +54,12 @@
       animation-duration: .8s;
       animation-timing-function: ease-out;
 
+      .numberDiv {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
       .titleCard {
         color: #cdcdcd;
         font-size: 14px;
