@@ -130,6 +130,14 @@
     justify-content: space-between;
     color: #282d32;
 
+    .titleLink {
+      color: #282D32;
+      text-decoration: none;
+      &:hover{
+        text-decoration: none;
+      }
+    }
+
     .dragHandler {
       color: #999999;
       font-size: 25px;
