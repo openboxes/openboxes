@@ -532,7 +532,8 @@ class AddItemsPage extends Component {
 
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
     this.setState({
-      currentLineItems: data,
+      currentLineItems: this.props.isPaginated ?
+        _.uniqBy(_.concat(this.state.currentLineItems, data), 'id') : data,
       values: {
         ...this.state.values,
         lineItems: this.props.isPaginated ?
