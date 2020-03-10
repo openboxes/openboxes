@@ -8,22 +8,15 @@ function truncateString(value, length) {
 
 const NumberCard = ({ cardTitle, cardNumber, cardSubtitle, cardLink }) => {
   const card = (
-    <div className="numberCard">
+    <div className="numberDiv">
       <span className="titleCard"> {cardTitle} </span>
       <span className="resultCard"> {cardNumber.toLocaleString()} </span>
       <span className="subtitleCard"> {truncateString(cardSubtitle, 22)} </span>
     </div>
   );
-  const linkedCard = (
-    <a href={cardLink} className="numberCard" target="_blank">
-      <span className="titleCard"> {cardTitle} </span>
-      <span className="resultCard"> {cardNumber.toLocaleString()} </span>
-      <span className="subtitleCard"> {truncateString(cardSubtitle, 22)} </span>
-    </a>
-  );
 
   return (
-    cardLink ? linkedCard : card
+    cardLink ? <a href={cardLink} className="numberCard" target="_blank">{card}</a> : <div className="numberCard">{card}</div>
   );
 };
 
