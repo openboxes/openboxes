@@ -32,6 +32,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -807,7 +808,14 @@ class ShipmentService {
      * @param shipment
      */
     void deleteShipment(Shipment shipment) {
-        shipment.delete(flush: true)
+        shipment.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
+            shipment.removeFromShipmentItems(shipmentItem)
+            shipmentItem.orderItems.toArray().flatten().each { OrderItem orderItem ->
+                orderItem.removeFromShipmentItems(shipmentItem)
+            }
+            shipmentItem.delete()
+        }
+        shipment.delete()
     }
 
 
