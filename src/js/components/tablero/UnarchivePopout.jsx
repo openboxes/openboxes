@@ -5,6 +5,10 @@ import loadColors from '../../consts/dataFormat/dataLoading';
 import { getColor } from '../../consts/dataFormat/chartColors';
 
 /* global _ */
+function truncateString(value, length) {
+  return (value.length > length) ? `${value.substr(0, length - 1)}...` : value;
+}
+
 const Numbers = () => {
   const colors = ['green', 'yellow', 'red'];
   const classColor = `circle ${colors[_.random(0, colors.length - 1)]}`;
@@ -58,7 +62,7 @@ const ArchivedIndicators = (props) => {
         <div className="row">
           <div className="col col-3 graph-preview">{graph}</div>
           <div className="col col-6">
-            <span>{props.title}</span>
+            <span>{truncateString(props.title, 25)}</span>
           </div>
           <div className="col col-3">
             <span
