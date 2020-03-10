@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable react/prop-types */
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
@@ -35,40 +33,38 @@ const DragHandle = sortableHandle(() => (
   <span className="dragHandler">::</span>
 ));
 
-let graphClass = 'graphCard';
-const GraphCard = SortableElement(({ cardTitle, cardType, data }) => {
+const GraphCard = SortableElement(({ cardTitle, cardType, cardLink, data }) => {
   let graph;
   if (cardType === 'line') {
     data.datasets = loadColors(data, 'line');
     graph = <Line data={data} />;
-    graphClass = 'graphCard';
   } else if (cardType === 'bar') {
     data.datasets = loadColors(data, 'bar');
     graph = <Bar data={data} />;
-    graphClass = 'graphCard';
   } else if (cardType === 'doughnut') {
     data.datasets = loadColors(data, 'doughnut');
     graph = <Doughnut data={data} />;
-    graphClass = 'graphCard';
   } else if (cardType === 'horizontalBar') {
     data.datasets = loadColors(data, 'horizontalBar');
     graph = <HorizontalBar data={data} />;
-    graphClass = 'graphCard';
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
-    graphClass = 'graphCard';
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
-    graphClass = 'graphCard';
   } else if (cardType === 'error') {
     graph = <i className="fa fa-repeat" />;
-    graphClass = 'graphCard errorCard';
   }
 
   return (
-    <div className={graphClass}>
+    <div className={"graphCard " + (cardType === 'error' ? 'errorCard' : '')}>
       <div className="headerCard">
-        <span className="titleCard"> {cardTitle} </span>
+        {cardLink ?
+          <a href={cardLink} className="titleLink">
+            <span className="titleLink"> {cardTitle} </span>
+          </a>
+          :
+          <span className="titleLink"> {cardTitle} </span>
+        }
         <DragHandle />
       </div>
       <div className="contentCard">{graph}</div>
@@ -81,6 +77,5 @@ export default GraphCard;
 GraphCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardType: PropTypes.string.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
   data: PropTypes.any.isRequired,
 };

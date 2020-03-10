@@ -24,6 +24,7 @@ const SortableCards = SortableContainer(({ data }) => (
           index={index}
           cardTitle={value.title}
           cardType={value.type}
+          cardLink={value.link}
           data={value.data}
         />
       )))}
@@ -41,6 +42,7 @@ const NumberCardsRow = ({ data }) => {
             cardTitle={value.title}
             cardNumber={value.number}
             cardSubtitle={value.subtitle}
+            cardLink={value.link}
           />
         ))}
       </div>

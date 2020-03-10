@@ -34,6 +34,10 @@
     flex-direction: row;
     flex-wrap: wrap;
 
+    a:hover {
+      text-decoration: none;
+    }
+
     .numberCard {
       position: relative;
       width: 47.5%;
