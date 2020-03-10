@@ -17,7 +17,7 @@ NumberDataService numberDataService = new NumberDataService();
 IndicatorDataService indicatorDataService = new IndicatorDataService();
 
 def getNumberData = {
-    render  numberDataService.getListNumberData(session?.user, location) as JSON;
+    render  numberDataService.getListNumberData(session.user, location) as JSON;
 }
 
 def getExpirationSummary = {
