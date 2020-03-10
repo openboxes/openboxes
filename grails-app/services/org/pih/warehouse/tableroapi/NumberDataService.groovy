@@ -23,7 +23,7 @@ List<NumberData> getListNumberData(def user, def location){
     List<NumberData> numberDataList = [
         new NumberData("Bin Location Summary", binLocationData[0]["count"], binLocationData[0]["label"], 1),
         new NumberData("Bin Location Summary", binLocationData[1]["count"], binLocationData[1]["label"], 2),
-        new NumberData("Stock Movements", shipments[0], "Not shipped", 3, "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id),
+        new NumberData("Your shipments", shipments[0], "In Progress", 3, "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id),
         new NumberData("User Incomplete Tasks", pending[0][0], "Not shiped", 4),
         new NumberData("User Incomplete Tasks",notCompleted[0][0], "Not completed", 5),
         new NumberData("Discrepancy",discrepancy[0][0], "Items received", 6)
