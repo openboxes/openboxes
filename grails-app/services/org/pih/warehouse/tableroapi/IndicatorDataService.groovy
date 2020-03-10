@@ -177,13 +177,13 @@ NumberIndicator getOutgoingStock(def location){
     m4.clearTime();
     m7.clearTime();
 
-    def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :day and r.origin = :location""", 
+    def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated > :day and r.origin = :location and r.status <> 'ISSUED'""", 
     ['day': m4, 'location': location]);
     
-    def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated < :dayTwo and r.origin = :location""",
+    def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated <= :dayTwo and r.origin = :location and r.status <> 'ISSUED'""",
     ['dayOne': m7, 'dayTwo': m4, 'location': location]);
 
-    def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.origin = :location""", // + than 7 days untill when? getting too old data
+    def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.origin = :location and r.status <> 'ISSUED'""", 
     ['day': m7, 'location': location]);
 
     ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago');
