@@ -320,8 +320,6 @@ class EditItemsPage extends Component {
       }, () => {
         if (!this.props.isPaginated) {
           this.fetchItems();
-        } else {
-          this.props.hideSpinner();
         }
       });
     }).catch(() => {
