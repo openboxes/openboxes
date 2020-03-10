@@ -2,6 +2,9 @@ import React from 'react';
 import ReactLoading from 'react-loading';
 import { loadColors } from '../../../assets/dataFormat/dataLoading';
 
+function truncateString(value, length) {
+  return (value.length > length) ? `${value.substr(0, length - 1)}...` : value;
+}
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
@@ -71,7 +74,7 @@ const ArchivedIndicators = (props) => {
         <div className="row">
           <div className="col col-3 graph-preview">{graph}</div>
           <div className="col col-6">
-            <span>{props.title}</span>
+            <span>{truncateString(props.title, 25)}</span>
           </div>
           <div className="col col-3">
             <span
