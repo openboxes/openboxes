@@ -248,7 +248,7 @@ class SelectTagLib {
     def selectCurrency = { attrs, body ->
         println "attrs: ${attrs}"
         UnitOfMeasureClass currencyClass = UnitOfMeasureClass.findByType(UnitOfMeasureType.CURRENCY)
-        attrs.from = UnitOfMeasure.findAllByUomClass(currencyClass)
+        attrs.from = currencyClass ? UnitOfMeasure.findAllByUomClass(currencyClass) : []
         attrs.optionKey = 'code'
         attrs.value = attrs.value ?: currencyClass?.baseUom?.code
         attrs.optionValue = { it.name + " " + it.code }

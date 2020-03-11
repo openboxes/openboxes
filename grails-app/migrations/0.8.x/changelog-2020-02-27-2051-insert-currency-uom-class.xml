@@ -50,4 +50,11 @@
             <where>id='CURRENCY'</where>
         </update>
     </changeSet>
+    <changeSet author="jmiranda" id="1582858163230-5">
+        <update tableName="unit_of_measure_class">
+            <column name="type" value="CURRENCY" />
+            <where>id='CURRENCY'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>
