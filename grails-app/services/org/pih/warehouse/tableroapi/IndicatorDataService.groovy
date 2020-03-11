@@ -107,22 +107,38 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    DataGraph getSentStockMovements(def location) {
+DataGraph getSentStockMovements(def location, def params){
+    Integer querySize = params.querySize? params.querySize.toInteger() : 5
+    List allLocations = dataService.executeQuery("select id from openboxes.location")
+    List listDatasets = []
+    List listLabel = []
+    // Query data for all locations
+    for(item in allLocations){
         List listData = []
-        List listLabel = []
-        today.clearTime()
-        for(int i=5;i>=0;i--){
-            def monthBegin = today.clone()
-            def monthEnd = today.clone()
-            monthBegin.set(month: today.month - i, date: 1)
-            monthEnd.set(month: today.month - i + 1, date: 1)
-                
-            def temp = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :monthOne and r.dateCreated < :monthTwo and r.origin = :location""",
-                ['monthOne': monthBegin, 'monthTwo': monthEnd, 'location': location]);
-            String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
+        listLabel = []
+        try{
+            List locationName = dataService.executeQuery("select name from location where id="+item[0].value)
+            // querySize is the quantity of months in the filter : until which month query data
+            for(int i=querySize;i>=0;i--){
+                // using TimeCategory to calculate i months (i.months = i months)
+                use(TimeCategory) { 
+                    def monthBegin = today + 1 - today.date - i.months
+                    def monthEnd = today + 1 - today.date - (i-1).months
+                    monthBegin.clearTime()
+                    monthEnd.clearTime()
 
-            listLabel.push(monthLabel)
-            listData.push(temp[0])
+                    def query = Shipment.executeQuery("select count(*) from Shipment s where s.lastUpdated >= :monthOne and s.lastUpdated < :monthTwo and s.origin = "+ item[0].value +" and s.currentStatus <> 'PENDING'", 
+                    // The column transaction_transaction_date doesn't exist, using lastUpdated instead
+                    ['monthOne': monthBegin, 'monthTwo': monthEnd]);
+                    String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month].substring(0,3)
+
+                    listLabel.push(monthLabel)
+                    listData.push(query[0])
+                }
+            }
+            listDatasets.push(new IndicatorDatasets(locationName[0].name, listData))
+        }catch(err){
+            println "Query error : " + err
         }
 
         List<IndicatorDatasets> datasets = [
