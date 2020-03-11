@@ -16,6 +16,17 @@ const GraphCard = SortableElement(({
 }) => {
   const cardData = data;
   let graph;
+  let filter = 0;
+  const stackedBar = {
+    scales: {
+      xAxes: [{
+        stacked: true
+      }],
+      yAxes: [{
+        stacked: true
+      }]
+    }
+  }
   if (cardType === 'line') {
     cardData.datasets = loadColors(data, 'line');
     graph = <Line data={data} />;
@@ -48,7 +59,20 @@ const GraphCard = SortableElement(({
         }
         <DragHandle />
       </div>
-      <div className="contentCard">{graph}</div>
+      <div className="contentCard">
+        <div className="dataFilter">
+          <select
+            className={filter ? "customSelect" : "customSelect disabled"}
+            onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, "querySize=" + e.target.value)}
+            disabled={!filter}
+          >
+            <option value="6">Last 6 Months</option>
+            <option value="12">Last Year</option>
+            <option value="24">Last 2 Years</option>
+          </select>
+        </div>
+        {graph}
+      </div>
     </div>
   );
 });

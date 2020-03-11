@@ -117,6 +117,7 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
     type: FETCH_INDICATORS,
     payload: {
       id,
+      method: indicatorMethod,
       title: indicatorTitle,
       type: 'loading',
       data: [],
@@ -130,6 +131,7 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
       type: FETCH_INDICATORS,
       payload: {
         id,
+        method: indicatorMethod,
         title: indicatorTitle,
         type: indicatorType,
         data: res.data,
@@ -142,6 +144,7 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
       type: FETCH_INDICATORS,
       payload: {
         id,
+        method: indicatorMethod,
         title: indicatorTitle,
         type: 'error',
         data: [],
@@ -150,6 +153,12 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
       },
     });
   });
+}
+
+export function reloadIndicator(method, type, title, link, id, params) {
+  return (dispatch) => {
+    fetchIndicator(dispatch, method, type, title, link, id, params);
+  };
 }
 
 export function fetchIndicators() {
