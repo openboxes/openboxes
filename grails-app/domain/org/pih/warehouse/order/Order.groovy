@@ -24,8 +24,12 @@ class Order implements Serializable {
     Location origin            // the vendor
     Location destination    // the customer location
     Person recipient
+
+    Person approvedBy
     Person orderedBy
     Person completedBy
+
+    Date dateApproved
     Date dateOrdered
     Date dateCompleted
 
@@ -40,7 +44,14 @@ class Order implements Serializable {
     Date dateCreated
     Date lastUpdated
 
-    static transients = ["totalAdjustments", "totalOrderAdjustments", "totalOrderItemAdjustments", "subtotal", "total"]
+    static transients = [
+            "isApprovalRequired",
+            "subtotal",
+            "totalAdjustments",
+            "totalOrderAdjustments",
+            "totalOrderItemAdjustments",
+            "total"
+    ]
 
     static hasMany = [
             orderItems: OrderItem,
@@ -71,6 +82,8 @@ class Order implements Serializable {
         recipient(nullable: true)
         orderedBy(nullable: false)
         dateOrdered(nullable: true)
+        approvedBy(nullable: true)
+        dateApproved(nullable: true)
         completedBy(nullable: true)
         dateCompleted(nullable: true)
         paymentMethodType(nullable: true)
@@ -85,7 +98,6 @@ class Order implements Serializable {
     OrderStatus getStatus() {
         return status
     }
-
 
     /**
      * Checks to see if this order has been received, or partially received, and
@@ -106,6 +118,13 @@ class Order implements Serializable {
 
         return status
     }
+
+    Boolean getIsApprovalRequired() {
+        BigDecimal minimumAmount = ConfigurationHolder.config.openboxes.purchasing.approval.minimumAmount
+        return (origin?.supports([ActivityCode.APPROVE_ORDER]) ||
+                destination?.supports(ActivityCode.APPROVE_ORDER)) && total > minimumAmount
+    }
+
 
     /**
      * @return a boolean indicating whether the order is pending
