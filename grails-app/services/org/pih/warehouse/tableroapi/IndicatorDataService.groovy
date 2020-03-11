@@ -12,7 +12,7 @@ class IndicatorDataService {
 
     Date today = new Date()
 
-    DataGraph getExpirationSummaryData(def expirationData){
+    DataGraph getExpirationSummaryData(def expirationData) {
         List listData = []
         for(item in expirationData){
             def tmp = item.value? item.value : 0
@@ -69,7 +69,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    DataGraph getInventorySummaryData(def results){
+    DataGraph getInventorySummaryData(def results) {
         def inStockCount = results.findAll {
             it.quantityOnHand > 0
         }.size()
@@ -112,7 +112,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    DataGraph getSentStockMovements(def location){
+    DataGraph getSentStockMovements(def location) {
         List listData = []
         List listLabel = []
         for(int i=5;i>=0;i--){
@@ -142,7 +142,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    DataGraph getReceivedStockData(def location){
+    DataGraph getReceivedStockData(def location) {
         List listData = []
         List listLabel = []
         for(int i=5;i>=0;i--){
@@ -172,7 +172,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    NumberIndicator getOutgoingStock(def location){
+    NumberIndicator getOutgoingStock(def location) {
         def m4 = today - 4;
         def m7 = today - 7;
         m4.clearTime();
@@ -196,7 +196,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    NumberIndicator getIncomingStock(def location){
+    NumberIndicator getIncomingStock(def location) {
         def m4 = today - 4;
         def m7 = today - 7;
         m4.clearTime();
