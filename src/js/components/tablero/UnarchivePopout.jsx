@@ -1,33 +1,17 @@
 import React from 'react';
 import ReactLoading from 'react-loading';
-import { loadColors } from '../../../assets/dataFormat/dataLoading';
+import { loadColors } from '../../consts/dataFormat/dataLoading';
+import { getColor } from '../../consts/dataFormat/chartColors';
 
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
 const Numbers = () => {
   const colors = ['green', 'yellow', 'red'];
-  const classColor = `circle ${colors[getRandomInt(0, colors.length)]}`;
+  const classColor = `circle ${colors[_.random(0, colors.length - 1)]}`;
 
   return (
     <div className="value">
-      <div className={classColor} /> {getRandomInt(3, 95)}
+      <div className={classColor} /> {_.random(3, 95)}
     </div>
   );
-};
-
-const getColor = () => {
-  const colors = [
-    '#6fb98f',
-    '#004445',
-    '#2e5685',
-    '#fcc169',
-    '#cf455c',
-    '#e89da2',
-    '#e0b623',
-    '#444444',
-  ];
-  return colors[getRandomInt(0, colors.length)];
 };
 
 const ArchivedIndicators = (props) => {

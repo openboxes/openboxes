@@ -3,8 +3,7 @@ import React from 'react';
 import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 import LoadingCard from './LoadingCard';
-
-import { loadColors } from '../../../assets/dataFormat/dataLoading';
+import { loadColors } from '../../consts/dataFormat/dataLoading';
 
 const Numbers = ({ data }) => (
   <div className="gyrIndicator">

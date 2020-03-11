@@ -56,10 +56,10 @@ class IndicatorDataService {
         }
         
         List<IndicatorDatasets> datasets = [
-            new IndicatorDatasets('Line1 Dataset', listData),
-            new IndicatorDatasets('Line2 Dataset', [15, 15, 15, 15, 15, 15, 15]),
-            new IndicatorDatasets('Bar1 Dataset', listData, 'bar'),
-            new IndicatorDatasets('Bar2 Dataset', bar2Data, 'bar'),
+            new IndicatorDatasets('Line1 Dataset', listData, 'line'),
+            new IndicatorDatasets('Line2 Dataset', [15, 15, 15, 15, 15, 15], 'line'),
+            new IndicatorDatasets('Bar1 Dataset', listData),
+            new IndicatorDatasets('Bar2 Dataset', bar2Data),
         ];
 
         IndicatorData data = new IndicatorData(datasets, listLabel);
