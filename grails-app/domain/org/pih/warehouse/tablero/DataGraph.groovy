@@ -11,8 +11,7 @@ class DataGraph implements Serializable {
      Boolean archived;
      Integer id;
 
-    DataGraph(IndicatorData data, Integer id, Boolean archived = 0 ,String title, String type)
-    {
+    DataGraph(IndicatorData data, Integer id, Boolean archived = 0 ,String title, String type) {
         this.title = title;
         this.type = type;
         this.id = id;
