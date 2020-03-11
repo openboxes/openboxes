@@ -331,7 +331,12 @@ class StockMovementService {
             order("dateCreated", "desc")
         }
         def stockMovements = shipments.collect { Shipment shipment ->
-            return StockMovement.createFromShipment(shipment)
+            if (shipment.requisition) {
+                return StockMovement.createFromRequisition(shipment.requisition)
+            }
+            else {
+                return StockMovement.createFromShipment(shipment)
+            }
         }
         return new PagedResultList(stockMovements, shipments.totalCount)
     }
@@ -417,12 +422,12 @@ class StockMovementService {
     }
 
     StockMovement getStockMovement(String id, String stepNumber) {
-        Shipment shipment = Shipment.get(id)
         Requisition requisition = Requisition.get(id)
+        Shipment shipment = Shipment.get(id)
         if (requisition) {
-            return getOutboundStockMovement(requisition)
+            return getStockMovement(requisition, stepNumber)
         } else if (shipment) {
-            return getInboundStockMovement(shipment)
+            return getStockMovement(shipment)
         }
         else {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
@@ -430,13 +435,18 @@ class StockMovementService {
     }
 
 
-    StockMovement getInboundStockMovement(Shipment shipment) {
+    StockMovement getStockMovement(Shipment shipment) {
         StockMovement stockMovement = StockMovement.createFromShipment(shipment)
         stockMovement.documents = getDocuments(stockMovement)
         return stockMovement
     }
 
-    StockMovement getOutboundStockMovement(Requisition requisition, String stepNumber) {
+
+    StockMovement getStockMovement(Requisition requisition) {
+        return getStockMovement(requisition, null)
+    }
+
+    StockMovement getStockMovement(Requisition requisition, String stepNumber) {
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
         stockMovement.documents = getDocuments(stockMovement)
         if (stepNumber.equals("3")) {
