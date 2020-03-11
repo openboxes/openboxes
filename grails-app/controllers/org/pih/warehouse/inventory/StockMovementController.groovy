@@ -203,11 +203,10 @@ class StockMovementController {
         }
         else {
             flash.error = "You are not able to delete stock movement from your location."
-        }
-
-        if (params.show) {
-            redirect(action: "show", id: params.id)
-            return
+            if (params.show) {
+                redirect(action: "show", id: params.id)
+                return
+            }
         }
 
         redirect(action: "list")
