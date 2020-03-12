@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import { SortableContainer } from 'react-sortable-hoc';
@@ -11,9 +12,10 @@ import NumberCard from './NumberCard';
 import './tablero.scss';
 import UnarchiveIndicator from './UnarchivePopout';
 
+
 // Disable charts legends by default.
 defaults.global.legend = false;
-Chart.defaults.scale.ticks.beginAtZero = true;
+defaults.scale.ticks.beginAtZero = true;
 
 const SortableCards = SortableContainer(({ data }) => (
   <div className="cardComponent">
@@ -47,12 +49,12 @@ const NumberCardsRow = ({ data }) => {
         ))}
       </div>
     );
-  } else {
-    return (
-      <LoadingNumbers />
-    );
   }
+  return (
+    <LoadingNumbers />
+  );
 };
+
 
 const ArchiveIndicator = ({ hideArchive }) => (
   <div className={hideArchive ? 'archiveDiv hideArchive' : 'archiveDiv'}>
@@ -61,6 +63,7 @@ const ArchiveIndicator = ({ hideArchive }) => (
     </span>
   </div>
 );
+
 
 class Tablero extends Component {
   state = {
@@ -78,8 +81,8 @@ class Tablero extends Component {
   }
 
   fetchNumbersData() {
-    const url = "/openboxes/apitablero/getNumberData";
-    apiClient.get(url).then(res => {
+    const url = '/openboxes/apitablero/getNumberData';
+    apiClient.get(url).then((res) => {
       this.setState({ numberData: res.data });
     });
   }
@@ -98,16 +101,16 @@ class Tablero extends Component {
   };
 
   unarchiveHandler = () => {
-    this.props.indicatorsData.filter(data => data.archived).length
-      ? this.setState({ showPopout: !this.state.showPopout })
-      : this.setState({ showPopout: false });
+    const size = this.props.indicatorsData.filter(data => data.archived).length;
+    if (size) this.setState({ showPopout: !this.state.showPopout });
+    else this.setState({ showPopout: false });
   };
 
   handleAdd = (index) => {
     this.props.addToIndicators(index);
-    this.props.indicatorsData.filter(data => data.archived).length
-      ? this.setState({ showPopout: true })
-      : this.setState({ showPopout: false });
+    const size = this.props.indicatorsData.filter(data => data.archived).length - 1;
+    if (size) this.setState({ showPopout: true });
+    else this.setState({ showPopout: false });
   };
 
   render() {
@@ -134,7 +137,7 @@ class Tablero extends Component {
 }
 
 const mapStateToProps = state => ({
-  indicatorsData: state.indicators.data
+  indicatorsData: state.indicators.data,
 });
 
 export default connect(mapStateToProps, {
@@ -142,3 +145,26 @@ export default connect(mapStateToProps, {
   addToIndicators,
   reorderIndicators,
 })(Tablero);
+
+Tablero.defaultProps = {
+  indicatorsData: null,
+};
+
+Tablero.propTypes = {
+  fetchIndicators: PropTypes.func.isRequired,
+  reorderIndicators: PropTypes.func.isRequired,
+  indicatorsData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  addToIndicators: PropTypes.func.isRequired,
+};
+
+NumberCardsRow.defaultProps = {
+  data: null,
+};
+
+NumberCardsRow.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.shape({})),
+};
+
+ArchiveIndicator.propTypes = {
+  hideArchive: PropTypes.bool.isRequired,
+};

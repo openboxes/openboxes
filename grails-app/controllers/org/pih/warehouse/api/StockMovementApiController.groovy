@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.apache.commons.lang.math.NumberUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
@@ -46,13 +47,25 @@ class StockMovementApiController {
     }
 
     def read = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, params.stepNumber)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        String stepNumber = params.stepNumber
+        def totalCount = stockMovement.lineItems.size()
+
+        if (params.stepNumber == "4") {
+            totalCount = stockMovementService.getPickPageItems(params.id, null, null).size()
+        }
+        if (params.stepNumber == "5") {
+            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
+        }
+        if (params.stepNumber == "6" && !stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
+        }
 
         // FIXME Debugging
         JSONObject jsonObject = new JSONObject(stockMovement.toJson())
 
         log.debug "read " + jsonObject.toString(4)
-        render([data: stockMovement] as JSON)
+        render([data: stockMovement, totalCount: totalCount] as JSON)
     }
 
     def create = { StockMovement stockMovement ->
@@ -215,11 +228,11 @@ class StockMovementApiController {
         JSONObject jsonObject = request.JSON
         log.debug "revise items: " + jsonObject.toString(4)
 
-        bindStockMovement(stockMovement, jsonObject)
+        def packPageItems = createPackPageItemsFromJson(stockMovement, jsonObject.packPageItems)
 
-        stockMovement = stockMovementService.updatePackPageItems(stockMovement)
+        stockMovementService.updatePackPageItems(packPageItems)
 
-        render([data: stockMovement] as JSON)
+        render([data: stockMovementService.getPackPageItems(stockMovement.id, null, null)] as JSON)
     }
 
     def updateAdjustedItems = {
@@ -227,15 +240,14 @@ class StockMovementApiController {
 
         stockMovementService.updateAdjustedItems(stockMovement, params.adjustedProduct)
 
-        stockMovement = stockMovementService.getStockMovement(params.id, "4")
+        stockMovement = stockMovementService.getStockMovement(params.id)
 
         render([data: stockMovement] as JSON)
     }
 
     def exportPickListItems = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, "4")
-
-        List<PicklistItem> picklistItems = stockMovement?.pickPage?.pickPageItems?.inject([]) { result, pickPageItem ->
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
+        List<PicklistItem> picklistItems = pickPageItems.inject([]) { result, pickPageItem ->
             result.addAll(pickPageItem.picklistItems)
             result
         }
@@ -261,7 +273,8 @@ class StockMovementApiController {
     def importPickListItems = { ImportDataCommand command ->
 
         try {
-            StockMovement stockMovement = stockMovementService.getStockMovement(params.id, "4")
+            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+            List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
 
             def importFile = command.importFile
             if (importFile.isEmpty()) {
@@ -290,7 +303,7 @@ class StockMovementApiController {
                             "Please reformat field with Lot Number: \"${lotNumber}\" to a number format")
                 }
 
-                PickPageItem pickPageItem = stockMovement?.pickPage?.pickPageItems?.find {
+                PickPageItem pickPageItem = pickPageItems.find {
                     it.requisitionItem?.id == requisitionItemId
                 }
 
@@ -325,7 +338,7 @@ class StockMovementApiController {
                 ))
             }
 
-            stockMovementService.createOrUpdatePicklistItem(stockMovement)
+            stockMovementService.createOrUpdatePicklistItem(stockMovement, pickPageItems)
 
         } catch (Exception e) {
             // FIXME The global error handler does not return JSON for multipart uploads
@@ -386,7 +399,7 @@ class StockMovementApiController {
         }
 
         if (packPageItems) {
-            bindPackPage(stockMovement, packPageItems)
+            createPackPageItemsFromJson(stockMovement, packPageItems)
         }
     }
 
@@ -469,12 +482,6 @@ class StockMovementApiController {
         return stockMovementItems
     }
 
-    void bindPackPage(StockMovement stockMovement, List lineItems) {
-        log.debug "line items: " + lineItems
-        List<PackPageItem> packPageItems = createPackPageItemsFromJson(stockMovement, lineItems)
-        PackPage packPage = new PackPage(packPageItems: packPageItems)
-        stockMovement.packPage = packPage
-    }
 
     List<PackPageItem> createPackPageItemsFromJson(StockMovement stockMovement, List lineItems) {
         List<PackPageItem> packPageItems = new ArrayList<PackPageItem>()

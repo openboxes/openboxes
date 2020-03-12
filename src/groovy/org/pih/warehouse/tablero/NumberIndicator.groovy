@@ -8,8 +8,7 @@ class NumberIndicator implements Serializable {
     ColorNumber yellow;
     ColorNumber red;
 
-    NumberIndicator(ColorNumber green, ColorNumber yellow, ColorNumber red)
-    {
+    NumberIndicator(ColorNumber green, ColorNumber yellow, ColorNumber red) {
         this.green = green;
         this.yellow = yellow;
         this.red = red;

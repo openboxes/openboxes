@@ -85,6 +85,6 @@
 		</button>
 		&nbsp;
 
-		<a href="#" class="close-dialog" dialog-id="package-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
+		<a href="#" class="btn-close-dialog" data-target="package-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
 	</div>
 </g:form>

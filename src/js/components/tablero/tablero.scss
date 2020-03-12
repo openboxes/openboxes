@@ -278,8 +278,8 @@
     position: absolute;
     background-color: #fbfbfb;
 
-    transition-property: transform, opacity, left;
-    transition-duration: 300ms;
+    transition-property: transform, opacity;
+    transition-duration: 80ms;
     transition-timing-function: ease-in-out;
 
     transform: scale(.9);

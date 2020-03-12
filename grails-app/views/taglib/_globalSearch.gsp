@@ -4,10 +4,7 @@
             placeholder="${warehouse.message(code:'globalSearch.placeholder.label')}"
 			value="${attrs.value}"/>
 		<g:hiddenField name="resetSearch" value="${true }"/>
-		<g:hiddenField name="categoryId" value="${session?.rootCategory?.id }"/>
 		<g:hiddenField name="searchPerformed" value="${true }"/>
-		<g:hiddenField name="showHiddenProducts" value="on"/>
-		<g:hiddenField name="showOutOfStockProducts" value="on"/>
 	</g:form>
 </span>
 <script>

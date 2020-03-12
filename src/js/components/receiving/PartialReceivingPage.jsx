@@ -20,30 +20,30 @@ import Translate from '../../utils/Translate';
 import apiClient, { flattenRequest } from '../../utils/apiClient';
 
 const isReceived = (subfield, fieldValue) => {
-  if (subfield) {
+  if (fieldValue && subfield) {
     return (_.toInteger(fieldValue.quantityReceived) + _.toInteger(fieldValue.quantityCanceled)) >=
       _.toInteger(fieldValue.quantityShipped);
   }
 
-  if (!fieldValue.shipmentItems) {
+  if (fieldValue && !fieldValue.shipmentItems) {
     return true;
   }
 
-  return _.every(fieldValue.shipmentItems, item =>
+  return _.every(fieldValue && fieldValue.shipmentItems, item =>
     _.toInteger(item.quantityReceived) >= _.toInteger(item.quantityShipped));
 };
 
 const isReceiving = (subfield, fieldValue) => {
   if (subfield) {
-    return !_.isNil(fieldValue.quantityReceiving) && fieldValue.quantityReceiving !== '';
+    return fieldValue && !_.isNil(fieldValue.quantityReceiving) && fieldValue.quantityReceiving !== '';
   }
 
   if (!fieldValue.shipmentItems) {
     return false;
   }
 
-  return _.every(fieldValue.shipmentItems, item => (!_.isNil(item.quantityReceiving) && item.quantityReceiving !== '') || isReceived(true, item))
-    && _.some(fieldValue.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '');
+  return _.every(fieldValue && fieldValue.shipmentItems, item => (!_.isNil(item.quantityReceiving) && item.quantityReceiving !== '') || isReceived(true, item))
+    && _.some(fieldValue && fieldValue.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '');
 };
 
 const isIndeterminate = (subfield, fieldValue) => {
@@ -51,12 +51,12 @@ const isIndeterminate = (subfield, fieldValue) => {
     return false;
   }
 
-  if (!fieldValue.shipmentItems) {
+  if (fieldValue && !fieldValue.shipmentItems) {
     return false;
   }
 
-  return _.some(fieldValue.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '')
-    && _.some(fieldValue.shipmentItems, item => (_.isNil(item.quantityReceiving) || item.quantityReceiving === '') && !isReceived(true, item));
+  return _.some(fieldValue && fieldValue.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '')
+    && _.some(fieldValue && fieldValue.shipmentItems, item => (_.isNil(item.quantityReceiving) || item.quantityReceiving === '') && !isReceived(true, item));
 };
 
 const isAnyItemSelected = (containers) => {
@@ -248,7 +248,6 @@ const FIELDS = {
             />),
         fieldKey: '',
         flexWidth: '1.7',
-        hide: ({ hasBinLocationSupport }) => !hasBinLocationSupport,
         label: 'react.partialReceiving.binLocation.label',
         defaultMessage: 'Bin Location',
         getDynamicAttr: ({
@@ -256,6 +255,7 @@ const FIELDS = {
         }) => ({
           options: bins,
           disabled: !hasBinLocationSupport || shipmentReceived || isReceived(true, fieldValue),
+          hide: !hasBinLocationSupport,
         }),
         attributes: {
           objectValue: true,
@@ -297,14 +297,15 @@ const FIELDS = {
         flexWidth: '0.8',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue, shipmentReceived }) => ({
-          className: _.toInteger(fieldValue.quantityRemaining) < 0 && !shipmentReceived
+          className: _.toInteger(fieldValue &&
+            fieldValue.quantityRemaining) < 0 && !shipmentReceived
             && !isReceived(true, fieldValue) ? 'text-danger' : '',
           formatValue: (val) => {
             if (!val.quantityRemaining) {
               return val.quantityRemaining;
             }
 
-            if (_.toInteger(fieldValue.quantityRemaining) < 0
+            if (_.toInteger(fieldValue && fieldValue.quantityRemaining) < 0
               && (shipmentReceived || isReceived(true, fieldValue))) {
               return '0';
             }

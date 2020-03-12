@@ -471,33 +471,37 @@
     <script src="${createLinkTo(dir:'js/jquery.scannerdetection', file:'jquery.scannerdetection.js')}" type="text/javascript" ></script>
     <script>
         $(document).ready(function() {
-            var scanner = $("body").scannerDetection();
-            scanner.bind('scannerDetectionComplete',function(event,data){
-                console.log("scanner detected", data, event);
-                var barcode = data.string;
-                $.ajax({
-                    dataType: "json",
-                    url: "${request.contextPath}/json/scanBarcode?barcode=" + barcode,
-                    success: function (data) {
-                        console.log(data);
-                        if (data.url) {
-                            window.location.replace(data.url);
-                        }
-                        else {
-                            // Perform global search after short delay
-                            $("#globalSearch").notify("Unable to locate object with barcode " + barcode + ". Attempting to search inventory ...", {className: "info"});
-                            setTimeout( function () {
-                                $("#globalSearch").val(barcode).closest("form").submit();
-                            }, 1000);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(status);
-                    }
-                });
+          var scanner = $(document).scannerDetection({ ignoreIfFocusOn: ':input' });
+          scanner.bind('scannerDetectionComplete', function (event, data) {
+            console.log("scanner detected", data, event);
+            var barcode = data.string;
+            $.ajax({
+              dataType: "json",
+              url: "${request.contextPath}/json/scanBarcode?barcode=" + barcode,
+              success: function (data) {
+                console.log(data);
+                if (data.url) {
+                  window.location.replace(data.url);
+                } else {
+                  // Perform global search after short delay
+                  $("#globalSearch")
+                  .notify("Unable to locate object with barcode " + barcode
+                    + ". Attempting to search inventory ...", { className: "info" });
+                  setTimeout(function () {
+                    $("#globalSearch")
+                    .val(barcode)
+                    .closest("form")
+                    .submit();
+                  }, 1000);
+                }
+              },
+              error: function (xhr, status, error) {
+                console.log(status);
+              }
             });
-
-            scanner.bind('scannerDetectionError',function(event,data){});
+          });
+          scanner.bind('scannerDetectionError', function (event, data) {
+          });
         });
     </script>
 </g:if>

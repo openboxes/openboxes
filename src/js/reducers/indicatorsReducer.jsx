@@ -1,4 +1,5 @@
 import { arrayMove } from 'react-sortable-hoc';
+import update from 'immutability-helper';
 import {
   ADD_TO_INDICATORS,
   FETCH_INDICATORS,
@@ -7,14 +8,12 @@ import {
 } from '../actions/types';
 
 function arrayArchive(array, index) {
-  const newArray = array;
-  newArray[index].archived = 1;
+  const newArray = update(array, { [index]: { archived: { $set: 1 } } });
   return newArray;
 }
 
 function arrayUnarchive(array, index) {
-  const newArray = array;
-  newArray[index].archived = 0;
+  const newArray = update(array, { [index]: { archived: { $set: 0 } } });
   return newArray;
 }
 
