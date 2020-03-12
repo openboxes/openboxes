@@ -32,6 +32,11 @@ const AsyncManagement = Loadable({
   loading: Loading,
 });
 
+const AsyncTablero = Loadable({
+  loader: () => import('./tablero/Tablero'),
+  loading: Loading,
+});
+
 const Router = props => (
   <div>
     <BrowserRouter>
@@ -40,6 +45,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
         <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
         <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
+        <MainLayoutRoute path="/**/tablero/" component={AsyncTablero} />
       </Switch>
     </BrowserRouter>
     <div className="spinner-container">

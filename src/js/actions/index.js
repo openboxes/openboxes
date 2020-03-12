@@ -9,9 +9,12 @@ import {
   CHANGE_CURRENT_LOCATION,
   TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
+  FETCH_INDICATORS,
+  ADD_TO_INDICATORS,
+  REMOVE_FROM_INDICATORS,
+  REORDER_INDICATORS,
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
-
 
 export function showSpinner() {
   return {
@@ -61,31 +64,30 @@ export function changeCurrentLocation(location) {
   return (dispatch) => {
     const url = `/openboxes/api/chooseLocation/${location.id}`;
 
-    apiClient.put(url)
-      .then(() => {
-        dispatch({
-          type: CHANGE_CURRENT_LOCATION,
-          payload: location,
-        });
+    apiClient.put(url).then(() => {
+      dispatch({
+        type: CHANGE_CURRENT_LOCATION,
+        payload: location,
       });
+    });
   };
 }
 
 export function fetchTranslations(lang, prefix) {
   return (dispatch) => {
-    const url = `/openboxes/api/localizations?lang=${lang || ''}&prefix=react.${prefix || ''}`;
+    const url = `/openboxes/api/localizations?lang=${lang ||
+      ''}&prefix=react.${prefix || ''}`;
 
-    apiClient.get(url)
-      .then((response) => {
-        const { messages, currentLocale } = parseResponse(response.data);
+    apiClient.get(url).then((response) => {
+      const { messages, currentLocale } = parseResponse(response.data);
 
-        dispatch(addTranslationForLanguage(messages, currentLocale));
+      dispatch(addTranslationForLanguage(messages, currentLocale));
 
-        dispatch({
-          type: TRANSLATIONS_FETCHED,
-          payload: prefix,
-        });
+      dispatch({
+        type: TRANSLATIONS_FETCHED,
+        payload: prefix,
       });
+    });
   };
 }
 
@@ -93,12 +95,90 @@ export function changeCurrentLocale(locale) {
   return (dispatch) => {
     const url = `/openboxes/api/chooseLocale/${locale}`;
 
-    apiClient.put(url)
-      .then(() => {
-        dispatch({
-          type: CHANGE_CURRENT_LOCALE,
-          payload: locale,
-        });
+    apiClient.put(url).then(() => {
+      dispatch({
+        type: CHANGE_CURRENT_LOCALE,
+        payload: locale,
       });
+    });
+  };
+}
+
+// New Dashboard
+
+// eslint-disable-next-line max-len
+function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle, link = null, indicatorId = null) {
+  const archived = 0;
+  const id = indicatorId || Math.random();
+
+  const url = `/openboxes/apitablero/${indicatorMethod}`;
+
+  dispatch({
+    type: FETCH_INDICATORS,
+    payload: {
+      id,
+      title: indicatorTitle,
+      type: 'loading',
+      data: [],
+      archived,
+      link,
+    },
+  });
+
+  apiClient.get(url).then((res) => {
+    dispatch({
+      type: FETCH_INDICATORS,
+      payload: {
+        id,
+        title: indicatorTitle,
+        type: indicatorType,
+        data: res.data,
+        archived,
+        link,
+      },
+    });
+  }, () => {
+    dispatch({
+      type: FETCH_INDICATORS,
+      payload: {
+        id,
+        title: indicatorTitle,
+        type: 'error',
+        data: [],
+        archived,
+        link,
+      },
+    });
+  });
+}
+
+export function fetchIndicators() {
+  return (dispatch) => {
+    fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary');
+    fetchIndicator(dispatch, 'getFillRate', 'bar', 'Fill Rate');
+    fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
+    fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Sent Stock Movements');
+    fetchIndicator(dispatch, 'getReceivedStockMovements', 'doughnut', 'Stock Movements Received');
+    fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements');
+  };
+}
+
+export function addToIndicators(index) {
+  return {
+    type: ADD_TO_INDICATORS,
+    payload: { index },
+  };
+}
+
+export function reorderIndicators({ oldIndex, newIndex }, e) {
+  if (e.target.id === 'archive') {
+    return {
+      type: REMOVE_FROM_INDICATORS,
+      payload: { index: oldIndex },
+    };
+  }
+  return {
+    type: REORDER_INDICATORS,
+    payload: { oldIndex, newIndex },
   };
 }
