@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { AutoSizer, List } from 'react-virtualized';
+import { AutoSizer, InfiniteLoader, List } from 'react-virtualized';
 
 import TableRow from './TableRow';
 
@@ -10,6 +10,13 @@ class TableBodyVirtualized extends Component {
 
     this.rowRenderer = this.rowRenderer.bind(this);
     this.getRowHeight = this.getRowHeight.bind(this);
+    this.bindListRef = this.bindListRef.bind(this);
+  }
+
+  componentDidUpdate() {
+    if (this.list) {
+      this.list.recomputeRowHeights();
+    }
   }
 
   getRowHeight({ index }) {
@@ -19,8 +26,8 @@ class TableBodyVirtualized extends Component {
       return 28;
     }
 
-    const rowValues = fields.value[index];
-    const subfields = rowValues[subfieldKey];
+    const rowValues = fields.value ? fields.value[index] : null;
+    const subfields = rowValues ? rowValues[subfieldKey] : null;
 
     if (!subfields) {
       return 28;
@@ -45,44 +52,68 @@ class TableBodyVirtualized extends Component {
     } = this.props;
     const field = `${fields.name}[${index}]`;
     const RowComponent = fieldsConfig.rowComponent || TableRow;
+    const { totalCount } = properties;
 
+
+    if (fields.value[index]) {
+      return (
+        <div key={key} style={style}>
+          <RowComponent
+            field={field}
+            index={index}
+            properties={{
+              ...properties,
+              rowCount: totalCount || 50,
+            }}
+            addRow={addRow}
+            fieldsConfig={fieldsConfig}
+            removeRow={() => fields.remove(index)}
+            rowValues={fields.value[index]}
+            rowRef={(el, fieldName) => tableRef(el, fieldName, index)}
+          />
+        </div>
+      );
+    }
     return (
       <div key={key} style={style}>
-        <RowComponent
-          field={field}
-          index={index}
-          properties={{
-            ...properties,
-            rowCount: fields.length || 0,
-          }}
-          addRow={addRow}
-          fieldsConfig={fieldsConfig}
-          removeRow={() => fields.remove(index)}
-          rowValues={fields.value[index]}
-          rowRef={(el, fieldName) => tableRef(el, fieldName, index)}
-        />
+        Loading...
       </div>
     );
   }
 
+  bindListRef(ref) {
+    this.list = ref;
+  }
+
   render() {
-    const { fields } = this.props;
+    // eslint-disable-next-line max-len
+    const { properties } = this.props;
+    const { totalCount, loadMoreRows, isRowLoaded } = properties;
 
     return (
       <div>
-        <AutoSizer disableHeight>
-          {({ width }) => (
-            <List
-              height={445}
-              overscanRowCount={3}
-              rowCount={fields.length || 0}
-              rowHeight={this.getRowHeight}
-              rowRenderer={this.rowRenderer}
-              width={width}
-              props={this.props.properties}
-            />
+        <InfiniteLoader
+          loadMoreRows={loadMoreRows}
+          isRowLoaded={isRowLoaded}
+          rowCount={totalCount || 50}
+        >
+          {({ onRowsRendered }) => (
+            <AutoSizer disableHeight>
+              {({ width }) => (
+                <List
+                  ref={this.bindListRef}
+                  height={445}
+                  onRowsRendered={onRowsRendered}
+                  rowCount={totalCount || 50}
+                  rowHeight={this.getRowHeight}
+                  rowRenderer={this.rowRenderer}
+                  width={width}
+                  props={properties}
+                />
+              )}
+            </AutoSizer>
           )}
-        </AutoSizer>
+        </InfiniteLoader>
       </div>
     );
   }

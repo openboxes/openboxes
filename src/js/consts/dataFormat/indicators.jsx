@@ -1,3 +1,4 @@
+// Commented code will be used in the future for defining charts comportement
 export const expirationSummary = {
   labels: ['January', 'February', 'March', 'April', 'May', 'June'],
   datasets: [

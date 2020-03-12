@@ -15,11 +15,8 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.DocumentGroupCode
-import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
-import org.pih.warehouse.api.PackPage
 import org.pih.warehouse.api.PackPageItem
-import org.pih.warehouse.api.PickPage
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
@@ -240,13 +237,8 @@ class StockMovementService {
         return new PagedResultList(stockMovements, requisitions.totalCount)
     }
 
-
     StockMovement getStockMovement(String id) {
-        return getStockMovement(id, null)
-    }
-
-    StockMovement getStockMovement(String id, String stepNumber) {
-        log.info "Getting stock movement for id ${id} step number ${stepNumber}"
+        log.info "Getting stock movement for id ${id}"
 
         Requisition requisition = Requisition.get(id)
         if (!requisition) {
@@ -261,30 +253,102 @@ class StockMovementService {
         stockMovement.documents = getDocuments(stockMovement)
         log.info(">>>>>>>>>>>>>>> getDocuments: ${System.currentTimeMillis() - startTime} ms")
 
-        startTime = System.currentTimeMillis()
-        if (stepNumber.equals("3")) {
-            stockMovement.lineItems = null
-            stockMovement.editPage = getEditPage(id)
-        } else if (stepNumber.equals("4")) {
-            stockMovement.lineItems = null
-            stockMovement.pickPage = getPickPage(id)
-        } else if (stepNumber.equals("5")) {
-            stockMovement.lineItems = null
-            stockMovement.packPage = getPackPage(id)
-        } else if (stepNumber.equals("6")) {
-            if (!stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
-                stockMovement.lineItems = null
-                stockMovement.packPage = getPackPage(id)
-            }
-        }
-        log.info(">>>>>>>>>>>>>>> get stock movement for stepNumber ${stepNumber}: ${System.currentTimeMillis() - startTime} ms")
-
         return stockMovement
     }
 
     StockMovementItem getStockMovementItem(String id) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
         return StockMovementItem.createFromRequisitionItem(requisitionItem)
+    }
+
+    def getStockMovementItems(String id, String stepNumber, String max, String offset) {
+        Requisition requisition = Requisition.get(id)
+        List<StockMovementItem> stockMovementItems = []
+        List <RequisitionItem> requisitionItems = []
+
+        if (max != null && offset != null) {
+            requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+                eq("requisition", requisition)
+                isNull("parentRequisitionItem")
+            }
+        } else {
+            requisitionItems = RequisitionItem.createCriteria().list() {
+                eq("requisition", requisition)
+                isNull("parentRequisitionItem")
+            }
+        }
+        requisitionItems.sort { a, b ->
+            a.orderIndex <=> b.orderIndex ?: a.id <=> b.id
+        }.each { requisitionItem ->
+            StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+            stockMovementItems.add(stockMovementItem)
+        }
+
+        if (stepNumber.equals("3")) {
+            List<EditPageItem> editPageItems = getEditPageItems(stockMovementItems, requisition.origin)
+            return editPageItems
+        } else if (stepNumber.equals("4")) {
+            List<PickPageItem> pickPageItems = getPickPageItems(id, max, offset)
+            return pickPageItems
+        } else if (stepNumber.equals("5")) {
+            List<PackPageItem> packPageItems = getPackPageItems(id, max, offset)
+            return packPageItems
+        } else if (stepNumber.equals("6")) {
+            if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                List<PackPageItem> packPageItems = getPackPageItems(id, max, offset)
+                return packPageItems
+            }
+        }
+
+        return stockMovementItems
+    }
+
+    List<EditPageItem> getEditPageItems(List<StockMovementItem> stockMovementItems, Location origin) {
+        List<EditPageItem> editPageItems = []
+        Map monthlyStocklistQuantities = calculateMonthlyStockListQuantity(origin)
+        stockMovementItems.each { stockMovementItem ->
+            EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
+            editPageItem.quantityConsumed = monthlyStocklistQuantities.get(stockMovementItem.product.id)
+            editPageItems.add(editPageItem)
+        }
+        return editPageItems
+    }
+
+    List<PickPageItem> getPickPageItems(String id, String max, String offset) {
+        List<PickPageItem> pickPageItems = []
+
+        StockMovement stockMovement = getStockMovement(id)
+
+        stockMovement.lineItems.each { stockMovementItem ->
+            def items = getPickPageItems(stockMovementItem)
+            pickPageItems.addAll(items)
+        }
+
+        if (max != null && offset != null) {
+            return pickPageItems.subList(offset.toInteger(), offset.toInteger() + max.toInteger() > pickPageItems.size() ? pickPageItems.size() : offset.toInteger() + max.toInteger());
+        }
+
+        return pickPageItems
+    }
+
+    List<PackPageItem> getPackPageItems(String id, String max, String offset) {
+        Set<PackPageItem> items = new LinkedHashSet<PackPageItem>()
+
+        StockMovement stockMovement = getStockMovement(id)
+
+        stockMovement.requisition?.picklist?.picklistItems?.sort { a, b ->
+            a.sortOrder <=> b.sortOrder ?: a.id <=> b.id
+        }?.each { PicklistItem picklistItem ->
+            items.addAll(getPackPageItems(picklistItem))
+        }
+
+        List<PackPageItem> packPageItems = new ArrayList<PackPageItem>(items)
+
+        if (max != null && offset != null) {
+            return packPageItems.subList(offset.toInteger(), offset.toInteger() + max.toInteger() > packPageItems.size() ? packPageItems.size() : offset.toInteger() + max.toInteger())
+        }
+
+        return packPageItems
     }
 
 
@@ -485,17 +549,15 @@ class StockMovementService {
         picklist.save(flush: true)
     }
 
-    void createOrUpdatePicklistItem(StockMovement stockMovement) {
+    void createOrUpdatePicklistItem(StockMovement stockMovement, List<PickPageItem> pickPageItems) {
 
         Requisition requisition = stockMovement.requisition
-
         Picklist picklist = requisition?.picklist
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisition
         }
-
-        stockMovement.pickPage.pickPageItems.each { pickPageItem ->
+        pickPageItems.each { pickPageItem ->
             pickPageItem.picklistItems?.toArray()?.each { PicklistItem picklistItem ->
                 // If one does not exist add it to the list
                 if (!picklistItem.id) {
@@ -510,6 +572,7 @@ class StockMovementService {
             }
         }
 
+        requisition.save()
         picklist.save()
     }
 
@@ -620,54 +683,6 @@ class StockMovementService {
         }
 
         return inventoryService.sortAvailableItems(availableItems)
-    }
-
-
-    EditPage getEditPage(String id) {
-        EditPage editPage = new EditPage()
-        def startTime = System.currentTimeMillis()
-        StockMovement stockMovement = getStockMovement(id)
-        log.info("Get stock movement ${id}: ${System.currentTimeMillis() - startTime}")
-
-        Map monthlyStocklistQuantities = calculateMonthlyStockListQuantity(stockMovement.origin)
-
-        startTime = System.currentTimeMillis()
-        stockMovement.lineItems.each { stockMovementItem ->
-            stockMovementItem.stockMovement = stockMovement
-            EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
-            editPageItem.quantityConsumed = monthlyStocklistQuantities.get(stockMovementItem.product.id)
-            editPage.editPageItems.addAll(editPageItem)
-        }
-        log.info("Build edit pages for stock movement: ${System.currentTimeMillis() - startTime} ms")
-        return editPage
-    }
-
-
-    PickPage getPickPage(String id) {
-        PickPage pickPage = new PickPage()
-
-        StockMovement stockMovement = getStockMovement(id)
-        stockMovement.lineItems.each { stockMovementItem ->
-            List pickPageItems = getPickPageItems(stockMovementItem)
-            pickPage.pickPageItems.addAll(pickPageItems)
-        }
-        return pickPage
-    }
-
-
-    PackPage getPackPage(String id) {
-        PackPage packPage = new PackPage()
-
-        StockMovement stockMovement = getStockMovement(id)
-        Set<PackPageItem> packPageItems = new LinkedHashSet<PackPageItem>()
-        stockMovement.requisition?.picklist?.picklistItems?.sort { a, b ->
-            a.sortOrder <=> b.sortOrder ?: a.id <=> b.id
-        }?.each { PicklistItem picklistItem ->
-            packPageItems.addAll(getPackPageItems(picklistItem))
-        }
-
-        packPage.packPageItems.addAll(packPageItems)
-        return packPage
     }
 
     /**
@@ -1424,16 +1439,14 @@ class StockMovementService {
         return shipmentItems
     }
 
-    StockMovement updatePackPageItems(StockMovement stockMovement) {
-        if (stockMovement?.packPage?.packPageItems) {
-            stockMovement.packPage.packPageItems.each { PackPageItem packPageItem ->
+    List<PackPageItem> updatePackPageItems(List<PackPageItem> packPageItems) {
+        if (packPageItems) {
+            packPageItems.each { PackPageItem packPageItem ->
                 updateShipmentItemAndProcessSplitLines(packPageItem)
             }
         }
 
-        stockMovement.packPage = getPackPage(stockMovement.id)
-
-        return stockMovement
+        return packPageItems
     }
 
     void updateShipmentItemAndProcessSplitLines(PackPageItem packPageItem) {

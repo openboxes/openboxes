@@ -1,52 +1,40 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
-import { loadColors } from '../../../assets/dataFormat/dataLoading';
+import loadColors from '../../consts/dataFormat/dataLoading';
+import { getColor } from '../../consts/dataFormat/chartColors';
 
+/* global _ */
 function truncateString(value, length) {
   return (value.length > length) ? `${value.substr(0, length - 1)}...` : value;
 }
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
+
 const Numbers = () => {
   const colors = ['green', 'yellow', 'red'];
-  const classColor = `circle ${colors[getRandomInt(0, colors.length)]}`;
+  const classColor = `circle ${colors[_.random(0, colors.length - 1)]}`;
 
   return (
     <div className="value">
-      <div className={classColor} /> {getRandomInt(3, 95)}
+      <div className={classColor} /> {_.random(3, 95)}
     </div>
   );
 };
 
-const getColor = () => {
-  const colors = [
-    '#6fb98f',
-    '#004445',
-    '#2e5685',
-    '#fcc169',
-    '#cf455c',
-    '#e89da2',
-    '#e0b623',
-    '#444444',
-  ];
-  return colors[getRandomInt(0, colors.length)];
-};
-
 const ArchivedIndicators = (props) => {
   let graph;
+  const property = props;
 
   if (props.type === 'line') {
-    props.data.datasets = loadColors(props.data, 'line');
+    property.data.datasets = loadColors(props.data, 'line');
     graph = <i className="fa fa-line-chart" style={{ color: getColor() }} />;
   } else if (props.type === 'bar') {
-    props.data.datasets = loadColors(props.data, 'bar');
+    property.data.datasets = loadColors(props.data, 'bar');
     graph = <i className="fa fa-bar-chart" style={{ color: getColor() }} />;
   } else if (props.type === 'doughnut') {
-    props.data.datasets = loadColors(props.data, 'doughnut');
+    property.data.datasets = loadColors(props.data, 'doughnut');
     graph = <i className="fa fa-pie-chart" style={{ color: getColor() }} />;
   } else if (props.type === 'horizontalBar') {
-    props.data.datasets = loadColors(props.data, 'horizontalBar');
+    property.data.datasets = loadColors(props.data, 'horizontalBar');
     graph = (
       <i
         className="fa fa-bar-chart horizontal-bar"
@@ -78,8 +66,11 @@ const ArchivedIndicators = (props) => {
           </div>
           <div className="col col-3">
             <span
+              role="button"
+              tabIndex={0}
               className="unarchive-button"
               onClick={() => props.handleAdd(props.index)}
+              onKeyDown={() => props.handleAdd(props.index)}
             >
               Unarchive
             </span>
@@ -89,6 +80,7 @@ const ArchivedIndicators = (props) => {
     </li>
   );
 };
+
 
 const PopOut = props => (
   <div>
@@ -108,6 +100,7 @@ const PopOut = props => (
   </div>
 );
 
+
 const UnarchiveIndicator = (props) => {
   const size = props.data.filter(data => data.archived).length;
 
@@ -117,13 +110,13 @@ const UnarchiveIndicator = (props) => {
         props.showPopout ? 'unarchivedItems popover-active' : 'unarchivedItems'
       }
     >
-      <div className="unarchive" onClick={props.unarchiveHandler}>
+      <div className="unarchive" role="button" tabIndex={0} onClick={props.unarchiveHandler} onKeyDown={props.unarchiveHandler}>
         <span>
           Archived Indicators ({size}) <i className="fa fa-archive" />
         </span>
       </div>
       <div className="unarchive-popover">
-        <span className="close-button" onClick={props.unarchiveHandler}>
+        <span role="button" tabIndex={0} className="close-button" onClick={props.unarchiveHandler} onKeyDown={props.unarchiveHandler} >
           &times;
         </span>
         <ul className="unarchivedList">
@@ -140,3 +133,25 @@ const UnarchiveIndicator = (props) => {
 };
 
 export default UnarchiveIndicator;
+
+UnarchiveIndicator.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  unarchiveHandler: PropTypes.func.isRequired,
+  handleAdd: PropTypes.func.isRequired,
+  showPopout: PropTypes.bool.isRequired,
+};
+
+ArchivedIndicators.propTypes = {
+  type: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  handleAdd: PropTypes.func.isRequired,
+  index: PropTypes.number.isRequired,
+  data: PropTypes.shape().isRequired,
+};
+
+PopOut.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  unarchiveHandler: PropTypes.func.isRequired,
+  handleAdd: PropTypes.func.isRequired,
+  size: PropTypes.number.isRequired,
+};

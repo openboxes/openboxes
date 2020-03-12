@@ -478,6 +478,9 @@ class OrderService {
             order {
                 eq("destination", destination)
                 eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+                not {
+                    'in'("status", OrderStatus.PENDING)
+                }
             }
             eq("product", product)
         }

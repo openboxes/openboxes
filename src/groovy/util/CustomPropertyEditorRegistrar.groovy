@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.OrganizationEditor
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.PersonEditor
+import org.pih.warehouse.core.ProductCatalogEditor
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.TagEditor
 import org.pih.warehouse.core.User
@@ -23,6 +24,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.inventory.TransactionTypeEditor
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.CategoryEditor
+import org.pih.warehouse.product.ProductCatalog
 import org.springframework.beans.PropertyEditorRegistrar
 import org.springframework.beans.PropertyEditorRegistry
 import org.springframework.beans.propertyeditors.CustomDateEditor
@@ -39,6 +41,7 @@ class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
         registry.registerCustomEditor(Organization.class, new OrganizationEditor())
         registry.registerCustomEditor(TransactionType.class, new TransactionTypeEditor())
         registry.registerCustomEditor(Tag.class, new TagEditor())
+        registry.registerCustomEditor(ProductCatalog.class, new ProductCatalogEditor())
     }
 }
 

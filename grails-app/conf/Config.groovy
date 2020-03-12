@@ -338,6 +338,18 @@ openboxes.anonymize.enabled = false
 grails.plugins.raven.active = false
 grails.plugins.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PROJECT_ID}"
 
+// Additional columns for cycle count report
+openboxes.cycleCount.additionalColumns = [:]
+
+// Acceptable values - MUST be added to openboxes-config.groovy!
+//openboxes.cycleCount.additionalColumns = [
+//    "Column1": { obj -> return "string literal" },
+//    "Column2": { obj -> return "${obj.product.productCode}" },
+//    "Column3": { obj -> return "" },
+//    "Column4": { obj -> return null },
+//    "Column5": null,
+//]
+
 // Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
 openboxes.dashboard.column1.widgets = ["requisitionItemSummary", "requisitionSummary", "receiptSummary", "shipmentSummary", "indicatorSummary"]
 openboxes.dashboard.column2.widgets = ["binLocationSummary", "expiringSummary", "productSummary", "genericProductSummary",]
@@ -548,7 +560,7 @@ openboxes.stockCard.consumption.reasonCodes = [ReasonCode.STOCKOUT, ReasonCode.L
 // Localization configuration - default and supported locales
 openboxes.locale.custom.enabled = false
 openboxes.locale.defaultLocale = 'en'
-openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt']
+openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt', 'fi']
 
 // Currency configuration
 openboxes.locale.defaultCurrencyCode = "USD"
@@ -604,6 +616,9 @@ openboxes.shipping.search.maxResults = 1000
 // Automatically create temporary receiving locations for shipments
 openboxes.receiving.createReceivingLocation.enabled = true
 openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX
+
+// Pagination
+openboxes.api.pagination.enabled = true
 
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"

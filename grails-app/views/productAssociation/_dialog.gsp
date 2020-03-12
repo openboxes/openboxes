@@ -64,7 +64,7 @@
                         <g:actionSubmit action="save" class="button icon approve" value="Save" id="save">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</g:actionSubmit>
                     </g:else>
                     &nbsp;
-                    <a href="#" class="close-dialog" dialog-id="product-association-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
+                    <a href="#" class="btn-close-dialog" data-target="product-association-dialog">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</a>
                 </div>
             </td>
         </tfoot>

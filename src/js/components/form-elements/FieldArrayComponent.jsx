@@ -39,19 +39,21 @@ class FieldArrayComponent extends Component {
   }
 
   render() {
-    const { fieldsConfig, properties, fields } = this.props;
+    const {
+      fieldsConfig, properties, fields, isPaginated,
+    } = this.props;
     const AddButton = fieldsConfig.addButton;
     const { maxTableHeight = 'calc(100vh - 400px)', virtualized } = fieldsConfig;
     const addRow = (row = {}) => fields.push(row);
-    const TableBodyComponent = virtualized ? TableBodyVirtualized : TableBody;
-    const { hasBinLocationSupport } = properties;
+    const TableBodyComponent = virtualized && isPaginated ? TableBodyVirtualized : TableBody;
 
     return (
       <div className="d-flex flex-column">
         <div className="text-center border">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1 mr-3">
             {_.map(fieldsConfig.fields, (config, name) => {
-              const hide = typeof config.hide === 'function' ? config.hide({ hasBinLocationSupport }) : config.hide;
+              const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
+              const { hide } = dynamicAttr;
               if (!hide) {
                 return (
                   <div
@@ -86,7 +88,7 @@ class FieldArrayComponent extends Component {
         </div>
         <div
           className="text-center border mb-1 flex-grow-1"
-          style={{ overflowY: virtualized ? 'hidden' : 'scroll', maxHeight: virtualized ? '450px' : maxTableHeight }}
+          style={{ overflowY: virtualized && isPaginated ? 'hidden' : 'scroll', maxHeight: virtualized && isPaginated ? '450px' : maxTableHeight }}
         >
           <TableBodyComponent
             fields={fields}
@@ -122,6 +124,7 @@ class FieldArrayComponent extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  isPaginated: state.session.isPaginated,
 });
 
 FieldArrayComponent.propTypes = {
@@ -132,6 +135,8 @@ FieldArrayComponent.propTypes = {
   ]).isRequired,
   properties: PropTypes.shape({}),
   translate: PropTypes.func.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
 };
 
 FieldArrayComponent.defaultProps = {

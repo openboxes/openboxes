@@ -7,8 +7,7 @@ class IndicatorData implements Serializable {
     List<IndicatorDatasets> datasets;
     List<String> labels;
 
-    IndicatorData(List<IndicatorDatasets> datasets, List<String> labels)
-    {
+    IndicatorData(List<IndicatorDatasets> datasets, List<String> labels) {
         this.labels = labels;
         this.datasets = datasets;
     }

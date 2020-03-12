@@ -36,10 +36,13 @@ const DELETE_BUTTON_FIELD = {
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
-    fieldValue, removeItem, removeRow, showOnly,
+    fieldValue, removeItem, removeRow, showOnly, updateTotalCount,
   }) => ({
-    onClick: fieldValue.id ? () => removeItem(fieldValue.id).then(() => removeRow()) : removeRow,
-    disabled: fieldValue.statusCode === 'SUBSTITUTED' || showOnly,
+    onClick: fieldValue && fieldValue.id ? () => {
+      removeItem(fieldValue.id).then(() => removeRow());
+      updateTotalCount(-1);
+    } : () => { updateTotalCount(-1); removeRow(); },
+    disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || showOnly,
   }),
   attributes: {
     className: 'btn btn-outline-danger',
@@ -50,15 +53,23 @@ const NO_STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
     arrowsNavigation: true,
-    // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder, showOnly }) => (
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+    addButton: ({
+      // eslint-disable-next-line react/prop-types
+      addRow, getSortOrder, showOnly, updateTotalCount,
+    }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
         disabled={showOnly}
-        onClick={() => addRow({
-          sortOrder: getSortOrder(),
-        })}
+        onClick={() => {
+          updateTotalCount(1);
+          addRow({ sortOrder: getSortOrder() });
+        }
+        }
       ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
@@ -100,7 +111,7 @@ const NO_STOCKLIST_FIELDS = {
         getDynamicAttr: ({
           fieldValue,
         }) => ({
-          disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
+          disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
         }),
       },
       recipient: {
@@ -110,19 +121,22 @@ const NO_STOCKLIST_FIELDS = {
         flexWidth: '2.5',
         fieldKey: '',
         getDynamicAttr: ({
-          fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder,
+          fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
         }) => ({
           options: recipients,
-          disabled: fieldValue.statusCode === 'SUBSTITUTED' || _.isNil(fieldValue.product),
-          onTabPress: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
+          disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
+          onTabPress: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
         }),
         attributes: {
           labelKey: 'name',
@@ -137,14 +151,20 @@ const NO_STOCKLIST_FIELDS = {
 const STOCKLIST_FIELDS = {
   lineItems: {
     type: ArrayField,
-    virtualized: true,
     arrowsNavigation: true,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+    addButton: ({
     // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder, newItemAdded }) => (
+      addRow, getSortOrder, newItemAdded, updateTotalCount,
+    }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
         onClick={() => {
+          updateTotalCount(1);
           addRow({ sortOrder: getSortOrder() });
           newItemAdded();
         }}
@@ -195,17 +215,20 @@ const STOCKLIST_FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder,
+          addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
         }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
+          onTabPress: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -217,14 +240,19 @@ const VENDOR_FIELDS = {
   lineItems: {
     type: ArrayField,
     arrowsNavigation: true,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder }) => (
+    addButton: ({ addRow, getSortOrder, updateTotalCount }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
-        onClick={() => addRow({
-          sortOrder: getSortOrder(),
-        })}
+        onClick={() => {
+          updateTotalCount(1);
+          addRow({ sortOrder: getSortOrder() });
+        }}
       ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
@@ -298,18 +326,21 @@ const VENDOR_FIELDS = {
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
         getDynamicAttr: ({
-          recipients, addRow, rowCount, rowIndex, getSortOrder,
+          recipients, addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
         }) => ({
           options: recipients,
-          onTabPress: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => addRow({
-            sortOrder: getSortOrder(),
-          }) : null,
+          onTabPress: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
         }),
         attributes: {
           labelKey: 'name',
@@ -332,8 +363,9 @@ class AddItemsPage extends Component {
     this.state = {
       currentLineItems: [],
       sortOrder: 0,
-      values: this.props.initialValues,
+      values: { ...this.props.initialValues, lineItems: [] },
       newItem: false,
+      totalCount: 0,
     };
 
     this.props.showSpinner();
@@ -344,6 +376,9 @@ class AddItemsPage extends Component {
     this.confirmTransition = this.confirmTransition.bind(this);
     this.newItemAdded = this.newItemAdded.bind(this);
     this.validate = this.validate.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
+    this.loadMoreRows = this.loadMoreRows.bind(this);
+    this.updateTotalCount = this.updateTotalCount.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -373,7 +408,7 @@ class AddItemsPage extends Component {
    * @public
    */
   getFields() {
-    if (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) {
+    if ((this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) && !request) {
       return VENDOR_FIELDS;
     } else if (_.get(this.state.values.stocklist, 'id')) {
       return STOCKLIST_FIELDS;
@@ -473,6 +508,47 @@ class AddItemsPage extends Component {
     });
 
     return this.state.sortOrder;
+  }
+
+  setLineItems(response) {
+    const { data } = response.data;
+    let lineItemsData;
+
+    if (this.state.values.lineItems.length === 0 && !data.length) {
+      lineItemsData = new Array(1).fill({ sortOrder: 100 });
+    } else {
+      lineItemsData = _.map(
+        data,
+        val => ({
+          ...val,
+          disabled: true,
+          product: {
+            ...val.product,
+            label: `${val.productCode} ${val.product.name}`,
+          },
+        }),
+      );
+    }
+
+    const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
+    this.setState({
+      currentLineItems: this.props.isPaginated ?
+        _.uniqBy(_.concat(this.state.currentLineItems, data), 'id') : data,
+      values: {
+        ...this.state.values,
+        lineItems: this.props.isPaginated ?
+          _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
+      },
+      sortOrder,
+      totalCount: lineItemsData.length > this.state.totalCount ?
+        lineItemsData.length : this.state.totalCount,
+    }, () => this.props.hideSpinner());
+  }
+
+  updateTotalCount(value) {
+    this.setState({
+      totalCount: this.state.totalCount + value === 0 ? 1 : this.state.totalCount + value,
+    });
   }
 
   dataFetched = false;
@@ -580,49 +656,10 @@ class AddItemsPage extends Component {
       this.props.fetchUsers();
     }
 
-    this.fetchAndSetLineItems();
-  }
-
-  /**
-   * Fetches stock movement's line items and sets them in redux form and in
-   * state as current line items.
-   * @public
-   */
-  fetchAndSetLineItems() {
-    this.props.showSpinner();
-    this.fetchLineItems().then((resp) => {
-      const { lineItems } = resp.data.data;
-      const { hasManageInventory } = resp.data.data;
-      const { statusCode } = resp.data.data;
-      let lineItemsData;
-      if (!lineItems.length) {
-        lineItemsData = new Array(1).fill({ sortOrder: 100 });
-      } else {
-        lineItemsData = _.map(
-          lineItems,
-          val => ({
-            ...val,
-            disabled: true,
-            product: {
-              ...val.product,
-              label: `${val.productCode} ${val.product.name}`,
-            },
-          }),
-        );
-      }
-
-      const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
-      this.setState({
-        currentLineItems: lineItems,
-        values: {
-          ...this.state.values,
-          lineItems: lineItemsData,
-          hasManageInventory,
-          statusCode,
-        },
-        sortOrder,
-      }, () => this.props.hideSpinner());
-    }).catch(() => this.props.hideSpinner());
+    this.fetchAddItemsPageData();
+    if (!this.props.isPaginated) {
+      this.fetchLineItems();
+    }
   }
 
   /**
@@ -630,11 +667,48 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=2`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=2`;
 
     return apiClient.get(url)
-      .then(resp => resp)
+      .then((response) => {
+        this.setLineItems(response);
+      })
       .catch(err => err);
+  }
+
+  /**
+   * Fetches stock movement's line items and sets them in redux form and in
+   * state as current line items.
+   * @public
+   */
+  fetchAddItemsPageData() {
+    this.props.showSpinner();
+
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    apiClient.get(url)
+      .then((resp) => {
+        const { hasManageInventory } = resp.data.data;
+        const { statusCode } = resp.data.data;
+        const { totalCount } = resp.data;
+
+        this.setState({
+          values: {
+            ...this.state.values,
+            hasManageInventory,
+            statusCode,
+          },
+          totalCount: totalCount === 0 ? 1 : totalCount,
+        }, () => this.props.hideSpinner());
+      });
+  }
+
+
+  loadMoreRows({ startIndex, stopIndex }) {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=2`;
+    apiClient.get(url)
+      .then((response) => {
+        this.setLineItems(response);
+      });
   }
 
   /**
@@ -692,7 +766,7 @@ class AddItemsPage extends Component {
           }
           this.transitionToNextStep('CHECKING')
             .then(() => {
-              this.props.goToPage(6, values);
+              this.props.goToPage(this.props.hasPackingSupport ? 6 : 5, values);
             })
             .catch(() => this.props.hideSpinner());
         })
@@ -885,8 +959,18 @@ class AddItemsPage extends Component {
     const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
 
     return apiClient.delete(removeItemsUrl)
+      .then(() => {
+        this.setState({
+          totalCount: 1,
+          currentLineItems: [],
+          values: {
+            ...this.state.values,
+            lineItems: new Array(1).fill({ sortOrder: 100 }),
+          },
+        });
+      })
       .catch(() => {
-        this.fetchAndSetLineItems();
+        this.fetchLineItems();
         return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
       });
   }
@@ -923,6 +1007,10 @@ class AddItemsPage extends Component {
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
 
     this.saveItemsAndExportTemplate(formValues, lineItems);
+  }
+
+  isRowLoaded({ index }) {
+    return !!this.state.values.lineItems[index];
   }
 
   /**
@@ -969,7 +1057,15 @@ class AddItemsPage extends Component {
 
     return apiClient.post(url, formData, config)
       .then(() => {
-        this.fetchAndSetLineItems();
+        this.fetchLineItems();
+        if (_.isNil(_.last(this.state.values.lineItems).product)) {
+          this.setState({
+            values: {
+              ...this.state.values,
+              lineItems: [],
+            },
+          });
+        }
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -1004,7 +1100,7 @@ class AddItemsPage extends Component {
   }
 
   render() {
-    const showOnly = request && this.state.values.statusCode !== 'CREATED';
+    const showOnly = this.props.showOnly && this.state.values.statusCode !== 'CREATED';
     return (
       <Form
         onSubmit={() => {}}
@@ -1066,7 +1162,7 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   disabled={invalid}
-                  onClick={() => this.removeAll().then(() => this.fetchAndSetLineItems())}
+                  onClick={() => this.removeAll()}
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
                 >
                   <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
@@ -1091,6 +1187,11 @@ class AddItemsPage extends Component {
                   getSortOrder: this.getSortOrder,
                   newItemAdded: this.newItemAdded,
                   newItem: this.state.newItem,
+                  totalCount: this.state.totalCount,
+                  loadMoreRows: this.loadMoreRows,
+                  isRowLoaded: this.isRowLoaded,
+                  updateTotalCount: this.updateTotalCount,
+                  isPaginated: this.props.isPaginated,
                   showOnly,
                 }))}
               <div>
@@ -1108,8 +1209,11 @@ class AddItemsPage extends Component {
                     if (!invalid) {
                       if (!request) {
                         this.nextPage(values);
-                      } else {
-                        this.confirmSubmit(() => this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() => this.transitionToNextStep('VERIFYING')));
+                      } else if (request || (this.props.currentLocation.id !== this.state.values.origin.id && this.state.values.origin.type !== 'SUPPLIER')) {
+                        this.confirmSubmit(() =>
+                          // eslint-disable-next-line max-len
+                          this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() =>
+                            this.transitionToNextStep(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory ? 'CHECKING' : 'VERIFYING')));
                       }
                     }
                   }}
@@ -1135,6 +1239,8 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   minimumExpirationDate: state.session.minimumExpirationDate,
+  hasPackingSupport: state.session.currentLocation.hasPackingSupport,
+  isPaginated: state.session.isPaginated,
 });
 
 export default (connect(mapStateToProps, {
@@ -1173,4 +1279,12 @@ AddItemsPage.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
+  /** Is true when currently selected location supports packing */
+  hasPackingSupport: PropTypes.bool.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string,
+  }).isRequired,
+  showOnly: PropTypes.bool.isRequired,
 };
