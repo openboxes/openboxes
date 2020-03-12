@@ -18,7 +18,7 @@ class NumberDataService {
         def discrepancy = dataService.executeQuery("select count(*) from receipt_item where quantity_shipped != quantity_received");
 
         List<NumberData> numberDataList = [
-            new NumberData("Bin Location Summary", binLocations[0], 'In / Out of stock', 1, "/openboxes/report/showBinLocationReport?location.id="+ location.id),
+            new NumberData("Lot and Bin", binLocations[0], 'In stock', 1, "/openboxes/report/showBinLocationReport?location.id="+ location.id),
             new NumberData("Stock Movements", shipments[0][0], "Not shipped", 3),
             new NumberData("User Incomplete Tasks", pending[0][0], "Not shiped", 4),
             new NumberData("User Incomplete Tasks",notCompleted[0][0], "Not completed", 5),
