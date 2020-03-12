@@ -13,6 +13,7 @@ import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -567,6 +568,19 @@ class InventorySnapshotService {
         }
     }
 
+    def getQuantityOnHand(List<Product> products, Location location, Date date) {
+        return InventorySnapshot.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                // Need to use alias other than product to prevent conflict
+                groupProperty("product", "p")
+                sum("quantityOnHand", "quantityOnHand")
+            }
+            eq("location", location)
+            eq("date", date)
+            'in'("product", products)
+        }
+    }
 
     List getInventorySnapshots(Product product, Location location, Date date) {
         log.info "Find inventory snapshots by product ${product} location ${location} and date ${date}"

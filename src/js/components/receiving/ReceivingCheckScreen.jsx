@@ -127,7 +127,9 @@ const FIELDS = {
         label: 'react.partialReceiving.binLocation.label',
         defaultMessage: 'Bin Location',
         flexWidth: '1.5',
-        hide: ({ hasBinLocationSupport }) => !hasBinLocationSupport,
+        getDynamicAttr: ({ hasBinLocationSupport }) => ({
+          hide: !hasBinLocationSupport,
+        }),
       },
       'recipient.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -151,10 +153,10 @@ const FIELDS = {
         flexWidth: '1',
         fieldKey: '',
         attributes: {
-          formatValue: fieldValue => (fieldValue.quantityRemaining ? fieldValue.quantityRemaining.toLocaleString('en-US') : fieldValue.quantityRemaining),
+          formatValue: fieldValue => (fieldValue && fieldValue.quantityRemaining ? fieldValue.quantityRemaining.toLocaleString('en-US') : fieldValue.quantityRemaining),
         },
         getDynamicAttr: ({ fieldValue }) => ({
-          className: fieldValue.cancelRemaining || !fieldValue.quantityRemaining ? 'strike-through' : 'text-danger',
+          className: fieldValue && (fieldValue.cancelRemaining || !fieldValue.quantityRemaining) ? 'strike-through' : 'text-danger',
         }),
       },
       cancelRemaining: {

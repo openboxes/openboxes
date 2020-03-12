@@ -95,7 +95,7 @@ const FIELDS = {
           showValueTooltip: true,
         },
         getDynamicAttr: ({ fieldValue }) => ({
-          tooltipValue: _.map(fieldValue.availableItems, availableItem =>
+          tooltipValue: _.map(fieldValue && fieldValue.availableItems, availableItem =>
             (
               <p>{fieldValue.productCode} {fieldValue.productName}, {availableItem.expirationDate ? availableItem.expirationDate : '---'}, Qty {availableItem.quantityAvailable}</p>
             )),
@@ -222,7 +222,7 @@ class SubstitutionsModal extends Component {
     const payload = {
       newQuantity: originalItem.quantitySelected && originalItem.quantitySelected !== '0' ? originalItem.quantityRequested - subQty : '',
       quantityRevised: originalItem.quantitySelected,
-      sortOrder: originalItem.sortOrder,
+      sortOrder: _.toInteger(originalItem.sortOrder) + 1,
       reasonCode: values.reasonCode,
       substitutionItems: _.map(substitutions, sub => ({
         'newProduct.id': sub.product.id,

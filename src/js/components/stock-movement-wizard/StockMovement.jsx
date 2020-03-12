@@ -89,6 +89,9 @@ class StockMovements extends Component {
    */
   getFormList(status) {
     let formList = [];
+    const showOnly = this.state.values.origin
+      && this.props.currentLocation.id !== this.state.values.origin.id
+      && !this.props.isUserAdmin;
     if (request && (status === 'CREATED' || !status)) {
       formList = [
         <CreateStockMovement
@@ -113,26 +116,31 @@ class StockMovements extends Component {
           previousPage={this.previousPage}
           goToPage={this.goToPage}
           onSubmit={this.nextPage}
+          showOnly={showOnly}
         />,
         <EditPage
           initialValues={this.state.values}
           previousPage={this.previousPage}
           onSubmit={this.nextPage}
+          showOnly={showOnly}
         />,
         <PickPage
           initialValues={this.state.values}
           previousPage={this.previousPage}
           onSubmit={this.nextPage}
+          showOnly={showOnly}
         />,
         <PackingPage
           initialValues={this.state.values}
           previousPage={this.previousPage}
           onSubmit={this.nextPage}
+          showOnly={showOnly}
         />,
         <SendMovementPage
           initialValues={this.state.values}
           previousPage={this.previousPage}
           setValues={this.setValues}
+          showOnly={showOnly}
         />,
       ];
     } else {
@@ -146,21 +154,25 @@ class StockMovements extends Component {
           previousPage={this.previousPage}
           goToPage={this.goToPage}
           onSubmit={this.nextPage}
+          showOnly={showOnly}
         />,
         <EditPage
           initialValues={this.state.values}
           previousPage={this.previousPage}
           onSubmit={this.nextPage}
+          showOnly={showOnly}
         />,
         <PickPage
           initialValues={this.state.values}
           previousPage={this.previousPage}
           onSubmit={this.nextPage}
+          showOnly={showOnly}
         />,
         <SendMovementPage
           initialValues={this.state.values}
           previousPage={this.previousPage}
           setValues={this.setValues}
+          showOnly={showOnly}
         />,
       ];
     }
@@ -328,6 +340,8 @@ const mapStateToProps = state => ({
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
+  currentLocation: state.session.currentLocation,
+  isUserAdmin: state.session.isUserAdmin,
 });
 
 export default connect(mapStateToProps, {
@@ -353,6 +367,10 @@ StockMovements.propTypes = {
   translate: PropTypes.func.isRequired,
   /** Is true when currently selected location supports packing */
   hasPackingSupport: PropTypes.bool.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string,
+  }).isRequired,
+  isUserAdmin: PropTypes.bool.isRequired,
 };
 
 StockMovements.defaultProps = {
