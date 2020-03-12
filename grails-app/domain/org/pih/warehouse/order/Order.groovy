@@ -21,10 +21,14 @@ class Order implements Serializable {
     String description        // a user-defined, searchable name for the order
     String orderNumber        // an auto-generated shipment number
 
-    Location origin            // the vendor
-    Location destination    // the customer location
-    Person recipient
 
+    Location origin           // the vendor
+    Party originParty
+
+    Location destination      // the customer location
+    Party destinationParty
+
+    Person recipient
     Person approvedBy
     Person orderedBy
     Person completedBy
@@ -77,8 +81,14 @@ class Order implements Serializable {
         orderNumber(nullable: true, maxSize: 255)
         currencyCode(nullable:true)
         exchangeRate(nullable:true)
-        origin(nullable: false)
-        destination(nullable: false)
+        origin(nullable: false, validator: { Location origin, Order obj ->
+            return !origin?.organization ? ['validator.organization.required'] : true
+        })
+        originParty(nullable:true)
+        destination(nullable: false, validator: { Location destination, Order obj ->
+            return !destination?.organization ? ['validator.organization.required'] : true
+        })
+        destinationParty(nullable:true)
         recipient(nullable: true)
         orderedBy(nullable: false)
         dateOrdered(nullable: true)

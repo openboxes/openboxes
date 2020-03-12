@@ -63,7 +63,12 @@ class Location implements Comparable<Location>, java.io.Serializable {
         name(nullable: false, blank: false, maxSize: 255, unique: 'parentLocation')
         description(nullable: true)
         address(nullable: true)
-        organization(nullable: true)
+        organization(nullable: true, validator: { organization, Location obj ->
+            def locationTypeCodes = [LocationTypeCode.DEPOT, LocationTypeCode.SUPPLIER]
+            if (obj?.locationType?.locationTypeCode in locationTypeCodes && !organization) {
+                return ['validator.required', locationTypeCodes]
+            }
+        })
         locationType(nullable: false)
         locationNumber(nullable: true, unique: true)
         locationGroup(nullable: true)

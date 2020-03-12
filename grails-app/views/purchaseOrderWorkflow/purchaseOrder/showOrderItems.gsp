@@ -108,8 +108,9 @@
                             </tr>
                         </g:each>
                         <g:form action="purchaseOrder" method="post">
-                            <g:hiddenField name="order.id" value="${order?.id }"></g:hiddenField>
-                            <g:hiddenField name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
+                            <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
+                            <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
+                            <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
                             <tr>
                                 <td>
                                     ${i+1}
@@ -130,10 +131,9 @@
                                 <td class="middle center">
                                     <g:selectOrganization name="manufacturer"
                                                           id="manufacturer"
-                                                          noSelection="['':'']"
                                                           disabled="true"
-                                                          roleTypes="[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER]"
-                                                          value="" />
+                                                          noSelection="['':'']"
+                                                          roleTypes="[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER]"/>
                                 </td>
                                 <td class="middle center">
                                     <input type="text" id="manufacturerCode" name='manufacturerCode' disabled value="" size="10" class="text" />
@@ -146,7 +146,7 @@
                                     each
                                 </td>
                                 <td class="center middle">
-                                    <input type="text" id="unitPrice" name='unitPrice' value="" size="10" class="text" />
+                                    <input type="text" id="unitPrice" name='unitPrice' size="10" class="text" />
                                 </td>
                                 <td></td>
                                 <td class="center">
@@ -277,7 +277,8 @@
 
         // When chosen product has changed, trigger function that updates source code column
         $("#product-id").change(function() {
-          productChanged(this.value);
+          var supplierId = $("#supplierId").val();
+          productChanged(this.value, supplierId);
         });
 
         // When chosen source code has changed, trigger function that updates supplier code, manufacturer and manufacturer code columns
@@ -286,10 +287,13 @@
         });
 
         // Update source code column with product supplier source codes based on product chosen by user
-        function productChanged(productId) {
+        function productChanged(productId, supplierId) {
           $.ajax({
             type: 'POST',
-            data: 'productId=' + productId,
+            data: {
+              productId: productId,
+              supplierId: supplierId,
+            },
             url: '${request.contextPath}/json/productChanged',
             success: function (data, textStatus) {
               $('#productSupplier').html(data);
@@ -306,10 +310,11 @@
             data: 'productSupplierId=' + productSupplierId,
             url: '${request.contextPath}/json/productSupplierChanged',
             success: function (data, textStatus) {
+              console.log("data: ", data);
               $('#supplierCode').val(data.supplierCode);
               $('#manufacturerCode').val(data.manufacturerCode);
               $('#manufacturer').html(data.manufacturer);
-              console.log(data);
+              $("#unitPrice").val(data.unitPrice);
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
             }
