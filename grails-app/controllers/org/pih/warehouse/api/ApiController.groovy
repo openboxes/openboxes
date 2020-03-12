@@ -76,6 +76,7 @@ class ApiController {
         def ipAddress = request?.getRemoteAddr()
         def hostname = session.hostname ?: "Unknown"
         def timezone = session?.timezone?.ID
+        def isPaginated = grailsApplication.config.openboxes.api.pagination.enabled
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
         String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
         render([
@@ -97,7 +98,8 @@ class ApiController {
                         hostname           : hostname,
                         timezone           : timezone,
                         minimumExpirationDate : minimumExpirationDate,
-                        activeLanguage     : locale.language],
+                        activeLanguage     : locale.language,
+                        isPaginated        : isPaginated],
         ] as JSON)
     }
 

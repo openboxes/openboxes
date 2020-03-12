@@ -41,6 +41,7 @@ const initialState = {
   hostname: '',
   timezone: '',
   minimumExpirationDate: '',
+  isPaginated: false,
 };
 
 export default function (state = initialState, action) {
@@ -66,6 +67,7 @@ export default function (state = initialState, action) {
         hostname: _.get(action, 'payload.data.data.hostname'),
         timezone: _.get(action, 'payload.data.data.timezone'),
         minimumExpirationDate: _.get(action, 'payload.data.data.minimumExpirationDate'),
+        isPaginated: _.get(action, 'payload.data.data.isPaginated'),
       };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload };

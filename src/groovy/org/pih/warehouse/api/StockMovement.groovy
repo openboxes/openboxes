@@ -57,10 +57,6 @@ class StockMovement {
 
     StockMovementType stockMovementType
 
-    PickPage pickPage
-    EditPage editPage
-    PackPage packPage
-
     List<StockMovementItem> lineItems =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class))
 
@@ -112,9 +108,6 @@ class StockMovement {
                 comments          : comments,
                 requestedBy       : requestedBy,
                 lineItems         : lineItems,
-                pickPage          : pickPage,
-                editPage          : editPage,
-                packPage          : packPage,
                 associations      : [
                         requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
                         shipment   : [id: shipment?.id, shipmentNUmber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
@@ -205,6 +198,7 @@ class StockMovement {
 
         // Include all requisition items except those that are substitutions or modifications because the
         // original requisition item will represent these changes
+
         if (requisition.requisitionItems) {
             SortedSet<RequisitionItem> requisitionItems = new TreeSet<RequisitionItem>(requisition.requisitionItems)
             requisitionItems.each { requisitionItem ->
@@ -238,46 +232,4 @@ enum DocumentGroupCode {
         return [EXPORT, INVOICE, PICKLIST, PACKING_LIST, CERTIFICATE_OF_DONATION, DELIVERY_NOTE, GOODS_RECEIPT_NOTE]
     }
 
-}
-
-class PickPage {
-    List<PickPageItem> pickPageItems = []
-
-    static constraints = {
-        pickPageItems(nullable: true)
-    }
-
-    Map toJson() {
-        return [
-                pickPageItems: pickPageItems
-        ]
-    }
-}
-
-class EditPage {
-    List<EditPageItem> editPageItems = []
-
-    static constraints = {
-        editPageItems(nullable: true)
-    }
-
-    Map toJson() {
-        return [
-                editPageItems: editPageItems
-        ]
-    }
-}
-
-class PackPage {
-    List<PackPageItem> packPageItems = []
-
-    static constraints = {
-        packPageItems(nullable: true)
-    }
-
-    Map toJson() {
-        return [
-                packPageItems: packPageItems
-        ]
-    }
 }

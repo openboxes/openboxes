@@ -77,7 +77,7 @@
     "react-table": "6.8.6",
     "react-tabs": "2.3.0",
     "react-tippy": "1.2.2",
-    "react-virtualized": "9.20.1",
+    "react-virtualized": "^9.21.2",
     "redux": "4.0.0",
     "redux-promise": "0.5.3",
     "redux-thunk": "2.3.0"

@@ -151,11 +151,11 @@
     </div>
 
     <div id="header" class="header">
-        <table class="w100 fixed-layout b-0">
+        <table class="w100 fixed-layout no-border-table">
             <tr>
                 <%-- Icon and title --%>
                 <td colspan="2" class="b-0">
-                    <table class="no-border-table w100">
+                    <table class=" w100">
                         <tr>
                             <td class="left top" width="5%">
                                 <g:displayReportLogo/>
@@ -163,9 +163,11 @@
                             <td class="left top">
                                 <h1 class="m-5">${warehouse.message(code: 'requisition.deliveryNote.label')}</h1>
                                 <div class="m-5 large">${requisition.requestNumber} ${requisition.name}</div>
-                                <g:if test="${requisition.requestNumber}">
-                                    <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, height: 30, format: 'CODE_128'])}"/>
-                                </g:if>
+                                <div class="m-0">
+                                    <g:if test="${requisition.requestNumber}">
+                                        <img src="${createLink(controller: 'product', action: 'barcode', params: [data: requisition?.requestNumber, height: 30, format: 'CODE_128'])}"/>
+                                    </g:if>
+                                </div>
                             </td>
                             <td class="right" width="25%">
                                 <table class="w100 no-wrap">
@@ -217,6 +219,103 @@
             </tr>
         </table>
     </div>
+
+    <g:if test="${requisition.origin.address && requisition.destination.address}">
+        <div id="address" class="page-content">
+            <table class="w100 fixed-layout b-0">
+                <tr>
+                    <td class="b-0">
+                        <h2>${g.message(code: 'deliveryNote.receivedFrom.label', default: 'Received From')}</h2>
+                        <table class="no-border-table w100">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <table class="w100 no-wrap left">
+                                            <tr>
+                                                <td>
+                                                    <strong>${requisition.origin?.name}</strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    ${requisition.origin?.address?.address}
+                                                </td>
+                                            </tr>
+                                            <g:if test="${requisition.origin?.address?.address2}">
+                                                <tr>
+                                                    <td>
+                                                        ${requisition.origin?.address?.address2}
+                                                    </td>
+                                                </tr>
+                                            </g:if>
+                                            <tr>
+                                                <td>
+                                                    ${requisition?.origin?.address?.city}
+                                                    ${requisition?.origin?.address?.stateOrProvince}
+                                                    ${requisition?.origin?.address?.postalCode}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    ${requisition?.origin?.address?.country}
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+
+                    <td class="b-0" class="top">
+                        <h2>${g.message(code: 'deliveryNote.deliveredTo.label', default: 'Delivered To')}</h2>
+
+                        <table class="no-border-table w100">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <table class="w100 no-wrap">
+                                            <tr>
+                                                <td>
+                                                    <strong>${requisition.destination?.name}</strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    ${requisition.destination?.address?.address}
+                                                </td>
+                                            </tr>
+                                            <g:if test="${requisition.destination?.address?.address2}">
+                                                <tr>
+                                                    <td>
+                                                        ${requisition.destination?.address?.address2}
+                                                    </td>
+                                                </tr>
+                                            </g:if>
+                                            <tr>
+                                                <td>
+                                                    ${requisition?.destination?.address?.city}
+                                                    ${requisition?.destination?.address?.stateOrProvince}
+                                                    ${requisition?.destination?.address?.postalCode}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    ${requisition?.destination?.address?.country}
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </g:if>
 
     <g:set var="requisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
     <g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()}}'/>

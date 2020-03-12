@@ -50,7 +50,9 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin Location',
-        hide: ({ hasBinLocationSupport }) => !hasBinLocationSupport,
+        getDynamicAttr: ({ hasBinLocationSupport }) => ({
+          hide: !hasBinLocationSupport,
+        }),
       },
       quantityShipped: {
         type: TextField,
