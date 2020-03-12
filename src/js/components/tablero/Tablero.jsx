@@ -17,6 +17,7 @@ import UnarchiveIndicator from './UnarchivePopout';
 defaults.global.legend = false;
 defaults.scale.ticks.beginAtZero = true;
 
+// eslint-disable-next-line no-shadow
 const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
   <div className="cardComponent">
     {data.map((value, index) =>
@@ -160,6 +161,7 @@ Tablero.propTypes = {
   reorderIndicators: PropTypes.func.isRequired,
   indicatorsData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   addToIndicators: PropTypes.func.isRequired,
+  reloadIndicator: PropTypes.func.isRequired,
 };
 
 NumberCardsRow.defaultProps = {
