@@ -2,7 +2,6 @@ package org.pih.warehouse.tablero
 
 import org.pih.warehouse.tablero.IndicatorData
 
-
 class DataGraph implements Serializable {
     
      IndicatorData data;
