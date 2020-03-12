@@ -1,6 +1,5 @@
 package org.pih.warehouse.tableroapi
 
-import groovy.time.TimeCategory
 import org.pih.warehouse.tablero.DataGraph
 import org.pih.warehouse.tablero.ColorNumber
 import org.pih.warehouse.tablero.IndicatorData
@@ -34,25 +33,21 @@ class IndicatorDataService {
         List listData = []
         List bar2Data  = []
         List listLabel = []
+        today.clearTime()
         for(int i=5;i>=0;i--){
-            // Using TimeCategory to calculate i months ago (i.months = i months instead i days as default)
-            use(TimeCategory) { 
-                // monthBegin = begin of the month i months ago
-                // monthEnd = begin of the month i-1 months ago (end of monthBegin)
-                def monthBegin = today + 1 - today.date - i.months
-                def monthEnd = today + 1 - today.date - (i-1).months
-                monthBegin.clearTime()
-                monthEnd.clearTime()
+            def monthBegin = today.clone()
+            def monthEnd = today.clone()
+            monthBegin.set(month: today.month - i, date: 1)
+            monthEnd.set(month: today.month - i + 1, date: 1)
                 
-                def query1 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ?""", [monthBegin, monthEnd]);
-                String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
+            def query1 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ?""", [monthBegin, monthEnd]);
 
-                def query2 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ? and quantityCanceled > 0 and (cancelReasonCode = 'STOCKOUT' or cancelReasonCode = 'LOW_STOCK' or cancelReasonCode = 'COULD_NOT_LOCATE')""", [monthBegin, monthEnd]);
+            def query2 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ? and quantityCanceled > 0 and (cancelReasonCode = 'STOCKOUT' or cancelReasonCode = 'LOW_STOCK' or cancelReasonCode = 'COULD_NOT_LOCATE')""", [monthBegin, monthEnd]);
+            String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
                 
-                listLabel.push(monthLabel)
-                listData.push(query1[0])
-                bar2Data.push(query2[0])
-            }
+            listLabel.push(monthLabel)
+            listData.push(query1[0])
+            bar2Data.push(query2[0])
         }
         
         List<IndicatorDatasets> datasets = [
@@ -115,20 +110,19 @@ class IndicatorDataService {
     DataGraph getSentStockMovements(def location) {
         List listData = []
         List listLabel = []
+        today.clearTime()
         for(int i=5;i>=0;i--){
-            use(TimeCategory) { 
-                def monthBegin = today + 1 - today.date - i.months
-                def monthEnd = today + 1 - today.date - (i-1).months
-                monthBegin.clearTime()
-                monthEnd.clearTime()
+            def monthBegin = today.clone()
+            def monthEnd = today.clone()
+            monthBegin.set(month: today.month - i, date: 1)
+            monthEnd.set(month: today.month - i + 1, date: 1)
                 
-                def temp = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :monthOne and r.dateCreated < :monthTwo and r.origin = :location""",
+            def temp = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :monthOne and r.dateCreated < :monthTwo and r.origin = :location""",
                 ['monthOne': monthBegin, 'monthTwo': monthEnd, 'location': location]);
-                String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
+            String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
 
-                listLabel.push(monthLabel)
-                listData.push(temp[0])
-            }
+            listLabel.push(monthLabel)
+            listData.push(temp[0])
         }
 
         List<IndicatorDatasets> datasets = [
@@ -145,20 +139,19 @@ class IndicatorDataService {
     DataGraph getReceivedStockData(def location) {
         List listData = []
         List listLabel = []
+        today.clearTime()
         for(int i=5;i>=0;i--){
-            use(TimeCategory) { 
-                def monthBegin = today + 1 - today.date - i.months
-                def monthEnd = today + 1 - today.date - (i-1).months
-                monthBegin.clearTime()
-                monthEnd.clearTime()
+            def monthBegin = today.clone()
+            def monthEnd = today.clone()
+            monthBegin.set(month: today.month - i, date: 1)
+            monthEnd.set(month: today.month - i + 1, date: 1)
                 
-                def temp = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :monthOne and r.dateCreated < :monthTwo and r.destination = :location""",
-                ['monthOne': monthBegin, 'monthTwo': monthEnd, 'location': location]);
-                String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
+            def temp = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :monthOne and r.dateCreated < :monthTwo and r.destination = :location""",
+            ['monthOne': monthBegin, 'monthTwo': monthEnd, 'location': location]);
+            String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
 
-                listLabel.push(monthLabel)
-                listData.push(temp[0])
-            }
+            listLabel.push(monthLabel)
+            listData.push(temp[0])
         }
 
         List<IndicatorDatasets> datasets = [
@@ -173,10 +166,9 @@ class IndicatorDataService {
     }
 
     NumberIndicator getOutgoingStock(def location) {
+        today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;
-        m4.clearTime();
-        m7.clearTime();
 
         def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :day and r.origin = :location""", 
         ['day': m4, 'location': location]);
@@ -197,10 +189,9 @@ class IndicatorDataService {
     }
 
     NumberIndicator getIncomingStock(def location) {
+        today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;
-        m4.clearTime();
-        m7.clearTime();
 
         def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :day and r.destination = :location""",
         ['day': m4, 'location': location]);
