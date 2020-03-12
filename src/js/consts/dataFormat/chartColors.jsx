@@ -1,3 +1,18 @@
+function getColor() {
+  const colors = [
+    '#6fb98f',
+    '#004445',
+    '#2e5685',
+    '#fcc169',
+    '#cf455c',
+    '#ff0000',
+    '#e89da2',
+    '#e0b623',
+    '#444444',
+  ];
+  return colors[_.random(0, colors.length - 1)];
+}
+
 const colorLineChart = {
   borderColor: '#2e5685',
   pointBorderColor: '#2e5685',
@@ -50,6 +65,7 @@ const graphMultipleChart3 = {
 };
 
 export {
+  getColor,
   colorLineChart,
   colorBarChart,
   colorHorizontalBarChart,

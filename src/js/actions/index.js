@@ -154,8 +154,8 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
 export function fetchIndicators() {
   return (dispatch) => {
     fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary');
+    fetchIndicator(dispatch, 'getFillRate', 'bar', 'Fill Rate');
     fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
-    fetchIndicator(dispatch, 'getFillRate', 'line', 'Fill Rate');
     fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Sent Stock Movements');
     fetchIndicator(dispatch, 'getReceivedStockMovements', 'doughnut', 'Stock Movements Received');
     fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements');

@@ -108,7 +108,7 @@ class Tablero extends Component {
 
   handleAdd = (index) => {
     this.props.addToIndicators(index);
-    const size = this.props.indicatorsData.filter(data => data.archived).length;
+    const size = this.props.indicatorsData.filter(data => data.archived).length - 1;
     if (size) this.setState({ showPopout: true });
     else this.setState({ showPopout: false });
   };
