@@ -1,18 +1,17 @@
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
 import loadColors from '../../consts/dataFormat/dataLoading';
-
 import { getColor } from '../../consts/dataFormat/chartColors';
 
+/* global _ */
 const Numbers = () => {
   const colors = ['green', 'yellow', 'red'];
-  const classColor = `circle ${colors[Math.random(0, colors.length - 1)]}`;
+  const classColor = `circle ${colors[_.random(0, colors.length - 1)]}`;
 
   return (
     <div className="value">
-      <div className={classColor} /> {Math.random(3, 95)}
+      <div className={classColor} /> {_.random(3, 95)}
     </div>
   );
 };

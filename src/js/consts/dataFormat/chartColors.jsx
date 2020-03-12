@@ -1,3 +1,4 @@
+/* global _ */
 function getColor() {
   const colors = [
     '#6fb98f',

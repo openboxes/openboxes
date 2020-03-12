@@ -157,7 +157,6 @@ Tablero.propTypes = {
   addToIndicators: PropTypes.func.isRequired,
 };
 
-
 NumberCardsRow.defaultProps = {
   data: null,
 };

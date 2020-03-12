@@ -106,11 +106,12 @@ export function changeCurrentLocale(locale) {
 
 // New Dashboard
 
-function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle, link = null, id = null) {
-  let archived = 0;
-  id = id ? id : Math.random();
+// eslint-disable-next-line max-len
+function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle, link = null, indicatorId = null) {
+  const archived = 0;
+  const id = indicatorId || Math.random();
 
-  const url = "/openboxes/apitablero/" + indicatorMethod;
+  const url = `/openboxes/apitablero/${indicatorMethod}`;
 
   dispatch({
     type: FETCH_INDICATORS,
@@ -120,7 +121,7 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
       type: 'loading',
       data: [],
       archived,
-      link
+      link,
     },
   });
 
@@ -133,7 +134,7 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
         type: indicatorType,
         data: res.data,
         archived,
-        link
+        link,
       },
     });
   }, () => {
@@ -145,7 +146,7 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
         type: 'error',
         data: [],
         archived,
-        link
+        link,
       },
     });
   });
