@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactLoading from 'react-loading';
-import { getColor } from '../../consts/dataFormat/chartColors';
+import { getColor } from '../../consts/dataFormat/dataLoading';
 
 const LoadingCard = () => (
   <div className="loaderDiv">
