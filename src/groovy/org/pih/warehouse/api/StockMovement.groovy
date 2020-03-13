@@ -210,7 +210,6 @@ class StockMovement {
                 description: shipment.description,
                 shipmentType: shipment.shipmentType,
                 statusCode: statusCode,
-                stockMovementType: StockMovementType.INBOUND,
                 dateShipped: shipment.expectedShippingDate,
                 //receiptStatusCode: , // FIXME Need to translate
                 identifier: shipment.shipmentNumber,
@@ -245,7 +244,6 @@ class StockMovement {
                 id: requisition.id,
                 name: requisition.name,
                 identifier: requisition.requestNumber,
-                stockMovementType: StockMovementType.OUTBOUND,
                 description: requisition.description,
                 statusCode: requisition?.status?.name(),
                 origin: requisition.origin,

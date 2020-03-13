@@ -61,7 +61,7 @@
                 </div>
                 <hr/>
                 <div class="action-menu-item">
-                    <g:link controller="stockMovement" action="index" id="${requisition?.id}">
+                    <g:link controller="stockMovement" action="edit" id="${requisition?.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
                         &nbsp;${warehouse.message(code: 'stockMovement.edit.label', default: 'Edit Stock Movement')}
                     </g:link>
