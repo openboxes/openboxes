@@ -4,7 +4,7 @@ import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
-import loadColors from '../../consts/dataFormat/dataLoading';
+import { loadColors } from '../../consts/dataFormat/dataLoading';
 
 
 const DragHandle = sortableHandle(() => (
