@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
-import loadColors from '../../consts/dataFormat/dataLoading';
-import { getColor } from '../../consts/dataFormat/chartColors';
+import { loadColors, getColor } from '../../consts/dataFormat/dataLoading';
 
 /* global _ */
 const Numbers = () => {
