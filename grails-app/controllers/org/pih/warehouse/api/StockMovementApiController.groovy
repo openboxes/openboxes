@@ -111,7 +111,7 @@ class StockMovementApiController {
         JSONObject jsonObject = request.JSON
         log.debug "update status: " + jsonObject.toString(4)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        stockMovementService.updateStatus(stockMovement, jsonObject)
+        stockMovementService.transitionStockMovement(stockMovement, jsonObject)
         render status: 200
     }
 

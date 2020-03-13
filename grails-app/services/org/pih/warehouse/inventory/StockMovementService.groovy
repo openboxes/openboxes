@@ -86,30 +86,27 @@ class StockMovementService {
         }
     }
 
-    void updateStatus(StockMovement stockMovement, JSONObject jsonObject) {
+    void transitionStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         if (stockMovement.requisition) {
-            updateRequisitionBasedStockMovementStatus(stockMovement, jsonObject)
+            transitionRequisitionBasedStockMovement(stockMovement, jsonObject)
         }
         else {
-            updateShipmentBasedStockMovementStatus(stockMovement, jsonObject)
+            transitionShipmentBasedStockMovement(stockMovement, jsonObject)
         }
     }
 
-
-    void updateShipmentBasedStockMovementStatus(StockMovement stockMovement, JSONObject jsonObject) {
+    void transitionShipmentBasedStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         RequisitionStatus status =
                 jsonObject.containsKey("status") ? jsonObject.status as RequisitionStatus : null
         if (status == RequisitionStatus.ISSUED) {
-            sendShipmentStockMovement(stockMovement.id)
+            issueShipmentBasedStockMovement(stockMovement.id)
         }
         else {
             throw new UnsupportedOperationException("Updating inbound status not yet supported")
         }
-
     }
 
-
-    void updateRequisitionBasedStockMovementStatus(StockMovement stockMovement, JSONObject jsonObject) {
+    void transitionRequisitionBasedStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         RequisitionStatus status =
                 jsonObject.containsKey("status") ? jsonObject.status as RequisitionStatus : null
 
@@ -158,7 +155,7 @@ class StockMovementService {
                         createShipment(stockMovement)
                         break
                     case RequisitionStatus.ISSUED:
-                        sendOutboundStockMovement(stockMovement.id)
+                        issueRequisitionBasedStockMovement(stockMovement.id)
                         break
                     default:
                         throw new IllegalArgumentException("Cannot update status with invalid status ${jsonObject.status}")
@@ -332,7 +329,6 @@ class StockMovementService {
         return new PagedResultList(stockMovements, shipments.totalCount)
     }
 
-
     def getOutboundStockMovements(Integer maxResults, Integer offset) {
         return getOutboundStockMovements(new StockMovement(), [:], maxResults, offset)
     }
@@ -399,7 +395,6 @@ class StockMovementService {
             }
         }
 
-
         def stockMovements = requisitions.collect { requisition ->
             return StockMovement.createFromRequisition(requisition)
         }
@@ -432,16 +427,10 @@ class StockMovementService {
         }
     }
 
-
     StockMovement getShipmentBasedStockMovement(Shipment shipment) {
         StockMovement stockMovement = StockMovement.createFromShipment(shipment)
         stockMovement.documents = getDocuments(stockMovement)
         return stockMovement
-    }
-
-
-    StockMovement getRequisitionBasedStockMovement(Requisition requisition) {
-        return getStockMovement(requisition, null)
     }
 
     StockMovement getRequisitionBasedStockMovement(Requisition requisition, String stepNumber) {
@@ -477,7 +466,6 @@ class StockMovementService {
                 getRequisitionBasedStockMovementReceiptItems(stockMovement) :
                 getShipmentBasedStockMovementReceiptItems(stockMovement)
     }
-
 
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(StockMovement stockMovement) {
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
@@ -1886,18 +1874,17 @@ class StockMovementService {
         }
     }
 
-    void sendShipmentStockMovement(String id) {
+    void issueShipmentBasedStockMovement(String id) {
         User user = AuthService.currentUser.get()
         StockMovement stockMovement = getStockMovement(id)
         Shipment shipment = stockMovement.shipment
         if (!shipment) {
             throw new IllegalStateException("There are no shipments associated with stock movement ${stockMovement.id}")
         }
-
         shipmentService.sendShipment(shipment, "Sent on ${new Date()}", user, shipment.origin, stockMovement.dateShipped ?: new Date())
     }
 
-    void sendOutboundStockMovement(String id) {
+    void issueRequisitionBasedStockMovement(String id) {
 
         User user = AuthService.currentUser.get()
         StockMovement stockMovement = getStockMovement(id)
