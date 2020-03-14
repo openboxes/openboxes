@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate } from 'react-localize-redux';
 
-import CreateStockMovement from './CreateStockMovement';
-import AddItemsPage from './AddItemsPage';
-import EditPage from './EditPage';
-import PickPage from './PickPage';
-import PackingPage from './PackingPage';
-import SendMovementPage from './SendMovementPage';
+import CreateStockMovement from './outbound/CreateStockMovement';
+import AddItemsPage from './outbound/AddItemsPage';
+import EditPage from './outbound/EditPage';
+import PickPage from './outbound/PickPage';
+import PackingPage from './outbound/PackingPage';
+import SendMovementPage from './outbound/SendMovementPage';
 import Wizard from '../wizard/Wizard';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';

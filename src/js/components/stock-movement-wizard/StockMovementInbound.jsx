@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate } from 'react-localize-redux';
 
-import CreateStockMovement from './CreateStockMovement';
-import AddItemsPage from './AddItemsPage';
-import SendMovementPage from './SendMovementPage';
+import CreateStockMovement from './inbound/CreateStockMovement';
+import AddItemsPage from './inbound/AddItemsPage';
+import SendMovementPage from './inbound/SendMovementPage';
 import Wizard from '../wizard/Wizard';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
@@ -139,9 +139,9 @@ class StockMovements extends Component {
             },
           };
 
-          const statuses = ['NEW', 'CREATED', 'PICKED'];
+          const statuses = ['NEW', 'CREATED', 'PENDING'];
 
-          let currentPage = 1;
+          let currentPage = 3;
           if (statuses.indexOf(values.statusCode) > 0) {
             currentPage = statuses.indexOf(values.statusCode) + 1;
           }

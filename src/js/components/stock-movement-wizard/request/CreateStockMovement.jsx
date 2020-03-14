@@ -5,19 +5,24 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
+import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import moment from 'moment';
 
-import TextField from '../../form-elements/TextField';
-import SelectField from '../../form-elements/SelectField';
-import DateField from '../../form-elements/DateField';
-import { renderFormField } from '../../../utils/form-utils';
-import apiClient from '../../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../../actions';
-import { debounceUsersFetch, debounceLocationsFetch } from '../../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import TextField from '../form-elements/TextField';
+import SelectField from '../form-elements/SelectField';
+import DateField from '../form-elements/DateField';
+import { renderFormField } from '../../utils/form-utils';
+import apiClient from '../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../actions';
+import { debounceUsersFetch, debounceLocationsFetch } from '../../utils/option-utils';
+import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+
+const request = queryString.parse(window.location.search).type === 'REQUEST';
+const inbound = queryString.parse(window.location.search).direction === 'INBOUND';
+const outbound = queryString.parse(window.location.search).direction === 'OUTBOUND';
 
 function validate(values) {
   const errors = {};
@@ -70,7 +75,12 @@ const FIELDS = {
     },
     getDynamicAttr: props => ({
       loadOptions: props.debouncedLocationsFetch,
-      disabled: !props.isSuperuser,
+      onChange: (value) => {
+        if (value && props.destination && props.destination.id) {
+          props.fetchStockLists(value, props.destination);
+        }
+      },
+      disabled: outbound && !props.isSuperuser,
     }),
   },
   destination: {
@@ -89,7 +99,23 @@ const FIELDS = {
     },
     getDynamicAttr: props => ({
       loadOptions: props.debouncedLocationsFetch,
-      disabled: !props.isSuperuser,
+      onChange: (value) => {
+        if (value && props.origin && props.origin.id) {
+          props.fetchStockLists(props.origin, value);
+        }
+      },
+      disabled: (inbound || request) && !props.isSuperuser,
+    }),
+  },
+  stocklist: {
+    label: 'react.stockMovement.stocklist.label',
+    defaultMessage: 'Stocklist',
+    type: SelectField,
+    getDynamicAttr: ({ origin, destination, stocklists }) => ({
+      disabled: !(origin && destination && origin.id && destination.id),
+      options: stocklists,
+      showValueTooltip: true,
+      objectValue: true,
     }),
   },
   requestedBy: {
@@ -128,9 +154,11 @@ class CreateStockMovement extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      stocklists: [],
       setInitialValues: true,
       values: this.props.initialValues,
     };
+    this.fetchStockLists = this.fetchStockLists.bind(this);
 
     this.debouncedUsersFetch =
       debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -139,29 +167,68 @@ class CreateStockMovement extends Component {
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.props.match.params.stockMovementId && this.state.setInitialValues
-      && nextProps.location.id) {
-      this.setInitialValues(nextProps.location);
+  componentDidMount() {
+    if (this.state.values.origin && this.state.values.destination) {
+      this.fetchStockLists(this.state.values.origin, this.state.values.destination);
     }
   }
 
-  setInitialValues(location) {
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.match.params.stockMovementId && this.state.setInitialValues
+      && nextProps.location.id) {
+      this.setInitialValues(nextProps.location, nextProps.user);
+    }
+  }
+
+  setInitialValues(location, user) {
     const { id, locationType, name } = location;
 
-    const values = {
-      destination: {
-        id,
-        type: locationType ? locationType.locationTypeCode : null,
-        name,
-        label: `${name} [${locationType ? locationType.description : null}]`,
-      },
-    };
-    this.setState({ values, setInitialValues: false });
+    if (inbound) {
+      const values = {
+        destination: {
+          id,
+          type: locationType ? locationType.locationTypeCode : null,
+          name,
+          label: `${name} [${locationType ? locationType.description : null}]`,
+        },
+      };
+      this.setState({ values, setInitialValues: false });
+    }
+
+    if (outbound) {
+      const values = {
+        origin: {
+          id,
+          type: locationType ? locationType.locationTypeCode : null,
+          name,
+          label: `${name} [${locationType ? locationType.description : null}]`,
+        },
+      };
+      this.setState({ values, setInitialValues: false });
+    }
+
+
+    if (request) {
+      const values = {
+        destination: {
+          id,
+          type: locationType ? locationType.locationTypeCode : null,
+          name,
+          label: `${name} [${locationType ? locationType.description : null}]`,
+        },
+        requestedBy: {
+          id: user.id,
+          name: user.name,
+          label: `${user.name}`,
+        },
+        dateRequested: moment(new Date()).format('MM/DD/YYYY'),
+      };
+      this.setState({ values, setInitialValues: false });
+    }
   }
 
   checkStockMovementChange(newValues) {
-    const { origin, destination } = this.props.initialValues;
+    const { origin, destination, stocklist } = this.props.initialValues;
 
     const originLocs = newValues.origin && origin;
     const isOldSupplier = origin && origin.type === 'SUPPLIER';
@@ -169,11 +236,41 @@ class CreateStockMovement extends Component {
     const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier)) ?
       newValues.origin.id !== origin.id : false;
 
-    const checkDest = newValues.destination && destination ?
+    const checkDest = stocklist && newValues.destination && destination ?
       newValues.destination.id !== destination.id : false;
+    const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id', null) !== _.get(stocklist, 'id', null) : false;
 
-    return (checkOrigin || checkDest);
+    return (checkOrigin || checkDest || checkStockList);
   }
+
+  /**
+   * Fetches available stock lists from API with given origin and destination.
+   * @param {object} origin
+   * @param {object} destination
+   * @param {function} clearStocklist
+   * @public
+   */
+  fetchStockLists(origin, destination, clearStocklist) {
+    this.props.showSpinner();
+    const url = `/openboxes/api/stocklists?origin.id=${origin.id}&destination.id=${destination.id}`;
+
+    return apiClient.get(url)
+      .then((response) => {
+        const stocklists = _.map(response.data.data, stocklist => (
+          { value: { id: stocklist.id, name: stocklist.name }, label: stocklist.name }
+        ));
+
+        const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));
+
+        if (stocklistChanged && clearStocklist) {
+          clearStocklist();
+        }
+
+        this.setState({ stocklists }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
 
   /**
    * Creates or updates stock movement with given data
@@ -199,19 +296,21 @@ class CreateStockMovement extends Component {
         'origin.id': values.origin.id,
         'destination.id': values.destination.id,
         'requestedBy.id': values.requestedBy.id,
+        'stocklist.id': _.get(values.stocklist, 'id') || '',
       };
 
       apiClient.post(stockMovementUrl, payload)
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(`/openboxes/stockMovement/createPurchaseOrders/${resp.id}`);
+            this.props.history.push(`/openboxes/stockMovement/create/${resp.id}${request ? '?type=REQUEST' : ''}`);
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,
               lineItems: resp.lineItems,
               movementNumber: resp.identifier,
               name: resp.name,
+              stocklist: resp.stocklist,
             });
           }
         })
@@ -266,11 +365,19 @@ class CreateStockMovement extends Component {
         onSubmit={values => this.nextPage(values)}
         validate={validate}
         initialValues={this.state.values}
-        render={({ form, handleSubmit, values }) => (
+        mutators={{
+          clearStocklist: (args, state, utils) => {
+            utils.changeValue(state, 'stocklist', () => null);
+          },
+        }}
+        render={({ form: { mutators }, handleSubmit, values }) => (
           <form className="create-form" onSubmit={handleSubmit}>
             {_.map(
               FIELDS,
               (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                stocklists: this.state.stocklists,
+                fetchStockLists: (origin, destination) =>
+                  this.fetchStockLists(origin, destination, mutators.clearStocklist),
                 origin: values.origin,
                 destination: values.destination,
                 isSuperuser: this.props.isSuperuser,
@@ -296,6 +403,7 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  user: state.session.user,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -315,6 +423,7 @@ CreateStockMovement.propTypes = {
     destination: PropTypes.shape({
       id: PropTypes.string,
     }),
+    stocklist: PropTypes.shape({}),
   }).isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
@@ -343,4 +452,9 @@ CreateStockMovement.propTypes = {
   translate: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  user: PropTypes.shape({
+    username: PropTypes.string,
+    id: PropTypes.string,
+    name: PropTypes.string,
+  }).isRequired,
 };
