@@ -58,8 +58,8 @@ class StockMovementApiController {
     def create = { StockMovement stockMovement ->
         // Detect whether inbound or outbound stock movement
         def currentLocation = Location.get(session.warehouse.id)
-        def stockMovementType = stockMovement.origin.equals(currentLocation) ?
-                StockMovementType.OUTBOUND ? stockMovement.destination.equals(currentLocation) :
+        StockMovementType stockMovementType = stockMovement.origin.equals(currentLocation) ?
+                StockMovementType.OUTBOUND : stockMovement.destination.equals(currentLocation) ?
                         StockMovementType.INBOUND : null
 
         stockMovement.stockMovementType = stockMovementType
