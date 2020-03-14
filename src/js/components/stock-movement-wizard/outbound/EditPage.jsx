@@ -8,7 +8,6 @@ import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import update from 'immutability-helper';
-import queryString from 'query-string';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -23,8 +22,6 @@ import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
 import ButtonField from '../../form-elements/ButtonField';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-
-const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
@@ -130,7 +127,7 @@ const FIELDS = {
           productCode: fieldValue.productCode,
           btnOpenText: `react.stockMovement.${fieldValue.substitutionStatus}.label`,
           btnOpenDefaultText: `${fieldValue.substitutionStatus}`,
-          btnOpenDisabled: fieldValue.statusCode === 'SUBSTITUTED' || showOnly,
+          btnOpenDisabled: fieldValue.statusCode === 'SUBSTITUTED',
           btnOpenClassName: BTN_CLASS_MAPPER[fieldValue.substitutionStatus || 'HIDDEN'],
           rowIndex,
           lineItem: fieldValue,
@@ -149,7 +146,7 @@ const FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({ fieldValue, subfield }) => ({
-          disabled: fieldValue === 'SUBSTITUTED' || subfield || showOnly,
+          disabled: fieldValue === 'SUBSTITUTED' || subfield,
         }),
       },
       reasonCode: {
@@ -179,7 +176,6 @@ const FIELDS = {
         }),
         attributes: {
           className: 'btn btn-outline-danger',
-          btnOpenDisabled: showOnly,
         },
       },
     },
@@ -439,7 +435,7 @@ class EditItemsPage extends Component {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = {
       status: 'PICKING',
-      createPicklist: this.state.statusCode === 'VERIFYING' ? 'true' : 'false',
+      createPicklist: this.state.statusCode === 'REQUESTED' ? 'true' : 'false',
     };
 
     return apiClient.post(url, payload);
@@ -620,53 +616,41 @@ class EditItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            { !showOnly ?
-              <span>
-                <button
-                  type="button"
-                  onClick={() => this.refresh()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-refresh pr-2" /><Translate
-                    id="react.default.button.refresh.label"
-                    defaultMessage="Reload"
-                  />
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-save pr-2" /><Translate
-                    id="react.default.button.save.label"
-                    defaultMessage="Save"
-                  />
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.saveAndExit(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-                >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate
-                    id="react.default.button.saveAndExit.label"
-                    defaultMessage="Save and exit"
-                  />
-                  </span>
-                </button>
-              </span>
-              :
+            <span>
               <button
                 type="button"
-                disabled={invalid}
-                onClick={() => {
-                  window.location = '/openboxes/stockMovement/list?type=REQUEST';
-                }}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
+                onClick={() => this.refresh()}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
-              </button> }
+                <span><i className="fa fa-refresh pr-2" /><Translate
+                  id="react.default.button.refresh.label"
+                  defaultMessage="Reload"
+                />
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.save(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-save pr-2" /><Translate
+                  id="react.default.button.save.label"
+                  defaultMessage="Save"
+                />
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.saveAndExit(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+              >
+                <span><i className="fa fa-sign-out pr-2" /><Translate
+                  id="react.default.button.saveAndExit.label"
+                  defaultMessage="Save and exit"
+                />
+                </span>
+              </button>
+            </span>
             <form onSubmit={handleSubmit}>
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stockMovementId: values.stockMovementId,
@@ -682,14 +666,13 @@ class EditItemsPage extends Component {
                 <button
                   type="submit"
                   onClick={() => this.previousPage(values, invalid)}
-                  disabled={showOnly}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
-                  disabled={!this.state.hasItemsLoaded || showOnly}
+                  disabled={!this.state.hasItemsLoaded}
                   onClick={() => {
                     if (!invalid) {
                       this.nextPage(values);

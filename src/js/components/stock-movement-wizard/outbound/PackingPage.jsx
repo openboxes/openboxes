@@ -8,7 +8,6 @@ import Alert from 'react-s-alert';
 import update from 'immutability-helper';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
-import queryString from 'query-string';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -22,8 +21,6 @@ import { showSpinner, hideSpinner } from '../../../actions';
 import PackingSplitLineModal from '../modals/PackingSplitLineModal';
 import { debounceUsersFetch } from '../../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-
-const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
 const FIELDS = {
   packPageItems: {
@@ -96,7 +93,6 @@ const FIELDS = {
           cache: false,
           options: [],
           labelKey: 'name',
-          disabled: showOnly,
           filterOptions: options => options,
         },
         getDynamicAttr: props => ({
@@ -108,18 +104,12 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
         flexWidth: '0.8',
-        attributes: {
-          disabled: showOnly,
-        },
       },
       boxName: {
         type: TextField,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '0.8',
-        attributes: {
-          disabled: showOnly,
-        },
       },
       splitLineItems: {
         type: PackingSplitLineModal,
@@ -132,7 +122,6 @@ const FIELDS = {
           btnOpenText: 'react.stockMovement.splitLine.label',
           btnOpenDefaultText: 'Split line',
           btnOpenClassName: 'btn btn-outline-success',
-          btnOpenDisabled: showOnly,
         },
         getDynamicAttr: ({
           fieldValue, rowIndex, onSave, formValues,
@@ -257,7 +246,7 @@ class PackingPage extends Component {
    */
   transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const status = 'CHECKING';
+    const status = 'REVIEWING';
     const payload = { status };
 
     if (this.state.values.statusCode !== status) {
@@ -349,45 +338,35 @@ class PackingPage extends Component {
         validate={validate}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            { !showOnly ?
-              <span>
-                <button
-                  type="button"
-                  onClick={() => this.refresh()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-refresh pr-2" />
-                    <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
-                >
-                  <span><i className="fa fa-save pr-2" />
-                    <Translate id="react.default.button.save.label" defaultMessage="Save" />
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; })}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-                >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-                </button>
-              </span>
-              :
+            <span>
+              <button
+                type="button"
+                onClick={() => this.refresh()}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-refresh pr-2" />
+                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
+                </span>
+              </button>
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => { window.location = '/openboxes/stockMovement/list?type=REQUEST'; }}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
+                onClick={() => this.save(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
               >
-                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
-              </button> }
+                <span><i className="fa fa-save pr-2" />
+                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                </span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; })}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+              >
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+              </button>
+            </span>
             <form onSubmit={handleSubmit}>
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 onSave: this.saveSplitLines,
@@ -399,13 +378,13 @@ class PackingPage extends Component {
                 <button
                   type="button"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={showOnly || invalid}
+                  disabled={invalid}
                   onClick={() => this.savePackingData(values.packPageItems)
                     .then(() => this.props.previousPage(values))}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly || invalid}>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={invalid}>
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

@@ -462,7 +462,7 @@ class AddItemsPage extends Component {
         if (resp) {
           values = { ...formValues, lineItems: resp.data.data.lineItems };
         }
-        this.transitionToNextStep('CHECKING')
+        this.transitionToNextStep()
           .then(() => {
             this.props.nextPage(values);
           })
@@ -648,12 +648,11 @@ class AddItemsPage extends Component {
    * Transition to next stock movement status:
    * - 'CHECKING' if origin type is supplier.
    * - 'VERIFYING' if origin type is other than supplier.
-   * @param {string} status
    * @public
    */
-  transitionToNextStep(status) {
+  transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status };
+    const payload = { status: 'PENDING' };
 
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload);

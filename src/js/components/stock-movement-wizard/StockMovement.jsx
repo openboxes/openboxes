@@ -182,9 +182,9 @@ class StockMovements extends Component {
 
           let statuses = [];
           if (this.props.hasPackingSupport) {
-            statuses = ['NEW', 'CREATED', 'VERIFYING', 'PICKING', 'PACKED', 'PICKED'];
+            statuses = ['NEW', 'CREATED', 'REQUESTED', 'PICKING', 'PACKING', 'REVIEWING'];
           } else {
-            statuses = ['NEW', 'CREATED', 'VERIFYING', 'PICKING', 'PICKED'];
+            statuses = ['NEW', 'CREATED', 'REQUESTED', 'PICKING', 'REVIEWING'];
           }
 
           let currentPage = 1;

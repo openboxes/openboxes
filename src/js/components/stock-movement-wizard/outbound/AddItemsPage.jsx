@@ -542,35 +542,19 @@ class AddItemsPage extends Component {
   saveAndTransitionToNextStep(formValues, lineItems) {
     this.props.showSpinner();
 
-    if (formValues.origin.type === 'SUPPLIER' || !formValues.hasManageInventory) {
-      this.saveRequisitionItems(lineItems)
-        .then((resp) => {
-          let values = formValues;
-          if (resp) {
-            values = { ...formValues, lineItems: resp.data.data.lineItems };
-          }
-          this.transitionToNextStep('CHECKING')
-            .then(() => {
-              this.props.goToPage(this.props.hasPackingSupport ? 6 : 5, values);
-            })
-            .catch(() => this.props.hideSpinner());
-        })
-        .catch(() => this.props.hideSpinner());
-    } else {
-      this.saveRequisitionItems(lineItems)
-        .then((resp) => {
-          let values = formValues;
-          if (resp) {
-            values = { ...formValues, lineItems: resp.data.data.lineItems };
-          }
-          this.transitionToNextStep('VERIFYING')
-            .then(() => {
-              this.props.nextPage(values);
-            })
-            .catch(() => this.props.hideSpinner());
-        })
-        .catch(() => this.props.hideSpinner());
-    }
+    this.saveRequisitionItems(lineItems)
+      .then((resp) => {
+        let values = formValues;
+        if (resp) {
+          values = { ...formValues, lineItems: resp.data.data.lineItems };
+        }
+        this.transitionToNextStep()
+          .then(() => {
+            this.props.nextPage(values);
+          })
+          .catch(() => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -754,12 +738,11 @@ class AddItemsPage extends Component {
    * Transition to next stock movement status:
    * - 'CHECKING' if origin type is supplier.
    * - 'VERIFYING' if origin type is other than supplier.
-   * @param {string} status
    * @public
    */
-  transitionToNextStep(status) {
+  transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status };
+    const payload = { status: 'REQUESTED' };
 
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload);
@@ -1002,8 +985,6 @@ AddItemsPage.propTypes = {
   }).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
-  /** Function taking user to specified page */
-  goToPage: PropTypes.func.isRequired,
   /**
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
@@ -1024,6 +1005,4 @@ AddItemsPage.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
-  /** Is true when currently selected location supports packing */
-  hasPackingSupport: PropTypes.bool.isRequired,
 };
