@@ -237,24 +237,24 @@ class AddItemsPage extends Component {
 
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
-        product: item.product.id,
+        'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
         palletName: item.palletName,
         boxName: item.boxName,
         lotNumber: item.lotNumber,
         expirationDate: item.expirationDate,
-        recipient: _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
+        'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
         sortOrder: item.sortOrder,
       })),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
-        product: item.product.id,
+        'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
         palletName: item.palletName,
         boxName: item.boxName,
         lotNumber: item.lotNumber,
         expirationDate: item.expirationDate,
-        recipient: _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
+        'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
         sortOrder: item.sortOrder,
       })),
     );
