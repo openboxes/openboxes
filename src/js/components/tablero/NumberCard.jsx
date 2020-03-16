@@ -6,7 +6,7 @@ function truncateString(value, length) {
   return (value.length > length) ? `${value.substr(0, length - 1)}...` : value;
 }
 
-const NumberCard = ({ 
+const NumberCard = ({
   cardTitle, cardNumber, cardSubtitle, cardLink,
 }) => {
   const card = (
@@ -18,19 +18,14 @@ const NumberCard = ({
   );
 
   return (
-    cardLink ? <a href={cardLink} className="numberCard" target="_blank">{card}</a> : <div className="numberCard">{card}</div>
+    cardLink ? <a target="_blank" rel="noopener noreferrer" href={cardLink} className="numberCard">{card}</a> : <div className="numberCard">{card}</div>
   );
 };
 
 export default NumberCard;
-// TO DELETE when data are received from the backend
-NumberCard.defaultProps = {
-  cardLink: '',
-};
-
 NumberCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardNumber: PropTypes.number.isRequired,
   cardSubtitle: PropTypes.string.isRequired,
-  cardLink: PropTypes.string,
+  cardLink: PropTypes.string.isRequired,
 };

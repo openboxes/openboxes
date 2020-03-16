@@ -9,7 +9,7 @@ class NumberData implements Serializable {
      int id;
      String link;
 
-    NumberData(String title, Long number, String subtitle, int id, String link = null)
+    NumberData(String title, Long number, String subtitle, int id, String link = '')
     {
         this.title = title;
         this.number = number;
