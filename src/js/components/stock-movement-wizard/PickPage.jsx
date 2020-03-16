@@ -209,13 +209,13 @@ class PickPage extends Component {
     this.setState({
       values: {
         ...this.state.values,
-        pickPageItems: this.props.isPaginated ? _.uniq(_.concat(
+        pickPageItems: this.props.isPaginated ? _.uniqBy(_.concat(
           this.state.values.pickPageItems,
           _.map(
             parseResponse(data),
             item => this.checkForInitialPicksChanges(item),
           ),
-        )) : _.map(
+        ), 'requisitionItem.id') : _.map(
           parseResponse(data),
           item => this.checkForInitialPicksChanges(item),
         ),
