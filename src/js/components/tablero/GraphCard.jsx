@@ -32,7 +32,7 @@ const GraphCard = SortableElement(({
     graph = <Line data={data} />;
   } else if (cardType === 'bar') {
     cardData.datasets = loadColors(data, 'bar');
-    graph = <Bar data={data} options={stackedBar} />;
+    graph = <Bar data={data} options={cardMethod === 'getFillRate' ? null : stackedBar} />;
     filter = 1;
   } else if (cardType === 'doughnut') {
     cardData.datasets = loadColors(data, 'doughnut');
