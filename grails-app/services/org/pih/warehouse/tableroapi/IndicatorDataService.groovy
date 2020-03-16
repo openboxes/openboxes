@@ -151,31 +151,41 @@ DataGraph getSentStockMovements(def location, def params){
     return indicatorData;
 }
 
-    DataGraph getReceivedStockData(def location) {
+    DataGraph getReceivedStockData(def location, def params) {
+        Integer querySize = params.querySize? params.querySize.toInteger() : 5
+    List allLocations = dataService.executeQuery("select id from openboxes.location")
+    List listDatasets = []
+    List listLabel = []
+    today.clearTime()
+    for(item in allLocations){
         List listData = []
-        List listLabel = []
-        today.clearTime()
-        for(int i=5;i>=0;i--){
-            def monthBegin = today.clone()
-            def monthEnd = today.clone()
-            monthBegin.set(month: today.month - i, date: 1)
-            monthEnd.set(month: today.month - i + 1, date: 1)
-                
-            def temp = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :monthOne and r.dateCreated < :monthTwo and r.destination = :location""",
-            ['monthOne': monthBegin, 'monthTwo': monthEnd, 'location': location]);
-            String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
+        listLabel = []
+        try{
+            List locationName = dataService.executeQuery("select name from location where id="+item[0].value)
+            for(int i=querySize;i>=0;i--){
+                def monthBegin = today.clone()
+                def monthEnd = today.clone()
+                monthBegin.set(month: today.month - i, date: 1)
+                monthEnd.set(month: today.month - i + 1, date: 1)
 
-            listLabel.push(monthLabel)
-            listData.push(temp[0])
+                def query = Shipment.executeQuery("select count(*) from Shipment s where s.lastUpdated >= :monthOne and s.lastUpdated < :monthTwo and s.destination = "+ item[0].value +" and s.currentStatus <> 'PENDING'",
+                // The column transaction_transaction_date doesn't exist, using lastUpdated instead
+                ['monthOne': monthBegin, 'monthTwo': monthEnd]);
+                String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month].substring(0,3)
+
+                listLabel.push(monthLabel)
+                listData.push(query[0])
+            }
+            listDatasets.push(new IndicatorDatasets(locationName[0].name, listData))
+        }catch(err){
+            println "Query error in getReceivedStockData : " + err
         }
-
-        List<IndicatorDatasets> datasets = [
-            new IndicatorDatasets('Stock movements received', listData)
-        ];
+    }
+    List<IndicatorDatasets> datasets = listDatasets;
 
         IndicatorData data = new IndicatorData(datasets, listLabel);
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Stock movements received", "doughnut");
+        DataGraph indicatorData = new DataGraph(data, 1, "Incoming Stock Movements by Month", "bar");
 
         return indicatorData;
     }
