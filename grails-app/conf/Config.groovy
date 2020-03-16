@@ -399,7 +399,7 @@ openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
 openboxes.linePrinterTerminal.port = "LPT1"
 
 // Require approval on purchase orders
-openboxes.purchasing.approval.enabled = true
+openboxes.purchasing.approval.enabled = false
 openboxes.purchasing.approval.minimumAmount = 0.00
 openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_APPROVER]
 
