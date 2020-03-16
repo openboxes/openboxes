@@ -7,8 +7,6 @@ import org.pih.warehouse.tablero.NumberIndicator
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 
-import groovy.time.TimeCategory
-
 import org.pih.warehouse.tablero.IndicatorDatasets
 
 class IndicatorDataService {
