@@ -12,7 +12,7 @@ const DragHandle = sortableHandle(() => (
 ));
 
 const GraphCard = SortableElement(({
-  cardTitle, cardType, cardLink, data,
+  cardMethod, cardId, cardTitle, cardType, cardLink, data, reloadIndicator,
 }) => {
   const cardData = data;
   let graph;
@@ -20,19 +20,20 @@ const GraphCard = SortableElement(({
   const stackedBar = {
     scales: {
       xAxes: [{
-        stacked: true
+        stacked: true,
       }],
       yAxes: [{
-        stacked: true
-      }]
-    }
-  }
+        stacked: true,
+      }],
+    },
+  };
   if (cardType === 'line') {
     cardData.datasets = loadColors(data, 'line');
     graph = <Line data={data} />;
   } else if (cardType === 'bar') {
     cardData.datasets = loadColors(data, 'bar');
-    graph = <Bar data={data} />;
+    graph = <Bar data={data} options={stackedBar} />;
+    filter = 1;
   } else if (cardType === 'doughnut') {
     cardData.datasets = loadColors(data, 'doughnut');
     graph = <Doughnut data={data} />;
@@ -62,8 +63,8 @@ const GraphCard = SortableElement(({
       <div className="contentCard">
         <div className="dataFilter">
           <select
-            className={filter ? "customSelect" : "customSelect disabled"}
-            onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, "querySize=" + e.target.value)}
+            className={filter ? 'customSelect' : 'customSelect disabled'}
+            onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
           >
             <option value="6">Last 6 Months</option>
@@ -83,4 +84,3 @@ GraphCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardType: PropTypes.string.isRequired,
 };
-
