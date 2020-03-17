@@ -10,7 +10,6 @@
 package org.pih.warehouse.shipping
 
 import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Document
 
 class DocumentUploadCommand {
     String shipmentId
@@ -18,14 +17,14 @@ class DocumentUploadCommand {
 }
 
 class DocumentUploadController {
-    def upload = { DocumentUploadCommand command ->
+    def upload(DocumentUploadCommand command) {
         def shipment = Shipment.get(command.shipmentId)
         shipment.addToDocuments(command.document)
         redirect(action: 'view', id: command.shipmentId)
     }
-    def form = {
+    def form() {
 
         [shipments: Shipment.list()]
     }
-    def view = {}
+    def view() {}
 }

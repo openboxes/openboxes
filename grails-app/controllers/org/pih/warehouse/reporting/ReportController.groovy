@@ -50,53 +50,53 @@ class ReportController {
     def userService
     StdScheduler quartzScheduler
 
-    def refreshProductDemand = {
+    def refreshProductDemand() {
         reportService.refreshProductDemandData()
         render([success: true] as JSON)
     }
 
-    def refreshProductAvailability = {
+    def refreshProductAvailability() {
         productAvailabilityService.refreshProductAvailability(Boolean.TRUE)
         render([success: true] as JSON)
     }
 
-    def refreshTransactionFact = {
+    def refreshTransactionFact() {
         reportService.buildTransactionFact()
         render([success: true] as JSON)
     }
 
-    def refreshConsumptionFact = {
+    def refreshConsumptionFact() {
         reportService.buildConsumptionFact()
         render([success: true] as JSON)
     }
 
-    def refreshStockoutFact = {
+    def refreshStockoutFact() {
         reportService.buildStockoutFact()
         render([success: true] as JSON)
     }
 
-    def buildFacts = {
+    def buildFacts() {
         def startTime = System.currentTimeMillis()
         def results = reportService.buildFacts()
         def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
         render([responseTime: responseTime, results: results, groovyVersion: GroovySystem.version] as JSON)
     }
 
-    def truncateFacts = {
+    def truncateFacts() {
         def startTime = System.currentTimeMillis()
         reportService.truncateFacts()
         def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
         render([responseTime: responseTime] as JSON)
     }
 
-    def buildDimensions = {
+    def buildDimensions() {
         def startTime = System.currentTimeMillis()
         reportService.buildDimensions()
         def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
         render([responseTime: responseTime] as JSON)
     }
 
-    def truncateDimensions = {
+    def truncateDimensions() {
         def startTime = System.currentTimeMillis()
         reportService.truncateDimensions()
         def responseTime = "${(System.currentTimeMillis() - startTime)} ms"
@@ -154,7 +154,7 @@ class ReportController {
     }
 
 
-    def exportBinLocation = {
+    def exportBinLocation() {
         long startTime = System.currentTimeMillis()
         log.info "Export by bin location " + params
         Location location = Location.get(session.warehouse.id)
@@ -185,8 +185,7 @@ class ReportController {
         render([elapsedTime: (System.currentTimeMillis() - startTime), binLocationCount: binLocations.size(), productCount: products.size(), binLocations: binLocations] as JSON)
     }
 
-
-    def exportDemandReport = {
+    def exportDemandReport() {
         long startTime = System.currentTimeMillis()
         Location location = Location.get(session.warehouse.id)
         def data = forecastingService.getDemandDetails(location, null)
@@ -200,8 +199,7 @@ class ReportController {
         render([responseTime: (System.currentTimeMillis() - startTime), count: data.size(), data: data] as JSON)
     }
 
-
-    def exportInventoryReport = {
+    def exportInventoryReport() {
         println "Export inventory report " + params
         def map = []
         def location = Location.get(session.warehouse.id)
@@ -220,10 +218,9 @@ class ReportController {
         return
     }
 
-    def showInventoryReport = {}
+    def showInventoryReport() {}
 
-
-    def showInventorySamplingReport = {
+    def showInventorySamplingReport() {
 
         def sw = new StringWriter()
         def count = (params.n ?: 10).toInteger()
@@ -267,15 +264,14 @@ class ReportController {
 
     }
 
-
-    def showConsumptionReport = {
+    def showConsumptionReport() {
 
         def transactions = Transaction.findAllByTransactionDateBetween(new Date() - 10, new Date())
 
         [transactions: transactions]
     }
 
-    def showTransactionReport = {
+    def showTransactionReport() {
         InventoryReportCommand command = new InventoryReportCommand()
         command.location = Location.get(session.warehouse.id)
         command.rootCategory = productService.getRootCategory()
@@ -298,12 +294,12 @@ class ReportController {
         return model
     }
 
-    def showTransactionReportDialog = {
+    def showTransactionReportDialog() {
         def url = createLink(controller: "json", action: "getTransactionReportDetails", params:params)
         render(template: "dataTableDialog", model: [url: url])
     }
 
-    def showShippingReport = { ChecklistReportCommand command ->
+    def showShippingReport(ChecklistReportCommand command) {
         command.rootCategory = productService.getRootCategory()
         if (!command?.hasErrors()) {
             reportService.generateShippingReport(command)
@@ -311,7 +307,7 @@ class ReportController {
         [command: command]
     }
 
-    def showPaginatedPackingListReport = { ChecklistReportCommand command ->
+    def showPaginatedPackingListReport(ChecklistReportCommand command) {
         command.rootCategory = productService.getRootCategory()
         if (!command?.hasErrors()) {
             reportService.generateShippingReport(command)
@@ -319,7 +315,7 @@ class ReportController {
         [command: command]
     }
 
-    def printShippingReport = { ChecklistReportCommand command ->
+    def printShippingReport(ChecklistReportCommand command) {
         command.rootCategory = productService.getRootCategory()
         if (!command?.hasErrors()) {
             reportService.generateShippingReport(command)
@@ -327,7 +323,7 @@ class ReportController {
         [command: command]
     }
 
-    def printPickListReport = { ChecklistReportCommand command ->
+    def printPickListReport(ChecklistReportCommand command) {
 
         Map binLocations
         if (!command?.hasErrors()) {
@@ -337,8 +333,7 @@ class ReportController {
         [command: command, binLocations: binLocations]
     }
 
-
-    def printPaginatedPackingListReport = { ChecklistReportCommand command ->
+    def printPaginatedPackingListReport(ChecklistReportCommand command) {
         try {
             command.rootCategory = productService.getRootCategory()
             if (!command?.hasErrors()) {
@@ -351,8 +346,7 @@ class ReportController {
         [command: command]
     }
 
-
-    def downloadTransactionReport = {
+    def downloadTransactionReport() {
         def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
 
         // JSESSIONID is required because otherwise the login page is rendered
@@ -378,7 +372,7 @@ class ReportController {
         reportService.generatePdf(url, response.getOutputStream())
     }
 
-    def downloadShippingReport = {
+    def downloadShippingReport() {
         if (params.format == 'docx') {
             def tempFile = documentService.generateChecklistAsDocx()
             response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
@@ -398,13 +392,12 @@ class ReportController {
     }
 
     //@CacheFlush(["binLocationReportCache", "binLocationSummaryCache"])
-    def clearBinLocationCache = {
+    def clearBinLocationCache() {
         flash.message = "Cache have been flushed"
         redirect(action: "showBinLocationReport")
     }
 
-
-    def showBinLocationReport = {
+    def showBinLocationReport() {
 
         log.info "showBinLocationReport " + params
         def startTime = System.currentTimeMillis()
@@ -458,7 +451,7 @@ class ReportController {
 
     }
 
-    def showOnOrderReport = {
+    def showOnOrderReport() {
         if (params.downloadAction == "downloadOnOrderReport") {
             def location = Location.get(session.warehouse.id)
             def items = orderService.getPendingInboundOrderItems(location)
@@ -543,7 +536,7 @@ class ReportController {
         }
     }
 
-    def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
+    def showInventoryByLocationReport(MultiLocationInventoryReportCommand command) {
         command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations)
 
         if (params.button == "download") {
@@ -606,7 +599,7 @@ class ReportController {
         render(view: 'showInventoryByLocationReport', model: [command: command])
     }
 
-    def showRequestDetailReport = {
+    def showRequestDetailReport() {
         def origin = Location.get(session.warehouse.id)
         params.origin = origin.id
         render(view: 'showRequestDetailReport', params: params)

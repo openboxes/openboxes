@@ -47,11 +47,11 @@ class OrderController {
 
     static allowedMethods = [save: "POST", update: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = { OrderCommand command ->
+    def list(OrderCommand command) {
 
         Location currentLocation = Location.get(session.warehouse.id)
         Boolean isCentralPurchasingEnabled = currentLocation.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
@@ -214,16 +214,16 @@ class OrderController {
         ]
     }
 
-    def listOrderItems = {
+    def listOrderItems() {
         def orderItems = OrderItem.getAll().findAll { !it.isCompletelyFulfilled() }
         return [orderItems: orderItems]
     }
 
-    def create = {
-        redirect(controller: 'purchaseOrder', action: 'index')
+    def create() {
+        redirect(controller: 'purchaseOrderWorkflow', action: 'index')
     }
 
-    def save = {
+    def save() {
         def orderInstance = new Order(params)
         if (orderInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
@@ -233,7 +233,7 @@ class OrderController {
         }
     }
 
-    def show = {
+    def show() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -243,7 +243,7 @@ class OrderController {
         }
     }
 
-    def edit = {
+    def edit() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -253,7 +253,7 @@ class OrderController {
         }
     }
 
-    def placeOrder = {
+    def placeOrder() {
         log.info "Issue order " + params
         def orderInstance = orderService.placeOrder(params.id, session.user.id)
         if (orderInstance) {
@@ -270,7 +270,7 @@ class OrderController {
     }
 
 
-    def update = {
+    def update() {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             if (params.version) {
@@ -296,7 +296,7 @@ class OrderController {
     }
 
 
-    def remove = {
+    def remove() {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             if (orderInstance.hasPrepaymentInvoice) {
@@ -328,7 +328,7 @@ class OrderController {
         }
     }
 
-    def addAdjustment = {
+    def addAdjustment() {
         def orderInstance = Order.get(params?.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -338,7 +338,7 @@ class OrderController {
         }
     }
 
-    def editAdjustment = {
+    def editAdjustment() {
         def orderInstance = Order.get(params?.order?.id)
         def currentLocation = Location.get(session.warehouse.id)
         def isAccountingRequired = currentLocation?.isAccountingRequired()
@@ -357,7 +357,7 @@ class OrderController {
         }
     }
 
-    def saveAdjustment = {
+    def saveAdjustment() {
         def orderInstance = Order.get(params?.order?.id)
         def currentLocation = Location.get(session?.warehouse.id)
         if (orderInstance) {
@@ -403,7 +403,7 @@ class OrderController {
 
     }
 
-    def deleteAdjustment = {
+    def deleteAdjustment() {
         User user = User.get(session?.user?.id)
 
         OrderAdjustment orderAdjustment = OrderAdjustment.get(params?.id)
@@ -421,7 +421,7 @@ class OrderController {
 
 
 
-    def addComment = {
+    def addComment() {
         def orderInstance = Order.get(params?.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -431,7 +431,7 @@ class OrderController {
         }
     }
 
-    def editComment = {
+    def editComment() {
         def orderInstance = Order.get(params?.order?.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -446,7 +446,7 @@ class OrderController {
         }
     }
 
-    def deleteComment = {
+    def deleteComment() {
         def orderInstance = Order.get(params.order.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
@@ -468,7 +468,7 @@ class OrderController {
         }
     }
 
-    def saveComment = {
+    def saveComment() {
         log.info(params)
 
         def orderInstance = Order.get(params?.order?.id)
@@ -499,7 +499,7 @@ class OrderController {
 
     }
 
-    def addDocument = {
+    def addDocument() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -509,7 +509,7 @@ class OrderController {
         }
     }
 
-    def editDocument = {
+    def editDocument() {
         def orderInstance = Order.get(params?.order?.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -524,7 +524,7 @@ class OrderController {
         }
     }
 
-    def deleteDocument = {
+    def deleteDocument() {
         def orderInstance = Order.get(params.order.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
@@ -546,7 +546,7 @@ class OrderController {
         }
     }
 
-    def receive = {
+    def receive() {
         def orderCommand = orderService.getOrder(params.id, session.user.id)
         if (!orderCommand.order) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -556,7 +556,7 @@ class OrderController {
         }
     }
 
-    def saveOrderShipment = { OrderCommand command ->
+    def saveOrderShipment(OrderCommand command) {
         bindData(command, params)
         def orderInstance = Order.get(params?.order?.id)
         command.order = orderInstance
@@ -573,7 +573,7 @@ class OrderController {
     }
 
 
-    def fulfill = {
+    def fulfill() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -583,7 +583,7 @@ class OrderController {
         }
     }
 
-    def addOrderItemToShipment = {
+    def addOrderItemToShipment() {
 
         def orderInstance = Order.get(params?.id)
         def orderItem = OrderItem.get(params?.orderItem?.id)
@@ -605,7 +605,7 @@ class OrderController {
 
     }
 
-    def download = {
+    def download() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -663,7 +663,7 @@ class OrderController {
         }
     }
 
-    def orderItemFormDialog = {
+    def orderItemFormDialog() {
         OrderItem orderItem = OrderItem.get(params.id)
         def currentLocation = Location.get(session.warehouse.id)
         def isAccountingRequired = currentLocation?.isAccountingRequired()
@@ -674,13 +674,13 @@ class OrderController {
                 model: [orderItem:orderItem, canEdit: orderService.canOrderItemBeEdited(orderItem, session.user), isAccountingRequired: isAccountingRequired])
     }
 
-    def productSourceFormDialog = {
+    def productSourceFormDialog() {
         Product product = Product.get(params.productId)
         Organization supplier = Organization.get(params.supplierId)
         render(template: "productSourceFormDialog", model: [product: product, supplier: supplier])
     }
 
-    def createProductSource = {
+    def createProductSource() {
         Organization supplier = Organization.get(params.supplier.id)
         ProductSupplier productSupplier = ProductSupplier.findByCodeAndSupplier(params.sourceCode, supplier)
         if (params.sourceCode && productSupplier) {
@@ -697,7 +697,7 @@ class OrderController {
         render (status: 200, text: productSupplier.id)
     }
 
-    def removeOrderItem = {
+    def removeOrderItem() {
         User user = User.get(session?.user?.id)
 
         OrderItem orderItem = OrderItem.get(params.id)
@@ -710,7 +710,7 @@ class OrderController {
         render (status: 200, text: "Successfully deleted order item")
     }
 
-    def saveOrderItem = {
+    def saveOrderItem() {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
         ProductSupplier productSupplier = null
@@ -776,7 +776,7 @@ class OrderController {
         render (status: 200, text: "Successfully added order item")
     }
 
-    def getOrderItems = {
+    def getOrderItems() {
         def orderInstance = Order.get(params.id)
         def orderItems = orderInstance.orderItems.collect {
             [
@@ -811,7 +811,7 @@ class OrderController {
     }
 
 
-    def downloadOrderItems = {
+    def downloadOrderItems() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -865,7 +865,7 @@ class OrderController {
         }
     }
 
-    def importOrderItems = {
+    def importOrderItems() {
         def orderInstance = Order.get(params.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
         if (!orderInstance) {
@@ -898,7 +898,7 @@ class OrderController {
     }
 
 
-    def upload = {
+    def upload() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -909,7 +909,7 @@ class OrderController {
     }
 
 
-    def print = {
+    def print() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -924,7 +924,7 @@ class OrderController {
         }
     }
 
-    def render = {
+    def render() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -972,7 +972,7 @@ class OrderController {
         [orderInstance:orderInstance]
     }
 
-    def rollbackOrderStatus = {
+    def rollbackOrderStatus() {
 
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
@@ -986,7 +986,7 @@ class OrderController {
 
     }
 
-    def exportTemplate = {
+    def exportTemplate() {
         Order order = Order.get(params.order.id)
         def orderItems = OrderItem.findAllByOrder(order)
         if (orderItems) {
@@ -1000,7 +1000,7 @@ class OrderController {
         }
     }
 
-    def cancelOrderItem = {
+    def cancelOrderItem() {
         OrderItem orderItem = OrderItem.get(params.id)
         def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
         if (canEdit) {
@@ -1012,7 +1012,7 @@ class OrderController {
         }
     }
 
-    def restoreOrderItem = {
+    def restoreOrderItem() {
         OrderItem orderItem = OrderItem.get(params.id)
         def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
         if (canEdit) {
@@ -1024,12 +1024,12 @@ class OrderController {
         }
     }
 
-    def getTotalPrice = {
+    def getTotalPrice() {
         Order order = Order.get(params.id)
         render order.total
     }
 
-    def cancelOrderAdjustment = {
+    def cancelOrderAdjustment() {
         OrderAdjustment orderAdjustment = OrderAdjustment.get(params.id)
         User user = User.get(session?.user?.id)
         def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user) && !orderAdjustment.hasRegularInvoice
@@ -1042,7 +1042,7 @@ class OrderController {
         }
     }
 
-    def restoreOrderAdjustment = {
+    def restoreOrderAdjustment() {
         OrderAdjustment orderAdjustment = OrderAdjustment.get(params.id)
         User user = User.get(session?.user?.id)
         def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user)
@@ -1055,7 +1055,7 @@ class OrderController {
         }
     }
 
-    def getOrderAdjustments = {
+    def getOrderAdjustments() {
         def orderInstance = Order.get(params.id)
         def orderAdjustments = orderInstance.orderAdjustments.sort { it.dateCreated }.collect {
 
@@ -1075,12 +1075,12 @@ class OrderController {
         render orderAdjustments as JSON
     }
 
-    def getTotalAdjustments = {
+    def getTotalAdjustments() {
         Order order = Order.get(params.id)
         render order.totalAdjustments
     }
 
-    def createCombinedShipment = {
+    def createCombinedShipment() {
         def orderInstance = Order.get(params.orderId)
         Location currentLocation = Location.get(session.warehouse.id)
 
@@ -1099,7 +1099,7 @@ class OrderController {
         redirect(controller: 'stockMovement', action: "createCombinedShipments", params: [direction: 'INBOUND', id: stockMovement.id])
     }
 
-    def orderSummary = {
+    def orderSummary() {
         params.max = params.max?:10
         params.offset = params.offset?:0
         def orderSummaryList = orderService.getOrderSummaryList(params)
@@ -1107,7 +1107,7 @@ class OrderController {
     }
 
     // For testing order item derived status feature. orderItemSummary action gets the data from extended SQL view
-    def orderItemSummary = {
+    def orderItemSummary() {
         params.max = params.max?:10
         params.offset = params.offset?:0
         def orderItemSummaryList = orderService.getOrderItemSummaryList(params)
@@ -1115,7 +1115,7 @@ class OrderController {
     }
 
     // For testing order item derived status feature. orderItemDetails action gets the data from simplified SQL view
-    def orderItemDetails = {
+    def orderItemDetails() {
         params.max = params.max?:10
         params.offset = params.offset?:0
         def orderItemDetailsList = orderService.getOrderItemDetailsList(params)

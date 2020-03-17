@@ -45,14 +45,14 @@ class DashboardController {
     def userAgentIdentService
     def megamenuService
 
-    def showCacheStatistics = {
+    def showCacheStatistics() {
         def statistics = sessionFactory.statistics
         log.info(statistics)
         render statistics
     }
 
 
-    def globalSearch = {
+    def globalSearch() {
 
         def transaction = Transaction.findByTransactionNumber(params.searchTerms)
         if (transaction) {
@@ -106,7 +106,7 @@ class DashboardController {
 
     }
 
-    def index = {
+    def index() {
         if (userAgentIdentService.isMobile()) {
             redirect(controller: "mobile")
             return
@@ -118,32 +118,32 @@ class DashboardController {
         render(template: "/common/react")
     }
 
-    def supplier = {
+    def supplier() {
         render(template: "/common/react")
     }
 
-    def expirationSummary = {
+    def expirationSummary() {
         def location = Location.get(session.warehouse.id)
         def results = dashboardService.getExpirationSummary(location)
 
         render results as JSON
     }
 
-    def hideTag = {
+    def hideTag() {
         Tag tag = Tag.get(params.id)
         tag.isActive = false
         tag.save(flush: true)
         redirect(controller: "dashboard", action: "index", params: [editTags: true])
     }
 
-    def hideCatalog = {
+    def hideCatalog() {
         ProductCatalog productCatalog = ProductCatalog.get(params.id)
         productCatalog.isActive = false
         productCatalog.save(flush: true)
         redirect(controller: "dashboard", action: "index", params: [editCatalogs: true])
     }
 
-    def status = {
+    def status() {
         def admin = User.get(1)
         def comments = Comment.findAllBySenderAndRecipient(admin, admin)
 
@@ -155,11 +155,11 @@ class DashboardController {
         render results as JSON
     }
 
-    def footer = {
+    def footer() {
         render(template: "/common/footer", model: [gitProperties:gitProperties])
     }
 
-    def megamenu = {
+    def megamenu() {
         Location location = Location.get(session.warehouse?.id)
         if (!location.supports(ActivityCode.MANAGE_INVENTORY) && location.supports(ActivityCode.SUBMIT_REQUEST)) {
             return [ menu: [] ]
@@ -188,21 +188,21 @@ class DashboardController {
     //@CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
     //        "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
     //        "selectTagsCache", "selectCategoryCache", "selectCatalogsCache", "forecastCache"])
-    def flushCache = {
+    def flushCache() {
         flash.message = "Data caches have been flushed and inventory snapshot job was triggered"
         RefreshProductAvailabilityJob.triggerNow([locationId: session.warehouse.id, forceRefresh: true])
         RefreshOrderSummaryJob.triggerNow()
         redirect(action: "index")
     }
 
-    def chooseLayout = {
+    def chooseLayout() {
         if (params.layout) {
             session.layout = params.layout
         }
         redirect(controller: 'dashboard', action: 'index')
     }
 
-    def chooseLocation = {
+    def chooseLocation() {
 
         // If the user has selected a new location from the topnav bar, we need
         // to retrieve the location to make sure it exists
@@ -257,14 +257,14 @@ class DashboardController {
     }
 
 
-    def changeLocation = {
+    def changeLocation() {
         User user = User.get(session.user.id)
         Map loginLocationsMap = locationService.getLoginLocationsMap(user, null, true)
         List savedLocations = [user?.warehouse, session?.warehouse].unique() - null
         render(template: "loginLocations", model: [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap])
     }
 
-    def downloadGenericProductSummaryAsCsv = {
+    def downloadGenericProductSummaryAsCsv() {
         def location = Location.get(session?.warehouse?.id)
         def genericProductSummary = inventoryService.getGenericProductSummary(location)
 
@@ -305,7 +305,7 @@ class DashboardController {
         return
     }
 
-    def downloadFastMoversAsCsv = {
+    def downloadFastMoversAsCsv() {
         println "exportFastMoversAsCsv: " + params
         def location = Location.get(params?.location?.id ?: session?.warehouse?.id)
 
