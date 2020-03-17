@@ -1353,8 +1353,7 @@ class CreateShipmentWorkflowController {
         }
     }
 
-
-    void bindReferenceNumbers(Shipment shipment, ShipmentWorkflow workflow, Map params) {
+    private void bindReferenceNumbers(Shipment shipment, ShipmentWorkflow workflow, Map params) {
         // need to manually bind the reference numbers
         if (!shipment.referenceNumbers) {
             shipment.referenceNumbers = []
@@ -1385,7 +1384,7 @@ class CreateShipmentWorkflowController {
         }
     }
 
-    void bindShipper(Shipment shipment, Map params) {
+    private void bindShipper(Shipment shipment, Map params) {
         // need to manually bind the shipper since it is nested within the "shipmentMethod"
         if (params.shipperInput) {
             if (!shipment.shipmentMethod) {
@@ -1407,7 +1406,7 @@ class CreateShipmentWorkflowController {
      * @param userInstance
      * @param recipients
      */
-    void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
+    private void triggerSendShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
         if (!recipients) recipients = new HashSet<Person>()
 
         // Add all admins to the email

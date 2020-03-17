@@ -15,8 +15,9 @@ import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.OrderItem
@@ -31,7 +32,7 @@ class StockMovementApiController {
     StockMovementService stockMovementService
     def dataService
 
-    def list = {
+    def list() {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
         int offset = params.offset ? params.int("offset") : 0
         def stockMovements = params.direction == "INBOUND" ?
@@ -51,21 +52,8 @@ class StockMovementApiController {
         render([data: stockMovements] as JSON)
     }
 
-    def read = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        String stepNumber = params.stepNumber
-        def totalCount = stockMovement.lineItems.size()
-
-        // FIXME this should happen in the service
-        if (params.stepNumber == "4") {
-            totalCount = stockMovementService.getPickPageItems(params.id, null, null).size()
-        }
-        if (params.stepNumber == "5") {
-            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
-        }
-        if (params.stepNumber == "6" && !stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
-            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
-        }
+    def read() {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, params.stepNumber)
 
         // FIXME Debugging
         JSONObject jsonObject = new JSONObject(stockMovement.toJson())
@@ -74,7 +62,7 @@ class StockMovementApiController {
         render([data: stockMovement, totalCount: totalCount] as JSON)
     }
 
-    def create = { StockMovement stockMovement ->
+    def create(StockMovement stockMovement) {
         // Detect whether inbound or outbound stock movement
         def currentLocation = Location.get(session.warehouse.id)
         StockMovementType stockMovementType = stockMovement.origin.equals(currentLocation) ?
@@ -90,7 +78,12 @@ class StockMovementApiController {
     /**
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */
-    def updateRequisition = { //StockMovement stockMovement ->
+    def updateRequisition() {
+
+        JSONObject jsonObject = request.JSON
+        log.debug "update: " + jsonObject.toString(4)
+
+        // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
         stockMovementService.updateStockMovement(stockMovement)
@@ -100,25 +93,31 @@ class StockMovementApiController {
     /**
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */
-    def updateShipment = { //StockMovement stockMovement ->
+    def updateShipment() {
+
+        JSONObject jsonObject = request.JSON
+        log.debug "update: " + jsonObject.toString(4)
+
+        // Bind all other properties to stock movement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        bindStockMovement(stockMovement, request.JSON)
+
+        bindStockMovement(stockMovement, jsonObject)
         stockMovementService.updateShipment(stockMovement)
         render status: 200
     }
 
-    def delete = {
+    def delete() {
         stockMovementService.deleteStockMovement(params.id)
         render status: 204
     }
 
 
-    def status = {
+    def status() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         render([data: stockMovement?.status] as JSON)
     }
 
-    def deleteStatus = {
+    def deleteStatus() {
         stockMovementService.rollbackStockMovement(params.id)
         forward(action: "read")
     }
@@ -126,7 +125,9 @@ class StockMovementApiController {
     /**
      * Peforms a status update on the stock movement and forwards to the read action.
      */
-    def updateStatus = {
+    def updateStatus() {
+
+
         JSONObject jsonObject = request.JSON
         log.info "update status: " + jsonObject.toString(4)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
@@ -138,7 +139,7 @@ class StockMovementApiController {
     /**
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */
-    def removeAllItems = {
+    def removeAllItems() {
         Requisition requisition = Requisition.get(params.id)
         stockMovementService.removeRequisitionItems(requisition)
         render status: 204
@@ -147,7 +148,7 @@ class StockMovementApiController {
     /**
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */
-    def reviseItems = {
+    def reviseItems() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
         List<EditPageItem> revisedItems = stockMovementService.reviseItems(stockMovement)
@@ -157,7 +158,7 @@ class StockMovementApiController {
     /**
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */
-    def updateItems = {
+    def updateItems() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
         stockMovement = stockMovementService.updateItems(stockMovement)
@@ -167,7 +168,7 @@ class StockMovementApiController {
     /**
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */
-    def updateShipmentItems = {
+    def updateShipmentItems() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         JSONObject jsonObject = request.JSON
@@ -180,7 +181,7 @@ class StockMovementApiController {
         render([data: stockMovementService.getPackPageItems(stockMovement.id, null, null)] as JSON)
     }
 
-    def updateAdjustedItems = {
+    def updateAdjustedItems() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         stockMovementService.updateAdjustedItems(stockMovement, params.adjustedProduct)
 
@@ -189,7 +190,7 @@ class StockMovementApiController {
         render([data: stockMovement] as JSON)
     }
 
-    def exportPickListItems = {
+    def exportPickListItems() {
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
         List<PicklistItem> picklistItems = pickPageItems.inject([]) { result, pickPageItem ->
             result.addAll(pickPageItem.picklistItems)
@@ -216,7 +217,7 @@ class StockMovementApiController {
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
-    def importPickListItems = { ImportDataCommand command ->
+    def importPickListItems(ImportDataCommand command) {
 
         try {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
@@ -297,15 +298,15 @@ class StockMovementApiController {
      * @param jsonObject
      * @param dateField
      */
-    Date parseDateRequested(String date) {
+    private Date parseDateRequested(String date) {
         return date ? Constants.EXPIRATION_DATE_FORMATTER.parse(date) : null
     }
 
-    Date parseDateShipped(String date) {
+    private Date parseDateShipped(String date) {
         return date ? Constants.DELIVERY_DATE_FORMATTER.parse(date) : null
     }
 
-    void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
+    private void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         // Remove attributes that cause issues in the default grails data binder
         List lineItems = jsonObject.remove("lineItems")
         List packPageItems = jsonObject.remove("packPageItems")
@@ -356,17 +357,17 @@ class StockMovementApiController {
      * @param stockMovement
      * @param lineItems
      */
-    void bindLineItems(StockMovement stockMovement, List lineItems) {
+    private void bindLineItems(StockMovement stockMovement, List lineItems) {
         log.debug "line items: " + lineItems
         List<StockMovementItem> stockMovementItems = createLineItemsFromJson(stockMovement, lineItems)
         stockMovement.lineItems.addAll(stockMovementItems)
     }
 
-    Boolean isNull(Object objectValue) {
+    private Boolean isNull(Object objectValue) {
         return objectValue == null || objectValue?.equals("")
     }
 
-    List<StockMovementItem> createLineItemsFromJson(StockMovement stockMovement, List lineItems) {
+    private List<StockMovementItem> createLineItemsFromJson(StockMovement stockMovement, List lineItems) {
         List<StockMovementItem> stockMovementItems = new ArrayList<StockMovementItem>()
         lineItems.each { lineItem ->
             StockMovementItem stockMovementItem = new StockMovementItem()
@@ -425,7 +426,7 @@ class StockMovementApiController {
     }
 
 
-    List<PackPageItem> createPackPageItemsFromJson(StockMovement stockMovement, List lineItems) {
+    private List<PackPageItem> createPackPageItemsFromJson(StockMovement stockMovement, List lineItems) {
         List<PackPageItem> packPageItems = new ArrayList<PackPageItem>()
         lineItems.each { lineItem ->
             PackPageItem packPageItem = new PackPageItem()

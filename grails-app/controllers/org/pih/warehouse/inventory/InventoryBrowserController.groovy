@@ -11,11 +11,11 @@ package org.pih.warehouse.inventory
 
 class InventoryBrowserController {
 
-    def index = {
+    def index() {
         redirect(action: "list")
     }
 
 
-    def list = {}
+    def list() {}
 
 }

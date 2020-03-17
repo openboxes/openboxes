@@ -16,9 +16,6 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
-import org.pih.warehouse.product.Product
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -30,7 +27,7 @@ class ApiController {
     GrailsApplication grailsApplication
     def megamenuService
 
-    def login = {
+    def login() {
         def username = request.JSON.username
         def password = request.JSON.password
         if (userService.authenticate(username, password)) {
@@ -44,7 +41,7 @@ class ApiController {
         render([status: 401, text: "Authentication failed"])
     }
 
-    def chooseLocation = {
+    def chooseLocation() {
         Location location = Location.get(params.id)
         if (!location) {
             throw new ObjectNotFoundException(params.id, Location.class.toString())
@@ -53,7 +50,7 @@ class ApiController {
         render([status: 200, text: "User ${session.user} is now logged into ${location.name}"])
     }
 
-    def chooseLocale = {
+    def chooseLocale() {
         Locale locale = localizationService.getLocale(params.id)
         if (!locale) {
             throw new ObjectNotFoundException(params.id, Locale.class.toString())
@@ -62,7 +59,7 @@ class ApiController {
         render([status: 200, text: "Current language is ${locale}"])
     }
 
-    def getMenuConfig = {
+    def getMenuConfig() {
         Map menuConfig = grailsApplication.config.getProperty("openboxes.megamenu")
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
@@ -70,7 +67,7 @@ class ApiController {
         render([data: [menuConfig: translatedMenu]] as JSON)
     }
 
-    def getAppContext = {
+    def getAppContext() {
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
         boolean isSuperuser = userService.isSuperuser(session?.user)
@@ -120,7 +117,7 @@ class ApiController {
     }
 
 
-    def logout = {
+    def logout() {
         if (session.impersonateUserId) {
             session.user = User.get(session.activeUserId)
             session.impersonateUserId = null
@@ -132,7 +129,7 @@ class ApiController {
         }
     }
 
-    def status = {
+    def status() {
         boolean databaseStatus = true
         String databaseStatusMessage = "Database is available"
 
