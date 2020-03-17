@@ -18,7 +18,7 @@ class Doc4jController {
     /**
      *
      */
-    def downloadPackingList = {
+    def downloadPackingList() {
 
         def shipmentInstance = Shipment.get(params.id)
 
@@ -38,7 +38,7 @@ class Doc4jController {
 
     }
 
-    def downloadCertificateOfDonation = {
+    def downloadCertificateOfDonation() {
 
         def shipmentInstance = Shipment.get(params.id)
 

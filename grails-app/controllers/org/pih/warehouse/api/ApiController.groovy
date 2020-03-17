@@ -32,7 +32,7 @@ class ApiController {
     def megamenuService
     def messageSource
 
-    def login = {
+    def login() {
         def username = request.JSON.username
         def password = request.JSON.password
         if (userService.authenticate(username, password)) {
@@ -46,7 +46,7 @@ class ApiController {
         render([status: 401, text: "Authentication failed"])
     }
 
-    def chooseLocation = {
+    def chooseLocation() {
         Location location = Location.get(params.id)
         if (!location) {
             throw new ObjectNotFoundException(params.id, Location.class.toString())
@@ -55,8 +55,7 @@ class ApiController {
         render([status: 200, text: "User ${session.user} is now logged into ${location.name}"])
     }
 
-    @CacheFlush(["megamenuCache"])
-    def chooseLocale = {
+    def chooseLocale() {
         Locale locale = localizationService.getLocale(params.id)
         if (!locale) {
             throw new ObjectNotFoundException(params.id, Locale.class.toString())
@@ -65,7 +64,7 @@ class ApiController {
         render([status: 200, text: "Current language is ${locale}"])
     }
 
-    def getMenuConfig = {
+    def getMenuConfig() {
         Map menuConfig = grailsApplication.config.getProperty("openboxes.megamenu")
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
@@ -73,7 +72,7 @@ class ApiController {
         render([data: [menuConfig: translatedMenu]] as JSON)
     }
 
-    def getAppContext = {
+    def getAppContext() {
 
         def localizationMode
         def locale = localizationService.getCurrentLocale()
@@ -178,7 +177,7 @@ class ApiController {
     }
 
 
-    def logout = {
+    def logout() {
         if (session.impersonateUserId) {
             session.user = User.get(session.activeUserId)
             session.impersonateUserId = null
@@ -190,7 +189,7 @@ class ApiController {
         }
     }
 
-    def status = {
+    def status() {
         boolean databaseStatus = true
         String databaseStatusMessage = "Database is available"
 
@@ -203,7 +202,7 @@ class ApiController {
         render([status: "OK", database: [status: databaseStatus, message: databaseStatusMessage ?: ""]] as JSON)
     }
 
-    def getRequestTypes = {
+    def getRequestTypes() {
         def requestTypes = []
         Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
         Locale locale = session?.user?.locale ?: defaultLocale

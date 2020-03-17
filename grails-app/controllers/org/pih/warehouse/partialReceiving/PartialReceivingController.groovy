@@ -6,11 +6,11 @@ class PartialReceivingController {
 
     def receiptService
 
-    def index = {
+    def index() {
         redirect(action: "create")
     }
 
-    def create = {
+    def create() {
         Shipment shipment = Shipment.get(params.id)
 
         receiptService.createTemporaryReceivingBin(shipment)
@@ -19,7 +19,7 @@ class PartialReceivingController {
         render(template: "/partialReceiving/create")
     }
 
-    def rollbackLastReceipt = {
+    def rollbackLastReceipt() {
         Shipment shipment = Shipment.get(params.id)
 
         if (shipment) {

@@ -77,7 +77,7 @@ class JsonController {
     def translationService
     def orderService
 
-    def evaluateIndicator = {
+    def evaluateIndicator() {
         def indicator = Indicator.get(params.id)
         if (indicator) {
             def results = consoleService.eval(indicator.expression, true, request)
@@ -87,7 +87,7 @@ class JsonController {
         }
     }
 
-    def calculateQuantityOnHand = {
+    def calculateQuantityOnHand() {
         def location = Location.load(params.locationId)
         def products = Product.list(params)
         products.each { product ->
@@ -96,7 +96,7 @@ class JsonController {
     }
 
 
-    def addToRequisitionItems = {
+    def addToRequisitionItems() {
         log.info "addToRequisitionItems: ${params} "
         def json
         def requisition = Requisition.get(params?.requisition?.id)
@@ -181,7 +181,7 @@ class JsonController {
         }
     }
 
-    def removeRequisitionItem = {
+    def removeRequisitionItem() {
         log.info "removeRequisitionItem: ${params} "
         def json
         def requisitionItem = RequisitionItem.get(params?.id)
@@ -197,12 +197,12 @@ class JsonController {
         render json as JSON
     }
 
-    def getTranslation = {
+    def getTranslation() {
         def data = translationService.getTranslation(params.text, params.src, params.dest)
         render ([data: data] as JSON)
     }
 
-    def getLocalization = {
+    def getLocalization() {
         log.info "get localization " + params
         def localization = Localization.get(params.id)
         // Get the localization from the database
@@ -230,7 +230,7 @@ class JsonController {
         render localization.toJson() as JSON
     }
 
-    def saveLocalization = {
+    def saveLocalization() {
         log.info "Save localization " + params
         def data = request.JSON
         log.info "Data " + data
@@ -268,7 +268,7 @@ class JsonController {
         return true
     }
 
-    def deleteLocalization = {
+    def deleteLocalization() {
         log.info "get localization " + params
         // Get the localization from the database
         def jsonResponse = []
@@ -285,7 +285,7 @@ class JsonController {
     }
 
     //@Cacheable("inventoryBrowserCache")
-    def getQuantityToReceive = {
+    def getQuantityToReceive() {
         def product = Product.get(params?.product?.id)
         def location = Location.get(params?.location?.id)
         def quantityToReceive = inventoryService.getQuantityToReceive(location, product)
@@ -293,7 +293,7 @@ class JsonController {
     }
 
     //@Cacheable("inventoryBrowserCache")
-    def getQuantityToShip = {
+    def getQuantityToShip() {
         def product = Product.get(params?.product?.id)
         def location = Location.get(params?.location?.id)
         def quantityToShip = inventoryService.getQuantityToShip(location, product)
@@ -301,7 +301,7 @@ class JsonController {
     }
 
     //@Cacheable("inventoryBrowserCache")
-    def getQuantityOnHand = {
+    def getQuantityOnHand() {
         def product = Product.get(params?.product?.id)
         def location = Location.get(params?.location?.id)
         def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
@@ -309,13 +309,13 @@ class JsonController {
     }
 
     //@Cacheable("inventoryBrowserCache")
-    def flushInventoryBrowserCache = {
+    def flushInventoryBrowserCache() {
         redirect(controller: "inventory", action: "browse")
     }
 
 
     //@Cacheable("dashboardCache")
-    def getGenericProductSummary = {
+    def getGenericProductSummary() {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session?.warehouse?.id)
         def genericProductByStatusMap = inventoryService.getGenericProductSummary(location)
@@ -332,21 +332,21 @@ class JsonController {
     }
 
     //@Cacheable("dashboardCache")
-    def getDashboardAlerts = {
+    def getDashboardAlerts() {
         def location = Location.get(session?.warehouse?.id)
         def dashboardAlerts = dashboardService.getDashboardAlerts(location)
         render dashboardAlerts as JSON
     }
 
     //@Cacheable("dashboardCache")
-    def getDashboardExpiryAlerts = {
+    def getDashboardExpiryAlerts() {
         def location = Location.get(session?.warehouse?.id)
         def map = dashboardService.getExpirationSummary(location)
         render map as JSON
     }
 
     //@Cacheable("dashboardCache")
-    def getTotalStockValue = {
+    def getTotalStockValue() {
         def location = Location.get(session?.warehouse?.id)
         def result = dashboardService.getTotalStockValue(location)
         def totalValue = g.formatNumber(number: result.totalStockValue)
@@ -367,7 +367,7 @@ class JsonController {
     }
 
     //@Cacheable("dashboardCache")
-    def getStockValueByProduct = {
+    def getStockValueByProduct() {
         def location = Location.get(session?.warehouse?.id)
         def result = dashboardService.getTotalStockValue(location)
         def hasRoleFinance = userService.hasRoleFinance(session?.user)
@@ -389,12 +389,12 @@ class JsonController {
 
 
     //@CacheFlush("dashboardTotalStockValueCache")
-    def refreshTotalStockValue = {
+    def refreshTotalStockValue() {
         render([success: true] as JSON)
     }
 
 
-    def getInventorySnapshots = {
+    def getInventorySnapshots() {
 
         def location = Location.get(params?.location?.id)
         def results = inventorySnapshotService.findInventorySnapshotByLocation(location)
@@ -430,7 +430,7 @@ class JsonController {
         ] as JSON)
     }
 
-    def getQuantityOnHandMap = {
+    def getQuantityOnHandMap() {
         def startTime = System.currentTimeMillis()
         def results = inventoryService.getQuantityByProductMap(session?.warehouse?.id)
 
@@ -438,7 +438,7 @@ class JsonController {
         render([count: results.size(), elapsedTime: elapsedTime, results: results] as JSON)
     }
 
-    def findProductCodes = {
+    def findProductCodes() {
         def searchTerm = params.term + "%"
         def c = Product.createCriteria()
         def products = c.list {
@@ -456,7 +456,7 @@ class JsonController {
         render results as JSON
     }
 
-    def findTags = {
+    def findTags() {
         def searchTerm = "%" + params.term + "%"
         def c = Tag.createCriteria()
         def tags = c.list {
@@ -468,7 +468,7 @@ class JsonController {
         render results as JSON
     }
 
-    def autoSuggest = {
+    def autoSuggest() {
         log.info "autoSuggest: " + params
         def searchTerm = "%" + params.term + "%"
         def c = Product.createCriteria()
@@ -483,7 +483,7 @@ class JsonController {
         render results as JSON
     }
 
-    def autoSuggestProductGroups = {
+    def autoSuggestProductGroups() {
         log.info "autoSuggest: " + params
         def searchTerms = params.term.split(" ")
         def c = ProductGroup.createCriteria()
@@ -502,7 +502,7 @@ class JsonController {
     }
 
 
-    def findProductNames = {
+    def findProductNames() {
         def searchTerm = "%" + params.term + "%"
         def c = Product.createCriteria()
         def productNames = c.list {
@@ -517,7 +517,7 @@ class JsonController {
         render results as JSON
     }
 
-    def findPrograms = {
+    def findPrograms() {
         log.info "find programs " + params
         def searchTerm = params.term + "%"
         def c = Requisition.createCriteria()
@@ -550,11 +550,11 @@ class JsonController {
     }
 
 
-    def getInventoryItem = {
+    def getInventoryItem() {
         render InventoryItem.get(params.id).toJson() as JSON
     }
 
-    def getQuantity = {
+    def getQuantity() {
         log.info params
         def quantity = 0
         def location = Location.get(session.warehouse.id)
@@ -569,7 +569,7 @@ class JsonController {
         render quantity ?: "N/A"
     }
 
-    def sortContainers = {
+    def sortContainers() {
         def container
         params.get("container[]").eachWithIndex { id, index ->
             container = Container.get(id)
@@ -582,7 +582,7 @@ class JsonController {
         render(text: "", contentType: "text/plain")
     }
 
-    def sortRequisitionItems = {
+    def sortRequisitionItems() {
         log.info "sort requisition items " + params
 
         def requisitionItem
@@ -599,7 +599,7 @@ class JsonController {
     /**
      * Ajax method for the Record Inventory page.
      */
-    def getInventoryItems = {
+    def getInventoryItems() {
         log.info params
         def productInstance = Product.get(params?.product?.id)
         def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
@@ -610,7 +610,7 @@ class JsonController {
     /**
      * Returns inventory items for the given location, lot number, and product.
      */
-    def findInventoryItems = {
+    def findInventoryItems() {
         log.info params
         long startTime = System.currentTimeMillis()
         def inventoryItems = []
@@ -683,7 +683,7 @@ class JsonController {
         render inventoryItems as JSON
     }
 
-    def findLotsByName = {
+    def findLotsByName() {
         log.info params
         // Constrain by product id if the productId param is passed in
         def items = new TreeSet()
@@ -726,7 +726,7 @@ class JsonController {
     }
 
 
-    def createPerson = {
+    def createPerson() {
         log.info("createPerson" + params)
         def data = [id: null, label: "Unable to create person with name " + params.name]
 
@@ -754,7 +754,7 @@ class JsonController {
 
     }
 
-    def findPersonByName = {
+    def findPersonByName() {
         log.info "findPersonByName: " + params
         def items = new TreeSet()
         try {
@@ -798,7 +798,7 @@ class JsonController {
 
     }
 
-    def findProductByName = {
+    def findProductByName() {
 
         log.info("find products by name " + params)
         def dateFormat = new SimpleDateFormat(Constants.SHORT_MONTH_YEAR_DATE_FORMAT)
@@ -888,7 +888,7 @@ class JsonController {
         render products as JSON
     }
 
-    def findLocations = {
+    def findLocations() {
         def locations = Location.createCriteria().list {
             if (params.term) {
                 ilike("name", params.term + "%")
@@ -905,7 +905,7 @@ class JsonController {
         render locations as JSON
     }
 
-    def findRequestItems = {
+    def findRequestItems() {
 
         log.info("find request items by name " + params)
 
@@ -954,7 +954,7 @@ class JsonController {
     }
 
 
-    def searchProductPackages = {
+    def searchProductPackages() {
 
         log.info "Search product packages " + params
         def location = Location.get(session.warehouse.id)
@@ -982,7 +982,7 @@ class JsonController {
     }
 
 
-    def searchProduct = {
+    def searchProduct() {
         def location = Location.get(session.warehouse.id)
         def results = productService.searchProductAndProductGroup(params.term)
         if (!results) {
@@ -1008,7 +1008,7 @@ class JsonController {
     }
 
 
-    def searchPersonByName = {
+    def searchPersonByName() {
         def items = []
         def terms = params.term?.split(" ")
         terms?.each { term ->
@@ -1028,7 +1028,7 @@ class JsonController {
         render json as JSON
     }
 
-    def globalSearch = {
+    def globalSearch() {
 
         // Sanitize the user input
         String[] terms = params?.term?.split(" ").findAll { String term -> StringUtils.isNotEmpty(term)}.toArray()
@@ -1081,12 +1081,12 @@ class JsonController {
     }
 
     //@CacheFlush("quantityOnHandCache")
-    def flushQuantityOnHandCache = {
+    def flushQuantityOnHandCache() {
         redirect(controller: "inventory", action: "analyze")
     }
 
     //@Cacheable("quantityOnHandCache")
-    def calculateQuantityOnHandByProduct = {
+    def calculateQuantityOnHandByProduct() {
 
         log.info "Calculating quantity on hand by product ..." + params
 
@@ -1146,7 +1146,7 @@ class JsonController {
     /**
      * Analytics > Inventory Browser > Data Table
      */
-    def getQuantityOnHandByProductGroup = {
+    def getQuantityOnHandByProductGroup() {
         def startTime = System.currentTimeMillis()
         log.info "getQuantityOnHandByProductGroup " + params
         def aaData = new HashSet() //data.productGroupDetails.ALL.values()
@@ -1176,14 +1176,14 @@ class JsonController {
                 totalValue      : totalValue, totalValueFormatted: totalValueFormatted] as JSON)
     }
 
-    def getSummaryByProductGroup = {
+    def getSummaryByProductGroup() {
         log.info "getSummaryByProductGroup " + params
         def data = reportService.calculateQuantityOnHandByProductGroup(params.location.id)
 
         render(data.productGroupSummary as JSON)
     }
 
-    def mostRecentQuantityOnHand = {
+    def mostRecentQuantityOnHand() {
         def product = Product.get(params.id)
         def location = Location.get(session?.warehouse?.id)
         def object = inventoryService.getMostRecentQuantityOnHand(product, location)
@@ -1191,26 +1191,26 @@ class JsonController {
     }
 
 
-    def mostRecentQuantityOnHandByLocation = {
+    def mostRecentQuantityOnHandByLocation() {
         def location = Location.get(session?.warehouse?.id)
         def results = inventoryService.getMostRecentQuantityOnHand(location)
         render([results: results] as JSON)
     }
 
-    def quantityMap = {
+    def quantityMap() {
         def location = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getQuantityMap(location)
         render([quantityMap: quantityMap] as JSON)
     }
 
 
-    def distinctProducts = {
+    def distinctProducts() {
         def location = Location.get(session?.warehouse?.id)
         def products = inventoryService.getDistinctProducts(location)
         render([products: null] as JSON)
     }
 
-    def scanBarcode = {
+    def scanBarcode() {
         log.info "Scan barcode: " + params
 
         def url
@@ -1244,7 +1244,7 @@ class JsonController {
     }
 
 
-    def getInventorySnapshotDetails = { InventorySnapshotCommand command ->
+    def getInventorySnapshotDetails(InventorySnapshotCommand command) {
 
         // Get the most recent inventory snapshot data for data table
         if (!command.date) {
@@ -1267,7 +1267,7 @@ class JsonController {
         render([data: data] as JSON)
     }
 
-    def getQuantityOnHandByMonth = {
+    def getQuantityOnHandByMonth() {
         Location location = Location.get(params.location.id)
         Product product = Product.get(params.product.id)
 
@@ -1290,7 +1290,7 @@ class JsonController {
     }
 
     //@Cacheable("dashboardCache")
-    def getFastMovers = {
+    def getFastMovers() {
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         def date = new Date()
         if (params.date) {
@@ -1303,28 +1303,28 @@ class JsonController {
         render([aaData: data?.results ?: []] as JSON)
     }
 
-    def getOrderItem = {
+    def getOrderItem() {
         def orderItem = OrderItem.get(params.id)
         render([id: orderItem.id, product: orderItem.product, order: orderItem.order, quantity: orderItem.quantity, unitPrice: orderItem.unitPrice] as JSON)
     }
 
 
-    def enableCalculateHistoricalQuantityJob = {
+    def enableCalculateHistoricalQuantityJob() {
         CalculateHistoricalQuantityJob.enabled = true
         render([message: "CalculateHistoricalQuantityJob has been ${CalculateHistoricalQuantityJob.enabled ? 'enabled' : 'disabled'}"] as JSON)
     }
 
-    def disableCalculateHistoricalQuantityJob = {
+    def disableCalculateHistoricalQuantityJob() {
         CalculateHistoricalQuantityJob.enabled = false
         render([message: "CalculateHistoricalQuantityJob has been ${CalculateHistoricalQuantityJob.enabled ? 'enabled' : 'disabled'}"] as JSON)
     }
 
-    def statusCalculateHistoricalQuantityJob = {
+    def statusCalculateHistoricalQuantityJob() {
         render "${CalculateHistoricalQuantityJob.enabled ? 'enabled' : 'disabled'}"
     }
 
     //@Cacheable("dashboardCache")
-    def getBinLocationSummary = {
+    def getBinLocationSummary() {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
         def binLocations = productAvailabilityService.getQuantityOnHandByBinLocation(location)
@@ -1333,7 +1333,7 @@ class JsonController {
         render(data as JSON)
     }
 
-    def getBinLocationReport = {
+    def getBinLocationReport() {
         log.info "binLocationReport: " + params
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
@@ -1370,7 +1370,7 @@ class JsonController {
         render(["aaData": data] as JSON)
     }
 
-    def getDetailedOrderReport = {
+    def getDetailedOrderReport() {
         def location = Location.get(session.warehouse.id)
         def items = orderService.getPendingInboundOrderItems(location)
         items += shipmentService.getPendingInboundShipmentItems(location)
@@ -1396,7 +1396,7 @@ class JsonController {
         render(["aaData": data] as JSON)
     }
 
-    def getSummaryOrderReport = {
+    def getSummaryOrderReport() {
         def location = Location.get(session.warehouse.id)
 
         def data = reportService.getOnOrderSummary(location)
@@ -1404,7 +1404,7 @@ class JsonController {
         render(["aaData": data] as JSON)
     }
 
-    def getTransactionReport = { TransactionReportCommand command ->
+    def getTransactionReport(TransactionReportCommand command) {
 
         Date startDate = command.startDate
         Date endDate = command.endDate + 1
@@ -1477,7 +1477,7 @@ class JsonController {
         render(["aaData": data] as JSON)
     }
 
-    def getTransactionReportDetails = { TransactionReportCommand command ->
+    def getTransactionReportDetails(TransactionReportCommand command) {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
         Product product = Product.findByProductCode(params.productCode)
@@ -1570,19 +1570,18 @@ class JsonController {
         render(["aaData": data] as JSON)
     }
 
-
-    def getShipmentsWithInvalidStatus = {
+    def getShipmentsWithInvalidStatus() {
         def shipments = shipmentService.shipmentsWithInvalidStatus
         render([count: shipments.size(), shipments: shipments] as JSON)
     }
 
-    def fixShipmentsWithInvalidStatus = {
+    def fixShipmentsWithInvalidStatus() {
         def count = shipmentService.fixShipmentsWithInvalidStatus()
         render([count: count] as JSON)
     }
 
     //@Cacheable("dashboardCache")
-    def getDashboardActivity = {
+    def getDashboardActivity() {
 
         List activityList = []
         def currentUser = User.get(session?.user?.id)
@@ -1609,7 +1608,7 @@ class JsonController {
 
         // Add recent shipments
         def shipments = Shipment.executeQuery("select distinct s from Shipment s where s.lastUpdated >= :lastUpdated and \
-			(s.origin = :origin or s.destination = :destination)", ['lastUpdated': new Date() - daysToInclude, 'origin': location, 'destination': location])
+            (s.origin = :origin or s.destination = :destination)", ['lastUpdated': new Date() - daysToInclude, 'origin': location, 'destination': location])
         shipments.each {
             def link = "${createLink(controller: 'shipment', action: 'showDetails', id: it.id)}"
             def activityType = (it.dateCreated == it.lastUpdated) ? "dashboard.activity.created.label" : "dashboard.activity.updated.label"
@@ -1668,7 +1667,7 @@ class JsonController {
         // If the current location has an inventory, add recent transactions associated with that location to the activity list
         if (location?.inventory) {
             def transactions = Transaction.executeQuery("select distinct t from Transaction t where t.lastUpdated >= :lastUpdated and \
-				t.inventory = :inventory", ['lastUpdated': new Date() - daysToInclude, 'inventory': location?.inventory])
+                t.inventory = :inventory", ['lastUpdated': new Date() - daysToInclude, 'inventory': location?.inventory])
 
             transactions.each {
                 def link = "${createLink(controller: 'inventory', action: 'showTransaction', id: it.id)}"
@@ -1716,13 +1715,13 @@ class JsonController {
         render([aaData: activityList] as JSON)
     }
 
-    def getProductDemandDetails = {
+    def getProductDemandDetails() {
         Product product = Product.get(params.id)
         Location location = Location.get(session.warehouse.id)
         render([aaData: forecastingService.getDemandDetails(location, product)] as JSON)
     }
 
-    def getProductDemandSummary = {
+    def getProductDemandSummary() {
         Product product = Product.get(params.id)
         Location location = Location.get(session.warehouse.id)
         render([aaData: forecastingService.getDemandSummary(location, product)] as JSON)
@@ -1736,7 +1735,7 @@ class JsonController {
         render demandData as JSON
     }
 
-    def getStockoutData = {
+    def getStockoutData() {
         int days = params.int("days")?:30
         Product product = Product.get(params.product.id)
         Location location = Location.get(params.location.id)
@@ -1744,7 +1743,7 @@ class JsonController {
         render stockoutData[0] as JSON
     }
 
-    def productChanged = {
+    def productChanged() {
         Product product = Product.get(params.productId)
         Organization supplier = Organization.get(params.supplierId)
         List productSuppliers = []
@@ -1763,7 +1762,7 @@ class JsonController {
         render([productSupplierOptions: productSuppliers] as JSON)
     }
 
-    def productSupplierChanged = {
+    def productSupplierChanged() {
         ProductSupplier productSupplier = ProductSupplier.findById(params.productSupplierId)
         ProductPackage productPackage = productSupplier?.defaultProductPackage
         render([
@@ -1777,7 +1776,7 @@ class JsonController {
         ] as JSON)
     }
 
-    def getRequestDetailReport = {
+    def getRequestDetailReport() {
         if (params.startDate && params.endDate) {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             params.startDate = dateFormat.parse(params.startDate)

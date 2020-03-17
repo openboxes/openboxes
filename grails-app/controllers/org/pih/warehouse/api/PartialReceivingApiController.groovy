@@ -22,16 +22,16 @@ class PartialReceivingApiController {
     def shipmentService
     def dataService
 
-    def list = {
+    def list() {
         render([data: []] as JSON)
     }
 
-    def read = {
+    def read() {
         PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
         render([data: partialReceipt] as JSON)
     }
 
-    def update = {
+    def update() {
 
         JSONObject jsonObject = request.JSON
 
@@ -55,7 +55,7 @@ class PartialReceivingApiController {
         render([data: partialReceipt] as JSON)
     }
 
-    def exportCsv = {
+    def exportCsv() {
         JSONObject jsonObject = request.JSON
 
         PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
@@ -94,7 +94,7 @@ class PartialReceivingApiController {
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
-    def importCsv = { ImportDataCommand command ->
+    def importCsv(ImportDataCommand command) {
 
         try {
             PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, "1")
@@ -152,11 +152,11 @@ class PartialReceivingApiController {
         render([data: "Data was imported successfully"] as JSON)
     }
 
-    Date parseDate(String date) {
+    private Date parseDate(String date) {
         return date ? Constants.DELIVERY_DATE_FORMATTER.parse(date) : null
     }
 
-    void bindPartialReceiptData(PartialReceipt partialReceipt, JSONObject jsonObject) {
+    private void bindPartialReceiptData(PartialReceipt partialReceipt, JSONObject jsonObject) {
 
         // Date is not bound properly using default JSON binding
         if (jsonObject.containsKey("dateDelivered")) {

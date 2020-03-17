@@ -19,7 +19,7 @@ class LocalizationApiController {
     def localizationService
     GrailsApplication grailsApplication
 
-    def list = {
+    def list() {
         String languageCode = params.lang
         String prefix = params.prefix
 
@@ -54,7 +54,7 @@ class LocalizationApiController {
         render([messages: messageProperties?.sort(), supportedLocales: supportedLocales, currentLocale: selectedLocale] as JSON)
     }
 
-    def read = {
+    def read() {
         String languageCode = params.lang
         Locale locale = localizationService.getLocale(languageCode)
         String message = messageSource.getMessage(params.id, params.list("args").toArray(), locale)

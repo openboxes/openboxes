@@ -27,7 +27,7 @@ class PutawayApiController {
     def identifierService
     PdfRenderingService pdfRenderingService
 
-    def list = {
+    def list() {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
         if (!location) {
@@ -37,7 +37,7 @@ class PutawayApiController {
         render([data: putawayItems.collect { it.toJson() }] as JSON)
     }
 
-    def read = {
+    def read() {
         Order order = Order.get(params.id)
         if (!order) {
             throw new IllegalArgumentException("No putaway found for order ID ${params.id}")
@@ -55,7 +55,7 @@ class PutawayApiController {
     }
 
 
-    def create = { Putaway putaway ->
+    def create(Putaway putaway) {
         JSONObject jsonObject = request.JSON
 
         Location currentLocation = Location.get(session.warehouse.id)
@@ -88,7 +88,7 @@ class PutawayApiController {
     }
 
 
-    Putaway bindPutawayData(Putaway putaway, User currentUser, Location currentLocation, JSONObject jsonObject) {
+    private Putaway bindPutawayData(Putaway putaway, User currentUser, Location currentLocation, JSONObject jsonObject) {
         // Bind the putaway
         bindData(putaway, jsonObject)
 

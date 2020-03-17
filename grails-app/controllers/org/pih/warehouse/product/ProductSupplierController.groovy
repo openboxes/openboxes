@@ -17,22 +17,22 @@ class ProductSupplierController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: ["GET", "POST"]]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [productSupplierInstanceList: ProductSupplier.list(params), productSupplierInstanceTotal: ProductSupplier.count()]
     }
 
-    def create = {
+    def create() {
         def productSupplierInstance = new ProductSupplier()
         productSupplierInstance.properties = params
         return [productSupplierInstance: productSupplierInstance]
     }
 
-    def save = {
+    def save() {
         def productSupplierInstance = new ProductSupplier(params)
 
         if (!productSupplierInstance.code) {
@@ -52,7 +52,7 @@ class ProductSupplierController {
         }
     }
 
-    def show = {
+    def show() {
         def productSupplierInstance = ProductSupplier.get(params.id)
         if (!productSupplierInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
@@ -62,7 +62,7 @@ class ProductSupplierController {
         }
     }
 
-    def edit = {
+    def edit() {
         def productSupplierInstance = ProductSupplier.get(params.id)
         if (!productSupplierInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
@@ -72,7 +72,7 @@ class ProductSupplierController {
         }
     }
 
-    def update = {
+    def update() {
         def productSupplierInstance = ProductSupplier.get(params.id)
         if (productSupplierInstance) {
             if (params.version) {
@@ -109,7 +109,7 @@ class ProductSupplierController {
         }
     }
 
-    def delete = {
+    def delete() {
         def productSupplierInstance = ProductSupplier.get(params.id)
         if (productSupplierInstance) {
             try {
@@ -133,7 +133,7 @@ class ProductSupplierController {
         }
     }
 
-    def dialog = {
+    def dialog() {
         log.info "Display dialog " + params
         def product = Product.get(params.product.id)
         def productSupplier = ProductSupplier.get(params.id)
@@ -146,7 +146,7 @@ class ProductSupplierController {
         render(template: "dialog", model: [productSupplier: productSupplier])
     }
 
-    def export = {
+    def export() {
         def productSuppliers = params.list("productSupplier.id") ?
                 ProductSupplier.findAllByIdInList(params.list("productSupplier.id")) : ProductSupplier.list()
         def data = productSuppliers ? dataService.transformObjects(productSuppliers, ProductSupplier.PROPERTIES) : [[:]]

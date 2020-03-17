@@ -13,8 +13,6 @@ import grails.converters.JSON
 import grails.plugins.rendering.pdf.PdfRenderingService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.requisition.Requisition
 
 class PicklistController {
 
@@ -23,7 +21,7 @@ class PicklistController {
     def picklistService
     PdfRenderingService pdfRenderingService
 
-    def save = {
+    def save() {
         def jsonRequest = request.JSON
         def jsonResponse = []
         def picklist = picklistService.save(jsonRequest)
@@ -35,14 +33,14 @@ class PicklistController {
         render jsonResponse as JSON
     }
 
-    def print = {
+    def print() {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
         [requisition: requisition, picklist: picklist, location: location, sorted: params.sorted]
     }
 
-    def renderPdf = {
+    def renderPdf() {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
@@ -55,7 +53,7 @@ class PicklistController {
         )
     }
 
-    def renderHtml = {
+    def renderHtml() {
 
         def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
         def locale = session?.user?.locale ?: session.locale ?: defaultLocale

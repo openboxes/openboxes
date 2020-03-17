@@ -15,7 +15,7 @@ class IdentifierApiController extends NoopApiController {
 
     def identifierService
 
-    def create = {
+    def create() {
         log.debug "create " + params
         def identifierType = params.identifierType
         if (!identifierType && !params.identifierFormat) {

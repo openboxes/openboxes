@@ -16,22 +16,22 @@ class ShipmentEventController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [shipmentEventInstanceList: ShipmentEvent.list(params), shipmentEventInstanceTotal: ShipmentEvent.count()]
     }
 
-    def create = {
+    def create() {
         def shipmentEventInstance = new Event()
         shipmentEventInstance.properties = params
         return [shipmentEventInstance: shipmentEventInstance]
     }
 
-    def save = {
+    def save() {
         def shipmentEventInstance = new Event(params)
         if (shipmentEventInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), shipmentEventInstance.id])}"
@@ -41,7 +41,7 @@ class ShipmentEventController {
         }
     }
 
-    def show = {
+    def show() {
         def shipmentEventInstance = Event.get(params.id)
         if (!shipmentEventInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
@@ -51,7 +51,7 @@ class ShipmentEventController {
         }
     }
 
-    def edit = {
+    def edit() {
         def shipmentEventInstance = Event.get(params.id)
         if (!shipmentEventInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
@@ -61,7 +61,7 @@ class ShipmentEventController {
         }
     }
 
-    def update = {
+    def update() {
         def shipmentEventInstance = Event.get(params.id)
         if (shipmentEventInstance) {
             if (params.version) {
@@ -86,7 +86,7 @@ class ShipmentEventController {
         }
     }
 
-    def delete = {
+    def delete() {
         def shipmentEventInstance = ShipmentEvent.get(params.id)
         if (shipmentEventInstance) {
             try {

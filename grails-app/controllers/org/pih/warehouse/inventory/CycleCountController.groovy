@@ -18,7 +18,7 @@ class CycleCountController {
     def dataService
     def inventoryService
 
-    def exportAsCsv = {
+    def exportAsCsv() {
         Location location = Location.load(session.warehouse.id)
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"

@@ -13,13 +13,12 @@ import grails.converters.JSON
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
-import org.pih.warehouse.core.Location
 
 class InternalLocationApiController {
 
     def locationService
 
-    def list = {
+    def list() {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location parentLocation = locationId ? Location.get(locationId) : null
         if (!parentLocation) {
@@ -32,7 +31,7 @@ class InternalLocationApiController {
         render([data: locations?.collect { [id: it.id, name: it.name] }] as JSON)
     }
 
-    def listReceiving = {
+    def listReceiving() {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location parentLocation = locationId ? Location.get(locationId) : null
         if (!parentLocation) {
@@ -51,7 +50,7 @@ class InternalLocationApiController {
         render([data: locations?.collect { [id: it.id, name: it.name] }] as JSON)
     }
 
-    def read = {
+    def read() {
         Location location = Location.get(params.id)
         render([data: location] as JSON)
     }
