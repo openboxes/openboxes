@@ -13,13 +13,12 @@ import grails.converters.JSON
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.UnresolvableObjectException
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Location
 
 class BinLocationApiController {
 
     def locationService
 
-    def list = {
+    def list() {
         String locationId = params?.parentLocation?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
         if (!location) {
@@ -29,7 +28,7 @@ class BinLocationApiController {
         render([data: location?.binLocations] as JSON)
     }
 
-    def read = {
+    def read() {
         Location binLocation = Location.get(params.id)
         if (!binLocation) {
             throw new ObjectNotFoundException(params.id, Location.class.toString())

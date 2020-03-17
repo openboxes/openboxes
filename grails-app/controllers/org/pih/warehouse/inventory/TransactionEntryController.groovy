@@ -13,7 +13,7 @@ class TransactionEntryController {
 
     def scaffold = TransactionEntry
 
-    def delete = {
+    def delete() {
         def transactionEntryInstance = TransactionEntry.get(params.id)
         if (!transactionEntryInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'transactionEntry.label'), params.id])}"

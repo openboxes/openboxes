@@ -20,7 +20,7 @@ class StocklistItemApiController {
 
     def stocklistItemService
 
-    def list = {
+    def list() {
         String productId = params?.product?.id
         if (!productId) {
             throw new IllegalArgumentException("Must provide product.id as request parameter")
@@ -30,7 +30,7 @@ class StocklistItemApiController {
         render([data: stocklistItems] as JSON)
     }
 
-    def read = {
+    def read() {
         StocklistItem stocklistItem = stocklistItemService.getStocklistItem(params.id)
 
         if (!stocklistItem) {
@@ -40,7 +40,7 @@ class StocklistItemApiController {
         render([data: stocklistItem] as JSON)
     }
 
-    def create = { StocklistItem stocklistItem ->
+    def create(StocklistItem stocklistItem) {
         String productId = params?.product?.id
         if (!productId) {
             throw new IllegalArgumentException("Must provide product.id as request parameter")
@@ -55,7 +55,7 @@ class StocklistItemApiController {
         render([data: stocklistItem] as JSON)
     }
 
-    def update = {
+    def update() {
         JSONObject jsonObject = request.JSON
         log.debug "update: " + jsonObject.toString(4)
 
@@ -70,13 +70,13 @@ class StocklistItemApiController {
         render([data: stocklistItem] as JSON)
     }
 
-    def remove = {
+    def remove() {
         stocklistItemService.deleteStocklistItem(params.id)
 
         render status: 204
     }
 
-    def availableStocklists = {
+    def availableStocklists() {
         def availableStocklists = stocklistItemService.getAvailableStocklists()
         render([data: availableStocklists] as JSON)
     }

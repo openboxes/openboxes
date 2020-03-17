@@ -13,11 +13,11 @@ class ProductGroupController {
 
     def productService
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
         def productGroupTotal
@@ -34,13 +34,13 @@ class ProductGroupController {
         [productGroupInstanceList: productGroups, productGroupInstanceTotal: productGroupTotal]
     }
 
-    def create = {
+    def create() {
         def productGroupInstance = new ProductGroup()
         productGroupInstance.properties = params
         return [productGroupInstance: productGroupInstance]
     }
 
-    def save = {
+    def save() {
         println "Save " + params
         def productGroupInstance = ProductGroup.get(params.id)
         if (!productGroupInstance) {
@@ -59,7 +59,7 @@ class ProductGroupController {
         }
     }
 
-    def show = {
+    def show() {
         def productGroupInstance = ProductGroup.get(params.id)
         if (!productGroupInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
@@ -69,7 +69,7 @@ class ProductGroupController {
         }
     }
 
-    def edit = {
+    def edit() {
         log.info "Edit product group: " + params
 
         def productGroupInstance = ProductGroup.get(params.id)
@@ -83,7 +83,7 @@ class ProductGroupController {
         }
     }
 
-    def addProducts = {
+    def addProducts() {
 
         def productGroupInstance = ProductGroup.get(params.id)
         if (productGroupInstance) {
@@ -123,7 +123,7 @@ class ProductGroupController {
 
     }
 
-    def update = {
+    def update() {
 
         log.info "Update product group " + params
 
@@ -154,7 +154,7 @@ class ProductGroupController {
         }
     }
 
-    def delete = {
+    def delete() {
         def productGroupInstance = ProductGroup.get(params.id)
         if (productGroupInstance) {
             try {
@@ -182,7 +182,7 @@ class ProductGroupController {
     /**
      * From the inventory browser.
      */
-    def addToProductGroup = {
+    def addToProductGroup() {
         def productGroupInstance = new ProductGroup()
         productGroupInstance.properties = params
         productGroupInstance.products = productService.getProducts(params['product.id'])
@@ -209,7 +209,7 @@ class ProductGroupController {
      * From the edit produt group page.
      */
 
-    def removeProductsFromProductGroup = {
+    def removeProductsFromProductGroup() {
         println params
 
         def productGroupInstance = ProductGroup.get(params.id)
@@ -220,7 +220,8 @@ class ProductGroupController {
 
         render(view: "edit", model: [productGroupInstance: productGroupInstance])
     }
-    def addProductsToProductGroup = {
+
+    def addProductsToProductGroup() {
         println params
 
         def productGroupInstance = ProductGroup.get(params.id)
@@ -238,7 +239,7 @@ class ProductGroupController {
      *
      * @return
      */
-    def addProductToProductGroup = {
+    def addProductToProductGroup() {
         println "addProductToProductGroup() " + params
         def productGroup = ProductGroup.get(params.id)
         if (productGroup) {
@@ -254,7 +255,7 @@ class ProductGroupController {
     /**
      * Delete product group from database
      */
-    def deleteProductFromProductGroup = {
+    def deleteProductFromProductGroup() {
         println "deleteProductFromProductGroup() " + params
         def productGroup = ProductGroup.get(params.id)
         def product = Product.get(params?.product?.id)

@@ -38,7 +38,7 @@ class ConsumptionController {
     InventoryService inventoryService
     ConsumptionService consumptionService
 
-    def show = { ShowConsumptionCommand command ->
+    def show(ShowConsumptionCommand command) {
 
         if (command.hasErrors()) {
             render(view: "show", model: [command: command])
@@ -308,12 +308,12 @@ class ConsumptionController {
     }
 
 
-    def index = {
+    def index() {
         redirect(action: "list")
     }
 
 
-    def delete = {
+    def delete() {
         long startTime = System.currentTimeMillis()
         Integer deletedRecords = consumptionService.deleteConsumptionRecords()
         flash.message = "Deleted ${deletedRecords} consumption records in ${System.currentTimeMillis() - startTime}"
@@ -321,13 +321,13 @@ class ConsumptionController {
         redirect(controller: "consumption", action: "list")
     }
 
-    def refresh = { ConsumptionCommand command ->
+    def refresh(ConsumptionCommand command) {
         reportService.buildConsumptionFact()
         redirect(controller: "consumption", action: "list")
     }
 
 
-    def pivot = { ConsumptionCommand command ->
+    def pivot(ConsumptionCommand command) {
 
         use(TimeCategory) {
             command.endDate = command?.endDate ?: new Date()
@@ -337,8 +337,7 @@ class ConsumptionController {
         [command: command]
     }
 
-
-    def list = { ConsumptionCommand command ->
+    def list(ConsumptionCommand command) {
 
         log.info "Params: " + params
 
@@ -362,8 +361,7 @@ class ConsumptionController {
         [command: command]
     }
 
-
-    def aggregate = { ConsumptionCommand command ->
+    def aggregate(ConsumptionCommand command) {
 
         String locationId = command?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
@@ -393,7 +391,7 @@ class ConsumptionController {
         render results as JSON
     }
 
-    def product = {
+    def product() {
         Product product = Product.get(params.id)
         render(template: "product", model: [product: product])
     }

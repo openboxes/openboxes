@@ -43,13 +43,13 @@ class InventoryItemController {
     GrailsApplication grailsApplication
 
 
-    def index = {
+    def index() {
         redirect(controller: "inventory", action: "browse")
     }
     /**
      *
      */
-    def show = {
+    def show() {
         def itemInstance = InventoryItem.get(params.id)
         def transactionEntryList = TransactionEntry.findAllByInventoryItem(itemInstance)
         [
@@ -61,7 +61,7 @@ class InventoryItemController {
     /**
      * Ajax method for the Record Inventory page.
      */
-    def getInventoryItems = {
+    def getInventoryItems() {
         def productInstance = Product.get(params?.product?.id)
         def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
         render inventoryItemList as JSON
@@ -71,7 +71,7 @@ class InventoryItemController {
     /**
      * Displays the stock card for a product
      */
-    def showStockCard = { StockCardCommand cmd ->
+    def showStockCard(StockCardCommand cmd) {
 
         try {
             // add the current warehouse to the command object which prevents location from being spoofed
@@ -87,7 +87,7 @@ class InventoryItemController {
         }
     }
 
-    def showCurrentStock = { StockCardCommand cmd ->
+    def showCurrentStock(StockCardCommand cmd) {
         def startTime = System.currentTimeMillis()
         cmd.warehouse = Location.get(session?.warehouse?.id)
         def commandInstance = inventoryService.getStockCardCommand(cmd, params)
@@ -98,7 +98,7 @@ class InventoryItemController {
     }
 
 
-    def showCurrentStockAllLocations = { StockCardCommand cmd ->
+    def showCurrentStockAllLocations(StockCardCommand cmd) {
         def startTime = System.currentTimeMillis()
         User currentUser = User.get(session.user.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
@@ -111,7 +111,7 @@ class InventoryItemController {
         render(template: "showCurrentStockAllLocations", model: [commandInstance: commandInstance, quantityMap: quantityMap, targetUri: targetUri])
     }
 
-    def showAlternativeProducts = { StockCardCommand cmd ->
+    def showAlternativeProducts(StockCardCommand cmd) {
         def startTime = System.currentTimeMillis()
         def product = Product.get(params.id)
         def location = Location.get(session?.warehouse?.id)
@@ -130,7 +130,7 @@ class InventoryItemController {
     }
 
 
-    def showStockHistory = { StockCardCommand cmd ->
+    def showStockHistory(StockCardCommand cmd) {
         def startTime = System.currentTimeMillis()
         // add the current warehouse to the command object
         cmd.warehouse = Location.get(session?.warehouse?.id)
@@ -242,7 +242,7 @@ class InventoryItemController {
         }
     }
 
-    def showSuppliers = {
+    def showSuppliers() {
 
         def productInstance = Product.get(params.id)
 
@@ -251,7 +251,7 @@ class InventoryItemController {
     }
 
 
-    def showPending = {
+    def showPending() {
 
         Product product = Product.get(params.id)
         Location location = Location.get(session?.warehouse?.id)
@@ -299,7 +299,7 @@ class InventoryItemController {
         render(template: "showPendingStock", model: [product: product, itemsMap: itemsMap])
     }
 
-    def showConsumption = { StockCardCommand cmd ->
+    def showConsumption(StockCardCommand cmd) {
 
         // add the current warehouse to the command object
         cmd.warehouse = Location.get(session?.warehouse?.id)
@@ -396,7 +396,7 @@ class InventoryItemController {
                         monthKeys       : monthKeys])
     }
 
-    def showProductDemand = {
+    def showProductDemand() {
         Product product = Product.get(params.id)
         Location location = Location.get(session.warehouse.id)
         if (params.format == 'csv') {
@@ -413,7 +413,7 @@ class InventoryItemController {
     }
 
 
-    def showInventorySnapshot = {
+    def showInventorySnapshot() {
         def location = Location.get(session.warehouse.id)
         def product = Product.get(params.id)
         def inventorySnapshots = InventorySnapshot.findAllByProductAndLocation(product, location)
@@ -425,7 +425,7 @@ class InventoryItemController {
     /**
      * Displays the stock card for a product
      */
-    def showLotNumbers = { StockCardCommand cmd ->
+    def showLotNumbers(StockCardCommand cmd) {
         // add the current warehouse to the command object
         cmd.warehouse = Location.get(session?.warehouse?.id)
 
@@ -439,7 +439,7 @@ class InventoryItemController {
     /**
      * Displays the stock card for a product
      */
-    def showTransactionLog = { StockCardCommand cmd ->
+    def showTransactionLog(StockCardCommand cmd) {
         // add the current warehouse to the command object
         cmd.warehouse = Location.get(session?.warehouse?.id)
 
@@ -453,7 +453,7 @@ class InventoryItemController {
     /**
      * Displays the stock card for a product
      */
-    def showGraph = { StockCardCommand cmd ->
+    def showGraph(StockCardCommand cmd) {
         // add the current warehouse to the command object
         cmd.warehouse = Location.get(session?.warehouse?.id)
 
@@ -467,7 +467,7 @@ class InventoryItemController {
     /**
      * Display the Record Inventory form for the product
      */
-    def showRecordInventory = { RecordInventoryCommand commandInstance ->
+    def showRecordInventory(RecordInventoryCommand commandInstance) {
 
         def locationInstance = Location.get(session?.warehouse?.id)
 
@@ -501,7 +501,7 @@ class InventoryItemController {
         [commandInstance: commandInstance, product: jsonString]
     }
 
-    def saveRecordInventory = { RecordInventoryCommand commandInstance ->
+    def saveRecordInventory(RecordInventoryCommand commandInstance) {
         log.info("Before saving record inventory " + params)
         inventoryService.saveRecordInventoryCommand(commandInstance, params)
         if (!commandInstance.hasErrors()) {
@@ -531,7 +531,7 @@ class InventoryItemController {
         render(view: "showRecordInventory", model: [commandInstance: commandInstance])
     }
 
-    def showTransactions = {
+    def showTransactions() {
 
         def warehouseInstance = Location.get(session?.warehouse?.id)
         def productInstance = Product.get(params?.product?.id)
@@ -549,7 +549,7 @@ class InventoryItemController {
     }
 
 
-    def createInventoryItem = {
+    def createInventoryItem() {
 
         flash.message = "${warehouse.message(code: 'inventoryItem.temporaryCreateInventoryItem.message')}"
 
@@ -561,7 +561,7 @@ class InventoryItemController {
         [itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]
     }
 
-    def saveInventoryItem = {
+    def saveInventoryItem() {
         log.info "save inventory item " + params
         def productInstance = Product.get(params.product.id)
         def inventoryInstance = Inventory.get(params.inventory.id)
@@ -610,7 +610,7 @@ class InventoryItemController {
     }
 
 
-    def edit = {
+    def edit() {
         def itemInstance = InventoryItem.get(params.id)
         if (!itemInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.id])}"
@@ -620,7 +620,7 @@ class InventoryItemController {
         }
     }
 
-    def editInventoryLevel = {
+    def editInventoryLevel() {
 
         def productInstance = Product.get(params?.product?.id)
         def inventoryInstance = Inventory.get(params?.inventory?.id)
@@ -637,7 +637,7 @@ class InventoryItemController {
         [productInstance: productInstance, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance]
     }
 
-    def updateInventoryLevel = {
+    def updateInventoryLevel() {
 
         log.info("update inventory level " + params)
 
@@ -668,7 +668,7 @@ class InventoryItemController {
     /**
      * Handles form submission from Show Stock Card > Adjust Stock dialog.
      */
-    def adjustStock = { AdjustStockCommand command ->
+    def adjustStock(AdjustStockCommand command) {
         InventoryItem inventoryItem = command.inventoryItem
         try {
             inventoryService.adjustStock(command)
@@ -689,7 +689,7 @@ class InventoryItemController {
                 id: inventoryItem?.product?.id, params: ['inventoryItem.id': inventoryItem?.id], model: [command: command])
     }
 
-    def showDialog = {
+    def showDialog() {
         def location = Location.get(session.warehouse.id)
         def inventoryItem = InventoryItem.get(params.id)
         def binLocation = Location.get(params.binLocation)
@@ -701,13 +701,13 @@ class InventoryItemController {
                                                   quantityAvailable: quantityAvailable])
     }
 
-    def refreshBinLocation = {
+    def refreshBinLocation() {
         log.info "params: " + params
         render g.selectBinLocationByLocation(params)
     }
 
 
-    def transferStock = { TransferStockCommand command ->
+    def transferStock(TransferStockCommand command) {
         log.info "Transfer stock " + params
         log.info "Command " + command
 
@@ -740,7 +740,7 @@ class InventoryItemController {
     }
 
 
-    def update = {
+    def update() {
 
         log.info "Params " + params
         def itemInstance = InventoryItem.get(params.id)
@@ -779,7 +779,7 @@ class InventoryItemController {
     }
 
 
-    def deleteTransactionEntry = {
+    def deleteTransactionEntry() {
         def transactionEntry = TransactionEntry.get(params.id)
         def productInstance
         if (transactionEntry) {
@@ -789,7 +789,7 @@ class InventoryItemController {
         redirect(action: 'showStockCard', params: ['product.id': productInstance?.id])
     }
 
-    def addToInventory = {
+    def addToInventory() {
         def product = Product.get(params.id)
         render warehouse.message(code: 'inventoryItem.productAddedToInventory.message', args: [product.name])
         //return product as XML
@@ -797,7 +797,7 @@ class InventoryItemController {
     /**
      * Add a shipment item to a shipment
      */
-    def addToShipment = {
+    def addToShipment() {
         log.info "params" + params
         def shipmentInstance = null
         def containerInstance = null
@@ -856,7 +856,7 @@ class InventoryItemController {
     }
 
 
-    def saveInventoryLevel = {
+    def saveInventoryLevel() {
         // Get existing inventory level
         def inventoryLevelInstance = InventoryLevel.get(params.id)
         def productInstance = Product.get(params?.product?.id)
@@ -878,7 +878,7 @@ class InventoryItemController {
         redirect(action: 'showStockCard', params: ['product.id': productInstance?.id])
     }
 
-    def create = {
+    def create() {
         def inventoryItem = new InventoryItem(params)
         if (InventoryItem && inventoryItem.save()) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryItem.label'), params.id])}"
@@ -889,7 +889,7 @@ class InventoryItemController {
     }
 
 
-    def delete = {
+    def delete() {
         def inventoryItem = InventoryItem.get(params.id)
         if (inventoryItem) {
             try {
@@ -906,7 +906,7 @@ class InventoryItemController {
         redirect(action: 'showLotNumbers', params: ['product.id': inventoryItem?.product?.id])
     }
 
-    def deleteInventoryItem = {
+    def deleteInventoryItem() {
         def inventoryItem = InventoryItem.get(params.id)
         def productInstance = inventoryItem?.product
         def inventoryInstance = Inventory.get(inventoryItem?.inventory?.id)
@@ -927,7 +927,7 @@ class InventoryItemController {
     }
 
 
-    def saveTransactionEntry = {
+    def saveTransactionEntry() {
         def productInstance = Product.get(params?.product?.id)
         if (!productInstance) {
             flash.message = "${warehouse.message(code: 'default.notfound.message', args: [warehouse.message(code: 'product.label', default: 'Product'), productInstance.id])}"

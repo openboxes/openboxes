@@ -11,7 +11,6 @@ package org.pih.warehouse.inventory
 
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Location
 
 class CycleCountController {
 
@@ -19,7 +18,7 @@ class CycleCountController {
     def reportService
     def inventoryService
 
-    def exportAsCsv = {
+    def exportAsCsv() {
         Location location = Location.load(session.warehouse.id)
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"

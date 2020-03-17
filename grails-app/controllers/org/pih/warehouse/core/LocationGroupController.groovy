@@ -13,22 +13,22 @@ class LocationGroupController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [locationGroupInstanceList: LocationGroup.list(params), locationGroupInstanceTotal: LocationGroup.count()]
     }
 
-    def create = {
+    def create() {
         def locationGroupInstance = new LocationGroup()
         locationGroupInstance.properties = params
         return [locationGroupInstance: locationGroupInstance]
     }
 
-    def save = {
+    def save() {
         def locationGroupInstance = new LocationGroup(params)
         if (locationGroupInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), locationGroupInstance.id])}"
@@ -38,7 +38,7 @@ class LocationGroupController {
         }
     }
 
-    def show = {
+    def show() {
         def locationGroupInstance = LocationGroup.get(params.id)
         if (!locationGroupInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
@@ -48,7 +48,7 @@ class LocationGroupController {
         }
     }
 
-    def edit = {
+    def edit() {
         def locationGroupInstance = LocationGroup.get(params.id)
         if (!locationGroupInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
@@ -58,7 +58,7 @@ class LocationGroupController {
         }
     }
 
-    def update = {
+    def update() {
         def locationGroupInstance = LocationGroup.get(params.id)
         if (locationGroupInstance) {
             if (params.version) {
@@ -94,7 +94,7 @@ class LocationGroupController {
         }
     }
 
-    def delete = {
+    def delete() {
         def locationGroupInstance = LocationGroup.get(params.id)
         if (locationGroupInstance) {
             try {

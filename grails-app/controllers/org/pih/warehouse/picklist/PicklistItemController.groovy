@@ -15,7 +15,7 @@ class PicklistItemController {
 
     def picklistService
 
-    def delete = {
+    def delete() {
         def picklistItem = PicklistItem.get(params.id)
         if (picklistItem) {
 
