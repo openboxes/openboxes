@@ -20,4 +20,4 @@ class IndicatorDatasets implements Serializable {
                 "type"         : type
         ]
     }
-} 
+}
