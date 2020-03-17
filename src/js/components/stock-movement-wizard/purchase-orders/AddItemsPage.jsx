@@ -140,7 +140,7 @@ const VENDOR_FIELDS = {
               label: `${fieldValue.product.productCode} ${fieldValue.product.name}`,
             },
             sortOrder: fieldValue.sortOrder + 1,
-            orderItem: fieldValue.orderItem,
+            referenceId: fieldValue.referenceId,
           }, rowIndex),
         }),
         attributes: {
@@ -257,6 +257,28 @@ class AddItemsPage extends Component {
       if (date.diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.invalidDate.label' };
       }
+      if (item.id) {
+        const splitItems = _.filter(values.lineItems, lineItem =>
+          lineItem.referenceId === item.referenceId);
+        const requestedQuantity = _.reduce(
+          splitItems, (sum, val) =>
+            (sum + (val.quantityRequested ? _.toInteger(val.quantityRequested) : 0)),
+          0,
+        );
+        if (requestedQuantity !== item.quantityRequired) {
+          if (splitItems.length === 1) {
+            errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.changedQuantity.label' };
+          } else {
+            _.forEach(values.lineItems, (lineItem, lineItemKey) => {
+              _.forEach(splitItems, (splitItem) => {
+                if (lineItem === splitItem) {
+                  errors.lineItems[lineItemKey] = { quantityRequested: 'react.stockMovement.error.changedSplitQuantity.label' };
+                }
+              });
+            });
+          }
+        }
+      }
     });
     return errors;
   }
@@ -360,6 +382,7 @@ class AddItemsPage extends Component {
           val => ({
             ...val,
             disabled: true,
+            referenceId: val.id,
             product: {
               ...val.product,
               label: `${val.productCode} ${val.product.name}`,
