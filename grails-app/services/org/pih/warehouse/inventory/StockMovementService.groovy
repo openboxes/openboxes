@@ -79,11 +79,7 @@ class StockMovementService {
             throw new ValidationException("Invalid stock movement", stockMovement.errors)
         }
 
-        if (stockMovement.stockMovementType == StockMovementType.OUTBOUND) {
-            return createRequisitionBasedStockMovement(stockMovement)
-        } else {
-            return createShipmentBasedStockMovement(stockMovement)
-        }
+        return createRequisitionBasedStockMovement(stockMovement)
     }
 
     void transitionStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
@@ -107,15 +103,16 @@ class StockMovementService {
     }
 
     void transitionRequisitionBasedStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
-        RequisitionStatus status =
-                jsonObject.containsKey("status") ? jsonObject.status as RequisitionStatus : null
+        StockMovementStatusCode status =
+                jsonObject.containsKey("status") ? jsonObject.status as StockMovementStatusCode : null
 
         Boolean statusOnly =
                 jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
 
         // Update status only
         if (status && statusOnly) {
-            updateStatus(stockMovement.id, status)
+            RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(stockMovementStatus)
+            updateRequisitionStatus(stockMovement.id, requisitionStatus)
         }
         // Determine whether we need to rollback change,
         else {
@@ -130,13 +127,17 @@ class StockMovementService {
 
             if (status) {
                 switch (status) {
-                    case RequisitionStatus.CREATED:
+                    //RequisitionStatus.CREATED:
+                    case StockMovementStatusCode.CREATED:
                         break
-                    case RequisitionStatus.EDITING:
+                    //RequisitionStatus.EDITING:
+                    case StockMovementStatusCode.REQUESTED:
                         break
-                    case RequisitionStatus.VERIFYING:
+                    //RequisitionStatus.VERIFYING:
+                    case StockMovementStatusCode.VALIDATED:
                         break
-                    case RequisitionStatus.PICKING:
+                    // RequisitionStatus.PICKING:
+                    case StockMovementStatusCode.PICKING:
                         // Clear picklist
                         Boolean clearPicklist =
                                 jsonObject.containsKey("clearPicklist") ? jsonObject.getBoolean("clearPicklist") : false
@@ -148,13 +149,12 @@ class StockMovementService {
                         if (createPicklist) createPicklist(stockMovement)
 
                         break
-                    case RequisitionStatus.PICKED:
+                    case StockMovementStatusCode.PICKED:
+                    case StockMovementStatusCode.CHECKING:
+                    case StockMovementStatusCode.CHECKED:
                         createShipment(stockMovement)
                         break
-                    case RequisitionStatus.CHECKING:
-                        createShipment(stockMovement)
-                        break
-                    case RequisitionStatus.ISSUED:
+                    case StockMovementStatusCode.DISPATCHED:
                         issueRequisitionBasedStockMovement(stockMovement.id)
                         break
                     default:
@@ -163,13 +163,14 @@ class StockMovementService {
 
                 }
                 // If the dependent actions were updated properly then we can update the
-                updateStatus(stockMovement.id, status)
+                RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(status)
+                updateRequisitionStatus(stockMovement.id, requisitionStatus)
             }
         }
     }
 
 
-    void updateStatus(String id, RequisitionStatus status) {
+    void updateRequisitionStatus(String id, RequisitionStatus status) {
 
         log.info "Update status ${id} " + status
         Requisition requisition = Requisition.get(id)
@@ -253,7 +254,8 @@ class StockMovementService {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
 
-        if (RequisitionStatus.CHECKING == requisition.status || RequisitionStatus.PICKED == requisition.status || RequisitionStatus.ISSUED == requisition.status) {
+        if (requisition.status in
+                [RequisitionStatus.CHECKING, RequisitionStatus.PICKED, RequisitionStatus.ISSUED]) {
             log.info "Updating shipment for stock movement ${stockMovement}"
             updateShipmentOnRequisitionChange(stockMovement)
         }
@@ -1605,11 +1607,12 @@ class StockMovementService {
             shipment.addToComments(new Comment(comment: stockMovement.comments))
         }
 
-        ReferenceNumber referenceNumber = findOrCreateReferenceNumber(shipment, stockMovement.trackingNumber)
-        if (referenceNumber) {
-            shipment.addToReferenceNumbers(referenceNumber)
+        if (stockMovement.trackingNumber) {
+            ReferenceNumber referenceNumber = findOrCreateReferenceNumber(shipment, stockMovement.trackingNumber)
+            if (referenceNumber) {
+                shipment.addToReferenceNumbers(referenceNumber)
+            }
         }
-
         shipment.save()
         //throw new IllegalStateException("Unable to update inbound shipment ${stockMovement.id} at this time")
     }
@@ -1644,14 +1647,18 @@ class StockMovementService {
         shipment.expectedShippingDate = stockMovement.dateShipped ?: shipment.expectedShippingDate
         shipment.shipmentType = stockMovement.shipmentType ?: shipment.shipmentType
 
-        ReferenceNumber referenceNumber = findOrCreateReferenceNumber(stockMovement.trackingNumber)
-        shipment.addToReferenceNumbers(referenceNumber)
+        if (stockMovement.trackingNumber) {
+            ReferenceNumber referenceNumber = findOrCreateReferenceNumber(stockMovement.trackingNumber)
+            if (referenceNumber) {
+                shipment.addToReferenceNumbers(referenceNumber)
+            }
+        }
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
-        updateRequisitionWhenShipmentChanged(stockMovement)
+        updateRequisitionOnShipmentChange(stockMovement)
 
         return shipment
     }

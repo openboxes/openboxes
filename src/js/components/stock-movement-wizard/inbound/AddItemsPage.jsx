@@ -652,7 +652,7 @@ class AddItemsPage extends Component {
    */
   transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'PENDING' };
+    const payload = { status: 'CHECKING' };
 
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload);

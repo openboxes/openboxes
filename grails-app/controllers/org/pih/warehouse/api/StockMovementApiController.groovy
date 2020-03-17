@@ -109,7 +109,7 @@ class StockMovementApiController {
      */
     def updateStatus = {
         JSONObject jsonObject = request.JSON
-        log.debug "update status: " + jsonObject.toString(4)
+        log.info "update status: " + jsonObject.toString(4)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         stockMovementService.transitionStockMovement(stockMovement, jsonObject)
         render status: 200

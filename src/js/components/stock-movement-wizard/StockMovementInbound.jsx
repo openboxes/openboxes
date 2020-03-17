@@ -139,7 +139,7 @@ class StockMovements extends Component {
             },
           };
 
-          const statuses = ['NEW', 'CREATED', 'PENDING'];
+          const statuses = ['NEW', 'CREATED', 'CHECKING'];
 
           let currentPage = 3;
           if (statuses.indexOf(values.statusCode) > 0) {
