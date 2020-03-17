@@ -12,9 +12,7 @@ package org.pih.warehouse.order
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductSupplier
 import org.springframework.dao.DataIntegrityViolationException
 
 class PurchaseOrderWorkflowController {
@@ -58,8 +56,6 @@ class PurchaseOrderWorkflowController {
                         return error()
                     }
                 } catch (ValidationException e) {
-                    log.error("Exception: " + e.message, e)
-                    //order.errors = e.errors
                     return error()
                 }
             }.to("showOrderItems")
@@ -116,29 +112,10 @@ class PurchaseOrderWorkflowController {
                     return error()
                 }
 
-                if (!orderItem.productSupplier) {
-                    ProductSupplier productSupplier = new ProductSupplier()
-                    productSupplier.code = identifierService.generateProductSupplierIdentifier(product.productCode)
-                    productSupplier.product = product
-                    productSupplier.supplier = supplier
-                    productSupplier.supplierCode = "TBD"
-                    productSupplier.supplierName = supplier
-                    productSupplier.manufacturer = supplier
-                    productSupplier.manufacturerCode = "TBD"
-                    productSupplier.name = product.name
-                    productSupplier.productCode = product.productCode
-                    productSupplier.unitPrice = orderItem.unitPrice
-                    productSupplier.save()
-                    orderItem.productSupplier = productSupplier
-                }
-
                 flow.order.addToOrderItems(orderItem)
                 if (!orderService.saveOrder(flow.order)) {
                     return error()
                 }
-
-
-
                 flow.orderItem = null
 
             }.to("showOrderItems")
