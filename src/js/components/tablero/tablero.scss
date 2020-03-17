@@ -154,6 +154,36 @@
   .contentCard {
     height: 100%;
 
+    .dataFilter {
+      margin: -15px 0 5px 0;
+      font-size: 12px;
+      font-weight: normal;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 0.83;
+      letter-spacing: normal;
+      text-align: right;
+      position: relative; 
+
+      .customSelect{
+        background-color: transparent;
+        border: transparent;
+        color: #aaacae;
+        font-family: Arial;
+        text-align: right;
+        cursor: pointer;
+
+        &:focus{
+          outline: none;
+        }
+      }
+    }
+
+    .dataFilter .disabled{
+      opacity: 0;
+      cursor: default;
+    }
+
     .loaderDiv {
       margin: auto;
       position: relative;
@@ -216,40 +246,40 @@
 
 @media (min-width: 630px) {
   .graphCard {
-    height: 400px;
+    height: 420px;
   }
 }
 
 @media (min-width: 730px) {
   .graphCard {
-    height: 450px;
+    height: 470px;
   }
 }
 
 @media (min-width: 868px) {
   .graphCard {
-    height: 300px;
+    height: 320px;
     width: 47%;
   }
 }
 
 @media (min-width: 1068px) {
   .graphCard {
-    height: 350px;
+    height: 370px;
     width: 47%;
   }
 }
 
 @media (min-width: 1268px) {
   .graphCard {
-    height: 400px;
+    height: 420px;
     width: 47%;
   }
 }
 
 @media (min-width: 1468px) {
   .graphCard {
-    height: 350px;
+    height: 370px;
     width: 30.6%;
   }
 }
