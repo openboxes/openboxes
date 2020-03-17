@@ -328,9 +328,7 @@ class PickPage extends Component {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=4`;
     apiClient.get(url)
       .then((response) => {
-        if (stopIndex - startIndex > 0) {
-          this.setPickPageItems(response);
-        }
+        this.setPickPageItems(response);
       });
   }
 
