@@ -4,9 +4,6 @@ import ReactLoading from 'react-loading';
 import { loadColors, getColor } from '../../consts/dataFormat/dataLoading';
 
 /* global _ */
-function truncateString(value, length) {
-  return (value.length > length) ? `${value.substr(0, length - 1)}...` : value;
-}
 
 const Numbers = () => {
   const colors = ['green', 'yellow', 'red'];
@@ -61,7 +58,7 @@ const ArchivedIndicators = (props) => {
         <div className="row">
           <div className="col col-3 graph-preview">{graph}</div>
           <div className="col col-6">
-            <span>{truncateString(props.title, 25)}</span>
+            <span>{_.truncate(props.title, { length: 25, omission: '...' })}</span>
           </div>
           <div className="col col-3">
             <span
