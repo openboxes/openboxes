@@ -21,23 +21,23 @@ class ProductCatalogController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [productCatalogInstanceList: ProductCatalog.list(params), productCatalogInstanceTotal: ProductCatalog.count()]
     }
 
-    def create = {
+    def create() {
         def productCatalogInstance = new ProductCatalog()
         productCatalogInstance.properties = params
         return [productCatalogInstance: productCatalogInstance]
     }
 
     @CacheFlush("selectCatalogsCache")
-    def save = {
+    def save() {
         def productCatalogInstance = new ProductCatalog(params)
         if (productCatalogInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), productCatalogInstance.id])}"
@@ -47,7 +47,7 @@ class ProductCatalogController {
         }
     }
 
-    def show = {
+    def show() {
         def productCatalogInstance = ProductCatalog.get(params.id)
         if (!productCatalogInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), params.id])}"
@@ -57,7 +57,7 @@ class ProductCatalogController {
         }
     }
 
-    def edit = {
+    def edit() {
         def productCatalogInstance = ProductCatalog.get(params.id)
         if (!productCatalogInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productCatalog.label', default: 'ProductCatalog'), params.id])}"
@@ -68,7 +68,7 @@ class ProductCatalogController {
     }
 
     @CacheFlush("selectCatalogsCache")
-    def update = {
+    def update() {
         def productCatalogInstance = ProductCatalog.get(params.id)
         if (productCatalogInstance) {
             if (params.version) {
@@ -94,7 +94,7 @@ class ProductCatalogController {
     }
 
     @CacheFlush("selectCatalogsCache")
-    def delete = {
+    def delete() {
         def productCatalogInstance = ProductCatalog.get(params.id)
         if (productCatalogInstance) {
             try {
@@ -112,14 +112,14 @@ class ProductCatalogController {
         }
     }
 
-    def productCatalogItems = {
+    def productCatalogItems() {
         def productCatalogInstance = ProductCatalog.get(params.id)
 
         render(template: "productCatalogItems", model: [productCatalogInstance: productCatalogInstance])
     }
 
     @CacheFlush("selectCatalogsCache")
-    def addProductCatalogItem = { ProductCatalogCommand command ->
+    def addProductCatalogItem(ProductCatalogCommand command) {
         log.info("Command: " + command)
         log.info("Params: " + params)
         def product = command.product
@@ -133,7 +133,7 @@ class ProductCatalogController {
     }
 
     @CacheFlush("selectCatalogsCache")
-    def removeProductCatalogItem = {
+    def removeProductCatalogItem() {
         String productCatalogId
         def productCatalogItem = ProductCatalogItem.get(params.id)
         if (productCatalogItem) {
@@ -157,7 +157,7 @@ class ProductCatalogController {
     }
 
 
-    def importProductCatalog = { ImportDataCommand command ->
+    def importProductCatalog(ImportDataCommand command) {
 
         log.info "uploadCsv " + params
 
@@ -208,7 +208,7 @@ class ProductCatalogController {
         redirect(action: "edit", id: params.id)
     }
 
-    def exportProductCatalog = {
+    def exportProductCatalog() {
 
         def productCatalog = ProductCatalog.get(params.id)
         if (productCatalog) {

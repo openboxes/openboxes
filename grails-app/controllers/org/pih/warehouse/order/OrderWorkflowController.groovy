@@ -16,8 +16,11 @@ import org.pih.warehouse.product.Category
 
 class OrderWorkflowController {
 
-    def index = { redirect(action: "order") }
-    def orderFlow = {
+    def index() {
+        redirect(action: "order")
+    }
+
+    def orderFlow() {
         getProducts {
             action {
                 def productList = []

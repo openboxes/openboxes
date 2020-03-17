@@ -13,22 +13,22 @@ class PartyTypeController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [partyTypeInstanceList: PartyType.list(params), partyTypeInstanceTotal: PartyType.count()]
     }
 
-    def create = {
+    def create() {
         def partyTypeInstance = new PartyType()
         partyTypeInstance.properties = params
         return [partyTypeInstance: partyTypeInstance]
     }
 
-    def save = {
+    def save() {
         def partyTypeInstance = new PartyType(params)
         if (partyTypeInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'partyType.label', default: 'PartyType'), partyTypeInstance.id])}"
@@ -38,7 +38,7 @@ class PartyTypeController {
         }
     }
 
-    def show = {
+    def show() {
         def partyTypeInstance = PartyType.get(params.id)
         if (!partyTypeInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'partyType.label', default: 'PartyType'), params.id])}"
@@ -48,7 +48,7 @@ class PartyTypeController {
         }
     }
 
-    def edit = {
+    def edit() {
         def partyTypeInstance = PartyType.get(params.id)
         if (!partyTypeInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'partyType.label', default: 'PartyType'), params.id])}"
@@ -58,7 +58,7 @@ class PartyTypeController {
         }
     }
 
-    def update = {
+    def update() {
         def partyTypeInstance = PartyType.get(params.id)
         if (partyTypeInstance) {
             if (params.version) {
@@ -83,7 +83,7 @@ class PartyTypeController {
         }
     }
 
-    def delete = {
+    def delete() {
         def partyTypeInstance = PartyType.get(params.id)
         if (partyTypeInstance) {
             try {

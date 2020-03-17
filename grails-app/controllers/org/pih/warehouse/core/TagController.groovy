@@ -16,23 +16,23 @@ class TagController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [tagInstanceList: Tag.list(params), tagInstanceTotal: Tag.count()]
     }
 
-    def create = {
+    def create() {
         def tagInstance = new Tag()
         tagInstance.properties = params
         return [tagInstance: tagInstance]
     }
 
     @CacheFlush("selectTagsCache")
-    def save = {
+    def save() {
         def tagInstance = new Tag(params)
         if (tagInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), tagInstance.id])}"
@@ -42,7 +42,7 @@ class TagController {
         }
     }
 
-    def show = {
+    def show() {
         def tagInstance = Tag.get(params.id)
         if (!tagInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
@@ -52,7 +52,7 @@ class TagController {
         }
     }
 
-    def edit = {
+    def edit() {
         def tagInstance = Tag.get(params.id)
         if (!tagInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
@@ -63,7 +63,7 @@ class TagController {
     }
 
     @CacheFlush("selectTagsCache")
-    def update = {
+    def update() {
         def tagInstance = Tag.get(params.id)
         if (tagInstance) {
             if (params.version) {
@@ -89,7 +89,7 @@ class TagController {
     }
 
     @CacheFlush("selectTagsCache")
-    def delete = {
+    def delete() {
         def tagInstance = Tag.get(params.id)
         if (tagInstance) {
             try {
@@ -111,7 +111,7 @@ class TagController {
     }
 
     @CacheFlush("selectTagsCache")
-    def addToProducts = {
+    def addToProducts() {
         println "add to products " + params
         Tag tag = Tag.get(params.id)
 
@@ -141,7 +141,7 @@ class TagController {
     }
 
     @CacheFlush("selectTagsCache")
-    def removeFromProducts = {
+    def removeFromProducts() {
         println "remove from products " + params
         Tag tag = Tag.get(params.id)
 

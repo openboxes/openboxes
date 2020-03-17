@@ -30,14 +30,14 @@ class AuthController {
     /**
      * Show index page - just a redirect to the list page.
      */
-    def index = {
+    def index() {
         redirect(action: "login", params: params)
     }
 
     /**
      * Checks whether there is an authenticated user in the session.
      */
-    def authorized = {
+    def authorized() {
         if (session.user == null) {
             flash.message = "${warehouse.message(code: 'auth.notAuthorized.message')}"
             redirect(controller: 'auth', action: 'login')
@@ -47,7 +47,7 @@ class AuthController {
     /**
      * Allows user to log into the system.
      */
-    def login = {
+    def login() {
         if (session.user) {
             flash.message = "You have already logged in."
             redirect(controller: "dashboard", action: "index")
@@ -64,7 +64,7 @@ class AuthController {
     /**
      * Performs the authentication logic.
      */
-    def handleLogin = {
+    def handleLogin() {
         def userInstance = User.findByUsernameOrEmail(params.username, params.username)
         if (userInstance) {
 
@@ -133,7 +133,7 @@ class AuthController {
     /**
      * Allows user to log out of the system
      */
-    def logout = {
+    def logout() {
         if (session.impersonateUserId) {
             session.user = User.get(session.activeUserId)
             session.impersonateUserId = null
@@ -150,7 +150,7 @@ class AuthController {
     /**
      * Allow user to register a new account
      */
-    def signup = {
+    def signup() {
         Boolean enabled = grailsApplication.config.openboxes.signup.enabled?:false
         if (!enabled) {
             flash.message = "Apologies, but the signup feature is disabled on your system. " +
@@ -168,7 +168,7 @@ class AuthController {
     /**
      * Handle account registration.
      */
-    def handleSignup = {
+    def handleSignup() {
         def userInstance = new User()
         if ("POST".equalsIgnoreCase(request.getMethod())) {
             userInstance.properties = params
@@ -216,12 +216,12 @@ class AuthController {
     }
 
 
-    def renderAccountCreatedEmail = {
+    def renderAccountCreatedEmail() {
         def userInstance = User.get(params.id)
         render(template: "/email/userAccountCreated", model: [userInstance: userInstance])
     }
 
-    def renderAccountConfirmedEmail = {
+    def renderAccountConfirmedEmail() {
         def userInstance = User.get(params.id)
         render(template: "/email/userAccountConfirmed", model: [userInstance: userInstance])
     }

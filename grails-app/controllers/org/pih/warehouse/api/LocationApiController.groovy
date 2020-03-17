@@ -41,7 +41,7 @@ class LocationApiController extends BaseDomainApiController {
         render([data: location] as JSON)
     }
 
-    def list = {
+    def list() {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
         if (params.name && params.name.size() < minLength) {
