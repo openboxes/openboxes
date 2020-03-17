@@ -440,17 +440,17 @@ class StockMovementService {
         stockMovement.documents = getDocuments(stockMovement)
         if (stepNumber.equals("3")) {
             stockMovement.lineItems = null
-            stockMovement.editPage = getEditPage(id)
+            stockMovement.editPage = getEditPage(stockMovement?.id)
         } else if (stepNumber.equals("4")) {
             stockMovement.lineItems = null
-            stockMovement.pickPage = getPickPage(id)
+            stockMovement.pickPage = getPickPage(stockMovement?.id)
         } else if (stepNumber.equals("5")) {
             stockMovement.lineItems = null
-            stockMovement.packPage = getPackPage(id)
+            stockMovement.packPage = getPackPage(stockMovement?.id)
         } else if (stepNumber.equals("6")) {
             if (!stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                 stockMovement.lineItems = null
-                stockMovement.packPage = getPackPage(id)
+                stockMovement.packPage = getPackPage(stockMovement?.id)
             }
         }
         return stockMovement
