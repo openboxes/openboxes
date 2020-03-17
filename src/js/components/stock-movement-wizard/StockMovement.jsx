@@ -89,9 +89,8 @@ class StockMovements extends Component {
    */
   getFormList(status) {
     let formList = [];
-    const showOnly = this.state.values.origin
-      && this.props.currentLocation.id !== this.state.values.origin.id
-      && !this.props.isUserAdmin;
+    const showOnly = this.state.values.origin && this.state.values.origin.type === 'DEPOT'
+      && this.props.currentLocation.id !== this.state.values.origin.id;
     if (request && (status === 'CREATED' || !status)) {
       formList = [
         <CreateStockMovement
@@ -341,7 +340,6 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   currentLocation: state.session.currentLocation,
-  isUserAdmin: state.session.isUserAdmin,
 });
 
 export default connect(mapStateToProps, {
@@ -370,7 +368,6 @@ StockMovements.propTypes = {
   currentLocation: PropTypes.shape({
     id: PropTypes.string,
   }).isRequired,
-  isUserAdmin: PropTypes.bool.isRequired,
 };
 
 StockMovements.defaultProps = {
