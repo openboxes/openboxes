@@ -27,11 +27,11 @@ class LocationController {
      * Controllers for managing other locations (besides warehouses)
      */
 
-    def index = {
+    def index() {
         redirect(action: "list")
     }
 
-    def list = {
+    def list() {
 
         def locationsTotal = 0
         def locationType = LocationType.get(params["locationType.id"])
@@ -44,7 +44,7 @@ class LocationController {
         [locationInstanceList: locations, locationInstanceTotal: locations.totalCount]
     }
 
-    def show = {
+    def show() {
         def locationInstance = inventoryService.getLocation(params.id)
         if (!locationInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
@@ -54,7 +54,7 @@ class LocationController {
         }
     }
 
-    def edit = {
+    def edit() {
         def locationInstance = inventoryService.getLocation(params.id)
         if (!locationInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
@@ -64,7 +64,7 @@ class LocationController {
         }
     }
 
-    def update = {
+    def update() {
         def locationInstance = inventoryService.getLocation(params.id)
 
         if (locationInstance) {
@@ -135,7 +135,7 @@ class LocationController {
 
     }
 
-    def delete = {
+    def delete() {
         def locationInstance = Location.get(params.id)
         if (locationInstance) {
             try {
@@ -159,14 +159,14 @@ class LocationController {
         }
     }
 
-    def resetSupportedActivities = {
+    def resetSupportedActivities() {
         def location = Location.get(params.id)
         location.supportedActivities.clear()
         location.save()
         redirect(action: "edit", id: params.id)
     }
 
-    def showContents = {
+    def showContents() {
         def binLocation = Location.get(params.id)
         if (!binLocation) {
             render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
@@ -183,7 +183,7 @@ class LocationController {
     /**
      * Render location logo
      */
-    def viewLogo = {
+    def viewLogo() {
         def warehouseInstance = Location.get(params.id)
         if (warehouseInstance) {
             if (warehouseInstance.logo) {
@@ -193,7 +193,7 @@ class LocationController {
     }
 
 
-    def renderLogo = {
+    def renderLogo() {
         def location = Location.get(params.id)
         if (location?.logo) {
             response.setContentLength(location.logo.length)
@@ -205,7 +205,7 @@ class LocationController {
     }
 
 
-    def uploadLogo = {
+    def uploadLogo() {
         def locationInstance = Location.get(params.id)
 
         if (request.method == "POST") {
@@ -250,7 +250,7 @@ class LocationController {
         [locationInstance: locationInstance]
     }
 
-    def deleteLogo = {
+    def deleteLogo() {
         def location = Location.get(params.id)
         if (location) {
             location.logo = []
@@ -260,44 +260,44 @@ class LocationController {
         redirect(action: "uploadLogo", id: params.id)
     }
 
-    def deleteTransaction = {
+    def deleteTransaction() {
         def transaction = Transaction.get(params.id)
         transaction.delete()
         flash.message = "Transaction deleted"
         redirect(action: "show", id: params.location.id)
     }
-    def deleteShipment = {
+    def deleteShipment() {
         def shipment = Shipment.get(params.id)
         shipment.delete()
         flash.message = "Shipment deleted"
         redirect(action: "show", id: params.location.id)
     }
-    def deleteOrder = {
+    def deleteOrder() {
         def order = Order.get(params.id)
         order.delete()
         flash.message = "Order deleted"
         redirect(action: "show", id: params.location.id)
     }
-    def deleteRequest = {
+    def deleteRequest() {
         def requestInstance = Requisition.get(params.id)
         requestInstance.delete()
         flash.message = "Request deleted"
         redirect(action: "show", id: params.location.id)
     }
-    def deleteEvent = {
+    def deleteEvent() {
         def event = Event.get(params.id)
         event.delete()
         flash.message = "Event deleted"
         redirect(action: "show", id: params.location.id)
     }
-    def deleteUser = {
+    def deleteUser() {
         def user = User.get(params.id)
         user.delete()
         flash.message = "User deleted"
         redirect(action: "show", id: params.location.id)
     }
 
-    def showBinLocations = {
+    def showBinLocations() {
 
         def locationInstance = Location.get(params.id)
         if (!locationInstance) {
@@ -309,7 +309,7 @@ class LocationController {
     }
 
 
-    def importBinLocations = {
+    def importBinLocations() {
         try {
             MultipartFile multipartFile = request.getFile('fileContents')
             if (multipartFile.empty) {
@@ -331,7 +331,7 @@ class LocationController {
     }
 
 
-    def exportBinLocations = {
+    def exportBinLocations() {
 
         Location location = Location.get(params.id)
 

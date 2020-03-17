@@ -22,7 +22,7 @@ class LocationApiController extends BaseDomainApiController {
     def userService
     GrailsApplication grailsApplication
 
-    def list = {
+    def list() {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
         if (params.name && params.name.size() < minLength) {

@@ -21,7 +21,7 @@ class StockAdjustmentApiController {
 
     def inventoryService
 
-    def create = {
+    def create() {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
 
@@ -48,7 +48,7 @@ class StockAdjustmentApiController {
     }
 
 
-    void bindStockAdjustments(List<StockAdjustment> stockAdjustments, JSONArray jsonArray) {
+    private void bindStockAdjustments(List<StockAdjustment> stockAdjustments, JSONArray jsonArray) {
         jsonArray.each {
             stockAdjustments << bindStockAdjustment(new StockAdjustment(), it)
         }
@@ -58,7 +58,7 @@ class StockAdjustmentApiController {
 //        stockAdjustments << bindStockAdjustmentData(new StockAdjustment(), jsonObject)
 //    }
 
-    StockAdjustment bindStockAdjustment(StockAdjustment stockAdjustment, JSONObject jsonObject) {
+    private StockAdjustment bindStockAdjustment(StockAdjustment stockAdjustment, JSONObject jsonObject) {
         bindData(stockAdjustment, jsonObject)
 
         if (!stockAdjustment.inventoryItem) {

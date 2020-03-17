@@ -22,7 +22,7 @@ class ErrorsController {
     def userService
     GrailsApplication grailsApplication
 
-    def handleException = {
+    def handleException() {
         if (RequestUtil.isAjax(request)) {
             def cause = request?.exception?.cause ?: request?.exception
             def message = cause?.message ?: ""
@@ -33,7 +33,7 @@ class ErrorsController {
         }
     }
 
-    def handleNotFound = {
+    def handleNotFound() {
         log.info "Params " + params
 
         if (RequestUtil.isAjax(request)) {
@@ -50,7 +50,7 @@ class ErrorsController {
         }
     }
 
-    def handleUnauthorized = {
+    def handleUnauthorized() {
         log.info "Unauthorized user"
         if (RequestUtil.isAjax(request)) {
             response.status = 401
@@ -60,7 +60,7 @@ class ErrorsController {
         }
     }
 
-    def handleForbidden = {
+    def handleForbidden() {
         log.info "Access denied"
         if (RequestUtil.isAjax(request)) {
             response.status = 403
@@ -71,7 +71,7 @@ class ErrorsController {
     }
 
 
-    def handleInvalidDataAccess = {
+    def handleInvalidDataAccess() {
         if (RequestUtil.isAjax(request)) {
             render([errorCode: 500, errorMessage: "Illegal data access"] as JSON)
         } else {
@@ -79,7 +79,7 @@ class ErrorsController {
         }
     }
 
-    def handleMethodNotAllowed = {
+    def handleMethodNotAllowed() {
         if (RequestUtil.isAjax(request)) {
             render([errorCode: 405, errorMessage: "Method not allowed"] as JSON)
             return
@@ -87,7 +87,7 @@ class ErrorsController {
         render(view: "/errors/methodNotAllowed")
     }
 
-    def handleValidationErrors = {
+    def handleValidationErrors() {
         if (RequestUtil.isAjax(request)) {
             response.status = 400
             BeanPropertyBindingResult errors = request?.exception?.cause?.errors
@@ -105,7 +105,7 @@ class ErrorsController {
     }
 
 
-    def sendFeedback = {
+    def sendFeedback() {
         def enabled = Boolean.valueOf(grailsApplication.config.openboxes.mail.feedback.enabled ?: true)
 
         if (enabled) {
@@ -133,7 +133,7 @@ class ErrorsController {
     }
 
 
-    def processError = {
+    def processError() {
 
         def enabled = ConfigHelper.booleanValue(grailsApplication.config.openboxes.mail.errors.enabled)
         if (enabled) {

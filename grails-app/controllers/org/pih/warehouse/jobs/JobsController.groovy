@@ -22,11 +22,11 @@ class JobsController {
 
     StdScheduler quartzScheduler
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         log.info "Jobs"
 
         Set<JobKey> jobKeys = quartzScheduler.getJobKeys()
@@ -34,7 +34,7 @@ class JobsController {
         [jobKeys: jobKeys]
     }
 
-    def show = {
+    def show() {
         JobKey jobKey = JobKey.jobKey(params.id)
         JobDetail jobDetail = quartzScheduler.getJobDetail(jobKey)
 
@@ -46,7 +46,7 @@ class JobsController {
     }
 
 
-    def unscheduleJob = {
+    def unscheduleJob() {
         // find jobKey of job
         JobKey jobKey = JobKey.jobKey(params.id)
         if (jobKey) {
@@ -65,7 +65,7 @@ class JobsController {
         redirect(action: "show", id: params.id)
     }
 
-    def unscheduleTrigger = {
+    def unscheduleTrigger() {
         // find jobKey of job
 
         TriggerKey triggerKey = TriggerKey.triggerKey(params.id)
@@ -79,7 +79,7 @@ class JobsController {
         redirect(action: "show", id: jobKey.name)
     }
 
-    def scheduleJob = {
+    def scheduleJob() {
         JobKey jobKey = JobKey.jobKey(params.id)
         if (jobKey) {
             // cronExpression 0 0 22 * * ?

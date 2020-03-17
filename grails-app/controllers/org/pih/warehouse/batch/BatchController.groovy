@@ -24,9 +24,9 @@ class BatchController {
     def genericApiService
     def uploadService
 
-    def index = {}
+    def index() {}
 
-    def downloadExcel = {
+    def downloadExcel() {
         println "Download XLS template " + params
 
         def objects = genericApiService.getList(params.type, [:])
@@ -39,7 +39,7 @@ class BatchController {
         response.outputStream.flush()
     }
 
-    def downloadTemplate = {
+    def downloadTemplate() {
         println "Download XLS template " + params
         def filename = params.template
         try {
@@ -54,7 +54,7 @@ class BatchController {
         }
     }
 
-    def downloadCsvTemplate = {
+    def downloadCsvTemplate() {
         println "Download csv template " + params
         def filename = params.template
         try {

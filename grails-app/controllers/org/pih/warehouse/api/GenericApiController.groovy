@@ -16,23 +16,23 @@ class GenericApiController {
 
     GenericApiService genericApiService
 
-    def list = {
+    def list() {
         List data = genericApiService.getList(params.resource, params)
         render([data: data] as JSON)
     }
 
-    def search = {
+    def search() {
         def jsonObject = request.JSON
         List data = genericApiService.searchObjects(params.resource, jsonObject, params)
         render([data: data] as JSON)
     }
 
-    def read = {
+    def read() {
         Object domainObject = genericApiService.getObject(params.resource, params.id)
         render([data: domainObject] as JSON)
     }
 
-    def create = {
+    def create() {
         Object result
         def jsonObject = request.JSON
         if (jsonObject instanceof JSONArray) {
@@ -44,12 +44,12 @@ class GenericApiController {
         render([data: result] as JSON)
     }
 
-    def update = {
+    def update() {
         Object domainObject = genericApiService.updateObject(params.resource, params.id, request.JSON)
         render([data: domainObject] as JSON)
     }
 
-    def delete = {
+    def delete() {
         genericApiService.deleteObject(params.resource, params.id)
         render status: 204
     }

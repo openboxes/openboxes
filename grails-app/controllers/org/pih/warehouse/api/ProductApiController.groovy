@@ -24,7 +24,7 @@ class ProductApiController extends BaseDomainApiController {
     def forecastingService
     GrailsApplication grailsApplication
 
-    def demand = {
+    def demand() {
         def product = Product.get(params.id)
         def location = Location.get(session.warehouse.id)
         def data = [:]
@@ -35,7 +35,7 @@ class ProductApiController extends BaseDomainApiController {
         render([data: data] as JSON)
     }
 
-    def demandSummary = {
+    def demandSummary() {
         def product = Product.get(params.id)
         def location = Location.get(session.warehouse.id)
         def data = forecastingService.getDemandSummary(location, product)
@@ -56,7 +56,7 @@ class ProductApiController extends BaseDomainApiController {
         render([data: data] as JSON)
     }
 
-    def list = {
+    def list() {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
         def location = Location.get(session.warehouse.id)
@@ -90,7 +90,7 @@ class ProductApiController extends BaseDomainApiController {
         render([data: products] as JSON)
     }
 
-    def availableItems = {
+    def availableItems() {
         def productIds = params.list("product.id") + params.list("id")
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
@@ -104,7 +104,7 @@ class ProductApiController extends BaseDomainApiController {
     }
 
 
-    def availableBins = {
+    def availableBins() {
         def productIds = params.list("product.id") + params.list("id")
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
@@ -119,13 +119,13 @@ class ProductApiController extends BaseDomainApiController {
     }
 
 
-    def substitutions = {
+    def substitutions() {
         params.type = ProductAssociationTypeCode.SUBSTITUTE
         params.resource = "substitutions"
         forward(action: "associatedProducts")
     }
 
-    def associatedProducts = {
+    def associatedProducts() {
         Product product = Product.get(params.id)
         ProductAssociationTypeCode[] types = params.list("type")
         log.debug "Types: " + types
@@ -184,7 +184,7 @@ class ProductApiController extends BaseDomainApiController {
         ] as JSON)
     }
 
-    def withCatalogs = {
+    def withCatalogs() {
         Product product = Product.get(params.id)
 
         render([data: [

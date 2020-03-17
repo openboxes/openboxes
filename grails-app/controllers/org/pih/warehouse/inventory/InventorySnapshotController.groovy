@@ -24,17 +24,17 @@ class InventorySnapshotController {
     DataService dataService
     InventorySnapshotService inventorySnapshotService
 
-    def index = {
+    def index() {
         redirect(action: "list")
     }
 
-    def list = {}
+    def list() {}
 
-    def show = {}
+    def show() {}
 
-    def edit = {}
+    def edit() {}
 
-    def update = {
+    def update() {
         println "Update inventory snapshot " + params
         try {
             def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
@@ -51,7 +51,7 @@ class InventorySnapshotController {
         }
     }
 
-    def triggerCalculateQuantityOnHandJob = {
+    def triggerCalculateQuantityOnHandJob() {
         def results = CalculateQuantityJob.triggerNow(
                 [
                         productId      : params.product.id,
@@ -64,13 +64,13 @@ class InventorySnapshotController {
     }
 
 
-    def dates = {
+    def dates() {
         Location location = Location.get(session.warehouse.id)
         def dates = inventorySnapshotService.getTransactionDates()
         render(dates as JSON)
     }
 
-    def locations = {
+    def locations() {
         def locations = inventorySnapshotService.getDepotLocations()
 
         render(locations as JSON)
@@ -78,7 +78,7 @@ class InventorySnapshotController {
     }
 
 
-    def refresh = {
+    def refresh() {
         log.info("Refresh inventory snapshot data: " + params)
         User user = User.get(session?.user?.id)
         Location location = Location.get(params?.location?.id)
@@ -94,7 +94,7 @@ class InventorySnapshotController {
         render([message: "Triggered data refresh at " + new Date().format("MMM dd yyyy hh:mm:ss a") + ". You will receive an email to '${user?.email}' when the process has completed. This may take several minutes."] as JSON)
     }
 
-    def download = {
+    def download() {
 
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         Location location = Location.get(params?.location?.id ?: session?.warehouse?.id)
@@ -114,7 +114,7 @@ class InventorySnapshotController {
      * Analytics > Inventory Snapshot data table
      */
 
-    def findByDateAndLocation = {
+    def findByDateAndLocation() {
         log.info "getInventorySnapshotsByDate: " + params
         try {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
@@ -133,7 +133,7 @@ class InventorySnapshotController {
 
     }
 
-    def transactionDates = {
+    def transactionDates() {
 
         Product product = Product.get(params.id)
         Location location = Location.get(session.warehouse.id)
